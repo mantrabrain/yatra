@@ -1,0 +1,133 @@
+.yatra-tabs {
+    border: 1px solid #0274be;
+}
+
+.yatra-tabs > ul {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px dotted #f9f9f9;
+    font-size: 0;
+    background: #0274be;
+}
+
+.yatra-tabs > ul .indicator {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 20%;
+    background: #1E88E5;
+    -webkit-transform: translateZ(0) translateX(0);
+    transform: translateZ(0) translateX(0);
+    transition: all 0.3s ease;
+}
+
+.yatra-tabs > ul li {
+    display: inline-block;
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.yatra-tabs > ul li a {
+    display: block;
+    position: relative;
+    padding: 20px;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    color: #fff;
+    border-right: 1px solid #0274be;
+
+}
+
+.yatra-tabs > ul li a:focus {
+    text-shadow: none;
+    box-shadow: none;
+}
+
+.yatra-tabs > ul li:last-child a {
+    border-right: 0;
+}
+
+.yatra-tabs > ul li a[aria-selected], .yatra-tabs > ul li a:hover {
+    color: #0274be;
+    background: #fff;
+
+}
+
+.yatra-tabs > ul li a[aria-selected]:before {
+    /*-webkit-transform: translateZ(0) translateY(0);
+    transform: translateZ(0) translateY(0);*/
+}
+
+.yatra-tabs > section[aria-hidden="true"] {
+    display: none;
+}
+
+.yatra-tabs section[role="tabpanel"] {
+    padding: 15px;
+}
+
+.yatra-field-wrap p {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.yatra-tab-content:after {
+    clear: both;
+    content: "";
+    display: block;
+}
+
+.yatra-tab-content label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.yatra-tab-content .select2 {
+    width: 100% !important;
+}
+
+.yatra-tab-content input,
+.yatra-tab-content input[type="text"],
+.yatra-tab-content input[type="number"],
+.yatra-tab-content select,
+.yatra-tab-content textarea
+.yatra-tab-content .widefat {
+    font-size: 14px;
+    height: auto;
+    padding: 6px 10px;
+    border-radius: 0;
+    border: 1px solid #ddd;
+    box-shadow: none;
+    color: #000;
+    margin-top: 5px;
+}
+
+@media (min-width: 600px) {
+
+    .yatra-right {
+        float: right;
+        width: 49%;
+        max-width: 49%;
+    }
+
+    .yatra-left {
+        float: left;
+        width: 49%;
+        max-width: 49%;
+    }
+
+    .yatra-field-row:after {
+        clear: both;
+        content: "";
+        display: block;
+    }
+
+    .yatra-field-row {
+        display: block;
+    }
+}
