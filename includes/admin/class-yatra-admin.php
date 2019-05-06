@@ -124,6 +124,7 @@ final class Yatra_Admin
     {
 
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-assets.php';
+        include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-post-types.php';
 
     }
 

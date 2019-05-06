@@ -16,7 +16,8 @@ class Yatra_Ajax
     {
         $actions = array(
 
-            'book_tour'
+            'select_tour',
+            'book_selected_tour'
         );
         return $actions;
     }
@@ -59,7 +60,22 @@ class Yatra_Ajax
 
     }
 
-    public function book_tour()
+    public function book_selected_tour()
+    {
+        $status = $this->validate_nonce();
+        if (!$status) {
+            wp_safe_redirect(yatra_get_checkout_page(true));
+        }
+        $yatra_booking = new Yatra_Tour_Booking();
+
+        $status = $yatra_booking->book($_POST);
+        if ($status) {
+            die('successfully booked');
+        }
+        die('Could not booked');
+    }
+
+    public function select_tour()
     {
         $status = $this->validate_nonce();
 
@@ -79,15 +95,9 @@ class Yatra_Ajax
 
         if ($status) {
 
-            global $wpdb;
-
-            $pageID = $wpdb->get_var('SELECT ID FROM ' . $wpdb->prefix . 'posts WHERE post_content LIKE "%[yatra_checkout]%" AND post_parent = 0');
-
-            $redirect_url = get_permalink($pageID);
-
             $return_data = array(
 
-                'redirect_url' => $redirect_url
+                'redirect_url' => yatra_get_checkout_page(true)
             );
             wp_send_json_success($return_data);
         }

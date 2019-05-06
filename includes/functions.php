@@ -263,6 +263,45 @@ if (!function_exists('yatra_single_tour_tabs')) {
     {
         global $post;
 
-        
+
+    }
+}
+
+if (!function_exists('yatra_get_checkout_page')) {
+
+    function yatra_get_checkout_page($get_permalink = false)
+    {
+        global $wpdb;
+
+        $page_id = $wpdb->get_var('SELECT ID FROM ' . $wpdb->prefix . 'posts WHERE post_content LIKE "%[yatra_checkout]%" AND post_parent = 0');
+
+        $page_permalink = get_permalink($page_id);
+
+        if ($get_permalink) {
+
+            return $page_permalink;
+        }
+
+        return $page_id;
+
+
+    }
+}
+
+
+if (!function_exists('yatra_get_booking_statuses')) {
+
+    function yatra_get_booking_statuses()
+    {
+        return apply_filters(
+            'yatra_booking_statuses', array(
+                'yatra-pending' => __('Pending'),
+                'yatra-processing' => __('Processing'),
+                'yatra-on-hold' => __('On Hold'),
+                'yatra-completed' => __('Completed'),
+                'yatra-cancelled' => __('Cancelled')
+            )
+        );
+
     }
 }

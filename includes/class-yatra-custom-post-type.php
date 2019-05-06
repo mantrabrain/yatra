@@ -28,6 +28,10 @@ class Yatra_Custom_Post_Type
 
     public $tour;
 
+
+    public $booking;
+
+
     /**
      * Main Yatra Instance.
      *
@@ -64,6 +68,7 @@ class Yatra_Custom_Post_Type
     {
 
         $this->tour = new Yatra_Custom_Post_Type_Tour();
+        $this->booking = new Yatra_Custom_Post_Type_Booking();
 
     }
 

@@ -35,9 +35,7 @@ class Yatra_Shortcode_Checkout
     public static function output($atts)
     {
 
-
         self::checkout();
-
 
     }
 
@@ -51,6 +49,8 @@ class Yatra_Shortcode_Checkout
         do_action('yatra_before_checkout_form_cart_notices');
 
         $checkout = array();
+
+        $checkout = yatra_get_session('tour_cart');
 
         yatra_get_template('checkout.php', array('checkout' => $checkout));
 

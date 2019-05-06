@@ -19,54 +19,95 @@ class Yatra_Forms
     public function tour_checkout_data()
     {
         $tour_cart = yatra_get_session('tour_cart');
-        /*echo '<pre>';
-        print_r($tour_cart);
-        echo '</pre>';*/
+
+        return $tour_cart;
+    }
+
+    public function chekcout_form_fields()
+    {
+        $tour_cart_data = $this->tour_checkout_data();
+
+        $form_fields = apply_filters('tour_checkout_form_fields', array(
+                'fullname' => array(
+                    'name' => 'fullname',
+                    'title' => __('Your full name', 'yatra'),
+                    'type' => 'text',
+                    'value' => 'text',
+                    'wrap_class' => 'yatra-left',
+                    'extra_attributes' => array(
+                        'placeholder' => __('Your full name', 'yatra')
+                    ),
+                    'group_id' => 'tour_meta',
+                    'row_start' => true,
+                ), 'email' => array(
+                    'name' => 'email',
+                    'title' => __('Email', 'yatra'),
+                    'type' => 'text',
+                    'value' => 'text',
+                    'group_id' => 'tour_meta',
+                    'wrap_class' => 'yatra-left',
+                    'extra_attributes' => array(
+                        'placeholder' => __('Your full name', 'yatra')
+                    ),
+                    'row_start' => true,
+                ), 'tour_package' => array(
+                    'name' => 'tour_package',
+                    'title' => __('Tour Package', 'yatra'),
+                    'type' => 'text',
+                    'group_id' => 'tour_meta',
+                    'value' => isset($tour_cart_data->post_title) ? $tour_cart_data->post_title . ' (' . $tour_cart_data->ID . ') ' : '',
+                    'wrap_class' => 'yatra-left',
+                    'extra_attributes' => array(
+                        'placeholder' => __('Your full name', 'yatra'),
+                        'readonly' => 'readonly'
+                    ),
+                    'row_start' => true,
+                )
+            )
+        );
+        return $form_fields;
+    }
+
+    public function get_valid_form_data($data = array())
+    {
+        $form_fields_all = $this->chekcout_form_fields();
+
+        $form_fields = array_keys($form_fields_all);
+
+        $valid_data = array();
+
+        foreach ($form_fields as $field) {
+
+            if (isset($form_fields_all[$field]['group_id'])) {
+
+                if (isset($data[$form_fields_all[$field]['group_id']][$field])) {
+
+                    $valid_data[$form_fields_all[$field]['group_id']][$field] = $this->sanitization($data[$form_fields_all[$field]['group_id']][$field]);
+                }
+
+            } else {
+
+                if (isset($data[$field])) {
+
+                    $valid_data[$field] = $this->sanitization($data[$field]);
+                }
+            }
+
+        }
+
+        return $valid_data;
+    }
+
+    public function sanitization($data)
+    {
+        return $data; // Need to write sanitization code.
     }
 
     public function tour_checkout_form()
     {
 
-        $tour_cart_data = $this->tour_checkout_data();
+        $form_fields = $this->chekcout_form_fields();
 
-        $form_fields = array(
-            'yatra_checkout_fullname' => array(
-                'name' => 'yatra_checkout_fullname',
-                'title' => __('Your full name', 'yatra'),
-                'type' => 'text',
-                'value' => 'text',
-                'wrap_class' => 'yatra-left',
-                'extra_attributes' => array(
-                    'placeholder' => __('Your full name', 'yatra')
-                ),
-                'row_start' => true,
-            ), 'yatra_checkout_email' => array(
-                'name' => 'yatra_checkout_email',
-                'title' => __('Email', 'yatra'),
-                'type' => 'text',
-                'value' => 'text',
-                'wrap_class' => 'yatra-left',
-                'extra_attributes' => array(
-                    'placeholder' => __('Your full name', 'yatra')
-                ),
-                'row_start' => true,
-            ), 'yatra_checkout_tour_package' => array(
-                'name' => 'yatra_checkout_tour_package',
-                'title' => __('Tour Package', 'yatra'),
-                'type' => 'select',
-                'value' => '4',
-                'options'=>array(
-                        '1'=>'Package 4444',
-                        '4'=>'Package 4',
-                        '5'=>'Package 5',
-                ),
-                'wrap_class' => 'yatra-left',
-                'extra_attributes' => array(
-                    'placeholder' => __('Your full name', 'yatra')
-                ),
-                'row_start' => true,
-            )
-        );
         foreach ($form_fields as $field) {
 
             $this->form_html($field);
@@ -109,6 +150,12 @@ class Yatra_Forms
             echo '<div class="yatra-field-row">';
         }
 
+        $name = $field_key;
+
+        if (isset($field['group_id'])) {
+
+            $name = $field['group_id'] . '[' . $field_key . ']';
+        }
         echo '<div class="yatra-field-wrap ' . esc_attr($wrap_class) . '">';
 
         switch ($field['type']) {
@@ -124,7 +171,7 @@ class Yatra_Forms
                 <?php } ?>
                 <input class="yatra_field"
                        id="<?php echo esc_attr(($field_key)); ?>"
-                       name="<?php echo esc_attr(($field_key)); ?>"
+                       name="<?php echo esc_attr(($name)); ?>"
                        type="<?php echo esc_attr($field_type) ?>"
                        value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
                 <?php if ($field['type'] != "hidden") {
@@ -196,7 +243,7 @@ class Yatra_Forms
 
                     <select class="<?php echo esc_attr($select_class); ?>"
                             id="<?php echo esc_attr(($field_key)); ?>"
-                            name="<?php echo esc_attr(($field_key));
+                            name="<?php echo esc_attr(($name));
                             echo $is_multi_select ? '[]' : ''; ?>"
                         <?php echo $extra_attribute_text; ?>>
                         <?php foreach ($options as $option_key => $option_value) {
@@ -237,7 +284,7 @@ class Yatra_Forms
 
                         <input class="yatra_field custom_media_input" type="hidden"
                                id="<?php echo esc_attr(($field_key)); ?>"
-                               name="<?php echo esc_attr(($field_key)); ?>"
+                               name="<?php echo esc_attr(($name)); ?>"
                             <?php echo $extra_attribute_text; ?>
                                type="text" value="<?php echo esc_html($value); ?>"/>
                         <button class="media_upload button"
