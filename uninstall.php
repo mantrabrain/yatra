@@ -21,8 +21,7 @@
  *
  * 
  * @since      1.0.0
- *
- * @package    Wp_Travel_Engine
+ * * @package    Yatra
  */
 
 // If uninstall not called from WordPress, then exit.

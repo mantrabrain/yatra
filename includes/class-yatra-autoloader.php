@@ -62,7 +62,7 @@ class Yatra_Autoloader
     }
 
     /**
-     * Auto-load WC classes on demand to reduce memory consumption.
+     * Auto-load Yatra classes on demand to reduce memory consumption.
      *
      * @param string $class Class name.
      */

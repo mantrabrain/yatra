@@ -24,7 +24,7 @@ if (!$tab_exists) {
 <div class="wrap yatra">
     <form method="<?php echo esc_attr(apply_filters('yatra_settings_form_method_tab_' . $current_tab, 'post')); ?>"
           id="mainform" action="" enctype="multipart/form-data">
-        <nav class="nav-tab-wrapper woo-nav-tab-wrapper">
+        <nav class="nav-tab-wrapper yatra-nav-tab-wrapper">
             <?php
 
             foreach ($tabs as $slug => $label) {
@@ -46,7 +46,7 @@ if (!$tab_exists) {
         ?>
         <p class="submit">
             <?php if (empty($GLOBALS['hide_save_button'])) : ?>
-                <button name="save" class="button-primary woocommerce-save-button" type="submit"
+                <button name="save" class="button-primary yatra-save-button" type="submit"
                         value="<?php esc_attr_e('Save changes', 'yatra'); ?>"><?php esc_html_e('Save changes', 'yatra'); ?></button>
             <?php endif; ?>
             <?php wp_nonce_field('yatra-settings'); ?>

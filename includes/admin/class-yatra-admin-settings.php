@@ -125,13 +125,13 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 
 			do_action( 'yatra_settings_start' );
 
-			//wp_enqueue_script( 'yatra_settings', WC()->plugin_url() . '/assets/js/admin/settings' . $suffix . '.js', array( 'jquery', 'wp-util', 'jquery-ui-datepicker', 'jquery-ui-sortable', 'iris', 'selectWoo' ), WC()->version, true );
+			//wp_enqueue_script( 'yatra_settings', Yatra()->plugin_url() . '/assets/js/admin/settings' . $suffix . '.js', array( 'jquery', 'wp-util', 'jquery-ui-datepicker', 'jquery-ui-sortable', 'iris', 'selectWoo' ), Yatra()->version, true );
 
 //			/*wp_localize_script(
 //				'yatra_settings', 'yatra_settings_params', array(
-//					'i18n_nav_warning' => __( 'The changes you made will be lost if you navigate away from this page.', 'woocommerce' ),
-//					'i18n_moved_up'    => __( 'Item moved up', 'woocommerce' ),
-//					'i18n_moved_down'  => __( 'Item moved down', 'woocommerce' ),
+//					'i18n_nav_warning' => __( 'The changes you made will be lost if you navigate away from this page.', 'yatra' ),
+//					'i18n_moved_up'    => __( 'Item moved up', 'yatra' ),
+//					'i18n_moved_down'  => __( 'Item moved down', 'yatra' ),
 //				)
 //			);*/
 
@@ -184,7 +184,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 		/**
 		 * Output admin fields.
 		 *
-		 * Loops though the woocommerce options array and outputs each field.
+		 * Loops though the yatra options array and outputs each field.
 		 *
 		 * @param array[] $options Opens array to output.
 		 */
@@ -499,37 +499,6 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 						}
 						break;
 
-					// Image width settings. @todo deprecate and remove in 4.0. No longer needed by core.
-					case 'image_width':
-						$image_size       = str_replace( '_image_size', '', $value['id'] );
-						$size             = wc_get_image_size( $image_size );
-						$width            = isset( $size['width'] ) ? $size['width'] : $value['default']['width'];
-						$height           = isset( $size['height'] ) ? $size['height'] : $value['default']['height'];
-						$crop             = isset( $size['crop'] ) ? $size['crop'] : $value['default']['crop'];
-						$disabled_attr    = '';
-						$disabled_message = '';
-
-						if ( has_filter( 'yatra_get_image_size_' . $image_size ) ) {
-							$disabled_attr    = 'disabled="disabled"';
-							$disabled_message = '<p><small>' . esc_html__( 'The settings of this image size have been disabled because its values are being overwritten by a filter.', 'woocommerce' ) . '</small></p>';
-						}
-
-						?>
-						<tr valign="top">
-							<th scope="row" class="titledesc">
-							<label><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html . $disabled_message; // WPCS: XSS ok. ?></label>
-						</th>
-							<td class="forminp image_width_settings">
-
-								<input name="<?php echo esc_attr( $value['id'] ); ?>[width]" <?php echo $disabled_attr; // WPCS: XSS ok. ?> id="<?php echo esc_attr( $value['id'] ); ?>-width" type="text" size="3" value="<?php echo esc_attr( $width ); ?>" /> &times; <input name="<?php echo esc_attr( $value['id'] ); ?>[height]" <?php echo $disabled_attr; // WPCS: XSS ok. ?> id="<?php echo esc_attr( $value['id'] ); ?>-height" type="text" size="3" value="<?php echo esc_attr( $height ); ?>" />px
-
-								<label><input name="<?php echo esc_attr( $value['id'] ); ?>[crop]" <?php echo $disabled_attr; // WPCS: XSS ok. ?> id="<?php echo esc_attr( $value['id'] ); ?>-crop" type="checkbox" value="1" <?php checked( 1, $crop ); ?> /> <?php esc_html_e( 'Hard crop?', 'woocommerce' ); ?></label>
-
-								</td>
-						</tr>
-						<?php
-						break;
-
 					// Single page selects.
 					case 'single_select_page':
 						$args = array(
@@ -554,106 +523,13 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 								<label><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
 							</th>
 							<td class="forminp">
-								<?php echo str_replace( ' id=', " data-placeholder='" . esc_attr__( 'Select a page&hellip;', 'woocommerce' ) . "' style='" . $value['css'] . "' class='" . $value['class'] . "' id=", wp_dropdown_pages( $args ) ); // WPCS: XSS ok. ?> <?php echo $description; // WPCS: XSS ok. ?>
+								<?php echo str_replace( ' id=', " data-placeholder='" . esc_attr__( 'Select a page&hellip;', 'yatra' ) . "' style='" . $value['css'] . "' class='" . $value['class'] . "' id=", wp_dropdown_pages( $args ) ); // WPCS: XSS ok. ?> <?php echo $description; // WPCS: XSS ok. ?>
 							</td>
 						</tr>
 						<?php
 						break;
 
-					// Single country selects.
-					case 'single_select_country':
-						$country_setting = (string) self::get_option( $value['id'], $value['default'] );
 
-						if ( strstr( $country_setting, ':' ) ) {
-							$country_setting = explode( ':', $country_setting );
-							$country         = current( $country_setting );
-							$state           = end( $country_setting );
-						} else {
-							$country = $country_setting;
-							$state   = '*';
-						}
-						?>
-						<tr valign="top">
-							<th scope="row" class="titledesc">
-								<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
-							</th>
-							<td class="forminp"><select name="<?php echo esc_attr( $value['id'] ); ?>" style="<?php echo esc_attr( $value['css'] ); ?>" data-placeholder="<?php esc_attr_e( 'Choose a country&hellip;', 'woocommerce' ); ?>" aria-label="<?php esc_attr_e( 'Country', 'woocommerce' ); ?>" class="wc-enhanced-select">
-								<?php WC()->countries->country_dropdown_options( $country, $state ); ?>
-							</select> <?php echo $description; // WPCS: XSS ok. ?>
-							</td>
-						</tr>
-						<?php
-						break;
-
-					// Country multiselects.
-					case 'multi_select_countries':
-						$selections = (array) self::get_option( $value['id'], $value['default'] );
-
-						if ( ! empty( $value['options'] ) ) {
-							$countries = $value['options'];
-						} else {
-							$countries = WC()->countries->countries;
-						}
-
-						asort( $countries );
-						?>
-						<tr valign="top">
-							<th scope="row" class="titledesc">
-								<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
-							</th>
-							<td class="forminp">
-								<select multiple="multiple" name="<?php echo esc_attr( $value['id'] ); ?>[]" style="width:350px" data-placeholder="<?php esc_attr_e( 'Choose countries&hellip;', 'woocommerce' ); ?>" aria-label="<?php esc_attr_e( 'Country', 'woocommerce' ); ?>" class="wc-enhanced-select">
-									<?php
-									if ( ! empty( $countries ) ) {
-										foreach ( $countries as $key => $val ) {
-											echo '<option value="' . esc_attr( $key ) . '"' . wc_selected( $key, $selections ) . '>' . esc_html( $val ) . '</option>'; // WPCS: XSS ok.
-										}
-									}
-									?>
-								</select> <?php echo ( $description ) ? $description : ''; // WPCS: XSS ok. ?> <br /><a class="select_all button" href="#"><?php esc_html_e( 'Select all', 'woocommerce' ); ?></a> <a class="select_none button" href="#"><?php esc_html_e( 'Select none', 'woocommerce' ); ?></a>
-							</td>
-						</tr>
-						<?php
-						break;
-
-					// Days/months/years selector.
-					case 'relative_date_selector':
-						$periods      = array(
-							'days'   => __( 'Day(s)', 'woocommerce' ),
-							'weeks'  => __( 'Week(s)', 'woocommerce' ),
-							'months' => __( 'Month(s)', 'woocommerce' ),
-							'years'  => __( 'Year(s)', 'woocommerce' ),
-						);
-						$option_value = wc_parse_relative_date_option( self::get_option( $value['id'], $value['default'] ) );
-						?>
-						<tr valign="top">
-							<th scope="row" class="titledesc">
-								<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
-							</th>
-							<td class="forminp">
-							<input
-									name="<?php echo esc_attr( $value['id'] ); ?>[number]"
-									id="<?php echo esc_attr( $value['id'] ); ?>"
-									type="number"
-									style="width: 80px;"
-									value="<?php echo esc_attr( $option_value['number'] ); ?>"
-									class="<?php echo esc_attr( $value['class'] ); ?>"
-									placeholder="<?php echo esc_attr( $value['placeholder'] ); ?>"
-									step="1"
-									min="1"
-									<?php echo implode( ' ', $custom_attributes ); // WPCS: XSS ok. ?>
-								/>&nbsp;
-								<select name="<?php echo esc_attr( $value['id'] ); ?>[unit]" style="width: auto;">
-									<?php
-									foreach ( $periods as $value => $label ) {
-										echo '<option value="' . esc_attr( $value ) . '"' . selected( $option_value['unit'], $value, false ) . '>' . esc_html( $label ) . '</option>';
-									}
-									?>
-								</select> <?php echo ( $description ) ? $description : ''; // WPCS: XSS ok. ?>
-							</td>
-						</tr>
-						<?php
-						break;
 
 					// Default: run an action.
 					default:
@@ -707,7 +583,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 		/**
 		 * Save admin fields.
 		 *
-		 * Loops though the woocommerce options array and outputs each field.
+		 * Loops though the yatra options array and outputs each field.
 		 *
 		 * @param array $options Options array to output.
 		 * @param array $data    Optional. Data to use for saving. Defaults to $_POST.
@@ -751,22 +627,6 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 					case 'textarea':
 						$value = wp_kses_post( trim( $raw_value ) );
 						break;
-					case 'multiselect':
-					case 'multi_select_countries':
-						$value = array_filter( array_map( 'wc_clean', (array) $raw_value ) );
-						break;
-					case 'image_width':
-						$value = array();
-						if ( isset( $raw_value['width'] ) ) {
-							$value['width']  = wc_clean( $raw_value['width'] );
-							$value['height'] = wc_clean( $raw_value['height'] );
-							$value['crop']   = isset( $raw_value['crop'] ) ? 1 : 0;
-						} else {
-							$value['width']  = $option['default']['width'];
-							$value['height'] = $option['default']['height'];
-							$value['crop']   = $option['default']['crop'];
-						}
-						break;
 					case 'select':
 						$allowed_values = empty( $option['options'] ) ? array() : array_map( 'strval', array_keys( $option['options'] ) );
 						if ( empty( $option['default'] ) && empty( $allowed_values ) ) {
@@ -776,24 +636,11 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 						$default = ( empty( $option['default'] ) ? $allowed_values[0] : $option['default'] );
 						$value   = in_array( $raw_value, $allowed_values, true ) ? $raw_value : $default;
 						break;
-					case 'relative_date_selector':
-						$value = wc_parse_relative_date_option( $raw_value );
-						break;
 					default:
-						$value = wc_clean( $raw_value );
+						$value = sanitize_text_field( $raw_value );
 						break;
 				}
 
-				/**
-				 * Fire an action when a certain 'type' of field is being saved.
-				 *
-				 * @deprecated 2.4.0 - doesn't allow manipulation of values!
-				 */
-				if ( has_action( 'yatra_update_option_' . sanitize_title( $option['type'] ) ) ) {
-					wc_deprecated_function( 'The yatra_update_option_X action', '2.4.0', 'yatra_admin_settings_sanitize_option filter' );
-					do_action( 'yatra_update_option_' . sanitize_title( $option['type'] ), $option );
-					continue;
-				}
 
 				/**
 				 * Sanitize the value of an option.

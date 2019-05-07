@@ -18,7 +18,7 @@ if (class_exists('Yatra_Admin_Post_Types', false)) {
 /**
  * Yatra_Admin_Post_Types Class.
  *
- * Handles the edit posts views and some functionality on the edit post screen for WC post types.
+ * Handles the edit posts views and some functionality on the edit post screen for yatra post types.
  */
 class Yatra_Admin_Post_Types
 {
@@ -164,8 +164,7 @@ class Yatra_Admin_Post_Types
             )
         );
 
-        //include WC()->plugin_path() . '/includes/admin/views/html-bulk-edit-product.php';
-    }
+     }
 
     /**
      * Custom quick edit - form.
@@ -186,8 +185,7 @@ class Yatra_Admin_Post_Types
             )
         );
 
-        //include WC()->plugin_path() . '/includes/admin/views/html-quick-edit-product.php';
-    }
+     }
 
     /**
      * Offers a way to hook into save post without causing an infinite loop
@@ -248,7 +246,7 @@ class Yatra_Admin_Post_Types
     {
         global $post;
 
-        if ($post && in_array(get_post_type($post->ID), wc_get_order_types('order-meta-boxes'), true)) {
+        if ($post && in_array(get_post_type($post->ID), array('yatra-booking'), true)) {
             wp_dequeue_script('autosave');
         }
     }
@@ -315,7 +313,7 @@ class Yatra_Admin_Post_Types
     }
 
     /**
-     * Add a post display state for special WC pages in the page list table.
+     * Add a post display state for special Yatra pages in the page list table.
      *
      * @param array $post_states An array of post display states.
      * @param WP_Post $post The current post object.

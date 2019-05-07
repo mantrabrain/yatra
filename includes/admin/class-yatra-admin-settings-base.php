@@ -132,7 +132,7 @@ if (!class_exists('Yatra_Admin_Settings_Base', false)) :
         {
             $settings = $this->get_settings();
 
-            WC_Admin_Settings::output_fields($settings);
+            Yatra_Admin_Settings::output_fields($settings);
         }
 
         /**
@@ -143,7 +143,7 @@ if (!class_exists('Yatra_Admin_Settings_Base', false)) :
             global $current_section;
 
             $settings = $this->get_settings();
-            WC_Admin_Settings::save_fields($settings);
+            Yatra_Admin_Settings::save_fields($settings);
 
             if ($current_section) {
                 do_action('yatra_update_options_' . $this->id . '_' . $current_section);

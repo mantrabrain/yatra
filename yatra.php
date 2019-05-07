@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Yatra - All in one WordPress Travel & Tour Plugin
+ * Plugin Name:       Yatra
  * Plugin URI:        https://wordpress.org/plugins/yatra/
  * Description:       Yatra - WordPress Travel & Tour Solution
  * Version:           1.0.0
@@ -46,7 +46,7 @@ if (!class_exists('Yatra')) {
 /**
  * Main instance of Yatra.
  *
- * Returns the main instance of WC to prevent the need to use globals.
+ * Returns the main instance of Yatra to prevent the need to use globals.
  *
  * @since  1.0.0
  * @return Yatra

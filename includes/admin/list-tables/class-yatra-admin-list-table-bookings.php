@@ -14,7 +14,7 @@ if (class_exists('Yatra_Admin_List_Table_Bookings', false)) {
     return;
 }
 
-if (!class_exists('WC_Admin_List_Table', false)) {
+if (!class_exists('Yatra_Admin_List_Table', false)) {
     include_once 'abstract-class-yatra-admin-list-table.php';
 }
 
