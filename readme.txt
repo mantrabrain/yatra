@@ -1,4 +1,4 @@
-=== Yatra - WordPress Travel & Tour Solution ===
+=== Yatra ===
 Contributors: Mantrabrain
 Tags: mantrabrain, travel, travel-booking
 Requires at least: 4.7
