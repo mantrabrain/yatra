@@ -31,17 +31,21 @@ get_header();
                      * called content-___.php (where ___ is the Post Format name) and that will be used instead.
                      */
 
-                    yatra_get_template_part('parts/content');
+                    yatra_get_template_part('parts/content', 'listing');
 
                     // End the loop.
                 endwhile;
 
                 // Previous/next page navigation.
-                yatra_the_posts_navigation();
+                the_posts_pagination(array(
+                    'prev_text' => '<i class="fa fa-angle-double-left"></i>',
+                    'next_text' => '<i class="fa fa-angle-double-right"></i>'
+                ));
+
 
             // If no content, include the "No posts found" template.
             else :
-                yatra_get_template_part('template-parts/content/content', 'none');
+                yatra_get_template_part('parts/content', 'none');
 
             endif;
             ?>

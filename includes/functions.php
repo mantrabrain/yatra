@@ -5,6 +5,7 @@ defined('ABSPATH') || exit;
 
 include_once YATRA_ABSPATH . 'includes/helpers/yatra-country-helper.php';
 include_once YATRA_ABSPATH . 'includes/helpers/yatra-currency-helper.php';
+include_once YATRA_ABSPATH . 'includes/template-tags.php';
 
 
 if (!function_exists('yatra_tour_tabs')) {
