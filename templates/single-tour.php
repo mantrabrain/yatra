@@ -35,7 +35,7 @@ get_header();
                                 sprintf(
                                     wp_kses(
                                     /* translators: %s: Name of current post. Only visible to screen readers. */
-                                        __('Edit <span class="screen-reader-text">%s</span>', 'twentynineteen'),
+                                        __('Edit <span class="screen-reader-text">%s</span>', 'yatra'),
                                         array(
                                             'span' => array(
                                                 'class' => array(),
@@ -44,7 +44,7 @@ get_header();
                                     ),
                                     get_the_title()
                                 ),
-                                '<span class="edit-link">' . twentynineteen_get_icon_svg('edit', 16),
+                                '<span class="edit-link">',
                                 '</span>'
                             );
                             ?>
@@ -58,7 +58,7 @@ get_header();
                             sprintf(
                                 wp_kses(
                                 /* translators: %s: Name of current post. Only visible to screen readers */
-                                    __('Continue reading<span class="screen-reader-text"> "%s"</span>', 'twentynineteen'),
+                                    __('Continue reading<span class="screen-reader-text"> "%s"</span>', 'yatra'),
                                     array(
                                         'span' => array(
                                             'class' => array(),
@@ -71,7 +71,7 @@ get_header();
 
                         wp_link_pages(
                             array(
-                                'before' => '<div class="page-links">' . __('Pages:', 'twentynineteen'),
+                                'before' => '<div class="page-links">' . __('Pages:', 'yatra'),
                                 'after' => '</div>',
                             )
                         );
