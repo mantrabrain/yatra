@@ -3,6 +3,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
 
     class Yatra_Custom_Post_Type_Tour
     {
+        private $slug = 'tour';
 
         public function __construct()
         {
@@ -32,8 +33,9 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'public' => true,
                 'supports' => array('title', 'editor', 'excerpt', 'thumbnail',),
                 'has_archive' => true,
+//                'rewrite' => array('slug' => "project_item", 'with_front' => TRUE)
             );
-            register_post_type('tour', $args);
+            register_post_type($this->slug, $args);
 
         }
 

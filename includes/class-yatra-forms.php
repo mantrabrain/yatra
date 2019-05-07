@@ -48,7 +48,7 @@ class Yatra_Forms
                     'group_id' => 'tour_meta',
                     'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
-                        'placeholder' => __('Your full name', 'yatra'),
+                        'placeholder' => __('Email address', 'yatra'),
                         'required' => 'required'
                     ),
                     'row_start' => true,

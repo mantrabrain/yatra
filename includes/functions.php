@@ -177,81 +177,84 @@ if (!function_exists('yatra_clear_session')) {
     }
 }
 
+if (!function_exists('yatra_get_template')) {
 
-function yatra_get_template($template_name, $args = array(), $template_path = '', $default_path = '')
-{
-    $cache_key = sanitize_key(implode('-', array('template', $template_name, $template_path, $default_path)));
-    $template = (string)wp_cache_get($cache_key, 'yatra');
+    function yatra_get_template($template_name, $args = array(), $template_path = '', $default_path = '')
+    {
+        $cache_key = sanitize_key(implode('-', array('template', $template_name, $template_path, $default_path)));
+        $template = (string)wp_cache_get($cache_key, 'yatra');
 
-    if (!$template) {
-        $template = yatra_locate_template($template_name, $template_path, $default_path);
-        wp_cache_set($cache_key, $template, 'yatra');
-    }
-    // Allow 3rd party plugin filter template file from their plugin.
-    $filter_template = apply_filters('yatra_get_template', $template, $template_name, $args, $template_path, $default_path);
-
-    if ($filter_template !== $template) {
-        if (!file_exists($filter_template)) {
-            /* translators: %s template */
-            _doing_it_wrong(__FUNCTION__, sprintf(__('%s does not exist.', 'yatra'), '<code>' . $template . '</code>'), '1.0.1');
-            return;
+        if (!$template) {
+            $template = yatra_locate_template($template_name, $template_path, $default_path);
+            wp_cache_set($cache_key, $template, 'yatra');
         }
-        $template = $filter_template;
-    }
+        // Allow 3rd party plugin filter template file from their plugin.
+        $filter_template = apply_filters('yatra_get_template', $template, $template_name, $args, $template_path, $default_path);
 
-    $action_args = array(
-        'template_name' => $template_name,
-        'template_path' => $template_path,
-        'located' => $template,
-        'args' => $args,
-    );
-
-    if (!empty($args) && is_array($args)) {
-        if (isset($args['action_args'])) {
-            _doing_it_wrong(
-                __FUNCTION__,
-                __('action_args should not be overwritten when calling yatra_get_template.', 'yatra'),
-                '1.0.0'
-            );
-            unset($args['action_args']);
+        if ($filter_template !== $template) {
+            if (!file_exists($filter_template)) {
+                /* translators: %s template */
+                _doing_it_wrong(__FUNCTION__, sprintf(__('%s does not exist.', 'yatra'), '<code>' . $template . '</code>'), '1.0.1');
+                return;
+            }
+            $template = $filter_template;
         }
-        extract($args); // @codingStandardsIgnoreLine
+
+        $action_args = array(
+            'template_name' => $template_name,
+            'template_path' => $template_path,
+            'located' => $template,
+            'args' => $args,
+        );
+
+        if (!empty($args) && is_array($args)) {
+            if (isset($args['action_args'])) {
+                _doing_it_wrong(
+                    __FUNCTION__,
+                    __('action_args should not be overwritten when calling yatra_get_template.', 'yatra'),
+                    '1.0.0'
+                );
+                unset($args['action_args']);
+            }
+            extract($args); // @codingStandardsIgnoreLine
+        }
+
+        do_action('yatra_before_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args']);
+
+
+        include $action_args['located'];
+
+        do_action('yatra_after_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args']);
     }
-
-    do_action('yatra_before_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args']);
-
-
-    include $action_args['located'];
-
-    do_action('yatra_after_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args']);
 }
 
-function yatra_locate_template($template_name, $template_path = '', $default_path = '')
-{
-    if (!$template_path) {
-        $template_path = yatra_instance()->template_path();
-    }
+if (!function_exists('yatra_locate_template')) {
+    function yatra_locate_template($template_name, $template_path = '', $default_path = '')
+    {
+        if (!$template_path) {
+            $template_path = yatra_instance()->template_path();
+        }
 
-    if (!$default_path) {
-        $default_path = yatra_instance()->plugin_template_path();
-    }
+        if (!$default_path) {
+            $default_path = yatra_instance()->plugin_template_path();
+        }
 
-    // Look within passed path within the theme - this is priority.
-    $template = locate_template(
-        array(
-            trailingslashit($template_path) . $template_name,
-            $template_name,
-        )
-    );
+        // Look within passed path within the theme - this is priority.
+        $template = locate_template(
+            array(
+                trailingslashit($template_path) . $template_name,
+                $template_name,
+            )
+        );
 
-    // Get default template/.
-    if (!$template) {
-        $template = $default_path . $template_name;
+        // Get default template/.
+        if (!$template) {
+            $template = $default_path . $template_name;
+        }
+        // Return what we found.
+        return apply_filters('yatra_locate_template', $template, $template_name, $template_path);
     }
-    // Return what we found.
-    return apply_filters('yatra_locate_template', $template, $template_name, $template_path);
 }
-
 
 if (!function_exists('yatra_single_tour_tabs')) {
 
@@ -283,7 +286,6 @@ if (!function_exists('yatra_get_checkout_page')) {
 
     }
 }
-
 
 if (!function_exists('yatra_get_booking_statuses')) {
 
@@ -327,8 +329,83 @@ if (!function_exists('yatra_get_template_part')) {
         }
         $template = yatra_locate_template($path, false, false);
 
-        include_once $template;
+        require $template;
 
+    }
+
+}
+if (!function_exists('yatra_posted_by')) :
+    /**
+     * Prints HTML with meta information about theme author.
+     */
+    function yatra_posted_by()
+    {
+        printf(
+        /* translators: 1: SVG icon. 2: post author, only visible to screen readers. 3: author link. */
+            '<span class="byline"><span class="screen-reader-text">%1$s</span><span class="author vcard"><a class="url fn n" href="%2$s">%3$s</a></span></span>',
+            __('Posted by', 'yatra'),
+            esc_url(get_author_posts_url(get_the_author_meta('ID'))),
+            esc_html(get_the_author())
+        );
+    }
+endif;
+
+if (!function_exists('yatra_posted_on')) :
+    /**
+     * Prints HTML with meta information for the current post-date/time.
+     */
+    function yatra_posted_on()
+    {
+        $time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
+        if (get_the_time('U') !== get_the_modified_time('U')) {
+            $time_string = '<time class="entry-date published" datetime="%1$s">%2$s</time><time class="updated" datetime="%3$s">%4$s</time>';
+        }
+
+        $time_string = sprintf(
+            $time_string,
+            esc_attr(get_the_date(DATE_W3C)),
+            esc_html(get_the_date()),
+            esc_attr(get_the_modified_date(DATE_W3C)),
+            esc_html(get_the_modified_date())
+        );
+
+        printf(
+            '<span class="posted-on"><a href="%1$s" rel="bookmark">%2$s</a></span>',
+            esc_url(get_permalink()),
+            $time_string
+        );
+    }
+endif;
+
+if (!function_exists('yatra_entry_meta')) {
+
+    function yatra_entry_meta()
+    {
+        ?>
+        <div class="entry-meta">
+            <?php yatra_posted_by(); ?>
+            <?php yatra_posted_on(); ?>
+            <?php
+            // Edit post link.
+            edit_post_link(
+                sprintf(
+                    wp_kses(
+                    /* translators: %s: Name of current post. Only visible to screen readers. */
+                        __('Edit <span class="screen-reader-text">%s</span>', 'yatra'),
+                        array(
+                            'span' => array(
+                                'class' => array(),
+                            ),
+                        )
+                    ),
+                    get_the_title()
+                ),
+                '<span class="edit-link">',
+                '</span>'
+            );
+            ?>
+        </div><!-- .meta-info -->
+        <?php
     }
 
 }
