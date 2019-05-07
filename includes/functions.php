@@ -124,9 +124,6 @@ if (!function_exists('yatra_get_session')) {
 
     function yatra_get_session($key = '')
     {
-        if (!session_id()) {
-            session_start();
-        }
 
         $yatra_session_id = "yatra_session";
 
@@ -190,7 +187,6 @@ function yatra_get_template($template_name, $args = array(), $template_path = ''
         $template = yatra_locate_template($template_name, $template_path, $default_path);
         wp_cache_set($cache_key, $template, 'yatra');
     }
-
     // Allow 3rd party plugin filter template file from their plugin.
     $filter_template = apply_filters('yatra_get_template', $template, $template_name, $args, $template_path, $default_path);
 
@@ -224,6 +220,7 @@ function yatra_get_template($template_name, $args = array(), $template_path = ''
 
     do_action('yatra_before_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args']);
 
+
     include $action_args['located'];
 
     do_action('yatra_after_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args']);
@@ -236,7 +233,7 @@ function yatra_locate_template($template_name, $template_path = '', $default_pat
     }
 
     if (!$default_path) {
-        $default_path = yatra_instance()->plugin_path() . '/templates/';
+        $default_path = yatra_instance()->plugin_template_path();
     }
 
     // Look within passed path within the theme - this is priority.
@@ -251,7 +248,6 @@ function yatra_locate_template($template_name, $template_path = '', $default_pat
     if (!$template) {
         $template = $default_path . $template_name;
     }
-
     // Return what we found.
     return apply_filters('yatra_locate_template', $template, $template_name, $template_path);
 }
@@ -304,4 +300,35 @@ if (!function_exists('yatra_get_booking_statuses')) {
         );
 
     }
+}
+
+if (!function_exists('yatra_the_posts_navigation')) :
+    /**
+     * Documentation for function.
+     */
+    function yatra_the_posts_navigation()
+    {
+        the_post_navigation(array(
+            'prev_text' => '<span class="screen-reader-text">' . esc_html__('Previous Post', 'yatra') . '</span><span class="nav-title">%title</span>',
+            'next_text' => '<span class="screen-reader-text">' . esc_html__('Next Post', 'yatra') . '</span><span class="nav-title">%title</span>',
+        ));
+    }
+endif;
+
+if (!function_exists('yatra_get_template_part')) {
+
+    function yatra_get_template_part($slug, $name = '')
+    {
+        $path = "{$slug}.php";
+
+        if ('' !== $name) {
+
+            $path = "{$slug}-{$name}.php";
+        }
+        $template = yatra_locate_template($path, false, false);
+
+        include_once $template;
+
+    }
+
 }

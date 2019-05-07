@@ -48,7 +48,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     $is_multiple = isset($meta_field['is_multiple']) && (boolean)$meta_field['is_multiple'] ? true : false;
 
                     if ($is_multiple) {
-
+                        $field_value = empty($field_value) ? array() : $field_value;
                         $array = array_map('sanitize_text_field', wp_unslash($field_value));
 
                         $updated_value = array_map('wp_kses_post', $array);

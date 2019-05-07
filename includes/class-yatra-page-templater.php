@@ -31,37 +31,44 @@ if (!class_exists('Yatra_Page_Templater')) {
 
         function page_template($template_path)
         {
+
+            $yatra_template_path = yatra_instance()->template_path();
+
+            $yatra_plugin_template_path = yatra_instance()->plugin_template_path();
+
+
             if (get_post_type() == 'tour') {
                 if (is_single()) {
-                    if ($theme_file = locate_template(array('single-tour.php'))) {
+                    if ($theme_file = locate_template(array("{$yatra_template_path}single-tour.php"))) {
                         $template_path = $theme_file;
                     } else {
-                        $template_path = YATRA_ABSPATH . 'includes/templates/single-tour.php';
+                        $template_path = "{$yatra_plugin_template_path}/single-tour.php";
                     }
                 }
                 if (is_archive()) {
 
-                    if ($theme_file = locate_template(array('archive-tour.php'))) {
+                    if ($theme_file = locate_template(array("{$yatra_template_path}archive-tour.php"))) {
                         $template_path = $theme_file;
                     } else {
-                        $template_path = YATRA_ABSPATH . 'includes/templates/archive-tour.php';
+                        $template_path = "{$yatra_plugin_template_path}archive-tour.php";
                     }
                 }
                 if (is_tax('destination')) {
-                    if ($theme_file = locate_template(array('taxonomy-destination.php'))) {
+                    if ($theme_file = locate_template(array("{$yatra_template_path}taxonomy-destination.php"))) {
                         $template_path = $theme_file;
                     } else {
-                        $template_path = YATRA_ABSPATH . 'includes/templates/taxonomy-destination.php';
+                        $template_path = "{$yatra_plugin_template_path}taxonomy-destination.php";
                     }
                 }
-                if (is_tax('activities')) {
-                    if ($theme_file = locate_template(array('taxonomy-activities.php'))) {
+                if (is_tax('activity')) {
+                    if ($theme_file = locate_template(array("{$yatra_template_path}taxonomy-activity.php"))) {
                         $template_path = $theme_file;
                     } else {
-                        $template_path = YATRA_ABSPATH . 'includes/templates/taxonomy-activities.php';
+                        $template_path = "{$yatra_plugin_template_path}taxonomy-activity.php";
                     }
                 }
             }
+
             return $template_path;
         }
 

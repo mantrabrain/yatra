@@ -32,22 +32,24 @@ class Yatra_Forms
                     'name' => 'fullname',
                     'title' => __('Your full name', 'yatra'),
                     'type' => 'text',
-                    'value' => 'text',
+                    'value' => '',
                     'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
-                        'placeholder' => __('Your full name', 'yatra')
+                        'placeholder' => __('Your full name', 'yatra'),
+                        'required' => 'required'
                     ),
                     'group_id' => 'tour_meta',
                     'row_start' => true,
                 ), 'email' => array(
                     'name' => 'email',
                     'title' => __('Email', 'yatra'),
-                    'type' => 'text',
-                    'value' => 'text',
+                    'type' => 'email',
+                    'value' => '',
                     'group_id' => 'tour_meta',
                     'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
-                        'placeholder' => __('Your full name', 'yatra')
+                        'placeholder' => __('Your full name', 'yatra'),
+                        'required' => 'required'
                     ),
                     'row_start' => true,
                 ), 'tour_package' => array(
@@ -59,7 +61,19 @@ class Yatra_Forms
                     'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
                         'placeholder' => __('Your full name', 'yatra'),
-                        'readonly' => 'readonly'
+                        'readonly' => 'readonly',
+                        'required' => 'required'
+                    ),
+                    'row_start' => true,
+                ), 'phone_number' => array(
+                    'name' => 'phone_number',
+                    'title' => __('Phone Number', 'yatra'),
+                    'type' => 'text',
+                    'group_id' => 'tour_meta',
+                    'value' => '',
+                    'wrap_class' => 'yatra-left',
+                    'extra_attributes' => array(
+                        'placeholder' => __('Your contact number', 'yatra'),
                     ),
                     'row_start' => true,
                 )
@@ -162,13 +176,15 @@ class Yatra_Forms
             case "text":
             case "number":
             case "hidden":
+            case "email":
                 if ($field['type'] != "hidden") {
                     ?>
                     <p>
                     <label
                             for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
                         :</label>
-                <?php } ?>
+                <?php }
+                ?>
                 <input class="yatra_field"
                        id="<?php echo esc_attr(($field_key)); ?>"
                        name="<?php echo esc_attr(($name)); ?>"

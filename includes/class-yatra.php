@@ -105,8 +105,7 @@ final class Yatra
         register_activation_hook(YATRA_FILE, array('Yatra_Install', 'install'));
 
         add_action('init', array($this, 'init'), 0);
-        add_action( 'init', array( 'Yatra_Shortcodes', 'init' ) );
-
+        add_action('init', array('Yatra_Shortcodes', 'init'));
 
 
     }
@@ -165,13 +164,13 @@ final class Yatra
          */
         include_once YATRA_ABSPATH . 'includes/class-yatra-autoloader.php';
         include_once YATRA_ABSPATH . 'includes/functions.php';
+        include_once YATRA_ABSPATH . 'includes/yatra-hooks.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-page-templater.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-custom-post-type.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-taxonomy.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-metabox.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-shortcodes.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-ajax.php';
-
 
 
         // Compatibility
@@ -261,6 +260,16 @@ final class Yatra
     public function template_path()
     {
         return apply_filters('yatra_template_path', 'yatra/');
+    }
+
+    /**
+     * Get the template path.
+     *
+     * @return string
+     */
+    public function plugin_template_path()
+    {
+        return apply_filters('yatra_plugin_template_path', $this->plugin_path() . '/templates/');
     }
 
     /**

@@ -16,7 +16,7 @@ if (!class_exists('Yatra_Assets')) {
             wp_enqueue_style('yatra-style');
 
 
-            wp_register_script('yatra-script', YATRA_PLUGIN_URI . '/assets/js/yatra.js', false, YATRA_VERSION);
+            wp_register_script('yatra-script', YATRA_PLUGIN_URI . '/assets/js/yatra.js', array( 'jquery' ), YATRA_VERSION);
             wp_enqueue_script('yatra-script');
 
             $yatra_params = array(
