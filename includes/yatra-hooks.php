@@ -96,7 +96,9 @@ if (!function_exists('yatra_before_page_content_callback')) {
 
         $class = $class . ' ' . get_option('yatra_page_container_class');
 
-        $class = $class . ' ' . get_option('yatra_archive_template', 'template-default');
+        if (!is_single()) {
+            $class = $class . ' ' . get_option('yatra_archive_template', 'template-default');
+        }
         ?>
         <div id="yatra-page-wrapper" class="<?php echo esc_attr($class); ?>">
         <?php
