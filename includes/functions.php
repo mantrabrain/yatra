@@ -53,52 +53,6 @@ if (!function_exists('yatra_tour_metabox_tabs')) {
     }
 }
 
-if (!function_exists('yatra_get_global_settings')) {
-
-    function yatra_get_global_settings($setting_key = '')
-    {
-
-        // Default setting options for yatra plugin, please add all keys here.
-
-        $default = array(
-
-            'yatra_currency' => 'USD'
-        );
-
-        if (!empty($setting_key) && !isset($default[$setting_key])) {
-
-            throw new Exception("Undefined default yatra option " . $setting_key);
-        }
-
-        $yatra_system_settings_from_db = get_option('yatra_global_options', $default);
-
-        if (isset($yatra_system_settings_from_db[$setting_key])) {
-
-            return $yatra_system_settings_from_db[$setting_key];
-        }
-        return $yatra_system_settings_from_db;
-
-    }
-}
-
-if (!function_exists('yatra_update_global_setting')) {
-
-    function yatra_update_global_setting($option_key = '', $sanitized_option_value = '')
-    {
-        $global_settings = yatra_get_global_settings();
-
-        if ($global_settings[$option_key] && !empty($option_key)) {
-
-            $global_settings[$option_key] = $sanitized_option_value;
-
-            update_option('yatra_global_options', $global_settings);
-
-            return true;
-        }
-        return false;
-
-    }
-}
 
 if (!function_exists('yatra_set_session')) {
 
@@ -271,9 +225,15 @@ if (!function_exists('yatra_get_checkout_page')) {
 
     function yatra_get_checkout_page($get_permalink = false)
     {
-        global $wpdb;
 
-        $page_id = $wpdb->get_var('SELECT ID FROM ' . $wpdb->prefix . 'posts WHERE post_content LIKE "%[yatra_checkout]%" AND post_parent = 0');
+        $page_id = absint(get_option('yatra_checkout_page'));
+
+        if ($page_id < 1) {
+
+            global $wpdb;
+
+            $page_id = $wpdb->get_var('SELECT ID FROM ' . $wpdb->prefix . 'posts WHERE post_content LIKE "%[yatra_checkout]%" AND post_parent = 0');
+        }
 
         $page_permalink = get_permalink($page_id);
 

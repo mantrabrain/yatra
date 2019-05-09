@@ -11,39 +11,39 @@
 
 ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-    <header class="entry-header">
-        <?php
-        if (is_sticky() && is_home() && !is_paged()) {
-            printf('<span class="sticky-post">%s</span>', _x('Featured', 'post', 'yatra'));
-        }
-        if (is_singular()) :
-            the_title('<h1 class="entry-title">', '</h1>');
-        else :
-            the_title(sprintf('<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url(get_permalink())), '</a></h2>');
-        endif;
-        ?>
-        <div class="entry-meta">
+    <?php
+    $template = get_option('yatra_archive_template', 'template-default');
+    switch ($template) {
+        case "template-default":
+            ?>
+
+            <div class="thumb-wrap">
+                <div class="inner">
+                    <?php yatra_post_thumbnail(); ?>
+                </div>
+            </div>
+
+            <div class="content-wrap">
+                <div class="inner">
+                    <?php yatra_entry_header(); ?>
+                    <?php yatra_entry_post_content(); ?>
+                </div>
+            </div>
+
+
+            <div class="meta-content-wrap">
+                <div class="inner">
+                    <?php yatra_entry_meta_attributes(); ?>
+                </div>
+            </div>
+
+
             <?php
-            yatra_get_taxonomy_term_lists(get_the_ID(), 'activity');
-            ?></div>
-    </header><!-- .entry-header -->
+            break;
 
-    <figure class="post-thumbnail">
-        <a class="post-thumbnail-inner" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
-            <?php the_post_thumbnail('post-thumbnail'); ?>
-        </a>
-    </figure>
+    }
 
-    <div class="entry-content">
-        <?php
-        the_excerpt();
-        ?>
-    </div><!-- .entry-content -->
-    <div class="entry-footer">
-        <?php
-        yatra_posted_by();
-        yatra_posted_on();
-        yatra_get_taxonomy_term_lists(get_the_ID(), 'destination'); ?>
-    </div>
+    //yatra_entry_footer();
 
+    ?>
 </article><!-- #post-${ID} -->

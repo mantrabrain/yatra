@@ -1,4 +1,125 @@
 .yatra-book-btn-wrapper {
+  text-align: center; }
 
-    text-align: center;
-}
+.yatra-content-area header {
+  margin-bottom: 30px; }
+
+.yatra-content-area .page-title, .yatra-content-area .entry-title {
+  line-height: 1.2;
+  font-weight: bold;
+  padding: 0;
+  margin: 0; }
+
+.yatra-content-area .yatra-book-now-btn {
+  padding: 10px 20px;
+  display: inline-block;
+  margin: 15px 0;
+  background: none;
+  border: 2px solid #777; }
+
+.yatra-page-wrapper.template-default article {
+  position: relative;
+  margin-bottom: 60px;
+  background-color: #fff;
+  -webkit-box-shadow: 0 0 30px 0 rgba(33, 30, 25, 0.1);
+  -moz-box-shadow: 0 0 30px 0 rgba(33, 30, 25, 0.1);
+  box-shadow: 0 0 30px 0 rgba(33, 30, 25, 0.1);
+  display: block; }
+  .yatra-page-wrapper.template-default article:after {
+    content: "";
+    display: block;
+    clear: both; }
+  .yatra-page-wrapper.template-default article .thumb-wrap {
+    width: 33.33%;
+    float: left; }
+  .yatra-page-wrapper.template-default article .content-wrap {
+    width: 41.67%;
+    float: left; }
+  .yatra-page-wrapper.template-default article .meta-content-wrap {
+    width: 25%;
+    float: left; }
+    .yatra-page-wrapper.template-default article .meta-content-wrap ul li {
+      list-style: none;
+      line-height: 1.5em;
+      background: #f9f9f9;
+      padding: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 1px; }
+  .yatra-page-wrapper.template-default article .inner {
+    padding: 15px; }
+
+.yatra-page-wrapper .nav-links .meta-nav {
+  display: none; }
+
+.yatra-page-wrapper .nav-links .nav-previous {
+  width: 50%;
+  float: left; }
+
+.yatra-page-wrapper .nav-links .nav-next {
+  width: 50%;
+  text-align: right;
+  float: right; }
+
+.yatra-page-wrapper .nav-links .nav-previous a:before {
+  content: "\f0d9";
+  font-family: FontAwesome;
+  font-style: normal;
+  margin-right: 5px; }
+
+.yatra-page-wrapper .nav-links .nav-next a:after {
+  content: "\f0da";
+  font-family: FontAwesome;
+  font-style: normal;
+  margin-left: 5px;
+  position: absolute;
+  right: 10px; }
+
+.yatra-page-wrapper .nav-links .nav-previous {
+  float: left;
+  width: 25%; }
+
+.yatra-page-wrapper .nav-links .nav-next {
+  width: 25%;
+  float: right; }
+  .yatra-page-wrapper .nav-links .nav-next a {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+    padding-right: 20px; }
+
+.yatra-page-wrapper .nav-links .nav-previous a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; }
+
+.yatra-page-wrapper .navigation.pagination {
+  padding: 0 0 30px; }
+
+.yatra-page-wrapper .navigation .nav-links a,
+.yatra-page-wrapper .navigation .nav-links span.current,
+.yatra-page-wrapper .navigation .nav-links span.dots,
+.yatra-page-wrapper .bttn, .yatra-page-wrapper button {
+  background: blue;
+  color: #ffffff;
+  cursor: pointer;
+  /* Improves usability and consistency of cursor style between image-type 'input' and others */
+  font-size: 14px;
+  line-height: 13px;
+  height: 33px;
+  padding: 10px 15px;
+  font-weight: 400;
+  display: inline-block;
+  position: relative;
+  text-shadow: none;
+  border: 1px solid blue; }
+
+.yatra-page-wrapper .navigation .nav-links span.current,
+.yatra-page-wrapper .navigation .nav-links span.dots {
+  color: inherit;
+  background: inherit;
+  padding: 10px 12px; }
+
+/*# sourceMappingURL=yatra.css.map */

@@ -1,0 +1,150 @@
+.yatra-book-btn-wrapper {
+  text-align: center;
+}
+
+.yatra-content-area {
+  header {
+    margin-bottom: 30px;
+  }
+
+  .page-title, .entry-title {
+    line-height: 1.2;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+  }
+  .yatra-book-now-btn {
+    padding: 10px 20px;
+    display: inline-block;
+    margin: 15px 0;
+    background: none;
+    border: 2px solid #777;
+  }
+}
+
+.yatra-page-wrapper {
+  &.template-default {
+    article {
+      position: relative;
+      margin-bottom: 60px;
+      background-color: #fff;
+      -webkit-box-shadow: 0 0 30px 0 rgba(33, 30, 25, .1);
+      -moz-box-shadow: 0 0 30px 0 rgba(33, 30, 25, .1);
+      box-shadow: 0 0 30px 0 rgba(33, 30, 25, .1);
+      display: block;
+      &:after {
+        content: "";
+        display: block;
+        clear: both;
+      }
+      .thumb-wrap {
+        width: 33.33%;
+        float: left;
+      }
+      .content-wrap {
+
+        width: 41.67%;
+        float: left;
+
+      }
+      .meta-content-wrap {
+        width: 25%;
+        float: left;
+        ul {
+          li {
+            list-style: none;
+            line-height: 1.5em;
+            background: #f9f9f9;
+            padding: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 1px;
+          }
+        }
+      }
+      .inner {
+        padding: 15px;
+      }
+    }
+  }
+
+  .nav-links {
+    .meta-nav {
+      display: none;
+    }
+    .nav-previous {
+      width: 50%;
+      float: left;
+    }
+    .nav-next {
+      width: 50%;
+      text-align: right;
+      float: right;
+    }
+    .nav-previous a:before {
+      content: "\f0d9";
+      font-family: FontAwesome;
+      font-style: normal;
+      margin-right: 5px;
+    }
+    .nav-next a:after {
+      content: "\f0da";
+      font-family: FontAwesome;
+      font-style: normal;
+      margin-left: 5px;
+      position: absolute;
+      right: 10px;
+    }
+    .nav-previous {
+      float: left;
+      width: 25%;
+    }
+    .nav-next {
+      width: 25%;
+      float: right;
+      a {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: relative;
+        padding-right: 20px;
+      }
+    }
+    .nav-previous a {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+  .navigation.pagination {
+    padding: 0 0 30px;
+  }
+
+  .navigation .nav-links a,
+  .navigation .nav-links span.current,
+  .navigation .nav-links span.dots,
+  .bttn, button {
+    background: blue;
+    color: #ffffff;
+    cursor: pointer;
+    /* Improves usability and consistency of cursor style between image-type 'input' and others */
+    font-size: 14px;
+    line-height: 13px;
+    height: 33px;
+    padding: 10px 15px;
+    font-weight: 400;
+    display: inline-block;
+    position: relative;
+    text-shadow: none;
+    border: 1px solid blue;
+  }
+
+  .navigation .nav-links span.current,
+  .navigation .nav-links span.dots {
+    color: inherit;
+    background: inherit;
+    padding: 10px 12px;
+  }
+
+}

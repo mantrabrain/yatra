@@ -8,7 +8,7 @@ if (!isset($checkout->ID)) {
 }
 
 ?>
-<form method="post" action="<?php echo admin_url('admin-ajax.php'); ?>"><?php
+<form method="post" action="<?php echo admin_url('admin-ajax.php'); ?>" class="yatra-checkout-form"><?php
 
     do_action('yatra_checkout_form_fields');
     ?>

@@ -13,9 +13,9 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         public function metabox_config($key = null, $get_merge_all_field = false)
         {
-            $currency = yatra_get_global_settings('yatra_currency');
+            $currency = get_option('yatra_currency');
 
-            $currency_symbols = get_yatra_currency_symbols($currency);
+            $currency_symbols = yatra_get_currency_symbols($currency);
 
             $countries = yatra_get_countries();
 

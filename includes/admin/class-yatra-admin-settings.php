@@ -47,6 +47,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 				$settings = array();
 
 				$settings[] = include 'settings/class-yatra-settings-general.php';
+				$settings[] = include 'settings/class-yatra-settings-design.php';
 				$settings[] = include 'settings/class-yatra-settings-miscellaneous.php';
 
 

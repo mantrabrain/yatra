@@ -31,20 +31,6 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
         parent::__construct();
     }
 
-    /**
-     * Get sections.
-     *
-     * @return array
-     */
-    public function get_sections()
-    {
-        $sections = array(
-            '' => __('General', 'yatra'),
-            'inventory' => __('Inventory', 'yatra'),
-        );
-
-        return apply_filters('yatra_get_sections_' . $this->id, $sections);
-    }
 
     /**
      * Output the settings.
@@ -81,56 +67,24 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
      */
     public function get_settings($current_section = '')
     {
-        if ('inventory' === $current_section) {
-            $settings = apply_filters(
-                'yatra_inventory_settings',
+
+        $settings = apply_filters(
+            'yatra_miscellaneous_settings',
+            array(
                 array(
-                    array(
-                        'title' => __('Inventory', 'yatra'),
-                        'type' => 'title',
-                        'desc' => '',
-                        'id' => 'product_inventory_options',
-                    ),
+                    'title' => __('Miscellaneous', 'yatra'),
+                    'type' => 'title',
+                    'desc' => '',
+                    'id' => 'miscellaneous_options',
+                ),
+                array(
+                    'type' => 'sectionend',
+                    'id' => 'miscellaneous_options',
+                ),
 
-                    array(
-                        'title' => __('Manage stock', 'yatra'),
-                        'desc' => __('Enable stock management', 'yatra'),
-                        'id' => 'yatra_manage_stock',
-                        'default' => 'yes',
-                        'type' => 'checkbox',
-                    ),
+            )
+        );
 
-                    array(
-                        'type' => 'sectionend',
-                        'id' => 'product_inventory_options',
-                    ),
-
-                )
-            );
-
-        } else {
-            $settings = apply_filters(
-                'yatra_product_settings',
-                apply_filters(
-                    'yatra_products_general_settings',
-                    array(
-                        array(
-                            'title' => __('Shop pages', 'yatra'),
-                            'type' => 'title',
-                            'desc' => '',
-                            'id' => 'catalog_options',
-                        ),
-
-
-                        array(
-                            'type' => 'sectionend',
-                            'id' => 'catalog_options',
-                        ),
-
-                    )
-                )
-            );
-        }
 
         return apply_filters('yatra_get_settings_' . $this->id, $settings, $current_section);
     }

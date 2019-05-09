@@ -181,8 +181,8 @@ if (!function_exists('yatra_get_currencies')) {
     }
 }
 
-if (!function_exists('get_yatra_currency_symbols')) {
-    function get_yatra_currency_symbols($currency_key = '')
+if (!function_exists('yatra_get_currency_symbols')) {
+    function yatra_get_currency_symbols($currency_key = '')
     {
         $symbols = apply_filters('yatra_currency_symbols', array(
             'AED' => '&#x62f;.&#x625;',
@@ -353,5 +353,28 @@ if (!function_exists('get_yatra_currency_symbols')) {
         $currency_symbol = isset($symbols[$currency_key]) ? $symbols[$currency_key] : '';
 
         return apply_filters('yatra_currency_symbol', $currency_symbol, $currency_key);
+    }
+}
+
+if (!function_exists('yatra_get_currency_with_symbol')) {
+
+    function yatra_get_currency_with_symbol($currency_position = 'right')
+    {
+        $currency = yatra_get_currencies();
+
+        $currency_with_symbol = array();
+
+        foreach ($currency as $currency_key => $currency_value) {
+
+            $symbol = yatra_get_currency_symbols($currency_key);
+
+            $value = !empty($symbol) ? ' (' . $symbol . ') ' : '';
+
+            $value = $currency_position == "left" ? $value . $currency_value : $currency_value . $value;
+
+            $currency_with_symbol[$currency_key] = $value;
+        }
+
+        return $currency_with_symbol;
     }
 }
