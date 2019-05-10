@@ -2,17 +2,18 @@
 Contributors: Mantrabrain
 Tags: mantrabrain, travel, travel-booking
 Requires at least: 4.7
-Tested up to: 5.1.1
+Tested up to: 5.2
 Stable tag: 1.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Yatra - WordPress Travel & Tour Solution
+Yatra is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies. This is beta version of travel & tour booking plugin for now.
 
 == Description ==
-Yatra - WordPress Travel & Tour Solution
+Yatra is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies. This is beta version of travel & tour booking plugin for now.
 
 Get [free support](https://mantrabrain.com/support-forum/)
+Wanna [contribute](https://github.com/mantrabrain/yatra/)
 
 == Installation ==
 
@@ -20,6 +21,24 @@ Get [free support](https://mantrabrain.com/support-forum/)
 2. Activate the Mantra Audience plugin through the 'Plugins' menu in WordPress.
 
 
+== Yatra - Features ==
+
+1. Unlimited Travel & Tour Package with Activity & Destination pages.
+
+2. Easy & Smart booking process
+
+3. Unlimited Travel and Tour Categories
+
+4. Translation Ready: The plugin is fully translation ready. So feel free to your website in any language.
+
+5. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
+
+== Screenshots ==
+
+1. Trip Page Backend
+2. Itinerary Tab in Trip Page
+3. Faq Tab in Trip Page
+4. Plugin Settings Page
 
 == Changelog ==
 

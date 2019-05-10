@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Yatra
  * Plugin URI:        https://wordpress.org/plugins/yatra/
- * Description:       Yatra - WordPress Travel & Tour Solution
+ * Description:       WP Travel Engine is a free travel booking WordPress plugin to create travel and tour packages for tour operators and travel agencies. It is a complete travel management system and includes plenty of useful features. You can create your travel booking website using WP Travel Engine in less than 5 minutes. Learn more at WP Travel Engine.com.
  * Version:           1.0.0
  * Author:            Mantrabrain
  * Author URI:        https://mantrabrain.com/
