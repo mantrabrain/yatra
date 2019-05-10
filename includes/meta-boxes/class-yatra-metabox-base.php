@@ -238,9 +238,9 @@ if (!class_exists('Yatra_Metabox_Base')) {
                                    type="text" value="<?php echo esc_html($value); ?>"/>
                             <button class="media_upload button"
                                     id="<?php echo('background_image'); ?>"
-                                    data-choose="<?php esc_attr_e('Choose an image', 'mantranews'); ?>"
-                                    data-update="<?php esc_attr_e('Use image', 'mantranews'); ?>"
-                                    style="width:100%;margin-top:6px;margin-right:30px;"><?php esc_html_e('Select an Image', 'mantranews'); ?></button>
+                                    data-choose="<?php esc_attr_e('Choose an image', 'yatra'); ?>"
+                                    data-update="<?php esc_attr_e('Use image', 'yatra'); ?>"
+                                    style="width:100%;margin-top:6px;margin-right:30px;"><?php esc_html_e('Select an Image', 'yatra'); ?></button>
                         </div>
 
                     </div>

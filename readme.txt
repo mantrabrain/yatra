@@ -14,6 +14,7 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 Get [free support](https://mantrabrain.com/support-forum/)
 Wanna [contribute](https://github.com/mantrabrain/yatra/)
+Feature [request](https://mantrabrain.com/request-new-feature/)
 
 == Installation ==
 
@@ -35,12 +36,16 @@ Wanna [contribute](https://github.com/mantrabrain/yatra/)
 
 == Screenshots ==
 
-1. Trip Page Backend
-2. Itinerary Tab in Trip Page
-3. Faq Tab in Trip Page
-4. Plugin Settings Page
+1. Tour Listing Page
+2. Destination Section backend
+3. Activity section backend
+4. Single Tour Page frontend
+5. Single Tour page book button
+6. Checkout page
+7. Booking listing page backend
+8. Yatra Setting backend
 
 == Changelog ==
 
-= 1.0.0 | 2019/02/05 =
+= 1.0.0 | 2019/05/10 =
 * Initial Release

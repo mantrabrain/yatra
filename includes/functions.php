@@ -253,11 +253,11 @@ if (!function_exists('yatra_get_booking_statuses')) {
     {
         return apply_filters(
             'yatra_booking_statuses', array(
-                'yatra-pending' => __('Pending'),
-                'yatra-processing' => __('Processing'),
-                'yatra-on-hold' => __('On Hold'),
-                'yatra-completed' => __('Completed'),
-                'yatra-cancelled' => __('Cancelled')
+                'yatra-pending' => __('Pending', 'yatra' ),
+                'yatra-processing' => __('Processing', 'yatra' ),
+                'yatra-on-hold' => __('On Hold', 'yatra' ),
+                'yatra-completed' => __('Completed', 'yatra' ),
+                'yatra-cancelled' => __('Cancelled', 'yatra' )
             )
         );
 

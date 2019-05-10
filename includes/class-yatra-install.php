@@ -47,7 +47,14 @@ final class Yatra_Install
 
         foreach ($pages as $page) {
 
-            wp_insert_post($page);
+            $page_id = wp_insert_post($page);
+
+            if ($page['post_title'] == 'Yatra Checkout') {
+                update_option('yatra_checkout_page', $page_id);
+            }
+            if ($page['post_title'] == 'Yatra Thank You') {
+                update_option('yatra_thankyou_page', $page_id);
+            }
 
         }
 
