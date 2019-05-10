@@ -69,6 +69,7 @@ if (!class_exists('Yatra_Taxonomy_Destination')) {
 
         public function register()
         {
+            $permalinks = yatra_get_permalink_structure();
             // Add new taxonomy, make it hierarchical (like categories)
             $labels = array(
                 'name' => __('Destinations', 'yatra'),
@@ -89,7 +90,10 @@ if (!class_exists('Yatra_Taxonomy_Destination')) {
                 'show_ui' => true,
                 'show_admin_column' => true,
                 'query_var' => true,
-                'rewrite' => array('slug' => 'destination'),
+                'rewrite' => array(
+                    'slug' => $permalinks['yatra_destination_base'],
+                    'with_front' => true
+                )
             );
             register_taxonomy('destination', array('tour'), $args);
 

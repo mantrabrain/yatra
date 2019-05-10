@@ -13,6 +13,8 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
 
         public function register()
         {
+            $permalinks = yatra_get_permalink_structure();
+
             $labels = array(
                 'name' => __('Tours', 'yatra'),
                 'singular_name' => __('Tour', 'yatra'),
@@ -33,7 +35,10 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'public' => true,
                 'supports' => array('title', 'editor', 'excerpt', 'thumbnail',),
                 'has_archive' => true,
-//                'rewrite' => array('slug' => "project_item", 'with_front' => TRUE)
+                'rewrite' => array(
+                    'slug' => $permalinks['yatra_tour_base'],
+                    'with_front' => TRUE
+                )
             );
             register_post_type($this->slug, $args);
 

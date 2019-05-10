@@ -68,6 +68,7 @@ if (!class_exists('Yatra_Taxonomy_Activity')) {
 
         public function register()
         {
+            $permalinks = yatra_get_permalink_structure();
             // Add new taxonomy, make it hierarchical (like categories)
             $labels = array(
                 'name' => __('Activities', 'yatra'),
@@ -88,7 +89,10 @@ if (!class_exists('Yatra_Taxonomy_Activity')) {
                 'show_ui' => true,
                 'show_admin_column' => true,
                 'query_var' => true,
-                'rewrite' => array('slug' => 'activity'),
+                'rewrite' => array(
+                    'slug' => $permalinks['yatra_activity_base'],
+                    'with_front' => true
+                )
             );
             register_taxonomy('activity', array('tour'), $args);
 

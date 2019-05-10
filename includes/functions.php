@@ -253,11 +253,11 @@ if (!function_exists('yatra_get_booking_statuses')) {
     {
         return apply_filters(
             'yatra_booking_statuses', array(
-                'yatra-pending' => __('Pending', 'yatra' ),
-                'yatra-processing' => __('Processing', 'yatra' ),
-                'yatra-on-hold' => __('On Hold', 'yatra' ),
-                'yatra-completed' => __('Completed', 'yatra' ),
-                'yatra-cancelled' => __('Cancelled', 'yatra' )
+                'yatra-pending' => __('Pending', 'yatra'),
+                'yatra-processing' => __('Processing', 'yatra'),
+                'yatra-on-hold' => __('On Hold', 'yatra'),
+                'yatra-completed' => __('Completed', 'yatra'),
+                'yatra-cancelled' => __('Cancelled', 'yatra')
             )
         );
 
@@ -368,4 +368,30 @@ if (!function_exists('yatra_entry_meta')) {
         <?php
     }
 
+}
+
+
+/**
+ * Get permalink settings
+ *
+ * @since  1.0.0
+ * @return array
+ */
+function yatra_get_permalink_structure()
+{
+
+    $permalinks = wp_parse_args(
+        (array)get_option('yatra_permalinks', array()),
+        array(
+            'yatra_tour_base' => '',
+            'yatra_destination_base' => '',
+            'yatra_activity_base' => '',
+        )
+    );
+
+    // Ensure rewrite slugs are set.
+    $permalinks['yatra_tour_base'] = untrailingslashit(empty($permalinks['yatra_tour_base']) ? 'tour' : $permalinks['yatra_tour_base']);
+    $permalinks['yatra_destination_base'] = untrailingslashit(empty($permalinks['yatra_destination_base']) ? 'destination' : $permalinks['yatra_destination_base']);
+    $permalinks['yatra_activity_base'] = untrailingslashit(empty($permalinks['yatra_activity_base']) ? 'activity' : $permalinks['yatra_activity_base']);
+    return $permalinks;
 }
