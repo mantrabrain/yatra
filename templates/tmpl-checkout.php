@@ -15,5 +15,6 @@ if (!isset($checkout->ID)) {
     <input type="hidden" name="yatra_nonce" value="<?php echo wp_create_nonce('wp_yatra_book_selected_tour_nonce') ?>"/>
     <input type="hidden" name="action" value="yatra_book_selected_tour"/>
     <input type="hidden" name="yatra_tour_id" value="<?php echo absint($checkout->ID); ?>"/>
-    <input type="submit" name="yatra_checkout_submit" value="Order Booking"/>
+    <input type="submit" name="yatra_checkout_submit"
+           value="<?php echo esc_attr(get_option('yatra_order_booking_text', 'Order Booking')); ?>"/>
 </form>

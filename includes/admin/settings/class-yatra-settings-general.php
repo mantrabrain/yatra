@@ -138,17 +138,24 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                         'options' => yatra_get_currency_with_symbol()
                     ),
                     array(
-                        'title' => __('Booknow Button Text', 'yatra'),
+                        'title' => __('Book Now Button Text', 'yatra'),
                         'desc' => __('Text for Book now button.', 'yatra'),
                         'id' => 'yatra_booknow_button_text',
                         'default' => __('Book Now', 'yatra'),
                         'type' => 'text',
                     ),
                     array(
-                        'title' => __('Booknow loading text.', 'yatra'),
+                        'title' => __('Book Now loading text.', 'yatra'),
                         'desc' => __('Text for loading book now button.', 'yatra'),
                         'id' => 'yatra_booknow_loading_text',
                         'default' => __('Loading....', 'yatra'),
+                        'type' => 'text',
+                    ),
+                    array(
+                        'title' => __('Order booking text.', 'yatra'),
+                        'desc' => __('Text for order booking text.', 'yatra'),
+                        'id' => 'yatra_order_booking_text',
+                        'default' => __('Order Booking', 'yatra'),
                         'type' => 'text',
                     ),
                     array(
