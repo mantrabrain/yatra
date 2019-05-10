@@ -1,6 +1,6 @@
-=== Yatra ===
+=== Yatra - Complete Travel & Tour Booking System ===
 Contributors: Mantrabrain
-Tags: mantrabrain, travel, travel-booking
+Tags: mantrabrain, travel, travel-booking, tour, wp, booking, tour-booking
 Requires at least: 4.7
 Tested up to: 5.2
 Stable tag: 1.0.0
