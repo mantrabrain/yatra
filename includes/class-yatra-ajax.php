@@ -70,7 +70,9 @@ class Yatra_Ajax
         $status = $yatra_booking->book($_POST);
         if ($status) {
             $success_redirect_page_id = get_option('yatra_thankyou_page');
+            yatra_clear_session('tour_cart');
             $page_permalink = get_permalink($success_redirect_page_id);
+
             wp_safe_redirect($page_permalink);
         }
         die('Could not booked, please try again');

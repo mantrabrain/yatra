@@ -54,7 +54,6 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
         echo '<h2 class="yatra-BlankState-message">' . esc_html__('When you receive a new order, it will appear here.', 'yatra') . '</h2>';
 
         echo '<div class="yatra-BlankState-buttons">';
-        echo '<a class="yatra-BlankState-cta button-primary button" target="_blank" href="https://docs.yatra.com/document/managing-orders/?utm_source=blankslate&utm_medium=product&utm_content=ordersdoc&utm_campaign=yatraplugin">' . esc_html__('Learn more about orders', 'yatra') . '</a>';
         echo '</div>';
 
         echo '</div>';
