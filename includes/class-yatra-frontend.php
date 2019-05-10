@@ -70,6 +70,7 @@ final class Yatra_Frontend
     public function includes()
     {
         include_once YATRA_ABSPATH . 'includes/class-yatra-assets.php';
+        include_once YATRA_ABSPATH . 'includes/class-yatra-frontend-tour-tabs.php';
 
 
     }

@@ -1,0 +1,263 @@
+.yatra-book-btn-wrapper {
+  text-align: center;
+}
+
+.yatra-content-area {
+  header {
+    margin-bottom: 30px;
+  }
+
+  .page-title, .entry-title {
+    line-height: 1.2;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+  }
+  .yatra-book-now-btn {
+    padding: 10px 20px;
+    display: inline-block;
+    margin: 15px 0;
+    background: none;
+    border: 2px solid #777;
+  }
+}
+
+.yatra-page-wrapper {
+  &.template-default {
+    article {
+      position: relative;
+      margin-bottom: 60px;
+      background-color: #fff;
+      -webkit-box-shadow: 0 0 30px 0 rgba(33, 30, 25, .1);
+      -moz-box-shadow: 0 0 30px 0 rgba(33, 30, 25, .1);
+      box-shadow: 0 0 30px 0 rgba(33, 30, 25, .1);
+      display: block;
+      &:after {
+        content: "";
+        display: block;
+        clear: both;
+      }
+      .thumb-wrap {
+        width: 33.33%;
+        float: left;
+      }
+      .content-wrap {
+
+        width: 41.67%;
+        float: left;
+
+      }
+      .meta-content-wrap {
+        width: 25%;
+        float: left;
+        ul {
+          li {
+            list-style: none;
+            line-height: 1.5em;
+            background: #f9f9f9;
+            padding: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 1px;
+          }
+        }
+      }
+      .inner {
+        padding: 15px;
+      }
+    }
+  }
+
+  .nav-links {
+    .meta-nav {
+      display: none;
+    }
+    .nav-previous {
+      width: 50%;
+      float: left;
+    }
+    .nav-next {
+      width: 50%;
+      text-align: right;
+      float: right;
+    }
+    .nav-previous a:before {
+      content: "\f0d9";
+      font-family: FontAwesome;
+      font-style: normal;
+      margin-right: 5px;
+    }
+    .nav-next a:after {
+      content: "\f0da";
+      font-family: FontAwesome;
+      font-style: normal;
+      margin-left: 5px;
+      position: absolute;
+      right: 10px;
+    }
+    .nav-previous {
+      float: left;
+      width: 25%;
+    }
+    .nav-next {
+      width: 25%;
+      float: right;
+      a {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: relative;
+        padding-right: 20px;
+      }
+    }
+    .nav-previous a {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+  .navigation.pagination {
+    padding: 0 0 30px;
+  }
+
+  .navigation .nav-links a,
+  .navigation .nav-links span.current,
+  .navigation .nav-links span.dots,
+  .bttn, button {
+    background: blue;
+    color: #ffffff;
+    cursor: pointer;
+    /* Improves usability and consistency of cursor style between image-type 'input' and others */
+    font-size: 14px;
+    line-height: 13px;
+    height: 33px;
+    padding: 10px 15px;
+    font-weight: 400;
+    display: inline-block;
+    position: relative;
+    text-shadow: none;
+    border: 1px solid blue;
+  }
+
+  .navigation .nav-links span.current,
+  .navigation .nav-links span.dots {
+    color: inherit;
+    background: inherit;
+    padding: 10px 12px;
+  }
+
+}
+
+.yatra-tabs {
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .yatra-tab-content {
+    ul {
+      margin: 0;
+      padding: 0;
+      li {
+        list-style: none;
+      }
+    }
+    .cost-info-half {
+      width: 50%;
+      float: left;
+      padding: 15px;
+      padding-top: 0;
+      li {
+        padding-bottom: 10px;
+        list-style-type: none;
+        position: relative;
+        padding: 0 0 0 25px;
+        line-height: 18px;
+        color: #555542;
+        margin: 5px 0 15px;
+        &:before {
+          position: absolute;
+          font: normal normal normal 12px/1 FontAwesome;
+          font-size: 13px;
+          left: 0;
+          top: 4px
+        }
+      }
+      &.cost_included {
+        li {
+          &:before {
+            content: "\f00c";
+            color: #21769b;
+
+          }
+        }
+      }
+      &.cost_excluded {
+        li {
+          &:before {
+            content: "\f00d";
+            color: #ed7701;
+
+          }
+        }
+      }
+      h4 {
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-align: center;
+        padding: 10px 0;
+        /* background: #d77b5d; */
+        color: #ef805c;
+        border-bottom: 2px solid #ef805c;
+        margin-bottom: 20px;
+
+      }
+    }
+    .tab-inner:after {
+      clear: both;
+      content: "";
+      display: block;
+    }
+  }
+}
+
+/// Main Content
+.sec-row {
+  margin-left: -7.5px;
+  margin-right: -7.5px;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-wrap: wrap;
+  color: #000;
+}
+
+.col-half {
+  width: calc(50% - 15px);
+  padding: 10px 15px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border: 1.5px dotted #ccc;
+  margin: 7.5px;
+}
+
+.detail-wrap .tab .tab-content {
+  font-size: 14px;
+  color: #00779c;
+  line-height: 30px;
+  background: #fff;
+  padding: 20px 25px;
+  margin-top: 20px;
+}
+
+.detail-tab .tabs h3 {
+  color: #ef805c;
+}
+
+.overview-section {
+  padding-bottom: 20px;
+  overflow: hidden;
+}

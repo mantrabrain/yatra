@@ -176,7 +176,6 @@ if (!function_exists('yatra_get_template')) {
 
         do_action('yatra_before_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args']);
 
-
         include $action_args['located'];
 
         do_action('yatra_after_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args']);

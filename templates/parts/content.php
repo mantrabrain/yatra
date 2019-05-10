@@ -20,11 +20,9 @@
         <div class="entry-meta">
             <?php yatra_posted_by(); ?>
             <?php yatra_posted_on();
-            yatra_get_taxonomy_term_lists(get_the_ID(), 'activity');
-
-            ?>
-
-            <?php
+            echo "&nbsp;";
+            yatra_get_taxonomy_term_lists(get_the_ID(), 'destination');
+            yatra_post_thumbnail('full');
             // Edit post link.
             edit_post_link(
                 sprintf(
@@ -47,22 +45,14 @@
 
     </header>
 
+    <div class="entry-footer">
+        <?php yatra_get_taxonomy_term_lists(get_the_ID(), 'activity'); ?>
+    </div>
     <div class="entry-content">
+
         <?php
-        the_content(
-            sprintf(
-                wp_kses(
-                /* translators: %s: Name of current post. Only visible to screen readers */
-                    __('Continue reading<span class="screen-reader-text"> "%s"</span>', 'yatra'),
-                    array(
-                        'span' => array(
-                            'class' => array(),
-                        ),
-                    )
-                ),
-                get_the_title()
-            )
-        );
+
+        yatra_frontend_tabs();
 
         wp_link_pages(
             array(
@@ -72,11 +62,6 @@
         );
         ?>
     </div><!-- .entry-content -->
-    <div class="entry-footer">
-        <?php
-        yatra_get_taxonomy_term_lists(get_the_ID(), 'destination');
 
-        ?>
-    </div>
 
 </article><!-- #post-${ID} -->

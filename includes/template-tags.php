@@ -57,12 +57,12 @@ if (!function_exists('yatra_entry_header')) {
 
 if (!function_exists('yatra_post_thumbnail')) {
 
-    function yatra_post_thumbnail()
+    function yatra_post_thumbnail($size = "post-thumbnail")
     {
         ?>
         <figure class="post-thumbnail">
             <a class="post-thumbnail-inner" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
-                <?php the_post_thumbnail('post-thumbnail'); ?>
+                <?php the_post_thumbnail($size); ?>
             </a>
         </figure>
         <?php
@@ -98,9 +98,9 @@ if (!function_exists('yatra_entry_footer')) {
     }
 }
 
-if (!function_exists('yatra_entry_meta_for_frontend')) {
+if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
 
-    function yatra_entry_meta_for_frontend()
+    function yatra_entry_meta_for_frontend_archive()
     {
 
         $currency = get_option('yatra_currency');
@@ -109,25 +109,35 @@ if (!function_exists('yatra_entry_meta_for_frontend')) {
 
         $meta_frontend = array(
 
-            '0' => array(
+            array(
                 'icon' => 'fa fa-money',
-                'text' => 'Price: ' . $currency_symbol . '{{yatra_tour_meta_tour_price}}'
+                'text' => $currency_symbol . '{{yatra_tour_meta_tour_price}}',
+                'title' => __('Price', 'yatra')
+
             ),
-            '1' => array(
+            array(
                 'icon' => 'fa fa-clock-o',
-                'text' => 'Duration: {{yatra_tour_meta_tour_duration_days}} days and {{yatra_tour_meta_tour_duration_nights}} nights'
+                'text' => '{{yatra_tour_meta_tour_duration_days}} days and {{yatra_tour_meta_tour_duration_nights}} nights',
+                'title' => __('Duration', 'yatra')
+
             ),
-            '2' => array(
+            array(
                 'icon' => 'fa fa-calendar-check-o',
-                'text' => 'Starting location: {{yatra_tour_meta_tour_starts_at}}'
+                'text' => '{{yatra_tour_meta_tour_starts_at}}',
+                'title' => __('Starting location', 'yatra')
+
             ),
-            '3' => array(
+            array(
                 'icon' => 'fa fa-calendar-check-o',
-                'text' => 'Ending location: {{yatra_tour_meta_tour_ends_at}}'
+                'text' => '{{yatra_tour_meta_tour_ends_at}}',
+                'title' => __('Ending location', 'yatra')
+
             ),
-            '4' => array(
+            array(
                 'icon' => 'fa fa-users',
-                'text' => 'Best sessions: {{yatra_tour_meta_tour_best_season}}'
+                'text' => '{{yatra_tour_meta_tour_best_season}}',
+                'title' => __('Best sessions', 'yatra')
+
             )
         );
 
@@ -138,21 +148,119 @@ if (!function_exists('yatra_entry_meta_for_frontend')) {
 
     }
 }
-if (!function_exists('yatra_entry_meta_attributes')) {
 
-    function yatra_entry_meta_attributes()
+
+if (!function_exists('yatra_entry_meta_for_frontend_single_tab')) {
+
+    function yatra_entry_meta_for_frontend_single_tab($key = '')
     {
+
         $post_id = get_the_id();
 
-        $meta_frontend = yatra_entry_meta_for_frontend();
+        if (empty($key)) {
+            return;
+        }
+        $currency = get_option('yatra_currency');
 
-        $list = '';
+        $country = get_post_meta($post_id, 'yatra_tour_meta_tour_country', true);
+
+        $country_array = array_values(yatra_get_countries($country));
+
+        $country_text = implode(',', $country_array);
+
+        $currency_symbol = yatra_get_currency_symbols($currency);
+
+        $meta_frontend_for_tabs = array(
+
+            'overview' => array(
+                array(
+                    'icon' => 'fa fa-money',
+                    'text' => $currency_symbol . '{{yatra_tour_meta_tour_price}}',
+                    'title' => __('Tour Price', 'yatra')
+                ),
+                array(
+                    'icon' => 'fa fa-money',
+                    'text' => $country_text,
+                    'title' => __('Country', 'yatra')
+                ),
+                array(
+                    'icon' => 'fa fa-money',
+                    'text' => '{{yatra_tour_meta_tour_max_altitude}}',
+                    'title' => __('Max altitude', 'yatra')
+                ),
+                array(
+                    'icon' => 'fa fa-clock-o',
+                    'text' => 'Duration: {{yatra_tour_meta_tour_duration_days}} days and {{yatra_tour_meta_tour_duration_nights}} nights',
+                    'title' => 'Trip Code'
+                ),
+                array(
+                    'icon' => 'fa fa-calendar-check-o',
+                    'text' => '{{yatra_tour_meta_tour_starts_at}}',
+                    'title' => __('Starts at', 'yatra')
+                ),
+                array(
+                    'icon' => 'fa fa-calendar-check-o',
+                    'text' => '{{yatra_tour_meta_tour_ends_at}}',
+                    'title' => __('Ends at', 'yatra')
+                ),
+                array(
+                    'icon' => 'fa fa-users',
+                    'text' => '{{yatra_tour_meta_tour_best_season}}',
+                    'title' => __('Best sessions', 'yatra')
+                ), array(
+                    'icon' => 'fa fa-users',
+                    'text' => '{{yatra_tour_meta_tour_route}}',
+                    'title' => __('Tour Route', 'yatra')
+                )
+            ), 'itinerary' => array(
+                array(
+                    'icon' => 'fa fa-users',
+                    'text' => '{{yatra_itineray_detail}}',
+                    'title' => __('Tour Route', 'yatra')
+                )
+            ), 'cost_info' => array(
+                array(
+                    'icon' => 'fa fa-users',
+                    'text' => '{{yatra_cost_included}}',
+                    'title' => __('Cost Included', 'yatra'),
+                    'id' => 'cost_included'
+                ), array(
+                    'icon' => 'fa fa-users',
+                    'text' => '{{yatra_cost_excluded}}',
+                    'title' => __('Cost Excluded', 'yatra'),
+                    'id' => 'cost_excluded'
+                )
+            ), 'tour_facts' => array(
+                array(
+                    'icon' => 'fa fa-users',
+                    'text' => '{{yatra_facts_detail}}',
+                    'title' => __('Tour Route', 'yatra')
+                )
+            )
+        );
+
+        if (!isset($meta_frontend_for_tabs[$key])) {
+
+            return;
+        }
+        $meta_frontend_for_tabs = apply_filters(
+
+            'yatra_entry_meta_frontend_single_tab',
+
+            $meta_frontend_for_tabs
+        );
+
+        $meta_frontend = $meta_frontend_for_tabs[$key];
+
+        $list = array();
 
         foreach ($meta_frontend as $value) {
 
             $icon = isset($value['icon']) ? $value['icon'] : '';
 
             $text = isset($value['text']) ? $value['text'] : '';
+
+            $title = isset($value['title']) ? $value['title'] : '';
 
             preg_match_all("~\{\{\s*(.*?)\s*\}\}~", $text, $matches);
 
@@ -167,7 +275,54 @@ if (!function_exists('yatra_entry_meta_attributes')) {
                 $text = str_replace('{{' . $match . '}}', $text_option, $text);
             }
 
-            $list .= '<li><i class="' . esc_attr($icon) . '"></i>&nbsp;' . esc_html($text) . '</li>';
+            $list_array =
+
+                array(
+                    'icon' => $icon,
+                    'text' => $text,
+                    'title' => $title,
+                    'id' => isset($value['id']) ? $value['id'] : ''
+                );
+            $list[] = $list_array;
+        }
+
+        return $list;
+    }
+}
+
+
+if (!function_exists('yatra_entry_meta_attributes')) {
+
+    function yatra_entry_meta_attributes()
+    {
+        $post_id = get_the_id();
+
+        $meta_frontend = yatra_entry_meta_for_frontend_archive();
+
+        $list = '';
+
+        foreach ($meta_frontend as $value) {
+
+            $icon = isset($value['icon']) ? $value['icon'] : '';
+
+            $text = isset($value['text']) ? $value['text'] : '';
+
+            $title = isset($value['title']) ? $value['title'] : '';
+
+            preg_match_all("~\{\{\s*(.*?)\s*\}\}~", $text, $matches);
+
+            $matches = isset($matches[1]) ? $matches[1] : array();
+
+            foreach ($matches as $match) {
+
+                $text_id = sanitize_text_field($match);
+
+                $text_option = get_post_meta($post_id, $text_id, true);
+
+                $text = str_replace('{{' . $match . '}}', $text_option, $text);
+            }
+
+            $list .= '<li><i class="' . esc_attr($icon) . '"></i>&nbsp;<strong>' . esc_html($title) . ': </strong>' . esc_html($text) . '</li>';
         }
 
         echo '<ul>';
@@ -176,5 +331,56 @@ if (!function_exists('yatra_entry_meta_attributes')) {
 
         echo '</ul>';
 
+    }
+}
+
+if (!function_exists('yatra_frontend_tabs_config')) {
+
+    function yatra_frontend_tabs_config()
+    {
+        $frontend_tabs_config = array(
+
+            'overview' => __('Overview', 'yatra'),
+            'itinerary' => __('Itinerary', 'yatra'),
+            'cost_info' => __('Cost Info', 'yatra'),
+            'tour_facts' => __('Tour Facts', 'yatra'),
+        );
+        return apply_filters('frontend_tabs_configurations', $frontend_tabs_config);
+    }
+}
+
+
+if (!function_exists('yatra_frontend_tabs')) {
+
+    function yatra_frontend_tabs()
+    {
+
+        $frontend_tabs_config = yatra_frontend_tabs_config();
+
+        ?>
+        <div class="yatra-tabs">
+
+            <ul>
+                <?php foreach ($frontend_tabs_config as $tab_key => $tab) { ?>
+                    <li><a href="#<?php echo esc_attr($tab_key); ?>"><?php echo esc_html($tab); ?></a></li>
+                <?php } ?>
+            </ul>
+            <?php
+            $loop_index = 0;
+            foreach ($frontend_tabs_config as $tab_content_key => $tab_content) { ?>
+                <section id="<?php echo esc_attr($tab_content_key); ?>"
+                         class="yatra-tab-content" <?php if ($loop_index > 0) { ?> aria-hidden="true" <?php } ?>>
+                    <div class="tab-inner">
+                        <?php
+                        do_action('yatra_frontend_tab_content_' . $tab_content_key, $tab_content)
+                        ?>
+                    </div>
+                </section>
+                <?php
+                $loop_index++;
+            } ?>
+
+        </div>
+        <?php
     }
 }

@@ -2,7 +2,7 @@
 defined('ABSPATH') || exit;
 
 if (!function_exists('yatra_get_countries')) {
-    function yatra_get_countries($country_key = '')
+    function yatra_get_countries($country_key = null)
     {
         $countries =
         $currencies = array_unique(
@@ -252,9 +252,23 @@ if (!function_exists('yatra_get_countries')) {
             )
         );
 
-        if (!empty($country_key) && isset($countries[$country_key])) {
+        if (!is_array($country_key)) {
 
-            return $countries[$country_key];
+            if (!empty($country_key) && isset($countries[$country_key])) {
+
+                return $countries[$country_key];
+            }
+        } else {
+
+            $return_countries = array();
+
+            foreach ($countries as $country_index => $country) {
+
+                if (in_array($country_index, $country_key)) {
+                    $return_countries[$country_index] = $country;
+                }
+            }
+            return $return_countries;
         }
         return $countries;
 
