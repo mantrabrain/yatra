@@ -128,11 +128,16 @@
   margin: 0; }
 
 .yatra-content-area .yatra-book-now-btn {
+  line-height: 1.5em;
   padding: 10px 20px;
   display: inline-block;
   margin: 15px 0;
   background: none;
-  border: 2px solid #777; }
+  border: 2px solid #777;
+  background: #767575; }
+  .yatra-content-area .yatra-book-now-btn:hover {
+    background: #fff;
+    color: #777; }
 
 .yatra-page-wrapper.template-default article {
   position: relative;

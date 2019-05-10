@@ -14,11 +14,17 @@
     margin: 0;
   }
   .yatra-book-now-btn {
+    line-height: 1.5em;
     padding: 10px 20px;
     display: inline-block;
     margin: 15px 0;
     background: none;
     border: 2px solid #777;
+    background: #767575;
+    &:hover {
+      background: #fff;
+      color: #777;
+    }
   }
 }
 
