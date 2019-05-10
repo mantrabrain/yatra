@@ -35,7 +35,6 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 5. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
 == Screenshots ==
-
 1. Tour Listing Page
 2. Destination Section backend
 3. Activity section backend
