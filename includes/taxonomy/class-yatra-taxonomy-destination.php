@@ -158,7 +158,7 @@ if (!class_exists('Yatra_Taxonomy_Destination')) {
                                     // Fire the original procedure with the same arguments
                                     uploadSuccess_original(fileObj, serverData);
                                     // Execute whatever you want here:
-                                    alert('Upload Complete!');
+
                                 }
                             }
 
@@ -167,7 +167,7 @@ if (!class_exists('Yatra_Taxonomy_Destination')) {
                             // Hooking on the uploader queue (on reset):
                             if (typeof wp.Uploader !== 'undefined' && typeof wp.Uploader.queue !== 'undefined') {
                                 wp.Uploader.queue.on('reset', function () {
-                                    alert('Upload Complete!');
+
                                 });
                             }
                         });
