@@ -41,7 +41,7 @@ var YatraFrontend = function ($) {
         },
         bookTour: function (tour_id) {
             var $this = this;
-             var booking_params = yatra_params.booking_params;
+            var booking_params = yatra_params.booking_params;
             var booking_data = {
                 action: booking_params.booking_action,
                 yatra_nonce: booking_params.booking_nonce,

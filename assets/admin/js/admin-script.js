@@ -6,14 +6,15 @@ var YatraTabs = function ($) {
             this.cacheDom();
             this.setupAria();
             this.bindEvents();
+            this.removeStyle();
         },
 
         cacheDom: function () {
             this.$el = $('.yatra-tabs');
-            this.$tabList = this.$el.find('ul');
+            this.$tabList = this.$el.find('ul.mb-tab-list');
             this.$tab = this.$tabList.find('li');
             this.$tabFirst = this.$tabList.find('li:first-child a');
-            this.$tabLink = this.$tab.find('a');
+            this.$tabLink = this.$tabList.find('li>a');
 
             this.$tabPanel = this.$el.find('section');
             this.$tabPanelFirstContent = this.$el.find('section > *:first-child');
@@ -123,6 +124,9 @@ var YatraTabs = function ($) {
         setSelectedTabPanel: function (self) {
             this.$el.find('#' + self.attr('aria-controls')).attr('aria-hidden', null);
         },
+        removeStyle: function () {
+            this.$el.find('.yatra-tab-section').removeAttr('style');
+        }
 
     };
 }(jQuery);
@@ -143,7 +147,48 @@ var YatraAdmin = function ($) {
 
     };
 }(jQuery);
+
+var YatraSubTabs = function ($) {
+    return {
+
+        init: function () {
+
+            this.cacheDom();
+            this.bindEvents();
+        },
+
+        cacheDom: function () {
+            this.$tabList = $('.mb-meta-vertical-tab');
+
+            this.$tab = this.$tabList.find('li');
+            this.$tabFirst = this.$tabList.find('li:first-child');
+            this.$tabLink = this.$tabList.find('li');
+            this.$tabPanel = this.$tabList.closest('section').find('.mb-meta-vertical-tab-content-item');
+
+        },
+
+        bindEvents: function () {
+            this.$tabLink.on('click', function () {
+                this.changeTab();
+            }.bind(this));
+        },
+
+        changeTab: function () {
+            var self = $(event.target);
+            event.preventDefault();
+            this.$tab.removeClass('active');
+            self.addClass('active');
+            var data_tab_content_id = self.attr('data-tab-content');
+
+            this.$tabPanel.removeClass('active');
+            this.$tabList.closest('section').find('.mb-meta-vertical-tab-content-item[data-tab-content="'+data_tab_content_id+'"]').addClass('active');
+        }
+
+    };
+}(jQuery);
+
 $(function () {
     YatraAdmin.init();
     YatraTabs.init();
+    YatraSubTabs.init();
 });

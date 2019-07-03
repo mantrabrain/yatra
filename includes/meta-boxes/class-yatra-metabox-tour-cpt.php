@@ -13,14 +13,10 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         public function metabox_config($key = null, $get_merge_all_field = false)
         {
-            $currency = get_option('yatra_currency');
 
-            $currency_symbols = yatra_get_currency_symbols($currency);
 
-            $countries = yatra_get_countries();
-
-            $configurations = array(
-                'tour-overview' => array(
+            /*$configurations = array(
+                'tour-options' => array(
                     'yatra_tour_meta_tour_price' => array(
                         'name' => 'yatra_tour_meta_tour_price',
                         'title' => sprintf(__('Tour Price(%s)', 'yatra'), $currency_symbols),
@@ -205,9 +201,13 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                         )
                     )
                 ),
-            );
+            );*/
+            $configurations = array();
 
-            $yatra_metabox_tabs_keys = array_keys(yatra_tour_metabox_tabs());
+            $yatra_metabox_tabs_keys = yatra_tour_metabox_tabs();
+            echo '<pre>';
+            print_r($yatra_metabox_tabs_keys);
+            exit;
 
             $config = array();
 
@@ -237,6 +237,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 }
                 return $return_field_values;
             }
+
+
             return $config;
         }
 
@@ -265,22 +267,48 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
         public function callback($args)
         {
 
+
             $metabox_tabs = yatra_tour_metabox_tabs();
+
 
             ?>
             <div class="yatra-tabs">
 
-                <ul>
+                <ul class="mb-tab-list">
                     <?php foreach ($metabox_tabs as $tab_key => $tab) { ?>
-                        <li><a href="#<?php echo esc_attr($tab_key); ?>"><?php echo esc_html($tab); ?></a></li>
+                        <li><a href="#<?php echo esc_attr($tab_key); ?>"><?php echo esc_html($tab['label']); ?></a></li>
                     <?php } ?>
                 </ul>
-                <?php foreach ($metabox_tabs as $tab_content_key => $tab_content) { ?>
-                    <section id="<?php echo esc_attr($tab_content_key); ?>">
+                <?php
+
+                $index = 0;
+
+                foreach ($metabox_tabs as $tab_content_key => $tab_content) {
+                    $index++;
+                    ?>
+                    <section id="<?php echo esc_attr($tab_content_key); ?>" style="display:none;"
+                             class="yatra-tab-section">
                         <?php
-                        $path = apply_filters('yatra_tour_metabox_view_tab_' . $tab_content_key, YATRA_ABSPATH . 'includes/meta-boxes/views/');
-                        $final_path = $path . $tab_content_key . '.php';
-                        include_once $final_path;
+
+                        $configs = isset($tab_content['config']) ? $tab_content['config'] : array();
+
+                        switch ($tab_content_key) {
+
+                            case "tour-options":
+                                $this->tour_options($configs, $tab_content_key);
+
+                                break;
+
+                            case "tour-attributes":
+                                $this->tour_attributes($configs, $tab_content_key);
+
+                                break;
+
+                            case "tour-tabs":
+                                $this->tour_tabs($configs, $tab_content_key);
+
+                                break;
+                        }
                         ?>
                     </section>
                 <?php } ?>
@@ -291,12 +319,17 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
         }
 
 
+        public function save($post)
+        {
+
+        }
+
         /**
          * When the post is saved, saves our custom data.
          *
          * @param int $post_id The ID of the post being saved.
          */
-        public function save($post_id)
+        public function save1($post_id)
         {
             /*
              * We need to verify this came from our screen and with proper authorization,
@@ -322,6 +355,87 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                     }
                 }
             }
+        }
+
+        private function tour_options($configs = array(), $tab_content_key)
+        {
+            foreach ($configs as $field) {
+                $this->metabox_html($field);
+            }
+
+        }
+
+        private function tour_attributes($configs = array(), $tab_content_key)
+        {
+            $fields = array();
+            foreach ($configs as $config_key => $value) {
+                $fields[$config_key] = isset($value['label']) ? $value['label'] : '';
+            }
+
+            $tour_attribute_field = array(
+                'name' => $tab_content_key,
+                'title' => sprintf(__('Tour Attributes', 'yatra')),
+                'type' => 'select',
+                'options' => $fields
+            );
+            $this->metabox_html($tour_attribute_field);
+        }
+
+        private function tour_tabs($configs = array(), $tab_content_key)
+        {
+
+            echo '<ul  class="mb-meta-vertical-tab">';
+
+            $index = 0;
+
+            foreach ($configs as $config => $setting) {
+
+                $class = $index === 0 ? 'active' : '';
+
+                echo '<li class="' . $class . '" data-tab-content="' . $config . '">' . $setting['label'] . '</li>';
+
+                $index++;
+            }
+
+
+            echo '</ul>';
+
+            echo '<div class="mb-meta-vertical-tab-content">';
+
+            $content_index = 0;
+
+            foreach ($configs as $config_key => $setting_value) {
+
+                $class = 'mb-meta-vertical-tab-content-item';
+
+                $class .= $content_index === 0 ? ' active' : '';
+
+                echo '<div class="' . $class . '" data-tab-content="' . $config_key . '">';
+
+                foreach ($setting_value as $setting_key => $setting_args) {
+
+                    switch ($setting_key) {
+
+                        case "label":
+                            echo "<h2>{$setting_args}</h2>";
+                            break;
+
+                        case "options":
+                            foreach ($setting_args as $option) {
+                                $this->metabox_html($option);
+                            }
+                            break;
+
+                    }
+
+                }
+
+
+                echo '</div>';
+                $content_index++;
+            }
+            echo '</div>';
+
         }
 
 

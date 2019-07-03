@@ -12,8 +12,8 @@ if (!function_exists('yatra_tour_tabs')) {
     function yatra_tour_tabs()
     {
         $tour_tabs_array = array(
-            'overview' => array(
-                'title' => __('Overview', 'yatra'),
+            'options' => array(
+                'title' => __('Options', 'yatra'),
                 'icon' => '',
             ),
             'itinerary' => array(
@@ -39,14 +39,23 @@ if (!function_exists('yatra_tour_tabs')) {
 }
 
 if (!function_exists('yatra_tour_metabox_tabs')) {
+
     function yatra_tour_metabox_tabs()
     {
         $metabox_tabs = array(
 
-            'tour-overview' => __('Overview', 'yatra'),
-            'tour-itinerary' => __('Itinerary', 'yatra'),
-            'tour-cost' => __('Cost Info', 'yatra'),
-            'tour-facts' => __('Tour Facts', 'yatra'),
+            'tour-options' => array(
+                'label' => __('Tour Options', 'yatra'),
+                'config' => yatra_tour_general_configurations()
+            ),
+            'tour-attributes' => array(
+                'label' => __('Attributes', 'yatra'),
+                'config' => yatra_tour_attributes()
+            ),
+            'tour-tabs' => array(
+                'label' => __('Tour Tabs', 'yatra'),
+                'config' => yatra_tour_tab_configurations()
+            ),
         );
 
         return apply_filters('yatra_tour_metabox_tabs', $metabox_tabs);

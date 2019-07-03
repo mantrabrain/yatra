@@ -333,6 +333,343 @@ if (!function_exists('yatra_entry_meta_attributes')) {
 
     }
 }
+if (!function_exists('yatra_tour_tab_configurations')) {
+
+    function yatra_tour_tab_configurations()
+    {
+
+        $tab_config = array(
+
+            'overview' => array(
+                'label' => __('Overviewddddd', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label Text', 'yatra'),
+                            'type' => 'text',
+                            'default' => 'This is default text',
+                        ),
+                        'description' => array(
+                            'name' => 'description',
+                            'title' => __('Overview Description', 'yatra'),
+                            'type' => 'textarea',
+                        )
+                    ),
+
+            ),
+            'itinerary' => array(
+                'label' => __('Itinerary', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'itinerary_repeator' => array(
+                            'name' => 'itinerary_repeator',
+                            'type' => 'repeator',
+                            'options' => array('heading' => array(
+                                'name' => 'heading',
+                                'title' => __('Heading', 'yatra'),
+                                'type' => 'text',
+                                'default' => __('Day {index} ', 'yatra'),
+                            ),
+                                'title' => array(
+                                    'name' => 'title',
+                                    'title' => __('Title', 'yatra'),
+                                    'type' => 'text',
+                                ),
+                                'details' => array(
+                                    'name' => 'details',
+                                    'title' => __('Details', 'yatra'),
+                                    'type' => 'textarea',
+                                )
+                            )
+                        )
+
+                    )
+            ),
+            'cost_info' => array(
+                'label' => __('Cost Info', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                            'default' => __('Price Information', 'yatra'),
+                        ),
+                        'price_includes_title' => array(
+                            'name' => 'price_includes_title',
+                            'title' => __('Title', 'yatra'),
+                            'type' => 'text',
+                            'default' => __('Price includes', 'yatra'),
+                        ),
+                        'price_includes_description' => array(
+                            'name' => 'price_includes_description',
+                            'title' => __('Price include description', 'yatra'),
+                            'type' => 'textarea',
+                            'description' => __('Type enter to show in new list.', 'yatra'),
+                        ),
+                        'price_excludes_title' => array(
+                            'name' => 'price_excludes_title',
+                            'title' => __('Price excludes title', 'yatra'),
+                            'type' => 'text',
+                            'default' => __('Price excludes', 'yatra'),
+                        ),
+                        'price_excludes_description' => array(
+                            'name' => 'price_includes_description',
+                            'title' => __('Price excludes description', 'yatra'),
+                            'type' => 'textarea',
+                            'description' => __('Type enter to show in new list.', 'yatra'),
+                        )
+                    ),
+            ),
+            'faq' => array(
+                'label' => __('FAQ', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'faq_repeator' => array(
+                            'name' => 'faq_repeator',
+                            'type' => 'repeator',
+                            'options' =>
+                                array(
+                                    'heading' => array(
+                                        'name' => 'heading',
+                                        'title' => __('FAQ Heading', 'yatra'),
+                                        'type' => 'text',
+                                        'default' => __('FAQ {index} ', 'yatra'),
+                                    ),
+                                    'description' => array(
+                                        'name' => 'description',
+                                        'title' => __('Description', 'yatra'),
+                                        'type' => 'textarea',
+                                    )
+                                )
+                        )
+
+                    )
+
+            ),
+            'map' => array(
+                'label' => __('Map', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Map Content', 'yatra'),
+                            'type' => 'textarea',
+                        )
+                    ),
+            ),
+            'gallery' => array(
+                'label' => __('Gallery', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Gallery', 'yatra'),
+                            'type' => 'gallery',
+                        )
+                    ),
+            ),
+        );
+        return apply_filters('yatra_tour_tab_configurations', $tab_config);
+    }
+}
+
+
+if (!function_exists('yatra_tour_attributes')) {
+
+    function yatra_tour_attributes()
+    {
+
+        $tour_attributes = array(
+
+            'altitude' => array(
+                'label' => __('Altitude', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Content', 'yatra'),
+                            'type' => 'text',
+                        )
+                    ),
+            ),
+            'group_size' => array(
+                'label' => __('Grop Size', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Content', 'yatra'),
+                            'type' => 'number',
+                        )
+                    ),
+            ),
+            'tour_starts_at' => array(
+
+                'label' => __('Tour Starts At', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Starts at', 'yatra'),
+                            'type' => 'text',
+                        )
+                    ),
+
+
+            ),
+            'tour_ends_at' => array(
+                'label' => __('Tour Starts At', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Ends at', 'yatra'),
+                            'type' => 'text',
+                        )
+                    ),
+
+            ),
+            'tour_route' => array(
+                'label' => __('Tour Route', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Description', 'yatra'),
+                            'type' => 'text',
+                        )
+                    ),
+
+            ),
+            'tour_best_season' => array(
+                'label' => __('Tour Route', 'yatra'),
+                'options' =>
+                    array(
+                        'label' => array(
+                            'name' => 'label',
+                            'title' => __('Label', 'yatra'),
+                            'type' => 'text',
+                        ),
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Description', 'yatra'),
+                            'type' => 'text',
+                        )
+                    ),
+            )
+        );
+        return apply_filters('yatra_tour_attributes', $tour_attributes);
+    }
+}
+
+
+if (!function_exists('yatra_tour_general_configurations')) {
+
+    function yatra_tour_general_configurations()
+    {
+        $currency = get_option('yatra_currency');
+
+        $currency_symbols = yatra_get_currency_symbols($currency);
+
+        $countries = yatra_get_countries();
+
+        $tour_options = array(
+            'tour_price' => array(
+                'name' => 'tour_price',
+                'title' => sprintf(__('Tour Price(%s)', 'yatra'), $currency_symbols),
+                'type' => 'number',
+                'wrap_class' => 'yatra-left',
+                'extra_attributes' => array(
+                    'placeholder' => sprintf(__('Tour Price (%s)', 'yatra'), $currency_symbols),
+                ),
+                'row_start' => true,
+            ), 'tour_duration_days' => array(
+                'name' => 'tour_duration_days',
+                'title' => esc_html__('Tour Duration Days', 'yatra'),
+                'type' => 'number',
+                'wrap_class' => 'yatra-right',
+                'extra_attributes' => array(
+                    'placeholder' => __('Number of days', 'yatra'),
+                ),
+                'row_end' => true,
+
+            ), 'tour_duration_nights' => array(
+                'name' => 'tour_duration_nights',
+                'title' => esc_html__('Tour Duration Nights', 'yatra'),
+                'type' => 'number',
+                'wrap_class' => 'yatra-left',
+                'extra_attributes' => array(
+                    'placeholder' => __('Number of nights', 'yatra'),
+                ),
+                'row_start' => true,
+
+            ), 'tour_country' => array(
+                'name' => 'tour_country',
+                'title' => esc_html__('Country', 'yatra'),
+                'type' => 'select',
+                'wrap_class' => 'yatra-right',
+                'extra_attributes' => array(
+                    'placeholder' => __('Number of nights', 'yatra'),
+                ),
+                'options' => $countries,
+                'default' => 'NP',
+                'is_multiple' => true,
+                'select2' => true,
+                'row_end' => true,
+
+            ),
+        );
+        return apply_filters('yatra_tour_general_configurations', $tour_options);
+    }
+}
+
 
 if (!function_exists('yatra_frontend_tabs_config')) {
 

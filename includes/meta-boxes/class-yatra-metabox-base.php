@@ -83,11 +83,24 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
                 return;
             }
+
+            if ($field['type'] == 'repeator') {
+
+                echo '<div class="mb-repeator">';
+
+                $repeator_options = isset($field['options']) ? $field['options'] : array();
+
+                foreach ($repeator_options as $repeator_single) {
+
+                    $this->metabox_html($repeator_single);
+                }
+                echo '</div>';
+            }
             $field_key = $field['name'];
 
             $post_meta = get_post_meta($post_id, $field_key, true);
 
-            $value = isset($post_meta) ? $post_meta : $field['default'];
+            $value = metadata_exists('post', $post_id, $field_key) ? $post_meta : isset($field['default']) ? $field['default'] : '';
 
             $extra_attributes = isset($field['extra_attributes']) ? $field['extra_attributes'] : array();
 
@@ -112,6 +125,22 @@ if (!class_exists('Yatra_Metabox_Base')) {
             echo '<div class="yatra-field-wrap ' . esc_attr($wrap_class) . '">';
 
             switch ($field['type']) {
+                case "heading":
+                    ?>
+                    <p>
+
+                        <label
+                                for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                            :</label>
+                        <span><?php echo esc_html($value); ?></span>
+                        <input class="widefat"
+                               id="<?php echo esc_attr(($field_key)); ?>"
+                               name="<?php echo esc_attr(($field_key)); ?>"
+                               type="hidden"
+                               value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+                    </p>
+                    <?php
+                    break;
                 case "text":
                 case "number":
                     ?>
