@@ -136,13 +136,68 @@ var YatraAdmin = function ($) {
 
         init: function () {
 
+            this.initElement();
             this.initLib();
+            this.initGalleryBuilder();
+        },
+        initElement: function () {
+            this.gallery_upload_frame = '';
 
         }, initLib: function () {
 
             if (typeof "select2" !== 'undefined') {
                 $('.yatra-select2').select2();
             }
+        },
+        initGalleryBuilder: function () {
+            var uploadBtn = $('.mb-gallery-add');
+            var parent = uploadBtn.closest('.mb-admin-gallery');
+            var $this = this;
+            uploadBtn.on('click', function (event) {
+                event.preventDefault();
+                $this.initMediaUploader(uploadBtn, parent);
+            })
+        },
+        initMediaUploader: function (uploadBtn, wrapper) {
+
+            var $this = this;
+            if (this.gallery_upload_frame) this.gallery_upload_frame.close();
+
+            this.gallery_upload_frame = wp.media.frames.file_frame = wp.media({
+                title: uploadBtn.data('uploader-title'),
+                button: {
+                    text: uploadBtn.data('uploader-button-text'),
+                },
+                multiple: true
+            });
+
+            this.gallery_upload_frame.on('select', function () {
+                var previous_selection_value = wrapper.find("input").val();
+                var previous_selection_array = previous_selection_value.split(",");
+                if (previous_selection_array.length == 1 && previous_selection_array[0] == "") {
+                    previous_selection_array = [];
+                }
+                var selection = $this.gallery_upload_frame.state().get('selection');
+                var selected_list_html = '<ul class="mb-selected-gallery-list">';
+                selection.map(function (attachment_object, i) {
+                    var attachment = attachment_object.toJSON();
+                    var attachment_id = attachment.id;
+                    var attachment_url = attachment.sizes.full.url;
+                    if ($.inArray(attachment_id, previous_selection_array) !== "-1") {
+                        previous_selection_array.push(attachment_id);
+                        selected_list_html += ('<li><img src="' + attachment_url + '"/></li>');
+                    }
+
+
+                });
+                selected_list_html += '</ul>';
+                wrapper.find("input").val(previous_selection_array.join())
+                wrapper.find('.mb-selected-gallery-list').remove();
+                wrapper.append(selected_list_html);
+            });
+
+
+            this.gallery_upload_frame.open();
         }
 
     };

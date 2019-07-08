@@ -234,3 +234,40 @@
     margin-left: 10px;
     font-weight: 500;
 }
+
+.mb-gallery-add {
+    width: 225px;
+    height: 160px;
+    border: 4px dotted #074771;
+    padding: 0;
+    /* border-radius: 4px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 30px;
+    color: #1A84EE;
+    background: #fbfbfb;
+    position: relative;
+    margin: 10px auto;
+}
+
+ul.mb-selected-gallery-list {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+ul.mb-selected-gallery-list li {
+    width: 160px;
+    display: block;
+    margin: 5px;
+    padding: 5px;
+    float: left;
+}
+
+ul.mb-selected-gallery-list li img {
+    width: 100%;
+    height: 125px;
+    object-fit: cover;
+    border: 4px solid #bbbbbb;
+}

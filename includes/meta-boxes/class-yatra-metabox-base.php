@@ -327,6 +327,46 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     </p>
                     <?php
                     break;
+                case "gallery":
+                    ?>
+                    <div class="mb-admin-gallery">
+
+                        <label
+                                for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                            :</label>
+                        <input class="<?php echo esc_attr($field_class) ?>"
+                               id="<?php echo esc_attr(($field_key)); ?>"
+                               name="<?php echo esc_attr(($field_key)); ?>"
+                               type="text"
+                               value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+                        <a class="mb-gallery-add" href="#"
+                           data-uploader-title="<?php esc_attr_e('Add image(s) to gallery', 'yatra'); ?>"
+                           data-uploader-button-text="<?php esc_attr_e('Add image(s)', 'yatra'); ?>"
+                        ><span><?php esc_html_e('Add image(s)', 'yatra'); ?></span></a>
+                        <?php
+                        $gallery_item_array = explode(',', $value);
+
+                        if (count($gallery_item_array) > 0) {
+                            //wp_attachment_is_image
+                            echo '<ul class="mb-selected-gallery-list">';
+                            for ($i = 0; $i < count($gallery_item_array); $i++) {
+                                $src = wp_get_attachment_url($gallery_item_array[$i]);
+                                if (wp_attachment_is_image($gallery_item_array[$i]) && $src) {
+
+                                    echo '<li>';
+                                    echo '<img src="' . esc_url_raw($src) . '"/>';
+                                    echo '</li>';
+                                }
+                            }
+
+
+                            echo '</ul>';
+                        }
+
+                        ?>
+                    </div>
+                    <?php
+                    break;
 
             }
             echo "</div>";
