@@ -159,7 +159,6 @@ var YatraSubTabs = function ($) {
 
         cacheDom: function () {
             this.$tabList = $('.mb-meta-vertical-tab');
-
             this.$tab = this.$tabList.find('li');
             this.$tabFirst = this.$tabList.find('li:first-child');
             this.$tabLink = this.$tabList.find('li');
@@ -168,9 +167,62 @@ var YatraSubTabs = function ($) {
         },
 
         bindEvents: function () {
+            var $this = this;
             this.$tabLink.on('click', function () {
                 this.changeTab();
             }.bind(this));
+
+            $('body').on('click', '.mb-repeator-heading span.toggle', function () {
+
+                $(this).closest('.mb-repeator').find('.mb-repeator-fields').slideToggle('slow', function () {
+
+                });
+            });
+
+            $('body').on('click', '.mb-repeator-heading span.add', function () {
+
+                $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').after($(this).closest('.mb-repeator').clone());
+
+
+                var node = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.mb-repeator-heading-input');
+
+                var index = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').index(node.closest('.mb-repeator'));
+
+                $this.repeatorHeading(node, index);
+
+                $this.updateRepeatorIndex($(this));
+            });
+
+            $('body').on('click', '.mb-repeator-heading span.remove', function () {
+
+                if ($(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').length > 1) {
+                    $(this).closest('.mb-repeator').remove();
+                }
+                $('.mb-repeator-heading-input').trigger('keyup');
+                $this.updateRepeatorIndex($(this));
+            });
+            $('body').on('keyup', '.mb-repeator-heading-input', function () {
+
+                var index = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').index($(this).closest('.mb-repeator'));
+
+                $this.repeatorHeading($(this), index);
+
+            });
+            $.each($('.mb-repeator-heading-input'), function () {
+
+                var index = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').index($(this).closest('.mb-repeator'));
+
+                $this.repeatorHeading($(this), index);
+            });
+        },
+        repeatorHeading: function ($node, $node_index) {
+            var $node_val = $node.val();
+            var replaced_value = $node_val.replace("{index}", $node_index + 1);
+            $node.closest('.mb-repeator').find('.repeator-title').html(replaced_value);
+        },
+
+        updateRepeatorIndex: function ($node) {
+
         },
 
         changeTab: function () {
@@ -181,7 +233,7 @@ var YatraSubTabs = function ($) {
             var data_tab_content_id = self.attr('data-tab-content');
 
             this.$tabPanel.removeClass('active');
-            this.$tabList.closest('section').find('.mb-meta-vertical-tab-content-item[data-tab-content="'+data_tab_content_id+'"]').addClass('active');
+            this.$tabList.closest('section').find('.mb-meta-vertical-tab-content-item[data-tab-content="' + data_tab_content_id + '"]').addClass('active');
         }
 
     };

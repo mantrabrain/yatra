@@ -68,6 +68,35 @@ if (!class_exists('Yatra_Metabox_Base')) {
             return $updated_value;
         }
 
+        public function parse_repeator_options($repeator_options_raw, $field, $post_id)
+        {
+            $post_meta = get_post_meta($post_id, $field['name'], true);
+
+
+            $post_meta_keys = array_keys($post_meta);
+
+            $repeator_count = isset($post_meta_keys[0]) ? count($post_meta[$post_meta_keys[0]]) : count($repeator_options_raw);
+
+
+            $new_repeator_options = $repeator_options_raw;
+
+            for ($i = 0; $i < $repeator_count; $i++) {
+
+                $repeator_options = isset($repeator_options_raw[0]) ? $repeator_options_raw[0] : array();
+
+                foreach ($repeator_options as $option_key => $option) {
+
+                    $option_value = isset($post_meta[$option_key]) && isset($post_meta[$option_key][$i]) ? $post_meta[$option_key][$i] : '';
+
+                    $repeator_options[$option_key]['default'] = $option_value;
+                }
+                $new_repeator_options[$i] = $repeator_options;
+            }
+
+
+            return $new_repeator_options;
+        }
+
         public function metabox_html($field = array())
         {
             global $post;
@@ -84,24 +113,45 @@ if (!class_exists('Yatra_Metabox_Base')) {
                 return;
             }
 
+
             if ($field['type'] == 'repeator') {
 
-                echo '<div class="mb-repeator">';
+                $repeator_options_raw = isset($field['options']) ? $field['options'] : array();
 
-                $repeator_options = isset($field['options']) ? $field['options'] : array();
+                $repeator_options = $this->parse_repeator_options($repeator_options_raw, $field, $post_id);
 
-                foreach ($repeator_options as $repeator_single) {
+                foreach ($repeator_options as $repeator_key => $repeator_field) {
+                    echo '<div class="mb-repeator">';
+                    echo '<div class="mb-repeator-heading">';
+                    echo '<span class="toggle dashicons dashicons-arrow-down-alt2"></span>';
+                    echo '<span class="repeator-title"></span>';
+                    echo '<span class="add dashicons dashicons-plus"></span>';
+                    echo '<span class="remove dashicons dashicons-minus"></span>';
+                    echo '</div>';
+                    echo '<div class="mb-repeator-fields">';
+                    foreach ($repeator_field as $repeator_single) {
 
-                    $this->metabox_html($repeator_single);
+                        $repeator_single['name'] = $field['name'] . "[" . $repeator_single['name'] . "][]";
+
+                        $this->metabox_html($repeator_single);
+                    }
+
+                    echo '</div>';
+                    echo '</div>';
                 }
-                echo '</div>';
             }
             $field_key = $field['name'];
 
             $post_meta = get_post_meta($post_id, $field_key, true);
 
-            $value = metadata_exists('post', $post_id, $field_key) ? $post_meta : isset($field['default']) ? $field['default'] : '';
+            if ($field['type'] != 'repeator' && metadata_exists('post', $post_id, $field_key)) {
 
+                $value = $post_meta;
+
+            } else {
+
+                $value = isset($field['default']) ? $field['default'] : '';
+            }
             $extra_attributes = isset($field['extra_attributes']) ? $field['extra_attributes'] : array();
 
             $extra_attribute_text = '';
@@ -124,6 +174,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
             echo '<div class="yatra-field-wrap ' . esc_attr($wrap_class) . '">';
 
+            $field_class = isset($field['class']) ? 'widefat ' . $field['class'] : 'widefat';
             switch ($field['type']) {
                 case "heading":
                     ?>
@@ -133,7 +184,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                                 for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
                             :</label>
                         <span><?php echo esc_html($value); ?></span>
-                        <input class="widefat"
+                        <input class="<?php echo esc_attr($field_class) ?>"
                                id="<?php echo esc_attr(($field_key)); ?>"
                                name="<?php echo esc_attr(($field_key)); ?>"
                                type="hidden"
@@ -148,7 +199,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         <label
                                 for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
                             :</label>
-                        <input class="widefat"
+                        <input class="<?php echo esc_attr($field_class) ?>"
                                id="<?php echo esc_attr(($field_key)); ?>"
                                name="<?php echo esc_attr(($field_key)); ?>"
                                type="<?php echo esc_attr($field_type) ?>"
@@ -191,7 +242,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         wp_editor($value, $field_key, $editor_settings);
                     } else {
                         ?>
-                        <textarea class="widefat"
+                        <textarea class="<?php echo esc_attr($field_class) ?>"
                                   id="<?php echo esc_attr(($field_key)); ?>"
                                   name="<?php echo esc_attr(($field_key)); ?>"
                             <?php echo $extra_attribute_text; ?>
@@ -215,11 +266,11 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         if ($is_multi_select) {
                             $extra_attribute_text .= ' multiple="multiple"';
                         }
-                        $select_class = 'widefat';
-                        $select_class .= $is_select2 ? ' yatra-select2' : '';
+
+                        $field_class .= $is_select2 ? ' yatra-select2' : '';
                         ?>
 
-                        <select class="<?php echo esc_attr($select_class); ?>"
+                        <select class="<?php echo esc_attr($field_class); ?>"
                                 id="<?php echo esc_attr(($field_key)); ?>"
                                 name="<?php echo esc_attr(($field_key));
                                 echo $is_multi_select ? '[]' : ''; ?>"

@@ -318,18 +318,12 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             <?php
         }
 
-
-        public function save($post)
-        {
-
-        }
-
         /**
          * When the post is saved, saves our custom data.
          *
          * @param int $post_id The ID of the post being saved.
          */
-        public function save1($post_id)
+        public function save($post_id)
         {
             /*
              * We need to verify this came from our screen and with proper authorization,
@@ -343,16 +337,112 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
                 if ($is_valid_nonce) {
 
-                    $form_fields = $this->metabox_config(null, true);
+                    $metabox_tabs = yatra_tour_metabox_tabs();
 
-                    foreach ($form_fields as $field_key => $field) {
+                    foreach ($metabox_tabs as $tab_content_key => $tab_content) {
 
-                        $field_value = isset($_POST[$field_key]) ? $_POST[$field_key] : '';
+                        $configs = isset($tab_content['config']) ? $tab_content['config'] : array();
 
-                        $valid_field_value = $this->sanitize($field_value, $field);
+                        switch ($tab_content_key) {
 
-                        update_post_meta($post_id, $field_key, $valid_field_value);
+                            case "tour-options":
+                                $this->save_tour_options($configs, $post_id);
+
+                                break;
+
+                            case "tour-attributes":
+
+
+                                break;
+
+                            case "tour-tabs":
+                                $this->save_tour_tabs($configs, $post_id);
+                                break;
+                        }
                     }
+                }
+            }
+        }
+
+        private function save_tour_options($configs = array(), $post_id)
+        {
+            foreach ($configs as $field_key => $field) {
+
+                $field_value = isset($_POST[$field_key]) ? $_POST[$field_key] : '';
+
+                $valid_field_value = $this->sanitize($field_value, $field);
+
+                update_post_meta($post_id, $field_key, $valid_field_value);
+            }
+        }
+
+        private function save_tour_tabs($configs = array(), $post_id)
+        {
+            /*
+                        echo '<pre>';
+                        print_r($_POST);
+                        exit;*/
+
+            foreach ($configs as $config) {
+
+                $options = isset($config['options']) ? $config['options'] : array();
+
+                foreach ($options as $option => $option_field) {
+
+                    $field_key = isset($option_field['name']) ? $option_field['name'] : '';
+
+                    $type = isset($option_field['type']) ? $option_field['type'] : '';
+
+                    if (!empty($field_key)) {
+
+                        if ($type != 'repeator') {
+
+                            $field_value = isset($_POST[$field_key]) ? $_POST[$field_key] : '';
+
+                            $valid_field_value = $this->sanitize($field_value, $option_field);
+
+                            update_post_meta($post_id, $field_key, $valid_field_value);
+
+                        } else {
+
+                            $repeator_options = isset($option_field['options']) ? $option_field['options'] : array();
+
+                            $repeator = isset($_POST[$field_key]) ? $_POST[$field_key] : array();
+
+                            $repeator_array = isset($repeator_options[0]) ? $repeator_options[0] : array();
+
+                            $final_field_value = array();
+
+                            foreach ($repeator as $repeator_key => $repeator_value) {
+
+                                $valid_field_value_array = array();
+
+                                foreach ($repeator_value as $single_repeator_value) {
+
+                                    if (isset($repeator_array[$repeator_key])) {
+
+                                        $valid_field_value = $this->sanitize($single_repeator_value, $repeator_array[$repeator_key]);
+
+                                        array_push($valid_field_value_array, $valid_field_value);
+
+                                    }
+
+                                }
+                                $final_field_value[$field_key][$repeator_key] = $valid_field_value_array;
+
+
+                            }
+
+                            if (isset($final_field_value[$field_key])) {
+
+                                update_post_meta($post_id, $field_key, $final_field_value[$field_key]);
+                            }
+
+
+                        }
+
+                    }
+
                 }
             }
         }
