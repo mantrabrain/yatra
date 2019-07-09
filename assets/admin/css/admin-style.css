@@ -176,7 +176,10 @@
     text-transform: uppercase;
 
 }
-
+.mb-meta-vertical-tab li .fa {
+    margin-right: 10px;
+    line-height: 22px;
+}
 .mb-meta-vertical-tab li:hover, .mb-meta-vertical-tab li.active {
     background: #0468a9;
 }
@@ -268,7 +271,7 @@ ul.mb-selected-gallery-list li {
 
 ul.mb-selected-gallery-list li a.remove {
     position: absolute;
- 
+
     height: 25px;
     width: 25px;
     text-align: center;

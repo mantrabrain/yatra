@@ -196,7 +196,7 @@ var YatraAdmin = function ($) {
 
 
                 });
-                wrapper.find("input").val(previous_selection_array.join())
+                wrapper.find("input").val(previous_selection_array.join());
                 selected_list_node.append(selected_list_html);
             });
 
@@ -238,6 +238,7 @@ var YatraSubTabs = function ($) {
             this.$tabFirst = this.$tabList.find('li:first-child');
             this.$tabLink = this.$tabList.find('li');
             this.$tabPanel = this.$tabList.closest('section').find('.mb-meta-vertical-tab-content-item');
+            this.tabReordering();
 
         },
 
@@ -313,7 +314,7 @@ var YatraSubTabs = function ($) {
 
                 $(this).closest('.yatra-field-wrap').find('#' + updated_id).show();
 
-            
+
                 tinyMCE.execCommand("mceAddEditor", true, updated_id);
 
                 /* var editorSettings = {
@@ -337,12 +338,10 @@ var YatraSubTabs = function ($) {
             var replaced_value = $node_val.replace("{index}", $node_index);
             $node.closest('.mb-repeator').find('.repeator-title').html(replaced_value);
         },
-
         getUpdatedRepeatorIndex: function ($node) {
             var index = $node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').index($node.closest('.mb-repeator'));
             return index + 1;
         },
-
         changeTab: function () {
             var self = $(event.target);
             event.preventDefault();
@@ -352,6 +351,21 @@ var YatraSubTabs = function ($) {
 
             this.$tabPanel.removeClass('active');
             this.$tabList.closest('section').find('.mb-meta-vertical-tab-content-item[data-tab-content="' + data_tab_content_id + '"]').addClass('active');
+        },
+        tabReordering: function () {
+            var $this = this;
+            this.$tabList.sortable({
+                update: function (event, ui) {
+                    var sortableItemArray = [];
+                    $.each($this.$tabList.find('li'), function () {
+                        sortableItemArray.push($(this).attr('data-tab-content'));
+                    });
+                    if (sortableItemArray.length > 0) {
+
+                        $('#tour_meta_information').find('input[name="tour_tabs_ordering"]').val(sortableItemArray.join())
+                    }
+                }
+            });
         }
 
     };

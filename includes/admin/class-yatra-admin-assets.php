@@ -22,8 +22,11 @@ if (!class_exists('Yatra_Admin_Assets')) {
             // Register Only Styles
             wp_register_style('yatra-select2css', YATRA_PLUGIN_URI . '/assets/lib/select2/css/select2.min.css', false, YATRA_VERSION);
 
+            // Font Awesome
+            wp_register_style('yatra-font-awesome', YATRA_PLUGIN_URI . '/assets/lib/font-awesome/css/fontawesome.min.css', false, YATRA_VERSION);
+
             // Other Register and Enqueue
-            wp_register_style('yatra-admin-style', YATRA_PLUGIN_URI . '/assets/admin/css/admin-style.css', array('yatra-select2css'), YATRA_VERSION);
+            wp_register_style('yatra-admin-style', YATRA_PLUGIN_URI . '/assets/admin/css/admin-style.css', array('yatra-select2css', 'yatra-font-awesome'), YATRA_VERSION);
             wp_enqueue_style('yatra-admin-style');
 
 

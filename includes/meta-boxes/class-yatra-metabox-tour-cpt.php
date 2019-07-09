@@ -480,13 +480,46 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             $index = 0;
 
-            foreach ($configs as $config => $setting) {
+            global $post;
 
-                $class = $index === 0 ? 'active' : '';
+            $post_id = $post->ID;
 
-                echo '<li class="' . $class . '" data-tab-content="' . $config . '">' . $setting['label'] . '</li>';
+            $tour_tabs_ordering = get_post_meta($post_id, 'tour_tabs_ordering', true);
 
-                $index++;
+            $tour_tabs_ordering_array = explode(',', $tour_tabs_ordering);
+
+            $config_array_keys = array_keys($configs);
+
+            $array_diff = array_diff($config_array_keys, $tour_tabs_ordering_array);
+
+            $final_ordered_config_keys = $tour_tabs_ordering_array;
+
+            if (count($array_diff) > 0) {
+
+                $final_ordered_config_keys = array_merge($tour_tabs_ordering_array, $array_diff);
+            }
+
+            $active_tab_config = '';
+
+            foreach ($final_ordered_config_keys as $config) {
+
+                if (isset($configs[$config])) {
+
+                    $setting = $configs[$config];
+
+                    $class = $index === 0 ? 'active' : '';
+
+                    if ($index === 0) {
+
+                        $active_tab_config = $config;
+                    }
+
+                    $icon = isset($setting['icon']) ? '<span class="' . esc_attr($setting['icon']) . '"></span>' : '';
+
+                    echo '<li class="' . $class . '" data-tab-content="' . $config . '">' . $icon . $setting['label'] . '</li>';
+
+                    $index++;
+                }
             }
 
 
@@ -494,13 +527,11 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             echo '<div class="mb-meta-vertical-tab-content">';
 
-            $content_index = 0;
-
             foreach ($configs as $config_key => $setting_value) {
 
                 $class = 'mb-meta-vertical-tab-content-item';
 
-                $class .= $content_index === 0 ? ' active' : '';
+                $class .= $config_key === $active_tab_config ? ' active' : '';
 
                 echo '<div class="' . $class . '" data-tab-content="' . $config_key . '">';
 
@@ -524,7 +555,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
 
                 echo '</div>';
-                $content_index++;
             }
             echo '</div>';
 

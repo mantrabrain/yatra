@@ -339,9 +339,9 @@ if (!function_exists('yatra_tour_tab_configurations')) {
     {
 
         $tab_config = array(
-
             'overview' => array(
                 'label' => __('Overview', 'yatra'),
+                'icon' => 'fa fa-atom',
                 'options' =>
                     array(
                         'overview_label' => array(
@@ -354,13 +354,14 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'overview_description',
                             'title' => __('Overview Description', 'yatra'),
                             'type' => 'textarea',
-                            'editor'=> true
+                            'editor' => true
                         )
                     ),
 
             ),
             'itinerary' => array(
                 'label' => __('Itinerary', 'yatra'),
+                'icon' => 'fa fa-gopuram',
                 'options' =>
                     array(
                         'itinerary_label' => array(
@@ -389,7 +390,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                                         'name' => 'itinerary_details',
                                         'title' => __('Details', 'yatra'),
                                         'type' => 'textarea',
-                                        'editor'=> true
+                                        'editor' => true
                                     )
                                 )
                             )
@@ -399,6 +400,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
             ),
             'cost_info' => array(
                 'label' => __('Cost Info', 'yatra'),
+                'icon' => 'fa fa-dollar-sign',
                 'options' =>
                     array(
                         'cost_info_label' => array(
@@ -418,7 +420,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'title' => __('Price include description', 'yatra'),
                             'type' => 'textarea',
                             'description' => __('Type enter to show in new list.', 'yatra'),
-                            'editor'=> true
+                            'editor' => true
                         ),
                         'cost_info_price_excludes_title' => array(
                             'name' => 'cost_info_price_excludes_title',
@@ -431,12 +433,13 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'title' => __('Price excludes description', 'yatra'),
                             'type' => 'textarea',
                             'description' => __('Type enter to show in new list.', 'yatra'),
-                            'editor'=> true
+                            'editor' => true
                         )
                     ),
             ),
             'faq' => array(
                 'label' => __('FAQ', 'yatra'),
+                'icon' => 'fa fa-comment-dots',
                 'options' =>
                     array(
                         'faq_label' => array(
@@ -460,7 +463,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                                         'name' => 'faq_description',
                                         'title' => __('Description', 'yatra'),
                                         'type' => 'textarea',
-                                        'editor'=> true
+                                        'editor' => true
                                     )
                                 )
                             )
@@ -471,6 +474,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
             ),
             'map' => array(
                 'label' => __('Map', 'yatra'),
+                'icon' => 'fa fa-directions',
                 'options' =>
                     array(
                         'map_label' => array(
@@ -482,12 +486,13 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'map_content',
                             'title' => __('Map Content', 'yatra'),
                             'type' => 'textarea',
-                            'editor'=> true
+                            'editor' => true
                         )
                     ),
             ),
             'gallery' => array(
                 'label' => __('Gallery', 'yatra'),
+                'icon' => 'fa fa-images',
                 'options' =>
                     array(
                         'gallery_label' => array(
@@ -626,6 +631,11 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 'select2' => true,
                 'row_end' => true,
 
+            ),
+            'tour_tabs_ordering' => array(
+                'name' => 'tour_tabs_ordering',
+                'type' => 'hidden',
+                 
             ),
         );
         return apply_filters('yatra_tour_general_configurations', $tour_options);
