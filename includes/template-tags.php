@@ -354,6 +354,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'overview_description',
                             'title' => __('Overview Description', 'yatra'),
                             'type' => 'textarea',
+                            'editor'=> true
                         )
                     ),
 
@@ -388,6 +389,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                                         'name' => 'itinerary_details',
                                         'title' => __('Details', 'yatra'),
                                         'type' => 'textarea',
+                                        'editor'=> true
                                     )
                                 )
                             )
@@ -416,6 +418,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'title' => __('Price include description', 'yatra'),
                             'type' => 'textarea',
                             'description' => __('Type enter to show in new list.', 'yatra'),
+                            'editor'=> true
                         ),
                         'cost_info_price_excludes_title' => array(
                             'name' => 'cost_info_price_excludes_title',
@@ -428,6 +431,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'title' => __('Price excludes description', 'yatra'),
                             'type' => 'textarea',
                             'description' => __('Type enter to show in new list.', 'yatra'),
+                            'editor'=> true
                         )
                     ),
             ),
@@ -456,6 +460,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                                         'name' => 'faq_description',
                                         'title' => __('Description', 'yatra'),
                                         'type' => 'textarea',
+                                        'editor'=> true
                                     )
                                 )
                             )
@@ -477,6 +482,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'map_content',
                             'title' => __('Map Content', 'yatra'),
                             'type' => 'textarea',
+                            'editor'=> true
                         )
                     ),
             ),

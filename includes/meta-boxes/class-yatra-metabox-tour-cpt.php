@@ -9,6 +9,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             add_action('add_meta_boxes', array($this, 'metabox_form'));
 
             add_action('save_post', array($this, 'save'));
+
+
         }
 
         public function metabox_config($key = null, $get_merge_all_field = false)

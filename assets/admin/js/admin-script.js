@@ -261,11 +261,12 @@ var YatraSubTabs = function ($) {
 
                 var node = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.mb-repeator-heading-input');
 
-                var index = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').index(node.closest('.mb-repeator'));
+                var index = $this.getUpdatedRepeatorIndex($(this));
 
                 $this.repeatorHeading(node, index);
 
-                $this.updateRepeatorIndex($(this));
+                $this.editorFix(node);
+
             });
 
             $('body').on('click', '.mb-repeator-heading span.remove', function () {
@@ -274,30 +275,72 @@ var YatraSubTabs = function ($) {
                     $(this).closest('.mb-repeator').remove();
                 }
                 $('.mb-repeator-heading-input').trigger('keyup');
-                $this.updateRepeatorIndex($(this));
             });
             $('body').on('keyup', '.mb-repeator-heading-input', function () {
 
-                var index = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').index($(this).closest('.mb-repeator'));
+                var index = $this.getUpdatedRepeatorIndex($(this));
 
-                $this.repeatorHeading($(this), index);
+                $this.repeatorHeading($(this));
 
             });
             $.each($('.mb-repeator-heading-input'), function () {
 
                 var index = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').index($(this).closest('.mb-repeator'));
 
-                $this.repeatorHeading($(this), index);
+                $this.repeatorHeading($(this));
             });
         },
-        repeatorHeading: function ($node, $node_index) {
+        editorFix: function (node) {
+
+            var $this = this;
+            var editorAreas = node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.wp-editor-area');
+
+            node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.tmce-active').hide();
+
+            $.each(editorAreas, function () {
+
+                var this_id = $(this).attr('id');
+
+                var trimed_id = this_id.substr(0, this_id.lastIndexOf("-", this_id.length - 2));
+
+                var latest_id = $this.getUpdatedRepeatorIndex(node);
+
+                var updated_id = trimed_id + '-' + latest_id;
+
+                $(this).attr('id', updated_id);
+
+                $(this).closest('.yatra-field-wrap').append($(this));
+
+                $(this).closest('.yatra-field-wrap').find('#' + updated_id).show();
+
+            
+                tinyMCE.execCommand("mceAddEditor", true, updated_id);
+
+                /* var editorSettings = {
+                     mediaButtons: true, // <- must be true
+                     tinymce: true,      // <- must be true
+                     quicktags: true,    // <- must be true
+
+                 };
+
+                 wp.editor.initialize(updated_id, editorSettings);*/
+
+
+            });
+
+            node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.tmce-active').remove();
+
+        },
+        repeatorHeading: function ($node) {
             var $node_val = $node.val();
-            var replaced_value = $node_val.replace("{index}", $node_index + 1);
+            var $node_index = this.getUpdatedRepeatorIndex($node);
+            var replaced_value = $node_val.replace("{index}", $node_index);
             $node.closest('.mb-repeator').find('.repeator-title').html(replaced_value);
         },
 
-        updateRepeatorIndex: function ($node) {
-
+        getUpdatedRepeatorIndex: function ($node) {
+            var index = $node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').index($node.closest('.mb-repeator'));
+            return index + 1;
         },
 
         changeTab: function () {

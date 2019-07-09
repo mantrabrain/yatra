@@ -44,6 +44,9 @@ if (!class_exists('Yatra_Metabox_Base')) {
                             'p' => array(),
                             'em' => array(),
                             'strong' => array(),
+                            'img' => array(
+                                'src' => array()
+                            ),
                             'a' => array(
                                 'href' => array(),
                             ),
@@ -143,7 +146,11 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     echo '<div class="mb-repeator-fields">';
                     foreach ($repeator_field as $repeator_single) {
 
-                        $repeator_single['name'] = $field['name'] . "[" . $repeator_single['name'] . "][]";
+                        $single_name = $repeator_single['name'];
+                        $repeator_single['name'] = $field['name'] . "[" . $single_name . "][]";
+                        $repeator_single['repeator_id'] = $repeator_key + 1;
+                        $repeator_single['repeator_name'] = $field['name'] . "-" . $single_name . "-" . ($repeator_key + 1);
+
 
                         $this->metabox_html($repeator_single);
                     }
@@ -236,6 +243,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                                        $("#" + inst.id + "_ifr").css({minHeight: "' . $editor_height . 'px"});
                                 }'
                         ),
+                        'wpautop' => true
 
 
                     );
@@ -251,6 +259,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     <?php
                     if ($editor) {
                         echo '</p>';
+                        $field_key = isset($field['repeator_name']) ? $field['repeator_name'] : $field_key;
                         wp_editor($value, $field_key, $editor_settings);
                     } else {
                         ?>
@@ -366,13 +375,12 @@ if (!class_exists('Yatra_Metabox_Base')) {
                                     $src = wp_get_attachment_url($gallery_item_array[$i]);
                                     if (wp_attachment_is_image($gallery_item_array[$i]) && $src) {
 
-                                        echo '<li data-id="'.absint($gallery_item_array[$i]).'">';
+                                        echo '<li data-id="' . absint($gallery_item_array[$i]) . '">';
                                         echo '<a class="remove dashicons dashicons-trash"></a>';
                                         echo '<img src="' . esc_url_raw($src) . '"/>';
                                         echo '</li>';
                                     }
                                 }
-
 
 
                             }
