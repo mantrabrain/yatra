@@ -263,6 +263,18 @@ ul.mb-selected-gallery-list li {
     margin: 5px;
     padding: 5px;
     float: left;
+    position: relative;
+}
+
+ul.mb-selected-gallery-list li a.remove {
+    position: absolute;
+ 
+    height: 25px;
+    width: 25px;
+    text-align: center;
+    background: #ffff;
+    border: 1px solid;
+    cursor: pointer;
 }
 
 ul.mb-selected-gallery-list li img {

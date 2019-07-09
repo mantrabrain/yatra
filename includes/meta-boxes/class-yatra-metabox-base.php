@@ -19,6 +19,18 @@ if (!class_exists('Yatra_Metabox_Base')) {
                 case 'number':
                     $updated_value = absint($field_value);
                     break;
+                case 'gallery':
+                    $gallery_item_array = explode(',', $field_value);
+                    $updated_value = '';
+                    foreach ($gallery_item_array as $item_index => $item) {
+                        if ($item_index + 1 == count($gallery_item_array)) {
+                            $updated_value .= absint($item);
+                        } else {
+                            $updated_value .= absint($item) . ',';
+                        }
+                    }
+
+                    break;
                 // Allow some tags in textareas
                 case 'textarea':
 
@@ -331,39 +343,42 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     ?>
                     <div class="mb-admin-gallery">
 
-                        <label
-                                for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                            :</label>
-                        <input class="<?php echo esc_attr($field_class) ?>"
-                               id="<?php echo esc_attr(($field_key)); ?>"
-                               name="<?php echo esc_attr(($field_key)); ?>"
-                               type="text"
-                               value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
-                        <a class="mb-gallery-add" href="#"
-                           data-uploader-title="<?php esc_attr_e('Add image(s) to gallery', 'yatra'); ?>"
-                           data-uploader-button-text="<?php esc_attr_e('Add image(s)', 'yatra'); ?>"
-                        ><span><?php esc_html_e('Add image(s)', 'yatra'); ?></span></a>
-                        <?php
-                        $gallery_item_array = explode(',', $value);
+                        <p><label
+                                    for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                                :</label>
 
-                        if (count($gallery_item_array) > 0) {
-                            //wp_attachment_is_image
+                            <input class="<?php echo esc_attr($field_class) ?>"
+                                   id="<?php echo esc_attr(($field_key)); ?>"
+                                   name="<?php echo esc_attr(($field_key)); ?>"
+                                   type="hidden"
+                                   value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+                            <a class="mb-gallery-add" href="#"
+                               data-uploader-title="<?php esc_attr_e('Add image(s) to gallery', 'yatra'); ?>"
+                               data-uploader-button-text="<?php esc_attr_e('Add image(s)', 'yatra'); ?>"
+                            ><span><?php esc_html_e('Add image(s)', 'yatra'); ?></span></a>
+                            <?php
+                            $gallery_item_array = explode(',', $value);
                             echo '<ul class="mb-selected-gallery-list">';
-                            for ($i = 0; $i < count($gallery_item_array); $i++) {
-                                $src = wp_get_attachment_url($gallery_item_array[$i]);
-                                if (wp_attachment_is_image($gallery_item_array[$i]) && $src) {
+                            if (count($gallery_item_array) > 0) {
+                                //wp_attachment_is_image
 
-                                    echo '<li>';
-                                    echo '<img src="' . esc_url_raw($src) . '"/>';
-                                    echo '</li>';
+                                for ($i = 0; $i < count($gallery_item_array); $i++) {
+                                    $src = wp_get_attachment_url($gallery_item_array[$i]);
+                                    if (wp_attachment_is_image($gallery_item_array[$i]) && $src) {
+
+                                        echo '<li data-id="'.absint($gallery_item_array[$i]).'">';
+                                        echo '<a class="remove dashicons dashicons-trash"></a>';
+                                        echo '<img src="' . esc_url_raw($src) . '"/>';
+                                        echo '</li>';
+                                    }
                                 }
+
+
+
                             }
-
-
                             echo '</ul>';
-                        }
-
-                        ?>
+                            ?>
+                        </p>
                     </div>
                     <?php
                     break;

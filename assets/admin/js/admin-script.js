@@ -156,7 +156,12 @@ var YatraAdmin = function ($) {
             uploadBtn.on('click', function (event) {
                 event.preventDefault();
                 $this.initMediaUploader(uploadBtn, parent);
-            })
+            });
+            $('body').on('click', 'ul.mb-selected-gallery-list li a.remove', function (event) {
+                event.preventDefault();
+                $this.removeGalleryItem($(this).closest('li'), parent);
+
+            });
         },
         initMediaUploader: function (uploadBtn, wrapper) {
 
@@ -178,26 +183,41 @@ var YatraAdmin = function ($) {
                     previous_selection_array = [];
                 }
                 var selection = $this.gallery_upload_frame.state().get('selection');
-                var selected_list_html = '<ul class="mb-selected-gallery-list">';
+                var selected_list_node = wrapper.find('ul.mb-selected-gallery-list');
+                var selected_list_html = '';
                 selection.map(function (attachment_object, i) {
                     var attachment = attachment_object.toJSON();
                     var attachment_id = attachment.id;
                     var attachment_url = attachment.sizes.full.url;
                     if ($.inArray(attachment_id, previous_selection_array) !== "-1") {
                         previous_selection_array.push(attachment_id);
-                        selected_list_html += ('<li><img src="' + attachment_url + '"/></li>');
+                        selected_list_html += ('<li data-id="' + attachment_id + '"><a class="remove dashicons dashicons-trash"></a><img src="' + attachment_url + '"/></li>');
                     }
 
 
                 });
-                selected_list_html += '</ul>';
                 wrapper.find("input").val(previous_selection_array.join())
-                wrapper.find('.mb-selected-gallery-list').remove();
-                wrapper.append(selected_list_html);
+                selected_list_node.append(selected_list_html);
             });
 
 
             this.gallery_upload_frame.open();
+        },
+        removeGalleryItem: function (gallery_item, wrapper) {
+            var gallery_id = gallery_item.attr('data-id');
+            var list_ids = wrapper.find("input").val();
+
+            var list_ids_array = list_ids.split(",");
+            if (list_ids_array.length == 1 && list_ids_array[0] == "") {
+                list_ids_array = [];
+            }
+            var index = list_ids_array.indexOf(gallery_id);
+
+            if (index > -1) {
+                list_ids_array.splice(index, 1);
+            }
+            gallery_item.remove();
+            wrapper.find("input").val(list_ids_array.join());
         }
 
     };
