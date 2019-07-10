@@ -462,6 +462,42 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             foreach ($configs as $field) {
                 $this->metabox_html($field);
             }
+
+            echo '<div style="clear:both"></div>';
+            $tour_attributes_list = yatra_tour_attributes_list();
+
+            $yatra_tour_attribute_type = yatra_tour_attribute_type();
+
+            $updated_tour_attributes_list_options = array();
+
+            foreach ($tour_attributes_list as $term_id => $term_name) {
+
+                $attribute_field_type = get_term_meta($term_id, 'attribute_field_type', true);
+
+                $attribute_available_for_tour = get_term_meta($term_id, 'attribute_available_for_tour', true);
+
+                if ($attribute_available_for_tour && isset($yatra_tour_attribute_type[$attribute_field_type])) {
+
+                    $options = isset($yatra_tour_attribute_type[$attribute_field_type]['options']) ? $yatra_tour_attribute_type[$attribute_field_type]['options'] : array();
+
+                    $yatra_taxonomy_attribute = get_term_meta($term_id, 'yatra_taxonomy_attribute', true);
+
+                    foreach ($options as $option) {
+
+                        $option['title'] = $term_name . '(' . $option['title'] . ')';
+
+                        $option['default'] = isset($yatra_taxonomy_attribute[$option['name']]) ? $yatra_taxonomy_attribute[$option['name']] : '';
+
+                        $this->metabox_html($option);
+
+                        $option['name'] = 'tour_meta_custom_attributes[' . $term_id . '][]';
+
+                    }
+
+                }
+            }
+
+
         }
 
         private function tour_tabs($configs = array(), $tab_content_key)

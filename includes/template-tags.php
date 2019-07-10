@@ -526,9 +526,17 @@ if (!function_exists('yatra_tour_attribute_type')) {
                     array(
                         'content' => array(
                             'name' => 'content',
-                            'title' => __('Default value for text field.', 'yatra'),
+                            'title' => __('Content', 'yatra'),
                             'placeholder' => __('Default value for text field.', 'yatra'),
                             'description' => __('Default value for text field.', 'yatra'),
+                            'type' => 'text',
+
+                        ),
+                        'icon' => array(
+                            'name' => 'icon',
+                            'title' => __('Icon for text field.', 'yatra'),
+                            'placeholder' => __('Icon for text field.', 'yatra'),
+                            'description' => __('Icon for text field.', 'yatra'),
                             'type' => 'text',
 
                         )
@@ -582,8 +590,10 @@ if (!function_exists('yatra_tour_attribute_type')) {
         return apply_filters('yatra_tour_attribute_type', $tour_attributes);
     }
 }
-if (!function_exists('yatra_tour_attributes')) {
-    function yatra_tour_attributes()
+
+
+if (!function_exists('yatra_tour_attributes_list')) {
+    function yatra_tour_attributes_list()
     {
         $terms = get_terms(array(
             'taxonomy' => 'attributes',
@@ -593,16 +603,29 @@ if (!function_exists('yatra_tour_attributes')) {
 
         $fields = array();
 
-        if (count($terms) > 0 && !is_wp_error($terms)) {
-            $fields = wp_list_pluck($terms, 'name', 'term_id');
-        }
+        $number_of_tour_attributes = apply_filters('number_of_tour_attributes', 5);
 
+        foreach ($terms as $term_key => $term_value) {
+            if (isset($term_value->term_id)) {
+                $fields[$term_value->term_id] = $term_value->name;
+                if (count($fields) === $number_of_tour_attributes && $number_of_tour_attributes !== -1) {
+                    break;
+                }
+            }
+        }
+        return $fields;
+
+    }
+}
+if (!function_exists('yatra_tour_attributes')) {
+    function yatra_tour_attributes()
+    {
         $tour_attributes = array(
             array(
                 'name' => 'tour_attributes',
                 'title' => sprintf(__('Tour Attributes', 'yatra')),
                 'type' => 'select',
-                'options' => $fields,
+                'options' => yatra_tour_attributes_list(),
                 'wrap_class' => 'yatra-left'
             ),
             array(
