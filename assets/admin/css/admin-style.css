@@ -176,7 +176,7 @@
     text-transform: uppercase;
 
 }
-.mb-meta-vertical-tab li .fa {
+.mb-meta-vertical-tab li .fa, .mb-meta-vertical-tab li svg {
     margin-right: 10px;
     line-height: 22px;
 }

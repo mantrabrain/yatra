@@ -465,12 +465,26 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             }
 
             $tour_attribute_field = array(
-                'name' => $tab_content_key,
-                'title' => sprintf(__('Tour Attributes', 'yatra')),
-                'type' => 'select',
-                'options' => $fields
+
+                array(
+                    'name' => $tab_content_key,
+                    'title' => sprintf(__('Tour Attributes', 'yatra')),
+                    'type' => 'select',
+                    'options' => $fields,
+                    'wrap_class' => 'yatra-left'
+                ),
+                array(
+                    'name' => 'add_tour_attribute',
+                    'type' => 'button',
+                    'default' => sprintf(__('Add New', 'yatra')),
+                    'wrap_class' => 'yatra-right'
+
+                )
+
             );
-            $this->metabox_html($tour_attribute_field);
+            foreach ($tour_attribute_field as $field) {
+                $this->metabox_html($field);
+            }
         }
 
         private function tour_tabs($configs = array(), $tab_content_key)

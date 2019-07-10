@@ -239,6 +239,17 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
                     <?php
                     break;
+                case "button":
+                    ?>
+                    <input class="<?php echo esc_attr($field_class) ?>"
+                           id="<?php echo esc_attr(($field_key)); ?>"
+                           name="<?php echo esc_attr(($field_key)); ?>"
+                           type="button"
+                           value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+
+
+                    <?php
+                    break;
                 case "textarea":
 
                     $editor = isset($field['editor']) ? (boolean)$field['editor'] : false;

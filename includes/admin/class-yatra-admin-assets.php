@@ -32,6 +32,20 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
             wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array('yatra-select2js'), YATRA_VERSION);
             wp_enqueue_script('yatra-admin-script');
+            $term_id = get_queried_object();
+
+
+            $yatra_admin_params = array(
+
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'attribute_params' => array(
+                    'attribute_action' => 'yatra_change_tour_attribute',
+                    'attribute_nonce' => wp_create_nonce('wp_yatra_change_tour_attribute_nonce'),
+                    'is_edit' => isset($_GET['tag_ID']) && $_GET['tag_ID'] > 0 ? 1 : 0
+                )
+            );
+
+            wp_localize_script('yatra-admin-script', 'yatra_admin_params', $yatra_admin_params);
 
         }
 

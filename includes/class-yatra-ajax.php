@@ -6,7 +6,10 @@ class Yatra_Ajax
 
     private function admin_ajax_actions()
     {
-        $actions = array();
+        $actions = array(
+
+            'change_tour_attribute'
+        );
 
         return $actions;
 
@@ -106,6 +109,31 @@ class Yatra_Ajax
         }
 
         wp_send_json_error();
+
+    }
+
+    public function change_tour_attribute()
+    {
+        $status = $this->validate_nonce();
+
+        if (!$status) {
+            wp_send_json_error($this->ajax_error());
+        }
+        $attribute_type = isset($_POST['attribute_type']) ? sanitize_text_field($_POST['attribute_type']) : '';
+
+        $is_edit = isset($_POST['is_edit']) ? (boolean)($_POST['is_edit']) : false;
+
+
+        $attribute_parser = new Yatra_Tour_Attribute_Parser($attribute_type);
+
+        $parsed_html = $attribute_parser->parse(true, $is_edit);
+
+        if (empty($attribute_type) || !$parsed_html) {
+            wp_send_json_error($this->ajax_error());
+        }
+
+        wp_send_json_success($parsed_html);
+
 
     }
 

@@ -30,6 +30,9 @@ class Yatra_Taxonomy
 
     public $activity_taxonomy;
 
+    public $attribute_taxonomy;
+
+
     /**
      * Main Yatra Instance.
      *
@@ -67,6 +70,7 @@ class Yatra_Taxonomy
 
         $this->destination_taxonomy = new Yatra_Taxonomy_Destination();
         $this->activity_taxonomy = new Yatra_Taxonomy_Activity();
+        $this->attribute_taxonomy = new Yatra_Taxonomy_Attributes();
 
     }
 

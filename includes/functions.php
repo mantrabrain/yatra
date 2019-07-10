@@ -50,7 +50,7 @@ if (!function_exists('yatra_tour_metabox_tabs')) {
             ),
             'tour-attributes' => array(
                 'label' => __('Attributes', 'yatra'),
-                'config' => yatra_tour_attributes()
+                'config' => yatra_tour_attribute_type()
             ),
             'tour-tabs' => array(
                 'label' => __('Tour Tabs', 'yatra'),
@@ -392,9 +392,10 @@ function yatra_get_permalink_structure()
     $permalinks = wp_parse_args(
         (array)get_option('yatra_permalinks', array()),
         array(
-            'yatra_tour_base' => '',
-            'yatra_destination_base' => '',
-            'yatra_activity_base' => '',
+            'yatra_tour_base' => 'tour',
+            'yatra_destination_base' => 'destination',
+            'yatra_activity_base' => 'activity',
+            'yatra_attributes_base' => 'attributes',
         )
     );
 

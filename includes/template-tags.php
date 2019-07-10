@@ -513,9 +513,9 @@ if (!function_exists('yatra_tour_tab_configurations')) {
 }
 
 
-if (!function_exists('yatra_tour_attributes')) {
+if (!function_exists('yatra_tour_attribute_type')) {
 
-    function yatra_tour_attributes()
+    function yatra_tour_attribute_type()
     {
 
         $tour_attributes = array(
@@ -524,15 +524,13 @@ if (!function_exists('yatra_tour_attributes')) {
                 'label' => __('Text Field', 'yatra'),
                 'options' =>
                     array(
-                        'text_field_label' => array(
-                            'name' => 'text_field_label',
-                            'title' => __('Text field label', 'yatra'),
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Default value for text field.', 'yatra'),
+                            'placeholder' => __('Default value for text field.', 'yatra'),
+                            'description' => __('Default value for text field.', 'yatra'),
                             'type' => 'text',
-                        ),
-                        'text_field_content' => array(
-                            'name' => 'text_field_content',
-                            'title' => __('Text field content', 'yatra'),
-                            'type' => 'text',
+
                         )
                     ),
             ),
@@ -540,14 +538,12 @@ if (!function_exists('yatra_tour_attributes')) {
                 'label' => __('Number Field', 'yatra'),
                 'options' =>
                     array(
-                        'number_field_label' => array(
-                            'name' => 'number_field_label',
-                            'title' => __('Number field label', 'yatra'),
-                            'type' => 'text',
-                        ),
-                        'number_field_content' => array(
-                            'name' => 'number_field_content',
-                            'title' => __('Number field content', 'yatra'),
+
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Default value for number field.', 'yatra'),
+                            'placeholder' => __('Default value for number field.', 'yatra'),
+                            'description' => __('Default value for number field.', 'yatra'),
                             'type' => 'number',
                         )
                     ),
@@ -556,20 +552,34 @@ if (!function_exists('yatra_tour_attributes')) {
                 'label' => __('Textarea Field', 'yatra'),
                 'options' =>
                     array(
-                        'textarea_field_label' => array(
-                            'name' => 'textarea_field_label',
-                            'title' => __('Textarea field label', 'yatra'),
-                            'type' => 'text',
-                        ),
-                        'textarea_field_content' => array(
-                            'name' => 'textarea_field_content',
-                            'title' => __('Textarea field content', 'yatra'),
+
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Default value for textarea field.', 'yatra'),
+                            'placeholder' => __('Default value for textarea field.', 'yatra'),
+                            'description' => __('Default value for textarea field.', 'yatra'),
                             'type' => 'textarea',
+
+                        )
+                    ),
+            ),
+            'dropdown_field' => array(
+                'label' => __('Dropdown Field', 'yatra'),
+                'options' =>
+                    array(
+                        'content' => array(
+                            'name' => 'content',
+                            'title' => __('Default value for select(drop-down) field. Enter drop-down values separated by commas.', 'yatra'),
+                            'placeholder' => __('Default value for select(drop-down) field. Enter drop-down values separated by commas.', 'yatra'),
+                            'description' => __('Default value for select(drop-down) field. Enter drop-down values separated by commas.', 'yatra'),
+                            'type' => 'textarea',
+
+
                         )
                     ),
             )
         );
-        return apply_filters('yatra_tour_attributes', $tour_attributes);
+        return apply_filters('yatra_tour_attribute_type', $tour_attributes);
     }
 }
 
@@ -635,7 +645,7 @@ if (!function_exists('yatra_tour_general_configurations')) {
             'tour_tabs_ordering' => array(
                 'name' => 'tour_tabs_ordering',
                 'type' => 'hidden',
-                 
+
             ),
         );
         return apply_filters('yatra_tour_general_configurations', $tour_options);

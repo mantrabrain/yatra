@@ -84,6 +84,14 @@ if (!class_exists('Yatra_Admin_Permalinks', false)) :
                 'permalink',                        // settings page
                 'optional'                          // settings section
             );
+
+            add_settings_field(
+                'yatra_attribute_slug',            // id
+                __('Attribute base', 'yatra'),   // setting title
+                array($this, 'attribute_slug_input'),  // display callback
+                'permalink',                        // settings page
+                'optional'                          // settings section
+            );
             $this->permalinks = yatra_get_permalink_structure();
         }
 
@@ -126,6 +134,20 @@ if (!class_exists('Yatra_Admin_Permalinks', false)) :
             <?php
         }
 
+
+        /**
+         * Show a slug input box.
+         */
+        public function attribute_slug_input()
+        {
+
+            ?>
+            <input name="yatra_attributes_base" type="text" class="regular-text code"
+                   value="<?php echo esc_attr($this->permalinks['yatra_attributes_base']); ?>"
+                   placeholder="<?php echo esc_attr_x('attributes', 'slug', 'yatra') ?>"/>
+            <?php
+        }
+
         /**
          * Save the settings.
          */
@@ -141,6 +163,7 @@ if (!class_exists('Yatra_Admin_Permalinks', false)) :
                 $permalinks['yatra_tour_base'] = trim(sanitize_text_field($_POST['yatra_tour_base']));
                 $permalinks['yatra_destination_base'] = trim(sanitize_text_field($_POST['yatra_destination_base']));
                 $permalinks['yatra_activity_base'] = trim(sanitize_text_field($_POST['yatra_activity_base']));
+                $permalinks['yatra_attributes_base'] = trim(sanitize_text_field($_POST['yatra_attributes_base']));
 
                 update_option('yatra_permalinks', $permalinks);
             }
