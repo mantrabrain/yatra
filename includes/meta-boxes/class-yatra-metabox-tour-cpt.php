@@ -459,30 +459,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         private function tour_attributes($configs = array(), $tab_content_key)
         {
-            $fields = array();
-            foreach ($configs as $config_key => $value) {
-                $fields[$config_key] = isset($value['label']) ? $value['label'] : '';
-            }
-
-            $tour_attribute_field = array(
-
-                array(
-                    'name' => $tab_content_key,
-                    'title' => sprintf(__('Tour Attributes', 'yatra')),
-                    'type' => 'select',
-                    'options' => $fields,
-                    'wrap_class' => 'yatra-left'
-                ),
-                array(
-                    'name' => 'add_tour_attribute',
-                    'type' => 'button',
-                    'default' => sprintf(__('Add New', 'yatra')),
-                    'wrap_class' => 'yatra-right'
-
-                )
-
-            );
-            foreach ($tour_attribute_field as $field) {
+            foreach ($configs as $field) {
                 $this->metabox_html($field);
             }
         }

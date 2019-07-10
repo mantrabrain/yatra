@@ -521,7 +521,7 @@ if (!function_exists('yatra_tour_attribute_type')) {
         $tour_attributes = array(
 
             'text_field' => array(
-                'label' => __('Text Field', 'yatra'),
+                'label' => __('Text Fieldss', 'yatra'),
                 'options' =>
                     array(
                         'content' => array(
@@ -580,6 +580,40 @@ if (!function_exists('yatra_tour_attribute_type')) {
             )
         );
         return apply_filters('yatra_tour_attribute_type', $tour_attributes);
+    }
+}
+if (!function_exists('yatra_tour_attributes')) {
+    function yatra_tour_attributes()
+    {
+        $terms = get_terms(array(
+            'taxonomy' => 'attributes',
+            'hide_empty' => false
+
+        ));
+
+        $fields = array();
+
+        if (count($terms) > 0 && !is_wp_error($terms)) {
+            $fields = wp_list_pluck($terms, 'name', 'term_id');
+        }
+
+        $tour_attributes = array(
+            array(
+                'name' => 'tour_attributes',
+                'title' => sprintf(__('Tour Attributes', 'yatra')),
+                'type' => 'select',
+                'options' => $fields,
+                'wrap_class' => 'yatra-left'
+            ),
+            array(
+                'name' => 'add_tour_attribute',
+                'type' => 'button',
+                'default' => sprintf(__('Add New', 'yatra')),
+                'wrap_class' => 'yatra-right'
+
+            )
+        );
+        return apply_filters('yatra_tour_attributes', $tour_attributes);
     }
 }
 

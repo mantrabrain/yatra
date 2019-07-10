@@ -50,7 +50,7 @@ if (!function_exists('yatra_tour_metabox_tabs')) {
             ),
             'tour-attributes' => array(
                 'label' => __('Attributes', 'yatra'),
-                'config' => yatra_tour_attribute_type()
+                'config' => yatra_tour_attributes()
             ),
             'tour-tabs' => array(
                 'label' => __('Tour Tabs', 'yatra'),

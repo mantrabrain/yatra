@@ -241,13 +241,14 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     break;
                 case "button":
                     ?>
-                    <input class="<?php echo esc_attr($field_class) ?>"
-                           id="<?php echo esc_attr(($field_key)); ?>"
-                           name="<?php echo esc_attr(($field_key)); ?>"
-                           type="button"
-                           value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+                    <p><label style="display: block;">&nbsp;&nbsp;</label>
+                        <input class="button-primary"
+                               id="<?php echo esc_attr(($field_key)); ?>"
+                               name="<?php echo esc_attr(($field_key)); ?>"
+                               type="button"
+                               value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
 
-
+                    </p>
                     <?php
                     break;
                 case "textarea":
