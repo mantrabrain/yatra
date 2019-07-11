@@ -10,6 +10,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             add_action('save_post', array($this, 'save'));
 
+            add_action('wp_ajax_yatra_add_attribute_meta', array($this, 'yatra_add_attribute_meta'));
+
 
         }
 
@@ -353,8 +355,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                                 break;
 
                             case "tour-attributes":
-
-
+                                $this->save_tour_attributes($configs, $post_id);
                                 break;
 
                             case "tour-tabs":
@@ -364,6 +365,64 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                     }
                 }
             }
+        }
+
+        private function save_tour_attributes($configs = array(), $post_id)
+        {
+
+            $tour_meta_custom_attributes = isset($_POST['tour_meta_custom_attributes']) ? $_POST['tour_meta_custom_attributes'] : array();
+
+            if (!is_array($tour_meta_custom_attributes)) {
+                
+                $tour_meta_custom_attributes = array();
+            }
+
+            $valid_tour_meta_custom_attributes = array();
+
+            $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
+
+            foreach ($tour_meta_custom_attributes as $term_id => $meta_attribute) {
+
+                $term_id = absint($term_id);
+
+                $field_type = get_term_meta($term_id, 'attribute_field_type', true);
+
+                $field_option = isset($yatra_tour_attribute_type_options[$field_type]) ? $yatra_tour_attribute_type_options[$field_type] : array();
+
+                $options = isset($field_option['options']) ? $field_option['options'] : array();
+
+
+                $field_valid_option = array();
+
+                foreach ($options as $option) {
+
+                    $type = isset($option['type']) ? $option['type'] : '';
+
+                    $name = isset($option['name']) ? $option['name'] : '';
+
+                    $field_value = isset($meta_attribute[$name]) ? $meta_attribute[$name] : '';
+
+                    if (!empty($name) && !empty($type)) {
+
+                        $valid_field_value = $this->sanitize($field_value, $option);
+
+                        $field_valid_option[$name] = $valid_field_value;
+
+                    }
+
+                }
+
+                if (count($field_valid_option) > 0) {
+
+                    $valid_tour_meta_custom_attributes[$term_id] = $field_valid_option;
+
+                }
+
+
+            }
+
+            update_post_meta($post_id, 'tour_meta_custom_attributes', $valid_tour_meta_custom_attributes);
+
         }
 
         private function save_tour_options($configs = array(), $post_id)
@@ -380,10 +439,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         private function save_tour_tabs($configs = array(), $post_id)
         {
-            /*
-                        echo '<pre>';
-                        print_r($_POST);
-                        exit;*/
 
             foreach ($configs as $config) {
 
@@ -459,42 +514,42 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         private function tour_attributes($configs = array(), $tab_content_key)
         {
+
             foreach ($configs as $field) {
+
                 $this->metabox_html($field);
             }
 
-            echo '<div style="clear:both"></div>';
-            $tour_attributes_list = yatra_tour_attributes_list();
+            echo '<div style="clear:both" class="mb-clear"></div>';
 
-            $yatra_tour_attribute_type = yatra_tour_attribute_type();
+            global $post;
 
-            $updated_tour_attributes_list_options = array();
+            $post_id = $post->ID;
 
-            foreach ($tour_attributes_list as $term_id => $term_name) {
+            $tour_meta_custom_attributes = get_post_meta($post_id, 'tour_meta_custom_attributes', true);
 
-                $attribute_field_type = get_term_meta($term_id, 'attribute_field_type', true);
+            if (!is_array($tour_meta_custom_attributes)) {
+                $tour_meta_custom_attributes = array();
+            }
 
-                $attribute_available_for_tour = get_term_meta($term_id, 'attribute_available_for_tour', true);
+            $yatra_tour_attribute_type_options = array_keys(yatra_tour_attribute_type_options());
 
-                if ($attribute_available_for_tour && isset($yatra_tour_attribute_type[$attribute_field_type])) {
+            foreach ($tour_meta_custom_attributes as $term_id => $term_value_array) {
 
-                    $options = isset($yatra_tour_attribute_type[$attribute_field_type]['options']) ? $yatra_tour_attribute_type[$attribute_field_type]['options'] : array();
+                $field_type = get_term_meta($term_id, 'attribute_field_type', true);
 
-                    $yatra_taxonomy_attribute = get_term_meta($term_id, 'yatra_taxonomy_attribute', true);
 
-                    foreach ($options as $option) {
+                if (in_array($field_type, $yatra_tour_attribute_type_options)) {
 
-                        $option['title'] = $term_name . '(' . $option['title'] . ')';
+                    echo '<div class="mb-tour-attributes">';
 
-                        $option['default'] = isset($yatra_taxonomy_attribute[$option['name']]) ? $yatra_taxonomy_attribute[$option['name']] : '';
+                    echo $this->parse_attribute($field_type, $term_id, $term_value_array);
 
-                        $this->metabox_html($option);
+                    echo '<div style="clear:both" class="mb-clear"></div>';
 
-                        $option['name'] = 'tour_meta_custom_attributes[' . $term_id . '][]';
-
-                    }
-
+                    echo '</div>';
                 }
+
             }
 
 
@@ -584,6 +639,95 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 echo '</div>';
             }
             echo '</div>';
+
+        }
+
+
+        public function yatra_add_attribute_meta()
+        {
+            $nonce_value = isset($_REQUEST['yatra_nonce']) ? $_REQUEST['yatra_nonce'] : '';
+
+            $is_valid_nonce = wp_verify_nonce($nonce_value, 'wp_yatra_add_attribute_meta_nonce');
+
+            $term_id = isset($_POST['term_id']) ? absint($_POST['term_id']) : 0;
+
+            if (!$is_valid_nonce || $term_id < 1) {
+
+                wp_send_json_error();
+            }
+            $term = get_term($term_id);
+
+            $field_type = get_term_meta($term_id, 'attribute_field_type', true);
+
+            $yatra_tour_attribute_type_options = array_keys(yatra_tour_attribute_type_options());
+
+            if ((!isset($term->term_id)) || (!in_array($field_type, $yatra_tour_attribute_type_options))) {
+
+                wp_send_json_error();
+            }
+
+            $content = $this->parse_attribute($field_type, $term_id);
+
+            wp_send_json_success($content);
+
+        }
+
+        public function parse_attribute($field_type, $term_id, $term_value_array = array())
+        {
+
+            $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
+
+            $tour_attributes = array();
+
+            if (isset($yatra_tour_attribute_type_options[$field_type])) {
+
+                $tour_attributes = $yatra_tour_attribute_type_options[$field_type];
+            }
+
+            if (count($tour_attributes) < 1) {
+                return false;
+            }
+
+
+            ob_start();
+
+            echo '<div class="mb-tour-attributes-fields" data-term-id="' . absint($term_id) . '">';
+
+            echo '<span class="mb-remove-item dashicons dashicons-dismiss"></span>';
+
+            $options = isset($tour_attributes['options']) ? $tour_attributes['options'] : array();
+
+            $yatra_attribute_meta = get_term_meta($term_id, 'yatra_attribute_meta', true);
+
+            $term = get_term($term_id);
+
+            $term_name = isset($term->name) ? $term->name : '';
+
+            foreach ($options as $option) {
+
+                $option['title'] = $term_name . '(' . $option['title'] . ')';
+
+                if (isset($term_value_array[$option['name']])) {
+
+                    $option['default'] = $term_value_array[$option['name']];
+
+                } else {
+
+                    $option['default'] = isset($yatra_attribute_meta[$option['name']]) ? $yatra_attribute_meta[$option['name']] : '';
+                }
+
+                $option['name'] = 'tour_meta_custom_attributes[' . $term_id . '][' . $option['name'] . ']';
+
+                $this->metabox_html($option);
+
+
+            }
+
+            echo '</div>';
+            $content = ob_get_clean();
+
+            return $content;
+
 
         }
 

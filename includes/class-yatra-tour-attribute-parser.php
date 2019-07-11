@@ -19,17 +19,21 @@ if (!class_exists('Yatra_Tour_Attribute_Parser')) {
 
         private $tour_attribute = array();
 
-        private $attribute_index = 'yatra_taxonomy_attribute';
+        private $attribute_index = 'yatra_attribute_meta';
+
+        private $attribute_type = '';
 
         private $term_id = 0;
 
         public function __construct($attribute_type = '', $term_id = 0)
         {
-            $yatra_tour_attribute_type = yatra_tour_attribute_type();
+            $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
 
-            if (isset($yatra_tour_attribute_type[$attribute_type])) {
+            if (isset($yatra_tour_attribute_type_options[$attribute_type])) {
 
-                $this->tour_attribute = $yatra_tour_attribute_type[$attribute_type];
+                $this->attribute_type = $attribute_type;
+
+                $this->tour_attribute = $yatra_tour_attribute_type_options[$attribute_type];
 
             }
             if ($term_id > 0) {
@@ -57,11 +61,11 @@ if (!class_exists('Yatra_Tour_Attribute_Parser')) {
 
                 $value = isset($option['default']) ? $option['default'] : '';
 
-                if($this->term_id>0){
+                if ($this->term_id > 0) {
 
-                    $yatra_taxonomy_attribute = get_term_meta($this->term_id, 'yatra_taxonomy_attribute', true);
+                    $yatra_attribute_meta = get_term_meta($this->term_id, 'yatra_attribute_meta', true);
 
-                    $value = isset($yatra_taxonomy_attribute[$option['name']]) ? $yatra_taxonomy_attribute[$option['name']]: $value;
+                    $value = isset($yatra_attribute_meta[$option['name']]) ? $yatra_attribute_meta[$option['name']] : $value;
                 }
 
                 if (!empty($name) && $option_key == $option['name'] && !empty($type)) {

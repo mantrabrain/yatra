@@ -3,7 +3,7 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
 
     class Yatra_Taxonomy_Attributes
     {
-        private $attribute_index = 'yatra_taxonomy_attribute';
+        private $attribute_index = 'yatra_attribute_meta';
 
         public function __construct()
         {
@@ -22,21 +22,18 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
 
             $attribute_field_type = isset($_POST['attribute_field_type']) ? sanitize_text_field($_POST['attribute_field_type']) : '';
 
-            $attribute_available_for_tour = isset($_POST['attribute_available_for_tour']) ? absint($_POST['attribute_available_for_tour']) : 0;
-
-            $yatra_tour_attribute_type = yatra_tour_attribute_type();
+            $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
 
             $meta_array = array(
 
-                'attribute_available_for_tour' => $attribute_available_for_tour
             );
 
 
-            if (isset($yatra_tour_attribute_type[$attribute_field_type])) {
+            if (isset($yatra_tour_attribute_type_options[$attribute_field_type])) {
 
                 $meta_array['attribute_field_type'] = $attribute_field_type;
 
-                $options = isset($yatra_tour_attribute_type[$attribute_field_type]['options']) ? $yatra_tour_attribute_type[$attribute_field_type]['options'] : array();
+                $options = isset($yatra_tour_attribute_type_options[$attribute_field_type]['options']) ? $yatra_tour_attribute_type_options[$attribute_field_type]['options'] : array();
 
 
                 $field = isset($_POST[$this->attribute_index]) ? $_POST[$this->attribute_index] : array();
@@ -104,22 +101,7 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
 
 
         public function edit($term, $taxonomy)
-        {
-            $attribute_available_for_tour = (boolean)get_term_meta($term->term_id, 'attribute_available_for_tour', true);
-            ?>
-            <tr class="form-field term-group-wrap">
-                <th scope="row">
-                    <label
-                            for="attribute_available_for_tour"><?php _e('Always Available for All Tours', 'yatra'); ?></label>
-                </th>
-                <td>
-
-                    <p>
-                        <input type="checkbox" name="attribute_available_for_tour"
-                               value="1" <?php echo $attribute_available_for_tour ? 'checked="checked"' : '' ?>/>
-                    </p>
-                </td>
-            </tr>
+        { ?>
 
             <tr class="form-field term-group-wrap">
                 <th scope="row">
@@ -130,8 +112,8 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
                     <p>
                         <select name="attribute_field_type" required="required">
                             <?php
-                            $yatra_tour_attribute_type = yatra_tour_attribute_type();
-                            foreach ($yatra_tour_attribute_type as $attribute_key => $attribute_type) {
+                            $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
+                            foreach ($yatra_tour_attribute_type_options as $attribute_key => $attribute_type) {
 
                                 echo '<option ' . selected($attribute_field_type_key, $attribute_key) . ' value="' . esc_attr($attribute_key) . '">' . $attribute_type['label'] . '</option>';
                             }
@@ -184,15 +166,7 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
 
         public function form($taxonomy)
         { ?>
-            <div class="form-field term-group">
 
-
-                <p>
-                    <input type="checkbox" name="attribute_available_for_tour" value="1"/>
-                    <label style="display:inline"
-                           for="attribute_available_for_tour"><?php _e('Always Available for All Tours', 'yatra'); ?></label>
-                </p>
-            </div>
             <div class="form-field term-group">
                 <label for="attribute_field_type"><?php _e('Attribute Type', 'yatra'); ?></label>
 
@@ -200,8 +174,8 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
 
                     <select name="attribute_field_type" required="required">
                         <?php
-                        $yatra_tour_attribute_type = yatra_tour_attribute_type();
-                        foreach ($yatra_tour_attribute_type as $attribute_key => $attribute_type) {
+                        $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
+                        foreach ($yatra_tour_attribute_type_options as $attribute_key => $attribute_type) {
 
                             echo '<option value="' . esc_attr($attribute_key) . '">' . $attribute_type['label'] . '</option>';
                         }

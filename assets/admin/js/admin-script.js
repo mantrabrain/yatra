@@ -373,7 +373,6 @@ var YatraSubTabs = function ($) {
     };
 }(jQuery);
 
-
 var YatraTaxonomy = function ($) {
     return {
 
@@ -408,7 +407,7 @@ var YatraTaxonomy = function ($) {
                 return;
             }
 
-             var attribute_data = {
+            var attribute_data = {
                 action: attribute_params.attribute_action,
                 yatra_nonce: attribute_params.attribute_nonce,
                 attribute_type: $attribute_node.val(),
@@ -447,9 +446,109 @@ var YatraTaxonomy = function ($) {
     };
 }(jQuery);
 
+var YatraTourAttributes = function ($) {
+    return {
+
+        init: function () {
+
+            this.cacheDom();
+
+            this.bindEvents();
+        },
+
+        cacheDom: function () {
+
+            this.$add_tour_attribute = $('#add_tour_attribute');
+
+            this.$yatra_tab_section = this.$add_tour_attribute.closest('section.yatra-tab-section');
+
+        },
+
+        bindEvents: function () {
+
+            var $this = this;
+
+            this.$add_tour_attribute.on('click', function () {
+
+                var term_id = $this.$yatra_tab_section.find('select[name="tour_attributes"]').find('option:selected').val();
+
+                var spinner = $('<div class="spinner is-active" style="float:none; margin-top:-5px;"></div>');
+
+                var attribute_tour_meta_params = yatra_admin_params.attribute_tour_meta_params;
+
+                var length = $this.$yatra_tab_section.find('.mb-tour-attributes-fields[data-term-id="' + term_id + '"]').length;
+
+                if (term_id < 1 || length > 0) {
+
+                    return;
+                }
+
+                var attribute_tour_meta_data = {
+                    action: attribute_tour_meta_params.attribute_meta_action,
+                    yatra_nonce: attribute_tour_meta_params.attribute_meta_nonce,
+                    term_id: term_id
+                };
+
+                $this.$add_tour_attribute.after(spinner);
+                $.ajax({
+                    type: "POST",
+                    url: yatra_admin_params.ajax_url,
+                    data: attribute_tour_meta_data,
+                    beforeSend: function () {
+
+                    },
+                    success: function (response) {
+
+                        if (response.success === true) {
+
+                            $this.$yatra_tab_section.append(response.data);
+
+                            $this.$yatra_tab_section.find('select[name="tour_attributes"]').find('option[value="' + term_id + '"]').attr('disabled', 'disabled');
+
+                        }
+                        $this.$yatra_tab_section.find('.spinner').remove()
+
+                    },
+                    complete: function () {
+                        $this.$yatra_tab_section.find('.spinner').remove()
+                    }
+                });
+
+
+            });
+
+            $('body').on('click', '.mb-remove-item', function () {
+
+                var confirm = window.confirm('Are you sure want to delete attribute?');
+
+                if (!confirm) {
+
+                    return;
+                }
+
+                var term_id = $(this).closest('.mb-tour-attributes-fields').attr('data-term-id');
+
+                $(this).closest('.mb-tour-attributes-fields').remove();
+
+                $this.$yatra_tab_section.find('#tour_attributes').find('option[value="' + term_id + '"]').removeAttr('disabled');
+            });
+            $.each($this.$yatra_tab_section.find('.mb-tour-attributes-fields'), function () {
+
+                var term_id = $(this).attr('data-term-id');
+
+                $this.$yatra_tab_section.find('#tour_attributes').find('option[value="' + term_id + '"]').attr('disabled', 'disabled')
+
+            });
+        },
+
+
+    };
+}(jQuery);
+
 $(document).ready(function () {
     YatraAdmin.init();
     YatraTabs.init();
     YatraSubTabs.init();
     YatraTaxonomy.init();
+    YatraTourAttributes.init();
 });

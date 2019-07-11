@@ -41,7 +41,12 @@ if (!class_exists('Yatra_Admin_Assets')) {
                 'attribute_params' => array(
                     'attribute_action' => 'yatra_change_tour_attribute',
                     'attribute_nonce' => wp_create_nonce('wp_yatra_change_tour_attribute_nonce'),
+
                     'is_edit' => isset($_GET['tag_ID']) && $_GET['tag_ID'] > 0 ? 1 : 0
+                ),
+                'attribute_tour_meta_params' => array(
+                    'attribute_meta_nonce' => wp_create_nonce('wp_yatra_add_attribute_meta_nonce'),
+                    'attribute_meta_action' => 'yatra_add_attribute_meta',
                 )
             );
 

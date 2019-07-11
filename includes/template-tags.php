@@ -513,9 +513,9 @@ if (!function_exists('yatra_tour_tab_configurations')) {
 }
 
 
-if (!function_exists('yatra_tour_attribute_type')) {
+if (!function_exists('yatra_tour_attribute_type_options')) {
 
-    function yatra_tour_attribute_type()
+    function yatra_tour_attribute_type_options()
     {
 
         $tour_attributes = array(
@@ -530,6 +530,8 @@ if (!function_exists('yatra_tour_attribute_type')) {
                             'placeholder' => __('Default value for text field.', 'yatra'),
                             'description' => __('Default value for text field.', 'yatra'),
                             'type' => 'text',
+                            'wrap_class' => 'yatra-left',
+
 
                         ),
                         'icon' => array(
@@ -538,6 +540,7 @@ if (!function_exists('yatra_tour_attribute_type')) {
                             'placeholder' => __('Icon for text field.', 'yatra'),
                             'description' => __('Icon for text field.', 'yatra'),
                             'type' => 'text',
+                            'wrap_class' => 'yatra-right',
 
                         )
                     ),
@@ -571,7 +574,7 @@ if (!function_exists('yatra_tour_attribute_type')) {
                         )
                     ),
             ),
-            'dropdown_field' => array(
+           /* 'dropdown_field' => array(
                 'label' => __('Dropdown Field', 'yatra'),
                 'options' =>
                     array(
@@ -583,11 +586,12 @@ if (!function_exists('yatra_tour_attribute_type')) {
                             'type' => 'textarea',
 
 
+
                         )
                     ),
-            )
+            )*/
         );
-        return apply_filters('yatra_tour_attribute_type', $tour_attributes);
+        return apply_filters('yatra_tour_attribute_type_options', $tour_attributes);
     }
 }
 
@@ -626,7 +630,7 @@ if (!function_exists('yatra_tour_attributes')) {
                 'title' => sprintf(__('Tour Attributes', 'yatra')),
                 'type' => 'select',
                 'options' => yatra_tour_attributes_list(),
-                'wrap_class' => 'yatra-left'
+                'wrap_class' => 'yatra-left',
             ),
             array(
                 'name' => 'add_tour_attribute',
