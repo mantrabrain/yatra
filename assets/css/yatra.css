@@ -54,11 +54,15 @@
 .yatra-tabs > ul li:last-child a {
   border-right: 0; }
 
-.yatra-tabs > ul li a[aria-selected], .yatra-tabs > ul li a:hover {
+.yatra-tabs > ul li a[data-aria-selected],
+.yatra-tabs > ul li a:hover,
+.yatra-tabs > ul li.active a,
+.yatra-tabs > ul li.active:hover a,
+.yatra-tabs > ul li a:hover {
   color: #1abc9c;
   background: #fff; }
 
-.yatra-tabs > ul li a[aria-selected]:before {
+.yatra-tabs > ul li a[data-aria-selected]:before {
   /*-webkit-transform: translateZ(0) translateY(0);
   transform: translateZ(0) translateY(0);*/ }
 
@@ -248,10 +252,10 @@
   margin-left: 0;
   margin-right: 0; }
 
-.yatra-tabs .yatra-tab-content ul {
+.yatra-tabs .yatra-tab-content ul, .yatra-tabs .yatra-tab-content ol {
   margin: 0;
   padding: 0; }
-  .yatra-tabs .yatra-tab-content ul li {
+  .yatra-tabs .yatra-tab-content ul li, .yatra-tabs .yatra-tab-content ol li {
     list-style: none; }
 
 .yatra-tabs .yatra-tab-content .cost-info-half {
@@ -269,7 +273,8 @@
     margin: 5px 0 15px; }
     .yatra-tabs .yatra-tab-content .cost-info-half li:before {
       position: absolute;
-      font: normal normal normal 12px/1 FontAwesome;
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
       font-size: 13px;
       left: 0;
       top: 4px; }
@@ -328,5 +333,25 @@
 .overview-section {
   padding-bottom: 20px;
   overflow: hidden; }
+
+.yatra-itinerary-list {
+  padding: 10px; }
+
+.yatra-tour-gallery li.yatra-gallery-item {
+  width: 25%;
+  float: left;
+  position: relative;
+  padding-top: 25%; }
+  .yatra-tour-gallery li.yatra-gallery-item a {
+    display: block;
+    padding: 5px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0; }
+    .yatra-tour-gallery li.yatra-gallery-item a img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover; }
 
 /*# sourceMappingURL=yatra.css.map */

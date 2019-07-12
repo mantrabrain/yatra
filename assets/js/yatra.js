@@ -83,11 +83,10 @@ var YatraTabs = function ($) {
 
         cacheDom: function () {
             this.$el = $('.yatra-tabs');
-            this.$tabList = this.$el.find('ul');
-            this.$tab = this.$tabList.find('li');
-            this.$tabFirst = this.$tabList.find('li:first-child a');
-            this.$tabLink = this.$tab.find('a');
-
+            this.$tabList = this.$el.find('ul.yatra-tab-wrap');
+            this.$tab = this.$tabList.find('li.item');
+            this.$tabFirst = this.$tabList.find('li.item:first-child a');
+            this.$tabLink = this.$tabList.find('li.item > a')
             this.$tabPanel = this.$el.find('section');
             this.$tabPanelFirstContent = this.$el.find('section > *:first-child');
             this.$tabPanelFirst = this.$el.find('section:first-child');
@@ -134,15 +133,15 @@ var YatraTabs = function ($) {
 
             $this.attr({
                 'tabindex': '-1',
-                'aria-selected': null
-            });
+                'data-aria-selected': null
+            }).closest('li').removeClass('active');
         },
 
         selectFirstTab: function () {
             this.$tabFirst.attr({
-                'aria-selected': 'true',
+                'data-aria-selected': 'true',
                 'tabindex': '0'
-            });
+            }).closest('li').addClass('active');
         },
 
         setupAria: function () {
@@ -188,9 +187,9 @@ var YatraTabs = function ($) {
 
         setSelectedTab: function (self) {
             self.attr({
-                'aria-selected': true,
+                'data-aria-selected': true,
                 'tabindex': '0'
-            }).focus();
+            }).focus().closest('li').addClass('active');
         },
 
         setSelectedTabPanel: function (self) {
@@ -205,5 +204,7 @@ var YatraTabs = function ($) {
     $(document).ready(function () {
         YatraFrontend.init();
         YatraTabs.init();
+
+
     });
 }(jQuery));

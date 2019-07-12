@@ -51,7 +51,7 @@
     <div class="entry-content">
 
         <?php
-
+        the_content();
         yatra_frontend_tabs();
 
         wp_link_pages(

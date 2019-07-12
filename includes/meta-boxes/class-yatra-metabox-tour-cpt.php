@@ -329,11 +329,13 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
          */
         public function save($post_id)
         {
+
             /*
              * We need to verify this came from our screen and with proper authorization,
              * because the save_post action can be triggered at other times.
              */
             $nonce = isset($_POST['yatra_tour_cpt_meta_nonce']) ? ($_POST['yatra_tour_cpt_meta_nonce']) : '';
+
 
             if (isset($_POST['yatra_tour_cpt_meta_nonce'])) {
 
@@ -347,6 +349,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
                         $configs = isset($tab_content['config']) ? $tab_content['config'] : array();
 
+                        echo $tab_content_key . '<br/>';
                         switch ($tab_content_key) {
 
                             case "tour-options":
@@ -363,6 +366,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                                 break;
                         }
                     }
+
                 }
             }
         }
@@ -373,7 +377,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             $tour_meta_custom_attributes = isset($_POST['tour_meta_custom_attributes']) ? $_POST['tour_meta_custom_attributes'] : array();
 
             if (!is_array($tour_meta_custom_attributes)) {
-                
+
                 $tour_meta_custom_attributes = array();
             }
 
@@ -705,8 +709,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             foreach ($options as $option) {
 
-                $option['title'] = $term_name . '(' . $option['title'] . ')';
-
+                echo '<h2>' . esc_attr($term_name) . '</h2>';
+                
                 if (isset($term_value_array[$option['name']])) {
 
                     $option['default'] = $term_value_array[$option['name']];

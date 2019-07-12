@@ -9,14 +9,13 @@
   border-top: 1px solid #ddd;
   .tab-inner {
     background: #fff;
-    padding:10px;
-    border:1px solid #ddd;
-    &:focus{
-      outline:none;
+    padding: 10px;
+    border: 1px solid #ddd;
+    &:focus {
+      outline: none;
     }
   }
 }
-
 
 .yatra-tabs > ul {
   position: relative;
@@ -57,26 +56,29 @@
   color: #fff;
   border-right: 1px solid #00bc7c;
 
-
 }
 
 .yatra-tabs > ul li a:focus {
   text-shadow: none;
   box-shadow: none;
-  outline:none;
+  outline: none;
 }
 
 .yatra-tabs > ul li:last-child a {
   border-right: 0;
 }
 
-.yatra-tabs > ul li a[aria-selected], .yatra-tabs > ul li a:hover {
+.yatra-tabs > ul li a[data-aria-selected],
+.yatra-tabs > ul li a:hover,
+.yatra-tabs > ul li.active a,
+.yatra-tabs > ul li.active:hover a,
+.yatra-tabs > ul li a:hover {
   color: #1abc9c;
   background: #fff;
 
 }
 
-.yatra-tabs > ul li a[aria-selected]:before {
+.yatra-tabs > ul li a[data-aria-selected]:before {
   /*-webkit-transform: translateZ(0) translateY(0);
   transform: translateZ(0) translateY(0);*/
 }

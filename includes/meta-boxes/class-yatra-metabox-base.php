@@ -47,6 +47,9 @@ if (!class_exists('Yatra_Metabox_Base')) {
                             'img' => array(
                                 'src' => array()
                             ),
+                            'ul' => array(),
+                            'ol' => array(),
+                            'li' => array(),
                             'a' => array(
                                 'href' => array(),
                             ),
@@ -87,11 +90,11 @@ if (!class_exists('Yatra_Metabox_Base')) {
         {
             $post_meta = get_post_meta($post_id, $field['name'], true);
 
+            $post_meta = is_array($post_meta) ? $post_meta : array();
 
             $post_meta_keys = array_keys($post_meta);
 
             $repeator_count = isset($post_meta_keys[0]) ? count($post_meta[$post_meta_keys[0]]) : count($repeator_options_raw);
-
 
             $new_repeator_options = $repeator_options_raw;
 
@@ -101,7 +104,9 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
                 foreach ($repeator_options as $option_key => $option) {
 
-                    $option_value = isset($post_meta[$option_key]) && isset($post_meta[$option_key][$i]) ? $post_meta[$option_key][$i] : '';
+                    $default = isset($option['default']) ? $option['default'] : '';
+
+                    $option_value = isset($post_meta[$option_key]) && isset($post_meta[$option_key][$i]) ? $post_meta[$option_key][$i] : $default;
 
                     $repeator_options[$option_key]['default'] = $option_value;
                 }
@@ -163,7 +168,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
             $post_meta = get_post_meta($post_id, $field_key, true);
 
-            if ($field['type'] != 'repeator' && metadata_exists('post', $post_id, $field_key)) {
+            if (!isset($field['repeator_id']) && metadata_exists('post', $post_id, $field_key)) {
 
                 $value = $post_meta;
 
@@ -171,6 +176,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
                 $value = isset($field['default']) ? $field['default'] : '';
             }
+
             $extra_attributes = isset($field['extra_attributes']) ? $field['extra_attributes'] : array();
 
             $extra_attribute_text = '';

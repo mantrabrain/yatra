@@ -323,3 +323,14 @@ ul.mb-selected-gallery-list li img {
 .mb-tour-attributes-fields .mb-remove-item:hover {
     background: #000;
 }
+
+.postbox .inside .mb-tour-attributes-fields h2 {
+    padding-top: 0;
+    padding-bottom: 0;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.yatra-tabs > section#tour-attributes {
+    width: 50%;
+}

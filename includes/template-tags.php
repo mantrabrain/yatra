@@ -500,8 +500,8 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'title' => __('Label', 'yatra'),
                             'type' => 'text',
                         ),
-                        'gallery_content' => array(
-                            'name' => 'gallery_content',
+                        'yatra_tab_gallery' => array(
+                            'name' => 'yatra_tab_gallery',
                             'title' => __('Gallery', 'yatra'),
                             'type' => 'gallery',
                         )
@@ -521,7 +521,7 @@ if (!function_exists('yatra_tour_attribute_type_options')) {
         $tour_attributes = array(
 
             'text_field' => array(
-                'label' => __('Text Fieldss', 'yatra'),
+                'label' => __('Text Field', 'yatra'),
                 'options' =>
                     array(
                         'content' => array(
@@ -530,17 +530,7 @@ if (!function_exists('yatra_tour_attribute_type_options')) {
                             'placeholder' => __('Default value for text field.', 'yatra'),
                             'description' => __('Default value for text field.', 'yatra'),
                             'type' => 'text',
-                            'wrap_class' => 'yatra-left',
 
-
-                        ),
-                        'icon' => array(
-                            'name' => 'icon',
-                            'title' => __('Icon for text field.', 'yatra'),
-                            'placeholder' => __('Icon for text field.', 'yatra'),
-                            'description' => __('Icon for text field.', 'yatra'),
-                            'type' => 'text',
-                            'wrap_class' => 'yatra-right',
 
                         )
                     ),
@@ -574,22 +564,38 @@ if (!function_exists('yatra_tour_attribute_type_options')) {
                         )
                     ),
             ),
-           /* 'dropdown_field' => array(
-                'label' => __('Dropdown Field', 'yatra'),
+            'shortcode_field' => array(
+                'label' => __('Shortcode Field', 'yatra'),
                 'options' =>
                     array(
-                        'content' => array(
-                            'name' => 'content',
-                            'title' => __('Default value for select(drop-down) field. Enter drop-down values separated by commas.', 'yatra'),
-                            'placeholder' => __('Default value for select(drop-down) field. Enter drop-down values separated by commas.', 'yatra'),
-                            'description' => __('Default value for select(drop-down) field. Enter drop-down values separated by commas.', 'yatra'),
-                            'type' => 'textarea',
-
+                        'shortcode' => array(
+                            'name' => 'shortcode',
+                            'title' => __('Shortcode', 'yatra'),
+                            'placeholder' => __('Default value for text field.', 'yatra'),
+                            'description' => __('Default value for text field.', 'yatra'),
+                            'type' => 'text',
+                            'wrap_class' => 'yatra-left',
 
 
                         )
                     ),
-            )*/
+            ),
+            /* 'dropdown_field' => array(
+                 'label' => __('Dropdown Field', 'yatra'),
+                 'options' =>
+                     array(
+                         'content' => array(
+                             'name' => 'content',
+                             'title' => __('Default value for select(drop-down) field. Enter drop-down values separated by commas.', 'yatra'),
+                             'placeholder' => __('Default value for select(drop-down) field. Enter drop-down values separated by commas.', 'yatra'),
+                             'description' => __('Default value for select(drop-down) field. Enter drop-down values separated by commas.', 'yatra'),
+                             'type' => 'textarea',
+
+
+
+                         )
+                     ),
+             )*/
         );
         return apply_filters('yatra_tour_attribute_type_options', $tour_attributes);
     }
@@ -658,49 +664,59 @@ if (!function_exists('yatra_tour_general_configurations')) {
         $tour_options = array(
             'tour_price' => array(
                 'name' => 'tour_price',
-                'title' => sprintf(__('Tour Price(%s)', 'yatra'), $currency_symbols),
+                'title' => sprintf(__('Tour Price- Regular (%s)', 'yatra'), $currency_symbols),
                 'type' => 'number',
                 'wrap_class' => 'yatra-left',
                 'extra_attributes' => array(
-                    'placeholder' => sprintf(__('Tour Price (%s)', 'yatra'), $currency_symbols),
+                    'placeholder' => sprintf(__('Tour Price - Regular (%s)', 'yatra'), $currency_symbols),
                 ),
                 'row_start' => true,
+            ),
+            'tour_sales_price' => array(
+                'name' => 'tour_sales_price',
+                'title' => sprintf(__('Tour Price- Sales Price (%s)', 'yatra'), $currency_symbols),
+                'type' => 'number',
+                'wrap_class' => 'yatra-right',
+                'extra_attributes' => array(
+                    'placeholder' => sprintf(__('Tour Price - Sales Price (%s). Leave it empty if you do not want to show sales price.', 'yatra'), $currency_symbols),
+                ),
+                'row_end' => true,
             ),
             'tour_duration_days' => array(
                 'name' => 'tour_duration_days',
                 'title' => esc_html__('Tour Duration Days', 'yatra'),
                 'type' => 'number',
-                'wrap_class' => 'yatra-right',
+                'wrap_class' => 'yatra-left',
                 'extra_attributes' => array(
                     'placeholder' => __('Number of days', 'yatra'),
                 ),
-                'row_end' => true,
+                'row_start' => true,
 
             ),
             'tour_duration_nights' => array(
                 'name' => 'tour_duration_nights',
                 'title' => esc_html__('Tour Duration Nights', 'yatra'),
                 'type' => 'number',
-                'wrap_class' => 'yatra-left',
+                'wrap_class' => 'yatra-right',
                 'extra_attributes' => array(
                     'placeholder' => __('Number of nights', 'yatra'),
                 ),
-                'row_start' => true,
+                'row_end' => true,
 
             ),
             'tour_country' => array(
                 'name' => 'tour_country',
                 'title' => esc_html__('Country', 'yatra'),
                 'type' => 'select',
-                'wrap_class' => 'yatra-right',
+                'wrap_class' => 'yatra-left',
                 'extra_attributes' => array(
-                    'placeholder' => __('Number of nights', 'yatra'),
+                    'placeholder' => __('Country', 'yatra'),
                 ),
                 'options' => $countries,
                 'default' => 'NP',
                 'is_multiple' => true,
                 'select2' => true,
-                'row_end' => true,
+                'row_start' => true,
 
             ),
             'tour_tabs_ordering' => array(
@@ -718,13 +734,45 @@ if (!function_exists('yatra_frontend_tabs_config')) {
 
     function yatra_frontend_tabs_config()
     {
-        $frontend_tabs_config = array(
 
-            'overview' => __('Overview', 'yatra'),
-            'itinerary' => __('Itinerary', 'yatra'),
-            'cost_info' => __('Cost Info', 'yatra'),
-            'tour_facts' => __('Tour Facts', 'yatra'),
-        );
+        $post_id = get_the_ID();
+
+        $tour_tabs_ordering = get_post_meta($post_id, 'tour_tabs_ordering', true);
+
+        $tour_tabs_ordering_array = explode(',', $tour_tabs_ordering);
+
+        $configs = yatra_tour_tab_configurations();
+
+        $config_array_keys = array_keys($configs);
+
+        $array_diff = array_diff($config_array_keys, $tour_tabs_ordering_array);
+
+        $final_ordered_config_keys = $tour_tabs_ordering_array;
+
+        if (count($array_diff) > 0) {
+
+            $final_ordered_config_keys = array_merge($tour_tabs_ordering_array, $array_diff);
+        }
+
+        $frontend_tabs_config = array();
+
+        $active_tab_config = '';
+
+        foreach ($final_ordered_config_keys as $config) {
+
+            if (isset($configs[$config])) {
+
+                $setting = $configs[$config];
+
+                $label = get_post_meta($post_id, $config . '_label', true);
+
+                $label = empty($label) ? $setting['label'] : $label;
+
+                $frontend_tabs_config [$config] = $label;
+
+            }
+        }
+
         return apply_filters('frontend_tabs_configurations', $frontend_tabs_config);
     }
 }
@@ -734,15 +782,16 @@ if (!function_exists('yatra_frontend_tabs')) {
 
     function yatra_frontend_tabs()
     {
+        global $post;
 
         $frontend_tabs_config = yatra_frontend_tabs_config();
 
         ?>
         <div class="yatra-tabs">
 
-            <ul>
+            <ul class="yatra-tab-wrap">
                 <?php foreach ($frontend_tabs_config as $tab_key => $tab) { ?>
-                    <li><a href="#<?php echo esc_attr($tab_key); ?>"><?php echo esc_html($tab); ?></a></li>
+                    <li class="item"><a href="#<?php echo esc_attr($tab_key); ?>"><?php echo esc_html($tab); ?></a></li>
                 <?php } ?>
             </ul>
             <?php
@@ -752,7 +801,7 @@ if (!function_exists('yatra_frontend_tabs')) {
                          class="yatra-tab-content" <?php if ($loop_index > 0) { ?> aria-hidden="true" <?php } ?>>
                     <div class="tab-inner">
                         <?php
-                        do_action('yatra_frontend_tab_content_' . $tab_content_key, $tab_content)
+                        do_action('yatra_frontend_tab_content_' . $tab_content_key, $tab_content, $post)
                         ?>
                     </div>
                 </section>
