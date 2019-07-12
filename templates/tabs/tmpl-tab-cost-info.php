@@ -1,4 +1,4 @@
-<h3><?php echo esc_html($title); ?></h3>
+<h3 class="tab-title"><?php echo esc_html($title); ?></h3>
 
 <div class="cost-info-half cost_included">
     <h4><?php echo esc_html($cost_info['includes_title']) ?></h4>

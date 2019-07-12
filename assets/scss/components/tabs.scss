@@ -82,7 +82,7 @@
   ul.yatra-tab-wrap {
     li.item {
       & > a {
-        .fa {
+        .fa, svg {
           margin-right: 10px;
         }
       }
@@ -101,6 +101,12 @@
 
 .yatra-tabs section.yatra-tab-content {
   padding: 15px;
+  h3.tab-title {
+    .fa, svg {
+      float: right;
+      cursor: pointer;
+    }
+  }
 }
 
 .yatra-field-wrap p {

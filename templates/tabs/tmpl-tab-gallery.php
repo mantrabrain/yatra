@@ -1,4 +1,4 @@
-<h3><?php echo esc_html($title); ?></h3>
+<h3 class="tab-title"><?php echo esc_html($title); ?></h3>
 
 <ul class="yatra-tour-gallery">
     <?php

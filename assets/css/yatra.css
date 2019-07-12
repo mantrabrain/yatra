@@ -62,7 +62,7 @@
   color: #1abc9c;
   background: #fff; }
 
-.yatra-tabs ul.yatra-tab-wrap li.item > a .fa {
+.yatra-tabs ul.yatra-tab-wrap li.item > a .fa, .yatra-tabs ul.yatra-tab-wrap li.item > a svg {
   margin-right: 10px; }
 
 .yatra-tabs > ul li a[data-aria-selected]:before {
@@ -74,6 +74,9 @@
 
 .yatra-tabs section.yatra-tab-content {
   padding: 15px; }
+  .yatra-tabs section.yatra-tab-content h3.tab-title .fa, .yatra-tabs section.yatra-tab-content h3.tab-title svg {
+    float: right;
+    cursor: pointer; }
 
 .yatra-field-wrap p {
   padding-left: 10px;
@@ -141,7 +144,7 @@
   margin: 15px 0;
   background: none;
   border: 2px solid #777;
-  background: #767575; }
+  color: #ccc; }
   .yatra-content-area .yatra-book-now-btn:hover {
     background: #fff;
     color: #777; }
@@ -356,5 +359,14 @@
       height: 100%;
       width: 100%;
       object-fit: cover; }
+
+.yatra-itinerary-list .itinerary-content, .yatra-itinerary-list .itinerary-heading, .yatra-itinerary-list .faq-content, .yatra-itinerary-list .faq-heading, .yatra-faq-list-item .itinerary-content, .yatra-faq-list-item .itinerary-heading, .yatra-faq-list-item .faq-content, .yatra-faq-list-item .faq-heading {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: 0; }
+
+.yatra-itinerary-list .itinerary-heading .fa, .yatra-itinerary-list .itinerary-heading svg, .yatra-itinerary-list .faq-heading .fa, .yatra-itinerary-list .faq-heading svg, .yatra-faq-list-item .itinerary-heading .fa, .yatra-faq-list-item .itinerary-heading svg, .yatra-faq-list-item .faq-heading .fa, .yatra-faq-list-item .faq-heading svg {
+  float: right;
+  cursor: pointer; }
 
 /*# sourceMappingURL=yatra.css.map */

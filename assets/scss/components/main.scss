@@ -20,7 +20,7 @@
     margin: 15px 0;
     background: none;
     border: 2px solid #777;
-    background: #767575;
+    color: #ccc;
     &:hover {
       background: #fff;
       color: #777;
@@ -290,6 +290,20 @@
       height: 100%;
       width: 100%;
       object-fit: cover;
+    }
+  }
+}
+
+.yatra-itinerary-list, .yatra-faq-list-item {
+  .itinerary-content, .itinerary-heading, .faq-content, .faq-heading {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 0;
+  }
+  .itinerary-heading, .faq-heading {
+    .fa, svg {
+      float:right;
+      cursor:pointer;
     }
   }
 }

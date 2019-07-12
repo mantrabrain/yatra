@@ -20,6 +20,73 @@ var YatraFrontend = function ($) {
                 }
                 $this.bookTour(tour_id);
             });
+            $('body').on('click',
+                '.yatra-itinerary-list-item .itinerary-heading svg, .yatra-itinerary-list-item .itinerary-heading .fa, .yatra-faq-list-item .faq-heading svg, .yatra-faq-list-item .faq-heading .fa', function () {
+
+                    if ($(this).hasClass('fa-minus')) {
+
+                        $this.toggleYatraList($(this), 'close');
+                    } else {
+                        $this.toggleYatraList($(this), 'open');
+                    }
+                });
+            $('body').on('click', '.yatra-tab-content .tab-title svg, .yatra-tab-content .tab-title .fa', function () {
+
+                var toggle_node = $(this);
+                var span = $('<span class=""/>');
+                var heading = toggle_node.closest('h3');
+                toggle_node.hide();
+                var toggle_status = 'close';
+                if (toggle_node.hasClass('fa-minus')) {
+                    toggle_status = 'close';
+                    span.addClass('fa fa-plus');
+                } else {
+                    toggle_status = 'open';
+                    span.addClass('fa fa-minus');
+                }
+
+                $.each(toggle_node.closest('.yatra-tab-content').find('ul.yatra-list li.yatra-list-item .yatra-heading'), function () {
+
+                    var icon = $(this).find('.icon');
+                    if (icon.length > 0) {
+                        $this.toggleYatraList(icon, toggle_status);
+                    }
+                });
+
+
+                heading.append(span);
+                toggle_node.remove();
+
+            });
+        },
+        toggleYatraList: function ($toggle_node, toggle_status) {
+            var $this = this;
+
+
+            if (toggle_status == 'open') {
+                $this.listToggleOpen($toggle_node);
+            } else {
+                $this.listToggleClose($toggle_node);
+
+            }
+        },
+        listToggleOpen: function ($toggle_node) {
+            $toggle_node.closest('li.yatra-list-item').find('.yatra-content').slideDown('slow');
+            var span = $('<span class="icon fa fa-minus"/>');
+            var heading = $toggle_node.closest('h4');
+            $toggle_node.hide();
+            heading.append(span);
+            $toggle_node.remove();
+
+        },
+        listToggleClose: function ($toggle_node) {
+            $toggle_node.closest('li.yatra-list-item').find('.yatra-content').slideUp('slow');
+            var span = $('<span class="icon fa fa-plus"/>');
+            var heading = $toggle_node.closest('h4');
+            $toggle_node.hide();
+            heading.append(span);
+            $toggle_node.remove();
+
         },
         addLoading: function ($node) {
 
