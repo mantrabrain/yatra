@@ -78,6 +78,18 @@
 
 }
 
+.yatra-tabs {
+  ul.yatra-tab-wrap {
+    li.item {
+      & > a {
+        .fa {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+}
+
 .yatra-tabs > ul li a[data-aria-selected]:before {
   /*-webkit-transform: translateZ(0) translateY(0);
   transform: translateZ(0) translateY(0);*/
