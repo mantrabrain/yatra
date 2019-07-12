@@ -161,9 +161,16 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
             );
         }
 
-        function misc($title, $post)
+        function map($title, $post)
         {
+            $yatra_tour_meta_map_content = get_post_meta($post->ID, 'yatra_tour_meta_map_content', true);
 
+            yatra_get_template('tabs/tmpl-tab-map.php',
+                array(
+                    'map' => $yatra_tour_meta_map_content,
+                    'title' => $title
+                )
+            );
         }
     }
 

@@ -482,11 +482,12 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'title' => __('Label', 'yatra'),
                             'type' => 'text',
                         ),
-                        'map_content' => array(
-                            'name' => 'map_content',
+                        'yatra_tour_meta_map_content' => array(
+                            'name' => 'yatra_tour_meta_map_content',
                             'title' => __('Map Content', 'yatra'),
                             'type' => 'textarea',
-                            'editor' => true
+                            'editor' => true,
+                            'allow-html' => true
                         )
                     ),
             ),

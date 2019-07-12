@@ -55,7 +55,16 @@ if (!class_exists('Yatra_Metabox_Base')) {
                             ),
                         );
                     }
-                    $updated_value = wp_kses($field_value, $allowed_tags);
+                    if (isset($meta_field['allow-html'])) {
+
+                        $updated_value = ($field_value);
+
+                    } else {
+
+                        $updated_value = wp_kses($field_value, $allowed_tags);
+
+                    }
+
                     break;
                 // No allowed tags for all other fields
                 case 'url':
