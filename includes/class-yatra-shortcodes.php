@@ -22,6 +22,7 @@ class Yatra_Shortcodes
         $shortcodes = array(
 
             'yatra_checkout' => __CLASS__ . '::checkout',
+            'yatra_cart' => __CLASS__ . '::cart',
         );
 
         foreach ($shortcodes as $shortcode => $function) {
@@ -70,6 +71,18 @@ class Yatra_Shortcodes
     public static function checkout($atts)
     {
         return self::shortcode_wrapper(array('Yatra_Shortcode_Checkout', 'output'), $atts);
+    }
+
+
+    /**
+     * Cart page shortcode.
+     *
+     * @param array $atts Attributes.
+     * @return string
+     */
+    public static function cart($atts)
+    {
+        return self::shortcode_wrapper(array('Yatra_Shortcode_Cart', 'output'), $atts);
     }
 
 }

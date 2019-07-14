@@ -38,6 +38,11 @@ final class Yatra_Install
                 'post_status' => 'publish',
                 'post_type' => 'page',
             ), array(
+                'post_content' => '[yatra_cart]',
+                'post_title' => 'Yatra Cart',
+                'post_status' => 'publish',
+                'post_type' => 'page',
+            ), array(
                 'post_content' => 'Your booking has been confirmed. We will get back to you soon.',
                 'post_title' => 'Yatra Thank You',
                 'post_status' => 'publish',
@@ -51,6 +56,9 @@ final class Yatra_Install
 
             if ($page['post_title'] == 'Yatra Checkout') {
                 update_option('yatra_checkout_page', $page_id);
+            }
+            if ($page['post_title'] == 'Yatra Cart') {
+                update_option('yatra_cart_page', $page_id);
             }
             if ($page['post_title'] == 'Yatra Thank You') {
                 update_option('yatra_thankyou_page', $page_id);

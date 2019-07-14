@@ -125,7 +125,7 @@ var YatraFrontend = function ($) {
 
                     if (data.success === true) {
 
-                        window.location = data.data.redirect_url;
+                        window.location = data.data.cart_page_url;
 
                     }
                 },

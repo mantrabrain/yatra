@@ -103,7 +103,7 @@ class Yatra_Ajax
 
             $return_data = array(
 
-                'redirect_url' => yatra_get_checkout_page(true)
+                'cart_page_url' => yatra_get_cart_page(true)
             );
             wp_send_json_success($return_data);
         }

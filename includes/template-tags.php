@@ -98,13 +98,23 @@ if (!function_exists('yatra_entry_footer')) {
     }
 }
 
-if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
-
-    function yatra_entry_meta_for_frontend_archive($post_id)
+if (!function_exists('yatra_get_current_currency_symbol')) {
+    function yatra_get_current_currency_symbol()
     {
         $currency = get_option('yatra_currency');
 
         $currency_symbol = yatra_get_currency_symbols($currency);
+
+        return $currency_symbol;
+    }
+}
+
+if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
+
+    function yatra_entry_meta_for_frontend_archive($post_id)
+    {
+
+        $currency_symbol = yatra_get_current_currency_symbol();
 
         $regular_yatra_tour_meta_regular_price = get_post_meta($post_id, 'yatra_tour_meta_regular_price', true);
 
@@ -127,6 +137,17 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
                 'icon' => 'fa fa-money',
                 'text' => $yatra_tour_meta_regular_price_string,
                 'title' => __('Price', 'yatra')
+
+            ),
+            array(
+                'icon' => 'fa fa-user',
+                'text' => '{{yatra_tour_meta_price_per}}',
+                'title' => __('Price Per', 'yatra')
+
+            ), array(
+                'icon' => 'fa fa-user-circle',
+                'text' => '{{yatra_tour_meta_group_size}}',
+                'title' => __('Group Size', 'yatra')
 
             ),
             array(
@@ -800,61 +821,65 @@ if (!function_exists('yatra_frontend_options')) {
                 <td><?php echo esc_html($country_string); ?></td>
             </tr>
         </table>
-        <h3><?php echo __('Attributes') ?></h3>
+
         <?php
+
         $tour_meta_custom_attributes = get_post_meta($post_id, 'tour_meta_custom_attributes', true);
+        if (count($tour_meta_custom_attributes) > 0) {
+            echo '<h3>' . __('Attributes') . '</h3>';
+            $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
+            ?>
+            <table>
+                <?php foreach ($tour_meta_custom_attributes as $term_id => $content) {
+                    $term = get_term($term_id);
+                    $field_key = get_term_meta($term_id, 'attribute_field_type', true);
+                    $field = isset($yatra_tour_attribute_type_options[$field_key]) ? $yatra_tour_attribute_type_options[$field_key] : array();
+                    $field_option = isset($field['options']) ? $field['options'] : array();
+                    if (isset($term->name)) {
+                        ?>
+                        <tr>
+                            <th><?php echo esc_html($term->name) ?></th>
+                            <td><?php
 
-        $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
-        ?>
-        <table>
-            <?php foreach ($tour_meta_custom_attributes as $term_id => $content) {
-                $term = get_term($term_id);
-                $field_key = get_term_meta($term_id, 'attribute_field_type', true);
-                $field = isset($yatra_tour_attribute_type_options[$field_key]) ? $yatra_tour_attribute_type_options[$field_key] : array();
-                $field_option = isset($field['options']) ? $field['options'] : array();
-                if (isset($term->name)) {
-                    ?>
-                    <tr>
-                        <th><?php echo esc_html($term->name) ?></th>
-                        <td><?php
+                                foreach ($content as $content_key => $content_value) {
 
-                            foreach ($content as $content_key => $content_value) {
+                                    $type = isset($field_option[$content_key]['type']) ? $field_option[$content_key]['type'] : '';
 
-                                $type = isset($field_option[$content_key]['type']) ? $field_option[$content_key]['type'] : '';
+                                    $value = '';
 
-                                $value = '';
+                                    if (count($field_option) > 0) {
 
-                                if (count($field_option) > 0) {
+                                        switch ($type) {
+                                            case    "text":
+                                                $value = esc_html($content_value);
+                                                break;
+                                            case    "textarea":
+                                                $value = esc_html($content_value);
+                                                break;
 
-                                    switch ($type) {
-                                        case    "text":
-                                            $value = esc_html($content_value);
-                                            break;
-                                        case    "textarea":
-                                            $value = esc_html($content_value);
-                                            break;
-
-                                        case "number":
-                                            $value = absint($content_value);
-                                            break;
-                                        case "shortcode":
-                                            $value = do_shortcode($content_value);
-                                            break;
+                                            case "number":
+                                                $value = absint($content_value);
+                                                break;
+                                            case "shortcode":
+                                                $value = do_shortcode($content_value);
+                                                break;
 
 
+                                        }
+
+                                        echo '<p>' . ($value) . '</p>';
                                     }
-
-                                    echo '<p>' . ($value) . '</p>';
                                 }
-                            }
-                            ?></td>
-                    </tr>
+                                ?></td>
+                        </tr>
 
-                    <?php
-                }
-            } ?>
-        </table>
-        <?php
+                        <?php
+                    }
+                } ?>
+            </table>
+
+            <?php
+        }
 
     }
 }

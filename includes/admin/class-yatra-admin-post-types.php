@@ -51,6 +51,10 @@ class Yatra_Admin_Post_Types
         add_action('quick_edit_custom_box', array($this, 'quick_edit'), 10, 2);
         add_action('save_post', array($this, 'bulk_and_quick_edit_hook'), 10, 2);
         add_action('yatra_product_bulk_and_quick_edit', array($this, 'bulk_and_quick_edit_save_post'), 10, 2);
+
+
+        add_filter('display_post_states', array($this, 'add_display_post_states'), 10, 2);
+
     }
 
     /**
@@ -164,7 +168,7 @@ class Yatra_Admin_Post_Types
             )
         );
 
-     }
+    }
 
     /**
      * Custom quick edit - form.
@@ -185,7 +189,7 @@ class Yatra_Admin_Post_Types
             )
         );
 
-     }
+    }
 
     /**
      * Offers a way to hook into save post without causing an infinite loop
@@ -320,7 +324,23 @@ class Yatra_Admin_Post_Types
      */
     public function add_display_post_states($post_states, $post)
     {
+        $cart_page_id = get_option('yatra_cart_page');
 
+        $yatra_checkout_page = get_option('yatra_checkout_page');
+        
+        $yatra_thankyou_page = get_option('yatra_thankyou_page');
+
+        if ($cart_page_id == $post->ID) {
+            $post_states['yatra_page_for_cart'] = __('Yatra Cart Page', 'yatra');
+        }
+
+        if ($yatra_checkout_page == $post->ID) {
+            $post_states['yatra_page_for_checkout'] = __('Yatra Checkout Page', 'yatra');
+        }
+
+        if ($yatra_thankyou_page == $post->ID) {
+            $post_states['yatra_page_for_thankyou'] = __('Yatra Thank You Page', 'yatra');
+        }
         return $post_states;
     }
 }

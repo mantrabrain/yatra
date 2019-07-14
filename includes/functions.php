@@ -256,6 +256,33 @@ if (!function_exists('yatra_get_checkout_page')) {
     }
 }
 
+
+if (!function_exists('yatra_get_cart_page')) {
+
+    function yatra_get_cart_page($get_permalink = false)
+    {
+        $page_id = absint(get_option('yatra_cart_page'));
+
+        if ($page_id < 1) {
+
+            global $wpdb;
+
+            $page_id = $wpdb->get_var('SELECT ID FROM ' . $wpdb->prefix . 'posts WHERE post_content LIKE "%[yatra_cart]%" AND post_parent = 0');
+        }
+
+        $page_permalink = get_permalink($page_id);
+
+        if ($get_permalink) {
+
+            return $page_permalink;
+        }
+
+        return $page_id;
+
+
+    }
+}
+
 if (!function_exists('yatra_get_booking_statuses')) {
 
     function yatra_get_booking_statuses()
@@ -405,3 +432,67 @@ function yatra_get_permalink_structure()
     $permalinks['yatra_activity_base'] = untrailingslashit(empty($permalinks['yatra_activity_base']) ? 'activity' : $permalinks['yatra_activity_base']);
     return $permalinks;
 }
+
+if (!function_exists('yatra_tour_price')) {
+
+    function yatra_tour_price($tour_id, $is_html = true)
+    {
+        $yatra_tour_meta_regular_price = get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
+
+        $yatra_tour_meta_sales_price = get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
+
+        $price_per_person = empty($yatra_tour_meta_sales_price) || $yatra_tour_meta_sales_price == 0 ? $yatra_tour_meta_regular_price : $yatra_tour_meta_sales_price;
+
+        if (!$is_html) {
+
+            return $price_per_person;
+        }
+        $price_string = '<span class="regular-price"><del>' . yatra_get_current_currency_symbol() . '' . $yatra_tour_meta_regular_price . '</del></span>';
+
+        $price_string .= '<br/><span class="sales-price">' . yatra_get_current_currency_symbol() . '' . $yatra_tour_meta_sales_price . '</del></span>';
+
+        if (empty($yatra_tour_meta_sales_price) || $yatra_tour_meta_sales_price == 0) {
+
+            $price_string = '<span class="regular-price">' . yatra_get_current_currency_symbol() . '' . $yatra_tour_meta_regular_price . '</span>';
+
+
+        }
+        return $price_string;
+    }
+
+}
+
+if (!function_exists('yatra_get_final_tour_price')) {
+
+    function yatra_get_final_tour_price($tour_id, $number_of_people = 1)
+    {
+        $yatra_tour_meta_regular_price = get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
+
+        $yatra_tour_meta_sales_price = get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
+
+        $price_per_person = empty($yatra_tour_meta_sales_price) || $yatra_tour_meta_sales_price == 0 ? $yatra_tour_meta_regular_price : $yatra_tour_meta_sales_price;
+
+        $yatra_tour_meta_price_per = get_post_meta($tour_id, 'yatra_tour_meta_price_per', true);
+
+        if ($yatra_tour_meta_price_per == 'person') {
+
+            return $price_per_person * $number_of_people;
+        }
+        if ($yatra_tour_meta_price_per == 'group') {
+
+            $yatra_tour_meta_group_size = get_post_meta($tour_id, 'yatra_tour_meta_group_size', true);
+
+            if ($yatra_tour_meta_group_size == 0) {
+
+                $yatra_tour_meta_group_size = 1;
+            }
+            $number_of_group = ceil($number_of_people / $yatra_tour_meta_group_size);
+
+            return $price_per_person * $number_of_group;
+        }
+        return $price_per_person;
+    }
+}
+
+
+

@@ -93,6 +93,12 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     ),
 
                     array(
+                        'title' => __('Cart Page', 'yatra'),
+                        'desc' => __('Cart page for tour booking', 'yatra'),
+                        'id' => 'yatra_cart_page',
+                        'type' => 'single_select_page',
+                    ),
+                    array(
                         'title' => __('Checkout Page', 'yatra'),
                         'desc' => __('Checkout page for tour booking', 'yatra'),
                         'id' => 'yatra_checkout_page',
