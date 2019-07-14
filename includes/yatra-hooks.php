@@ -77,20 +77,24 @@ if (!function_exists('yatra_after_main_content_loop_callback')) {
         if (!is_single()) {
             return;
         }
-        ?>
-        <div class="yatra-book-btn-wrapper book-btn">
-            <?php $book_now_text = get_option('yatra_booknow_button_text', __('Book now', 'yatra')); ?>
-            <a href="" class="btn primary-btn yatra-book-now-btn"
-               data-text="<?php echo esc_attr($book_now_text); ?>"
-               data-loading-text="<?php echo esc_attr(get_option('yatra_booknow_loading_text', __('Loading....', 'yatra'))) ?>"
-               data-tour-id="<?php the_ID(); ?>"><?php echo esc_html($book_now_text); ?></a>
-        </div>
-        <?php
+
+        yatra_book_now_button();
     }
 
     add_action('yatra_after_main_content_loop', 'yatra_after_main_content_loop_callback');
 }
 
+function yatra_book_now_button()
+{ ?>
+    <div class="yatra-book-btn-wrapper book-btn">
+        <?php $book_now_text = get_option('yatra_booknow_button_text', __('Book now', 'yatra')); ?>
+        <a href="" class="btn primary-btn yatra-book-now-btn"
+           data-text="<?php echo esc_attr($book_now_text); ?>"
+           data-loading-text="<?php echo esc_attr(get_option('yatra_booknow_loading_text', __('Loading....', 'yatra'))) ?>"
+           data-tour-id="<?php the_ID(); ?>"><?php echo esc_html($book_now_text); ?></a>
+    </div>
+    <?php
+}
 
 if (!function_exists('yatra_before_page_content_callback')) {
     function yatra_before_page_content_callback()

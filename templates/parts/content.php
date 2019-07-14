@@ -70,7 +70,9 @@
     </div>
 
     <div class="entry-content entry-tabs">
-        <?php yatra_frontend_tabs(); ?>
+        <?php
+        yatra_book_now_button();
+        yatra_frontend_tabs(); ?>
     </div>
 
 
