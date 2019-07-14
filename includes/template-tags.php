@@ -815,35 +815,35 @@ if (!function_exists('yatra_frontend_options')) {
                 if (isset($term->name)) {
                     ?>
                     <tr>
-                        <th><?php echo $term->name ?></th>
+                        <th><?php echo esc_html($term->name) ?></th>
                         <td><?php
 
                             foreach ($content as $content_key => $content_value) {
 
                                 $type = isset($field_option[$content_key]['type']) ? $field_option[$content_key]['type'] : '';
 
-                                $value = $content_value;
+                                $value = '';
 
-                                if (isset($field_option[$content_key])) {
+                                if (count($field_option) > 0) {
 
                                     switch ($type) {
                                         case    "text":
-                                            $value = esc_html($value);
+                                            $value = esc_html($content_value);
                                             break;
                                         case    "textarea":
-                                            $value = esc_html($value);
+                                            $value = esc_html($content_value);
                                             break;
 
                                         case "number":
-                                            $value = absint($value);
+                                            $value = absint($content_value);
                                             break;
                                         case "shortcode":
-                                            $value = do_shortcode($value);
+                                            $value = do_shortcode($content_value);
                                             break;
 
 
                                     }
-    
+
                                     echo '<p>' . ($value) . '</p>';
                                 }
                             }
