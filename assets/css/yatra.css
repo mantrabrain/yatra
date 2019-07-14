@@ -383,4 +383,10 @@
   clear: both;
   width: 100%; }
 
+.yatra-shortcode-wrapper form.yatra-cart-form .person input {
+  width: 80px; }
+
+.yatra-shortcode-wrapper form.yatra-cart-form .actions {
+  text-align: right; }
+
 /*# sourceMappingURL=yatra.css.map */

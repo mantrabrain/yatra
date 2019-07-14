@@ -15,10 +15,11 @@ var YatraFrontend = function ($) {
             this.$book_now.on('click', function (e) {
                 e.preventDefault();
                 var tour_id = $(this).attr('data-tour-id');
-                if (tour_id < 1) {
+                var number_of_person = $(this).closest('.yatra-book-btn-wrapper').find('.yatra_number_of_person').val();
+                if (tour_id < 1 || number_of_person < 1) {
                     return;
                 }
-                $this.bookTour(tour_id);
+                $this.bookTour(tour_id, number_of_person);
             });
             $('body').on('click',
                 '.yatra-itinerary-list-item .itinerary-heading svg, .yatra-itinerary-list-item .itinerary-heading .fa, .yatra-faq-list-item .faq-heading svg, .yatra-faq-list-item .faq-heading .fa', function () {
@@ -106,13 +107,14 @@ var YatraFrontend = function ($) {
                 $node.val($node.attr('data-text'));
             }
         },
-        bookTour: function (tour_id) {
+        bookTour: function (tour_id, number_of_person) {
             var $this = this;
             var booking_params = yatra_params.booking_params;
             var booking_data = {
                 action: booking_params.booking_action,
                 yatra_nonce: booking_params.booking_nonce,
-                tour_id: tour_id
+                tour_id: tour_id,
+                number_of_person: number_of_person
             };
             $.ajax({
                 type: "POST",

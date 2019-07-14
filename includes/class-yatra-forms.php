@@ -18,14 +18,14 @@ class Yatra_Forms
 
     public function tour_checkout_data()
     {
-        $tour_cart = yatra_get_session('tour_cart');
+        $yatra_tour_cart = yatra_get_session('yatra_tour_cart');
 
-        return $tour_cart;
+        return $yatra_tour_cart;
     }
 
     public function chekcout_form_fields()
     {
-        $tour_cart_data = $this->tour_checkout_data();
+        $yatra_tour_cart_data = $this->tour_checkout_data();
 
         $form_fields = apply_filters('tour_checkout_form_fields', array(
                 'fullname' => array(
@@ -57,7 +57,7 @@ class Yatra_Forms
                     'title' => __('Tour Package', 'yatra'),
                     'type' => 'text',
                     'group_id' => 'tour_meta',
-                    'value' => isset($tour_cart_data->post_title) ? $tour_cart_data->post_title . ' (' . $tour_cart_data->ID . ') ' : '',
+                    'value' => isset($yatra_tour_cart_data->post_title) ? $yatra_tour_cart_data->post_title . ' (' . $yatra_tour_cart_data->ID . ') ' : '',
                     'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
                         'placeholder' => __('Your full name', 'yatra'),

@@ -23,6 +23,13 @@ final class Yatra
      */
     public $version = YATRA_VERSION;
 
+
+    /**
+     * Cart instance.
+     *
+     * @var Yatra_Cart
+     */
+    public $cart = null;
     /**
      * The single instance of the class.
      *
@@ -200,6 +207,11 @@ final class Yatra
         $this->load_plugin_textdomain();
 
 
+        // Classes/actions loaded for the frontend and for ajax requests.
+        if ($this->is_request('frontend')) {
+            $this->initialize_cart();
+        }
+
         // Init action.
         do_action('yatra_init');
     }
@@ -280,6 +292,20 @@ final class Yatra
     public function ajax_url()
     {
         return admin_url('admin-ajax.php', 'relative');
+    }
+
+    /**
+     * Initialize the customer and cart objects and setup customer saving on shutdown.
+     *
+     * @since 2.0.0
+     * @return void
+     */
+    public function initialize_cart()
+    {
+
+        if (is_null($this->cart) || !$this->cart instanceof Yatra_Cart) {
+            $this->cart = new Yatra_Cart();
+        }
     }
 
 

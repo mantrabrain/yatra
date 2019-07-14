@@ -50,9 +50,13 @@ class Yatra_Shortcode_Cart
 
         $cart = array();
 
-        $cart = yatra_get_session('tour_cart');
+        $cart = yatra_instance()->cart->get_cart();
 
-        yatra_get_template('tmpl-cart.php', array('cart' => $cart));
+        if (!is_array($cart)) {
+            $cart = array();
+        }
+
+        yatra_get_template('tmpl-cart.php', array('cart_items' => $cart));
 
 
     }

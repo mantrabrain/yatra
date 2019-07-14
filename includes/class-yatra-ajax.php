@@ -73,7 +73,7 @@ class Yatra_Ajax
         $status = $yatra_booking->book($_POST);
         if ($status) {
             $success_redirect_page_id = get_option('yatra_thankyou_page');
-            yatra_clear_session('tour_cart');
+            yatra_clear_session('yatra_tour_cart');
             $page_permalink = get_permalink($success_redirect_page_id);
 
             wp_safe_redirect($page_permalink);
@@ -89,15 +89,19 @@ class Yatra_Ajax
             wp_send_json_error($this->ajax_error());
         }
         $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
-        if ($tour_id < 1) {
+
+        $number_of_person = isset($_POST['number_of_person']) ? absint($_POST['number_of_person']) : 0;
+
+        if ($tour_id < 1 || $number_of_person < 1) {
             wp_send_json_error($this->ajax_error());
         }
 
         $tour = get_post($tour_id);
+
         if (!isset($tour->post_type) || $tour->post_type != 'tour') {
             wp_send_json_error($this->ajax_error());
         }
-        $status = yatra_set_session('tour_cart', $tour);
+        $status = yatra_instance()->cart->update_cart($tour_id, $number_of_person);
 
         if ($status) {
 

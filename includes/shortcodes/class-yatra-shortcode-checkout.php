@@ -50,7 +50,7 @@ class Yatra_Shortcode_Checkout
 
         $checkout = array();
 
-        $checkout = yatra_get_session('tour_cart');
+        $checkout = yatra_get_session('yatra_tour_cart');
 
         yatra_get_template('tmpl-checkout.php', array('checkout' => $checkout));
 

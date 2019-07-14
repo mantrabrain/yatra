@@ -88,6 +88,13 @@ function yatra_book_now_button()
 { ?>
     <div class="yatra-book-btn-wrapper book-btn">
         <?php $book_now_text = get_option('yatra_booknow_button_text', __('Book now', 'yatra')); ?>
+        <label><?php echo __('Number of person: ', 'yatra') ?>
+            <input type="number" name="yatra_number_of_person"
+                   class="yatra_number_of_person"
+                   id="yatra_number_of_person"
+                   placeholder="<?php echo __('Number of person: ', 'yatra') ?>"
+                   value="1"/>
+        </label>
         <a href="" class="btn primary-btn yatra-book-now-btn"
            data-text="<?php echo esc_attr($book_now_text); ?>"
            data-loading-text="<?php echo esc_attr(get_option('yatra_booknow_loading_text', __('Loading....', 'yatra'))) ?>"
