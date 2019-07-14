@@ -364,7 +364,7 @@ var YatraSubTabs = function ($) {
                     });
                     if (sortableItemArray.length > 0) {
 
-                        $('#tour_meta_information').find('input[name="tour_tabs_ordering"]').val(sortableItemArray.join())
+                        $('#tour_meta_information').find('input[name="yatra_tour_meta_tour_tabs_ordering"]').val(sortableItemArray.join())
                     }
                 }
             });

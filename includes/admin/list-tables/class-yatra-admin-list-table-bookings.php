@@ -263,11 +263,11 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
      */
     protected function render_booking_total_column()
     {
-        $yatra_tour_price = isset($this->booking_meta['yatra_tour_price']) ? $this->booking_meta['yatra_tour_price'] : '';
+        $yatra_yatra_tour_meta_regular_price = isset($this->booking_meta['yatra_yatra_tour_meta_regular_price']) ? $this->booking_meta['yatra_yatra_tour_meta_regular_price'] : '';
 
         $yatra_currency_symbol = isset($this->booking_meta['yatra_currency_symbol']) ? $this->booking_meta['yatra_currency_symbol'] : '';
 
-        printf('<span>%s %s</span>', $yatra_currency_symbol, esc_html($yatra_tour_price));
+        printf('<span>%s %s</span>', $yatra_currency_symbol, esc_html($yatra_yatra_tour_meta_regular_price));
     }
 
 

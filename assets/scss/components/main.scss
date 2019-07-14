@@ -216,11 +216,12 @@
         text-align: center;
         padding: 10px 0;
         /* background: #d77b5d; */
-        color: #ef805c;
-        border-bottom: 2px solid #ef805c;
+        color: #1abc9c;
+        border-bottom: 2px solid #1abc9c;
         margin-bottom: 20px;
 
       }
+
     }
     .tab-inner:after {
       clear: both;
@@ -262,7 +263,7 @@
 }
 
 .detail-tab .tabs h3 {
-  color: #ef805c;
+  color: #1abc9c;
 }
 
 .overview-section {
@@ -302,8 +303,29 @@
   }
   .itinerary-heading, .faq-heading {
     .fa, svg {
-      float:right;
-      cursor:pointer;
+      float: right;
+      cursor: pointer;
+    }
+  }
+}
+
+.yatra-single-meta-content {
+  float: left;
+  width: 50%;
+}
+
+.yatra-single-meta-options {
+  float: right;
+  width: 50%;
+}
+
+.entry-content {
+  &.entry-tabs {
+    &:before {
+      content: '';
+      display: block;
+      clear: both;
+      width: 100%;
     }
   }
 }

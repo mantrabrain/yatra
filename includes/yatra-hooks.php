@@ -45,13 +45,16 @@ if (!function_exists('yatra_main_content_callback')) {
 
 
 if (!function_exists('yatra_before_main_content_callback')) {
+
     function yatra_before_main_content_callback()
     {
         $class = '';
-        $class = is_post_type_archive('tour') ? 'yatra-archive-tour' : '';
-        $class = is_single('tour') ? 'yatra-single-tour' : '';
 
-        ?><section id="primary" class="content-area yatra-content-area yatra-archive-tour">
+        $class .= is_post_type_archive('tour') ? 'yatra-archive-tour' : '';
+
+        $class .= is_singular('tour') ? 'yatra-single-tour' : '';
+
+        ?><section id="primary" class="content-area yatra-content-area <?php echo esc_attr($class); ?>">
         <?php
     }
 

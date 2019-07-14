@@ -19,6 +19,9 @@ if (!class_exists('Yatra_Metabox_Base')) {
                 case 'number':
                     $updated_value = absint($field_value);
                     break;
+                case 'shortcode':
+                    $updated_value = sanitize_text_field($field_value);
+                    break;
                 case 'gallery':
                     $gallery_item_array = explode(',', $field_value);
                     $updated_value = '';
@@ -228,6 +231,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     break;
                 case "text":
                 case "number":
+                case "shortcode":
                     ?>
                     <p>
                         <label

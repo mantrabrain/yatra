@@ -28,7 +28,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                 $valid_form_data['yatra_tour_name'] = $tour_post->post_title;
 
-                $valid_form_data['yatra_tour_price'] = get_post_meta($yatra_tour_id, 'yatra_tour_meta_tour_price', true);
+                $valid_form_data['yatra_yatra_tour_meta_regular_price'] = get_post_meta($yatra_tour_id, 'yatra_tour_meta_yatra_tour_meta_regular_price', true);
 
                 $currency = get_option('yatra_currency');
 

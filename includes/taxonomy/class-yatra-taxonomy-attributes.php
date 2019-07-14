@@ -49,6 +49,7 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
                     switch ($type) {
 
                         case "text":
+                        case "shortcode":
                             $updated_value = sanitize_text_field($value);
                             break;
                         case "number":

@@ -21,8 +21,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             /*$configurations = array(
                 'tour-options' => array(
-                    'yatra_tour_meta_tour_price' => array(
-                        'name' => 'yatra_tour_meta_tour_price',
+                    'yatra_tour_meta_yatra_tour_meta_regular_price' => array(
+                        'name' => 'yatra_tour_meta_yatra_tour_meta_regular_price',
                         'title' => sprintf(__('Tour Price(%s)', 'yatra'), $currency_symbols),
                         'type' => 'number',
                         'wrap_class' => 'yatra-left',
@@ -30,8 +30,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                             'placeholder' => sprintf(__('Tour Price (%s)', 'yatra'), $currency_symbols),
                         ),
                         'row_start' => true,
-                    ), 'yatra_tour_meta_tour_duration_days' => array(
-                        'name' => 'yatra_tour_meta_tour_duration_days',
+                    ), 'yatra_tour_meta_yatra_tour_meta_tour_duration_days' => array(
+                        'name' => 'yatra_tour_meta_yatra_tour_meta_tour_duration_days',
                         'title' => esc_html__('Tour Duration Days', 'yatra'),
                         'type' => 'number',
                         'wrap_class' => 'yatra-right',
@@ -40,8 +40,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                         ),
                         'row_end' => true,
 
-                    ), 'yatra_tour_meta_tour_duration_nights' => array(
-                        'name' => 'yatra_tour_meta_tour_duration_nights',
+                    ), 'yatra_tour_meta_yatra_tour_meta_tour_duration_nights' => array(
+                        'name' => 'yatra_tour_meta_yatra_tour_meta_tour_duration_nights',
                         'title' => esc_html__('Tour Duration Nights', 'yatra'),
                         'type' => 'number',
                         'wrap_class' => 'yatra-left',
@@ -50,8 +50,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                         ),
                         'row_start' => true,
 
-                    ), 'yatra_tour_meta_tour_country' => array(
-                        'name' => 'yatra_tour_meta_tour_country',
+                    ), 'yatra_tour_meta_yatra_tour_meta_tour_country' => array(
+                        'name' => 'yatra_tour_meta_yatra_tour_meta_tour_country',
                         'title' => esc_html__('Country', 'yatra'),
                         'type' => 'select',
                         'wrap_class' => 'yatra-right',
@@ -570,19 +570,19 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             $post_id = $post->ID;
 
-            $tour_tabs_ordering = get_post_meta($post_id, 'tour_tabs_ordering', true);
+            $yatra_tour_meta_tour_tabs_ordering = get_post_meta($post_id, 'yatra_tour_meta_tour_tabs_ordering', true);
 
-            $tour_tabs_ordering_array = explode(',', $tour_tabs_ordering);
+            $yatra_tour_meta_tour_tabs_ordering_array = explode(',', $yatra_tour_meta_tour_tabs_ordering);
 
             $config_array_keys = array_keys($configs);
 
-            $array_diff = array_diff($config_array_keys, $tour_tabs_ordering_array);
+            $array_diff = array_diff($config_array_keys, $yatra_tour_meta_tour_tabs_ordering_array);
 
-            $final_ordered_config_keys = $tour_tabs_ordering_array;
+            $final_ordered_config_keys = $yatra_tour_meta_tour_tabs_ordering_array;
 
             if (count($array_diff) > 0) {
 
-                $final_ordered_config_keys = array_merge($tour_tabs_ordering_array, $array_diff);
+                $final_ordered_config_keys = array_merge($yatra_tour_meta_tour_tabs_ordering_array, $array_diff);
             }
 
             $active_tab_config = '';

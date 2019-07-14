@@ -33,7 +33,7 @@
 
             <div class="meta-content-wrap">
                 <div class="inner">
-                    <?php yatra_entry_meta_attributes(); ?>
+                    <?php yatra_entry_meta_options(); ?>
                 </div>
             </div>
 

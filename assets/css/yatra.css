@@ -297,8 +297,8 @@
     text-align: center;
     padding: 10px 0;
     /* background: #d77b5d; */
-    color: #ef805c;
-    border-bottom: 2px solid #ef805c;
+    color: #1abc9c;
+    border-bottom: 2px solid #1abc9c;
     margin-bottom: 20px; }
 
 .yatra-tabs .yatra-tab-content .tab-inner:after {
@@ -334,7 +334,7 @@
   margin-top: 20px; }
 
 .detail-tab .tabs h3 {
-  color: #ef805c; }
+  color: #1abc9c; }
 
 .overview-section {
   padding-bottom: 20px;
@@ -368,5 +368,19 @@
 .yatra-itinerary-list .itinerary-heading .fa, .yatra-itinerary-list .itinerary-heading svg, .yatra-itinerary-list .faq-heading .fa, .yatra-itinerary-list .faq-heading svg, .yatra-faq-list-item .itinerary-heading .fa, .yatra-faq-list-item .itinerary-heading svg, .yatra-faq-list-item .faq-heading .fa, .yatra-faq-list-item .faq-heading svg {
   float: right;
   cursor: pointer; }
+
+.yatra-single-meta-content {
+  float: left;
+  width: 50%; }
+
+.yatra-single-meta-options {
+  float: right;
+  width: 50%; }
+
+.entry-content.entry-tabs:before {
+  content: '';
+  display: block;
+  clear: both;
+  width: 100%; }
 
 /*# sourceMappingURL=yatra.css.map */

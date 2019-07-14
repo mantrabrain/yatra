@@ -101,6 +101,11 @@ if (!class_exists('Yatra_Tour_Attribute_Parser')) {
                             $html .= '<input type="' . esc_attr($type) . '" name="' . esc_attr($name) . '" id="' . esc_attr($name) . '" size="40" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($value) . '"/>';
 
                             break;
+                        case "shortcode":
+
+                            $html .= '<input type="text" name="' . esc_attr($name) . '" id="' . esc_attr($name) . '" size="40" placeholder="' . esc_attr($placeholder) . '" value="' . esc_attr($value) . '"/>';
+
+                            break;
 
                         case "textarea":
                             $html .= '<textarea name="' . esc_attr($name) . '" id="' . esc_attr($name) . '" rows="5" cols="40" placeholder="' . esc_attr($placeholder) . '">' . esc_html($value) . '</textarea>';
