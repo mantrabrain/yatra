@@ -259,7 +259,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'overview_label',
                             'title' => __('Label Text', 'yatra'),
                             'type' => 'text',
-                            'default' => 'This is default text',
+                            'default' => __('Overview', 'yatra'),
                         ),
                         'overview_description' => array(
                             'name' => 'overview_description',
@@ -279,6 +279,8 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'itinerary_label',
                             'title' => __('Label', 'yatra'),
                             'type' => 'text',
+                            'default' => __('Itinerary', 'yatra'),
+
                         ),
                         'itinerary_repeator' => array(
                             'name' => 'itinerary_repeator',
@@ -318,7 +320,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'cost_info_label',
                             'title' => __('Label', 'yatra'),
                             'type' => 'text',
-                            'default' => __('Price Information', 'yatra'),
+                            'default' => __('Cost Info', 'yatra'),
                         ),
                         'cost_info_price_includes_title' => array(
                             'name' => 'cost_info_price_includes_title',
@@ -357,6 +359,8 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'faq_label',
                             'title' => __('Label', 'yatra'),
                             'type' => 'text',
+                            'default' => __('FAQ', 'yatra'),
+
                         ),
                         'faq_repeator' => array(
                             'name' => 'faq_repeator',
@@ -392,6 +396,8 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'map_label',
                             'title' => __('Label', 'yatra'),
                             'type' => 'text',
+                            'default' => __('Map', 'yatra'),
+
                         ),
                         'yatra_tour_meta_map_content' => array(
                             'name' => 'yatra_tour_meta_map_content',
@@ -411,6 +417,8 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'name' => 'gallery_label',
                             'title' => __('Label', 'yatra'),
                             'type' => 'text',
+                            'default' => __('Gallery', 'yatra'),
+
                         ),
                         'yatra_tab_gallery' => array(
                             'name' => 'yatra_tab_gallery',

@@ -66,10 +66,55 @@ final class Yatra_Install
 
         }
 
+        $terms = array(
+            array(
+                'term' => 'Altitude',
+                'taxonomy' => 'attributes',
+                'slug' => 'altitude',
+                'meta' => array(
+                    'attribute_field_type' => 'text_field',
+                    'yatra_attribute_meta' => array(
+                        'content' => ''
+                    )
+                )
+            ), array(
+                'term' => 'Height',
+                'taxonomy' => 'attributes',
+                'slug' => 'height',
+                'meta' => array(
+                    'attribute_field_type' => 'text_field',
+                    'yatra_attribute_meta' => array(
+                        'content' => ''
+                    )
+                )
+            ),
+        );
+
+        foreach ($terms as $term) {
+
+            $term_id = wp_insert_term(
+                $term['term'], // the term
+                $term['taxonomy'], // the taxonomy
+                array(
+                    'slug' => $term['slug'],
+                )
+            );
+            $meta = isset($term['meta']) ? $term['meta'] : array();
+
+            foreach ($meta as $meta_key => $meta_value) {
+
+                add_term_meta($term_id, $meta_key, $meta_value, true);
+
+            }
+        }
+
         $options = array(
             'yatra_currency' => 'USD',
             'yatra_booknow_button_text' => 'Book Now',
-            'yatra_booknow_loading_text' => 'Loading....'
+            'yatra_booknow_loading_text' => 'Loading....',
+            'yatra_update_cart_text' => 'Update Cart',
+            'yatra_proceed_to_checkout_text' => 'Proceed to Checkout',
+            'yatra_order_booking_text' => 'Order Booking'
         );
 
         foreach ($options as $option_key => $option_value) {
