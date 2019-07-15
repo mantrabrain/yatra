@@ -7,7 +7,7 @@ Stable tag: 2.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Yatra is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies. This is beta version of travel & tour booking plugin for now.
+Yatra is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
 
 == Description ==
 Yatra is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies. This is beta version of travel & tour booking plugin for now.
@@ -38,7 +38,7 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 1. Tour Listing Page
 2. Destination Section backend
 3. Activity section backend
-4. Single Tour Page frontend
+4. Single Tour Page frontendp
 5. Single Tour page book button
 6. Checkout page
 7. Booking listing page backend

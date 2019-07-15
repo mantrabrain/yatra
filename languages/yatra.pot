@@ -2,9 +2,9 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Complete Travel & Tour Booking System 1.0.0\n"
+"Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.0.0\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2019-07-15 09:34:36+00:00\n"
+"POT-Creation-Date: 2019-07-15 12:13:31+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -193,13 +193,15 @@ msgid "When you receive a new order, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:153
 #: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:121
 #: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:121
 msgid "Booking Code"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:63
 #: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:122
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:18
 #: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:122
@@ -222,6 +224,7 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:129
 #: includes/class-yatra-forms.php:45
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:149
 #: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
 #: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:45
 #: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
@@ -524,9 +527,11 @@ msgstr ""
 msgid "Email address"
 msgstr ""
 
-#: includes/class-yatra-forms.php:57 includes/template-tags.php:191
-#: includes/template-tags.php:641 includes/template-tags.php:645
-#: includes/template-tags.php:788 includes/template-tags.php:820
+#: includes/class-yatra-forms.php:57
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:150
+#: includes/template-tags.php:191 includes/template-tags.php:641
+#: includes/template-tags.php:645 includes/template-tags.php:788
+#: includes/template-tags.php:820
 #: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:55
 #: svn-repository/tags/1.0.0/includes/template-tags.php:184
 #: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:55
@@ -669,8 +674,8 @@ msgstr ""
 msgid "No Bookings found in the Trash"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:31
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:32
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:17
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:29
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:17
@@ -678,56 +683,56 @@ msgstr ""
 msgid "Tours"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
 #: includes/template-tags.php:556
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
 msgid "Add New"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
 msgid "Add New Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:24
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
 msgid "Edit Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:24
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
 msgid "New Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:26
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
 msgid "All Tours"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:26
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:24
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:24
 msgid "View Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:28
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
 msgid "Search Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:28
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:29
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:26
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:26
 msgid "No Tours found"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:29
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:30
 #: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
 #: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
 msgid "No Tours found in the Trash"
@@ -774,9 +779,9 @@ msgid "Tour Options"
 msgstr ""
 
 #: includes/functions.php:52
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:140
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:141
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:150
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:138
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:139
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:148
 #: includes/template-tags.php:829
 msgid "Attributes"
 msgstr ""
@@ -1839,7 +1844,66 @@ msgstr ""
 msgid "Add image(s)"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:261
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:39
+msgid "Booking Additional Information"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:60
+msgid "Tour Information"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:64
+msgid "Number of person"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:65
+msgid "Regular Price"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:66
+msgid "Sales Price"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:67
+#: includes/template-tags.php:145 includes/template-tags.php:579
+msgid "Price Per"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:68
+#: includes/template-tags.php:150 includes/template-tags.php:589
+#: includes/template-tags.php:593 includes/template-tags.php:806
+msgid "Group Size"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:69
+msgid "Duration Days"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:70
+msgid "Duration Nights"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:145
+msgid "Booking Customer Information"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:148
+msgid "Fullname"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:151
+msgid "Phone"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:152
+msgid "Total Booking Price"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:215
+msgid "Booking Status"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:38
 #: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:255
 #: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:255
 msgid "Tour Additional Information"
@@ -1953,40 +2017,40 @@ msgstr ""
 msgid "New Activity Name"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:109
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:107
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:172
 msgid "Attribute Type"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:142
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:140
 msgid "Search Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:143
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:141
 msgid "All Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:144
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:142
 msgid "Parent Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:145
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:143
 msgid "Parent Attributes:"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:146
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:144
 msgid "Edit Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:147
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:145
 msgid "Update Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:148
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:146
 msgid "Add New Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:149
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:147
 msgid "New Attributes Name"
 msgstr ""
 
@@ -2073,15 +2137,6 @@ msgstr ""
 #: svn-repository/trunk/includes/template-tags.php:115
 #: templates/tmpl-cart-table.php:17
 msgid "Price"
-msgstr ""
-
-#: includes/template-tags.php:145 includes/template-tags.php:579
-msgid "Price Per"
-msgstr ""
-
-#: includes/template-tags.php:150 includes/template-tags.php:589
-#: includes/template-tags.php:593 includes/template-tags.php:806
-msgid "Group Size"
 msgstr ""
 
 #: includes/template-tags.php:156
