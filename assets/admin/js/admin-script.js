@@ -261,7 +261,6 @@ var YatraSubTabs = function ($) {
 
                 $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').after($(this).closest('.mb-repeator').clone());
 
-
                 var node = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.mb-repeator-heading-input');
 
                 var index = $this.getUpdatedRepeatorIndex($(this));
@@ -296,6 +295,7 @@ var YatraSubTabs = function ($) {
         editorFix: function (node) {
 
             var $this = this;
+
             var editorAreas = node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.wp-editor-area');
 
             node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.tmce-active').hide();
@@ -316,7 +316,9 @@ var YatraSubTabs = function ($) {
 
                 $(this).closest('.yatra-field-wrap').find('#' + updated_id).show();
 
-
+                node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.tmce-active').remove();
+                node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.mce-tinymce').remove();
+                
                 tinyMCE.execCommand("mceAddEditor", true, updated_id);
 
                 /* var editorSettings = {
@@ -331,7 +333,6 @@ var YatraSubTabs = function ($) {
 
             });
 
-            node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.tmce-active').remove();
 
         },
         repeatorHeading: function ($node) {
