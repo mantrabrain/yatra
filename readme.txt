@@ -3,7 +3,7 @@ Contributors: Mantrabrain
 Tags: mantrabrain, travel, travel-booking, tour, wp, booking, tour-booking
 Requires at least: 4.7
 Tested up to: 5.2.2
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,6 +45,10 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 8. Yatra Setting backend
 
 == Changelog ==
+
+= 2.0.1 | 2019/07/15 =
+* Fixed - Js issue fixed for repeator field
+* Fixed - Style issue fixed for single page tour
 
 = 2.0.0 | 2019/07/15 =
 * Added - Flexible tab option added
