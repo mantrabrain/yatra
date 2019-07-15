@@ -129,11 +129,12 @@ if (!class_exists('Yatra_Metabox_Base')) {
             return $new_repeator_options;
         }
 
-        public function metabox_html($field = array())
+        public function metabox_html($field = array(), $post_id = 0)
         {
+
             global $post;
 
-            $post_id = $post->ID;
+            $post_id = $post_id < 1 ? $post->ID : $post_id;
 
             $extra_attributes = array();
 

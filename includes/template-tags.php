@@ -420,8 +420,8 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                             'default' => __('Gallery', 'yatra'),
 
                         ),
-                        'yatra_tab_gallery' => array(
-                            'name' => 'yatra_tab_gallery',
+                        'yatra_tour_meta_gallery' => array(
+                            'name' => 'yatra_tour_meta_gallery',
                             'title' => __('Gallery', 'yatra'),
                             'type' => 'gallery',
                         )

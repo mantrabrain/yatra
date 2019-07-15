@@ -8,7 +8,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
         {
             add_action('add_meta_boxes', array($this, 'metabox_form'));
 
-            add_action('update_post', array($this, 'save'));
+            add_action('save_post', array($this, 'save'));
 
 
         }
@@ -240,7 +240,6 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
          */
         public function save($post_id)
         {
-
             $nonce = isset($_POST['yatra_booking_post_type_metabox_nonce']) ? ($_POST['yatra_booking_post_type_metabox_nonce']) : '';
 
             if (isset($_POST['yatra_booking_post_type_metabox_nonce'])) {
@@ -255,7 +254,16 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
                     if (in_array($post_status, $booking_statuses)) {
 
-                        yatra_update_booking_status($post_id, $post_status);
+                        if (!wp_is_post_revision($post_id)) {
+
+                            // unhook this function so it doesn't loop infinitely
+                            remove_action('save_post', array($this, 'save'));
+
+                            yatra_update_booking_status($post_id, $post_status);
+                            // re-hook this function
+                            add_action('save_post', array($this, 'save'));
+                        }
+
                     }
                 }
             }

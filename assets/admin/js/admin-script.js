@@ -486,7 +486,8 @@ var YatraTourAttributes = function ($) {
                 var attribute_tour_meta_data = {
                     action: attribute_tour_meta_params.attribute_meta_action,
                     yatra_nonce: attribute_tour_meta_params.attribute_meta_nonce,
-                    term_id: term_id
+                    term_id: term_id,
+                    post_id: $('body').find('.yatra_tour_cpt_meta_post_id').val()
                 };
 
                 $this.$add_tour_attribute.after(spinner);

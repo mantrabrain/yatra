@@ -95,6 +95,12 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 <?php } ?>
                 <input type="hidden" value="<?php echo wp_create_nonce('yatra_tour_post_type_metabox_nonce') ?>"
                        name="yatra_tour_cpt_meta_nonce"/>
+                <?php
+                global $post;
+
+                ?>
+                <input type="hidden" value="<?php echo $post->ID ?>"
+                       name="yatra_tour_cpt_meta_post_id" class="yatra_tour_cpt_meta_post_id"/>
             </div>
             <?php
         }
@@ -432,7 +438,9 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             $term_id = isset($_POST['term_id']) ? absint($_POST['term_id']) : 0;
 
-            if (!$is_valid_nonce || $term_id < 1) {
+            $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
+
+            if (!$is_valid_nonce || $term_id < 1 || $post_id < 1) {
 
                 wp_send_json_error();
             }
@@ -447,13 +455,13 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 wp_send_json_error();
             }
 
-            $content = $this->parse_attribute($field_type, $term_id);
+            $content = $this->parse_attribute($field_type, $term_id, array(), $post_id);
 
             wp_send_json_success($content);
 
         }
 
-        public function parse_attribute($field_type, $term_id, $term_value_array = array())
+        public function parse_attribute($field_type, $term_id, $term_value_array = array(), $post_id)
         {
 
             $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
@@ -499,7 +507,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
                 $option['name'] = 'tour_meta_custom_attributes[' . $term_id . '][' . $option['name'] . ']';
 
-                $this->metabox_html($option);
+
+                $this->metabox_html($option, $post_id);
 
 
             }

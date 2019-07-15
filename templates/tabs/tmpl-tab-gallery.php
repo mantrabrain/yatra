@@ -3,7 +3,6 @@
 <ul class="yatra-tour-gallery">
     <?php
 
-
     foreach ($attachments as $attachment) {
 
         echo '<li class="yatra-gallery-item">';
