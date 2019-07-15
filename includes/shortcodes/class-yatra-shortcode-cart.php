@@ -46,7 +46,7 @@ class Yatra_Shortcode_Cart
     private static function cart()
     {
         // Show non-cart errors.
-        do_action('yatra_before_cart_form_cart_notices');
+        do_action('yatra_before_cart_template');
 
         $cart = array();
 

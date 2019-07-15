@@ -1,13 +1,13 @@
 .yatra-shortcode-wrapper {
   form.yatra-cart-form {
-
+    position: relative;
     .person {
       input {
         width: 80px;
       }
     }
-    .actions{
-      text-align:right;
+    .actions {
+      text-align: right;
     }
   }
 }

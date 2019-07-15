@@ -18,9 +18,9 @@ class Yatra_Ajax
     private function public_ajax_actions()
     {
         $actions = array(
-
             'select_tour',
-            'book_selected_tour'
+            'book_selected_tour',
+            'update_cart'
         );
         return $actions;
     }
@@ -138,6 +138,37 @@ class Yatra_Ajax
 
         wp_send_json_success($parsed_html);
 
+
+    }
+
+    public function update_cart()
+    {
+        $status = $this->validate_nonce();
+
+        if (!$status) {
+            wp_send_json_error($this->ajax_error());
+        }
+
+        $number_of_persons = isset($_POST['number_of_person']) ? $_POST['number_of_person'] : array();
+
+
+        foreach ($number_of_persons as $tour_id => $number_of_person) {
+
+            $tour_id = absint($tour_id);
+
+            $number_of_person = absint($number_of_person);
+
+            if ($tour_id > 0 && yatra_instance()->cart->is_valid_tour_id_on_cart($tour_id)) {
+
+                yatra_instance()->cart->update_cart($tour_id, $number_of_person);
+
+            }
+
+        }
+
+        $cart_table = yatra_instance()->cart->get_cart_table(true);
+
+        wp_send_json_success($cart_table);
 
     }
 

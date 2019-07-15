@@ -16,16 +16,16 @@ class Yatra_Forms
 
     }
 
-    public function tour_checkout_data()
-    {
-        $yatra_tour_cart = yatra_get_session('yatra_tour_cart');
-
-        return $yatra_tour_cart;
-    }
-
     public function chekcout_form_fields()
     {
-        $yatra_tour_cart_data = $this->tour_checkout_data();
+        $country_list = yatra_get_countries();
+        $countries = array_merge(
+            array(
+                '0' => __('Select Country', 'yatra')
+            ),
+            $country_list
+        );
+
 
         $form_fields = apply_filters('tour_checkout_form_fields', array(
                 'fullname' => array(
@@ -38,38 +38,34 @@ class Yatra_Forms
                         'placeholder' => __('Your full name', 'yatra'),
                         'required' => 'required'
                     ),
-                    'group_id' => 'tour_meta',
+                    'group_id' => 'yatra_tour_customer_info',
                     'row_start' => true,
                 ), 'email' => array(
                     'name' => 'email',
                     'title' => __('Email', 'yatra'),
                     'type' => 'email',
                     'value' => '',
-                    'group_id' => 'tour_meta',
+                    'group_id' => 'yatra_tour_customer_info',
                     'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
                         'placeholder' => __('Email address', 'yatra'),
                         'required' => 'required'
                     ),
                     'row_start' => true,
-                ), 'tour_package' => array(
-                    'name' => 'tour_package',
-                    'title' => __('Tour Package', 'yatra'),
-                    'type' => 'text',
-                    'group_id' => 'tour_meta',
-                    'value' => isset($yatra_tour_cart_data->post_title) ? $yatra_tour_cart_data->post_title . ' (' . $yatra_tour_cart_data->ID . ') ' : '',
+                ), 'country' => array(
+                    'name' => 'country',
+                    'title' => __('Country', 'yatra'),
+                    'type' => 'select',
+                    'group_id' => 'yatra_tour_customer_info',
+                    'options' => $countries,
                     'wrap_class' => 'yatra-left',
-                    'extra_attributes' => array(
-                        'placeholder' => __('Your full name', 'yatra'),
-                        'readonly' => 'readonly',
-                        'required' => 'required'
-                    ),
                     'row_start' => true,
+                    'select2' => true
                 ), 'phone_number' => array(
                     'name' => 'phone_number',
                     'title' => __('Phone Number', 'yatra'),
                     'type' => 'text',
-                    'group_id' => 'tour_meta',
+                    'group_id' => 'yatra_tour_customer_info',
                     'value' => '',
                     'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
@@ -86,35 +82,106 @@ class Yatra_Forms
     {
         $form_fields_all = $this->chekcout_form_fields();
 
-        $form_fields = array_keys($form_fields_all);
-
         $valid_data = array();
 
-        foreach ($form_fields as $field) {
+        foreach ($form_fields_all as $field => $field_option) {
 
             if (isset($form_fields_all[$field]['group_id'])) {
 
                 if (isset($data[$form_fields_all[$field]['group_id']][$field])) {
 
-                    $valid_data[$form_fields_all[$field]['group_id']][$field] = $this->sanitization($data[$form_fields_all[$field]['group_id']][$field]);
+                    $valid_data[$form_fields_all[$field]['group_id']][$field] = $this->sanitization($data[$form_fields_all[$field]['group_id']][$field], $field_option);
                 }
 
             } else {
 
                 if (isset($data[$field])) {
 
-                    $valid_data[$field] = $this->sanitization($data[$field]);
+                    $valid_data[$field] = $this->sanitization($data[$field], $field_option);
                 }
             }
 
         }
-
         return $valid_data;
     }
 
-    public function sanitization($data)
+    public function sanitization($field_value, $field_option)
     {
-        return $data; // Need to write sanitization code.
+        $type = isset($field_option['type']) ? $field_option['type'] : '';
+        if (empty($type)) {
+            return '';
+        }
+        $updated_value = '';
+
+        switch ($type) {
+            // Allow only integers in number fields
+            case 'number':
+                $updated_value = absint($field_value);
+                break;
+
+            case 'text':
+                $updated_value = sanitize_text_field($field_value);
+                break;
+
+            case 'email':
+                $updated_value = sanitize_email($field_value);
+                break;
+
+            // Allow some tags in textareas
+            case 'textarea':
+
+                if (isset($field_option['allowed_tags'])) {
+
+                    $allowed_tags = $field_option['allowed_tags'];
+
+                } else {
+
+                    $allowed_tags = array(
+                        'p' => array(),
+                        'em' => array(),
+                        'strong' => array(),
+                        'img' => array(
+                            'src' => array()
+                        ),
+                        'ul' => array(),
+                        'ol' => array(),
+                        'li' => array(),
+                        'a' => array(
+                            'href' => array(),
+                        ),
+                    );
+                }
+
+                $updated_value = wp_kses($field_value, $allowed_tags);
+
+
+                break;
+            // No allowed tags for all other fields
+            case 'url':
+                $updated_value = esc_url_raw($field_value);
+                break;
+            case 'select':
+                $is_multiple = isset($meta_field['is_multiple']) && (boolean)$field_option['is_multiple'] ? true : false;
+
+                if ($is_multiple) {
+                    $field_value = empty($field_value) ? array() : $field_value;
+                    $array = array_map('sanitize_text_field', wp_unslash($field_value));
+
+                    $updated_value = array_map('wp_kses_post', $array);
+
+                } else {
+
+                    $updated_value = wp_kses_post(sanitize_text_field($field_value));
+                }
+                break;
+            default:
+                $updated_value = wp_kses_post(sanitize_text_field($field_value));
+                break;
+
+        }
+
+
+        return $updated_value;
     }
 
     public function tour_checkout_form()

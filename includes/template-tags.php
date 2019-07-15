@@ -800,7 +800,7 @@ if (!function_exists('yatra_frontend_options')) {
         <table>
             <tr>
                 <th><?php echo __('Price per', 'yatra') ?></th>
-                <td>Person</td>
+                <td><?php echo esc_html(ucwords($yatra_tour_meta_price_per)) ?></td>
             </tr>
             <tr>
                 <th><?php echo __('Group Size', 'yatra') ?></th>

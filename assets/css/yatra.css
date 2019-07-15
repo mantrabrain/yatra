@@ -128,6 +128,10 @@
 .yatra-book-btn-wrapper {
   text-align: right; }
 
+.mb-clear {
+  clear: both;
+  display: block; }
+
 .yatra-content-area header {
   margin-bottom: 30px; }
 
@@ -383,10 +387,28 @@
   clear: both;
   width: 100%; }
 
-.yatra-shortcode-wrapper form.yatra-cart-form .person input {
-  width: 80px; }
+.yatra-overlay {
+  z-index: 1000;
+  border: none;
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  background: white;
+  opacity: 0.6;
+  cursor: wait;
+  position: absolute; }
 
-.yatra-shortcode-wrapper form.yatra-cart-form .actions {
-  text-align: right; }
+.yatra-shortcode-wrapper form.yatra-cart-form {
+  position: relative; }
+  .yatra-shortcode-wrapper form.yatra-cart-form .person input {
+    width: 80px; }
+  .yatra-shortcode-wrapper form.yatra-cart-form .actions {
+    text-align: right; }
+
+form.yatra-checkout-form label {
+  display: block; }
 
 /*# sourceMappingURL=yatra.css.map */

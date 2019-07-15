@@ -46,7 +46,7 @@ class Yatra_Shortcode_Checkout
     private static function checkout()
     {
         // Show non-cart errors.
-        do_action('yatra_before_checkout_form_cart_notices');
+        do_action('yatra_before_checkout_template');
 
         $checkout = array();
 

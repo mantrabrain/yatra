@@ -117,6 +117,7 @@ if (!function_exists('yatra_clear_session')) {
             session_start();
         }
 
+
         $yatra_session_id = "yatra_session";
 
         if (!empty($key)) {

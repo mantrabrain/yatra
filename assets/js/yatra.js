@@ -5,9 +5,11 @@ var YatraFrontend = function ($) {
         init: function () {
             this.cacheDom();
             this.bindEvents();
+            this.initLib();
         },
         cacheDom: function () {
             this.$book_now = $('.yatra-book-now-btn');
+            this.$yatra_update_cart = $('.yatra_update_cart');
         },
 
         bindEvents: function () {
@@ -20,6 +22,24 @@ var YatraFrontend = function ($) {
                     return;
                 }
                 $this.bookTour(tour_id, number_of_person);
+            });
+
+            $('body').on('click', '.yatra_update_cart', function (e) {
+
+                e.preventDefault();
+
+                var form = $(this).closest('form');
+                var form_data = form.serialize();
+
+                $this.update_cart(form_data, $(this));
+            });
+            $('body').on('click', 'table.yatra_cart_table input.number_of_person', function (e) {
+                e.preventDefault();
+
+                var yatra_cart_table = $(this).closest('.yatra_cart_table');
+
+                yatra_cart_table.find('.yatra_update_cart').removeAttr('disabled');
+
             });
             $('body').on('click',
                 '.yatra-itinerary-list-item .itinerary-heading svg, .yatra-itinerary-list-item .itinerary-heading .fa, .yatra-faq-list-item .faq-heading svg, .yatra-faq-list-item .faq-heading .fa', function () {
@@ -59,6 +79,12 @@ var YatraFrontend = function ($) {
                 toggle_node.remove();
 
             });
+        },
+        initLib: function () {
+
+            if (typeof select2 !== 'undefined') {
+                $('.yatra-select2').select2();
+            }
         },
         toggleYatraList: function ($toggle_node, toggle_status) {
             var $this = this;
@@ -106,6 +132,35 @@ var YatraFrontend = function ($) {
             } else {
                 $node.val($node.attr('data-text'));
             }
+        },
+        update_cart: function (form_data, cart_btn) {
+
+            var cart_form = cart_btn.closest('form.yatra-cart-form');
+            var $this = this;
+            $.ajax({
+                type: "POST",
+                url: yatra_params.ajax_url,
+                data: form_data,
+                beforeSend: function () {
+                    $this.table_loading(cart_btn);
+                },
+                success: function (response) {
+
+
+                    if (response.success === true) {
+
+                        cart_form.find('.yatra-cart-table-wrapper').find('table.yatra_cart_table').remove();
+                        cart_form.find('.yatra-cart-table-wrapper').append(response.data)
+                    }
+                    cart_form.find('.yatra-overlay').remove();
+                },
+                complete: function () {
+                    cart_form.find('.yatra-overlay').remove();
+                }
+            });
+        },
+        table_loading: function (cart_btn) {
+            cart_btn.closest('form').append('<div class="yatra-overlay"></div>');
         },
         bookTour: function (tour_id, number_of_person) {
             var $this = this;

@@ -34,6 +34,10 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
 
     private $booking_meta = null;
 
+    private $booking_meta_params = null;
+
+    private $booking_customer_info = null;
+
     /**
      * Constructor.
      */
@@ -76,10 +80,10 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
      * @param WP_Post $post Current post object.
      * @return array
      */
-  /*  protected function get_row_actions($actions, $post)
-    {
-        return array();
-    }*/
+    /*  protected function get_row_actions($actions, $post)
+      {
+          return array();
+      }*/
 
     /**
      * Define hidden columns.
@@ -162,6 +166,8 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
         $this->object = get_post($post_id);
         $the_order = $this->object;
         $this->booking_meta = get_post_meta($post_id, 'yatra_booking_meta', true);
+        $this->booking_meta_params = get_post_meta($post_id, 'yatra_booking_meta_params', true);
+        $this->booking_customer_info = isset($this->booking_meta_params['yatra_tour_customer_info']) ? $this->booking_meta_params['yatra_tour_customer_info'] : array();
 
     }
 
@@ -170,10 +176,17 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
      */
     protected function render_yatra_tour_name_column()
     {
-        $tour_title = isset($this->booking_meta['yatra_tour_name']) ? $this->booking_meta['yatra_tour_name'] : '';
-        $tour_id = isset($this->booking_meta['yatra_tour_id']) ? $this->booking_meta['yatra_tour_id'] : '';
+        $tour_string = '';
 
-        echo '<a target="_blank" href="' . esc_url(admin_url('post.php?post=' . absint($tour_id)) . '&action=edit') . '" class="tour-view"><strong>' . esc_html($tour_title) . '</strong></a>';
+        foreach ($this->booking_meta as $tour_id => $booking_meta) {
+
+            $tour_id = absint($tour_id);
+
+            $tour_title = isset($booking_meta['yatra_tour_name']) ? $booking_meta['yatra_tour_name'] : '';
+
+            $tour_string .= '<a target="_blank" href="' . esc_url(admin_url('post.php?post=' . absint($tour_id)) . '&action=edit') . '" class="tour-view"><strong>' . esc_html($tour_title) . '</strong></a><br/>';
+        }
+        echo $tour_string;
 
     }
 
@@ -238,9 +251,8 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
      */
     protected function render_email_address_column()
     {
-        $tour_meta = isset($this->booking_meta['tour_meta']) ? $this->booking_meta['tour_meta'] : array();
 
-        $email = isset($tour_meta['email']) ? $tour_meta['email'] : '';
+        $email = isset($this->booking_customer_info['email']) ? $this->booking_customer_info['email'] : '';
 
         printf('<span>%s</span>', esc_html($email));
 
@@ -251,9 +263,8 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
      */
     protected function render_full_name_column()
     {
-        $tour_meta = isset($this->booking_meta['tour_meta']) ? $this->booking_meta['tour_meta'] : array();
 
-        $fullname = isset($tour_meta['fullname']) ? $tour_meta['fullname'] : '';
+        $fullname = isset($this->booking_customer_info['fullname']) ? $this->booking_customer_info['fullname'] : '';
 
         printf('<span>%s</span>', esc_html($fullname));
     }
@@ -263,11 +274,11 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
      */
     protected function render_booking_total_column()
     {
-        $yatra_yatra_tour_meta_regular_price = isset($this->booking_meta['yatra_yatra_tour_meta_regular_price']) ? $this->booking_meta['yatra_yatra_tour_meta_regular_price'] : '';
+        $total_booking_price = isset($this->booking_meta_params['total_booking_price']) ? $this->booking_meta_params['total_booking_price'] : '';
 
-        $yatra_currency_symbol = isset($this->booking_meta['yatra_currency_symbol']) ? $this->booking_meta['yatra_currency_symbol'] : '';
+        $yatra_currency_symbol = isset($this->booking_meta_params['currency_symbol']) ? $this->booking_meta_params['currency_symbol'] : yatra_get_current_currency_symbol();
 
-        printf('<span>%s %s</span>', $yatra_currency_symbol, esc_html($yatra_yatra_tour_meta_regular_price));
+        printf('<span>%s%s</span>', $yatra_currency_symbol, esc_html($total_booking_price));
     }
 
 
