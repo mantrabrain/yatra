@@ -22,9 +22,11 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
             $yatra_tour_id_string = implode(',', $tour_ids);
 
+            $booking_code = '#' . $this->get_booking_code($yatra_tour_id_string);
+
             $booking_arguments = array(
 
-                'post_title' => '#' . $this->get_booking_code($yatra_tour_id_string),
+                'post_title' => $booking_code,
                 'post_status' => 'yatra-pending',
                 'post_content' => '',
                 'post_type' => 'yatra-booking'
@@ -78,11 +80,11 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                         $number_of_person = $cart[$yatra_tour_id]['number_of_person'];
 
+                        $booking_post_meta['number_of_person'] = $number_of_person;
+
                         $final_price = yatra_get_final_tour_price($yatra_tour_id, $number_of_person);
 
                         $total_booking_price += $final_price;
-
-                        $booking_post_meta['yatra_final_price'] = $final_price;
 
                         $booking_post_meta_value[$yatra_tour_id] = $booking_post_meta;
 
@@ -116,7 +118,9 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                     'booking_date' => date('Y-m-d H:i:s'),
 
-                    'yatra_tour_customer_info' => $yatra_tour_customer_info
+                    'yatra_tour_customer_info' => $yatra_tour_customer_info,
+
+                    'booking_code' => $booking_code
 
                 ));
 
@@ -163,35 +167,6 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
             $booking = get_post($this->booking_id);
 
-        }
-
-        public function update_status($booking_id = 0, $status = 'pending')
-        {
-            $yatra_booking_statuses = yatra_get_booking_statuses();
-
-            if ($booking_id < 1 || !isset($yatra_booking_statuses[$status])) {
-
-                return false;
-            }
-
-            do_action('yatra_before_booking_status_change', array(
-                'booking_id' => $booking_id,
-                'status' => $status
-            ));
-
-            $booking_array = array();
-            $booking_array['ID'] = $booking_id;
-            $booking_array['post_status'] = $status;
-
-            // Update the post into the database
-            wp_update_post($booking_array);
-
-            do_action('yatra_after_booking_status_change', array(
-                'booking_id' => $booking_id,
-                'status' => $status
-            ));
-
-            return true;
         }
 
     }

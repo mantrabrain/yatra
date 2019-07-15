@@ -64,6 +64,7 @@ class Yatra_Metabox
     {
 
         $this->tour_metabox = new Yatra_Metabox_Tour_CPT();
+        $this->tour_metabox = new Yatra_Metabox_Booking_CPT();
 
     }
 

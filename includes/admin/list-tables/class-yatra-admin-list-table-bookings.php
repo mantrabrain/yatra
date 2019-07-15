@@ -304,8 +304,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
             if (isset($booking_statuses[$new_status])) {
 
                 foreach ($ids as $id) {
-                    $booking = new Yatra_Tour_Booking($id);
-                    $booking->update_status($id, $new_status);
+                    yatra_update_booking_status($id, $new_status);
                     do_action('yatra_booking_edit_status', $id, $new_status);
                     $changed++;
                 }

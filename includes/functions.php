@@ -496,4 +496,34 @@ if (!function_exists('yatra_get_final_tour_price')) {
 }
 
 
+if (!function_exists('yatra_update_booking_status')) {
 
+    function yatra_update_booking_status($booking_id = 0, $status = 'pending')
+    {
+        $yatra_booking_statuses = yatra_get_booking_statuses();
+
+        if ($booking_id < 1 || !isset($yatra_booking_statuses[$status])) {
+
+            return false;
+        }
+
+        do_action('yatra_before_booking_status_change', array(
+            'booking_id' => $booking_id,
+            'status' => $status
+        ));
+
+        $booking_array = array();
+        $booking_array['ID'] = $booking_id;
+        $booking_array['post_status'] = $status;
+
+        // Update the post into the database
+        wp_update_post($booking_array);
+
+        do_action('yatra_after_booking_status_change', array(
+            'booking_id' => $booking_id,
+            'status' => $status
+        ));
+
+        return true;
+    }
+}
