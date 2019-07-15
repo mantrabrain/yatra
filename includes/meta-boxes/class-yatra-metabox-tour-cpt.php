@@ -461,7 +461,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         }
 
-        public function parse_attribute($field_type, $term_id, $term_value_array = array(), $post_id)
+        public function parse_attribute($field_type, $term_id, $term_value_array = array(), $post_id = 0)
         {
 
             $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();

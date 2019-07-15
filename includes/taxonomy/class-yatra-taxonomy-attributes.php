@@ -88,7 +88,7 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
                 $current_screen = get_current_screen();
 
                 $base = isset($current_screen->base) ? $current_screen->base : '';
-                
+
                 if ($base == 'edit-tags') {
 
                     update_term_meta($term_id, $meta_key, $meta_value, '');
