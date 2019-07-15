@@ -13,6 +13,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
 
         public function register()
         {
+
             $permalinks = yatra_get_permalink_structure();
 
             $labels = array(
