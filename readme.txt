@@ -2,8 +2,8 @@
 Contributors: Mantrabrain
 Tags: mantrabrain, travel, travel-booking, tour, wp, booking, tour-booking
 Requires at least: 4.7
-Tested up to: 5.2
-Stable tag: 1.0.0
+Tested up to: 5.2.2
+Stable tag: 2.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,6 +45,15 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 8. Yatra Setting backend
 
 == Changelog ==
+
+= 2.0.0 | 2019/07/15 =
+* Added - Flexible tab option added
+* Added - Tour Custom attribute added
+* Added - Frontend Tab sortable option
+* Added - Booking detail option on backend
+* Fixed - Major file option updated
+* Fixed - Cart option optimized
+* Fixed - Checkout option optimized
 
 = 1.0.0 | 2019/05/10 =
 * Initial Release
