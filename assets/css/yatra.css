@@ -375,11 +375,15 @@
 
 .yatra-single-meta-content {
   float: left;
-  width: 50%; }
+  width: 50%;
+  max-width: 50%;
+  padding: 10px; }
 
 .yatra-single-meta-options {
   float: right;
-  width: 50%; }
+  width: 50%;
+  max-width: 50%;
+  padding: 10px; }
 
 .entry-content.entry-tabs:before {
   content: '';
