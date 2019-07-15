@@ -24,9 +24,7 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
 
             $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
 
-            $meta_array = array(
-
-            );
+            $meta_array = array();
 
 
             if (isset($yatra_tour_attribute_type_options[$attribute_field_type])) {
@@ -154,6 +152,8 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
                 'labels' => $labels,
                 'show_ui' => true,
                 'show_admin_column' => true,
+                'meta_box_cb'=> false,
+                'public' => false,
                 'query_var' => true,
                 'rewrite' => array(
                     'slug' => $permalinks['yatra_attributes_base'],
