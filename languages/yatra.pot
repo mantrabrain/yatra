@@ -2,9 +2,9 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra 1.0.0\n"
+"Project-Id-Version: Yatra - Complete Travel & Tour Booking System 1.0.0\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2019-05-10 06:28:01+00:00\n"
+"POT-Creation-Date: 2019-07-15 09:34:36+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,321 +13,569 @@ msgstr ""
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "X-Generator: grunt-wp-i18n 1.0.3\n"
 
-#: includes/admin/class-yatra-admin-post-types.php:102
-msgid "updated."
+#: includes/admin/class-yatra-admin-permalinks.php:68
+msgid "Tour base"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:103
-msgid "Custom field updated."
+#: includes/admin/class-yatra-admin-permalinks.php:75
+msgid "Destination base"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:104
-msgid "Custom field deleted."
+#: includes/admin/class-yatra-admin-permalinks.php:82
+msgid "Activity base"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:105
-#: includes/admin/class-yatra-admin-post-types.php:107
-msgid "Order updated."
+#: includes/admin/class-yatra-admin-permalinks.php:90
+msgid "Attribute base"
 msgstr ""
 
 #: includes/admin/class-yatra-admin-post-types.php:106
-msgid "Revision restored."
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:102
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:102
+msgid "updated."
+msgstr ""
+
+#: includes/admin/class-yatra-admin-post-types.php:107
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:103
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:103
+msgid "Custom field updated."
 msgstr ""
 
 #: includes/admin/class-yatra-admin-post-types.php:108
-msgid "Order saved."
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:104
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:104
+msgid "Custom field deleted."
 msgstr ""
 
 #: includes/admin/class-yatra-admin-post-types.php:109
-msgid "Order submitted."
+#: includes/admin/class-yatra-admin-post-types.php:111
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:105
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:107
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:105
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:107
+msgid "Order updated."
+msgstr ""
+
+#: includes/admin/class-yatra-admin-post-types.php:110
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:106
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:106
+msgid "Revision restored."
 msgstr ""
 
 #: includes/admin/class-yatra-admin-post-types.php:112
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:108
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:108
+msgid "Order saved."
+msgstr ""
+
+#: includes/admin/class-yatra-admin-post-types.php:113
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:109
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:109
+msgid "Order submitted."
+msgstr ""
+
+#: includes/admin/class-yatra-admin-post-types.php:116
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:112
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:112
 #. translators: %s: date
 msgid "Order scheduled for: %s."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:113
+#: includes/admin/class-yatra-admin-post-types.php:117
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:113
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:113
 msgid "M j, Y @ G:i"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:115
+#: includes/admin/class-yatra-admin-post-types.php:119
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:115
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:115
 msgid "Order draft updated."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:116
+#: includes/admin/class-yatra-admin-post-types.php:120
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:116
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:116
 msgid "Order updated and sent."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:134
+#: includes/admin/class-yatra-admin-post-types.php:138
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:134
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:134
 #. translators: %s: order count
 msgid "%s order updated."
 msgid_plural "%s orders updated."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:136
+#: includes/admin/class-yatra-admin-post-types.php:140
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:136
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:136
 #. translators: %s: order count
 msgid "%s order not updated, somebody is editing it."
 msgid_plural "%s orders not updated, somebody is editing them."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:138
+#: includes/admin/class-yatra-admin-post-types.php:142
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:138
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:138
 #. translators: %s: order count
 msgid "%s order permanently deleted."
 msgid_plural "%s orders permanently deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:140
+#: includes/admin/class-yatra-admin-post-types.php:144
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:140
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:140
 #. translators: %s: order count
 msgid "%s order moved to the Trash."
 msgid_plural "%s orders moved to the Trash."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:142
+#: includes/admin/class-yatra-admin-post-types.php:146
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:142
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:142
 #. translators: %s: order count
 msgid "%s order restored from the Trash."
 msgid_plural "%s orders restored from the Trash."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:275
+#: includes/admin/class-yatra-admin-post-types.php:279
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:275
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:275
 msgid "Product name"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:278
+#: includes/admin/class-yatra-admin-post-types.php:282
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:278
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:278
 msgid "Coupon code"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:294
+#: includes/admin/class-yatra-admin-post-types.php:298
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-post-types.php:294
+#: svn-repository/trunk/includes/admin/class-yatra-admin-post-types.php:294
 msgid "Description (optional)"
 msgstr ""
 
+#: includes/admin/class-yatra-admin-post-types.php:334
+msgid "Yatra Cart Page"
+msgstr ""
+
+#: includes/admin/class-yatra-admin-post-types.php:338
+msgid "Yatra Checkout Page"
+msgstr ""
+
+#: includes/admin/class-yatra-admin-post-types.php:342
+msgid "Yatra Thank You Page"
+msgstr ""
+
 #: includes/admin/class-yatra-admin-settings.php:73
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-settings.php:73
+#: svn-repository/trunk/includes/admin/class-yatra-admin-settings.php:73
 msgid "Your settings have been saved."
 msgstr ""
 
 #: includes/admin/class-yatra-admin-settings.php:527
+#: svn-repository/tags/1.0.0/includes/admin/class-yatra-admin-settings.php:527
+#: svn-repository/trunk/includes/admin/class-yatra-admin-settings.php:527
 msgid "Select a page&hellip;"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:54
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:58
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:54
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:54
 msgid "When you receive a new order, it will appear here."
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:121
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:121
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:121
 msgid "Booking Code"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:122
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:18
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:122
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:18
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:122
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:18
+#: templates/tmpl-cart-table.php:16 templates/tmpl-order-table.php:6
 msgid "Tour"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:123
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:123
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:123
 msgid "Date"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:124
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:128
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:124
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:124
 msgid "Status"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:129
 #: includes/class-yatra-forms.php:45
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:45
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
+#: svn-repository/trunk/includes/class-yatra-forms.php:45
 msgid "Email"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:130
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
 msgid "Full name"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
+#: templates/tmpl-cart-table.php:20 templates/tmpl-order-table.php:7
+#: templates/tmpl-order-table.php:40
 msgid "Total"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:144
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:148
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:144
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:144
 msgid "Change status to Pending"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:145
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:149
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:145
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:145
 msgid "Change status to Processing"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:146
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:150
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:146
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:146
 msgid "Change status to On-hold"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:147
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:151
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:147
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:147
 msgid "Change status to Completed"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:148
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:152
+#: svn-repository/tags/1.0.0/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:148
+#: svn-repository/trunk/includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:148
 msgid "Change status to Cancelled"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:29
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-design.php:29
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-design.php:29
 msgid "Design"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:42
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-design.php:42
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-design.php:42
 msgid "CSS Classes"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:43
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-design.php:43
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-design.php:43
 msgid "Templates"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:89
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-design.php:89
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-design.php:89
 msgid "Templates Settings"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:107
-msgid "CSS Classess Settings"
+msgid "CSS Classes Settings"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:113
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-design.php:113
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-design.php:113
 msgid "Page Container Class"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:114
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-design.php:114
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-design.php:114
 msgid "Container class for all page templates for yatra plugin."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:29
 #: includes/admin/settings/class-yatra-settings-general.php:42
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:29
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:42
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:29
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:42
 msgid "General"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:43
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:43
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:43
 msgid "Pages"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:89
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:89
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:89
 msgid "Page Settings"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:96
-msgid "Checkout Page"
+msgid "Cart Page"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:97
-msgid "Checkout page for tour booking"
+msgid "Cart page for tour booking"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:102
-msgid "Thank you page"
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:96
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:96
+msgid "Checkout Page"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:103
-msgid "Thank you page after tour booking"
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:97
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:97
+msgid "Checkout page for tour booking"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:108
-msgid "Terms and conditions page"
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:102
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:102
+msgid "Thank you page"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:109
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:103
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:103
+msgid "Thank you page after tour booking"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:114
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:108
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:108
+msgid "Terms and conditions page"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:115
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:109
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:109
 msgid "Page for your terms and condition."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:127
+#: includes/admin/settings/class-yatra-settings-general.php:133
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:127
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:127
 msgid "General Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:133
+#: includes/admin/settings/class-yatra-settings-general.php:139
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:133
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:133
 msgid "Currency & symbol"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:134
+#: includes/admin/settings/class-yatra-settings-general.php:140
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:134
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:134
 msgid "Currency for price of tour and other pricing parts."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:141
-msgid "Booknow Button Text"
-msgstr ""
-
-#: includes/admin/settings/class-yatra-settings-general.php:142
-msgid "Text for Book now button."
-msgstr ""
-
-#: includes/admin/settings/class-yatra-settings-general.php:144
-msgid "Book Now"
+#: includes/admin/settings/class-yatra-settings-general.php:147
+msgid "Book Now Button Text"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:148
-msgid "Booknow loading text."
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:142
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:142
+msgid "Text for Book now button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:149
+#: includes/admin/settings/class-yatra-settings-general.php:150
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:144
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:144
+msgid "Book Now"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:154
+msgid "Book Now loading text"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:155
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:149
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:149
 msgid "Text for loading book now button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:151
-#: includes/yatra-hooks.php:82
+#: includes/admin/settings/class-yatra-settings-general.php:157
+#: includes/yatra-hooks.php:100
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:151
+#: svn-repository/tags/1.0.0/includes/yatra-hooks.php:82
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:151
+#: svn-repository/trunk/includes/yatra-hooks.php:82
 msgid "Loading...."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:161
+msgid "Update cart button text"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:162
+msgid "Text for update cart button"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:164
+msgid "Update Cart"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:168
+msgid "Proceed to checkout text"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:169
+msgid "Text for proceed to checkout button."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:171
+msgid "Proceed to checkout"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:175
+msgid "Order booking text"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:176
+msgid "Text for order booking text."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:178
+msgid "Order Booking"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-miscellaneous.php:29
 #: includes/admin/settings/class-yatra-settings-miscellaneous.php:75
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-miscellaneous.php:29
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-miscellaneous.php:75
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-miscellaneous.php:29
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-miscellaneous.php:75
 msgid "Miscellaneous"
 msgstr ""
 
 #: includes/admin/views/html-admin-settings.php:50
+#: svn-repository/tags/1.0.0/includes/admin/views/html-admin-settings.php:50
+#: svn-repository/trunk/includes/admin/views/html-admin-settings.php:50
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-yatra-ajax.php:42
+#: includes/class-yatra-ajax.php:45
+#: svn-repository/tags/1.0.0/includes/class-yatra-ajax.php:42
+#: svn-repository/trunk/includes/class-yatra-ajax.php:42
 msgid "Something wrong, please try again."
 msgstr ""
 
-#: includes/class-yatra-compatibility.php:52 includes/class-yatra.php:60
+#: includes/class-yatra-compatibility.php:52 includes/class-yatra.php:67
+#: svn-repository/tags/1.0.0/includes/class-yatra-compatibility.php:52
+#: svn-repository/tags/1.0.0/includes/class-yatra.php:60
+#: svn-repository/trunk/includes/class-yatra-compatibility.php:52
+#: svn-repository/trunk/includes/class-yatra.php:60
 msgid "Cloning is forbidden."
 msgstr ""
 
-#: includes/class-yatra-compatibility.php:62 includes/class-yatra.php:70
+#: includes/class-yatra-compatibility.php:62 includes/class-yatra.php:77
+#: svn-repository/tags/1.0.0/includes/class-yatra-compatibility.php:62
+#: svn-repository/tags/1.0.0/includes/class-yatra.php:70
+#: svn-repository/trunk/includes/class-yatra-compatibility.php:62
+#: svn-repository/trunk/includes/class-yatra.php:70
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
+#: includes/class-yatra-forms.php:24
+msgid "Select Country"
+msgstr ""
+
 #: includes/class-yatra-forms.php:33 includes/class-yatra-forms.php:38
-#: includes/class-yatra-forms.php:63
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:33
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:38
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:63
+#: svn-repository/trunk/includes/class-yatra-forms.php:33
+#: svn-repository/trunk/includes/class-yatra-forms.php:38
+#: svn-repository/trunk/includes/class-yatra-forms.php:63
 msgid "Your full name"
 msgstr ""
 
 #: includes/class-yatra-forms.php:51
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:51
+#: svn-repository/trunk/includes/class-yatra-forms.php:51
 msgid "Email address"
 msgstr ""
 
-#: includes/class-yatra-forms.php:57
-msgid "Tour Package"
+#: includes/class-yatra-forms.php:57 includes/template-tags.php:191
+#: includes/template-tags.php:641 includes/template-tags.php:645
+#: includes/template-tags.php:788 includes/template-tags.php:820
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:55
+#: svn-repository/tags/1.0.0/includes/template-tags.php:184
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:55
+#: svn-repository/trunk/includes/template-tags.php:184
+msgid "Country"
 msgstr ""
 
-#: includes/class-yatra-forms.php:70
+#: includes/class-yatra-forms.php:66
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:70
+#: svn-repository/trunk/includes/class-yatra-forms.php:70
 msgid "Phone Number"
 msgstr ""
 
-#: includes/class-yatra-forms.php:76
+#: includes/class-yatra-forms.php:72
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:76
+#: svn-repository/trunk/includes/class-yatra-forms.php:76
 msgid "Your contact number"
 msgstr ""
 
-#: includes/class-yatra-forms.php:308
-#: includes/meta-boxes/class-yatra-metabox-base.php:241
+#: includes/class-yatra-forms.php:375
+#: includes/meta-boxes/class-yatra-metabox-base.php:384
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:308
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-base.php:241
+#: svn-repository/trunk/includes/class-yatra-forms.php:308
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-base.php:241
 msgid "Choose an image"
 msgstr ""
 
-#: includes/class-yatra-forms.php:309
-#: includes/meta-boxes/class-yatra-metabox-base.php:242
+#: includes/class-yatra-forms.php:376
+#: includes/meta-boxes/class-yatra-metabox-base.php:385
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:309
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-base.php:242
+#: svn-repository/trunk/includes/class-yatra-forms.php:309
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-base.php:242
 msgid "Use image"
 msgstr ""
 
-#: includes/class-yatra-forms.php:310
-#: includes/meta-boxes/class-yatra-metabox-base.php:243
+#: includes/class-yatra-forms.php:377
+#: includes/meta-boxes/class-yatra-metabox-base.php:386
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:310
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-base.php:243
+#: svn-repository/trunk/includes/class-yatra-forms.php:310
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-base.php:243
 msgid "Select an Image"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:29
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:29
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:29
 #. translators: %s: number of orders
 msgid "Pending booking <span class=\"count\">(%s)</span>"
 msgid_plural "Pending bookings <span class=\"count\">(%s)</span>"
@@ -335,6 +583,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:38
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:38
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:38
 #. translators: %s: number of orders
 msgid "Processing <span class=\"count\">(%s)</span>"
 msgid_plural "Processing <span class=\"count\">(%s)</span>"
@@ -342,6 +592,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:47
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:47
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:47
 #. translators: %s: number of orders
 msgid "On hold <span class=\"count\">(%s)</span>"
 msgid_plural "On hold <span class=\"count\">(%s)</span>"
@@ -349,6 +601,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:56
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:56
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:56
 #. translators: %s: number of orders
 msgid "Completed <span class=\"count\">(%s)</span>"
 msgid_plural "Completed <span class=\"count\">(%s)</span>"
@@ -356,6 +610,8 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:65
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:65
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:65
 #. translators: %s: number of orders
 msgid "Cancelled <span class=\"count\">(%s)</span>"
 msgid_plural "Cancelled <span class=\"count\">(%s)</span>"
@@ -364,1067 +620,1875 @@ msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:89
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:98
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:89
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:98
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:89
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:98
 msgid "Bookings"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:90
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:90
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:90
 msgid "Booking"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:91
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:91
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:91
 msgid "Edit Booking"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:92
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:92
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:92
 msgid "All Bookings"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:93
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:93
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:93
 msgid "View Booking"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:94
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:94
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:94
 msgid "Search Booking"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:95
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:95
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:95
 msgid "No Bookings found"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:96
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:96
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:96
 msgid "No Bookings found in the Trash"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:17
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:29
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:31
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:17
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:29
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:17
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:29
 msgid "Tours"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
+#: includes/template-tags.php:556
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
 msgid "Add New"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
 msgid "Add New Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
 msgid "Edit Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:24
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
 msgid "New Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
 msgid "All Tours"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:24
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:26
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:24
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:24
 msgid "View Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
 msgid "Search Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:26
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:28
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:26
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:26
 msgid "No Tours found"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:29
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
 msgid "No Tours found in the Trash"
 msgstr ""
 
-#: includes/functions.php:16 includes/functions.php:46
-#: includes/template-tags.php:343
-msgid "Overview"
+#: includes/functions.php:16 includes/template-tags.php:799
+msgid "Options"
 msgstr ""
 
-#: includes/functions.php:20 includes/functions.php:47
-#: includes/template-tags.php:344
+#: includes/functions.php:20 includes/template-tags.php:274
+#: svn-repository/tags/1.0.0/includes/functions.php:20
+#: svn-repository/tags/1.0.0/includes/functions.php:47
+#: svn-repository/tags/1.0.0/includes/template-tags.php:344
+#: svn-repository/trunk/includes/functions.php:20
+#: svn-repository/trunk/includes/functions.php:47
+#: svn-repository/trunk/includes/template-tags.php:344
 msgid "Itinerary"
 msgstr ""
 
-#: includes/functions.php:24 includes/functions.php:48
-#: includes/template-tags.php:345
+#: includes/functions.php:24 includes/template-tags.php:313
+#: svn-repository/tags/1.0.0/includes/functions.php:24
+#: svn-repository/tags/1.0.0/includes/functions.php:48
+#: svn-repository/tags/1.0.0/includes/template-tags.php:345
+#: svn-repository/trunk/includes/functions.php:24
+#: svn-repository/trunk/includes/functions.php:48
+#: svn-repository/trunk/includes/template-tags.php:345
 msgid "Cost Info"
 msgstr ""
 
 #: includes/functions.php:28
+#: svn-repository/tags/1.0.0/includes/functions.php:28
+#: svn-repository/trunk/includes/functions.php:28
 msgid "Facts"
 msgstr ""
 
-#: includes/functions.php:32
+#: includes/functions.php:32 includes/template-tags.php:352
+#: svn-repository/tags/1.0.0/includes/functions.php:32
+#: svn-repository/trunk/includes/functions.php:32
 msgid "FAQ"
 msgstr ""
 
-#: includes/functions.php:49 includes/template-tags.php:346
-msgid "Tour Facts"
+#: includes/functions.php:48
+msgid "Tour Options"
 msgstr ""
 
-#: includes/functions.php:152
+#: includes/functions.php:52
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:140
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:141
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:150
+#: includes/template-tags.php:829
+msgid "Attributes"
+msgstr ""
+
+#: includes/functions.php:56
+msgid "Tour Tabs"
+msgstr ""
+
+#: includes/functions.php:162
+#: svn-repository/tags/1.0.0/includes/functions.php:152
+#: svn-repository/trunk/includes/functions.php:152
 #. translators: %s template
 msgid "%s does not exist."
 msgstr ""
 
-#: includes/functions.php:169
+#: includes/functions.php:179
+#: svn-repository/tags/1.0.0/includes/functions.php:169
+#: svn-repository/trunk/includes/functions.php:169
 msgid "action_args should not be overwritten when calling yatra_get_template."
 msgstr ""
 
-#: includes/functions.php:256
+#: includes/functions.php:293
+#: svn-repository/tags/1.0.0/includes/functions.php:256
+#: svn-repository/trunk/includes/functions.php:256
 msgid "Pending"
 msgstr ""
 
-#: includes/functions.php:257
+#: includes/functions.php:294
+#: svn-repository/tags/1.0.0/includes/functions.php:257
+#: svn-repository/trunk/includes/functions.php:257
 msgid "Processing"
 msgstr ""
 
-#: includes/functions.php:258
+#: includes/functions.php:295
+#: svn-repository/tags/1.0.0/includes/functions.php:258
+#: svn-repository/trunk/includes/functions.php:258
 msgid "On Hold"
 msgstr ""
 
-#: includes/functions.php:259
+#: includes/functions.php:296
+#: svn-repository/tags/1.0.0/includes/functions.php:259
+#: svn-repository/trunk/includes/functions.php:259
 msgid "Completed"
 msgstr ""
 
-#: includes/functions.php:260
+#: includes/functions.php:297
+#: svn-repository/tags/1.0.0/includes/functions.php:260
+#: svn-repository/trunk/includes/functions.php:260
 msgid "Cancelled"
 msgstr ""
 
-#: includes/functions.php:274
+#: includes/functions.php:311
+#: svn-repository/tags/1.0.0/includes/functions.php:274
+#: svn-repository/trunk/includes/functions.php:274
 msgid "Previous Post"
 msgstr ""
 
-#: includes/functions.php:275
+#: includes/functions.php:312
+#: svn-repository/tags/1.0.0/includes/functions.php:275
+#: svn-repository/trunk/includes/functions.php:275
 msgid "Next Post"
 msgstr ""
 
-#: includes/functions.php:306
+#: includes/functions.php:343
+#: svn-repository/tags/1.0.0/includes/functions.php:306
+#: svn-repository/trunk/includes/functions.php:306
 #. translators: 1: SVG icon. 2: post author, only visible to screen readers. 3:
 #. author link.
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:354 templates/parts/content.php:31
+#: includes/functions.php:391
+#: svn-repository/tags/1.0.0/includes/functions.php:354
+#: svn-repository/tags/1.0.0/templates/parts/content.php:31
+#: svn-repository/trunk/includes/functions.php:354
+#: svn-repository/trunk/templates/parts/content.php:31
+#: templates/parts/content.php:31
 #. translators: %s: Name of current post. Only visible to screen readers.
 msgid "Edit <span class=\"screen-reader-text\">%s</span>"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:10
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:10
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:10
 msgid "United Arab Emirates dirham"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:11
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:11
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:11
 msgid "Afghan afghani"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:12
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:12
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:12
 msgid "Albanian lek"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:13
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:13
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:13
 msgid "Armenian dram"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:14
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:14
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:14
 msgid "Netherlands Antillean guilder"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:15
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:15
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:15
 msgid "Angolan kwanza"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:16
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:16
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:16
 msgid "Argentine peso"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:17
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:17
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:17
 msgid "Australian dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:18
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:18
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:18
 msgid "Aruban florin"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:19
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:19
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:19
 msgid "Azerbaijani manat"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:20
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:20
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:20
 msgid "Bosnia and Herzegovina convertible mark"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:21
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:21
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:21
 msgid "Barbadian dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:22
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:22
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:22
 msgid "Bangladeshi taka"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:23
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:23
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:23
 msgid "Bulgarian lev"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:24
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:24
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:24
 msgid "Bahraini dinar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:25
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:25
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:25
 msgid "Burundian franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:26
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:26
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:26
 msgid "Bermudian dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:27
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:27
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:27
 msgid "Brunei dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:28
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:28
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:28
 msgid "Bolivian boliviano"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:29
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:29
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:29
 msgid "Brazilian real"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:30
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:30
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:30
 msgid "Bahamian dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:31
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:31
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:31
 msgid "Bitcoin"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:32
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:32
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:32
 msgid "Bhutanese ngultrum"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:33
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:33
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:33
 msgid "Botswana pula"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:34
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:34
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:34
 msgid "Belarusian ruble (old)"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:35
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:35
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:35
 msgid "Belarusian ruble"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:36
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:36
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:36
 msgid "Belize dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:37
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:37
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:37
 msgid "Canadian dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:38
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:38
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:38
 msgid "Congolese franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:39
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:39
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:39
 msgid "Swiss franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:40
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:40
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:40
 msgid "Chilean peso"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:41
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:41
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:41
 msgid "Chinese yuan"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:42
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:42
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:42
 msgid "Colombian peso"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:43
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:43
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:43
 msgid "Costa Rican col&oacute;n"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:44
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:44
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:44
 msgid "Cuban convertible peso"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:45
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:45
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:45
 msgid "Cuban peso"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:46
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:46
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:46
 msgid "Cape Verdean escudo"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:47
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:47
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:47
 msgid "Czech koruna"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:48
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:48
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:48
 msgid "Djiboutian franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:49
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:49
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:49
 msgid "Danish krone"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:50
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:50
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:50
 msgid "Dominican peso"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:51
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:51
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:51
 msgid "Algerian dinar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:52
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:52
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:52
 msgid "Egyptian pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:53
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:53
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:53
 msgid "Eritrean nakfa"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:54
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:54
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:54
 msgid "Ethiopian birr"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:55
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:55
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:55
 msgid "Euro"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:56
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:56
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:56
 msgid "Fijian dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:57
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:57
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:57
 msgid "Falkland Islands pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:58
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:58
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:58
 msgid "Pound sterling"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:59
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:59
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:59
 msgid "Georgian lari"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:60
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:60
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:60
 msgid "Guernsey pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:61
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:61
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:61
 msgid "Ghana cedi"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:62
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:62
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:62
 msgid "Gibraltar pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:63
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:63
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:63
 msgid "Gambian dalasi"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:64
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:64
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:64
 msgid "Guinean franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:65
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:65
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:65
 msgid "Guatemalan quetzal"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:66
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:66
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:66
 msgid "Guyanese dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:67
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:67
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:67
 msgid "Hong Kong dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:68
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:68
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:68
 msgid "Honduran lempira"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:69
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:69
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:69
 msgid "Croatian kuna"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:70
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:70
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:70
 msgid "Haitian gourde"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:71
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:71
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:71
 msgid "Hungarian forint"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:72
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:72
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:72
 msgid "Indonesian rupiah"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:73
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:73
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:73
 msgid "Israeli new shekel"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:74
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:74
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:74
 msgid "Manx pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:75
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:75
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:75
 msgid "Indian rupee"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:76
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:76
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:76
 msgid "Iraqi dinar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:77
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:77
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:77
 msgid "Iranian rial"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:78
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:78
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:78
 msgid "Iranian toman"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:79
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:79
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:79
 msgid "Icelandic kr&oacute;na"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:80
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:80
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:80
 msgid "Jersey pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:81
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:81
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:81
 msgid "Jamaican dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:82
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:82
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:82
 msgid "Jordanian dinar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:83
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:83
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:83
 msgid "Japanese yen"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:84
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:84
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:84
 msgid "Kenyan shilling"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:85
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:85
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:85
 msgid "Kyrgyzstani som"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:86
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:86
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:86
 msgid "Cambodian riel"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:87
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:87
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:87
 msgid "Comorian franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:88
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:88
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:88
 msgid "North Korean won"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:89
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:89
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:89
 msgid "South Korean won"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:90
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:90
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:90
 msgid "Kuwaiti dinar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:91
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:91
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:91
 msgid "Cayman Islands dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:92
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:92
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:92
 msgid "Kazakhstani tenge"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:93
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:93
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:93
 msgid "Lao kip"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:94
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:94
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:94
 msgid "Lebanese pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:95
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:95
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:95
 msgid "Sri Lankan rupee"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:96
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:96
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:96
 msgid "Liberian dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:97
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:97
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:97
 msgid "Lesotho loti"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:98
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:98
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:98
 msgid "Libyan dinar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:99
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:99
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:99
 msgid "Moroccan dirham"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:100
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:100
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:100
 msgid "Moldovan leu"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:101
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:101
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:101
 msgid "Malagasy ariary"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:102
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:102
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:102
 msgid "Macedonian denar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:103
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:103
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:103
 msgid "Burmese kyat"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:104
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:104
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:104
 msgid "Mongolian t&ouml;gr&ouml;g"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:105
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:105
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:105
 msgid "Macanese pataca"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:106
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:106
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:106
 msgid "Mauritanian ouguiya"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:107
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:107
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:107
 msgid "Mauritian rupee"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:108
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:108
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:108
 msgid "Maldivian rufiyaa"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:109
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:109
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:109
 msgid "Malawian kwacha"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:110
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:110
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:110
 msgid "Mexican peso"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:111
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:111
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:111
 msgid "Malaysian ringgit"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:112
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:112
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:112
 msgid "Mozambican metical"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:113
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:113
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:113
 msgid "Namibian dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:114
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:114
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:114
 msgid "Nigerian naira"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:115
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:115
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:115
 msgid "Nicaraguan c&oacute;rdoba"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:116
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:116
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:116
 msgid "Norwegian krone"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:117
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:117
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:117
 msgid "Nepalese rupee"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:118
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:118
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:118
 msgid "New Zealand dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:119
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:119
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:119
 msgid "Omani rial"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:120
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:120
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:120
 msgid "Panamanian balboa"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:121
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:121
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:121
 msgid "Peruvian nuevo sol"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:122
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:122
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:122
 msgid "Papua New Guinean kina"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:123
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:123
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:123
 msgid "Philippine peso"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:124
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:124
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:124
 msgid "Pakistani rupee"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:125
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:125
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:125
 msgid "Polish z&#x142;oty"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:126
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:126
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:126
 msgid "Transnistrian ruble"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:127
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:127
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:127
 msgid "Paraguayan guaran&iacute;"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:128
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:128
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:128
 msgid "Qatari riyal"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:129
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:129
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:129
 msgid "Romanian leu"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:130
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:130
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:130
 msgid "Serbian dinar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:131
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:131
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:131
 msgid "Russian ruble"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:132
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:132
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:132
 msgid "Rwandan franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:133
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:133
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:133
 msgid "Saudi riyal"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:134
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:134
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:134
 msgid "Solomon Islands dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:135
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:135
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:135
 msgid "Seychellois rupee"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:136
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:136
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:136
 msgid "Sudanese pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:137
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:137
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:137
 msgid "Swedish krona"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:138
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:138
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:138
 msgid "Singapore dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:139
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:139
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:139
 msgid "Saint Helena pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:140
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:140
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:140
 msgid "Sierra Leonean leone"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:141
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:141
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:141
 msgid "Somali shilling"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:142
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:142
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:142
 msgid "Surinamese dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:143
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:143
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:143
 msgid "South Sudanese pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:144
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:144
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:144
 msgid "S&atilde;o Tom&eacute; and Pr&iacute;ncipe dobra"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:145
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:145
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:145
 msgid "Syrian pound"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:146
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:146
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:146
 msgid "Swazi lilangeni"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:147
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:147
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:147
 msgid "Thai baht"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:148
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:148
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:148
 msgid "Tajikistani somoni"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:149
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:149
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:149
 msgid "Turkmenistan manat"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:150
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:150
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:150
 msgid "Tunisian dinar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:151
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:151
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:151
 msgid "Tongan pa&#x2bb;anga"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:152
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:152
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:152
 msgid "Turkish lira"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:153
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:153
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:153
 msgid "Trinidad and Tobago dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:154
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:154
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:154
 msgid "New Taiwan dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:155
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:155
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:155
 msgid "Tanzanian shilling"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:156
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:156
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:156
 msgid "Ukrainian hryvnia"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:157
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:157
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:157
 msgid "Ugandan shilling"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:158
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:158
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:158
 msgid "United States (US) dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:159
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:159
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:159
 msgid "Uruguayan peso"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:160
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:160
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:160
 msgid "Uzbekistani som"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:161
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:161
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:161
 msgid "Venezuelan bol&iacute;var"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:162
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:162
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:162
 msgid "Vietnamese &#x111;&#x1ed3;ng"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:163
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:163
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:163
 msgid "Vanuatu vatu"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:164
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:164
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:164
 msgid "Samoan t&#x101;l&#x101;"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:165
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:165
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:165
 msgid "Central African CFA franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:166
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:166
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:166
 msgid "East Caribbean dollar"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:167
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:167
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:167
 msgid "West African CFA franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:168
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:168
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:168
 msgid "CFP franc"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:169
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:169
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:169
 msgid "Yemeni rial"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:170
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:170
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:170
 msgid "South African rand"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:171
+#: svn-repository/tags/1.0.0/includes/helpers/yatra-currency-helper.php:171
+#: svn-repository/trunk/includes/helpers/yatra-currency-helper.php:171
 msgid "Zambian kwacha"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:26
-msgid "Tour Price(%s)"
+#: includes/meta-boxes/class-yatra-metabox-base.php:407
+msgid "Add image(s) to gallery"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:30
-msgid "Tour Price (%s)"
+#: includes/meta-boxes/class-yatra-metabox-base.php:408
+#: includes/meta-boxes/class-yatra-metabox-base.php:409
+msgid "Add image(s)"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:35
-msgid "Tour Duration Days"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:39
-msgid "Number of days"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:45
-msgid "Tour Duration Nights"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:49
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:59
-msgid "Number of nights"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:55
-#: includes/template-tags.php:184
-msgid "Country"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:69
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:73
-#: includes/template-tags.php:189
-msgid "Max altitude"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:79
-#: includes/template-tags.php:199
-msgid "Starts at"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:83
-msgid "Please type start location address."
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:89
-#: includes/template-tags.php:204
-msgid "Ends at"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:93
-msgid "Please type end location address."
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:99
-msgid "Route"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:103
-msgid "Tour Route."
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:109
-msgid "Best Season"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:113
-msgid "Best season, month. Eg. Jan,Feb etc."
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:120
-msgid "Itinerary Description"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:143
-#: includes/template-tags.php:225
-msgid "Cost Included"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:164
-#: includes/template-tags.php:230
-msgid "Cost Excluded"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:188
-msgid "Facts Description"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:255
+#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:261
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:255
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:255
 msgid "Tour Additional Information"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:40
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:101
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:105
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:41
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:102
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:106
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:40
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:101
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:41
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:102
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:40
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:101
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:41
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:102
 msgid "Image"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:54
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:108
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:112
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:55
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:109
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:113
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:54
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:108
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:55
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:109
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:54
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:108
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:55
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:109
 msgid "Add Image"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:57
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:111
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:115
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:58
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:112
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:116
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:57
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:111
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:58
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:112
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:57
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:111
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:58
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:112
 msgid "Remove Image"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:73
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:74
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:73
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:73
 msgid "Activities"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:74
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:83
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:75
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:84
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:74
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:83
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:74
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:83
 msgid "Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:75
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:76
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:75
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:75
 msgid "Search Activities"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:76
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:77
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:76
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:76
 msgid "All Activities"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:77
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:78
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:77
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:77
 msgid "Parent Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:78
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:79
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:78
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:78
 msgid "Parent Activity:"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:79
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:80
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:79
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:79
 msgid "Edit Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:80
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:81
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:80
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:80
 msgid "Update Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:81
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:82
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:81
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:81
 msgid "Add New Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:82
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:83
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-activity.php:82
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-activity.php:82
 msgid "New Activity Name"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:74
-msgid "Destinations"
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:109
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:172
+msgid "Attribute Type"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:142
+msgid "Search Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:143
+msgid "All Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:144
+msgid "Parent Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:145
+msgid "Parent Attributes:"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:146
+msgid "Edit Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:147
+msgid "Update Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:148
+msgid "Add New Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:149
+msgid "New Attributes Name"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:75
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:84
-msgid "Destination"
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:74
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:74
+msgid "Destinations"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:76
-msgid "Search Destinations"
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:85
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:75
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:84
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:75
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:84
+msgid "Destination"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:77
-msgid "All Destinations"
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:76
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:76
+msgid "Search Destinations"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:78
-msgid "Parent Destination"
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:77
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:77
+msgid "All Destinations"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:79
-msgid "Parent Destination:"
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:78
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:78
+msgid "Parent Destination"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:80
-msgid "Edit Destination"
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:79
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:79
+msgid "Parent Destination:"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:81
-msgid "Update Destination"
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:80
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:80
+msgid "Edit Destination"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:82
-msgid "Add New Destination"
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:81
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:81
+msgid "Update Destination"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:83
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:82
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:82
+msgid "Add New Destination"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:84
+#: svn-repository/tags/1.0.0/includes/taxonomy/class-yatra-taxonomy-destination.php:83
+#: svn-repository/trunk/includes/taxonomy/class-yatra-taxonomy-destination.php:83
 msgid "New Destination Name"
 msgstr ""
 
 #: includes/template-tags.php:8
+#: svn-repository/tags/1.0.0/includes/template-tags.php:8
+#: svn-repository/trunk/includes/template-tags.php:8
 #. translators: used between list items, there is a space after the comma.
 msgid ", "
 msgstr ""
 
 #: includes/template-tags.php:14
+#: svn-repository/tags/1.0.0/includes/template-tags.php:14
+#: svn-repository/trunk/includes/template-tags.php:14
 #. translators: 1: SVG icon. 2: posted in label, only visible to screen
 #. readers. 3: list of categories.
 msgid "Posted in"
 msgstr ""
 
-#: includes/template-tags.php:115
+#: includes/template-tags.php:139 includes/template-tags.php:810
+#: svn-repository/tags/1.0.0/includes/template-tags.php:115
+#: svn-repository/trunk/includes/template-tags.php:115
+#: templates/tmpl-cart-table.php:17
 msgid "Price"
 msgstr ""
 
-#: includes/template-tags.php:121
+#: includes/template-tags.php:145 includes/template-tags.php:579
+msgid "Price Per"
+msgstr ""
+
+#: includes/template-tags.php:150 includes/template-tags.php:589
+#: includes/template-tags.php:593 includes/template-tags.php:806
+msgid "Group Size"
+msgstr ""
+
+#: includes/template-tags.php:156
+#: svn-repository/tags/1.0.0/includes/template-tags.php:121
+#: svn-repository/trunk/includes/template-tags.php:121
 msgid "Duration"
 msgstr ""
 
-#: includes/template-tags.php:127
-msgid "Starting location"
+#: includes/template-tags.php:254
+#: svn-repository/tags/1.0.0/includes/functions.php:16
+#: svn-repository/tags/1.0.0/includes/functions.php:46
+#: svn-repository/tags/1.0.0/includes/template-tags.php:343
+#: svn-repository/trunk/includes/functions.php:16
+#: svn-repository/trunk/includes/functions.php:46
+#: svn-repository/trunk/includes/template-tags.php:343
+msgid "Overview"
 msgstr ""
 
-#: includes/template-tags.php:133
-msgid "Ending location"
+#: includes/template-tags.php:260
+msgid "Label Text"
 msgstr ""
 
-#: includes/template-tags.php:139 includes/template-tags.php:209
-msgid "Best sessions"
+#: includes/template-tags.php:266
+msgid "Overview Description"
 msgstr ""
 
-#: includes/template-tags.php:179
-msgid "Tour Price"
+#: includes/template-tags.php:280 includes/template-tags.php:319
+#: includes/template-tags.php:358 includes/template-tags.php:393
+#: includes/template-tags.php:412
+msgid "Label"
 msgstr ""
 
-#: includes/template-tags.php:213 includes/template-tags.php:219
-#: includes/template-tags.php:237
-msgid "Tour Route"
+#: includes/template-tags.php:290
+msgid "Heading"
 msgstr ""
 
-#: includes/yatra-hooks.php:79
+#: includes/template-tags.php:292
+msgid "Day {index} "
+msgstr ""
+
+#: includes/template-tags.php:297 includes/template-tags.php:325
+msgid "Title"
+msgstr ""
+
+#: includes/template-tags.php:302
+msgid "Details"
+msgstr ""
+
+#: includes/template-tags.php:321
+msgid "Price Information"
+msgstr ""
+
+#: includes/template-tags.php:327
+msgid "Price includes"
+msgstr ""
+
+#: includes/template-tags.php:331
+msgid "Price include description"
+msgstr ""
+
+#: includes/template-tags.php:333 includes/template-tags.php:346
+msgid "Type enter to show in new list."
+msgstr ""
+
+#: includes/template-tags.php:338
+msgid "Price excludes title"
+msgstr ""
+
+#: includes/template-tags.php:340
+msgid "Price excludes"
+msgstr ""
+
+#: includes/template-tags.php:344
+msgid "Price excludes description"
+msgstr ""
+
+#: includes/template-tags.php:368
+msgid "FAQ Heading"
+msgstr ""
+
+#: includes/template-tags.php:370
+msgid "FAQ {index} "
+msgstr ""
+
+#: includes/template-tags.php:375
+msgid "Description"
+msgstr ""
+
+#: includes/template-tags.php:387
+msgid "Map"
+msgstr ""
+
+#: includes/template-tags.php:398
+msgid "Map Content"
+msgstr ""
+
+#: includes/template-tags.php:406 includes/template-tags.php:417
+msgid "Gallery"
+msgstr ""
+
+#: includes/template-tags.php:436
+msgid "Text Field"
+msgstr ""
+
+#: includes/template-tags.php:441
+msgid "Content"
+msgstr ""
+
+#: includes/template-tags.php:442 includes/template-tags.php:443
+#: includes/template-tags.php:486 includes/template-tags.php:487
+msgid "Default value for text field."
+msgstr ""
+
+#: includes/template-tags.php:451
+msgid "Number Field"
+msgstr ""
+
+#: includes/template-tags.php:457 includes/template-tags.php:458
+#: includes/template-tags.php:459
+msgid "Default value for number field."
+msgstr ""
+
+#: includes/template-tags.php:465
+msgid "Textarea Field"
+msgstr ""
+
+#: includes/template-tags.php:471 includes/template-tags.php:472
+#: includes/template-tags.php:473
+msgid "Default value for textarea field."
+msgstr ""
+
+#: includes/template-tags.php:480
+msgid "Shortcode Field"
+msgstr ""
+
+#: includes/template-tags.php:485
+msgid "Shortcode"
+msgstr ""
+
+#: includes/template-tags.php:548
+msgid "Tour Attributes"
+msgstr ""
+
+#: includes/template-tags.php:584 templates/tmpl-cart-table.php:19
+msgid "Person"
+msgstr ""
+
+#: includes/template-tags.php:585
+msgid "Group"
+msgstr ""
+
+#: includes/template-tags.php:599
+msgid "Tour Price- Regular (%s)"
+msgstr ""
+
+#: includes/template-tags.php:603
+msgid "Tour Price - Regular (%s)"
+msgstr ""
+
+#: includes/template-tags.php:609
+msgid "Tour Price- Sales Price (%s)"
+msgstr ""
+
+#: includes/template-tags.php:613
+msgid ""
+"Tour Price - Sales Price (%s). Leave it empty if you do not want to show "
+"sales price."
+msgstr ""
+
+#: includes/template-tags.php:619
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:35
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:35
+msgid "Tour Duration Days"
+msgstr ""
+
+#: includes/template-tags.php:623
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:39
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:39
+msgid "Number of days"
+msgstr ""
+
+#: includes/template-tags.php:630
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:45
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:45
+msgid "Tour Duration Nights"
+msgstr ""
+
+#: includes/template-tags.php:634
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:49
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:59
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:49
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:59
+msgid "Number of nights"
+msgstr ""
+
+#: includes/template-tags.php:802
+msgid "Price per"
+msgstr ""
+
+#: includes/template-tags.php:814
+msgid "Tour Duration"
+msgstr ""
+
+#: includes/yatra-hooks.php:90
+#: svn-repository/tags/1.0.0/includes/yatra-hooks.php:79
+#: svn-repository/trunk/includes/yatra-hooks.php:79
 msgid "Book now"
 msgstr ""
 
+#: includes/yatra-hooks.php:91 includes/yatra-hooks.php:95
+msgid "Number of person: "
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-design.php:107
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-design.php:107
+msgid "CSS Classess Settings"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:141
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:141
+msgid "Booknow Button Text"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/admin/settings/class-yatra-settings-general.php:148
+#: svn-repository/trunk/includes/admin/settings/class-yatra-settings-general.php:148
+msgid "Booknow loading text."
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:57
+#: svn-repository/trunk/includes/class-yatra-forms.php:57
+msgid "Tour Package"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/functions.php:49
+#: svn-repository/tags/1.0.0/includes/template-tags.php:346
+#: svn-repository/trunk/includes/functions.php:49
+#: svn-repository/trunk/includes/template-tags.php:346
+msgid "Tour Facts"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:26
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:26
+msgid "Tour Price(%s)"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:30
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:30
+msgid "Tour Price (%s)"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:69
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:73
+#: svn-repository/tags/1.0.0/includes/template-tags.php:189
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:69
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:73
+#: svn-repository/trunk/includes/template-tags.php:189
+msgid "Max altitude"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:79
+#: svn-repository/tags/1.0.0/includes/template-tags.php:199
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:79
+#: svn-repository/trunk/includes/template-tags.php:199
+msgid "Starts at"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:83
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:83
+msgid "Please type start location address."
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:89
+#: svn-repository/tags/1.0.0/includes/template-tags.php:204
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:89
+#: svn-repository/trunk/includes/template-tags.php:204
+msgid "Ends at"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:93
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:93
+msgid "Please type end location address."
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:99
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:99
+msgid "Route"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:103
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:103
+msgid "Tour Route."
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:109
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:109
+msgid "Best Season"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:113
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:113
+msgid "Best season, month. Eg. Jan,Feb etc."
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:120
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:120
+msgid "Itinerary Description"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:143
+#: svn-repository/tags/1.0.0/includes/template-tags.php:225
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:143
+#: svn-repository/trunk/includes/template-tags.php:225
+msgid "Cost Included"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:164
+#: svn-repository/tags/1.0.0/includes/template-tags.php:230
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:164
+#: svn-repository/trunk/includes/template-tags.php:230
+msgid "Cost Excluded"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:188
+#: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:188
+msgid "Facts Description"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/template-tags.php:127
+#: svn-repository/trunk/includes/template-tags.php:127
+msgid "Starting location"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/template-tags.php:133
+#: svn-repository/trunk/includes/template-tags.php:133
+msgid "Ending location"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/template-tags.php:139
+#: svn-repository/tags/1.0.0/includes/template-tags.php:209
+#: svn-repository/trunk/includes/template-tags.php:139
+#: svn-repository/trunk/includes/template-tags.php:209
+msgid "Best sessions"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/template-tags.php:179
+#: svn-repository/trunk/includes/template-tags.php:179
+msgid "Tour Price"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/includes/template-tags.php:213
+#: svn-repository/tags/1.0.0/includes/template-tags.php:219
+#: svn-repository/tags/1.0.0/includes/template-tags.php:237
+#: svn-repository/trunk/includes/template-tags.php:213
+#: svn-repository/trunk/includes/template-tags.php:219
+#: svn-repository/trunk/includes/template-tags.php:237
+msgid "Tour Route"
+msgstr ""
+
+#: svn-repository/tags/1.0.0/templates/parts/content-none.php:16
+#: svn-repository/trunk/templates/parts/content-none.php:16
 #: templates/parts/content-none.php:16
 msgid "Nothing Found"
 msgstr ""
 
+#: svn-repository/tags/1.0.0/templates/parts/content-none.php:26
+#: svn-repository/trunk/templates/parts/content-none.php:26
 #: templates/parts/content-none.php:26
 #. translators: 1: link to WP admin new post page.
 msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
 msgstr ""
 
+#: svn-repository/tags/1.0.0/templates/parts/content-none.php:39
+#: svn-repository/trunk/templates/parts/content-none.php:39
 #: templates/parts/content-none.php:39
 msgid ""
 "Sorry, but nothing matched your search terms. Please try again with some "
 "different keywords."
 msgstr ""
 
+#: svn-repository/tags/1.0.0/templates/parts/content-none.php:46
+#: svn-repository/trunk/templates/parts/content-none.php:46
 #: templates/parts/content-none.php:46
 msgid ""
 "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps "
 "searching can help."
 msgstr ""
 
-#: templates/parts/content.php:59
+#: svn-repository/tags/1.0.0/templates/parts/content.php:59
+#: svn-repository/trunk/templates/parts/content.php:59
+#: templates/parts/content.php:57
 msgid "Pages:"
 msgstr ""
 
+#: templates/tmpl-cart-table.php:18
+msgid "Per"
+msgstr ""
+
+#: templates/tmpl-order-table.php:1
+msgid "Your booking"
+msgstr ""
+
+#: templates/tmpl-order-table.php:34
+msgid "Subtotal"
+msgstr ""
+
 #. Plugin Name of the plugin/theme
-msgid "Yatra"
+msgid "Yatra - Complete Travel & Tour Booking System"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
@@ -1446,32 +2510,60 @@ msgstr ""
 msgid "https://mantrabrain.com/"
 msgstr ""
 
+#: includes/admin/class-yatra-admin-permalinks.php:107
+msgctxt "slug"
+msgid "tour"
+msgstr ""
+
+#: includes/admin/class-yatra-admin-permalinks.php:120
+#: includes/admin/class-yatra-admin-permalinks.php:133
+msgctxt "slug"
+msgid "travel-locations"
+msgstr ""
+
+#: includes/admin/class-yatra-admin-permalinks.php:147
+msgctxt "slug"
+msgid "attributes"
+msgstr ""
+
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:23
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:23
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:23
 msgctxt "Booking status"
 msgid "Pending booking"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:32
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:32
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:32
 msgctxt "Booking status"
 msgid "Processing"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:41
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:41
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:41
 msgctxt "Booking status"
 msgid "On hold"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:50
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:50
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:50
 msgctxt "Booking status"
 msgid "Completed"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:59
+#: svn-repository/tags/1.0.0/includes/custom-post-type/class-yatra-custom-post-type-booking.php:59
+#: svn-repository/trunk/includes/custom-post-type/class-yatra-custom-post-type-booking.php:59
 msgctxt "Booking status"
 msgid "Cancelled"
 msgstr ""
 
 #: includes/template-tags.php:41
+#: svn-repository/tags/1.0.0/includes/template-tags.php:41
+#: svn-repository/trunk/includes/template-tags.php:41
 msgctxt "post"
 msgid "Featured"
 msgstr ""

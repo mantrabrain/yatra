@@ -576,21 +576,21 @@ if (!function_exists('yatra_tour_general_configurations')) {
         $tour_options = array(
             'yatra_tour_meta_price_per' => array(
                 'name' => 'yatra_tour_meta_price_per',
-                'title' => __('Price Per'),
+                'title' => __('Price Per', 'yatra'),
                 'type' => 'select',
                 'wrap_class' => 'yatra-left',
                 'row_start' => true,
                 'options' => array(
-                    'person' => __('Person'),
-                    'group' => __('Group')
+                    'person' => __('Person', 'yatra'),
+                    'group' => __('Group', 'yatra')
                 ),
             ), 'yatra_tour_meta_group_size' => array(
                 'name' => 'yatra_tour_meta_group_size',
-                'title' => __('Group Size'),
+                'title' => __('Group Size', 'yatra'),
                 'type' => 'number',
                 'wrap_class' => 'yatra-right',
                 'extra_attributes' => array(
-                    'placeholder' => __('Group Size'),
+                    'placeholder' => __('Group Size', 'yatra'),
                 ),
                 'row_end' => true,
             ),
@@ -826,7 +826,7 @@ if (!function_exists('yatra_frontend_options')) {
 
         $tour_meta_custom_attributes = get_post_meta($post_id, 'tour_meta_custom_attributes', true);
         if (count($tour_meta_custom_attributes) > 0) {
-            echo '<h3>' . __('Attributes') . '</h3>';
+            echo '<h3>' . __('Attributes', 'yatra') . '</h3>';
             $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
             ?>
             <table>

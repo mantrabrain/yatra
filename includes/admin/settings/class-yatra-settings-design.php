@@ -104,7 +104,7 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
                 'yatra_settings_design_css_classes',
                 array(
                     array(
-                        'title' => __('CSS Classess Settings', 'yatra'),
+                        'title' => __('CSS Classes Settings', 'yatra'),
                         'type' => 'title',
                         'desc' => '',
                         'id' => 'yatra_css_classes_options',
