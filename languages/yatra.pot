@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.0.0\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2019-07-15 12:19:40+00:00\n"
+"POT-Creation-Date: 2019-07-15 13:20:49+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -552,7 +552,7 @@ msgid "Your contact number"
 msgstr ""
 
 #: includes/class-yatra-forms.php:375
-#: includes/meta-boxes/class-yatra-metabox-base.php:384
+#: includes/meta-boxes/class-yatra-metabox-base.php:385
 #: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:308
 #: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-base.php:241
 #: svn-repository/trunk/includes/class-yatra-forms.php:308
@@ -561,7 +561,7 @@ msgid "Choose an image"
 msgstr ""
 
 #: includes/class-yatra-forms.php:376
-#: includes/meta-boxes/class-yatra-metabox-base.php:385
+#: includes/meta-boxes/class-yatra-metabox-base.php:386
 #: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:309
 #: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-base.php:242
 #: svn-repository/trunk/includes/class-yatra-forms.php:309
@@ -570,7 +570,7 @@ msgid "Use image"
 msgstr ""
 
 #: includes/class-yatra-forms.php:377
-#: includes/meta-boxes/class-yatra-metabox-base.php:386
+#: includes/meta-boxes/class-yatra-metabox-base.php:387
 #: svn-repository/tags/1.0.0/includes/class-yatra-forms.php:310
 #: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-base.php:243
 #: svn-repository/trunk/includes/class-yatra-forms.php:310
@@ -782,9 +782,9 @@ msgid "Tour Options"
 msgstr ""
 
 #: includes/functions.php:52
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:138
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:139
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:148
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:140
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:141
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:150
 #: includes/template-tags.php:837
 msgid "Attributes"
 msgstr ""
@@ -1838,12 +1838,12 @@ msgstr ""
 msgid "Zambian kwacha"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-base.php:407
+#: includes/meta-boxes/class-yatra-metabox-base.php:408
 msgid "Add image(s) to gallery"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-base.php:408
 #: includes/meta-boxes/class-yatra-metabox-base.php:409
+#: includes/meta-boxes/class-yatra-metabox-base.php:410
 msgid "Add image(s)"
 msgstr ""
 
@@ -2020,40 +2020,40 @@ msgstr ""
 msgid "New Activity Name"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:107
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:172
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:109
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:174
 msgid "Attribute Type"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:140
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:142
 msgid "Search Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:141
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:143
 msgid "All Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:142
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:144
 msgid "Parent Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:143
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:145
 msgid "Parent Attributes:"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:144
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:146
 msgid "Edit Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:145
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:147
 msgid "Update Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:146
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:148
 msgid "Add New Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:147
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:149
 msgid "New Attributes Name"
 msgstr ""
 
