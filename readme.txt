@@ -35,14 +35,22 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 5. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
 == Screenshots ==
-1. Tour Listing Page
-2. Destination Section backend
-3. Activity section backend
-4. Single Tour Page frontendp
-5. Single Tour page book button
-6. Checkout page
-7. Booking listing page backend
-8. Yatra Setting backend
+1. Add new tour option - Backend
+2. Add new tour with custom attributes - Backend
+3. Add new tour and manage frontend tabs while creating new tour - Backend
+4. Custom destination create option - Backend
+5. Custom activity create option - Backend
+6. Custom attribute create option - Backend
+7. Booking listing page - Backend
+8. Booking view option - Backend
+9. General setting page - Backend
+10. General page setting page - Backend
+11. Design setting (Custom container class) page - Backend
+12. Single tour page with all tabs - Frontend
+13. Tour cart page - Frontend
+14. Checkout page - Frontend
+14. Thank you page ( after checkout success ) - Frontend
+
 
 == Changelog ==
 
