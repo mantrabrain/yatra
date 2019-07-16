@@ -49,7 +49,7 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 12. Single tour page with all tabs - Frontend
 13. Tour cart page - Frontend
 14. Checkout page - Frontend
-14. Thank you page ( after checkout success ) - Frontend
+15. Thank you page ( after checkout success ) - Frontend
 
 
 == Changelog ==
