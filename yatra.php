@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Yatra - Complete Travel & Tour Booking System
- * Plugin URI:        https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/
+ * Plugin URI:        https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg
  * Description:       Yatra is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
  * Version:           2.0.1
  * Author:            Mantrabrain
