@@ -51,6 +51,11 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 14. Checkout page - Frontend
 15. Thank you page ( after checkout success ) - Frontend
 
+== IMPORTANT LINKS ==
+
+* Plugin page: [Click here](https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/)
+* Plugin review/feedback: [Click here](https://wordpress.org/support/plugin/yatra/reviews/)
+* Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
 
 == Changelog ==
 
