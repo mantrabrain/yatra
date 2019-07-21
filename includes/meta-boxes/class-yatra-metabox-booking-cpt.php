@@ -110,7 +110,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         // Regular Price
                         echo '<td>';
 
-                        echo '<span>' . absint($yatra_tour_meta_regular_price) . '</span>';
+                        echo '<span>' . esc_html($yatra_currency_symbol) . absint($yatra_tour_meta_regular_price) . '</span>';
 
                         echo '</td>';
                         // Price Per

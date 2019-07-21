@@ -37,8 +37,8 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'supports' => array('title', 'editor', 'excerpt', 'thumbnail',),
                 'has_archive' => true,
                 'rewrite' => array(
-                    'slug' => $permalinks['yatra_tour_base'],
-                    'with_front' => TRUE
+                    'slug' => trim($permalinks['yatra_tour_base']),
+                    'with_front' => true
                 )
             );
             register_post_type($this->slug, $args);

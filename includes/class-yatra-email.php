@@ -39,10 +39,6 @@ if (!class_exists('Yatra_Email')) {
 
             $booking_id = isset($params['booking_id']) ? $params['booking_id'] : 0;
 
-            $booking_id = 20;
-
-            $tour_ids = array(8);
-
             if ($booking_id < 1 || count($tour_ids) < 1) {
 
                 return;
@@ -86,10 +82,6 @@ if (!class_exists('Yatra_Email')) {
             $booking_id = isset($params['booking_id']) ? $params['booking_id'] : 0;
 
             $status = isset($params['status']) ? $params['status'] : '';
-
-            $booking_id = 195;
-
-            $status = 'yatra-on-hold';
 
             $yatra_booking_statuses = yatra_get_booking_statuses();
 

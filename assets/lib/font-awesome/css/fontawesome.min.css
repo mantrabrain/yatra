@@ -5749,7 +5749,7 @@
 }
 
 @font-face {
-    font-family: "Font Awesome 5 Brands";
+    font-family: "Font Awesome 5 Brands"!important;
     font-style: normal;
     font-weight: normal;
     font-display: auto;
@@ -5758,7 +5758,7 @@
 }
 
 .fab {
-    font-family: "Font Awesome 5 Brands"
+    font-family: "Font Awesome 5 Brands";
 }
 
 @font-face {
@@ -5784,7 +5784,7 @@
 }
 
 .fa, .far, .fas {
-    font-family: "Font Awesome 5 Free"
+    font-family: "Font Awesome 5 Free";
 }
 
 .fa, .fas {

@@ -153,6 +153,10 @@
     background: #fff;
     color: #777; }
 
+.yatra-content-area .fa, .yatra-content-area .far, .yatra-content-area .fas {
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 900; }
+
 .yatra-page-wrapper.template-default article {
   position: relative;
   margin-bottom: 60px;
