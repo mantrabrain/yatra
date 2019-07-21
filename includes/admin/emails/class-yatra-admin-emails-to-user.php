@@ -11,9 +11,10 @@ if (!class_exists('Yatra_Admin_Emails_To_User')) {
             return apply_filters(
 
                 'yatra_booking_complete_message',
-                sprintf(
-                    __(
-                        'Hi {{customer_name}},
+                get_option('yatra_booking_notification_email_content_for_customer',
+                    sprintf(
+                        __(
+                            'Hi {{customer_name}},
                 
                 <br/>
 
@@ -30,9 +31,9 @@ if (!class_exists('Yatra_Admin_Emails_To_User')) {
  				<br/>
 
  				Thank You!',
-                        'yatra'
-                    )
-                )
+                            'yatra'
+                        )
+                    ))
             );
         }
 
@@ -41,12 +42,13 @@ if (!class_exists('Yatra_Admin_Emails_To_User')) {
             return apply_filters(
 
                 'yatra_booking_complete_subject',
-                sprintf(
-                    __(
-                        'Your tour booking has been confirmed',
-                        'yatra'
-                    )
-                )
+                get_option('yatra_booking_notification_email_subject_for_customer',
+                    sprintf(
+                        __(
+                            'Your tour booking has been confirmed',
+                            'yatra'
+                        )
+                    ))
             );
         }
 

@@ -114,7 +114,10 @@ final class Yatra_Install
             'yatra_booknow_loading_text' => 'Loading....',
             'yatra_update_cart_text' => 'Update Cart',
             'yatra_proceed_to_checkout_text' => 'Proceed to Checkout',
-            'yatra_order_booking_text' => 'Order Booking'
+            'yatra_order_booking_text' => 'Order Booking',
+            'yatra_booking_notification_email_subject_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_subject(),
+            'yatra_booking_notification_email_content_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_message(),
+            'yatra_enable_booking_notification_email_for_customer' => 'yes'
         );
 
         foreach ($options as $option_key => $option_value) {

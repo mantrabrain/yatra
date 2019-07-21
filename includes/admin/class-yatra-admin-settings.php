@@ -48,7 +48,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 
 				$settings[] = include 'settings/class-yatra-settings-general.php';
 				$settings[] = include 'settings/class-yatra-settings-design.php';
-				$settings[] = include 'settings/class-yatra-settings-miscellaneous.php';
+				$settings[] = include 'settings/class-yatra-settings-emails.php';
 
 
 				self::$settings = apply_filters( 'yatra_get_settings_pages', $settings );
@@ -341,6 +341,33 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 							<td class="forminp forminp-<?php echo esc_attr( sanitize_title( $value['type'] ) ); ?>">
 								<?php echo $description; // WPCS: XSS ok. ?>
 
+                            <?php
+
+                            $editor = isset($value['editor']) ? (boolean)$value['editor'] : false;
+                    if ($editor) {
+                                $editor_settings = isset($value['editor_settings']) ? $value['editor_settings'] : array();
+
+                                $editor_height = isset($editor_settings['editor_height']) ? (int)$value['editor_height'] : 350;
+
+                                $editor_default_settings = array(
+                                    'textarea_name' => $value['id'],
+                                    'tinymce' => array(
+                                        'init_instance_callback ' => 'function(inst) {
+                                                   $("#" + inst.id + "_ifr").css({minHeight: "' . $editor_height . 'px"});
+                                            }'
+                                    ),
+                                    'wpautop' => true
+
+
+                                       );
+
+
+                    $editor_settings = wp_parse_args($editor_default_settings, $editor_settings);
+
+
+                        wp_editor($option_value, $value['id'], $editor_settings);
+                    }else{
+                        ?>
 								<textarea
 									name="<?php echo esc_attr( $value['id'] ); ?>"
 									id="<?php echo esc_attr( $value['id'] ); ?>"
@@ -349,6 +376,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 									placeholder="<?php echo esc_attr( $value['placeholder'] ); ?>"
 									<?php echo implode( ' ', $custom_attributes ); // WPCS: XSS ok. ?>
 									><?php echo esc_textarea( $option_value ); // WPCS: XSS ok. ?></textarea>
+									<?php } ?>
 							</td>
 						</tr>
 						<?php

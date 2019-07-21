@@ -20,8 +20,9 @@ if (!class_exists('Yatra_Email')) {
 
 
             // Booking Complete Email Hook
-            add_action('yatra_after_tour_booking_completed', array($this, 'booking_completed_email'), 10);
-
+            if ('yes' === get_option('yatra_enable_booking_notification_email_for_customer', 'yes')) {
+                add_action('yatra_after_tour_booking_completed', array($this, 'booking_completed_email'), 10);
+            }
             // Booking Status Change Hook
             add_action('yatra_after_booking_status_change', array($this, 'booking_status_change'), 10);
 
