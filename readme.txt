@@ -3,7 +3,7 @@ Contributors: Mantrabrain
 Tags: mantrabrain, travel, travel-booking, tour, wp, booking, tour-booking
 Requires at least: 4.7
 Tested up to: 5.2.2
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -32,6 +32,8 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 
 4. Translation Ready: The plugin is fully translation ready. So feel free to your website in any language.
 
+5. Email notification
+
 5. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
 == Screenshots ==
@@ -58,6 +60,11 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 * Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
 
 == Changelog ==
+
+= 2.0.2 | 2019/07/21 =
+* Fixed - Minor css issue fixed
+* Fixed - Currency symbol not showing on booking page issue fixed
+* Added - email notification feature
 
 = 2.0.1 | 2019/07/15 =
 * Fixed - Js issue fixed for repeator field
