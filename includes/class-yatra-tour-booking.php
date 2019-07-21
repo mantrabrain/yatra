@@ -16,7 +16,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
         {
             $cart = yatra_instance()->cart->get_cart();
 
-            do_action('before_yatra_tour_booking', array('cart' => $cart));
+            do_action('yatra_before_tour_booking', array('cart' => $cart));
 
             $tour_ids = array_keys($cart);
 
@@ -98,7 +98,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
             }
             if (count($booking_failed_tour_ids) > 0) {
 
-                do_action('after_yatra_tour_booking_failed', array('tour_ids' => $booking_failed_tour_ids));
+                do_action('yatra_after_tour_booking_failed', array('tour_ids' => $booking_failed_tour_ids));
 
                 return false;
 
@@ -124,7 +124,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                 ));
 
-                do_action('after_yatra_tour_booking_completed', array('tour_ids' => $tour_ids, 'booking_id' => $booking_id));
+                do_action('yatra_after_tour_booking_completed', array('tour_ids' => $tour_ids, 'booking_id' => $booking_id));
 
                 return $booking_id;
             }

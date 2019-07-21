@@ -498,7 +498,7 @@ if (!function_exists('yatra_get_final_tour_price')) {
 
 if (!function_exists('yatra_update_booking_status')) {
 
-    function yatra_update_booking_status($booking_id = 0, $status = 'pending')
+    function yatra_update_booking_status($booking_id = 0, $status = 'yatra-pending')
     {
         $yatra_booking_statuses = yatra_get_booking_statuses();
 
@@ -527,3 +527,104 @@ if (!function_exists('yatra_update_booking_status')) {
         return true;
     }
 }
+
+
+if (!function_exists('yatra_global_smart_tags')) {
+
+    function yatra_global_smart_tags()
+    {
+        return apply_filters(
+            'yatra_global_smart_tags',
+            array(
+                'home_url' => get_home_url(),
+                'blog_info' => get_bloginfo(),
+            )
+        );
+    }
+}
+
+if (!function_exists('yatra_booking_smart_tags')) {
+
+    function yatra_booking_smart_tags($booking_id = 0)
+    {
+        $smart_tags['booking_code'] = '';
+
+        $smart_tags['booking_status'] = '';
+
+        $smart_tags['tour_lists'] = '';
+
+        if ($booking_id > 0) {
+
+            $booking_post = get_post($booking_id);
+
+            $booking_status = isset($booking_post->post_status) ? $booking_post->post_status : '';
+
+            $all_post_statuses = yatra_get_booking_statuses();
+
+            $booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
+
+            $booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
+
+            $smart_tags['booking_code'] = isset($booking_meta_params['booking_code']) ? $booking_meta_params['booking_code'] : '';
+
+            $smart_tags['booking_status'] = isset($all_post_statuses[$booking_status]) ? $all_post_statuses[$booking_status] : '';
+
+            foreach ($booking_meta as $tour_id => $meta) {
+
+                $smart_tags['tour_lists'] .= '<a href="' . get_permalink($tour_id) . '" target="_blank">' . $meta['yatra_tour_name'] . '</a><br/>';
+
+            }
+
+        }
+
+        return apply_filters(
+            'yatra_booking_smart_tags',
+            $smart_tags
+        );
+    }
+}
+
+if (!function_exists('yatra_customer_smart_tags')) {
+
+    function yatra_customer_smart_tags($booking_id = 0)
+    {
+        $smart_tags['customer_name'] = '';
+
+        $smart_tags['customer_email'] = '';
+
+        if ($booking_id > 0) {
+
+            $booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
+
+            $customer_info = isset($booking_meta_params ['yatra_tour_customer_info']) ? $booking_meta_params ['yatra_tour_customer_info'] : array();
+
+            $smart_tags['customer_name'] = isset($customer_info['fullname']) ? $customer_info['fullname'] : '';
+
+            $smart_tags['customer_email'] = isset($customer_info['email']) ? $customer_info['email'] : '';
+        }
+
+        return apply_filters(
+            'yatra_customer_smart_tags',
+            $smart_tags
+        );
+    }
+}
+
+if (!function_exists('yatra_all_smart_tags')) {
+
+    function yatra_all_smart_tags($booking_id = 0)
+    {
+        $yatra_global_smart_tags = yatra_global_smart_tags();
+
+        $yatra_booking_smart_tags = yatra_booking_smart_tags($booking_id);
+
+        $yatra_customer_smart_tags = yatra_customer_smart_tags($booking_id);
+
+        $all_tags = array_merge($yatra_global_smart_tags, $yatra_booking_smart_tags, $yatra_customer_smart_tags);
+
+        return apply_filters('yatra_all_smart_tags', $all_tags);
+    }
+}
+
+
+

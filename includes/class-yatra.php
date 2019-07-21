@@ -173,6 +173,7 @@ final class Yatra
         include_once YATRA_ABSPATH . 'includes/functions.php';
         include_once YATRA_ABSPATH . 'includes/yatra-hooks.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-page-templater.php';
+        include_once YATRA_ABSPATH . 'includes/class-yatra-email.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-custom-post-type.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-taxonomy.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-metabox.php';

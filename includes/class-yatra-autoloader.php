@@ -88,6 +88,8 @@ class Yatra_Autoloader
             $path = $this->include_path . 'taxonomy/';
         } elseif (0 === strpos($class, 'yatra_custom_post_type')) {
             $path = $this->include_path . 'custom-post-type/';
+        } elseif (0 === strpos($class, 'yatra_admin_emails')) {
+            $path = $this->include_path . 'admin/emails/';
         } elseif (0 === strpos($class, 'yatra_admin')) {
             $path = $this->include_path . 'admin/';
         } elseif (0 === strpos($class, 'yatra_customizer_control')) {
@@ -95,7 +97,6 @@ class Yatra_Autoloader
         } elseif (0 === strpos($class, 'yatra_helper')) {
             $path = $this->include_path . 'helper/';
         }
-
         if (empty($path) || !$this->load_file($path . $file)) {
             $this->load_file($this->include_path . $file);
         }
