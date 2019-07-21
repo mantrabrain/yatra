@@ -34,7 +34,20 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 
 5. Email notification
 
-5. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
+6. Smart Tags for email message
+
+6. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
+
+
+== Smart Tags ==
+* {{home_url}} : Get home page url
+* {{blog_info}} : Get blog info of a website
+* {{booking_code}} : Get booking code of specific booking
+* {{booking_status}} : Get current booking status of specific booking
+* {{tour_lists}} : Get booked tour lists of specific booking
+* {{customer_name}} : Get customer name of specific booking
+* {{customer_email}} : Get customer email of specific booking
+
 
 == Screenshots ==
 1. Add new tour option - Backend
