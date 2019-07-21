@@ -141,17 +141,28 @@
   padding: 0;
   margin: 0; }
 
+.yatra-content-area .yatra-book-btn-wrapper input.yatra_number_of_person {
+  padding: 8px 10px;
+  height: auto;
+  font-size: 15px;
+  width: 100px;
+  border: 2px solid #1abc9c;
+  border-radius: 0; }
+
 .yatra-content-area .yatra-book-now-btn {
   line-height: 1.5em;
   padding: 10px 20px;
   display: inline-block;
   margin: 15px 0;
   background: none;
-  border: 2px solid #777;
-  color: #ccc; }
+  border: 2px solid #1abc9c;
+  color: #484848;
+  font-size: 15px;
+  margin-left: 0;
+  border-radius: 0; }
   .yatra-content-area .yatra-book-now-btn:hover {
-    background: #fff;
-    color: #777; }
+    background: #1abc9c;
+    color: #fff; }
 
 .yatra-content-area .fa, .yatra-content-area .far, .yatra-content-area .fas {
   font-family: "Font Awesome 5 Free" !important;
@@ -415,6 +426,14 @@
     width: 80px; }
   .yatra-shortcode-wrapper form.yatra-cart-form .actions {
     text-align: right; }
+  .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra-proceed-to-checkout, .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra_update_cart {
+    padding: 10px;
+    background: #1abc9c;
+    color: #fff;
+    border: 1px solid #1abc9c; }
+    .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra-proceed-to-checkout:hover, .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra_update_cart:hover {
+      background: #fff;
+      color: #1abc9c !important; }
 
 form.yatra-checkout-form label {
   display: block; }

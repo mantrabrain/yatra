@@ -18,17 +18,31 @@
     padding: 0;
     margin: 0;
   }
+  .yatra-book-btn-wrapper {
+    input.yatra_number_of_person {
+      padding: 8px 10px;
+      height: auto;
+      font-size: 15px;
+      width: 100px;
+      border: 2px solid #1abc9c;
+      border-radius: 0;
+    }
+  }
   .yatra-book-now-btn {
     line-height: 1.5em;
     padding: 10px 20px;
     display: inline-block;
     margin: 15px 0;
     background: none;
-    border: 2px solid #777;
-    color: #ccc;
+    border: 2px solid #1abc9c;
+    color: #484848;
+    font-size: 15px;
+    margin-left: 0;
+    border-radius: 0;
+
     &:hover {
-      background: #fff;
-      color: #777;
+      background: #1abc9c;
+      color: #fff;
     }
   }
 

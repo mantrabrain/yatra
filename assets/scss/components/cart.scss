@@ -9,5 +9,15 @@
     .actions {
       text-align: right;
     }
+    .button.yatra-proceed-to-checkout, .button.yatra_update_cart {
+      padding: 10px;
+      background: #1abc9c;
+      color: #fff;
+      border: 1px solid #1abc9c;
+      &:hover {
+        background: #fff;
+        color: #1abc9c!important;
+      }
+    }
   }
 }
