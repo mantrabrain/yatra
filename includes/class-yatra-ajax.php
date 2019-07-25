@@ -53,7 +53,7 @@ class Yatra_Ajax
 
         foreach ($all_ajax_actions as $action) {
             add_action('wp_ajax_yatra_' . $action, array($this, $action));
-            if (isset($public_ajax_actions[$action])) {
+            if (in_array($action, $public_ajax_actions)) {
                 add_action('wp_ajax_nopriv_yatra_' . $action, array($this, $action));
             }
 

@@ -66,6 +66,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         <th><?php echo __('Sales Price', 'yatra'); ?></th>
                         <th><?php echo __('Price Per', 'yatra'); ?></th>
                         <th><?php echo __('Group Size', 'yatra'); ?></th>
+                        <th><?php echo __('Toal Price', 'yatra'); ?></th>
                         <th><?php echo __('Duration Days', 'yatra'); ?></th>
                         <th><?php echo __('Duration Nights', 'yatra'); ?></th>
 
@@ -80,10 +81,11 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         $yatra_tour_meta_sales_price = isset($booking['yatra_tour_meta_sales_price']) ? $booking['yatra_tour_meta_sales_price'] : '';
                         $yatra_tour_meta_group_size = isset($booking['yatra_tour_meta_group_size']) ? $booking['yatra_tour_meta_group_size'] : '';
                         $yatra_tour_meta_price_per = isset($booking['yatra_tour_meta_price_per']) ? $booking['yatra_tour_meta_price_per'] : '';
+                        $number_of_person = isset($booking['number_of_person']) ? $booking['number_of_person'] : '';
+                        $total_tour_price = isset($booking['total_tour_price']) ? $booking['total_tour_price'] : yatra_get_final_tour_price($id, $number_of_person);
                         $yatra_tour_meta_tour_duration_nights = isset($booking['yatra_tour_meta_tour_duration_nights']) ? $booking['yatra_tour_meta_tour_duration_nights'] : '';
                         $yatra_tour_meta_tour_duration_days = isset($booking['yatra_tour_meta_tour_duration_days']) ? $booking['yatra_tour_meta_tour_duration_days'] : '';
                         $yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['yatra_currency_symbol'] : '';
-                        $number_of_person = isset($booking['number_of_person']) ? $booking['number_of_person'] : '';
 
 
                         // Tour Name
@@ -123,6 +125,13 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         echo '<td>';
 
                         echo '<span>' . absint($yatra_tour_meta_group_size) . '</span>';
+
+                        echo '</td>';
+
+                        // Total Tour Price
+                        echo '<td>';
+
+                        echo '<span>' . esc_html($yatra_currency_symbol) . absint($total_tour_price) . '</span>';
 
                         echo '</td>';
                         // Duration Days
