@@ -38,6 +38,9 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 
 7. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
+== Shortcodes ==
+* <pre>[yatra_checkout]</pre> : Shortcode for checkout page
+* <pre>[yatra_cart]</pre> : Shortcode for cart page
 
 == Smart Tags ==
 * {{home_url}} : Get home page url
@@ -47,7 +50,6 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 * {{tour_lists}} : Get booked tour lists of specific booking
 * {{customer_name}} : Get customer name of specific booking
 * {{customer_email}} : Get customer email of specific booking
-
 
 == Screenshots ==
 1. Add new tour option - Backend
