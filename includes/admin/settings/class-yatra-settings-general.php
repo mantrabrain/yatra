@@ -105,9 +105,21 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                         'type' => 'single_select_page',
                     ),
                     array(
+                        'title' => __('My Account Page', 'yatra'),
+                        'desc' => __('My Account Page', 'yatra'),
+                        'id' => 'yatra_my_account_page',
+                        'type' => 'single_select_page',
+                    ),
+                    array(
                         'title' => __('Thank you page', 'yatra'),
-                        'desc' => __('Thank you page after tour booking', 'yatra'),
+                        'desc' => __('Thank you page after tour booking completed.', 'yatra'),
                         'id' => 'yatra_thankyou_page',
+                        'type' => 'single_select_page',
+                    ),
+                    array(
+                        'title' => __('Transaction failed page', 'yatra'),
+                        'desc' => __('This is the page buyers are sent to if their transaction is cancelled or fails', 'yatra'),
+                        'id' => 'yatra_failed_transaction_page',
                         'type' => 'single_select_page',
                     ),
                     array(

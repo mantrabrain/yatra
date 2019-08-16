@@ -48,7 +48,7 @@ if (!class_exists('Mantrabrain_Admin_Dashboard')) {
         {
             $widget_key = 'mantrabrain_dashboard_blog_news';
 
-            wp_add_dashboard_widget('mantrabrain_dashboard_blog_news', __('Latest News From MantraBrain Blog', 'mantrabrain-starter-sites'), 'Mantrabrain_Admin_Dashboard::dashboard_blog_news');
+            wp_add_dashboard_widget('mantrabrain_dashboard_blog_news', __('Latest News From MantraBrain Blog', 'yatra'), 'Mantrabrain_Admin_Dashboard::dashboard_blog_news');
 
             global $wp_meta_boxes;
 
@@ -75,20 +75,20 @@ if (!class_exists('Mantrabrain_Admin_Dashboard')) {
             wp_widget_rss_output($feed, $args);
             $urls = array(
                 'theme_url' => array(
-                    'text' => __('New Themes', 'mantrabrain-starter-sites'),
+                    'text' => __('New Themes', 'yatra'),
                     'url' => static::$_themes_url,
-                    'screen_reader_text' => __('opens in a new tab', 'mantrabrain-starter-sites'),
+                    'screen_reader_text' => __('opens in a new tab', 'yatra'),
                     'icon' => 'dashicons dashicons-external'
                 ),
                 'blog_url' => array(
-                    'text' => __('Blog Posts', 'mantrabrain-starter-sites'),
+                    'text' => __('Blog Posts', 'yatra'),
                     'url' => static::$_blog_url,
-                    'screen_reader_text' => __('opens in a new tab', 'mantrabrain-starter-sites'),
+                    'screen_reader_text' => __('opens in a new tab', 'yatra'),
                     'icon' => 'dashicons dashicons-external'
                 ), 'main_site_url' => array(
-                    'text' => __('Main Site', 'mantrabrain-starter-sites'),
+                    'text' => __('Main Site', 'yatra'),
                     'url' => static::$_main_site,
-                    'screen_reader_text' => __('opens in a new tab', 'mantrabrain-starter-sites'),
+                    'screen_reader_text' => __('opens in a new tab', 'yatra'),
                     'icon' => 'dashicons dashicons-external'
                 )
             );

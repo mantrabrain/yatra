@@ -37,16 +37,37 @@ final class Yatra_Install
                 'post_title' => 'Yatra Checkout',
                 'post_status' => 'publish',
                 'post_type' => 'page',
+                'comment_status' => 'closed'
+
             ), array(
                 'post_content' => '[yatra_cart]',
                 'post_title' => 'Yatra Cart',
                 'post_status' => 'publish',
                 'post_type' => 'page',
+                'comment_status' => 'closed'
+
+            ), array(
+                'post_content' => '[yatra_my_account]',
+                'post_title' => 'Yatra My Account',
+                'post_status' => 'publish',
+                'post_type' => 'page',
+                'comment_status' => 'closed'
+
             ), array(
                 'post_content' => 'Your booking has been confirmed. We will get back to you soon.',
                 'post_title' => 'Yatra Thank You',
                 'post_status' => 'publish',
                 'post_type' => 'page',
+                'comment_status' => 'closed'
+
+            ),
+            array(
+                'post_content' => 'Your transaction failed, please try again or contact site support.',
+                'post_title' => 'Yatra Transaction Failed',
+                'post_status' => 'publish',
+                'post_type' => 'page',
+                'comment_status' => 'closed'
+
             ),
         );
 
@@ -62,6 +83,9 @@ final class Yatra_Install
             }
             if ($page['post_title'] == 'Yatra Thank You') {
                 update_option('yatra_thankyou_page', $page_id);
+            }
+            if ($page['post_title'] == 'Yatra My Account') {
+                update_option('yatra_my_account_page', $page_id);
             }
 
         }
@@ -117,7 +141,8 @@ final class Yatra_Install
             'yatra_order_booking_text' => 'Order Booking',
             'yatra_booking_notification_email_subject_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_subject(),
             'yatra_booking_notification_email_content_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_message(),
-            'yatra_enable_booking_notification_email_for_customer' => 'yes'
+            'yatra_enable_booking_notification_email_for_customer' => 'yes',
+            'yatra_enable_guest_checkout' => 'yes'
         );
 
         foreach ($options as $option_key => $option_value) {

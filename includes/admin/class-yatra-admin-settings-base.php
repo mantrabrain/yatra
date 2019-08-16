@@ -88,6 +88,7 @@ if (!class_exists('Yatra_Admin_Settings_Base', false)) :
          */
         public function get_settings()
         {
+
             return apply_filters('yatra_get_settings_' . $this->id, array());
         }
 

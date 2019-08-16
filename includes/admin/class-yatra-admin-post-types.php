@@ -82,6 +82,10 @@ class Yatra_Admin_Post_Types
                 include_once 'list-tables/class-yatra-admin-list-table-bookings.php';
                 $yatra_list_table = new Yatra_Admin_List_Table_Bookings();
                 break;
+            case 'edit-yatra-customers':
+                include_once 'list-tables/class-yatra-admin-list-table-customers.php';
+                $yatra_list_table = new Yatra_Admin_List_Table_Customers();
+                break;
 
         }
 
@@ -327,8 +331,10 @@ class Yatra_Admin_Post_Types
         $cart_page_id = get_option('yatra_cart_page');
 
         $yatra_checkout_page = get_option('yatra_checkout_page');
-        
+
         $yatra_thankyou_page = get_option('yatra_thankyou_page');
+
+        $yatra_my_account_page = get_option('yatra_my_account_page');
 
         if ($cart_page_id == $post->ID) {
             $post_states['yatra_page_for_cart'] = __('Yatra Cart Page', 'yatra');
@@ -340,6 +346,9 @@ class Yatra_Admin_Post_Types
 
         if ($yatra_thankyou_page == $post->ID) {
             $post_states['yatra_page_for_thankyou'] = __('Yatra Thank You Page', 'yatra');
+        }
+        if ($yatra_my_account_page == $post->ID) {
+            $post_states['yatra_page_for_my_account'] = __('Yatra My Account Page', 'yatra');
         }
         return $post_states;
     }

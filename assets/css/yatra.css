@@ -125,6 +125,38 @@
   .yatra-field-row {
     display: block; } }
 
+.yatra-account-messages {
+  list-style: square;
+  margin: 0;
+  padding: 0; }
+
+.yatra-info, .yatra-success, .yatra-warning, .yatra-error, .yatra-validation {
+  border: 1px solid;
+  margin: 10px 0px;
+  padding: 15px 10px 15px 50px;
+  background-repeat: no-repeat;
+  background-position: 10px center; }
+
+.yatra-info {
+  color: #00529B;
+  background-color: #BDE5F8; }
+
+.yatra-success {
+  color: #4F8A10;
+  background-color: #DFF2BF; }
+
+.yatra-warning {
+  color: #9F6000;
+  background-color: #FEEFB3; }
+
+.yatra-error {
+  color: #D8000C;
+  background-color: #FFBABA; }
+
+.yatra-validation {
+  color: #D63301;
+  background-color: #FFCCBA; }
+
 .yatra-book-btn-wrapper {
   text-align: right; }
 
@@ -427,6 +459,7 @@
   .yatra-shortcode-wrapper form.yatra-cart-form .actions {
     text-align: right; }
   .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra-proceed-to-checkout, .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra_update_cart {
+    float: right;
     padding: 10px;
     background: #1abc9c;
     color: #fff;
@@ -437,5 +470,28 @@
 
 form.yatra-checkout-form label {
   display: block; }
+
+.yatra-my-account-navigation {
+  width: 20%;
+  float: left; }
+  .yatra-my-account-navigation ul {
+    list-style: none;
+    margin: 0;
+    padding: 0; }
+    .yatra-my-account-navigation ul li .fa, .yatra-my-account-navigation ul li svg {
+      margin-right: 5px; }
+    .yatra-my-account-navigation ul li.active:before {
+      content: " ";
+      height: 100%;
+      border-left-width: 3px;
+      border-left-style: solid;
+      vertical-align: sub;
+      margin-right: 18px; }
+
+.yatra-my-account-content {
+  float: right;
+  width: 80%; }
+  .yatra-my-account-content label {
+    display: block; }
 
 /*# sourceMappingURL=yatra.css.map */

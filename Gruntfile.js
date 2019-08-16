@@ -144,7 +144,8 @@ module.exports = function (grunt) {
                 options: {
                     potFilename: 'yatra.pot',
                     exclude: [
-                        'vendor/.*'
+                        'vendor/.*',
+                        'svn-repository/.*',
                     ]
                 }
             }
@@ -175,7 +176,8 @@ module.exports = function (grunt) {
                 src: [
                     '**/*.php',         // Include all files
                     '!node_modules/**', // Exclude node_modules/
-                    '!vendor/**'        // Exclude vendor/
+                    '!vendor/**',        // Exclude vendor/
+                    '!svn-repository/**'        // Exclude vendor/
                 ],
                 expand: true
             }

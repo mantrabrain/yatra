@@ -49,6 +49,8 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 				$settings[] = include 'settings/class-yatra-settings-general.php';
 				$settings[] = include 'settings/class-yatra-settings-design.php';
 				$settings[] = include 'settings/class-yatra-settings-emails.php';
+				$settings[] = include 'settings/class-yatra-settings-checkout.php';
+				$settings[] = include 'settings/class-yatra-settings-payment-gateways.php';
 
 
 				self::$settings = apply_filters( 'yatra_get_settings_pages', $settings );
@@ -528,6 +530,84 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 						}
 						break;
 
+
+					// Checkbox input.
+					case 'multicheckbox':
+						$option_value     = self::get_option( $value['id'], $value['default'] );
+						$visibility_class = array();
+
+						if ( ! isset( $value['hide_if_checked'] ) ) {
+							$value['hide_if_checked'] = false;
+						}
+						if ( ! isset( $value['show_if_checked'] ) ) {
+							$value['show_if_checked'] = false;
+						}
+						if ( 'yes' === $value['hide_if_checked'] || 'yes' === $value['show_if_checked'] ) {
+							$visibility_class[] = 'hidden_option';
+						}
+						if ( 'option' === $value['hide_if_checked'] ) {
+							$visibility_class[] = 'hide_options_if_checked';
+						}
+						if ( 'option' === $value['show_if_checked'] ) {
+							$visibility_class[] = 'show_options_if_checked';
+						}
+
+ 							?>
+								<tr valign="top" class="<?php echo esc_attr( implode( ' ', $visibility_class ) ); ?>">
+									<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ); ?></th>
+									<td class="forminp forminp-checkbox">
+
+                            <?php $checkbox_options = isset($value['options']) ? $value['options']: array();
+
+                            foreach($checkbox_options as  $checkbox_option_values){
+
+                                $main_id = $value['id'];
+
+                                $multi_checkbox_id = isset($checkbox_option_values['id']) ? $checkbox_option_values['id']: '';
+
+                                $multi_checkbox_title = isset($checkbox_option_values['title']) ? $checkbox_option_values['title']: '';
+
+                                 $multi_checkbox_option_value = isset($option_value[$multi_checkbox_id]) ? $option_value[$multi_checkbox_id]:'';
+
+                                if(!empty($multi_checkbox_id )){
+
+                                    $multi_checkbox_id=$main_id.'['.$multi_checkbox_id.']';
+                                }
+                             ?>
+
+										<fieldset>
+							<?php
+
+
+						if ( ! empty( $value['title'] ) ) {
+							?>
+								<legend class="screen-reader-text"><span><?php echo esc_html( $value['title'] ); ?></span></legend>
+							<?php
+						}
+
+						?>
+							<label for="<?php echo esc_attr( $multi_checkbox_id ); ?>">
+								<input
+									name="<?php echo esc_attr( $multi_checkbox_id ); ?>"
+									id="<?php echo esc_attr( $multi_checkbox_id ); ?>"
+									type="checkbox"
+									class="<?php echo esc_attr( isset( $value['class'] ) ? $value['class'] : '' ); ?>"
+									value="1"
+									<?php checked( $multi_checkbox_option_value, 'yes' ); ?>
+									<?php echo implode( ' ', $custom_attributes ); // WPCS: XSS ok. ?>
+								/> <?php echo $multi_checkbox_title; // WPCS: XSS ok. ?>
+							</label> <?php echo $tooltip_html; // WPCS: XSS ok. ?>
+						<?php
+
+  										?>
+										</fieldset>
+										<?php } ?>
+									</td>
+								</tr>
+							<?php
+
+						break;
+
 					// Single page selects.
 					case 'single_select_page':
 						$args = array(
@@ -652,6 +732,23 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 				switch ( $option['type'] ) {
 					case 'checkbox':
 						$value = '1' === $raw_value || 'yes' === $raw_value ? 'yes' : 'no';
+						break;
+                    case 'multicheckbox':
+                        $multi_options = isset($option['options']) ? $option['options']: array();
+
+                        $value  = array();
+
+                        foreach($multi_options as $multi_option){
+
+                            $multi_option_id = isset($multi_option['id']) ? $multi_option['id']: '';
+
+                            if(isset($raw_value[$multi_option_id]) && !empty($multi_option_id)){
+
+                                $value[$multi_option_id] = '1' === $raw_value[$multi_option_id] || 'yes' === $raw_value[$multi_option_id] ? 'yes' : 'no';
+                            }
+
+                        }
+
 						break;
 					case 'textarea':
 						$value = wp_kses_post( trim( $raw_value ) );

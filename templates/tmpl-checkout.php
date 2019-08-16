@@ -7,16 +7,27 @@ if (count($checkout) < 1) {
     return;
 }
 
+do_action('yatra_checkout_before_form_fields');
+
 ?>
 
-<form method="post" action="<?php echo admin_url('admin-ajax.php'); ?>" class="yatra-checkout-form"><?php
+    <form method="post" class="yatra-checkout-form"><?php
 
-    do_action('yatra_checkout_form_fields');
-    echo '<div class="mb-clear"></div>';
-    yatra_instance()->cart->get_cart_order_table();
-    ?>
-    <input type="hidden" name="yatra_nonce" value="<?php echo wp_create_nonce('wp_yatra_book_selected_tour_nonce') ?>"/>
-    <input type="hidden" name="action" value="yatra_book_selected_tour"/>
-    <input type="submit" name="yatra_checkout_submit"
-           value="<?php echo esc_attr(get_option('yatra_order_booking_text', 'Order Booking')); ?>"/>
-</form>
+        do_action('yatra_checkout_form_fields');
+
+        echo '<div class="mb-clear"></div>';
+
+
+        yatra_instance()->cart->get_cart_order_table();
+        ?>
+        <p>
+            <?php wp_nonce_field('yatra_book_selected_tour_nonce', 'yatra-book-selected-tour-nonce'); ?>
+            <input type="submit" class="yatra-button button" name="book_selected_tour_nonce"
+                   value="<?php echo esc_attr(get_option('yatra_order_booking_text', 'Order Booking')); ?>"/>
+            <input type="hidden" name="action" value="yatra_book_selected_tour_nonce"/>
+        </p>
+
+
+    </form>
+<?php
+do_action('yatra_checkout_after_form_fields');

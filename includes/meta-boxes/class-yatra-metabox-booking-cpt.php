@@ -52,7 +52,6 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
             $yatra_booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
             $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
-
             $yatra_tour_customer_info = isset($yatra_booking_meta_params['yatra_tour_customer_info']) ? $yatra_booking_meta_params['yatra_tour_customer_info'] : array();
 
             ?>
@@ -62,8 +61,8 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                     <tr>
                         <th><?php echo __('Tour', 'yatra'); ?></th>
                         <th><?php echo __('Number of person', 'yatra'); ?></th>
-                        <th><?php echo __('Regular Price', 'yatra'); ?></th>
                         <th><?php echo __('Sales Price', 'yatra'); ?></th>
+                        <th><?php echo __('Regular Price', 'yatra'); ?></th>
                         <th><?php echo __('Price Per', 'yatra'); ?></th>
                         <th><?php echo __('Group Size', 'yatra'); ?></th>
                         <th><?php echo __('Toal Price', 'yatra'); ?></th>
@@ -191,7 +190,9 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                     // Country
                     echo '<td>';
 
-                    echo '<span>' . esc_html(yatra_get_countries($country)) . '</span>';
+                    if(!empty($country)) {
+                        echo '<span>' . esc_html(yatra_get_countries($country)) . '</span>';
+                    }
 
                     echo '</td>';
 

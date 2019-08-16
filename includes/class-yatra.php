@@ -30,6 +30,21 @@ final class Yatra
      * @var Yatra_Cart
      */
     public $cart = null;
+
+    /**
+     * Yatra_Error instance.
+     *
+     * @var WP_Error
+     */
+    public $yatra_error = null;
+
+    /**
+     * Yatra_Error instance.
+     *
+     * @var Yatra_Messages
+     */
+    public $yatra_messages = null;
+
     /**
      * The single instance of the class.
      *
@@ -95,9 +110,12 @@ final class Yatra
      */
     public function __construct()
     {
+
         $this->define_constants();
         $this->includes();
         $this->init_hooks();
+
+
         do_action('yatra_loaded');
     }
 
@@ -108,6 +126,7 @@ final class Yatra
      */
     private function init_hooks()
     {
+
 
         register_activation_hook(YATRA_FILE, array('Yatra_Install', 'install'));
 
@@ -166,12 +185,25 @@ final class Yatra
     public function includes()
     {
 
+
+        /*
+         * Abstract Class
+         */
+
+        include_once YATRA_ABSPATH . 'includes/abstracts/abstract-yatra-form.php';
+        include_once YATRA_ABSPATH . 'includes/abstracts/abstract-yatra-payment-gateways.php';
+
+
         /**
          * Class autoloader.
          */
         include_once YATRA_ABSPATH . 'includes/class-yatra-autoloader.php';
+
+        include_once YATRA_ABSPATH . 'includes/payment-gateways/class-yatra-gateways-core.php';
         include_once YATRA_ABSPATH . 'includes/functions.php';
         include_once YATRA_ABSPATH . 'includes/yatra-hooks.php';
+        include_once YATRA_ABSPATH . 'includes/yatra-template-functions.php';
+        include_once YATRA_ABSPATH . 'includes/yatra-template-hooks.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-page-templater.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-email.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-custom-post-type.php';
@@ -192,6 +224,10 @@ final class Yatra
         if ($this->is_request('frontend')) {
             Yatra_Frontend::instance();
         }
+
+        $this->yatra_error = new WP_Error;
+        $this->yatra_messages = new Yatra_Messages;
+
 
     }
 

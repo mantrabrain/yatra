@@ -286,9 +286,9 @@ if (!function_exists('yatra_get_cart_page')) {
 
 if (!function_exists('yatra_get_booking_statuses')) {
 
-    function yatra_get_booking_statuses()
+    function yatra_get_booking_statuses($status_key = '')
     {
-        return apply_filters(
+        $statuses = apply_filters(
             'yatra_booking_statuses', array(
                 'yatra-pending' => __('Pending', 'yatra'),
                 'yatra-processing' => __('Processing', 'yatra'),
@@ -297,6 +297,15 @@ if (!function_exists('yatra_get_booking_statuses')) {
                 'yatra-cancelled' => __('Cancelled', 'yatra')
             )
         );
+
+        if (empty($status_key)) {
+
+            return $statuses;
+        }
+        if (isset($statuses[$status_key])) {
+            return $statuses[$status_key];
+        }
+        return $statuses;
 
     }
 }
@@ -468,7 +477,7 @@ if (!function_exists('yatra_get_final_tour_price')) {
     function yatra_get_final_tour_price($tour_id, $number_of_people = 1)
     {
         $number_of_people = absint($number_of_people);
-        
+
         $yatra_tour_meta_regular_price = get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
 
         $yatra_tour_meta_sales_price = get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
@@ -611,6 +620,13 @@ if (!function_exists('yatra_customer_smart_tags')) {
         );
     }
 }
+if (!function_exists('yatra_get_date')) {
+
+    function yatra_get_date()
+    {
+        return date('Y-m-d H:i:s');
+    }
+}
 
 if (!function_exists('yatra_all_smart_tags')) {
 
@@ -629,4 +645,116 @@ if (!function_exists('yatra_all_smart_tags')) {
 }
 
 
+/**
+ * Get data if set, otherwise return a default value or null. Prevents notices when data is not set.
+ *
+ * @since
+ * @param  mixed $var Variable.
+ * @param  string $default Default value.
+ * @return mixed
+ */
+if (!function_exists(('yatra_get_var'))) {
+    function yatra_get_var(&$var, $default = null)
+    {
+        return isset($var) ? $var : $default;
+    }
+}
 
+if (!function_exists('is_yatra_error')) {
+
+    function is_yatra_error($thing)
+    {
+        return ($thing instanceof WP_Error);
+    }
+
+
+}
+
+if (!function_exists('yatra_logout_url')) {
+
+    function yatra_logout_url()
+    {
+
+        return wp_logout_url(get_permalink());
+
+    }
+
+
+}
+
+if (!function_exists('yatra_get_my_account_page')) {
+
+    function yatra_get_my_account_page($get_permalink = false)
+    {
+        $page_id = absint(get_option('yatra_my_account_page'));
+
+        if ($page_id < 1) {
+
+            global $wpdb;
+
+            $page_id = $wpdb->get_var('SELECT ID FROM ' . $wpdb->prefix . 'posts WHERE post_content LIKE "%[yatra_my_account]%" AND post_parent = 0');
+        }
+
+        $page_permalink = get_permalink($page_id);
+
+        if ($get_permalink) {
+
+            return $page_permalink;
+        }
+
+        return $page_id;
+
+
+    }
+}
+
+if (!function_exists('yatra_enable_guest_checkout')) {
+
+    function yatra_enable_guest_checkout()
+    {
+        if ('yes' === get_option('yatra_enable_guest_checkout', 'yes')) {
+
+            return true;
+        }
+        return false;
+
+    }
+}
+
+if (!function_exists('yatra_payment_gateway_fields')) {
+    function yatra_payment_gateway_fields()
+    {
+        $yatra_get_active_payment_gateways = (yatra_get_active_payment_gateways());
+
+        $yatra_get_payment_gateways = yatra_get_payment_gateways();
+
+        if (count($yatra_get_active_payment_gateways) > 0) {
+
+            echo '<ul class="yatra-payment-gateway">';
+
+            echo '<h2>' . __('Payment Gateways', 'yatra') . '</h2>';
+
+            foreach ($yatra_get_payment_gateways as $gateway) {
+
+                $gateway_id = isset($gateway['id']) ? $gateway['id'] : '';
+
+                if (in_array($gateway_id, $yatra_get_active_payment_gateways)) {
+
+                    echo '<li>';
+
+                    echo '<label>';
+
+                    echo '<input type="radio" name="yatra-payment-gateway" value="' . esc_attr($gateway_id) . '"/>';
+
+                    echo '&nbsp;<span>' . $gateway['frontend_title'] . '</span>';
+
+                    echo '</label>';
+                    
+                    echo '</li>';
+                }
+
+            }
+            echo '</ul>';
+        }
+    }
+}

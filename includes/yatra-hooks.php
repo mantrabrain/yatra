@@ -1,12 +1,41 @@
 <?php
 
 if (!function_exists('yatra_checkout_form_fields')) {
+
     function yatra_checkout_form_fields()
     {
-        Yatra_Forms::get_instance()->tour_checkout_form();
+        if (!yatra_enable_guest_checkout()) {
+
+            if (!is_user_logged_in()) {
+
+                yatra_get_template('myaccount/tmpl-form-login.php', array());
+
+                echo '<h2>OR</h2>';
+
+                yatra_get_template('myaccount/tmpl-form-registration.php', array());
+
+            } else {
+
+                echo '<h2>You are already loged in, please proceed to checkout.</h2>';
+
+            }
+
+        } else {
+
+            Yatra_Checkout_Form::get_instance()->tour_checkout_form();
+        }
     }
 
     add_action('yatra_checkout_form_fields', 'yatra_checkout_form_fields');
+}
+
+if (!function_exists('yatra_registration_form_fields')) {
+
+    function yatra_registration_form_fields()
+    {
+        Yatra_Checkout_Form::get_instance()->create_account_checkout_form_fields();
+
+    }
 }
 
 

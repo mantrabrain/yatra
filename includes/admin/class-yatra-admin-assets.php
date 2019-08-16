@@ -30,8 +30,9 @@ if (!class_exists('Yatra_Admin_Assets')) {
             wp_enqueue_style('yatra-admin-style');
 
 
-            wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array('yatra-select2js'), YATRA_VERSION);
+            wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array('yatra-select2js',  'jquery'), YATRA_VERSION);
             wp_enqueue_script('yatra-admin-script');
+
             $term_id = get_queried_object();
 
 

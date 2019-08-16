@@ -547,10 +547,14 @@ var YatraTourAttributes = function ($) {
     };
 }(jQuery);
 
-$(document).ready(function () {
-    YatraAdmin.init();
-    YatraTabs.init();
-    YatraSubTabs.init();
-    YatraTaxonomy.init();
-    YatraTourAttributes.init();
-});
+
+(function ($) {
+
+    $(document).ready(function () {
+        YatraAdmin.init();
+        YatraTabs.init();
+        YatraSubTabs.init();
+        YatraTaxonomy.init();
+        YatraTourAttributes.init();
+    });
+}(jQuery));

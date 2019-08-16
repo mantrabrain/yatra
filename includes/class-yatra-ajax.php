@@ -19,8 +19,7 @@ class Yatra_Ajax
     {
         $actions = array(
             'select_tour',
-            'book_selected_tour',
-            'update_cart'
+             'update_cart'
         );
         return $actions;
     }
@@ -60,25 +59,6 @@ class Yatra_Ajax
         }
 
 
-    }
-
-    public function book_selected_tour()
-    {
-        $status = $this->validate_nonce();
-        if (!$status) {
-            wp_safe_redirect(yatra_get_checkout_page(true));
-        }
-        $yatra_booking = new Yatra_Tour_Booking();
-
-        $status = $yatra_booking->book($_POST);
-        if ($status) {
-            $success_redirect_page_id = get_option('yatra_thankyou_page');
-            yatra_clear_session('yatra_tour_cart');
-            $page_permalink = get_permalink($success_redirect_page_id);
-
-            wp_safe_redirect($page_permalink);
-        }
-        die('Could not booked, please try again');
     }
 
     public function select_tour()

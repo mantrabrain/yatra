@@ -1,94 +1,37 @@
 <?php
-defined('ABSPATH') || exit;
+/**
+ * Abstract Form.
+ *
+ * Handles different types of form for frontend
+ *
+ * @class       Yatra_Form
+ * @version     2.0.5
+ * @package     Yatra/Classes
+ */
 
-class Yatra_Forms
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+
+abstract class Yatra_Form
 {
-    private static $instance;
 
-
-    public static function get_instance()
+    protected function valid_data($data = array(), $form_fields_all = array())
     {
-        if (empty(self::$instance)) {
-
-            self::$instance = new self();
-        }
-        return self::$instance;
-
-    }
-
-    public function chekcout_form_fields()
-    {
-        $country_list = yatra_get_countries();
-        $countries = array_merge(
-            array(
-                '0' => __('Select Country', 'yatra')
-            ),
-            $country_list
-        );
-
-
-        $form_fields = apply_filters('tour_checkout_form_fields', array(
-                'fullname' => array(
-                    'name' => 'fullname',
-                    'title' => __('Your full name', 'yatra'),
-                    'type' => 'text',
-                    'value' => '',
-                    'wrap_class' => 'yatra-left',
-                    'extra_attributes' => array(
-                        'placeholder' => __('Your full name', 'yatra'),
-                        'required' => 'required'
-                    ),
-                    'group_id' => 'yatra_tour_customer_info',
-                    'row_start' => true,
-                ), 'email' => array(
-                    'name' => 'email',
-                    'title' => __('Email', 'yatra'),
-                    'type' => 'email',
-                    'value' => '',
-                    'group_id' => 'yatra_tour_customer_info',
-                    'wrap_class' => 'yatra-left',
-                    'extra_attributes' => array(
-                        'placeholder' => __('Email address', 'yatra'),
-                        'required' => 'required'
-                    ),
-                    'row_start' => true,
-                ), 'country' => array(
-                    'name' => 'country',
-                    'title' => __('Country', 'yatra'),
-                    'type' => 'select',
-                    'group_id' => 'yatra_tour_customer_info',
-                    'options' => $countries,
-                    'wrap_class' => 'yatra-left',
-                    'row_start' => true,
-                    'select2' => true
-                ), 'phone_number' => array(
-                    'name' => 'phone_number',
-                    'title' => __('Phone Number', 'yatra'),
-                    'type' => 'text',
-                    'group_id' => 'yatra_tour_customer_info',
-                    'value' => '',
-                    'wrap_class' => 'yatra-left',
-                    'extra_attributes' => array(
-                        'placeholder' => __('Your contact number', 'yatra'),
-                    ),
-                    'row_start' => true,
-                )
-            )
-        );
-        return $form_fields;
-    }
-
-    public function get_valid_form_data($data = array())
-    {
-        $form_fields_all = $this->chekcout_form_fields();
-
         $valid_data = array();
 
-        foreach ($form_fields_all as $field => $field_option) {
+
+        foreach ($form_fields_all as $field_option) {
+
+
+            $field = isset($field_option['name']) ? $field_option['name'] : '';
 
             if (isset($form_fields_all[$field]['group_id'])) {
 
                 if (isset($data[$form_fields_all[$field]['group_id']][$field])) {
+
+                    $this->form_validation($data[$form_fields_all[$field]['group_id']], $field_option, $form_fields_all);
 
                     $valid_data[$form_fields_all[$field]['group_id']][$field] = $this->sanitization($data[$form_fields_all[$field]['group_id']][$field], $field_option);
                 }
@@ -96,6 +39,8 @@ class Yatra_Forms
             } else {
 
                 if (isset($data[$field])) {
+
+                    $this->form_validation($data, $field_option, $form_fields_all);
 
                     $valid_data[$field] = $this->sanitization($data[$field], $field_option);
                 }
@@ -105,7 +50,56 @@ class Yatra_Forms
         return $valid_data;
     }
 
-    public function sanitization($field_value, $field_option)
+    private function form_validation($data, $single_field, $all_fields)
+    {
+        $field_key = isset($single_field['name']) ? $single_field['name'] : '';
+
+        $value = $data[$field_key];
+
+        $validation = isset($single_field['validation']) ? $single_field['validation'] : array();
+
+
+        foreach ($validation as $validation_type => $validation_config) {
+
+            $error_message = !isset($validation_config['message']) ? sprintf(__('Validation error for %s field', 'yatra'), $single_field['label']) : $validation_config['message'];
+
+            switch ($validation_type) {
+
+                case "required":
+
+                    if (empty($value)) {
+                        yatra_instance()->yatra_error->add('yatra_form_validation_errors', $error_message);
+                    }
+                    break;
+                case "email":
+                    if (!is_email($value)) {
+                        yatra_instance()->yatra_error->add('yatra_form_validation_errors', $error_message);
+                    }
+
+                case "equal_compare":
+                    $rule = isset($validation_config['rule']) ? $validation_config['rule'] : '';
+
+                    $rule_fields = explode('|', $rule);
+
+                    if (count($rule_fields) == 2) {
+
+                        if ($data[$rule_fields[0]] != $data[$rule_fields[1]]) {
+
+                            yatra_instance()->yatra_error->add('yatra_form_validation_errors', $error_message);
+
+                        }
+                    }
+
+                    break;
+
+            }
+
+        }
+
+
+    }
+
+    private function sanitization($field_value, $field_option)
     {
         $type = isset($field_option['type']) ? $field_option['type'] : '';
         if (empty($type)) {
@@ -184,19 +178,10 @@ class Yatra_Forms
         return $updated_value;
     }
 
-    public function tour_checkout_form()
+    protected function form_html($field = array())
     {
 
-        $form_fields = $this->chekcout_form_fields();
 
-        foreach ($form_fields as $field) {
-
-            $this->form_html($field);
-        }
-    }
-
-    private function form_html($field = array())
-    {
         $extra_attributes = array();
 
         if (!isset($field['name']) || !isset($field['type'])) {
@@ -212,6 +197,8 @@ class Yatra_Forms
         $value = isset($field['value']) ? $field['value'] : '';
 
         $extra_attributes = isset($field['extra_attributes']) ? $field['extra_attributes'] : array();
+
+        $required_indicator = isset($extra_attributes['required']) ? '<span class="yatra-required-indicator">*</span>' : '';
 
         $extra_attribute_text = '';
 
@@ -231,6 +218,10 @@ class Yatra_Forms
             echo '<div class="yatra-field-row">';
         }
 
+        $class = 'yatra-field';
+
+        $class .= isset($field['class']) ? ' ' . $field['class'] : '';
+
         $name = $field_key;
 
         if (isset($field['group_id'])) {
@@ -244,15 +235,17 @@ class Yatra_Forms
             case "number":
             case "hidden":
             case "email":
+            case "date":
+            case "password":
                 if ($field['type'] != "hidden") {
                     ?>
                     <p>
                     <label
-                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']) . $required_indicator; ?>
                         :</label>
                 <?php }
                 ?>
-                <input class="yatra_field"
+                <input class="<?php echo esc_attr($class); ?>"
                        id="<?php echo esc_attr(($field_key)); ?>"
                        name="<?php echo esc_attr(($name)); ?>"
                        type="<?php echo esc_attr($field_type) ?>"
@@ -288,7 +281,7 @@ class Yatra_Forms
                 ?>
                 <p>
                 <label
-                        for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                        for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']).$required_indicator; ?>
                     :</label>
                 <?php
                 if ($editor) {
@@ -296,7 +289,7 @@ class Yatra_Forms
                     wp_editor($value, $field_key, $editor_settings);
                 } else {
                     ?>
-                    <textarea class="yatra_field"
+                    <textarea class="<?php echo esc_attr($class); ?>"
                               id="<?php echo esc_attr(($field_key)); ?>"
                               name="<?php echo esc_attr(($field_key)); ?>"
                         <?php echo $extra_attribute_text; ?>
@@ -311,7 +304,7 @@ class Yatra_Forms
                 ?>
                 <p>
                     <label
-                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']).$required_indicator; ?>
                         :</label>
                     <?php
                     $options = isset($field['options']) ? $field['options'] : array();
@@ -320,7 +313,7 @@ class Yatra_Forms
                     if ($is_multi_select) {
                         $extra_attribute_text .= ' multiple="multiple"';
                     }
-                    $select_class = 'yatra_field';
+                    $select_class = $class;
                     $select_class .= $is_select2 ? ' yatra-select2' : '';
                     ?>
 
@@ -357,10 +350,10 @@ class Yatra_Forms
             case "image":
                 ?>
                 <p><label
-                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']).$required_indicator; ?>
                         :</label>
                 <div class="media-uploader" id="<?php echo('background_image'); ?>">
-                    <div class="custom_media_preview">
+                    <div class="custom_media_preview <?php echo esc_attr($class); ?>">
                         <img style="<?php echo empty($value) ? 'display:none;' : '' ?>max-width:100%;"
                              class="media_preview_image"
                              src="<?php echo esc_url($value); ?>" alt=""/>
@@ -394,5 +387,6 @@ class Yatra_Forms
 
 
     }
-}
 
+
+}
