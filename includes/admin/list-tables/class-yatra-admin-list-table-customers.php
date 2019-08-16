@@ -152,8 +152,16 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
      */
     protected function render_full_name_column()
     {
-
         $fullname = get_post_meta($this->object->ID, 'fullname', true);
+
+        if (empty($fullname)) {
+
+            $email = $this->object->post_title;
+
+            $user = get_user_by('email', $email);
+
+            $fullname = $user->first_name . ' ' . $user->last_name;
+        }
 
         printf('<span>%s</span>', esc_html($fullname));
     }
@@ -182,11 +190,35 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
      */
     protected function render_total_spent_column()
     {
-        $total_booking_spent = get_post_meta($this->object->ID, 'yatra_total_paid_amount', true);
 
-        $customer_paid_currency = get_post_meta($this->object->ID, 'yatra_total_paid_amount_currency', true);
+        $amount_array = array();
 
-        printf('<span>%s%s</span>', $customer_paid_currency, absint($total_booking_spent));
+        foreach ($this->yatra_customer_booking_meta as $booking_meta) {
+
+            $booking_id = isset($booking_meta['booking_id']) ? $booking_meta['booking_id'] : '';
+
+            $currency = isset($booking_meta['currency']) ? $booking_meta['currency'] : '';
+
+            $payment_id = get_post_meta($booking_id, 'yatra_payment_id', true);
+
+            $paid_currency = get_post_meta($payment_id, 'yatra_total_paid_currency', true);
+
+            $paid_currency = empty($paid_currency) ? $currency : $paid_currency;
+
+            $paid_amount = absint(get_post_meta($payment_id, 'yatra_total_paid_amount', true));
+
+            if (!empty($paid_currency)) {
+                $amount_array[$paid_currency] = isset($amount_array[$paid_currency]) ? $amount_array[$paid_currency] + $paid_amount : $paid_amount;
+            }
+
+        }
+
+        foreach ($amount_array as $currency_key => $amount_spent) {
+
+            $customer_paid_currency = yatra_get_currency_symbols($currency_key);
+
+            printf('<span>%s%s</span>', $customer_paid_currency, absint($amount_spent));
+        }
     }
 
     /**

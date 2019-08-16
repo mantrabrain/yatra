@@ -163,9 +163,9 @@ if (!function_exists('yatra_account_bookings')) {
 
         $current_user_id = get_current_user_id();
 
-        $customer_id = get_post_meta($booking_id, 'yatra_user_id', true);
+        $user_id = get_post_meta($booking_id, 'yatra_user_id', true);
 
-        if ($booking_id > 0 && $customer_id == $current_user_id) {
+        if ($booking_id > 0 && $user_id == $current_user_id) {
 
             $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
 
@@ -183,7 +183,6 @@ if (!function_exists('yatra_account_bookings')) {
             $booking_details = array();
 
             foreach ($booking_array as $booking) {
-
 
                 $booking_meta_params = get_post_meta($booking->ID, 'yatra_booking_meta_params', true);
 

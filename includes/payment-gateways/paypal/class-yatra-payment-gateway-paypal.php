@@ -215,6 +215,8 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
                 update_post_meta($payment_id, 'yatra_total_paid_amount', $_POST['mc_gross']);
 
+                update_post_meta($payment_id, 'yatra_total_paid_currency', $_POST['mc_currency']);
+
                 do_action('yatra_after_successful_payment', $booking_id, $message);
 
             } else {
