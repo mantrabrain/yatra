@@ -5,6 +5,7 @@ var YatraActivityTaxonomy = function ($) {
 
             this.initElement();
             this.InitUpload();
+            this.ajaxComplete();
         },
         initElement: function () {
             this.taxonomy_activity_media_frame = '';
@@ -58,15 +59,27 @@ var YatraActivityTaxonomy = function ($) {
         removeGalleryItem: function (gallery_item, wrapper) {
             $('#activity_image_id').val('');
             $('#activity_image_wrapper').html('<img class="custom_media_image" src="" style="margin:0;padding:0;max-height:100px;float:none;" />');
+        },
+        ajaxComplete: function () {
+            $(document).ajaxComplete(function (event, xhr, options) {
+                var queryStringArr = options.data.split('&');
+                if ($.inArray('action=add-tag', queryStringArr) !== -1) {
+                    var xml = xhr.responseXML;
+                    var $response = $(xml).find('term_id').text();
+                    if ($response != "") {
+                        // Clear the thumb image
+                        $('#mb_taxonomy_remove_media').trigger('click');
+                    }
+                }
+            });
         }
 
     };
 }(jQuery);
-
-
 (function ($) {
 
     $(document).ready(function () {
         YatraActivityTaxonomy.init();
+
     });
 }(jQuery));
