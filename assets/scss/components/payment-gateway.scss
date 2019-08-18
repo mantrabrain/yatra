@@ -1,0 +1,18 @@
+ul.yatra-payment-gateway {
+  padding: 15px;
+  list-style: none;
+  background: #f9f9f9;
+  margin-left: 0;
+  font-size: 18px;
+  &:after {
+    clear: both;
+    content: '';
+    display: block;
+  }
+}
+
+h2.yatra-payment-gateway-title:before {
+  clear: both;
+  content: '';
+  display: block;
+}

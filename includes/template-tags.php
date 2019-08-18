@@ -804,7 +804,7 @@ if (!function_exists('yatra_frontend_options')) {
             $price_string = '<del>' . $price_string . '</del> &nbsp;' . $currency_symbol . $yatra_tour_meta_sales_price;
         }
         ?>
-        <h3><?php echo __('Options', 'yatra') ?></h3>
+        <h3><?php echo __('Tour Options', 'yatra') ?></h3>
         <table>
             <tr>
                 <th><?php echo __('Price per', 'yatra') ?></th>

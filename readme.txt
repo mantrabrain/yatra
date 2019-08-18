@@ -3,7 +3,7 @@ Contributors: Mantrabrain
 Tags: mantrabrain, travel, travel-booking, tour, wp, booking, tour-booking
 Requires at least: 4.7
 Tested up to: 5.2.2
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -75,6 +75,9 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 * Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
 
 == Changelog ==
+
+= 2.0.4 | 2019/08/18 =
+*
 
 = 2.0.3 | 2019/07/25 =
 * Fixed - Ajax issue for non logged in user fixed

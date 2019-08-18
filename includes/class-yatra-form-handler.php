@@ -62,6 +62,18 @@ class Yatra_Form_Handler
             );
         }
 
+        $payment_gateway_id = isset($_POST['yatra-payment-gateway']) ? sanitize_text_field($_POST['yatra-payment-gateway']) : 'yatra-not-gateway';
+
+        $yatra_get_active_payment_gateways = yatra_get_active_payment_gateways();
+
+        if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && count($yatra_get_active_payment_gateways) > 0) {
+
+            yatra_instance()->yatra_error->add('yatra_form_validation_errors', __('Please select at least one payment gateway', 'yatra'));
+
+            return;
+
+        }
+
         $yatra_booking = new Yatra_Tour_Booking();
 
         $booking_id = (int)$yatra_booking->book($valid_data);
@@ -69,10 +81,6 @@ class Yatra_Form_Handler
         if ($booking_id > 0) {
 
             yatra_clear_session('yatra_tour_cart');
-
-            $payment_gateway_id = isset($_POST['yatra-payment-gateway']) ? sanitize_text_field($_POST['yatra-payment-gateway']) : '';
-
-            $yatra_get_active_payment_gateways = yatra_get_active_payment_gateways();
 
             if (in_array($payment_gateway_id, $yatra_get_active_payment_gateways)) {
 
