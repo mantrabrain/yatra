@@ -15,6 +15,9 @@ if (!class_exists('Yatra_Admin_Assets')) {
             wp_enqueue_media();
             wp_enqueue_editor();
 
+            $screen = get_current_screen();
+
+            $screen_id = isset($screen->id) ? $screen->id : '';
 
             // Register Only Script
             wp_register_script('yatra-select2js', YATRA_PLUGIN_URI . '/assets/lib/select2/js/select2.min.js', false, YATRA_VERSION);
@@ -25,15 +28,30 @@ if (!class_exists('Yatra_Admin_Assets')) {
             // Font Awesome
             wp_register_style('yatra-font-awesome', YATRA_PLUGIN_URI . '/assets/lib/font-awesome/css/fontawesome.min.css', false, YATRA_VERSION);
 
+            // Taxonomy Activity JS
+            wp_register_script('yatra-taxonomy-activityjs', YATRA_PLUGIN_URI . '/assets/admin/js/yatra-activity-taxonomy.js', array('jquery'), YATRA_VERSION);
+
+            // Taxonomy Activity JS
+            wp_register_script('yatra-taxonomy-destinationjs', YATRA_PLUGIN_URI . '/assets/admin/js/yatra-destination-taxonomy.js', array('jquery'), YATRA_VERSION);
+
+
             // Other Register and Enqueue
             wp_register_style('yatra-admin-style', YATRA_PLUGIN_URI . '/assets/admin/css/admin-style.css', array('yatra-select2css', 'yatra-font-awesome'), YATRA_VERSION);
             wp_enqueue_style('yatra-admin-style');
 
+            switch ($screen_id) {
+                case "edit-activity":
+                    wp_enqueue_script('yatra-taxonomy-activityjs');
+                    break;
+                case "edit-destination":
+                    wp_enqueue_script('yatra-taxonomy-destinationjs');
+                    break;
 
-            wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array('yatra-select2js',  'jquery'), YATRA_VERSION);
+            }
+
+
+            wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array('yatra-select2js', 'jquery'), YATRA_VERSION);
             wp_enqueue_script('yatra-admin-script');
-
-            $term_id = get_queried_object();
 
 
             $yatra_admin_params = array(
