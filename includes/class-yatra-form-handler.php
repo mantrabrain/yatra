@@ -310,6 +310,8 @@ class Yatra_Form_Handler
                 );
                 $user_id = wp_insert_user($userdata);
 
+                update_user_meta($user_id, 'yatra_user', true);
+
                 if ($user_id) {
                     $creds = array(
                         'user_login' => $username,

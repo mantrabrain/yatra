@@ -77,7 +77,12 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 == Changelog ==
 
 = 2.0.4 | 2019/08/18 =
-*
+* Fixed - Minor issue fixed
+* Added - PayPal payment gateway integrated
+* Added - My Account Feature Added
+* Added - Customer creation feature added
+* Added - User creation feature added
+
 
 = 2.0.3 | 2019/07/25 =
 * Fixed - Ajax issue for non logged in user fixed
