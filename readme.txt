@@ -36,11 +36,18 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 
 6. Smart Tags for email message
 
-7. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
+7. PayPal payment gateway
+
+8. My account section
+
+9. Seperated customer section
+
+10. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
 == Shortcodes ==
 * <pre>[yatra_checkout]</pre> : Shortcode for checkout page
 * <pre>[yatra_cart]</pre> : Shortcode for cart page
+* <pre>[yatra_my_account]</pre> : Shortcode for my account page
 
 == Smart Tags ==
 * {{home_url}} : Get home page url
@@ -68,6 +75,7 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 14. Checkout page - Frontend
 15. Thank you page ( after checkout success ) - Frontend
 
+
 == IMPORTANT LINKS ==
 
 * Plugin page: [Click here](https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg)
@@ -82,7 +90,6 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 * Added - My Account Feature Added
 * Added - Customer creation feature added
 * Added - User creation feature added
-
 
 = 2.0.3 | 2019/07/25 =
 * Fixed - Ajax issue for non logged in user fixed
