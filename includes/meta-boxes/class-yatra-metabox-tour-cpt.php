@@ -132,7 +132,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
                         $configs = isset($tab_content['config']) ? $tab_content['config'] : array();
 
-                        echo $tab_content_key . '<br/>';
                         switch ($tab_content_key) {
 
                             case "tour-options":

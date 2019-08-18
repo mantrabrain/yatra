@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.0.3\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2019-08-14 06:45:22+00:00\n"
+"POT-Creation-Date: 2019-08-16 12:09:23+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -157,11 +157,11 @@ msgstr ""
 msgid "Yatra My Account Page"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-settings.php:74
+#: includes/admin/class-yatra-admin-settings.php:75
 msgid "Your settings have been saved."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-settings.php:556
+#: includes/admin/class-yatra-admin-settings.php:635
 msgid "Select a page&hellip;"
 msgstr ""
 
@@ -456,6 +456,7 @@ msgstr ""
 #: includes/admin/settings/class-yatra-settings-emails.php:42
 #: includes/admin/settings/class-yatra-settings-general.php:29
 #: includes/admin/settings/class-yatra-settings-general.php:42
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:42
 msgid "General"
 msgstr ""
 
@@ -561,88 +562,119 @@ msgid "Thank you page"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:115
-msgid "Thank you page after tour booking"
+msgid "Thank you page after tour booking completed."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:120
-msgid "Terms and conditions page"
+msgid "Transaction failed page"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:121
+msgid ""
+"This is the page buyers are sent to if their transaction is cancelled or "
+"fails"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:126
+msgid "Terms and conditions page"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:127
 msgid "Page for your terms and condition."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:139
+#: includes/admin/settings/class-yatra-settings-general.php:145
 msgid "General Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:145
+#: includes/admin/settings/class-yatra-settings-general.php:151
 msgid "Currency & symbol"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:146
+#: includes/admin/settings/class-yatra-settings-general.php:152
 msgid "Currency for price of tour and other pricing parts."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:153
+#: includes/admin/settings/class-yatra-settings-general.php:159
 msgid "Book Now Button Text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:154
+#: includes/admin/settings/class-yatra-settings-general.php:160
 msgid "Text for Book now button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:156
+#: includes/admin/settings/class-yatra-settings-general.php:162
 msgid "Book Now"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:160
+#: includes/admin/settings/class-yatra-settings-general.php:166
 msgid "Book Now loading text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:161
+#: includes/admin/settings/class-yatra-settings-general.php:167
 msgid "Text for loading book now button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:163
+#: includes/admin/settings/class-yatra-settings-general.php:169
 #: includes/yatra-hooks.php:129
 msgid "Loading...."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:167
+#: includes/admin/settings/class-yatra-settings-general.php:173
 msgid "Update cart button text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:168
+#: includes/admin/settings/class-yatra-settings-general.php:174
 msgid "Text for update cart button"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:170
+#: includes/admin/settings/class-yatra-settings-general.php:176
 msgid "Update Cart"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:174
+#: includes/admin/settings/class-yatra-settings-general.php:180
 msgid "Proceed to checkout text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:175
+#: includes/admin/settings/class-yatra-settings-general.php:181
 msgid "Text for proceed to checkout button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:177
+#: includes/admin/settings/class-yatra-settings-general.php:183
 msgid "Proceed to checkout"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:181
+#: includes/admin/settings/class-yatra-settings-general.php:187
 msgid "Order booking text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:182
+#: includes/admin/settings/class-yatra-settings-general.php:188
 msgid "Text for order booking text."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:184
+#: includes/admin/settings/class-yatra-settings-general.php:190
 msgid "Order Booking"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:103
+#: includes/functions.php:735
+msgid "Payment Gateways"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:91
+msgid "Payemnt Gateways General Settings"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:97
+msgid "Test Mode"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:98
+msgid ""
+" While in test mode no live transactions are processed. To fully use test "
+"mode, you must have a sandbox (test) account for the payment gateway you "
+"are testing."
 msgstr ""
 
 #: includes/admin/views/html-admin-settings.php:50
@@ -774,31 +806,31 @@ msgstr ""
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:81
+#: includes/class-yatra-form-handler.php:91
 msgid "Could not booked, please try again"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:133
+#: includes/class-yatra-form-handler.php:143
 msgid "User profile successfully updated."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:172
+#: includes/class-yatra-form-handler.php:182
 msgid "Old Password doesn't match"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:190
+#: includes/class-yatra-form-handler.php:200
 msgid "Password successfully changed."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:217
+#: includes/class-yatra-form-handler.php:227
 msgid "Username is required."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:281
+#: includes/class-yatra-form-handler.php:291
 msgid "Email or Usrename already exists, please try again.."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:312
+#: includes/class-yatra-form-handler.php:322
 msgid "Something wrong on registration, please check all form fields once."
 msgstr ""
 
@@ -1817,6 +1849,31 @@ msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:38
 msgid "Tour Additional Information"
+msgstr ""
+
+#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:145
+msgid "Trip Code"
+msgstr ""
+
+#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:147
+msgid "Trip Price"
+msgstr ""
+
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:15
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:18
+msgid "PayPal Standard"
+msgstr ""
+
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:40
+msgid "PayPal Settings"
+msgstr ""
+
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:46
+msgid "PayPal Email Address"
+msgstr ""
+
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:47
+msgid " Enter your PayPal account's email"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:40
