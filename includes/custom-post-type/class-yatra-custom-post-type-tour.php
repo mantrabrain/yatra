@@ -5,11 +5,6 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
     {
         private $slug = 'tour';
 
-        public function __construct()
-        {
-            add_action('init', array($this, 'register'));
-
-        }
 
         public function register()
         {
@@ -43,9 +38,15 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
             );
             register_post_type($this->slug, $args);
 
+            do_action('yatra_after_register_post_type');
+
         }
 
-
+        public function init()
+        {
+            add_action('init', array($this, 'register'));
+        }
     }
+
+
 }
-return new Yatra_Custom_Post_Type_Tour();

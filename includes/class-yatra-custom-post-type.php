@@ -25,12 +25,28 @@ class Yatra_Custom_Post_Type
      */
     protected static $_instance = null;
 
-
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Custom_Post_Type_Tour
+     * @since 1.0.0
+     */
     public $tour;
 
-
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Custom_Post_Type_Booking
+     * @since 1.0.0
+     */
     public $booking;
 
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Custom_Post_Type_Customers
+     * @since 1.0.0
+     */
     public $customers;
 
 
@@ -41,7 +57,7 @@ class Yatra_Custom_Post_Type
      *
      * @since 1.0.0
      * @static
-     * @return Yatra - Yatra_Custom_Post_Type
+     * @return Yatra_Custom_Post_Type - Yatra_Custom_Post_Type
      */
     public static function instance()
     {
@@ -52,21 +68,20 @@ class Yatra_Custom_Post_Type
     }
 
 
-    /**
-     * Yatra Constructor.
-     */
-    public function __construct()
+    public function maybe_flush_rewrite_rules()
     {
-        $this->init();
+        if ('yes' === get_option('yatra_queue_flush_rewrite_rules')) {
+            update_option('yatra_queue_flush_rewrite_rules', 'no');
+            $this->flush_rewrite_rules();
+        }
     }
-
 
     /**
      * Hook into actions and filters.
      *
      * @since 1.0.0
      */
-    private function init()
+    public function load()
     {
 
         $this->tour = new Yatra_Custom_Post_Type_Tour();
@@ -75,7 +90,39 @@ class Yatra_Custom_Post_Type
 
     }
 
+    /**
+     * Flush rewrite rules.
+     */
+    public function flush_rewrite_rules()
+    {
+        flush_rewrite_rules();
+    }
+
+    public function hooks()
+    {
+        add_action('yatra_flush_rewrite_rules', array($this, 'flush_rewrite_rules'));
+        add_action('yatra_after_register_post_type', array($this, 'maybe_flush_rewrite_rules'));
+
+
+    }
+
+    public function init_cpt()
+    {
+        $this->tour->init();
+        $this->booking->init();
+        $this->customers->init();
+
+
+    }
+
+    public function init()
+    {
+        $this->hooks();
+        $this->load();
+        $this->init_cpt();
+
+    }
 
 }
 
-return Yatra_Custom_Post_Type::instance();
+Yatra_Custom_Post_Type::instance()->init();

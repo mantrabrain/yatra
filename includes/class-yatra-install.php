@@ -26,6 +26,24 @@ final class Yatra_Install
             update_option('yatra_plugin_version', YATRA_VERSION);
         }
 
+        self::setup_environment();
+
+        do_action('yatra_flush_rewrite_rules');
+
+
+    }
+
+    public static function setup_environment()
+    {
+
+        $post_type = new Yatra_Custom_Post_Type();
+        $post_type->load();
+        $post_type->tour->register();
+
+        $taxonomy = new Yatra_Taxonomy();
+        $taxonomy->load();
+        $taxonomy->destination_taxonomy->register();
+        $taxonomy->attribute_taxonomy->register();
     }
 
     private static function install_content_and_options()

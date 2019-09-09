@@ -4,7 +4,7 @@ if (!class_exists('Yatra_Taxonomy_Activity')) {
     class Yatra_Taxonomy_Activity
     {
 
-        public function __construct()
+        public function init()
         {
             add_action('init', array($this, 'register'));
             add_action('activity_add_form_fields', array($this, 'form'), 10, 2);

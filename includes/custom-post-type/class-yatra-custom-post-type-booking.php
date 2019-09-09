@@ -5,13 +5,6 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
     {
         private $slug = 'yatra-booking';
 
-        public function __construct()
-        {
-            add_action('init', array($this, 'register'));
-            add_action('init', array($this, 'register_post_status'));
-            add_filter('post_row_actions', array($this, 'remove'));
-
-        }
 
         public static function register_post_status()
         {
@@ -112,6 +105,12 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
         }
 
 
+        public function init()
+        {
+            add_action('init', array($this, 'register'));
+            add_action('init', array($this, 'register_post_status'));
+            add_filter('post_row_actions', array($this, 'remove'));
+
+        }
     }
 }
-return new Yatra_Custom_Post_Type_Booking();

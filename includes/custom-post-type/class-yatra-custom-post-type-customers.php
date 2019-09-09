@@ -5,14 +5,6 @@ if (!class_exists('Yatra_Custom_Post_Type_Customers')) {
     {
         private $slug = 'yatra-customers';
 
-        public function __construct()
-        {
-            add_action('init', array($this, 'register'));
-            add_filter( 'bulk_actions-' . 'edit-yatra-customers', '__return_empty_array' );
-            add_filter( 'views_' . 'edit-yatra-customers', '__return_empty_array' );
-
-
-        }
 
         public function register()
         {
@@ -39,7 +31,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Customers')) {
                 'capabilities' => array(
                     'create_posts' => 'do_not_allow', // false < WP 4.5, credit @Ewout
                     'delete_posts' => 'do_not_allow', // false < WP 4.5, credit @Ewout
-                 ),
+                ),
 
 
             );
@@ -47,7 +39,14 @@ if (!class_exists('Yatra_Custom_Post_Type_Customers')) {
 
         }
 
+        public function init()
+        {
+            add_action('init', array($this, 'register'));
+            add_filter('bulk_actions-' . 'edit-yatra-customers', '__return_empty_array');
+            add_filter('views_' . 'edit-yatra-customers', '__return_empty_array');
+
+
+        }
 
     }
 }
-return new Yatra_Custom_Post_Type_Customers();

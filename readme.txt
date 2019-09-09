@@ -1,9 +1,9 @@
-=== Yatra - Complete Travel & Tour Booking System ===
+=== Complete Travel & Tour Booking System - Yatra ===
 Contributors: Mantrabrain
-Tags: mantrabrain, travel, travel-booking, tour, wp, booking, tour-booking
+Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours
 Requires at least: 4.7
-Tested up to: 5.2.2
-Stable tag: 2.0.4
+Tested up to: 5.2.3
+Stable tag: 2.0.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,9 +45,14 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 10. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
 == Shortcodes ==
-* <pre>[yatra_checkout]</pre> : Shortcode for checkout page
-* <pre>[yatra_cart]</pre> : Shortcode for cart page
-* <pre>[yatra_my_account]</pre> : Shortcode for my account page
+Shortcode for Checkout Page:
+<pre>[yatra_checkout]</pre>
+
+Shortcode for Cart Page:
+<pre>[yatra_cart]</pre>
+
+Shortcode for My Account Page:
+<pre>[yatra_my_account]</pre>
 
 == Smart Tags ==
 * {{home_url}} : Get home page url
@@ -83,6 +88,9 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 * Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
 
 == Changelog ==
+
+= 2.0.5 | 2019/09/09 =
+* Fixed - Permalink issue fixed
 
 = 2.0.4 | 2019/08/18 =
 * Fixed - Minor issue fixed

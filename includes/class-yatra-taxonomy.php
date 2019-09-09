@@ -26,10 +26,31 @@ class Yatra_Taxonomy
     protected static $_instance = null;
 
 
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Taxonomy_Destination
+     * @since 1.0.0
+     */
+
     public $destination_taxonomy;
 
+
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Taxonomy_Activity
+     * @since 1.0.0
+     */
     public $activity_taxonomy;
 
+
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Taxonomy_Attributes
+     * @since 1.0.0
+     */
     public $attribute_taxonomy;
 
 
@@ -51,13 +72,6 @@ class Yatra_Taxonomy
     }
 
 
-    /**
-     * Yatra Constructor.
-     */
-    public function __construct()
-    {
-        $this->init();
-    }
 
 
     /**
@@ -65,7 +79,7 @@ class Yatra_Taxonomy
      *
      * @since 1.0.0
      */
-    private function init()
+    public function load()
     {
 
         $this->destination_taxonomy = new Yatra_Taxonomy_Destination();
@@ -74,7 +88,21 @@ class Yatra_Taxonomy
 
     }
 
+    public function init_taxonomy()
+    {
+        $this->destination_taxonomy->init();
+        $this->activity_taxonomy->init();
+        $this->attribute_taxonomy->init();
+    }
+
+    public function init()
+    {
+        $this->load();
+        $this->init_taxonomy();
+
+    }
+
 
 }
 
-return Yatra_Taxonomy::instance();
+Yatra_Taxonomy::instance()->init();

@@ -5,7 +5,7 @@ if (!class_exists('Yatra_Taxonomy_Destination')) {
     {
 
 
-        public function __construct()
+        public function init()
         {
             add_action('init', array($this, 'register'));
             add_action('destination_add_form_fields', array($this, 'form'), 10, 2);
