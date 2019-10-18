@@ -55,7 +55,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
     {
         echo '<div class="yatra-BlankState">';
 
-        echo '<h2 class="yatra-BlankState-message">' . esc_html__('When you receive a new order, it will appear here.', 'yatra') . '</h2>';
+        echo '<h2 class="yatra-BlankState-message">' . esc_html__('When you receive a new booking, it will appear here.', 'yatra') . '</h2>';
 
         echo '<div class="yatra-BlankState-buttons">';
         echo '</div>';

@@ -71,6 +71,9 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
                     </tr>
                     <?php
+                    
+                    $yatra_booking_meta = !is_array($yatra_booking_meta) ? array() : $yatra_booking_meta;
+
                     foreach ($yatra_booking_meta as $id => $booking) {
 
                         echo '<tr>';
@@ -190,7 +193,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                     // Country
                     echo '<td>';
 
-                    if(!empty($country)) {
+                    if (!empty($country)) {
                         echo '<span>' . esc_html(yatra_get_countries($country)) . '</span>';
                     }
 

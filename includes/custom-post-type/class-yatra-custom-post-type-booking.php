@@ -97,7 +97,8 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
                 'has_archive' => false,
                 'show_in_menu' => 'edit.php?post_type=tour',
                 'publicly_queryable' => false,
-                'exclude_from_search' => true
+                'exclude_from_search' => true,
+
 
             );
             register_post_type($this->slug, $args);
