@@ -28,6 +28,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
             );
             $args = array(
                 'labels' => $labels,
+                'menu_icon' => YATRA_PLUGIN_URI . '/assets/images/menu-icon.png',// 'dashicons-palmtree',
                 'public' => true,
                 'supports' => array('title', 'editor', 'excerpt', 'thumbnail',),
                 'has_archive' => true,

@@ -52,7 +52,7 @@ if (!class_exists('Yatra_Page_Templater')) {
                     } else {
                         $template_path = "{$yatra_plugin_template_path}archive-tour.php";
                     }
-                }
+                 }
                 if (is_tax('destination')) {
                     if ($theme_file = locate_template(array("{$yatra_template_path}taxonomy-destination.php"))) {
                         $template_path = $theme_file;

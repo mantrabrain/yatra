@@ -245,7 +245,9 @@ final class Yatra
 
 
         // Classes/actions loaded for the frontend and for ajax requests.
-        if ($this->is_request('frontend')) {
+        //if ($this->is_request('frontend')) {
+        if (is_null($this->cart) || !$this->cart instanceof Yatra_Cart) {
+
             $this->initialize_cart();
         }
 

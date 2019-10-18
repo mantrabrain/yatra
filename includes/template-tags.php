@@ -9,9 +9,10 @@ if (!function_exists('yatra_get_taxonomy_term_lists')) {
 
         if ($terms) {
             printf(
-            /* translators: 1: SVG icon. 2: posted in label, only visible to screen readers. 3: list of categories. */
-                '<span class="cat-links"><span class="screen-reader-text">%1$s</span>%2$s</span>',
-                __('Posted in', 'yatra'),
+            /* translators: 1: Taxonomy name 2: SVG icon. 3: posted in label, only visible to screen readers.*/
+                '<span class="cat-links %1$s-links"><span class="screen-reader-text">%2$s</span>%3$s</span>',
+                ($taxonomy),
+                ucwords($taxonomy),
                 $terms
             ); // WPCS: XSS OK.
         }
