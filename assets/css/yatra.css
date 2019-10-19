@@ -452,6 +452,50 @@
   cursor: wait;
   position: absolute; }
 
+.yatra-destination-wrap, .yatra-activity-wrap {
+  display: block;
+  width: 100%; }
+  .yatra-destination-wrap.yatra-col-4 .yatra-destination-item, .yatra-destination-wrap.yatra-col-4 .yatra-activity-item, .yatra-activity-wrap.yatra-col-4 .yatra-destination-item, .yatra-activity-wrap.yatra-col-4 .yatra-activity-item {
+    width: 25%; }
+  .yatra-destination-wrap .yatra-destination-item, .yatra-destination-wrap .yatra-activity-item, .yatra-activity-wrap .yatra-destination-item, .yatra-activity-wrap .yatra-activity-item {
+    position: relative;
+    height: 275px;
+    padding: 0 15px;
+    margin: 0 0 30px;
+    float: left; }
+    .yatra-destination-wrap .yatra-destination-item img, .yatra-destination-wrap .yatra-activity-item img, .yatra-activity-wrap .yatra-destination-item img, .yatra-activity-wrap .yatra-activity-item img {
+      vertical-align: top;
+      height: 275px;
+      width: 100%;
+      -o-object-fit: cover;
+      object-fit: cover; }
+    .yatra-destination-wrap .yatra-destination-item h2.destination-title,
+    .yatra-destination-wrap .yatra-destination-item h2.activity-title, .yatra-destination-wrap .yatra-activity-item h2.destination-title,
+    .yatra-destination-wrap .yatra-activity-item h2.activity-title, .yatra-activity-wrap .yatra-destination-item h2.destination-title,
+    .yatra-activity-wrap .yatra-destination-item h2.activity-title, .yatra-activity-wrap .yatra-activity-item h2.destination-title,
+    .yatra-activity-wrap .yatra-activity-item h2.activity-title {
+      position: absolute;
+      left: 15px;
+      bottom: 0;
+      width: calc(100% - 30px);
+      font-size: 30px;
+      line-height: 1.2em;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      margin: 0;
+      padding: 23px;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 100%); }
+    .yatra-destination-wrap .yatra-destination-item a, .yatra-destination-wrap .yatra-activity-item a, .yatra-activity-wrap .yatra-destination-item a, .yatra-activity-wrap .yatra-activity-item a {
+      display: block;
+      height: 100%;
+      width: 100%;
+      background: #f9f9f9; }
+    .yatra-destination-wrap .yatra-destination-item:hover h2, .yatra-destination-wrap .yatra-activity-item:hover h2, .yatra-activity-wrap .yatra-destination-item:hover h2, .yatra-activity-wrap .yatra-activity-item:hover h2 {
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #1abc9c 100%);
+      color: #fff; }
+
 .yatra-shortcode-wrapper form.yatra-cart-form {
   position: relative; }
   .yatra-shortcode-wrapper form.yatra-cart-form .person input {

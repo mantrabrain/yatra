@@ -6,6 +6,8 @@ defined('ABSPATH') || exit;
 include_once YATRA_ABSPATH . 'includes/helpers/yatra-country-helper.php';
 include_once YATRA_ABSPATH . 'includes/helpers/yatra-currency-helper.php';
 include_once YATRA_ABSPATH . 'includes/template-tags.php';
+include_once YATRA_ABSPATH . 'includes/yatra-destination-functions.php';
+include_once YATRA_ABSPATH . 'includes/yatra-activity-functions.php';
 
 
 if (!function_exists('yatra_tour_tabs')) {
@@ -749,7 +751,7 @@ if (!function_exists('yatra_payment_gateway_fields')) {
                     echo '&nbsp;<span>' . $gateway['frontend_title'] . '</span>';
 
                     echo '</label>';
-                    
+
                     echo '</li>';
                 }
 

@@ -373,3 +373,56 @@
   cursor: wait;
   position: absolute;
 }
+
+.yatra-destination-wrap, .yatra-activity-wrap {
+  display: block;
+  width: 100%;
+  &.yatra-col-4 {
+    .yatra-destination-item, .yatra-activity-item {
+      width: 25%;
+    }
+  }
+
+  .yatra-destination-item, .yatra-activity-item {
+    position: relative;
+    height: 275px;
+    padding: 0 15px;
+    margin: 0 0 30px;
+    float: left;
+    img {
+      vertical-align: top;
+      height: 275px;
+      width: 100%;
+      -o-object-fit: cover;
+      object-fit: cover;
+    }
+    h2.destination-title,
+    h2.activity-title {
+      position: absolute;
+      left: 15px;
+      bottom: 0;
+      width: calc(100% - 30px);
+      font-size: 30px;
+      line-height: 1.2em;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      margin: 0;
+      padding: 23px;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 100%);
+    }
+    a {
+      display: block;
+      height: 100%;
+      width: 100%;
+      background: #f9f9f9;
+    }
+    &:hover {
+      h2 {
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(26, 188, 156, 1) 100%);
+        color: #fff
+      }
+    }
+  }
+}
