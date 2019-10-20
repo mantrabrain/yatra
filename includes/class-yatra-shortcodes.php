@@ -26,6 +26,7 @@ class Yatra_Shortcodes
             'yatra_my_account' => __CLASS__ . '::my_account',
             'yatra_activity' => __CLASS__ . '::activity',
             'yatra_destination' => __CLASS__ . '::destination',
+            'yatra_discount_and_deals' => __CLASS__ . '::discount_deals',
         );
 
         foreach ($shortcodes as $shortcode => $function) {
@@ -120,6 +121,18 @@ class Yatra_Shortcodes
     public static function destination($atts)
     {
         return self::shortcode_wrapper(array('Yatra_Shortcode_Destination', 'output'), $atts);
+    }
+
+
+    /**
+     * discount_deals   page shortcode.
+     *
+     * @param array $atts Attributes.
+     * @return string
+     */
+    public static function discount_deals($atts)
+    {
+        return self::shortcode_wrapper(array('Yatra_Shortcode_Discount_And_Deals', 'output'), $atts);
     }
 
 }

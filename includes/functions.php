@@ -8,6 +8,7 @@ include_once YATRA_ABSPATH . 'includes/helpers/yatra-currency-helper.php';
 include_once YATRA_ABSPATH . 'includes/template-tags.php';
 include_once YATRA_ABSPATH . 'includes/yatra-destination-functions.php';
 include_once YATRA_ABSPATH . 'includes/yatra-activity-functions.php';
+include_once YATRA_ABSPATH . 'includes/yatra-misc-functions.php';
 
 
 if (!function_exists('yatra_tour_tabs')) {
