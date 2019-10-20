@@ -12,7 +12,7 @@ do_action('yatra_before_change_password_form'); ?>
 
     <p>
         <?php wp_nonce_field('yatra_change_user_password', 'yatra-change-user-password-nonce'); ?>
-        <button type="submit" class="yatra-Button button" name="change_account_password"
+        <button type="submit" class="yatra-Button button button-primary" name="change_account_password"
                 value="<?php esc_attr_e('Save changes', 'yatra'); ?>"><?php esc_html_e('Change Password', 'yatra'); ?></button>
         <input type="hidden" name="action" value="yatra_change_user_password"/>
     </p>

@@ -24,6 +24,8 @@ class Yatra_Shortcodes
             'yatra_checkout' => __CLASS__ . '::checkout',
             'yatra_cart' => __CLASS__ . '::cart',
             'yatra_my_account' => __CLASS__ . '::my_account',
+            'yatra_activity' => __CLASS__ . '::activity',
+            'yatra_destination' => __CLASS__ . '::destination',
         );
 
         foreach ($shortcodes as $shortcode => $function) {
@@ -96,6 +98,28 @@ class Yatra_Shortcodes
     public static function my_account($atts)
     {
         return self::shortcode_wrapper(array('Yatra_Shortcode_My_Account', 'output'), $atts);
+    }
+
+    /**
+     * activity listing  page shortcode.
+     *
+     * @param array $atts Attributes.
+     * @return string
+     */
+    public static function activity($atts)
+    {
+        return self::shortcode_wrapper(array('Yatra_Shortcode_Activity', 'output'), $atts);
+    }
+
+    /**
+     * destination listing  page shortcode.
+     *
+     * @param array $atts Attributes.
+     * @return string
+     */
+    public static function destination($atts)
+    {
+        return self::shortcode_wrapper(array('Yatra_Shortcode_Destination', 'output'), $atts);
     }
 
 }

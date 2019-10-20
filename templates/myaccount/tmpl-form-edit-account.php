@@ -12,7 +12,7 @@ do_action('yatra_before_edit_account_form'); ?>
 
     <p>
         <?php wp_nonce_field('yatra_save_account_details', 'yatra-save-account-details-nonce'); ?>
-        <button type="submit" class="yatra-Button button" name="save_account_details"
+        <button type="submit" class="yatra-Button button button-primary" name="save_account_details"
                 value="<?php esc_attr_e('Save changes', 'yatra'); ?>"><?php esc_html_e('Save changes', 'yatra'); ?></button>
         <input type="hidden" name="action" value="yatra_save_account_details"/>
     </p>
