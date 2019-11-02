@@ -1,12 +1,16 @@
 <?php
 
 if (!function_exists('yatra_get_activity_lists')) {
-    function yatra_get_activity_lists()
+    function yatra_get_activity_lists($atts = array())
     {
+        $order = isset($atts['order']) ? sanitize_text_field($atts['order']) : 'ASC';
+
+        $order = in_array(strtolower($order), array('asc', 'desc')) ? $order : 'asc';
 
         $activity_terms = get_terms(array(
             'taxonomy' => 'activity',
             'hide_empty' => false,
+            'order' => $order,
         ));
         echo '<div class="yatra-activity-wrap yatra-col-4">';
 

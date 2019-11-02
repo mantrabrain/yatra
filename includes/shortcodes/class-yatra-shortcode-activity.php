@@ -34,7 +34,7 @@ class Yatra_Shortcode_Activity
      */
     public static function output($atts)
     {
-        yatra_get_activity_lists();
+        yatra_get_activity_lists($atts);
     }
 
 }

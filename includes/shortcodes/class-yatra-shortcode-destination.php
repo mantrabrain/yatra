@@ -34,7 +34,7 @@ class Yatra_Shortcode_Destination
      */
     public static function output($atts)
     {
-        yatra_get_destination_lists();
+        yatra_get_destination_lists($atts);
     }
 
 }

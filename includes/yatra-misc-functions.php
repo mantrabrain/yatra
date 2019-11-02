@@ -3,7 +3,8 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
 
     function yatra_get_discount_deals_lists($atts = array())
     {
-
+        $order = isset($atts['order']) ? sanitize_text_field($atts['order']) : 'DESC';
+        $order = in_array(strtolower($order), array('asc', 'desc')) ? $order : 'desc';
         $args = array(
             'meta_query' => array(
                 array(
@@ -13,6 +14,7 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
                 )
             ),
             'post_type' => 'tour',
+            'order' => $order,
             'posts_per_page' => 9
         );
         $posts = get_posts($args);

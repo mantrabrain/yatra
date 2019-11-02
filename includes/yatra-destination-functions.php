@@ -1,12 +1,17 @@
 <?php
 
 if (!function_exists('yatra_get_destination_lists')) {
-    function yatra_get_destination_lists()
+    function yatra_get_destination_lists($atts = array())
     {
+        $order = isset($atts['order']) ? sanitize_text_field($atts['order']) : 'ASC';
+
+        $order = in_array(strtolower($order), array('asc', 'desc')) ? $order : 'asc';
 
         $destination_terms = get_terms(array(
             'taxonomy' => 'destination',
             'hide_empty' => false,
+            'order' => $order,
+
         ));
         echo '<div class="yatra-destination-wrap yatra-col-4">';
 
