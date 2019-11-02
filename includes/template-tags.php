@@ -203,12 +203,11 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
     }
 }
 
-
 if (!function_exists('yatra_entry_meta_options')) {
 
-    function yatra_entry_meta_options()
+    function yatra_entry_meta_options($post_id = 0)
     {
-        $post_id = get_the_id();
+        $post_id = $post_id > 0 ? $post_id : get_the_id();
 
         $meta_frontend = yatra_entry_meta_for_frontend_archive($post_id);
 
@@ -237,7 +236,7 @@ if (!function_exists('yatra_entry_meta_options')) {
 
             $list .= '<li><i class="' . esc_attr($icon) . '"></i>&nbsp;<strong>' . esc_html($title) . ': </strong>' . ($text) . '</li>';
         }
-        echo '<ul>';
+        echo '<ul class="yatra-tour-meta-options">';
 
         echo $list;
 

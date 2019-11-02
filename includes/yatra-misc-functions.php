@@ -8,40 +8,37 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
             'meta_query' => array(
                 array(
                     'key' => 'yatra_tour_meta_sales_price',
-                    'value' => array(''),
+                    'value' => array('', 0, '0'),
                     'compare' => 'NOT IN'
                 )
             ),
             'post_type' => 'tour',
-            'posts_per_page' => 6
+            'posts_per_page' => 9
         );
         $posts = get_posts($args);
-        echo '<pre>';
-        print_r($posts);
-        echo '</pre>';
-        exit;
 
-        echo '<div class="yatra-discount-deails-wrap yatra-col-3">';
+        echo '<div class="yatra-discount-deals-wrap yatra-col-3">';
 
-        foreach ($destination_terms as $term) {
+        foreach ($posts as $item) {
 
             $data['data'] = array(
-                'id' => $term->term_id,
-                'name' => $term->name,
-                'slug' => $term->slug,
-                'count' => $term->count,
-                'permalink' => get_term_link($term->term_id),
+                'id' => $item->ID,
+                'title' => $item->post_title,
+                'excerpt' => $item->post_excerpt,
+                'permalink' => get_permalink($item->ID),
                 'image' => ''
             );
 
-            $attachment_id = (int)get_term_meta($term->term_id, 'destination_image_id', true);
+            $attachment_id = (int)get_post_thumbnail_id($item);
 
-            if ($attachment_id > 0) {
+            if (($attachment_id) > 0) {
 
-                $data['data']['image'] = wp_get_attachment_url($attachment_id);
+                $attachment_link = wp_get_attachment_image_url($attachment_id, 'full');
+
+                $data['data']['image'] = $attachment_link;
             }
 
-            yatra_get_template('destination/item.php', $data);
+            yatra_get_template('tmpl-deals-item.php', $data);
 
         }
         echo '</div>';
