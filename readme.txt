@@ -2,8 +2,8 @@
 Contributors: Mantrabrain
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
-Tested up to: 5.2.3
-Stable tag: 2.0.5
+Tested up to: 5.3
+Stable tag: 2.0.6
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -54,6 +54,19 @@ Shortcode for Cart Page:
 Shortcode for My Account Page:
 <pre>[yatra_my_account]</pre>
 
+Shortcode for Activity Listing:
+<pre>[yatra_activity order="desc"]</pre>
+
+Shortcode for Destination Listing:
+<pre>[yatra_destination order="desc"]</pre>
+
+Shortcode for Discount & Deals Listing:
+<pre>[yatra_discount_and_deals order="asc"]</pre>
+
+Shortcode for Tour Listing:
+<pre>[yatra_tour order="asc" featured="1"]</pre>
+
+
 == Smart Tags ==
 * {{home_url}} : Get home page url
 * {{blog_info}} : Get blog info of a website
@@ -88,6 +101,13 @@ Shortcode for My Account Page:
 * Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
 
 == Changelog ==
+
+= 2.0.6 | 2019/11/03 =
+* Fixed - Minor design issue fixed
+* Added - Shortcode for activity,destination,discount & deals, tour list
+* Added - Widgets for activity, destination, discount & deals, tour list
+* Added - Featured tour metabox added
+* Fixed - Other minor php related issue fixed
 
 = 2.0.5 | 2019/09/09 =
 * Fixed - Permalink issue fixed

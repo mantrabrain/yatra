@@ -84,13 +84,19 @@ if (!class_exists('Yatra_Discount_Deals_Widget')) :
             ?>
             <div class="yatra-discount-deals-widget-wrap">
 
-                <?php if (!empty($valid_widget_instance['title'])) { ?>
-                    <h2 class="widget-title"><?php echo esc_html($valid_widget_instance['title']); ?></h2>
-                <?php }
+                <?php if (!empty($valid_widget_instance['title']) || !empty($valid_widget_instance['description'])) { ?>
+                    <div class="yatra-widget-header">
+                        <?php if (!empty($valid_widget_instance['title'])) { ?>
+                            <h2 class="widget-title"><?php echo esc_html($valid_widget_instance['title']); ?></h2>
+                        <?php }
 
-                if (!empty($valid_widget_instance['description'])) { ?>
+                        if (!empty($valid_widget_instance['description'])) { ?>
 
-                    <p class="widget-description"><?php echo esc_html($valid_widget_instance['description']); ?></p>
+                            <p class="widget-description"><?php echo esc_html($valid_widget_instance['description']); ?></p>
+                            <?php
+                        }
+                        ?>
+                    </div>
                     <?php
                 }
 

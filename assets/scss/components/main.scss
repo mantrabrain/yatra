@@ -376,7 +376,8 @@
 
 .yatra-destination-wrap, .yatra-activity-wrap, .yatra-discount-deals-wrap, .yatra-tour-list-wrap {
   display: block;
-  width: 100%;
+  margin-left: -15px;
+  margin-right: -15px;
   &.yatra-col-4 {
     .yatra-destination-item, .yatra-activity-item, .yatra-deals-item, .yatra-tour-list-item {
       width: 25%;
@@ -509,6 +510,10 @@
       left: 33%;
       a {
         border-radius: 50px;
+        padding: 15px 25px;
+        background-color: #1abc9c;
+        border: 1px solid #1abc9c;
+        color: #fff;
       }
     }
   }
