@@ -568,6 +568,11 @@
       left: 33%; }
       .yatra-destination-wrap .yatra-item-inner .deals-footer a, .yatra-activity-wrap .yatra-item-inner .deals-footer a, .yatra-discount-deals-wrap .yatra-item-inner .deals-footer a {
         border-radius: 50px; }
+  .yatra-destination-wrap:after, .yatra-activity-wrap:after, .yatra-discount-deals-wrap:after {
+    content: '';
+    display: block;
+    clear: both;
+    width: 100%; }
 
 .yatra-shortcode-wrapper form.yatra-cart-form {
   position: relative; }

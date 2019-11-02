@@ -82,6 +82,8 @@ class Yatra_Autoloader
 
         if (0 === strpos($class, 'yatra_shortcode')) {
             $path = $this->include_path . 'shortcodes/';
+        } elseif (0 === strpos($class, 'yatra_widget')) {
+            $path = $this->include_path . 'widgets/';
         } elseif (0 === strpos($class, 'yatra_metabox')) {
             $path = $this->include_path . 'meta-boxes/';
         } elseif (0 === strpos($class, 'yatra_taxonomy')) {

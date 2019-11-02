@@ -209,6 +209,7 @@ final class Yatra
         include_once YATRA_ABSPATH . 'includes/class-yatra-custom-post-type.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-taxonomy.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-metabox.php';
+        include_once YATRA_ABSPATH . 'includes/class-yatra-widgets.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-shortcodes.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-ajax.php';
 
