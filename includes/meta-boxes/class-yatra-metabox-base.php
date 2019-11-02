@@ -22,6 +22,10 @@ if (!class_exists('Yatra_Metabox_Base')) {
                 case 'shortcode':
                     $updated_value = sanitize_text_field($field_value);
                     break;
+                case 'checkbox':
+                    $updated_value = absint($field_value);
+                    $updated_value = 1 == $updated_value ? 1 : 0;
+                    break;
                 case 'gallery':
                     $gallery_item_array = explode(',', $field_value);
                     $updated_value = '';
@@ -243,6 +247,24 @@ if (!class_exists('Yatra_Metabox_Base')) {
                                name="<?php echo esc_attr(($field_key)); ?>"
                                type="<?php echo esc_attr($field_type) ?>"
                                value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+
+
+                    </p>
+                    <?php
+                    break;
+                case "checkbox":
+                    ?>
+                    <p>
+
+                        <label
+                                for="<?php echo esc_attr(($field_key)); ?>">
+                            <input class="<?php echo esc_attr($field_class) ?>"
+                                   id="<?php echo esc_attr(($field_key)); ?>"
+                                   name="<?php echo esc_attr(($field_key)); ?>"
+                                   type="checkbox"
+                                   value="1" <?php echo absint($value) == 1 ? 'checked="checked"' : '';
+                            echo $extra_attribute_text; ?>/>
+                            <?php echo esc_html($field['title']); ?></label>
 
 
                     </p>

@@ -374,18 +374,18 @@
   position: absolute;
 }
 
-.yatra-destination-wrap, .yatra-activity-wrap, .yatra-discount-deals-wrap {
+.yatra-destination-wrap, .yatra-activity-wrap, .yatra-discount-deals-wrap, .yatra-tour-list-wrap {
   display: block;
   width: 100%;
   &.yatra-col-4 {
-    .yatra-destination-item, .yatra-activity-item, .yatra-deals-item {
+    .yatra-destination-item, .yatra-activity-item, .yatra-deals-item, .yatra-tour-list-item {
       width: 25%;
       float: left;
     }
   }
   &.yatra-col-3 {
 
-    .yatra-destination-item, .yatra-activity-item, .yatra-deals-item {
+    .yatra-destination-item, .yatra-activity-item, .yatra-deals-item, .yatra-tour-list-item {
       width: 33.33%;
       float: left;
     }
@@ -430,7 +430,7 @@
       text-overflow: ellipsis;
       text-align: center;
     }
-    h2.yatra-deals-title {
+    h2.yatra-deals-title, h2.yatra-tour-title {
       pointer-events: unset;
 
       a {
@@ -454,7 +454,8 @@
       background: #f9f9f9;
     }
     &:hover {
-      h2:not(.yatra-deals-title) {
+      h2.destination-title,
+      h2.activity-title {
         background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(26, 188, 156, 1) 100%);
         color: #fff
       }
@@ -465,8 +466,15 @@
     clear: both;
     content: '';
   }
-  .yatra-deals-item {
+  .yatra-deals-item, .yatra-tour-list-item {
     padding: 0 15px;
+    .yatra-item-inner {
+      &:hover {
+        box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
+        border: 1px solid #aaa;
+
+      }
+    }
   }
   .yatra-item-inner {
     position: relative;

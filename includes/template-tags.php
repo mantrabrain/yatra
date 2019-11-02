@@ -659,6 +659,14 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 'row_start' => true,
 
             ),
+            'yatra_tour_meta_tour_featured' => array(
+                'name' => 'yatra_tour_meta_tour_featured',
+                'title' => esc_html__('Feature this tour', 'yatra'),
+                'type' => 'checkbox',
+                'wrap_class' => 'yatra-right',
+                'row_end' => true,
+
+            ),
             'yatra_tour_meta_tour_tabs_ordering' => array(
                 'name' => 'yatra_tour_meta_tour_tabs_ordering',
                 'type' => 'hidden',

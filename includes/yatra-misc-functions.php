@@ -48,3 +48,89 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
     }
 
 }
+
+if (!function_exists('yatra_get_tour_lists')) {
+
+    function yatra_get_tour_lists($atts = array())
+    {
+        $order = isset($atts['order']) ? sanitize_text_field($atts['order']) : 'DESC';
+
+        $order = in_array(strtolower($order), array('asc', 'desc')) ? $order : 'desc';
+
+        $featured = isset($atts['featured']) ? absint($atts['featured']) : 2;
+
+        $meta_query = array();
+
+
+        switch ($featured) {
+
+            case 0:
+                $meta_query[] =
+
+                    array(
+                        'relation' => 'OR',
+                        array(
+                            'key' => 'yatra_tour_meta_tour_featured',
+                            'value' => array(1, '1'),
+                            'compare' => 'NOT IN'
+                        ),
+                        array(
+                            'key' => 'yatra_tour_meta_tour_featured',
+                            'compare' => 'NOT EXISTS',
+                            'value' => 'null',
+                        )
+                    );
+                break;
+
+            case 1:
+                $meta_query[] =
+                    array(
+                        'key' => 'yatra_tour_meta_tour_featured',
+                        'value' => array(1, '1'),
+                        'compare' => 'IN'
+
+                    );
+                break;
+        }
+
+        $args = array(
+            'post_type' => 'tour',
+            'order' => $order,
+            'posts_per_page' => 9
+        );
+
+        if (count($meta_query) > 0) {
+            $args['meta_query'] = $meta_query;
+        }
+
+        $posts = get_posts($args);
+
+        echo '<div class="yatra-tour-list-wrap yatra-col-3">';
+
+        foreach ($posts as $item) {
+
+            $data['data'] = array(
+                'id' => $item->ID,
+                'title' => $item->post_title,
+                'excerpt' => $item->post_excerpt,
+                'permalink' => get_permalink($item->ID),
+                'image' => ''
+            );
+
+            $attachment_id = (int)get_post_thumbnail_id($item);
+
+            if (($attachment_id) > 0) {
+
+                $attachment_link = wp_get_attachment_image_url($attachment_id, 'full');
+
+                $data['data']['image'] = $attachment_link;
+            }
+
+            yatra_get_template('tmpl-tour-item.php', $data);
+
+        }
+        echo '</div>';
+
+    }
+
+}

@@ -16,6 +16,7 @@ class Yatra_Widgets
         register_widget('Yatra_Activity_Widget');
         register_widget('Yatra_Destination_Widget');
         register_widget('Yatra_Discount_Deals_Widget');
+        register_widget('Yatra_Tour_Widget');
 
 
     }
@@ -26,6 +27,7 @@ class Yatra_Widgets
         require YATRA_ABSPATH . 'includes/widgets/class-yatra-activity-widget.php';
         require YATRA_ABSPATH . 'includes/widgets/class-yatra-destination-widget.php';
         require YATRA_ABSPATH . 'includes/widgets/class-yatra-discount-deals-widget.php';
+        require YATRA_ABSPATH . 'includes/widgets/class-yatra-tour-widget.php';
 
 
     }
