@@ -61,7 +61,50 @@ final class Yatra_Admin
     {
 
         add_action('admin_menu', array($this, 'admin_menu'));
+        add_action('init', array($this, 'setup_wizard'));
+        add_action('admin_init', array($this, 'admin_redirects'));
 
+    }
+
+    public function admin_redirects()
+    {
+
+        if (!get_transient('_yatra_activation_redirect')) {
+            return;
+        }
+
+        delete_transient('_yatra_activation_redirect');
+
+        if ((!empty($_GET['page']) && in_array($_GET['page'], array('yatra-setup'))) || is_network_admin() || isset($_GET['activate-multi']) || !current_user_can('manage_options')) {
+            return;
+        }
+
+        // If it's the first time
+        if (get_option('yatra_setup_wizard_ran') != '1') {
+            wp_safe_redirect(admin_url('index.php?page=yatra-setup'));
+            exit;
+
+            // Otherwise, the welcome page
+        } else {
+            wp_safe_redirect(admin_url('edit.php?post_type=tour'));
+            exit;
+        }
+    }
+
+    /**
+     * Include required files
+     *
+     * @return void
+     */
+    public function setup_wizard()
+    {
+        // Setup/welcome
+        if (!empty($_GET['page'])) {
+
+            if ('yatra-setup' == $_GET['page']) {
+                include_once YATRA_ABSPATH . 'includes/admin/setup/class-yatra-setup-wizard.php';
+            }
+        }
     }
 
     function admin_menu()

@@ -88,7 +88,7 @@ class Yatra_Settings_Payment_Gateways extends Yatra_Admin_Settings_Base
                 'yatra_settings_payment_gateways_general',
                 array(
                     array(
-                        'title' => __('Payemnt Gateways General Settings', 'yatra'),
+                        'title' => __('Payment Gateways General Settings', 'yatra'),
                         'type' => 'title',
                         'desc' => '',
                         'id' => 'yatra_payment_gateways_general_options',

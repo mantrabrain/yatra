@@ -22,8 +22,16 @@ final class Yatra_Install
 
         if (empty($yatra_version)) {
             self::install_content_and_options();
-        } else {
-            update_option('yatra_plugin_version', YATRA_VERSION);
+            if (empty($yatra_version) && apply_filters('yatra_enable_setup_wizard', true)) {
+                set_transient('_yatra_activation_redirect', 1, 30);
+            }
+        }
+        update_option('yatra_plugin_version', YATRA_VERSION);
+        update_option('yatra_plugin_db_version', YATRA_VERSION);
+
+        //save install date
+        if (false == get_option('yatra_install_date')) {
+            update_option('yatra_install_date', current_time('timestamp'));
         }
 
         self::setup_environment();

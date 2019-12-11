@@ -3,6 +3,7 @@ defined('ABSPATH') || exit;
 
 // Load Helpers
 
+include_once YATRA_ABSPATH . 'includes/yatra-html-functions.php';
 include_once YATRA_ABSPATH . 'includes/helpers/yatra-country-helper.php';
 include_once YATRA_ABSPATH . 'includes/helpers/yatra-currency-helper.php';
 include_once YATRA_ABSPATH . 'includes/template-tags.php';

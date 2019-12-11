@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.0.6\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2019-11-02 17:21:27+00:00\n"
+"POT-Creation-Date: 2019-12-11 12:44:00+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -414,6 +414,7 @@ msgid "Checkout Settings"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-checkout.php:94
+#: includes/admin/setup/class-yatra-setup-wizard.php:401
 msgid "Enable Guest Checkout"
 msgstr ""
 
@@ -424,6 +425,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:29
+#: includes/admin/setup/class-yatra-setup-wizard.php:64
 msgid "Design"
 msgstr ""
 
@@ -449,6 +451,7 @@ msgid "Page Container Class"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:114
+#: includes/admin/setup/class-yatra-setup-wizard.php:364
 msgid "Container class for all page templates for yatra plugin."
 msgstr ""
 
@@ -460,6 +463,7 @@ msgstr ""
 #: includes/admin/settings/class-yatra-settings-general.php:29
 #: includes/admin/settings/class-yatra-settings-general.php:42
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:42
+#: includes/admin/setup/class-yatra-setup-wizard.php:54
 msgid "General"
 msgstr ""
 
@@ -532,6 +536,7 @@ msgid "From email address for outgoing email address from yatra plugin."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:43
+#: includes/admin/setup/class-yatra-setup-wizard.php:59
 msgid "Pages"
 msgstr ""
 
@@ -540,6 +545,7 @@ msgid "Page Settings"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:96
+#: includes/admin/setup/class-yatra-setup-wizard.php:270
 msgid "Cart Page"
 msgstr ""
 
@@ -548,6 +554,7 @@ msgid "Cart page for tour booking"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:102
+#: includes/admin/setup/class-yatra-setup-wizard.php:282
 msgid "Checkout Page"
 msgstr ""
 
@@ -557,6 +564,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:108
 #: includes/admin/settings/class-yatra-settings-general.php:109
+#: includes/admin/setup/class-yatra-setup-wizard.php:294
 msgid "My Account Page"
 msgstr ""
 
@@ -587,6 +595,7 @@ msgid "Page for your terms and condition."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:145
+#: includes/admin/setup/class-yatra-setup-wizard.php:217
 msgid "General Settings"
 msgstr ""
 
@@ -661,12 +670,12 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:103
-#: includes/functions.php:736
+#: includes/functions.php:737
 msgid "Payment Gateways"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:91
-msgid "Payemnt Gateways General Settings"
+msgid "Payment Gateways General Settings"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:97
@@ -678,6 +687,109 @@ msgid ""
 " While in test mode no live transactions are processed. To fully use test "
 "mode, you must have a sandbox (test) account for the payment gateway you "
 "are testing."
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:49
+msgid "Introduction"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:69
+msgid "Miscellaneous"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:74
+msgid "Final!"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:120
+msgid "Yatra &rsaquo; Setup Wizard"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:140
+msgid "Return to the WordPress Dashboard"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:188
+msgid "Continue"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:190
+msgid "Skip this step"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:202
+msgid "Welcome to Complete Travel & Tour Booking System – Yatra!"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:203
+msgid ""
+"Thank you for choosing Yatra plugin for your travel & tour booking site. "
+"This setup wizard will help you configure the basic settings of the plugin. "
+"<strong>It’s completely optional and shouldn’t take longer than one "
+"minutes.</strong>"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:204
+msgid ""
+"No time right now? If you don’t want to go through the wizard, you can skip "
+"and return to the WordPress dashboard. Come back anytime if you change your "
+"mind!"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:207
+msgid "Let's Go!"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:209
+msgid "Not right now"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:223
+msgid "Currency"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:231
+msgid "Currency symbol for yatra plugin."
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:264
+msgid "Pages Options"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:277
+msgid "Cart page for yatra plugin."
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:289
+msgid "Checkout page for yatra plugin."
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:302
+msgid "My Account page for yatra plugin."
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:351
+msgid "Design Setup"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:357
+msgid "Container Class"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:391
+msgid "Miscellaneous Setup"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:451
+msgid "Your Site is Ready!"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:455
+msgid "Next Steps &rarr;"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:460
+msgid "Go to Dashboard!"
 msgstr ""
 
 #: includes/admin/views/html-admin-settings.php:50
@@ -1045,34 +1157,34 @@ msgstr ""
 msgid "No Tours found in the Trash"
 msgstr ""
 
-#: includes/functions.php:19
+#: includes/functions.php:20
 msgid "Options"
 msgstr ""
 
-#: includes/functions.php:23 includes/template-tags.php:274
+#: includes/functions.php:24 includes/template-tags.php:274
 #: includes/template-tags.php:282
 msgid "Itinerary"
 msgstr ""
 
-#: includes/functions.php:27 includes/template-tags.php:315
+#: includes/functions.php:28 includes/template-tags.php:315
 #: includes/template-tags.php:323
 msgid "Cost Info"
 msgstr ""
 
-#: includes/functions.php:31
+#: includes/functions.php:32
 msgid "Facts"
 msgstr ""
 
-#: includes/functions.php:35 includes/template-tags.php:354
+#: includes/functions.php:36 includes/template-tags.php:354
 #: includes/template-tags.php:362
 msgid "FAQ"
 msgstr ""
 
-#: includes/functions.php:51 includes/template-tags.php:815
+#: includes/functions.php:52 includes/template-tags.php:815
 msgid "Tour Options"
 msgstr ""
 
-#: includes/functions.php:55
+#: includes/functions.php:56
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:140
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:141
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:150
@@ -1080,54 +1192,54 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
-#: includes/functions.php:59
+#: includes/functions.php:60
 msgid "Tour Tabs"
 msgstr ""
 
-#: includes/functions.php:165
+#: includes/functions.php:166
 #. translators: %s template
 msgid "%s does not exist."
 msgstr ""
 
-#: includes/functions.php:182
+#: includes/functions.php:183
 msgid "action_args should not be overwritten when calling yatra_get_template."
 msgstr ""
 
-#: includes/functions.php:296
+#: includes/functions.php:297
 msgid "Pending"
 msgstr ""
 
-#: includes/functions.php:297
+#: includes/functions.php:298
 msgid "Processing"
 msgstr ""
 
-#: includes/functions.php:298
+#: includes/functions.php:299
 msgid "On Hold"
 msgstr ""
 
-#: includes/functions.php:299
+#: includes/functions.php:300
 msgid "Completed"
 msgstr ""
 
-#: includes/functions.php:300
+#: includes/functions.php:301
 msgid "Cancelled"
 msgstr ""
 
-#: includes/functions.php:323
+#: includes/functions.php:324
 msgid "Previous Post"
 msgstr ""
 
-#: includes/functions.php:324
+#: includes/functions.php:325
 msgid "Next Post"
 msgstr ""
 
-#: includes/functions.php:355
+#: includes/functions.php:356
 #. translators: 1: SVG icon. 2: post author, only visible to screen readers. 3:
 #. author link.
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:403 templates/parts/content.php:43
+#: includes/functions.php:404 templates/parts/content.php:43
 #. translators: %s: Name of current post. Only visible to screen readers.
 msgid "Edit <span class=\"screen-reader-text\">%s</span>"
 msgstr ""
