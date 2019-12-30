@@ -70,6 +70,11 @@ class Yatra_Setup_Wizard
                 'view' => array($this, 'setup_step_miscellaneous'),
                 'handler' => array($this, 'setup_step_miscellaneous_save'),
             ),
+            'themes' => array(
+                'name' => __('Themes', 'yatra'),
+                'view' => array($this, 'setup_step_themes'),
+                'handler' => array($this, 'setup_step_themes_save'),
+            ),
             'final' => array(
                 'name' => __('Final!', 'yatra'),
                 'view' => array($this, 'setup_final_ready'),
@@ -201,7 +206,7 @@ class Yatra_Setup_Wizard
         ?>
         <h1><?php _e('Welcome to Complete Travel & Tour Booking System – Yatra!', 'yatra'); ?></h1>
         <p><?php _e('Thank you for choosing Yatra plugin for your travel & tour booking site. This setup wizard will help you configure the basic settings of the plugin. <strong>It’s completely optional and shouldn’t take longer than one minutes.</strong>', 'yatra'); ?></p>
-        <p><?php _e('No time right now? If you don’t want to go through the wizard, you can skip and return to the WordPress dashboard. Come back anytime if you change your mind!', 'yatra'); ?></p>
+        <p><?php _e('No time right now? If you don’t want to go through the wizard, you can skip and return to the WordPress dashboard.', 'yatra'); ?></p>
         <p class="yatra-setup-actions step">
             <a href="<?php echo esc_url($this->get_next_step_link()); ?>"
                class="button-primary button button-large button-next"><?php _e('Let\'s Go!', 'yatra'); ?></a>
@@ -256,7 +261,7 @@ class Yatra_Setup_Wizard
         exit;
     }
 
- 
+
     public function setup_step_pages()
     {
         ?>
@@ -428,6 +433,7 @@ class Yatra_Setup_Wizard
 
     }
 
+
     public function setup_step_miscellaneous_save()
     {
         check_admin_referer('yatra-setup');
@@ -442,6 +448,83 @@ class Yatra_Setup_Wizard
         exit;
     }
 
+    public function setup_step_themes()
+    {
+        ?>
+        <h1 style="text-align: center;font-weight: bold;text-transform: uppercase;color: #18d0ab;"><?php _e('Compatible Themes for Yatra Plugin', 'yatra'); ?></h1>
+        <form method="post">
+            <?php
+            //$compatible_themes = apply_filters('yatra_most_compatible_themes', array());
+
+            $compatible_themes = array(
+                array(
+                    'slug' => 'yatri',
+                    'title' => __('Yatri', 'yatra'),
+                    'demo_url' => 'https://demo.mantrabrain.com/yatri-default/',
+                    'is_free' => true,
+                    'screenshot' => 'https://themes.svn.wordpress.org/yatri/1.0.1/screenshot.png',
+                    'landing_page' => 'https://demo.mantrabrain.com/yatri-default/',
+                    'is_installable' => false,
+                    'download_link' => 'https://wordpress.org/themes/download/yatri.1.0.1.zip'
+                )
+            )
+            ?>
+            <div class="theme-browser content-filterable rendered wpclearfix">
+                <div class="themes wpclearfix">
+                    <?php foreach ($compatible_themes as $theme) {
+                        $theme_slug = isset($theme['slug']) ? $theme['slug'] : '';
+                        $screenshot = isset($theme['screenshot']) ? $theme['screenshot'] : '';
+                        $title = isset($theme['title']) ? $theme['title'] : '';
+                        $demo_url = isset($theme['demo_url']) ? $theme['demo_url'] : '';
+                        $is_installable = isset($theme['is_installable']) ? $theme['is_installable'] : false;
+                        $landing_page = isset($theme['landing_page']) ? $theme['landing_page'] : '';
+                        $download_link = isset($theme['download_link']) ? $theme['download_link'] : '';
+                        ?>
+                        <div class="theme" tabindex="0"
+                             aria-describedby="<?php echo esc_attr($theme_slug) ?>-action <?php echo esc_attr($theme_slug) ?>-name"
+                             data-slug="<?php echo esc_attr($theme_slug) ?>">
+
+                            <div class="theme-screenshot">
+                                <img src="<?php echo esc_attr($screenshot); ?>" alt="<?php echo esc_attr($title); ?>">
+                            </div>
+
+                            <span class="more-details"
+                                  onclick="window.open('<?php echo esc_url($landing_page); ?>','_blank');"
+                                  data-details-link="<?php echo esc_url($landing_page); ?>"><?php echo __('Details &amp; Preview', 'yatra'); ?></span>
+
+
+                            <div class="theme-id-container">
+                                <h3 class="theme-name"><?php echo esc_html($title) ?></h3>
+                                <div class="theme-actions">
+                                    <a href="<?php echo esc_attr($download_link); ?>"
+                                       class="button button-primary theme-install"
+                                       data-name="<?php echo esc_attr($title) ?>"
+                                       data-slug="<?php echo esc_attr($theme_slug) ?>"
+                                       data-installable="<?php echo absint($is_installable) ?>"
+                                       aria-label="Install <?php echo esc_html($title) ?>"><?php echo __('Download', 'yatra'); ?></a>
+                                    <a href="<?php echo esc_attr($demo_url); ?>" target="_blank"
+                                       class="button preview install-theme-preview"><?php echo __('Preview', 'yatra'); ?></a>
+
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="wpclearfix"></div>
+
+            <?php $this->next_step_buttons(); ?>
+        </form>
+
+        <?php
+    }
+
+
+    public function setup_step_themes_save()
+    {
+        wp_redirect(esc_url_raw($this->get_next_step_link()));
+        exit;
+    }
 
     public function setup_final_ready()
     {
