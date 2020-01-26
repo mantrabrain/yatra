@@ -8,7 +8,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
         abstract function metabox_config($key);
 
-        abstract function callback($args);
+        //abstract function callback($args);
 
         public function sanitize($field_value, $meta_field = array())
         {

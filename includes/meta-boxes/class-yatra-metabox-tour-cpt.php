@@ -3,14 +3,43 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
     class Yatra_Metabox_Tour_CPT extends Yatra_Metabox_Base
     {
+        private $tabs = array();
 
         function __construct()
         {
+            $this->tabs = array(
+                'general' => array(
+                    'title' => esc_html__('General', 'yatra'),
+                    'is_active' => true
+                ),
+                'date' => array(
+                    'title' => esc_html__('Date', 'yatra')
+                ),
+                'pricing' => array(
+                    'title' => esc_html__('Pricing', 'yatra')
+                ),
+
+                'attributes' => array(
+                    'title' => esc_html__('Attributes', 'yatra')
+                ),
+                'tour_tabs' => array(
+                    'title' => esc_html__('Tour Tabs', 'yatra')
+                ),
+            );
             add_action('add_meta_boxes', array($this, 'metabox_form'));
 
             add_action('save_post', array($this, 'save'));
 
             add_action('wp_ajax_yatra_add_attribute_meta', array($this, 'yatra_add_attribute_meta'));
+
+            add_action('yatra_tour_meta_body_content', array($this, 'tour_meta'));
+
+
+            add_action('yatra_tour_meta_tab_content_general', array($this, 'general_tab_content'));
+            add_action('yatra_tour_meta_tab_content_date', array($this, 'date_tab_content'));
+            add_action('yatra_tour_meta_tab_content_pricing', array($this, 'pricing_tab_content'));
+            add_action('yatra_tour_meta_tab_content_attributes', array($this, 'attributes_tab_content'));
+            add_action('yatra_tour_meta_tab_content_tour_tabs', array($this, 'tour_tabs_tab_content'));
 
 
         }
@@ -30,6 +59,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
          */
         public function metabox_form()
         {
+            add_action('edit_form_after_editor', array($this, 'tour_settings'));
+
             $screens = array('tour');
 
             foreach ($screens as $screen) {
@@ -43,6 +74,52 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 );
             }
         }
+
+        /*  function callback($args){
+
+          }*/
+        public function tour_settings()
+        {
+            $args = array(
+                'title' => esc_html__('Tour Additional Information', 'yatra')
+            );
+            yatra_load_admin_template('metabox.tour.box', $args);
+        }
+
+        public function tour_meta()
+        {
+            $args['tabs'] = $this->tabs;
+            yatra_load_admin_template('metabox.tour.tab', $args);
+            yatra_load_admin_template('metabox.tour.tab-content', $args);
+
+        }
+
+        public function general_tab_content($content)
+        {
+            yatra_load_admin_template('metabox.tour.tab.general');
+
+        }
+
+        public function date_tab_content($content)
+        {
+            yatra_load_admin_template('metabox.tour.tab.date');
+        }
+
+        public function pricing_tab_content($content)
+        {
+            yatra_load_admin_template('metabox.tour.tab.pricing');
+        }
+
+        public function attributes_tab_content($content)
+        {
+            yatra_load_admin_template('metabox.tour.tab.attributes');
+        }
+
+        public function tour_tabs_tab_content($content)
+        {
+            yatra_load_admin_template('metabox.tour.tab.tour-tabs');
+        }
+
 
         // Tab for notice listing and settings
         public function callback($args)

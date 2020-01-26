@@ -5,11 +5,24 @@ var YatraTabs = function ($) {
 
         init: function () {
 
+            this.initNewYatraTabs();
             this.cacheDom();
             this.setupAria();
             this.bindEvents();
             this.removeStyle();
         },
+        initNewYatraTabs: function () {
+            var parent = $('.yatra-admin--tabs');
+            parent.find('li').on('click', function () {
+                $(this).closest('ul').find('li').removeClass('active');
+                $(this).addClass('active');
+                var tab_key = $(this).attr('data-tab');
+                var content = parent.next('.yatra-admin--tab-content');
+                content.find('.yatra-admin-tab--content-section').removeClass('active');
+                content.find('#' + tab_key).addClass('active');
+            });
+        },
+
 
         cacheDom: function () {
             this.$el = $('.yatra-tabs');
@@ -318,7 +331,7 @@ var YatraSubTabs = function ($) {
 
                 node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.tmce-active').remove();
                 node.closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.mce-tinymce').remove();
-                
+
                 tinyMCE.execCommand("mceAddEditor", true, updated_id);
 
                 /* var editorSettings = {

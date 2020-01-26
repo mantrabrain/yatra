@@ -1,0 +1,12 @@
+<div class="yatra-admin--tabs">
+    <ul>
+        <?php foreach ($tabs as $tab_index => $tab) {
+            $title = isset($tab['title']) ? $tab['title'] : '';
+            $is_active = isset($tab['is_active']) ? (boolean)($tab['is_active']) : false;
+            $class = $is_active ? 'active' : '';
+            ?>
+            <li data-tab="<?php echo esc_attr($tab_index) ?>"
+                class="<?php esc_html_e($class); ?>"><?php echo esc_html($title); ?></li>
+        <?php } ?>
+    </ul>
+</div>

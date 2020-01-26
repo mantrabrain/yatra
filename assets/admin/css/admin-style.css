@@ -361,3 +361,85 @@ table.yatra-booking-meta-customer-info td {
     background: #ddd;
     text-transform: uppercase;
 }
+
+/* Custom Post Type Meta Box Box Design
+
+ */
+#admin-editor-yatra-tour {
+    background: #fff;
+}
+
+.yatra-box-data {
+    border: 1px solid #DDD;
+    margin: 20px 0 0 0;
+    position: relative;
+}
+
+.yatra-admin-editor .yatra-box-data-head {
+    padding: 0 10px;
+    background: #fff;
+}
+
+.yatra-admin-editor .yatra-box-data-head .heading {
+    padding: 10px 0;
+    margin: 0;
+}
+
+.yatra-box-data .yatra-box-data-content {
+    padding: 15px;
+    border-top: 1px solid #DDD;
+    background: #FFF;
+}
+
+.yatra-admin--tabs {
+    display: inline-block;
+    width: 100%;
+    background: #eee;
+    border: 1px solid #aaa;
+}
+
+.yatra-admin--tabs li {
+    display: block;
+    padding: 15px;
+    float: left;
+    margin: 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    border-right: 1px solid #aaa;
+    text-transform: capitalize;
+    border-bottom: 1px solid transparent;
+
+}
+
+.yatra-admin--tabs ul {
+    margin: 0;
+    padding: 0;
+}
+
+.yatra-admin--tabs li.active, .yatra-admin--tabs li:hover {
+    background: #bce5ff;
+    color: #000;
+    border-bottom: 1px solid #000;
+}
+
+.yatra-admin-tab--content-section {
+    padding: 0;
+    border: 1px solid #aaa;
+    width: 100%;
+    display: block;
+    margin-top: -5px;
+    padding-top: 5px;
+}
+
+.yatra-admin-tab--content-section {
+    display: none;
+}
+
+.yatra-admin-tab--content-section.active {
+    display: block;
+}
+
+.yatra-admin-tab--content-section .yatra-admin-tab-content-inner {
+    padding: 10px;
+}
