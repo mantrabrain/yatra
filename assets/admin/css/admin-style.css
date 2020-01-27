@@ -105,7 +105,7 @@
 .yatra-tab-content input[type="text"],
 .yatra-tab-content input[type="number"],
 .yatra-tab-content select,
-.yatra-tab-content textarea
+.yatra-tab-content textarea,
 .yatra-tab-content .widefat {
     font-size: 14px;
     height: auto;
@@ -143,6 +143,7 @@
 }
 
 .mb-meta-vertical-tab {
+    margin: 0;
     width: 40%;
     float: left;
 
@@ -164,6 +165,48 @@
 
 .mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item.active {
 
+    display: block;
+    padding: 10px;
+    border: 1px solid #aaa;
+    margin-left: 1px;
+    background: #fff;
+}
+
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item h2,
+#poststuff .mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item h2 {
+
+    background: #bce5ff;
+    padding: 11px;
+    border: 1px solid #aaa;
+    /* width: 100%; */
+    display: block;
+    max-width: 100%;
+    margin-left: -11px;
+    margin-right: -11px;
+    margin-top: -11px;
+    text-transform: capitalize;
+    text-align: center;
+}
+
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap label {
+    width: 100%;
+    margin-right: 0;
+    vertical-align: baseline;
+    max-width: 100%;
+    float: none;
+    font-weight: 600;
+    display: block;
+    padding: 10px 0;
+}
+
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap input[type="text"],
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap input[type="number"],
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap input[type="url"],
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap input[type="url"],
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap select,
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap textarea,
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap .select2-container {
+    max-width: 100%;
     display: block;
 }
 
@@ -198,31 +241,30 @@
 .mb-repeator {
     background: #f9f9f9;
     border: 1px solid #ddd;
-    margin: 5px;
+    margin-bottom: 5px;
 }
 
 .mb-repeator .add, .mb-repeator .remove {
     float: right;
     height: 25px;
     width: 25px;
-    background: #676767;
     line-height: 27px;
     border-radius: 100%;
     cursor: pointer;
-    color: #fff;
+    color: #aaa;
     margin: 0 5px 0 5px;
 }
 
 .mb-repeator .add:hover, .mb-repeator .remove:hover {
 
-    background: #074771;
+    color: #000;
 }
 
 .mb-repeator-heading {
     display: block;
     padding: 10px;
-    background: #dadadacc;
-
+    background: #f1f1f1;
+    border-bottom: 2px solid #aaa;
 }
 
 .mb-repeator-fields {
@@ -235,6 +277,11 @@
     float: left;
     cursor: pointer;
     line-height: 27px;
+    color: #aaa;
+}
+
+.mb-repeator .toggle:hover {
+    color: #000;
 }
 
 .mb-repeator-heading:after {
@@ -301,7 +348,7 @@ ul.mb-selected-gallery-list li img {
 .mb-tour-attributes-fields {
     padding: 10px;
     margin: 5px;
-    background: #f1f1f1;
+    background: #fff;
     border: 1px solid #aaa;
     display: block;
     position: relative;
@@ -476,6 +523,7 @@ table.yatra-booking-meta-customer-info td {
 .yatra-admin-tab--content-section .yatra-field-wrap input[type="url"],
 .yatra-admin-tab--content-section .yatra-field-wrap input[type="url"],
 .yatra-admin-tab--content-section .yatra-field-wrap select,
+.yatra-admin-tab--content-section .yatra-field-wrap textarea,
 .yatra-admin-tab--content-section .yatra-field-wrap .select2-container {
     max-width: 300px;
     width: 100%;
@@ -492,7 +540,8 @@ table.yatra-booking-meta-customer-info td {
 .yatra-admin-tab--content-section .yatra-field-wrap input[type="number"]:focus,
 .yatra-admin-tab--content-section .yatra-field-wrap input[type="url"]:focus,
 .yatra-admin-tab--content-section .yatra-field-wrap input[type="url"]:focus,
-.yatra-admin-tab--content-section .yatra-field-wrap select:focus {
+.yatra-admin-tab--content-section .yatra-field-wrap select:focus,
+.yatra-admin-tab--content-section .yatra-field-wrap textarea:focus {
     border-color: #000;
 }
 

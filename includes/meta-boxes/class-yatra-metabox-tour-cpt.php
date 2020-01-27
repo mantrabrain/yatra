@@ -7,38 +7,12 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         function __construct()
         {
-            $this->tabs = array(
-                'general' => array(
-                    'title' => esc_html__('General', 'yatra'),
-                    'is_active' => true,
-                    'settings' => yatra_tour_general_configurations()
-                ),
-                'date' => array(
-                    'title' => esc_html__('Date', 'yatra')
-                ),
-                'pricing' => array(
-                    'title' => esc_html__('Pricing', 'yatra'),
-                    'settings' => yatra_tour_pricing_configurations()
-                ),
-
-                'attributes' => array(
-                    'title' => esc_html__('Attributes', 'yatra'),
-                    'settings' => yatra_tour_attributes()
-                ),
-                'tour_tabs' => array(
-                    'title' => esc_html__('Tour Tabs', 'yatra'),
-                    'settings' => yatra_tour_tab_configurations()
-                ),
-            );
             add_action('add_meta_boxes', array($this, 'metabox_form'));
 
             add_action('save_post', array($this, 'save'));
-
             add_action('wp_ajax_yatra_add_attribute_meta', array($this, 'yatra_add_attribute_meta'));
-
             add_action('yatra_tour_meta_body_content', array($this, 'tour_meta'));
             add_action('yatra_tour_meta_tab_content_general', array($this, 'general_tab_content'));
-            add_action('yatra_tour_meta_tab_content_date', array($this, 'date_tab_content'));
             add_action('yatra_tour_meta_tab_content_pricing', array($this, 'pricing_tab_content'));
             add_action('yatra_tour_meta_tab_content_attributes', array($this, 'attributes_tab_content'));
             add_action('yatra_tour_meta_tab_content_tour_tabs', array($this, 'tour_tabs_tab_content'));
@@ -63,18 +37,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
         {
             add_action('edit_form_after_editor', array($this, 'tour_settings'));
 
-            $screens = array('tour');
-
-            foreach ($screens as $screen) {
-                add_meta_box(
-                    'tour_meta_information',
-                    __('Tour Additional Information', 'yatra'),
-                    array($this, 'callback'),
-                    $screen,
-                    'normal',
-                    'high'
-                );
-            }
         }
 
         /*  function callback($args){
@@ -93,7 +55,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         public function tour_meta()
         {
-            $args['tabs'] = $this->tabs;
+            $args['tabs'] = yatra_tour_metabox_tabs();
+
             yatra_load_admin_template('metabox.tour.tab', $args);
             yatra_load_admin_template('metabox.tour.tab-content', $args);
 
@@ -108,16 +71,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 $this->metabox_html($field);
             }
 
-        }
-
-        public function date_tab_content($content)
-        {
-            $settings = isset($content['settings']) ? $content['settings'] : array();
-
-            foreach ($settings as $field) {
-
-                $this->metabox_html($field);
-            }
         }
 
         public function pricing_tab_content($content)
@@ -139,8 +92,38 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 $this->metabox_html($field);
             }
 
-            yatra_load_admin_template('metabox.tour.tab.attributes');
+            echo '<div style="clear:both" class="mb-clear"></div>';
 
+            global $post;
+
+            $post_id = $post->ID;
+
+            $tour_meta_custom_attributes = get_post_meta($post_id, 'tour_meta_custom_attributes', true);
+
+            if (!is_array($tour_meta_custom_attributes)) {
+
+                $tour_meta_custom_attributes = array();
+            }
+
+            $yatra_tour_attribute_type_options = array_keys(yatra_tour_attribute_type_options());
+
+            foreach ($tour_meta_custom_attributes as $term_id => $term_value_array) {
+
+                $field_type = get_term_meta($term_id, 'attribute_field_type', true);
+
+
+                if (in_array($field_type, $yatra_tour_attribute_type_options)) {
+
+                    echo '<div class="mb-tour-attributes">';
+
+                    echo $this->parse_attribute($field_type, $term_id, $term_value_array);
+
+                    echo '<div style="clear:both" class="mb-clear"></div>';
+
+                    echo '</div>';
+                }
+
+            }
         }
 
         public function tour_tabs_tab_content($content)
@@ -231,64 +214,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
         }
 
 
-        // Tab for notice listing and settings
-        public function callback($args)
-        {
-            $metabox_tabs = yatra_tour_metabox_tabs();
-
-
-            ?>
-            <div class="yatra-tabs">
-
-                <ul class="mb-tab-list">
-                    <?php foreach ($metabox_tabs as $tab_key => $tab) { ?>
-                        <li><a href="#<?php echo esc_attr($tab_key); ?>"><?php echo esc_html($tab['label']); ?></a></li>
-                    <?php } ?>
-                </ul>
-                <?php
-
-                $index = 0;
-
-                foreach ($metabox_tabs as $tab_content_key => $tab_content) {
-                    $index++;
-                    ?>
-                    <section id="<?php echo esc_attr($tab_content_key); ?>" style="display:none;"
-                             class="yatra-tab-section">
-                        <?php
-
-                        $configs = isset($tab_content['config']) ? $tab_content['config'] : array();
-
-                        switch ($tab_content_key) {
-
-                            case "tour-options":
-                                $this->tour_options($configs, $tab_content_key);
-
-                                break;
-
-                            case "tour-attributes":
-                                $this->tour_attributes($configs, $tab_content_key);
-
-                                break;
-
-                            case "tour-tabs":
-                                $this->tour_tabs($configs, $tab_content_key);
-
-                                break;
-                        }
-                        ?>
-                    </section>
-                <?php } ?>
-                <input type="hidden" value="<?php echo wp_create_nonce('yatra_tour_post_type_metabox_nonce') ?>"
-                       name="yatra_tour_cpt_meta_nonce"/>
-                <?php
-                global $post;
-
-                ?>
-                <input type="hidden" value="<?php echo $post->ID ?>"
-                       name="yatra_tour_cpt_meta_post_id" class="yatra_tour_cpt_meta_post_id"/>
-            </div>
-            <?php
-        }
 
         /**
          * When the post is saved, saves our custom data.
@@ -304,7 +229,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
              */
             $nonce = isset($_POST['yatra_tour_cpt_meta_nonce']) ? ($_POST['yatra_tour_cpt_meta_nonce']) : '';
 
-
             if (isset($_POST['yatra_tour_cpt_meta_nonce'])) {
 
                 $is_valid_nonce = wp_verify_nonce($nonce, 'yatra_tour_post_type_metabox_nonce');
@@ -315,21 +239,25 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
                     foreach ($metabox_tabs as $tab_content_key => $tab_content) {
 
-                        $configs = isset($tab_content['config']) ? $tab_content['config'] : array();
+                        $settings = isset($tab_content['settings']) ? $tab_content['settings'] : array();
 
                         switch ($tab_content_key) {
 
-                            case "tour-options":
-                                $this->save_tour_options($configs, $post_id);
+                            case "general":
+                                $this->save_general_options($settings, $post_id);
+
+                                break;
+                            case "pricing":
+                                $this->save_pricing_options($settings, $post_id);
 
                                 break;
 
-                            case "tour-attributes":
-                                $this->save_tour_attributes($configs, $post_id);
+                            case "attributes":
+                                $this->save_tour_attributes($settings, $post_id);
                                 break;
 
-                            case "tour-tabs":
-                                $this->save_tour_tabs($configs, $post_id);
+                            case "tour_tabs":
+                                $this->save_tour_tabs($settings, $post_id);
                                 break;
                         }
                     }
@@ -396,7 +324,19 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         }
 
-        private function save_tour_options($configs = array(), $post_id)
+        private function save_general_options($configs = array(), $post_id)
+        {
+            foreach ($configs as $field_key => $field) {
+
+                $field_value = isset($_POST[$field_key]) ? $_POST[$field_key] : '';
+
+                $valid_field_value = $this->sanitize($field_value, $field);
+
+                update_post_meta($post_id, $field_key, $valid_field_value);
+            }
+        }
+
+        private function save_pricing_options($configs = array(), $post_id)
         {
             foreach ($configs as $field_key => $field) {
 
@@ -475,145 +415,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             }
         }
 
-        private function tour_options($configs = array(), $tab_content_key)
-        {
-            foreach ($configs as $field) {
-                $this->metabox_html($field);
-            }
-
-        }
-
-        private function tour_attributes($configs = array(), $tab_content_key)
-        {
-
-            foreach ($configs as $field) {
-
-                $this->metabox_html($field);
-            }
-
-            echo '<div style="clear:both" class="mb-clear"></div>';
-
-            global $post;
-
-            $post_id = $post->ID;
-
-            $tour_meta_custom_attributes = get_post_meta($post_id, 'tour_meta_custom_attributes', true);
-
-            if (!is_array($tour_meta_custom_attributes)) {
-                $tour_meta_custom_attributes = array();
-            }
-
-            $yatra_tour_attribute_type_options = array_keys(yatra_tour_attribute_type_options());
-
-            foreach ($tour_meta_custom_attributes as $term_id => $term_value_array) {
-
-                $field_type = get_term_meta($term_id, 'attribute_field_type', true);
-
-
-                if (in_array($field_type, $yatra_tour_attribute_type_options)) {
-
-                    echo '<div class="mb-tour-attributes">';
-
-                    echo $this->parse_attribute($field_type, $term_id, $term_value_array);
-
-                    echo '<div style="clear:both" class="mb-clear"></div>';
-
-                    echo '</div>';
-                }
-
-            }
-
-
-        }
-
-        private function tour_tabs($configs = array(), $tab_content_key)
-        {
-
-            echo '<ul  class="mb-meta-vertical-tab">';
-
-            $index = 0;
-
-            global $post;
-
-            $post_id = $post->ID;
-
-            $yatra_tour_meta_tour_tabs_ordering = get_post_meta($post_id, 'yatra_tour_meta_tour_tabs_ordering', true);
-
-            $yatra_tour_meta_tour_tabs_ordering_array = explode(',', $yatra_tour_meta_tour_tabs_ordering);
-
-            $config_array_keys = array_keys($configs);
-
-            $array_diff = array_diff($config_array_keys, $yatra_tour_meta_tour_tabs_ordering_array);
-
-            $final_ordered_config_keys = $yatra_tour_meta_tour_tabs_ordering_array;
-
-            if (count($array_diff) > 0) {
-
-                $final_ordered_config_keys = array_merge($yatra_tour_meta_tour_tabs_ordering_array, $array_diff);
-            }
-
-            $active_tab_config = '';
-
-            foreach ($final_ordered_config_keys as $config) {
-
-                if (isset($configs[$config])) {
-
-                    $setting = $configs[$config];
-
-                    $class = $index === 0 ? 'active' : '';
-
-                    if ($index === 0) {
-
-                        $active_tab_config = $config;
-                    }
-
-                    $icon = isset($setting['icon']) ? '<span class="' . esc_attr($setting['icon']) . '"></span>' : '';
-
-                    echo '<li class="' . $class . '" data-tab-content="' . $config . '">' . $icon . $setting['label'] . '</li>';
-
-                    $index++;
-                }
-            }
-
-
-            echo '</ul>';
-
-            echo '<div class="mb-meta-vertical-tab-content">';
-
-            foreach ($configs as $config_key => $setting_value) {
-
-                $class = 'mb-meta-vertical-tab-content-item';
-
-                $class .= $config_key === $active_tab_config ? ' active' : '';
-
-                echo '<div class="' . $class . '" data-tab-content="' . $config_key . '">';
-
-                foreach ($setting_value as $setting_key => $setting_args) {
-
-                    switch ($setting_key) {
-
-                        case "label":
-                            echo "<h2>{$setting_args}</h2>";
-                            break;
-
-                        case "options":
-                            foreach ($setting_args as $option) {
-                                $this->metabox_html($option);
-                            }
-                            break;
-
-                    }
-
-                }
-
-
-                echo '</div>';
-            }
-            echo '</div>';
-
-        }
-
-
         public function yatra_add_attribute_meta()
         {
             $nonce_value = isset($_REQUEST['yatra_nonce']) ? $_REQUEST['yatra_nonce'] : '';
@@ -626,7 +427,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             if (!$is_valid_nonce || $term_id < 1 || $post_id < 1) {
 
-                wp_send_json_error();
+                wp_send_json_error(array('error'=>'somethig wrong'));
             }
             $term = get_term($term_id);
 

@@ -324,7 +324,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
                         ),
                         'cost_info_price_includes_title' => array(
                             'name' => 'cost_info_price_includes_title',
-                            'title' => __('Title', 'yatra'),
+                            'title' => __('Price includes title', 'yatra'),
                             'type' => 'text',
                             'default' => __('Price includes', 'yatra'),
                         ),
@@ -582,6 +582,7 @@ if (!function_exists('yatra_tour_general_configurations')) {
             'yatra_tour_meta_tour_duration_days' => array(
                 'name' => 'yatra_tour_meta_tour_duration_days',
                 'title' => esc_html__('Tour Duration Days', 'yatra'),
+                'description' => esc_html__('Total duration days for this tour', 'yatra'),
                 'type' => 'number',
                 // 'wrap_class' => 'yatra-left',
                 'extra_attributes' => array(

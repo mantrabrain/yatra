@@ -48,17 +48,23 @@ if (!function_exists('yatra_tour_metabox_tabs')) {
     {
         $metabox_tabs = array(
 
-            'tour-options' => array(
-                'label' => __('Tour Options', 'yatra'),
-                'config' => yatra_tour_general_configurations()
+            'general' => array(
+                'title' => esc_html__('General & Dates', 'yatra'),
+                'is_active' => true,
+                'settings' => yatra_tour_general_configurations()
             ),
-            'tour-attributes' => array(
-                'label' => __('Attributes', 'yatra'),
-                'config' => yatra_tour_attributes()
+            'pricing' => array(
+                'title' => esc_html__('Pricing', 'yatra'),
+                'settings' => yatra_tour_pricing_configurations()
             ),
-            'tour-tabs' => array(
-                'label' => __('Tour Tabs', 'yatra'),
-                'config' => yatra_tour_tab_configurations()
+
+            'attributes' => array(
+                'title' => esc_html__('Attributes', 'yatra'),
+                'settings' => yatra_tour_attributes()
+            ),
+            'tour_tabs' => array(
+                'title' => esc_html__('Tour Tabs', 'yatra'),
+                'settings' => yatra_tour_tab_configurations()
             ),
         );
 
