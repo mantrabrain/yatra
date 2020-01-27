@@ -543,6 +543,7 @@ if (!function_exists('yatra_tour_attributes_list')) {
                 }
             }
         }
+
         return $fields;
 
     }
@@ -556,13 +557,11 @@ if (!function_exists('yatra_tour_attributes')) {
                 'title' => sprintf(__('Tour Attributes', 'yatra')),
                 'type' => 'select',
                 'options' => yatra_tour_attributes_list(),
-                'wrap_class' => 'yatra-left',
             ),
             array(
                 'name' => 'add_tour_attribute',
                 'type' => 'button',
                 'default' => sprintf(__('Add New', 'yatra')),
-                'wrap_class' => 'yatra-right'
 
             )
         );
@@ -575,19 +574,81 @@ if (!function_exists('yatra_tour_general_configurations')) {
 
     function yatra_tour_general_configurations()
     {
+
+        $countries = yatra_get_countries();
+
+        $tour_options = array(
+
+            'yatra_tour_meta_tour_duration_days' => array(
+                'name' => 'yatra_tour_meta_tour_duration_days',
+                'title' => esc_html__('Tour Duration Days', 'yatra'),
+                'type' => 'number',
+                // 'wrap_class' => 'yatra-left',
+                'extra_attributes' => array(
+                    'placeholder' => __('Number of days', 'yatra'),
+                ),
+                //'row_start' => true,
+
+            ),
+            'yatra_tour_meta_tour_duration_nights' => array(
+                'name' => 'yatra_tour_meta_tour_duration_nights',
+                'title' => esc_html__('Tour Duration Nights', 'yatra'),
+                'type' => 'number',
+                //'wrap_class' => 'yatra-right',
+                'extra_attributes' => array(
+                    'placeholder' => __('Number of nights', 'yatra'),
+                ),
+                ///'row_end' => true,
+
+            ),
+            'yatra_tour_meta_tour_country' => array(
+                'name' => 'yatra_tour_meta_tour_country',
+                'title' => esc_html__('Country', 'yatra'),
+                'type' => 'select',
+                //'wrap_class' => 'yatra-left',
+                'extra_attributes' => array(
+                    'placeholder' => __('Country', 'yatra'),
+                ),
+                'options' => $countries,
+                'default' => 'NP',
+                'is_multiple' => true,
+                'select2' => true,
+                //'row_start' => true,
+
+            ),
+            'yatra_tour_meta_tour_featured' => array(
+                'name' => 'yatra_tour_meta_tour_featured',
+                'title' => esc_html__('Feature this tour', 'yatra'),
+                'type' => 'checkbox',
+                //'wrap_class' => 'yatra-right',
+                //'row_end' => true,
+
+            ),
+            'yatra_tour_meta_tour_tabs_ordering' => array(
+                'name' => 'yatra_tour_meta_tour_tabs_ordering',
+                'type' => 'hidden',
+
+            ),
+        );
+        return apply_filters('yatra_tour_general_configurations', $tour_options);
+    }
+}
+
+if (!function_exists('yatra_tour_pricing_configurations')) {
+
+    function yatra_tour_pricing_configurations()
+    {
         $currency = get_option('yatra_currency');
 
         $currency_symbols = yatra_get_currency_symbols($currency);
-
-        $countries = yatra_get_countries();
 
         $tour_options = array(
             'yatra_tour_meta_price_per' => array(
                 'name' => 'yatra_tour_meta_price_per',
                 'title' => __('Price Per', 'yatra'),
                 'type' => 'select',
-                'wrap_class' => 'yatra-left',
-                'row_start' => true,
+                //'wrap_class' => 'yatra-left',
+                //'row_start' => true,
                 'options' => array(
                     'person' => __('Person', 'yatra'),
                     'group' => __('Group', 'yatra')
@@ -596,81 +657,31 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 'name' => 'yatra_tour_meta_group_size',
                 'title' => __('Group Size', 'yatra'),
                 'type' => 'number',
-                'wrap_class' => 'yatra-right',
+                //'wrap_class' => 'yatra-right',
                 'extra_attributes' => array(
                     'placeholder' => __('Group Size', 'yatra'),
                 ),
-                'row_end' => true,
+                // 'row_end' => true,
             ),
             'yatra_tour_meta_regular_price' => array(
                 'name' => 'yatra_tour_meta_regular_price',
                 'title' => sprintf(__('Tour Price- Regular (%s)', 'yatra'), $currency_symbols),
                 'type' => 'number',
-                'wrap_class' => 'yatra-left',
+                //'wrap_class' => 'yatra-left',
                 'extra_attributes' => array(
                     'placeholder' => sprintf(__('Tour Price - Regular (%s)', 'yatra'), $currency_symbols),
                 ),
-                'row_start' => true,
+                //'row_start' => true,
             ),
             'yatra_tour_meta_sales_price' => array(
                 'name' => 'yatra_tour_meta_sales_price',
                 'title' => sprintf(__('Tour Price- Sales Price (%s)', 'yatra'), $currency_symbols),
                 'type' => 'number',
-                'wrap_class' => 'yatra-right',
+                //'wrap_class' => 'yatra-right',
                 'extra_attributes' => array(
                     'placeholder' => sprintf(__('Tour Price - Sales Price (%s). Leave it empty if you do not want to show sales price.', 'yatra'), $currency_symbols),
                 ),
-                'row_end' => true,
-            ),
-            'yatra_tour_meta_tour_duration_days' => array(
-                'name' => 'yatra_tour_meta_tour_duration_days',
-                'title' => esc_html__('Tour Duration Days', 'yatra'),
-                'type' => 'number',
-                'wrap_class' => 'yatra-left',
-                'extra_attributes' => array(
-                    'placeholder' => __('Number of days', 'yatra'),
-                ),
-                'row_start' => true,
-
-            ),
-            'yatra_tour_meta_tour_duration_nights' => array(
-                'name' => 'yatra_tour_meta_tour_duration_nights',
-                'title' => esc_html__('Tour Duration Nights', 'yatra'),
-                'type' => 'number',
-                'wrap_class' => 'yatra-right',
-                'extra_attributes' => array(
-                    'placeholder' => __('Number of nights', 'yatra'),
-                ),
-                'row_end' => true,
-
-            ),
-            'yatra_tour_meta_tour_country' => array(
-                'name' => 'yatra_tour_meta_tour_country',
-                'title' => esc_html__('Country', 'yatra'),
-                'type' => 'select',
-                'wrap_class' => 'yatra-left',
-                'extra_attributes' => array(
-                    'placeholder' => __('Country', 'yatra'),
-                ),
-                'options' => $countries,
-                'default' => 'NP',
-                'is_multiple' => true,
-                'select2' => true,
-                'row_start' => true,
-
-            ),
-            'yatra_tour_meta_tour_featured' => array(
-                'name' => 'yatra_tour_meta_tour_featured',
-                'title' => esc_html__('Feature this tour', 'yatra'),
-                'type' => 'checkbox',
-                'wrap_class' => 'yatra-right',
-                'row_end' => true,
-
-            ),
-            'yatra_tour_meta_tour_tabs_ordering' => array(
-                'name' => 'yatra_tour_meta_tour_tabs_ordering',
-                'type' => 'hidden',
-
+                //'row_end' => true,
             ),
         );
         return apply_filters('yatra_tour_general_configurations', $tour_options);

@@ -132,7 +132,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         public function attributes_tab_content($content)
         {
-            $settings = yatra_tour_attributes();
+            $settings = isset($content['settings']) ? $content['settings'] : array();
 
             foreach ($settings as $field) {
 

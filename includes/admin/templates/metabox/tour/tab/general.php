@@ -1,1 +1,6 @@
-<h1>Hello This is General Tab</h1>
+<?php
+
+foreach ($settings as $setting) {
+
+    $this->metabox_html($setting);
+}

@@ -220,28 +220,27 @@ if (!class_exists('Yatra_Metabox_Base')) {
             switch ($field['type']) {
                 case "heading":
                     ?>
-                    <p>
+
 
                         <label
                                 for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                            :</label>
+                            </label>
                         <span><?php echo esc_html($value); ?></span>
                         <input class="<?php echo esc_attr($field_class) ?>"
                                id="<?php echo esc_attr(($field_key)); ?>"
                                name="<?php echo esc_attr(($field_key)); ?>"
                                type="hidden"
                                value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
-                    </p>
+
                     <?php
                     break;
                 case "text":
                 case "number":
                 case "shortcode":
                     ?>
-                    <p>
-                        <label
+                         <label
                                 for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                            :</label>
+                            </label>
                         <input class="<?php echo esc_attr($field_class) ?>"
                                id="<?php echo esc_attr(($field_key)); ?>"
                                name="<?php echo esc_attr(($field_key)); ?>"
@@ -249,12 +248,12 @@ if (!class_exists('Yatra_Metabox_Base')) {
                                value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
 
 
-                    </p>
+
                     <?php
                     break;
                 case "checkbox":
                     ?>
-                    <p>
+
 
                         <label
                                 for="<?php echo esc_attr(($field_key)); ?>">
@@ -267,7 +266,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                             <?php echo esc_html($field['title']); ?></label>
 
 
-                    </p>
+
                     <?php
                     break;
                 case "hidden":
@@ -283,14 +282,14 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     break;
                 case "button":
                     ?>
-                    <p><label style="display: block;">&nbsp;&nbsp;</label>
+                    <label style="display: block;">&nbsp;&nbsp;</label>
                         <input class="button-primary"
                                id="<?php echo esc_attr(($field_key)); ?>"
                                name="<?php echo esc_attr(($field_key)); ?>"
                                type="button"
                                value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
 
-                    </p>
+
                     <?php
                     break;
                 case "textarea":
@@ -317,10 +316,10 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     $editor_settings = wp_parse_args($editor_default_settings, $editor_settings);
 
                     ?>
-                    <p>
+
                     <label
                             for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                        :</label>
+                        </label>
                     <?php
                     if ($editor) {
                         echo '</p>';
@@ -336,15 +335,14 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         ><?php echo esc_html($value); ?></textarea>
 
 
-                        </p>
                     <?php }
                     break;
                 case "select":
                     ?>
-                    <p>
+
                         <label
                                 for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                            :</label>
+                            </label>
                         <?php
                         $options = isset($field['options']) ? $field['options'] : array();
                         $is_multi_select = isset($field['is_multiple']) ? (boolean)$field['is_multiple'] : false;
@@ -383,14 +381,14 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         </select>
 
 
-                    </p>
+
                     <?php
                     break;
                 case "image":
                     ?>
-                    <p><label
+                    <label
                                 for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                            :</label>
+                            </label>
                     <div class="media-uploader" id="<?php echo('background_image'); ?>">
                         <div class="custom_media_preview">
                             <img style="<?php echo empty($value) ? 'display:none;' : '' ?>max-width:100%;"
@@ -410,7 +408,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         </div>
 
                     </div>
-                    </p>
+
                     <?php
                     break;
                 case "gallery":
@@ -419,7 +417,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
                         <p><label
                                     for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                                :</label>
+                                </label>
 
                             <input class="<?php echo esc_attr($field_class) ?>"
                                    id="<?php echo esc_attr(($field_key)); ?>"
