@@ -6,7 +6,7 @@
             $class = $is_active ? 'active' : '';
             ?>
             <li data-tab="<?php echo esc_attr($tab_index) ?>"
-                class="<?php esc_html_e($class); ?>"><?php echo esc_html($title); ?></li>
+                class="<?php esc_html($class); ?>"><?php echo esc_html($title); ?></li>
         <?php } ?>
     </ul>
 </div>
