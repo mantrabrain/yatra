@@ -2,8 +2,8 @@
 Contributors: Mantrabrain
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
-Tested up to: 5.3
-Stable tag: 2.0.6
+Tested up to: 5.3.2
+Stable tag: 2.0.7
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -101,6 +101,11 @@ Shortcode for Tour Listing:
 * Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
 
 == Changelog ==
+
+= 2.0.7 | 2020/02/02 =
+* Fixed - Tour admin design changed
+* Added - Setup wizard
+* Added - Yatri Theme for the plugin
 
 = 2.0.6 | 2019/11/03 =
 * Fixed - Minor design issue fixed
