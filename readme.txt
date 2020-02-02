@@ -1,5 +1,5 @@
 === Complete Travel & Tour Booking System - Yatra ===
-Contributors: Mantrabrain
+Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
 Tested up to: 5.3.2
