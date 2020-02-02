@@ -460,12 +460,12 @@ class Yatra_Setup_Wizard
                 array(
                     'slug' => 'yatri',
                     'title' => __('Yatri', 'yatra'),
-                    'demo_url' => 'https://demo.mantrabrain.com/yatri-default/',
+                    'demo_url' => 'https://wpyatri.com',
                     'is_free' => true,
                     'screenshot' => 'https://themes.svn.wordpress.org/yatri/1.0.1/screenshot.png',
-                    'landing_page' => 'https://demo.mantrabrain.com/yatri-default/',
+                    'landing_page' => 'https://wpyatri.com',
                     'is_installable' => false,
-                    'download_link' => 'https://wordpress.org/themes/download/yatri.1.0.1.zip'
+                    'download_link' => 'https://github.com/mantrabrain/yatri/raw/master/yatri.zip'
                 )
             )
             ?>

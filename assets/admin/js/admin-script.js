@@ -474,7 +474,7 @@ var YatraTourAttributes = function ($) {
 
             this.$add_tour_attribute = $('#add_tour_attribute');
 
-            this.$yatra_tab_section = this.$add_tour_attribute.closest('section.yatra-tab-section');
+            this.$yatra_tab_section = this.$add_tour_attribute.closest('.yatra-admin-tab-content-inner');
 
         },
 

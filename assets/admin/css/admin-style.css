@@ -105,7 +105,7 @@
 .yatra-tab-content input[type="text"],
 .yatra-tab-content input[type="number"],
 .yatra-tab-content select,
-.yatra-tab-content textarea
+.yatra-tab-content textarea,
 .yatra-tab-content .widefat {
     font-size: 14px;
     height: auto;
@@ -143,6 +143,7 @@
 }
 
 .mb-meta-vertical-tab {
+    margin: 0;
     width: 40%;
     float: left;
 
@@ -165,16 +166,65 @@
 .mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item.active {
 
     display: block;
+    padding: 10px;
+    border: 1px solid #aaa;
+    margin-left: 1px;
+    background: #fff;
+}
+
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item h2,
+#poststuff .mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item h2 {
+
+    background: #bce5ff;
+    padding: 11px;
+    border: 1px solid #aaa;
+    /* width: 100%; */
+    display: block;
+    max-width: 100%;
+    margin-left: -11px;
+    margin-right: -11px;
+    margin-top: -11px;
+    text-transform: capitalize;
+    text-align: center;
+}
+
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap label {
+    width: 100%;
+    margin-right: 0;
+    vertical-align: baseline;
+    max-width: 100%;
+    float: none;
+    font-weight: 600;
+    display: block;
+    padding: 10px 0;
+}
+
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap input[type="text"],
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap input[type="number"],
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap input[type="url"],
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap input[type="url"],
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap select,
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap textarea,
+.mb-meta-vertical-tab-content .mb-meta-vertical-tab-content-item .yatra-field-wrap .select2-container {
+    max-width: 100%;
+    display: block;
 }
 
 .mb-meta-vertical-tab li {
-    padding: 5px;
-    background: #074771;
-    margin: 2px;
+    padding: 10px 15px;
+    background: #eeeeee;
+    margin: 0;
     cursor: pointer;
-    color: #ffff;
-    text-transform: uppercase;
+    /* color: #101010; */
+    text-transform: capitalize;
+    border: 1px solid #aaa;
+    border-bottom: 0;
+    font-weight: 600;
 
+}
+
+.mb-meta-vertical-tab li:last-child {
+    border-bottom: 1px solid #aaa;
 }
 
 .mb-meta-vertical-tab li .fa, .mb-meta-vertical-tab li svg {
@@ -183,37 +233,38 @@
 }
 
 .mb-meta-vertical-tab li:hover, .mb-meta-vertical-tab li.active {
-    background: #0468a9;
+    background: #bce5ff;
+    color: #101010;
+    border-right: 2px solid;
 }
 
 .mb-repeator {
     background: #f9f9f9;
     border: 1px solid #ddd;
-    margin: 5px;
+    margin-bottom: 5px;
 }
 
 .mb-repeator .add, .mb-repeator .remove {
     float: right;
     height: 25px;
     width: 25px;
-    background: #676767;
     line-height: 27px;
     border-radius: 100%;
     cursor: pointer;
-    color: #fff;
+    color: #aaa;
     margin: 0 5px 0 5px;
 }
 
 .mb-repeator .add:hover, .mb-repeator .remove:hover {
 
-    background: #074771;
+    color: #000;
 }
 
 .mb-repeator-heading {
     display: block;
     padding: 10px;
-    background: #dadadacc;
-
+    background: #f1f1f1;
+    border-bottom: 2px solid #aaa;
 }
 
 .mb-repeator-fields {
@@ -226,6 +277,11 @@
     float: left;
     cursor: pointer;
     line-height: 27px;
+    color: #aaa;
+}
+
+.mb-repeator .toggle:hover {
+    color: #000;
 }
 
 .mb-repeator-heading:after {
@@ -292,10 +348,14 @@ ul.mb-selected-gallery-list li img {
 .mb-tour-attributes-fields {
     padding: 10px;
     margin: 5px;
-    background: #f1f1f1;
+    background: #fff;
     border: 1px solid #aaa;
     display: block;
     position: relative;
+}
+.mb-tour-attributes-fields h2{
+    background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
 }
 
 .mb-tour-attributes-fields:after {
@@ -441,5 +501,68 @@ table.yatra-booking-meta-customer-info td {
 }
 
 .yatra-admin-tab--content-section .yatra-admin-tab-content-inner {
-    padding: 10px;
+    padding: 15px;
+    display: block;
+    max-width: 100%;
+    background: #f9f9f9;
+    margin-top: -5px;
+}
+
+.yatra-admin-tab--content-section .yatra-field-wrap {
+    padding: 10px 15px;
+}
+
+.yatra-admin-tab--content-section .yatra-field-wrap label {
+    width: 100%;
+    margin-right: 20px;
+    vertical-align: baseline;
+    max-width: 200px;
+    float: left;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.yatra-admin-tab--content-section .yatra-field-wrap input[type="text"],
+.yatra-admin-tab--content-section .yatra-field-wrap input[type="number"],
+.yatra-admin-tab--content-section .yatra-field-wrap input[type="url"],
+.yatra-admin-tab--content-section .yatra-field-wrap input[type="url"],
+.yatra-admin-tab--content-section .yatra-field-wrap select,
+.yatra-admin-tab--content-section .yatra-field-wrap textarea,
+.yatra-admin-tab--content-section .yatra-field-wrap .select2-container {
+    max-width: 300px;
+    width: 100%;
+    box-shadow: none;
+    border: 1px solid #aaa;
+    border-radius: 0;
+    padding: 4px 12px;
+    height: 35px;
+    outline: 0;
+    border-left: 3px solid #aaa;
+}
+
+.yatra-admin-tab--content-section .yatra-field-wrap input[type="text"]:focus,
+.yatra-admin-tab--content-section .yatra-field-wrap input[type="number"]:focus,
+.yatra-admin-tab--content-section .yatra-field-wrap input[type="url"]:focus,
+.yatra-admin-tab--content-section .yatra-field-wrap input[type="url"]:focus,
+.yatra-admin-tab--content-section .yatra-field-wrap select:focus,
+.yatra-admin-tab--content-section .yatra-field-wrap textarea:focus {
+    border-color: #000;
+}
+
+.yatra-admin-tab--content-section .yatra-field-wrap .select2-container {
+    height: auto;
+}
+
+.yatra-admin-tab--content-section .yatra-field-wrap .select2-container input {
+    border: none;
+    padding: 0;
+    width: auto;
+    max-width: auto;
+}
+
+.yatra-admin-tab--content-section .yatra-admin-tab-content-inner:after {
+    display: inline-block;
+    width: 100%;
+    content: "";
+    clear: both;
 }

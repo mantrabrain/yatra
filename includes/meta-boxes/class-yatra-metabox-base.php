@@ -158,6 +158,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                 $repeator_options = $this->parse_repeator_options($repeator_options_raw, $field, $post_id);
 
                 foreach ($repeator_options as $repeator_key => $repeator_field) {
+                    echo '<div class="yatra-field-wrap">';
                     echo '<div class="mb-repeator">';
                     echo '<div class="mb-repeator-heading">';
                     echo '<span class="toggle dashicons dashicons-arrow-down-alt2"></span>';
@@ -177,6 +178,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         $this->metabox_html($repeator_single);
                     }
 
+                    echo '</div>';
                     echo '</div>';
                     echo '</div>';
                 }
@@ -220,54 +222,51 @@ if (!class_exists('Yatra_Metabox_Base')) {
             switch ($field['type']) {
                 case "heading":
                     ?>
-                    <p>
 
-                        <label
-                                for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                            :</label>
-                        <span><?php echo esc_html($value); ?></span>
-                        <input class="<?php echo esc_attr($field_class) ?>"
-                               id="<?php echo esc_attr(($field_key)); ?>"
-                               name="<?php echo esc_attr(($field_key)); ?>"
-                               type="hidden"
-                               value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
-                    </p>
+
+                    <label
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                    </label>
+                    <span><?php echo esc_html($value); ?></span>
+                    <input class="<?php echo esc_attr($field_class) ?>"
+                           id="<?php echo esc_attr(($field_key)); ?>"
+                           name="<?php echo esc_attr(($field_key)); ?>"
+                           type="hidden"
+                           value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+
                     <?php
                     break;
                 case "text":
                 case "number":
                 case "shortcode":
                     ?>
-                    <p>
-                        <label
-                                for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                            :</label>
-                        <input class="<?php echo esc_attr($field_class) ?>"
-                               id="<?php echo esc_attr(($field_key)); ?>"
-                               name="<?php echo esc_attr(($field_key)); ?>"
-                               type="<?php echo esc_attr($field_type) ?>"
-                               value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+                    <label
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                    </label>
+                    <input class="<?php echo esc_attr($field_class) ?>"
+                           id="<?php echo esc_attr(($field_key)); ?>"
+                           name="<?php echo esc_attr(($field_key)); ?>"
+                           type="<?php echo esc_attr($field_type) ?>"
+                           value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
 
 
-                    </p>
                     <?php
                     break;
                 case "checkbox":
                     ?>
-                    <p>
-
-                        <label
-                                for="<?php echo esc_attr(($field_key)); ?>">
-                            <input class="<?php echo esc_attr($field_class) ?>"
-                                   id="<?php echo esc_attr(($field_key)); ?>"
-                                   name="<?php echo esc_attr(($field_key)); ?>"
-                                   type="checkbox"
-                                   value="1" <?php echo absint($value) == 1 ? 'checked="checked"' : '';
-                            echo $extra_attribute_text; ?>/>
-                            <?php echo esc_html($field['title']); ?></label>
 
 
-                    </p>
+                    <label
+                            for="<?php echo esc_attr(($field_key)); ?>">
+                        <input class="<?php echo esc_attr($field_class) ?>"
+                               id="<?php echo esc_attr(($field_key)); ?>"
+                               name="<?php echo esc_attr(($field_key)); ?>"
+                               type="checkbox"
+                               value="1" <?php echo absint($value) == 1 ? 'checked="checked"' : '';
+                        echo $extra_attribute_text; ?>/>
+                        <?php echo esc_html($field['title']); ?></label>
+
+
                     <?php
                     break;
                 case "hidden":
@@ -283,14 +282,14 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     break;
                 case "button":
                     ?>
-                    <p><label style="display: block;">&nbsp;&nbsp;</label>
-                        <input class="button-primary"
-                               id="<?php echo esc_attr(($field_key)); ?>"
-                               name="<?php echo esc_attr(($field_key)); ?>"
-                               type="button"
-                               value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+                    <label style="display: block;">&nbsp;&nbsp;</label>
+                    <input class="button-primary"
+                           id="<?php echo esc_attr(($field_key)); ?>"
+                           name="<?php echo esc_attr(($field_key)); ?>"
+                           type="button"
+                           value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
 
-                    </p>
+
                     <?php
                     break;
                 case "textarea":
@@ -317,10 +316,10 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     $editor_settings = wp_parse_args($editor_default_settings, $editor_settings);
 
                     ?>
-                    <p>
+
                     <label
                             for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                        :</label>
+                    </label>
                     <?php
                     if ($editor) {
                         echo '</p>';
@@ -336,61 +335,59 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         ><?php echo esc_html($value); ?></textarea>
 
 
-                        </p>
                     <?php }
                     break;
                 case "select":
                     ?>
-                    <p>
-                        <label
-                                for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                            :</label>
-                        <?php
-                        $options = isset($field['options']) ? $field['options'] : array();
-                        $is_multi_select = isset($field['is_multiple']) ? (boolean)$field['is_multiple'] : false;
-                        $is_select2 = isset($field['select2']) ? (boolean)$field['select2'] : false;
-                        if ($is_multi_select) {
-                            $extra_attribute_text .= ' multiple="multiple"';
-                        }
 
-                        $field_class .= $is_select2 ? ' yatra-select2' : '';
-                        ?>
+                    <label
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                    </label>
+                    <?php
+                    $options = isset($field['options']) ? $field['options'] : array();
+                    $is_multi_select = isset($field['is_multiple']) ? (boolean)$field['is_multiple'] : false;
+                    $is_select2 = isset($field['select2']) ? (boolean)$field['select2'] : false;
+                    if ($is_multi_select) {
+                        $extra_attribute_text .= ' multiple="multiple"';
+                    }
 
-                        <select class="<?php echo esc_attr($field_class); ?>"
-                                id="<?php echo esc_attr(($field_key)); ?>"
-                                name="<?php echo esc_attr(($field_key));
-                                echo $is_multi_select ? '[]' : ''; ?>"
-                            <?php echo $extra_attribute_text; ?>>
-                            <?php foreach ($options as $option_key => $option_value) {
+                    $field_class .= $is_select2 ? ' yatra-select2' : '';
+                    ?>
 
-                                if (!$is_multi_select) {
-                                    if (is_array($value)) {
-                                        $value = $value[0];
-                                    }
-                                    $selected = $option_key == $value ? true : false;
-                                } else {
-                                    if (!is_array($value)) {
-                                        $value = array($value);
-                                    }
-                                    $selected = in_array($option_key, $value) ? true : false;
+                    <select class="<?php echo esc_attr($field_class); ?>"
+                            id="<?php echo esc_attr(($field_key)); ?>"
+                            name="<?php echo esc_attr(($field_key));
+                            echo $is_multi_select ? '[]' : ''; ?>"
+                        <?php echo $extra_attribute_text; ?>>
+                        <?php foreach ($options as $option_key => $option_value) {
+
+                            if (!$is_multi_select) {
+                                if (is_array($value)) {
+                                    $value = $value[0];
                                 }
-
-                                ?>
-                                <option <?php echo $selected ? 'selected="selected"' : ''; ?>
-                                value="<?php echo esc_attr($option_key); ?>"><?php echo esc_html($option_value) ?></option><?php
+                                $selected = $option_key == $value ? true : false;
+                            } else {
+                                if (!is_array($value)) {
+                                    $value = array($value);
+                                }
+                                $selected = in_array($option_key, $value) ? true : false;
                             }
+
                             ?>
-                        </select>
+                            <option <?php echo $selected ? 'selected="selected"' : ''; ?>
+                            value="<?php echo esc_attr($option_key); ?>"><?php echo esc_html($option_value) ?></option><?php
+                        }
+                        ?>
+                    </select>
 
 
-                    </p>
                     <?php
                     break;
                 case "image":
                     ?>
-                    <p><label
-                                for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                            :</label>
+                    <label
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                    </label>
                     <div class="media-uploader" id="<?php echo('background_image'); ?>">
                         <div class="custom_media_preview">
                             <img style="<?php echo empty($value) ? 'display:none;' : '' ?>max-width:100%;"
@@ -410,7 +407,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         </div>
 
                     </div>
-                    </p>
+
                     <?php
                     break;
                 case "gallery":
@@ -419,7 +416,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
                         <p><label
                                     for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
-                                :</label>
+                            </label>
 
                             <input class="<?php echo esc_attr($field_class) ?>"
                                    id="<?php echo esc_attr(($field_key)); ?>"
