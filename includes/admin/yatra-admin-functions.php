@@ -44,6 +44,7 @@ if (!function_exists('yatra_get_admin_template')) {
         $template_location = YATRA_ABSPATH . "includes/admin/templates/{$template}.php";
 
         if (!file_exists($template_location)) {
+
             echo '<div class="yatra-notice-warning"> ' . __(sprintf('The file you are trying to load is not exists in your theme or yatra plugins location, if you are a developer and extending yatra plugin, please create a php file at location %s ', "<code>{$template_location}</code>"), 'yatra') . ' </div>';
         }
 
