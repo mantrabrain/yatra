@@ -353,6 +353,10 @@ ul.mb-selected-gallery-list li img {
     display: block;
     position: relative;
 }
+.mb-tour-attributes-fields h2{
+    background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+}
 
 .mb-tour-attributes-fields:after {
     content: '';
