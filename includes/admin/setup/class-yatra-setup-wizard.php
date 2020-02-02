@@ -465,7 +465,7 @@ class Yatra_Setup_Wizard
                     'screenshot' => 'https://themes.svn.wordpress.org/yatri/1.0.1/screenshot.png',
                     'landing_page' => 'https://wpyatri.com',
                     'is_installable' => false,
-                    'download_link' => 'https://github.com/mantrabrain/yatri/archive/master.zip'
+                    'download_link' => 'https://github.com/mantrabrain/yatri/raw/master/yatri.zip'
                 )
             )
             ?>
