@@ -658,4 +658,23 @@ h2.yatra-payment-gateway-title:before {
   content: '';
   display: block; }
 
+.elementor-element .yatra-widget-header {
+  max-width: 660px;
+  margin: 0 auto 60px;
+  text-align: center; }
+  .elementor-element .yatra-widget-header .widget-title {
+    font-size: 30px;
+    border-bottom: 1px solid #ddd;
+    position: relative; }
+    .elementor-element .yatra-widget-header .widget-title:after {
+      width: 200px;
+      height: 3px;
+      bottom: -2px;
+      left: 50%;
+      margin-left: -100px;
+      content: "";
+      display: block;
+      background: #03ad8b;
+      position: absolute; }
+
 /*# sourceMappingURL=yatra.css.map */
