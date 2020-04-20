@@ -245,7 +245,7 @@
                 $(this).closest('.yatra-field-wrap').before(tpl);
 
             });
-            $('.yatra-pricing-group-wrap .pricing-delete').on('click', function () {
+            $('body').on('click', '.yatra-pricing-group-wrap .pricing-delete', function () {
 
                 var sure = confirm('Are you sure want to delete this group pricing? Pricing will be deleted only after publish.');
                 if (sure) {
