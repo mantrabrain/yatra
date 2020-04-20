@@ -75,12 +75,51 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         public function pricing_tab_content($content)
         {
+            global $post;
+
+            $post_id = isset($post->ID) ? $post->ID : '';
+
+            $multiple_pricing = $post_id != '' ? get_post_meta($post_id, 'yatra_multiple_pricing', true) : array();
+
+
             $settings = isset($content['settings']) ? $content['settings'] : array();
 
             foreach ($settings as $field) {
 
                 $this->metabox_html($field);
             }
+            $currency = get_option('yatra_currency');
+
+            $currency_symbol = yatra_get_currency_symbols($currency);
+
+            // Load Template
+            yatra_load_admin_template('metabox.tour.pricing.group-pricing-tmpl', array(
+                'id' => '{%pricing_option_id%}',
+                'currency_symbol' => $currency_symbol,
+                'pricing_option_id' => 'yatra_multiple_pricing[{%pricing_option_id%}]',
+                'multiple_pricing' => array(
+                    'pricing_label' => '',
+                    'regular_price' => '',
+                    'sales_price' => ''
+                )
+            ));
+
+            $default_pricing = array('pricing_label' => '',
+                'regular_price' => '',
+                'sales_price' => '');
+            // Load Original Data
+            $multiple_pricing = is_array($multiple_pricing) ? $multiple_pricing : array();
+            foreach ($multiple_pricing as $pricing_option_id => $pricing) {
+                $pricing = wp_parse_args($pricing, $default_pricing);
+                yatra_load_admin_template('metabox.tour.pricing.group-pricing', array(
+                    'id' => $pricing_option_id,
+                    'currency_symbol' => $currency_symbol,
+                    'pricing_option_id' => 'yatra_multiple_pricing[' . $pricing_option_id . ']',
+                    'multiple_pricing' => $pricing
+                ));
+            }
+            yatra_load_admin_template('metabox.tour.pricing.add-new');
+
         }
 
         public function attributes_tab_content($content)
@@ -128,6 +167,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         public function tour_tabs_tab_content($content)
         {
+
             $settings = isset($content['settings']) ? $content['settings'] : array();
 
             echo '<ul  class="mb-meta-vertical-tab">';
@@ -212,7 +252,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             }
             echo '</div>';
         }
-
 
 
         /**
@@ -345,6 +384,27 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 $valid_field_value = $this->sanitize($field_value, $field);
 
                 update_post_meta($post_id, $field_key, $valid_field_value);
+
+                $multiple_pricing = isset($_POST['yatra_multiple_pricing']) ? $_POST['yatra_multiple_pricing'] : array();
+
+                $pricing_array = array();
+                foreach ($multiple_pricing as $pricing_key => $pricing) {
+                    $label = isset($pricing['pricing_label']) ? sanitize_text_field($pricing['pricing_label']) : '';
+                    $regular_price = isset($pricing['regular_price']) ? absint($pricing['regular_price']) : '';
+                    $sales_price = isset($pricing['sales_price']) ? ($pricing['sales_price']) : '';
+                    $sales_price = $sales_price == '' ? '' : absint($sales_price);
+                    $option_id = isset($pricing['option_id']) ? sanitize_text_field($pricing['option_id']) : '';
+                    if ($label != '' && $option_id === $pricing_key && $option_id != '{%pricing_option_id%}') {
+                        $pricing_array[$pricing_key]['pricing_label'] = $label;
+                        $pricing_array[$pricing_key]['regular_price'] = $regular_price;
+                        $pricing_array[$pricing_key]['sales_price'] = $sales_price;
+                    }
+                }
+                if (count($pricing_array) > 0) {
+
+                    update_post_meta($post_id, 'yatra_multiple_pricing', $pricing_array);
+
+                }
             }
         }
 
@@ -427,7 +487,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             if (!$is_valid_nonce || $term_id < 1 || $post_id < 1) {
 
-                wp_send_json_error(array('error'=>'somethig wrong'));
+                wp_send_json_error(array('error' => 'somethig wrong'));
             }
             $term = get_term($term_id);
 

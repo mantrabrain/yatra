@@ -462,10 +462,10 @@ class Yatra_Setup_Wizard
                     'title' => __('Yatri', 'yatra'),
                     'demo_url' => 'https://wpyatri.com',
                     'is_free' => true,
-                    'screenshot' => 'https://themes.svn.wordpress.org/yatri/1.0.1/screenshot.png',
-                    'landing_page' => 'https://wpyatri.com',
+                    'screenshot' => 'https://raw.githubusercontent.com/mantrabrain/yatri/master/screenshot.png',
+                    'landing_page' => 'https://wpyatri.com/?ref=yatrasetup',
                     'is_installable' => false,
-                    'download_link' => 'https://github.com/mantrabrain/yatri/raw/master/yatri.zip'
+                    'download_link' => 'https://downloads.wordpress.org/theme/yatri.zip'
                 )
             )
             ?>

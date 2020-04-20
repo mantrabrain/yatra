@@ -20,9 +20,11 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     $updated_value = absint($field_value);
                     break;
                 case 'shortcode':
+                case 'date':
                     $updated_value = sanitize_text_field($field_value);
                     break;
                 case 'checkbox':
+                case 'switch':
                     $updated_value = absint($field_value);
                     $updated_value = 1 == $updated_value ? 1 : 0;
                     break;
@@ -158,6 +160,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                 $repeator_options = $this->parse_repeator_options($repeator_options_raw, $field, $post_id);
 
                 foreach ($repeator_options as $repeator_key => $repeator_field) {
+
                     echo '<div class="yatra-field-wrap">';
                     echo '<div class="mb-repeator">';
                     echo '<div class="mb-repeator-heading">';
@@ -183,6 +186,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     echo '</div>';
                 }
             }
+
             $field_key = $field['name'];
 
             $post_meta = get_post_meta($post_id, $field_key, true);
@@ -215,8 +219,30 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
                 echo '<div class="yatra-field-row">';
             }
+            $is_visible = true;
 
-            echo '<div class="yatra-field-wrap ' . esc_attr($wrap_class) . '">';
+            if (isset($field['visibility_condition'])) {
+
+                $visibility_total = 0;
+                $visibility_condition = $field['visibility_condition'];
+
+                foreach ($visibility_condition as $visibility_meta_key => $visibility_meta_val) {
+
+                    $visibility_post_meta = get_post_meta($post_id, $visibility_meta_key, true);
+
+                    if ($visibility_post_meta == $visibility_meta_val) {
+                        $visibility_total++;
+                    }
+
+                }
+                if (!$visibility_total == count($visibility_condition)) {
+                    $is_visible = false;
+                }
+
+            }
+
+            $wrap_class .= !$is_visible ? ' yatra-hide' : '';
+            echo '<div class="yatra-field-wrap ' . esc_attr($wrap_class) . '" data-wrap-id="' . esc_attr($field_key) . '">';
 
             $field_class = isset($field['class']) ? 'widefat ' . $field['class'] : 'widefat';
             switch ($field['type']) {
@@ -252,24 +278,64 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
                     <?php
                     break;
+                case "date":
+                    ?>
+                    <label
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                    </label>
+                    <input autocomplete="off"
+                           class="<?php echo esc_attr($field_class) ?>"
+                           id="<?php echo esc_attr(($field_key)); ?>"
+                           name="<?php echo esc_attr(($field_key)); ?>"
+                           type="text"
+                           value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+
+
+                    <?php
+                    break;
                 case "checkbox":
                     ?>
 
 
                     <label
                             for="<?php echo esc_attr(($field_key)); ?>">
-                        <input class="<?php echo esc_attr($field_class) ?>"
-                               id="<?php echo esc_attr(($field_key)); ?>"
-                               name="<?php echo esc_attr(($field_key)); ?>"
-                               type="checkbox"
-                               value="1" <?php echo absint($value) == 1 ? 'checked="checked"' : '';
+                        <input
+                                class="<?php echo esc_attr($field_class) ?>"
+                                id="<?php echo esc_attr(($field_key)); ?>"
+                                name="<?php echo esc_attr(($field_key)); ?>"
+                                type="checkbox"
+                                value="1" <?php echo absint($value) == 1 ? 'checked="checked"' : '';
                         echo $extra_attribute_text; ?>/>
                         <?php echo esc_html($field['title']); ?></label>
 
 
                     <?php
                     break;
+                case "switch":
+                    $switch_args = array(
+                        'off' => 'Off',
+                        'on' => 'On',
+                    );
+                    ?>
+                    <label
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                    </label>
+                    <div class="yatra-switch-control-wrap">
+                        <label class="yatra-switch-control">
+                            <input class="<?php echo esc_attr($field_class) ?>"
+                                   id="<?php echo esc_attr(($field_key)); ?>"
+                                   name="<?php echo esc_attr(($field_key)); ?>"
+                                   type="checkbox"
+                                   value="1" <?php echo absint($value) == 1 ? 'checked="checked"' : '';
+                            echo $extra_attribute_text; ?>/>
+                            <span class="slider round" data-on="<?php echo esc_attr($switch_args['on']); ?>"
+                                  data-off="<?php echo esc_attr($switch_args['off']); ?>"></span>
+                        </label>
+                    </div>
+                    <?php
+                    break;
                 case "hidden":
+
                     ?>
                     <input class="<?php echo esc_attr($field_class) ?>"
                            id="<?php echo esc_attr(($field_key)); ?>"
@@ -304,7 +370,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         'textarea_name' => $field_key,
                         'tinymce' => array(
                             'init_instance_callback ' => 'function(inst) {
-                                       $("#" + inst.id + "_ifr").css({minHeight: "' . $editor_height . 'px"});
+                                       jQuery("#" + inst.id + "_ifr").css({minHeight: "' . $editor_height . 'px"});
                                 }'
                         ),
                         'wpautop' => true

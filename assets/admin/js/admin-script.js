@@ -1,10 +1,9 @@
 // @var yatra_admin_params
 
-var YatraTabs = function ($) {
-    return {
+(function ($) {
+    var YatraTabs = {
 
         init: function () {
-
             this.initNewYatraTabs();
             this.cacheDom();
             this.setupAria();
@@ -144,16 +143,18 @@ var YatraTabs = function ($) {
         }
 
     };
-}(jQuery);
 
-var YatraAdmin = function ($) {
-    return {
+
+    var YatraAdmin = {
 
         init: function () {
 
             this.initElement();
             this.initLib();
             this.initGalleryBuilder();
+            this.groupPricing();
+            this.fixedDeparture();
+            this.initDateTimePicker();
         },
         initElement: function () {
             this.gallery_upload_frame = '';
@@ -233,13 +234,102 @@ var YatraAdmin = function ($) {
             }
             gallery_item.remove();
             wrapper.find("input").val(list_ids_array.join());
+        },
+        groupPricing: function () {
+            var _that = this;
+            var add_new = $('#yatra_add_new_pricing_option');
+            add_new.on('click', function () {
+                var pricing_option_id = _that.uniqid();
+                var tpl = $('#yatra-group-pricing-tmpl').html();
+                tpl = _that._replaceAll(tpl, '{%pricing_option_id%}', pricing_option_id);
+                $(this).closest('.yatra-field-wrap').before(tpl);
+
+            });
+            $('.yatra-pricing-group-wrap .pricing-delete').on('click', function () {
+
+                var sure = confirm('Are you sure want to delete this group pricing? Pricing will be deleted only after publish.');
+                if (sure) {
+                    $(this).closest('.yatra-pricing-group-wrap-container').remove();
+                }
+            });
+        },
+        uniqid: function () {
+            return '_' + Math.random().toString(36).substr(2, 9);
+        },
+        _replaceAll: function (str, toReplace, replaceWith) {
+            return str ? str.split(toReplace).join(replaceWith) : '';
+        },
+        fixedDeparture: function () {
+            $('#yatra_tour_meta_tour_fixed_departure').on('click', function () {
+
+                if ($(this).prop('checked') == true) {
+                    $('div[data-wrap-id="yatra_tour_meta_tour_start_date"]').removeClass('yatra-hide');
+                    $('div[data-wrap-id="yatra_tour_meta_tour_end_date"]').removeClass('yatra-hide');
+
+                    $('div[data-wrap-id="yatra_tour_meta_tour_duration_days"]').addClass('yatra-hide');
+                    $('div[data-wrap-id="yatra_tour_meta_tour_duration_nights"]').addClass('yatra-hide');
+                } else {
+                    $('div[data-wrap-id="yatra_tour_meta_tour_start_date"]').addClass('yatra-hide');
+                    $('div[data-wrap-id="yatra_tour_meta_tour_end_date"]').addClass('yatra-hide');
+
+                    $('div[data-wrap-id="yatra_tour_meta_tour_duration_days"]').removeClass('yatra-hide');
+                    $('div[data-wrap-id="yatra_tour_meta_tour_duration_nights"]').removeClass('yatra-hide');
+                }
+            });
+
+        },
+        initDateTimePicker: function () {
+
+            if ($.fn.yatra_datepicker) {
+                $('#yatra_tour_meta_tour_start_date').yatra_datepicker({
+                    language: 'en',
+                    dateFormat: 'yyyy-mm-dd',
+                    minDate: new Date(),
+                    onSelect: function (dateStr) {
+                        newMinDate = null;
+                        newMaxDate = new Date();
+                        if ('' !== dateStr) {
+                            // milliseconds = moment( dateStr, wp_travel_drag_drop_uploader.moment_date_format ).format( 'MM/DD/YYYY' );
+                            milliseconds = moment(dateStr, 'YYYY-MM-DD');
+                            new_date_min = new Date(milliseconds);
+                            newMinDate = new Date(new_date_min.setDate(new Date(new_date_min.getDate())));
+
+                        }
+                        $('#yatra_tour_meta_tour_end_date').yatra_datepicker({
+                            minDate: newMinDate,
+                            dateFormat: 'yyyy-mm-dd',
+
+                        });
+                    }
+                });
+
+                $('#yatra_tour_meta_tour_end_date').yatra_datepicker({
+                    language: 'en',
+                    minDate: new Date(),
+                    dateFormat: 'yyyy-mm-dd',
+
+                });
+
+                $('.yatra-datepicker').yatra_datepicker({
+                    language: 'en',
+                    minDate: new Date(),
+                    dateFormat: 'yyyy-mm-dd',
+
+                });
+
+                $('.yatra-timepicker').yatra_datepicker({
+                    language: 'en',
+                    timepicker: true,
+                    onlyTimepicker: true,
+
+                });
+            }
         }
 
     };
-}(jQuery);
 
-var YatraSubTabs = function ($) {
-    return {
+
+    var YatraSubTabs = {
 
         init: function () {
 
@@ -385,10 +475,9 @@ var YatraSubTabs = function ($) {
         }
 
     };
-}(jQuery);
 
-var YatraTaxonomy = function ($) {
-    return {
+
+    var YatraTaxonomy = {
 
         init: function () {
 
@@ -458,10 +547,9 @@ var YatraTaxonomy = function ($) {
         }
 
     };
-}(jQuery);
 
-var YatraTourAttributes = function ($) {
-    return {
+
+    var YatraTourAttributes = {
 
         init: function () {
 
@@ -558,10 +646,7 @@ var YatraTourAttributes = function ($) {
 
 
     };
-}(jQuery);
 
-
-(function ($) {
 
     $(document).ready(function () {
         YatraAdmin.init();

@@ -348,3 +348,18 @@ if (!function_exists('yatra_my_account_change_password_form_fields')) {
         $yatra_user->change_password_form_fields();
     }
 }
+
+if (!function_exists('yatra_single_tour_additional_information')) {
+
+    function yatra_single_tour_additional_information()
+    {
+        $additional_info = yatra_tour_additional_info();
+        yatra_get_template('parts/tour-additional.php',
+            array(
+                'additional_info' => $additional_info
+            )
+        );
+
+    }
+}
+

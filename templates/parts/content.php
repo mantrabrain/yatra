@@ -10,7 +10,11 @@
  */
 ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-    <?php yatra_post_thumbnail('full'); ?>
+    <?php
+    yatra_single_tour_additional_information();
+    if (has_post_thumbnail()) {
+        yatra_post_thumbnail('full');
+    } ?>
     <div class="yatra-single-meta-content">
 
         <header class="entry-header">
@@ -59,14 +63,6 @@
             <?php yatra_get_taxonomy_term_lists(get_the_ID(), 'activity'); ?>
         </div>
     </div>
-    <div class="yatra-single-meta-options">
-        <?php
-
-        yatra_frontend_options();
-        ?>
-
-    </div>
-
     <div class="entry-content entry-tabs">
         <?php
         yatra_book_now_button();

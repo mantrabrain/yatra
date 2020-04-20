@@ -1,4 +1,5 @@
 <?php
+include_once YATRA_ABSPATH . 'includes/hooks/yatra-template-hooks.php';
 
 if (!function_exists('yatra_checkout_form_fields')) {
 
@@ -54,7 +55,7 @@ if (!function_exists('yatra_main_content_callback')) {
     function yatra_main_content_callback()
     {
         ?>
-        <main id="main" class="site-main">
+        <main id="main" class="site-main yatra-site-main">
 
             <?php
 
