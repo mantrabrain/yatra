@@ -400,11 +400,9 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                         $pricing_array[$pricing_key]['sales_price'] = $sales_price;
                     }
                 }
-                if (count($pricing_array) > 0) {
+                update_post_meta($post_id, 'yatra_multiple_pricing', $pricing_array);
 
-                    update_post_meta($post_id, 'yatra_multiple_pricing', $pricing_array);
 
-                }
             }
         }
 

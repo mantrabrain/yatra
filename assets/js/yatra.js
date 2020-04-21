@@ -8,7 +8,7 @@ var YatraFrontend = function ($) {
             this.initLib();
         },
         cacheDom: function () {
-            this.$book_now = $('.yatra-book-now-btn');
+            this.$book_now = $('.ayatra-book-now-btn');
             this.$yatra_update_cart = $('.yatra_update_cart');
         },
 

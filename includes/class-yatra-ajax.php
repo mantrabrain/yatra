@@ -18,8 +18,8 @@ class Yatra_Ajax
     private function public_ajax_actions()
     {
         $actions = array(
-            'select_tour',
-             'update_cart'
+            'tour_add_to_cart',
+            'update_cart'
         );
         return $actions;
     }
@@ -61,7 +61,7 @@ class Yatra_Ajax
 
     }
 
-    public function select_tour()
+    public function tour_add_to_cart()
     {
         $status = $this->validate_nonce();
 
@@ -70,18 +70,40 @@ class Yatra_Ajax
         }
         $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
 
-        $number_of_person = isset($_POST['number_of_person']) ? absint($_POST['number_of_person']) : 0;
+        $number_of_persons = isset($_POST['yatra_number_of_person']) ? ($_POST['yatra_number_of_person']) : array();
 
-        if ($tour_id < 1 || $number_of_person < 1) {
+        if ($tour_id < 1 || (!is_array($number_of_persons))) {
             wp_send_json_error($this->ajax_error());
         }
+        if (count($number_of_persons) < 1) {
+            wp_send_json_error($this->ajax_error());
+        }
+        if (!isset($number_of_persons['single_pricing']) && !isset($number_of_persons['multi_pricing'])) {
+            wp_send_json_error();
+        }
+
+        $type = 'single';
+        if (isset($number_of_persons['single_pricing'])) {
+
+            $number_of_persons = $number_of_persons['single_pricing'];
+            $type = 'single';
+
+        } else if (isset($number_of_persons['multi_pricing'])) {
+
+            $number_of_persons = $number_of_persons['multi_pricing'];
+            $type = 'multi';
+
+        } else {
+            $number_of_persons = 0;
+        }
+
 
         $tour = get_post($tour_id);
 
         if (!isset($tour->post_type) || $tour->post_type != 'tour') {
             wp_send_json_error($this->ajax_error());
         }
-        $status = yatra_instance()->cart->update_cart($tour_id, $number_of_person);
+        $status = yatra_instance()->cart->update_cart($tour_id, $number_of_persons, $type);
 
         if ($status) {
 

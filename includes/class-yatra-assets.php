@@ -41,8 +41,8 @@ if (!class_exists('Yatra_Assets')) {
 
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'booking_params' => array(
-                    'booking_action' => 'yatra_select_tour',
-                    'booking_nonce' => wp_create_nonce('wp_yatra_select_tour_nonce')
+                    'booking_action' => 'yatra_tour_add_to_cart',
+                    'booking_nonce' => wp_create_nonce('wp_yatra_tour_add_to_cart_nonce')
                 )
             );
 

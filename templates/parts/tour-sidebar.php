@@ -18,20 +18,19 @@
                     <h3 class="tab-title">Overview</h3>
                     <div class="yatra-tour-booking-form-section">
                         <div class="sec-row row">
+                            <?php do_action('yatra_single_tour_booking_form') ?>
                         </div><!-- .sec-row -->
                     </div>
                 </div>
             </section>
             <section id="yatra-enquiry-form" class="yatra-tab-content" role="tabpanel" aria-hidden="true">
                 <div class="tab-inner" tabindex="0">
-                    <h3 class="tab-title">Cost Info</h3>
+                    <h3 class="tab-title">Enquiry Form</h3>
 
-                    <div class="cost-info-half cost_included">
-                        <h4>Price includes</h4>
-                    </div>
-
-                    <div class="cost-info-half cost_excluded">
-                        <h4>Price excludes</h4>
+                    <div class="yatra-tour-enquiry-form-section">
+                        <div class="sec-row row">
+                            <?php do_action('yatra_single_tour_enquiry_form') ?>
+                        </div><!-- .sec-row -->
                     </div>
 
 

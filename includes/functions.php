@@ -484,35 +484,64 @@ if (!function_exists('yatra_tour_price')) {
 
 if (!function_exists('yatra_get_final_tour_price')) {
 
-    function yatra_get_final_tour_price($tour_id, $number_of_people = 1)
+    function yatra_get_final_tour_price($tour_id, $number_of_people = 1, $type = 'single')
     {
-        $number_of_people = absint($number_of_people);
+
 
         $yatra_tour_meta_regular_price = get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
 
         $yatra_tour_meta_sales_price = get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
 
-        $price_per_person = empty($yatra_tour_meta_sales_price) || $yatra_tour_meta_sales_price == 0 ? $yatra_tour_meta_regular_price : $yatra_tour_meta_sales_price;
-
         $yatra_tour_meta_price_per = get_post_meta($tour_id, 'yatra_tour_meta_price_per', true);
 
-        if ($yatra_tour_meta_price_per == 'person') {
+        $yatra_tour_meta_group_size = get_post_meta($tour_id, 'yatra_tour_meta_group_size', true);
 
-            return $price_per_person * $number_of_people;
+        if ($yatra_tour_meta_group_size == 0) {
+
+            $yatra_tour_meta_group_size = 1;
         }
-        if ($yatra_tour_meta_price_per == 'group') {
+        if ($type == 'single') {
 
-            $yatra_tour_meta_group_size = get_post_meta($tour_id, 'yatra_tour_meta_group_size', true);
+            $number_of_people = absint($number_of_people);
 
-            if ($yatra_tour_meta_group_size == 0) {
+            $price_per_person = empty($yatra_tour_meta_sales_price) || $yatra_tour_meta_sales_price == 0 ? $yatra_tour_meta_regular_price : $yatra_tour_meta_sales_price;
 
-                $yatra_tour_meta_group_size = 1;
+            if ($yatra_tour_meta_price_per == 'person') {
+
+                return $price_per_person * $number_of_people;
             }
-            $number_of_group = ceil($number_of_people / $yatra_tour_meta_group_size);
+            if ($yatra_tour_meta_price_per == 'group') {
 
-            return $price_per_person * $number_of_group;
+
+                $number_of_group = ceil($number_of_people / $yatra_tour_meta_group_size);
+
+                return $price_per_person * $number_of_group;
+            }
+            return $price_per_person;
+
+        } else if ($type == "multi") {
+
+            $total_price = 0;
+
+            $yatra_multiple_pricing = get_post_meta($tour_id, 'yatra_multiple_pricing', true);
+
+            foreach ($yatra_multiple_pricing as $pricing_key => $price_args) {
+                $person = is_array($number_of_people) && isset($number_of_people[$pricing_key]) ? absint($number_of_people[$pricing_key]) : 0;
+                $regular_price = isset($price_args['regular_price']) ? absint($price_args['regular_price']) : 0;
+                $sales_price = isset($price_args['sales_price']) ? absint($price_args['sales_price']) : 0;
+                $sales_price = isset($price_args['sales_price']) && '' != $price_args['sales_price'] ? $sales_price : $regular_price;
+                switch ($yatra_tour_meta_price_per) {
+                    case "person":
+                        $total_price += ($sales_price * $person);
+                        break;
+                    case "group":
+                        $number_of_group = ceil($person / $yatra_tour_meta_group_size);
+                        $total_price += ($sales_price * $number_of_group);
+                        break;
+                }
+            }
+            return $total_price;
         }
-        return $price_per_person;
     }
 }
 

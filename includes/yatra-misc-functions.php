@@ -134,3 +134,47 @@ if (!function_exists('yatra_get_tour_lists')) {
     }
 
 }
+if (!function_exists('yatra_booking_pricing_details')) {
+    function yatra_booking_pricing_details()
+    {
+        global $post;
+
+        $tour_id = isset($post->ID) ? $post->ID : '';
+
+        if ($tour_id == '') {
+            return array();
+        }
+        $yatra_tour_meta_regular_price = get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
+        $yatra_tour_meta_sales_price = get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
+        $yatra_multiple_pricing = get_post_meta($tour_id, 'yatra_multiple_pricing', true);
+        $yatra_tour_meta_price_per = get_post_meta($tour_id, 'yatra_tour_meta_price_per', true);
+        $yatra_tour_meta_group_size = get_post_meta($tour_id, 'yatra_tour_meta_group_size', true);
+        $current_currency_symbol = yatra_get_current_currency_symbol();
+        $pricing_details = array();
+        if (is_array($yatra_multiple_pricing)) {
+            if (count($yatra_multiple_pricing) > 0) {
+                foreach ($yatra_multiple_pricing as $pricing_id => $pricing) {
+                    $pricing_details[] = array(
+                        'name' => 'yatra_number_of_person[multi_pricing][' . $pricing_id . ']',
+                        'pricing_label' => $pricing['pricing_label'],
+                        'regular_price' => $current_currency_symbol . ' ' . $pricing['regular_price'],
+                        'sales_price' => $current_currency_symbol . ' ' . $pricing['sales_price'],
+                        'pricing_per' => $yatra_tour_meta_price_per,
+                        'group_size' => $yatra_tour_meta_group_size,
+                    );
+                }
+                return $pricing_details;
+            }
+        }
+        $pricing_details[] = array(
+            'name' => 'yatra_number_of_person[single_pricing]',
+            'pricing_label' => 'Person',
+            'regular_price' => $current_currency_symbol . ' ' . $yatra_tour_meta_regular_price,
+            'sales_price' => $current_currency_symbol . ' ' . $yatra_tour_meta_sales_price,
+            'pricing_per' => $yatra_tour_meta_price_per,
+            'group_size' => $yatra_tour_meta_group_size,
+        );
+        return $pricing_details;
+
+    }
+}
