@@ -49,11 +49,11 @@
                     <span class=""><?php echo esc_html($pricing_per_string); ?></span>
                 </div>
 
-                <?php if (!is_numeric($pricing_id)) { ?>
-                    <div class="yatra-traveler-total-price">
-                        <span class=""><?php echo esc_html($currency_symbol . ' ' . $booking_pricing_args['total']); ?></span>
-                    </div>
-                <?php } ?>
+                
+                <div class="yatra-traveler-total-price">
+                    <span class=""><?php echo esc_html($currency_symbol . ' ' . $booking_pricing_args['total']); ?></span>
+                </div>
+
             </div>
         </div>
     <?php }
