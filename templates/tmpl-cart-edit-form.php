@@ -1,9 +1,9 @@
-<div  id="yatra-tour-cart-edit-form-fields">
+<div id="yatra-tour-cart-edit-form-fields">
 
     <?php
     $currency_symbol = yatra_get_current_currency_symbol();
 
-    foreach ($yatra_booking_pricing_info as $booking_pricing_args) { ?>
+    foreach ($yatra_booking_pricing_info as $pricing_id => $booking_pricing_args) { ?>
 
         <div class="yatra-form-fields">
             <div class="yatra-traveler-info-wrap">
@@ -49,10 +49,11 @@
                     <span class=""><?php echo esc_html($pricing_per_string); ?></span>
                 </div>
 
-                <div class="yatra-traveler-total-price">
-                    <span class=""><?php echo esc_html($currency_symbol.' '.$booking_pricing_args['total']); ?></span>
-                </div>
-
+                <?php if (!is_numeric($pricing_id)) { ?>
+                    <div class="yatra-traveler-total-price">
+                        <span class=""><?php echo esc_html($currency_symbol . ' ' . $booking_pricing_args['total']); ?></span>
+                    </div>
+                <?php } ?>
             </div>
         </div>
     <?php }

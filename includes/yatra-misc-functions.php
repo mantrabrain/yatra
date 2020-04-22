@@ -190,23 +190,17 @@ if (!function_exists('yatra_cart_pricing_details')) {
         $updated_booking_details = array();
 
         $pricing_type = isset($cart_items['pricing_type']) ? $cart_items['pricing_type'] : 'single';
-
-        $cart_pricing = isset($cart_items['single_pricing']) ? $cart_items['single_pricing'] : '';
-
         $number_of_person = isset($cart_items['number_of_person']) ? $cart_items['number_of_person'] : '';
-
 
         switch ($pricing_type) {
             case "multi":
-                $cart_pricing = isset($cart_items['multiple_pricing']) ? $cart_items['multiple_pricing'] : array();
-
                 foreach ($booking_pricing_details as $pricing_id => $pricing_detail) {
                     $updated_booking_details[$pricing_id] = $pricing_detail;
                     $price_per = isset($pricing_detail['pricing_per']) ? $pricing_detail['pricing_per'] : 'single';
                     $group_size = isset($pricing_detail['group_size']) ? $pricing_detail['group_size'] : 1;
                     $person_count = is_array($number_of_person) && isset($number_of_person[$pricing_id]) ? (absint($number_of_person[$pricing_id])) : 0;
                     $updated_booking_details[$pricing_id]['number_of_person'] = $person_count;
-                    $person_count = $price_per == 'single' ? $person_count : ceil($person_count / $group_size);
+                    $person_count = $price_per == 'person' ? $person_count : ceil($person_count / $group_size);
                     $regular_price = isset($pricing_detail['regular_price']) ? absint($pricing_detail['regular_price']) : 0;
                     $sales_price = isset($pricing_detail['sales_price']) ? absint($pricing_detail['sales_price']) : 0;
                     $sales_price = isset($pricing_detail['sales_price']) && '' != $pricing_detail['sales_price'] ? $sales_price : $regular_price;
@@ -215,6 +209,17 @@ if (!function_exists('yatra_cart_pricing_details')) {
                 }
                 break;
             case "single":
+                $sales_price = isset($booking_pricing_details[0]['sales_price']) && '' != $booking_pricing_details[0]['sales_price'] ? $booking_pricing_details[0]['sales_price'] : $booking_pricing_details[0]['regular_price'];
+                $price_per = isset($booking_pricing_details[0]['pricing_per']) ? $booking_pricing_details[0]['pricing_per'] : 'single';
+                $group_size = isset($booking_pricing_details[0]['group_size']) ? $booking_pricing_details[0]['group_size'] : 1;
+                $person_count = !is_array($number_of_person) ? (absint($number_of_person)) : 0;
+                $booking_pricing_details[0]['number_of_person'] = $person_count;
+                $person_count = $price_per == 'person' ? $person_count : ceil($person_count / $group_size);
+                $booking_pricing_details[0]['total'] = $person_count * $sales_price;
+                $booking_pricing_details[0]['name'] = 'yatra_number_of_person[' . $tour_id . '][single_pricing]';
+                $updated_booking_details = $booking_pricing_details;
+
+
                 break;
         }
         return $updated_booking_details;
