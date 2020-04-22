@@ -34,13 +34,21 @@ if (!class_exists('Yatra_Cart')) {
 
             $tour = get_post($tour_id);
 
+            $yatra_multiple_pricing = get_post_meta($tour_id, 'yatra_multiple_pricing', true);
+
+            $yatra_multiple_pricing = is_array($yatra_multiple_pricing) ? $yatra_multiple_pricing : array();
+
             $single_cart_item = array(
 
                 'tour' => $tour,
 
                 'number_of_person' => $number_of_persons,
 
-                'tour_final_price' => yatra_get_final_tour_price($tour_id, $number_of_persons, $type)
+                'tour_final_price' => yatra_get_final_tour_price($tour_id, $number_of_persons, $type),
+
+                'pricing_type' => $type,
+
+                'multiple_pricing' => $yatra_multiple_pricing
             );
             $yatra_tour_cart[$tour_id] = $single_cart_item;
 

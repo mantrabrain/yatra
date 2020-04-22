@@ -1,6 +1,5 @@
 <?php
 defined('ABSPATH') || exit;
-
 if (count($cart_items) < 1) {
 
     echo '<p>Your tour cart is empty. Please select any of the booking first.</p>';
@@ -10,6 +9,7 @@ if (count($cart_items) < 1) {
 ?>
 
 <form method="post" action="<?php echo admin_url('admin-ajax.php'); ?>" class="yatra-cart-form"><?php
+
     do_action('before_yatra_cart');
 
     echo '<div class="yatra-cart-table-wrapper">';

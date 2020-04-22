@@ -83,6 +83,7 @@ class Yatra_Ajax
         }
 
         $type = 'single';
+
         if (isset($number_of_persons['single_pricing'])) {
 
             $number_of_persons = $number_of_persons['single_pricing'];
@@ -151,18 +152,32 @@ class Yatra_Ajax
             wp_send_json_error($this->ajax_error());
         }
 
-        $number_of_persons = isset($_POST['number_of_person']) ? $_POST['number_of_person'] : array();
+        $number_of_persons = isset($_POST['yatra_number_of_person']) ? $_POST['yatra_number_of_person'] : array();
 
 
         foreach ($number_of_persons as $tour_id => $number_of_person) {
 
             $tour_id = absint($tour_id);
 
-            $number_of_person = absint($number_of_person);
+            $type = 'single';
+
+            if (isset($number_of_person['single_pricing'])) {
+
+                $number_of_person = $number_of_person['single_pricing'];
+                $type = 'single';
+
+            } else if (isset($number_of_person['multi_pricing'])) {
+
+                $number_of_person = $number_of_person['multi_pricing'];
+                $type = 'multi';
+
+            } else {
+                $number_of_person = 0;
+            }
 
             if ($tour_id > 0 && yatra_instance()->cart->is_valid_tour_id_on_cart($tour_id)) {
 
-                yatra_instance()->cart->update_cart($tour_id, $number_of_person);
+                yatra_instance()->cart->update_cart($tour_id, $number_of_person, $type);
 
             }
 

@@ -487,7 +487,10 @@ if (!function_exists('yatra_get_final_tour_price')) {
     function yatra_get_final_tour_price($tour_id, $number_of_people = 1, $type = 'single')
     {
 
-
+        if (is_array($number_of_people) && $type == 'single') {
+            $type = 'multi';
+        }
+       
         $yatra_tour_meta_regular_price = get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
 
         $yatra_tour_meta_sales_price = get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);

@@ -1,10 +1,8 @@
-<form method="post" id="yatra-tour-booking-form-fields" action="<?php echo admin_url('admin-ajax.php') ?>">
+<div  id="yatra-tour-cart-edit-form-fields">
 
-    <input type="hidden" name="action" value="yatra_tour_add_to_cart"/>
-    <input type="hidden" name="yatra_nonce" value="<?php echo wp_create_nonce('wp_yatra_tour_add_to_cart_nonce'); ?>"/>
-    <input type="hidden" name="tour_id" value="<?php echo get_the_ID(); ?>"/>
     <?php
     $currency_symbol = yatra_get_current_currency_symbol();
+
     foreach ($yatra_booking_pricing_info as $booking_pricing_args) { ?>
 
         <div class="yatra-form-fields">
@@ -15,7 +13,8 @@
                         <input id="<?php echo esc_attr($booking_pricing_args['name']) ?>"
                                type="number"
                                name="<?php echo esc_attr($booking_pricing_args['name']) ?>"
-                               value="1"
+                               value="<?php echo esc_attr($booking_pricing_args['number_of_person']) ?>"
+                               class="yatra-number-of-person-field"
                         />
 
                     </div>
@@ -49,10 +48,14 @@
                     ?>
                     <span class=""><?php echo esc_html($pricing_per_string); ?></span>
                 </div>
+
+                <div class="yatra-traveler-total-price">
+                    <span class=""><?php echo esc_html($currency_symbol.' '.$booking_pricing_args['total']); ?></span>
+                </div>
+
             </div>
         </div>
     <?php }
-    yatra_book_now_button()
     ?>
 
-</form>
+</div>

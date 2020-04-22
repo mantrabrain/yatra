@@ -33,7 +33,7 @@ var YatraFrontend = function ($) {
 
                 $this.update_cart(form_data, $(this));
             });
-            $('body').on('click', 'table.yatra_cart_table input.number_of_person', function (e) {
+            $('body').on('click', 'table.yatra_cart_table input.yatra-number-of-person-field', function (e) {
                 e.preventDefault();
 
                 var yatra_cart_table = $(this).closest('.yatra_cart_table');
