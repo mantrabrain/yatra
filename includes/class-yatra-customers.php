@@ -55,7 +55,7 @@ class Yatra_Customers
 
         $booking_meta_params_from_db = get_post_meta($customer_id, 'yatra_customer_booking_meta', true);
 
-        if (count($booking_meta_params_from_db) < 1 || !is_array($booking_meta_params_from_db)) {
+        if ((is_array($booking_meta_params_from_db) && count($booking_meta_params_from_db) < 1) || !is_array($booking_meta_params_from_db)) {
 
             $booking_meta_params_from_db = array($yatra_booking_meta_params);
 
