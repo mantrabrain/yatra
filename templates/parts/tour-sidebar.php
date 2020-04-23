@@ -1,8 +1,6 @@
 <div class="yatra-tour-info">
     <div class="yatra-tour-info-inner">
-        <h2>Tour Options</h2>
-        <div class="yatra-tabs">
-
+        <div class="yatra-tabs" id="yatra-tour-sidebar-tabs">
             <ul class="yatra-tab-wrap" role="tablist">
                 <li class="item active" role="presentation"><a href="#yatra-tour-booking-form" role="tab" tabindex="0"
                                                                aria-controls="yatra-tour-booking-form"

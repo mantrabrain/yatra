@@ -108,7 +108,6 @@ if (!function_exists('yatra_after_main_content_loop_callback')) {
             return;
         }
 
-        yatra_book_now_button();
     }
 
     add_action('yatra_after_main_content_loop', 'yatra_after_main_content_loop_callback');

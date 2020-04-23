@@ -133,13 +133,6 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
 
 
         $meta_frontend = array(
-
-            array(
-                'icon' => 'fa fa-money',
-                'text' => $yatra_tour_meta_regular_price_string,
-                'title' => __('Price', 'yatra')
-
-            ),
             array(
                 'icon' => 'fa fa-user',
                 'text' => '{{yatra_tour_meta_price_per}}',
@@ -157,18 +150,6 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
                 'title' => __('Duration', 'yatra')
 
             ),
-            /*array(
-                'icon' => 'fa fa-calendar-check-o',
-                'text' => '{{yatra_tour_meta_tour_starts_at}}',
-                'title' => __('Starting location', 'yatra')
-
-            ),
-            array(
-                'icon' => 'fa fa-calendar-check-o',
-                'text' => '{{yatra_tour_meta_tour_ends_at}}',
-                'title' => __('Ending location', 'yatra')
-
-            ),*/
 
         );
         if (!empty($yatra_tour_meta_tour_country)) {
@@ -795,7 +776,7 @@ if (!function_exists('yatra_frontend_tabs')) {
         $yatra_tour_tab_configurations = yatra_tour_tab_configurations();
 
         ?>
-        <div class="yatra-tabs">
+        <div class="yatra-tabs" id="yatra-tour-tabs">
 
             <ul class="yatra-tab-wrap">
                 <?php foreach ($frontend_tabs_config as $tab_key => $tab) { ?>
