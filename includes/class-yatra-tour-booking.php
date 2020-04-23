@@ -69,9 +69,18 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                         $booking_post_meta['yatra_tour_meta_tour_duration_days'] = get_post_meta($yatra_tour_id, 'yatra_tour_meta_tour_duration_days', true);
 
+                        $booking_post_meta['yatra_tour_meta_tour_fixed_departure'] = get_post_meta($yatra_tour_id, 'yatra_tour_meta_tour_fixed_departure', true);
+
+                        $booking_post_meta['yatra_tour_meta_tour_start_date'] = get_post_meta($yatra_tour_id, 'yatra_tour_meta_tour_start_date', true);
+
+                        $booking_post_meta['yatra_tour_meta_tour_end_date'] = get_post_meta($yatra_tour_id, 'yatra_tour_meta_tour_end_date', true);
+
                         $booking_post_meta['yatra_tour_meta_tour_country'] = get_post_meta($yatra_tour_id, 'yatra_tour_meta_tour_country', true);
 
                         $booking_post_meta['yatra_currency_symbol'] = $currency_symbol;
+
+                        $booking_post_meta['yatra_multiple_pricing'] = get_post_meta($yatra_tour_id, 'yatra_multiple_pricing', true);
+
 
                         $booking_post_meta['yatra_currency'] = $currency;
 
@@ -205,7 +214,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
             $booking_details->yatra_booking_meta_params = $yatra_booking_meta_params;
 
             $booking_details->yatra_customer_id = $customer_id;
-            
+
             $booking_details->yatra_user_id = $user_id;
 
             return $booking_details;

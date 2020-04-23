@@ -111,6 +111,12 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
             add_action('init', array($this, 'register'));
             add_action('init', array($this, 'register_post_status'));
             add_filter('post_row_actions', array($this, 'remove'));
+           // add_action('do_meta_boxes', array($this, 'hide_metabox'));
+        }
+
+        public function hide_metabox()
+        {
+
 
         }
     }

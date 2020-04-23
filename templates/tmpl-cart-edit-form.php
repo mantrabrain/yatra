@@ -49,7 +49,7 @@
                     <span class=""><?php echo esc_html($pricing_per_string); ?></span>
                 </div>
 
-                
+
                 <div class="yatra-traveler-total-price">
                     <span class=""><?php echo esc_html($currency_symbol . ' ' . $booking_pricing_args['total']); ?></span>
                 </div>

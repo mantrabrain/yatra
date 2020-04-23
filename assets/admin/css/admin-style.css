@@ -600,7 +600,7 @@ table.yatra-booking-meta-customer-info td {
 }
 
 .yatra-switch-control-wrap {
-   display:inline-block;
+    display: inline-block;
 }
 
 .yatra-switch-control {
@@ -697,4 +697,14 @@ table.yatra-booking-meta-customer-info td {
     line-height: 1.75;
     font-weight: 600;
     margin-bottom: 4px;
+}
+
+.wp-admin.post-type-yatra-booking #poststuff #postbox-container-1 {
+
+    display: none;
+}
+
+.wp-admin.post-type-yatra-booking #poststuff #post-body.columns-2 {
+    margin: 0;
+
 }
