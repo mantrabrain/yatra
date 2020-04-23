@@ -31,7 +31,8 @@
   .yatra-book-now-btn {
     line-height: 1.5em;
     padding: 10px 20px;
-    display: inline-block;
+    display: block;
+    width:100%;
     margin: 15px 0;
     background: none;
     border: 2px solid #1abc9c;
@@ -39,6 +40,7 @@
     font-size: 15px;
     margin-left: 0;
     border-radius: 0;
+
 
     &:hover {
       background: #1abc9c;
