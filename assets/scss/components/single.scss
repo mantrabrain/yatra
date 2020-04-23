@@ -96,10 +96,21 @@ body.single {
     }
 
   }
-  .yatra-form-fields:last-child{
-    .yatra-traveler-info-wrap{
+  .yatra-form-fields:last-child {
+    .yatra-traveler-info-wrap {
       border-bottom: none;
       margin-bottom: 0;
     }
+  }
+}
+
+.yatra-tour-attribute-info {
+  padding: 10px 15px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  margin: 5px 0;
+  table, td, th, tr {
+    padding: 0;
+    border: 0;
   }
 }

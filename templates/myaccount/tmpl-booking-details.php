@@ -19,14 +19,9 @@ if (!defined('ABSPATH')) {
     <thead>
     <tr>
         <th><?php echo __('Tour', 'yatra'); ?></th>
-        <th><?php echo __('Total person', 'yatra'); ?></th>
-        <th><?php echo __('Sales Price', 'yatra'); ?></th>
-        <th><?php echo __('Regular Price', 'yatra'); ?></th>
         <th><?php echo __('Price Per', 'yatra'); ?></th>
         <th><?php echo __('Group Size', 'yatra'); ?></th>
         <th><?php echo __('Toal Price', 'yatra'); ?></th>
-        <th><?php echo __('Days', 'yatra'); ?></th>
-        <th><?php echo __('Nights', 'yatra'); ?></th>
 
     </tr>
     </thead>
@@ -55,26 +50,7 @@ if (!defined('ABSPATH')) {
 
         echo '</td>';
 
-        // Number Of Person
-        echo '<td>';
 
-        echo '<span>' . absint($number_of_person) . '</span>';
-
-        echo '</td>';
-
-        // Sales Price
-        echo '<td>';
-
-        echo '<span>' . esc_html($yatra_currency_symbol) . absint($yatra_tour_meta_sales_price) . '</span>';
-
-        echo '</td>';
-
-        // Regular Price
-        echo '<td>';
-
-        echo '<span>' . esc_html($yatra_currency_symbol) . absint($yatra_tour_meta_regular_price) . '</span>';
-
-        echo '</td>';
         // Price Per
         echo '<td>';
 
@@ -92,18 +68,6 @@ if (!defined('ABSPATH')) {
         echo '<td>';
 
         echo '<span>' . esc_html($yatra_currency_symbol) . absint($total_tour_price) . '</span>';
-
-        echo '</td>';
-        // Duration Days
-        echo '<td>';
-
-        echo '<span>' . absint($yatra_tour_meta_tour_duration_days) . '</span>';
-
-        echo '</td>';
-        // Duration Nights
-        echo '<td>';
-
-        echo '<span>' . absint($yatra_tour_meta_tour_duration_nights) . '</span>';
 
         echo '</td>';
 

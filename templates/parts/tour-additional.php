@@ -2,7 +2,7 @@
     <div class="yatra-tour-additional-info-item">
         <i class="icon fa fa-user"></i><span
                 class="info-title"><?php echo esc_html__('Price Per:', 'yatra'); ?>
-             <strong><?php echo esc_html($additional_info['price_per']); ?></strong></span>
+            <strong><?php echo esc_html($additional_info['price_per']); ?></strong></span>
     </div>
     <div class="yatra-tour-additional-info-item">
         <i class="icon fa fa-user-circle"></i><span class="info-title"><?php echo esc_html__('Group Size:', 'yatra'); ?>
@@ -16,4 +16,9 @@
         <i class="icon fa fa-map"></i><span class="info-title"><?php echo esc_html__('Country:', 'yatra'); ?>
             <strong><?php echo esc_html($additional_info['country']); ?></strong></span>
     </div>
+
+</div>
+<div class="yatra-tour-attribute-info">
+    <?php
+    yatra_frontend_options(true); ?>
 </div>

@@ -169,6 +169,8 @@ if (!function_exists('yatra_account_bookings')) {
 
             $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
 
+
+
             yatra_get_template('myaccount/tmpl-booking-details.php', array('yatra_booking_meta' => $yatra_booking_meta));
 
         } else {
@@ -198,6 +200,7 @@ if (!function_exists('yatra_account_bookings')) {
 
                 array_push($booking_details, $booking_detail);
             }
+
             yatra_get_template('myaccount/tmpl-booking.php', array('booking_details' => $booking_details));
         }
     }

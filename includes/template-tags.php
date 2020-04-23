@@ -814,7 +814,7 @@ if (!function_exists('yatra_frontend_tabs')) {
     }
 }
 if (!function_exists('yatra_frontend_options')) {
-    function yatra_frontend_options()
+    function yatra_frontend_options($attribute_only = false)
     {
         $post_id = get_the_ID();
         $yatra_tour_meta_price_per = get_post_meta($post_id, 'yatra_tour_meta_price_per', true);
@@ -858,34 +858,36 @@ if (!function_exists('yatra_frontend_options')) {
 
             $price_string = '<del>' . $price_string . '</del> &nbsp;' . $currency_symbol . $yatra_tour_meta_sales_price;
         }
-        ?>
-        <h3><?php echo __('Tour Options', 'yatra') ?></h3>
-        <table>
-            <tr>
-                <th><?php echo __('Price per', 'yatra') ?></th>
-                <td><?php echo esc_html(ucwords($yatra_tour_meta_price_per)) ?></td>
-            </tr>
-            <tr>
-                <th><?php echo __('Group Size', 'yatra') ?></th>
-                <td><?php echo absint($yatra_tour_meta_group_size) ?></td>
-            </tr>
-            <tr>
-                <th><?php echo __('Price', 'yatra') ?></th>
-                <td><?php echo $price_string; ?></td>
-            </tr>
-            <tr>
-                <th><?php echo __('Tour Duration', 'yatra') ?></th>
-                <td><?php echo absint($yatra_tour_meta_tour_duration_days); ?>
-                    Days <?php echo absint($yatra_tour_meta_tour_duration_nights) ?> Nights
-                </td>
-            </tr>
-            <tr>
-                <th><?php echo __('Country', 'yatra') ?></th>
-                <td><?php echo esc_html($country_string); ?></td>
-            </tr>
-        </table>
+        if(!$attribute_only) {
+            ?>
+            <h3><?php echo __('Tour Options', 'yatra') ?></h3>
+            <table>
+                <tr>
+                    <th><?php echo __('Price per', 'yatra') ?></th>
+                    <td><?php echo esc_html(ucwords($yatra_tour_meta_price_per)) ?></td>
+                </tr>
+                <tr>
+                    <th><?php echo __('Group Size', 'yatra') ?></th>
+                    <td><?php echo absint($yatra_tour_meta_group_size) ?></td>
+                </tr>
+                <tr>
+                    <th><?php echo __('Price', 'yatra') ?></th>
+                    <td><?php echo $price_string; ?></td>
+                </tr>
+                <tr>
+                    <th><?php echo __('Tour Duration', 'yatra') ?></th>
+                    <td><?php echo absint($yatra_tour_meta_tour_duration_days); ?>
+                        Days <?php echo absint($yatra_tour_meta_tour_duration_nights) ?> Nights
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php echo __('Country', 'yatra') ?></th>
+                    <td><?php echo esc_html($country_string); ?></td>
+                </tr>
+            </table>
 
-        <?php
+            <?php
+        }
 
         $tour_meta_custom_attributes = get_post_meta($post_id, 'tour_meta_custom_attributes', true);
         if (count($tour_meta_custom_attributes) > 0) {

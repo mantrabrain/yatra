@@ -137,9 +137,9 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                 $customer_id = Yatra_Customers::get_instance()->update($yatra_tour_customer_info, $yatra_booking_meta_params);
 
-                if (!yatra_enable_guest_checkout()) {
+                $current_user_id = get_current_user_id();
 
-                    $current_user_id = get_current_user_id();
+                if ($current_user_id > 0) {
 
                     update_post_meta($booking_id, 'yatra_user_id', $current_user_id);
 

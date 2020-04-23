@@ -729,6 +729,15 @@ body.single .yatra-single-tour:after {
     border-bottom: none;
     margin-bottom: 0; }
 
+.yatra-tour-attribute-info {
+  padding: 10px 15px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  margin: 5px 0; }
+  .yatra-tour-attribute-info table, .yatra-tour-attribute-info td, .yatra-tour-attribute-info th, .yatra-tour-attribute-info tr {
+    padding: 0;
+    border: 0; }
+
 .yatra-shortcode-wrapper form.yatra-cart-form {
   position: relative; }
   .yatra-shortcode-wrapper form.yatra-cart-form .actions {
