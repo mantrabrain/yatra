@@ -1,0 +1,29 @@
+@media (max-width: 768px) {
+  .yatra-destination-wrap, .yatra-activity-wrap, .yatra-discount-deals-wrap, .yatra-tour-list-wrap {
+    &.yatra-col-4, &.yatra-col-3 {
+      .yatra-destination-item, .yatra-activity-item, .yatra-item-inner, .yatra-tour-list-item, .yatra-deals-item {
+        width: 100%;
+        float: none;
+      }
+    }
+    .yatra-destination-item, .yatra-activity-item, .yatra-item-inner, .yatra-tour-list-item, .yatra-deals-item {
+      width: 100%;
+      float: none;
+    }
+  }
+  .yatra-page-wrapper.template-default article {
+    .thumb-wrap, .content-wrap {
+      width: 100%;
+      float: none;
+    }
+    .meta-content-wrap {
+      display: none;
+    }
+  }
+  body.single .yatra-single-tour .yatra-site-main,
+  body.single .yatra-single-tour .yatra-tour-info {
+    width: 100%;
+    float: none;
+  }
+
+}

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.0.7\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2020-04-23 11:10:21+00:00\n"
+"POT-Creation-Date: 2020-04-23 13:17:19+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2419,7 +2419,7 @@ msgstr ""
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:200
 #: includes/template-tags.php:180 includes/template-tags.php:639
 #: includes/template-tags.php:643 includes/template-tags.php:851
-#: includes/template-tags.php:883 includes/template-tags.php:989
+#: includes/template-tags.php:884 includes/template-tags.php:991
 #: svn-repository/tags/1.0.0/includes/meta-boxes/class-yatra-metabox-tour-cpt.php:55
 #: svn-repository/tags/1.0.0/includes/template-tags.php:184
 #: svn-repository/tags/2.0.0/includes/class-yatra-forms.php:57
@@ -3577,7 +3577,7 @@ msgstr ""
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:140
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:141
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:150
-#: includes/template-tags.php:892
+#: includes/template-tags.php:894
 #: svn-repository/tags/2.0.0/includes/functions.php:52
 #: svn-repository/tags/2.0.0/includes/taxonomy/class-yatra-taxonomy-attributes.php:140
 #: svn-repository/tags/2.0.0/includes/taxonomy/class-yatra-taxonomy-attributes.php:141
@@ -6166,7 +6166,6 @@ msgstr ""
 #: svn-repository/tags/2.0.7/templates/myaccount/tmpl-booking-details.php:23
 #: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-booking-cpt.php:64
 #: svn-repository/trunk/templates/myaccount/tmpl-booking-details.php:23
-#: templates/myaccount/tmpl-booking-details.php:23
 msgid "Sales Price"
 msgstr ""
 
@@ -6185,7 +6184,6 @@ msgstr ""
 #: svn-repository/tags/2.0.7/templates/myaccount/tmpl-booking-details.php:24
 #: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-booking-cpt.php:65
 #: svn-repository/trunk/templates/myaccount/tmpl-booking-details.php:24
-#: templates/myaccount/tmpl-booking-details.php:24
 msgid "Regular Price"
 msgstr ""
 
@@ -6223,13 +6221,13 @@ msgstr ""
 #: svn-repository/trunk/includes/template-tags.php:146
 #: svn-repository/trunk/includes/template-tags.php:649
 #: svn-repository/trunk/templates/myaccount/tmpl-booking-details.php:25
-#: templates/myaccount/tmpl-booking-details.php:25
+#: templates/myaccount/tmpl-booking-details.php:22
 msgid "Price Per"
 msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:67
 #: includes/template-tags.php:151 includes/template-tags.php:691
-#: includes/template-tags.php:695 includes/template-tags.php:869
+#: includes/template-tags.php:695 includes/template-tags.php:870
 #: svn-repository/tags/2.0.0/includes/meta-boxes/class-yatra-metabox-booking-cpt.php:68
 #: svn-repository/tags/2.0.0/includes/template-tags.php:150
 #: svn-repository/tags/2.0.0/includes/template-tags.php:597
@@ -6280,7 +6278,7 @@ msgstr ""
 #: svn-repository/trunk/includes/template-tags.php:663
 #: svn-repository/trunk/includes/template-tags.php:834
 #: svn-repository/trunk/templates/myaccount/tmpl-booking-details.php:26
-#: templates/myaccount/tmpl-booking-details.php:26
+#: templates/myaccount/tmpl-booking-details.php:23
 msgid "Group Size"
 msgstr ""
 
@@ -6296,7 +6294,7 @@ msgstr ""
 #: svn-repository/tags/2.0.7/templates/myaccount/tmpl-booking-details.php:27
 #: svn-repository/trunk/includes/meta-boxes/class-yatra-metabox-booking-cpt.php:68
 #: svn-repository/trunk/templates/myaccount/tmpl-booking-details.php:27
-#: templates/myaccount/tmpl-booking-details.php:27
+#: templates/myaccount/tmpl-booking-details.php:24
 msgid "Toal Price"
 msgstr ""
 
@@ -7837,7 +7835,7 @@ msgid ""
 "sales price."
 msgstr ""
 
-#: includes/template-tags.php:862
+#: includes/template-tags.php:863
 #: svn-repository/tags/2.0.0/includes/functions.php:48
 #: svn-repository/tags/2.0.1/includes/functions.php:48
 #: svn-repository/tags/2.0.2/includes/functions.php:48
@@ -7853,7 +7851,7 @@ msgstr ""
 msgid "Tour Options"
 msgstr ""
 
-#: includes/template-tags.php:865
+#: includes/template-tags.php:866
 #: svn-repository/tags/2.0.0/includes/template-tags.php:810
 #: svn-repository/tags/2.0.1/includes/template-tags.php:810
 #: svn-repository/tags/2.0.2/includes/template-tags.php:810
@@ -7866,7 +7864,7 @@ msgstr ""
 msgid "Price per"
 msgstr ""
 
-#: includes/template-tags.php:873
+#: includes/template-tags.php:874
 #: svn-repository/tags/1.0.0/includes/template-tags.php:115
 #: svn-repository/tags/2.0.0/includes/template-tags.php:139
 #: svn-repository/tags/2.0.0/includes/template-tags.php:818
@@ -7898,7 +7896,7 @@ msgstr ""
 msgid "Price"
 msgstr ""
 
-#: includes/template-tags.php:877
+#: includes/template-tags.php:878
 #: svn-repository/tags/2.0.0/includes/template-tags.php:822
 #: svn-repository/tags/2.0.1/includes/template-tags.php:822
 #: svn-repository/tags/2.0.2/includes/template-tags.php:822
@@ -8498,7 +8496,6 @@ msgstr ""
 #: svn-repository/tags/2.0.6/templates/myaccount/tmpl-booking-details.php:22
 #: svn-repository/tags/2.0.7/templates/myaccount/tmpl-booking-details.php:22
 #: svn-repository/trunk/templates/myaccount/tmpl-booking-details.php:22
-#: templates/myaccount/tmpl-booking-details.php:22
 msgid "Total person"
 msgstr ""
 
@@ -8507,7 +8504,6 @@ msgstr ""
 #: svn-repository/tags/2.0.6/templates/myaccount/tmpl-booking-details.php:28
 #: svn-repository/tags/2.0.7/templates/myaccount/tmpl-booking-details.php:28
 #: svn-repository/trunk/templates/myaccount/tmpl-booking-details.php:28
-#: templates/myaccount/tmpl-booking-details.php:28
 msgid "Days"
 msgstr ""
 
@@ -8516,7 +8512,6 @@ msgstr ""
 #: svn-repository/tags/2.0.6/templates/myaccount/tmpl-booking-details.php:29
 #: svn-repository/tags/2.0.7/templates/myaccount/tmpl-booking-details.php:29
 #: svn-repository/trunk/templates/myaccount/tmpl-booking-details.php:29
-#: templates/myaccount/tmpl-booking-details.php:29
 msgid "Nights"
 msgstr ""
 
