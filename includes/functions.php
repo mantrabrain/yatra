@@ -490,7 +490,7 @@ if (!function_exists('yatra_get_final_tour_price')) {
         if (is_array($number_of_people) && $type == 'single') {
             $type = 'multi';
         }
-       
+
         $yatra_tour_meta_regular_price = get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
 
         $yatra_tour_meta_sales_price = get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
@@ -798,5 +798,16 @@ if (!function_exists('yatra_payment_gateway_fields')) {
             }
             echo '</ul>';
         }
+    }
+}
+
+
+if (!function_exists('yatra_maybeintempty')) {
+    function yatra_maybeintempty($var)
+    {
+        if ($var == '') {
+            return '';
+        }
+        return absint($var);
     }
 }

@@ -185,6 +185,7 @@ module.exports = function (grunt) {
                 src: [
                     '**/*.php',         // Include all files
                     '!node_modules/**', // Exclude node_modules/
+                    '!svn-repository/**', // Exclude node_modules/
                     '!vendor/**'        // Exclude vendor/
                 ],
                 expand: true

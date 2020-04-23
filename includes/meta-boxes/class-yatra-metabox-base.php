@@ -17,7 +17,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
             switch ($meta_field['type']) {
                 // Allow only integers in number fields
                 case 'number':
-                    $updated_value = absint($field_value);
+                    $updated_value = $field_value == '' ? '' : absint($field_value);
                     break;
                 case 'shortcode':
                 case 'date':

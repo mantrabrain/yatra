@@ -22,12 +22,12 @@
                     <span><?php echo esc_html($booking_pricing_args['pricing_label']) ?></span>
                 </div>
                 <div class="yatra-traveler-price">
-                    <?php if ($booking_pricing_args['regular_price'] != '' && $booking_pricing_args['sales_price'] != '') { ?>
+                    <?php if ($booking_pricing_args['regular_price'] != '' && $booking_pricing_args['sales_price'] != '' && $booking_pricing_args['sales_price'] != "0") { ?>
                         <del><?php echo esc_html($currency_symbol . ' ' . $booking_pricing_args['regular_price']) ?></del>
                     <?php } ?>
                     <ins><?php
 
-                        if ($booking_pricing_args['sales_price'] != '') {
+                        if ($booking_pricing_args['sales_price'] != '' && $booking_pricing_args['sales_price'] != "0") {
 
                             echo esc_html($currency_symbol . ' ' . $booking_pricing_args['sales_price']);
                         } else {

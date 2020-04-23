@@ -181,10 +181,10 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         // Duration Days
                         echo '<td>';
 
-                        if ($yatra_tour_meta_tour_fixed_departure) {
+                        if (!$yatra_tour_meta_tour_fixed_departure) {
                             echo '<span>' . absint($yatra_tour_meta_tour_duration_days) . ' Days ' . absint($yatra_tour_meta_tour_duration_nights) . ' Nights </span>';
                         } else {
-                            echo '<span>' . esc_html($yatra_tour_meta_tour_start_date) . ' - ' . esc_html($yatra_tour_meta_tour_end_date) . '</span>';
+                            echo '<span>' . esc_html($yatra_tour_meta_tour_start_date) . ' to ' . esc_html($yatra_tour_meta_tour_end_date) . '</span>';
                         }
                         echo '</td>';
 

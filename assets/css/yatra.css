@@ -805,7 +805,8 @@ body.single .yatra-single-tour:after {
         #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-number .yatra-traveler-number-inner input {
           height: 100%;
           margin: 0;
-          border: none; }
+          border: none;
+          padding: 0 10px; }
     #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-price {
       text-align: center;
       -webkit-box-flex: 1;
@@ -824,6 +825,9 @@ body.single .yatra-single-tour:after {
 
 form.yatra-checkout-form label {
   display: block; }
+
+.select2-container {
+  max-width: 100%; }
 
 .yatra-my-account-navigation {
   width: 30%;

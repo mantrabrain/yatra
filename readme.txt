@@ -2,8 +2,8 @@
 Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
-Tested up to: 5.3.2
-Stable tag: 2.0.7
+Tested up to: 5.4
+Stable tag: 2.0.8
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -15,6 +15,7 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 Get [free support](https://mantrabrain.com/support-forum/)
 Wanna [contribute](https://github.com/mantrabrain/yatra/)
 Feature [request](https://mantrabrain.com/request-new-feature/)
+Compatible theme [Yatri](https://wpyatri.com/?ref=yatrapluginorg)is live now
 
 == Installation ==
 
@@ -101,6 +102,11 @@ Shortcode for Tour Listing:
 * Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
 
 == Changelog ==
+
+= 2.0.8 | 2020/04/23 =
+* Fixed - Minor issue fixed & frontend design tweak
+* Added - Tour Start & end date
+* Added - Variable/multi pricing
 
 = 2.0.7 | 2020/02/02 =
 * Fixed - Tour admin design changed
