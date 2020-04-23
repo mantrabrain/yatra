@@ -9,20 +9,17 @@
                 this.initLib();
             },
             cacheDom: function () {
-                this.$book_now = $('.ayatra-book-now-btn');
+                this.$booking_form = $('#yatra-tour-booking-form-fields');
                 this.$yatra_update_cart = $('.yatra_update_cart');
             },
 
             bindEvents: function () {
                 var $this = this;
-                this.$book_now.on('click', function (e) {
+                this.$booking_form.on('submit', function (e) {
                     e.preventDefault();
                     var tour_id = $(this).attr('data-tour-id');
-                    var number_of_person = $(this).closest('.yatra-book-btn-wrapper').find('.yatra_number_of_person').val();
-                    if (tour_id < 1 || number_of_person < 1) {
-                        return;
-                    }
-                    $this.bookTour(tour_id, number_of_person, $(this));
+                    var form_data = $(this).serialize();
+                    $this.bookTour(form_data);
                 });
 
                 $('body').on('click', '.yatra_update_cart', function (e) {
@@ -123,7 +120,7 @@
 
                 var type = $node[0].tagName.toLowerCase();
 
-                if (type === "a") {
+                if (type === "a" || type === "button") {
                     $node.text($node.attr('data-loading-text'));
                 } else {
                     $node.val($node.attr('data-loading-text'));
@@ -131,7 +128,7 @@
 
             }, removeLoading: function ($node) {
                 var type = $node[0].tagName.toLowerCase();
-                if (type === "a") {
+                if (type === "a" || type === "button") {
                     $node.text($node.attr('data-text'));
                 } else {
                     $node.val($node.attr('data-text'));
@@ -166,19 +163,13 @@
             table_loading: function (cart_btn) {
                 cart_btn.closest('form').append('<div class="yatra-overlay"></div>');
             },
-            bookTour: function (tour_id, number_of_person, $btn) {
+            bookTour: function (form_data) {
                 var $this = this;
-                var booking_params = yatra_params.booking_params;
-                var booking_data = {
-                    action: booking_params.booking_action,
-                    yatra_nonce: booking_params.booking_nonce,
-                    tour_id: tour_id,
-                    number_of_person: number_of_person
-                };
+                var $btn = $this.$booking_form.find('.yatra-book-now-btn');
                 $.ajax({
                     type: "POST",
                     url: yatra_params.ajax_url,
-                    data: booking_data,
+                    data: form_data,
                     beforeSend: function () {
                         $this.addLoading($btn);
                     },
@@ -264,7 +255,7 @@
                     },
 
                     removeTabFocus: function (self) {
-                        var $this =  this.$el.find('[role="tab"]');
+                        var $this = this.$el.find('[role="tab"]');
 
                         $this.attr({
                             'tabindex': '-1',

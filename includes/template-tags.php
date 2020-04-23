@@ -131,6 +131,13 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
 
         }
 
+        $yatra_tour_meta_tour_fixed_departure = get_post_meta($post_id, 'yatra_tour_meta_tour_fixed_departure', true);
+
+        if ((boolean)$yatra_tour_meta_tour_fixed_departure && !is_null($yatra_tour_meta_tour_fixed_departure)) {
+            $tour_duration = '{{yatra_tour_meta_tour_start_date}} to {{yatra_tour_meta_tour_end_date}}';
+        } else {
+            $tour_duration = '{{yatra_tour_meta_tour_duration_days}} days and {{yatra_tour_meta_tour_duration_nights}} nights';
+        }
 
         $meta_frontend = array(
             array(
@@ -146,7 +153,7 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
             ),
             array(
                 'icon' => 'fa fa-clock-o',
-                'text' => '{{yatra_tour_meta_tour_duration_days}} days and {{yatra_tour_meta_tour_duration_nights}} nights',
+                'text' => $tour_duration,
                 'title' => __('Duration', 'yatra')
 
             ),
