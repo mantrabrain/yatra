@@ -65,10 +65,10 @@ class Yatra_Core_Importer
 
 							foreach ($custom_post_type_metas as $cpt_meta_id => $cpt_meta_value) {
 
+								$cpt_meta_value = isset($cpt_meta_value[0]) ? $cpt_meta_value[0] : $cpt_meta_value;
+
 								if ($cpt_meta_id == 'yatra_tour_meta_gallery') {
 
-									$cpt_meta_value = isset($cpt_meta_value[0]) ? $cpt_meta_value[0] : $cpt_meta_value;
-									
 									$cpt_meta_values = explode(',', $cpt_meta_value);
 
 									$cpt_meta_values_updated = array();
