@@ -39,94 +39,54 @@ class Yatra_Core_Importer
 				$this->insert_term($terms);
 			}
 
-			echo '<pre>';
+			/*echo '<pre>';
 			print_r($this->image_id_mapping);
 			print_r($this->term_id_mapping);
-			exit;
-			$updated_post_ids_mapping = array();
-
-			foreach ($yatra_content_array as $yatra_custom_posts) {
+			exit;*/
 
 
-				$yatra_custom_post_arr = $yatra_custom_posts;
+			foreach ($yatra_custom_post_types as $custom_post_type => $custom_post_type_datas) {
 
-				unset($yatra_custom_post_arr['ID']);
-				unset($yatra_custom_post_arr['term_taxonomy']);
-				unset($yatra_custom_post_arr['meta']);
-				unset($yatra_custom_post_arr['image_attributes']);
+				foreach ($custom_post_type_datas as $custom_post_type_single_data) {
 
-				$sik_post_id = wp_insert_post($yatra_custom_post_arr);
+					if ($custom_post_type == $custom_post_type_single_data['post_type']) {
 
+						$custom_post_type_metas = $custom_post_type_single_data['meta'];
 
-				$term_taxonomies = isset($yatra_custom_posts['term_taxonomy']) ? $yatra_custom_posts['term_taxonomy'] : array();
+						$custom_post_type_terms = $custom_post_type_single_data['terms'];
 
+						unset($custom_post_type_single_data['meta']);
 
-				$sik_post_taxonomy_datas = array();
-				foreach ($term_taxonomies as $sik_term_taxonomy) {
+						unset($custom_post_type_single_data['terms']);
 
-					$sik_term_id = wp_insert_term(
-						sanitize_text_field($sik_term_taxonomy['name']),   // the term
-						sanitize_text_field($sik_term_taxonomy['taxonomy']),   // the term
-						array(
-							'description' => sanitize_text_field($sik_term_taxonomy['description']),
-							'slug' => $sik_term_taxonomy['slug'],
-							'parent' => $sik_term_taxonomy['parent'],
-						)
-					);
-					if (is_wp_error($sik_term_id)) {
-						$error_data = isset($sik_term_id->error_data) ? $sik_term_id->error_data : array();
-						$sik_term_id = isset($error_data['term_exists']) ? absint($error_data['term_exists']) : 0;
-					} else {
-						$sik_term_id = isset($sik_term_id['term_id']) ? absint($sik_term_id['term_id']) : 0;
+						$cpt_inserted_id = wp_insert_post($custom_post_type_single_data);
 
-					}
-					if (absint($sik_term_id) > 0) {
-						$sik_post_taxonomy_datas[$sik_term_taxonomy['taxonomy']][] = $sik_term_id;
-					}
-				}
+						if (!is_wp_error($cpt_inserted_id)) {
 
+							foreach ($custom_post_type_metas as $cpt_meta_id => $cpt_meta_value) {
 
-				foreach ($sik_post_taxonomy_datas as $sik_term_tax => $sik_term_ids) {
-					$sik_uniq_term_ids = array_unique($sik_term_ids);
-					wp_set_object_terms($sik_post_id, $sik_uniq_term_ids, $sik_term_tax);
+								if ($cpt_meta_id == 'yatra_tour_meta_gallery') {
 
-				}
+									$cpt_meta_values = explode(',', $cpt_meta_value);
 
+									$cpt_meta_values_updated = array();
 
-				$updated_post_ids_mapping[$yatra_custom_posts['ID']] = $sik_post_id;
+									foreach ($cpt_meta_values as $cpt_meta_value_image_id) {
 
+										$cpt_meta_values_updated[] = $this->get_new_image_id($cpt_meta_value_image_id);
+									}
+									$cpt_meta_value = @implode(',', $cpt_meta_values_updated);
 
-				$image_attributes = isset($yatra_custom_posts['image_attributes']) ? $yatra_custom_posts['image_attributes'] : array();
+								}
+								add_post_meta($cpt_inserted_id, $cpt_meta_id, $cpt_meta_value);
 
-				$this->import_image($sik_post_id, $image_attributes);
-			}
+							}
 
-
-			foreach ($yatra_content_array as $yatra_custom_posts1) {
-
-				$sik_post_metas = isset($yatra_custom_posts1['meta']) ? $yatra_custom_posts1['meta'] : array();
-
-				$sik_post_id_for_meta = isset($updated_post_ids_mapping[$yatra_custom_posts1['ID']]) ? $updated_post_ids_mapping[$yatra_custom_posts1['ID']] : 0;
-
-				if (absint($sik_post_id_for_meta) > 0) {
-
-					foreach ($sik_post_metas as $sik_post_meta) {
-
-						$sik_meta_value = $sik_post_meta['meta_value'];
-
-						switch ($sik_post_meta['meta_key']) {
-							case "course_id":
-							case "section_id":
-							case "quiz_id":
-								$sik_meta_value = absint($sik_meta_value);
-								$sik_meta_value = isset($updated_post_ids_mapping[$sik_meta_value]) ? $updated_post_ids_mapping[$sik_meta_value] : '';
-								break;
-							default:
-								$sik_meta_value = $sik_post_meta['meta_value'];
-								break;
+							foreach ($custom_post_type_terms as $cpt_term_id => $cpt_term_taxonomy) {
+								$cpt_term_id = $this->get_new_term_id($cpt_term_id);
+								$term_taxonomy_ids = wp_set_object_terms($cpt_inserted_id, $cpt_term_id, $cpt_term_taxonomy);
+							}
 						}
-						add_post_meta($sik_post_id_for_meta, sanitize_text_field($sik_post_meta['meta_key']), $sik_meta_value);
-
 					}
 				}
 			}
@@ -169,6 +129,12 @@ class Yatra_Core_Importer
 				$this->term_id_mapping[$term_id] = $inserted_term_id;
 
 				foreach ($metas as $meta_key => $meta_value) {
+
+
+					if ($meta_key == 'destination_image_id' || $meta_key == 'activity_image_id') {
+
+						$meta_value = $this->get_new_image_id($meta_value);
+					}
 
 					add_term_meta($inserted_term_id, $meta_key, $meta_value);
 
@@ -237,5 +203,28 @@ class Yatra_Core_Importer
 		return $attach_id;
 
 
+	}
+
+	private function get_new_image_id($old_image_id = null)
+	{
+		if (is_null($old_image_id) || '' == $old_image_id) {
+			return null;
+		}
+		if (isset($this->image_id_mapping[$old_image_id])) {
+			return $this->image_id_mapping[$old_image_id];
+		}
+		return $old_image_id;
+
+	}
+
+	private function get_new_term_id($old_term_id = null)
+	{
+		if (is_null($old_term_id) || '' == $old_term_id) {
+			return null;
+		}
+		if (isset($this->term_id_mapping[$old_term_id])) {
+			return $this->term_id_mapping[$old_term_id];
+		}
+		return $old_term_id;
 	}
 }

@@ -65,22 +65,25 @@ class Yatra_Core_Exporter
 			unset($term->count);
 			unset($term->slug);
 			unset($term->term_group);
-			$meta = get_term_meta($term_id);
+			$meta = array();
 			switch ($taxonomy) {
 				case "destination":
 					$destination_image_id = get_term_meta($term_id, 'destination_image_id', true);
+					$meta['destination_image_id'] = $destination_image_id;
 					$this->export_images($destination_image_id);
 					break;
 				case "activity":
 					$activity_image_id = get_term_meta($term_id, 'activity_image_id', true);
+					$meta['activity_image_id'] = $activity_image_id;
 					$this->export_images($activity_image_id);
 					break;
 				case "attributes":
+					$meta['attribute_field_type'] = get_term_meta($term_id, 'attribute_field_type', true);;
+					$meta['yatra_attribute_meta'] = get_term_meta($term_id, 'yatra_attribute_meta', true);;
 					break;
 			}
-			//$term->meta = get_term_meta($term_id);
 			$term->meta = $meta;
-
+			
 			$children[$term_id] = $term;
 		}
 
@@ -147,7 +150,10 @@ class Yatra_Core_Exporter
 				$post_terms_list = wp_get_object_terms($single_cpt_data->ID, array('destination', 'activity'));
 				$post_terms = array();
 				if (is_array($post_terms_list) && @count($post_terms_list) > 0) {
-					$post_terms = wp_list_pluck($post_terms_list, 'term_id');
+
+					foreach ($post_terms_list as $single_term_item) {
+						$post_terms[$single_term_item->term_id] = $single_term_item->taxonomy;
+					}
 				}
 
 				unset($cpt_data[$cpt_data_index]->ID);
