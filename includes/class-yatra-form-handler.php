@@ -46,7 +46,7 @@ class Yatra_Form_Handler
             $valid_data = Yatra_Checkout_Form::get_instance()->valid_tour_checkout_form($_POST);
 
 
-            if (yatra_instance()->yatra_error->has_errors()) {
+            if (yatra()->yatra_error->has_errors()) {
 
                 return;
             }
@@ -68,7 +68,7 @@ class Yatra_Form_Handler
 
         if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && count($yatra_get_active_payment_gateways) > 0) {
 
-            yatra_instance()->yatra_error->add('yatra_form_validation_errors', __('Please select at least one payment gateway', 'yatra'));
+            yatra()->yatra_error->add('yatra_form_validation_errors', __('Please select at least one payment gateway', 'yatra'));
 
             return;
 
@@ -96,7 +96,7 @@ class Yatra_Form_Handler
 
             exit;
         }
-        yatra_instance()->yatra_error->add('yatra_checkout_error', __('Could not booked, please try again', 'yatra'));
+        yatra()->yatra_error->add('yatra_checkout_error', __('Could not booked, please try again', 'yatra'));
 
     }
 
@@ -132,7 +132,7 @@ class Yatra_Form_Handler
         $user = new stdClass();
         $user->ID = $user_id;
 
-        if (yatra_instance()->yatra_error->has_errors()) {
+        if (yatra()->yatra_error->has_errors()) {
 
             return;
         }
@@ -148,7 +148,7 @@ class Yatra_Form_Handler
 
         wp_update_user($user);
 
-        yatra_instance()->yatra_messages->add('yatra_my_account_messages', __('User profile successfully updated.', 'yatra'), 'success');
+        yatra()->yatra_messages->add('yatra_my_account_messages', __('User profile successfully updated.', 'yatra'), 'success');
 
     }
 
@@ -174,7 +174,7 @@ class Yatra_Form_Handler
 
         $valid_form_data = $yatra_user->valid_change_password_form_data($_POST);
 
-        if (yatra_instance()->yatra_error->has_errors()) {
+        if (yatra()->yatra_error->has_errors()) {
 
             return;
         }
@@ -187,12 +187,12 @@ class Yatra_Form_Handler
 
         if (!wp_check_password($old_password, $current_user->user_pass, $current_user->ID) || empty($yatra_new_password)) {
 
-            yatra_instance()->yatra_error->add('yatra_form_validation_errors', __('Old Password doesn\'t match', 'yatra'));
+            yatra()->yatra_error->add('yatra_form_validation_errors', __('Old Password doesn\'t match', 'yatra'));
 
             return;
         }
 
-        if (yatra_instance()->yatra_error->has_errors()) {
+        if (yatra()->yatra_error->has_errors()) {
 
             return;
         }
@@ -205,7 +205,7 @@ class Yatra_Form_Handler
 
         wp_update_user($user);
 
-        yatra_instance()->yatra_messages->add('yatra_my_account_messages', __('Password successfully changed.', 'yatra'), 'success');
+        yatra()->yatra_messages->add('yatra_my_account_messages', __('Password successfully changed.', 'yatra'), 'success');
 
 
     }
@@ -263,7 +263,7 @@ class Yatra_Form_Handler
                     exit;
                 }
             } catch (Exception $e) {
-                yatra_instance()->yatra_error->add('yatra_login_error_message', $e->getMessage());
+                yatra()->yatra_error->add('yatra_login_error_message', $e->getMessage());
                 do_action('yatra_login_failed');
             }
         }
@@ -277,7 +277,7 @@ class Yatra_Form_Handler
 
             $valid_data = Yatra_Checkout_Form::get_instance()->create_account_valid_form_data($_POST);
 
-            if (yatra_instance()->yatra_error->has_errors()) {
+            if (yatra()->yatra_error->has_errors()) {
 
                 return;
             }
@@ -296,7 +296,7 @@ class Yatra_Form_Handler
 
             if ($is_email_already_exists || $username_exists) {
 
-                yatra_instance()->yatra_error->add('yatra_form_validation_errors', __('Email or Usrename already exists, please try again..', 'yatra'));
+                yatra()->yatra_error->add('yatra_form_validation_errors', __('Email or Usrename already exists, please try again..', 'yatra'));
 
                 return;
             }
@@ -329,7 +329,7 @@ class Yatra_Form_Handler
 
             } else {
 
-                yatra_instance()->yatra_error->add('yatra_form_validation_errors', __('Something wrong on registration, please check all form fields once.', 'yatra'));
+                yatra()->yatra_error->add('yatra_form_validation_errors', __('Something wrong on registration, please check all form fields once.', 'yatra'));
 
                 return;
             }

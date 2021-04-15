@@ -18,7 +18,7 @@ do_action('yatra_checkout_before_form_fields');
         echo '<div class="mb-clear"></div>';
 
 
-        yatra_instance()->cart->get_cart_order_table();
+        yatra()->cart->get_cart_order_table();
         ?>
         <p>
             <?php wp_nonce_field('yatra_book_selected_tour_nonce', 'yatra-book-selected-tour-nonce'); ?>

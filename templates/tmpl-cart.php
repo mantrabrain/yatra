@@ -14,8 +14,8 @@ if (count($cart_items) < 1) {
 
     echo '<div class="yatra-cart-table-wrapper">';
 
-    yatra_instance()->cart->get_cart_table();
-    
+    yatra()->cart->get_cart_table();
+
     echo '</div>';
 
     $checkout_page_url = yatra_get_checkout_page(true);

@@ -13,33 +13,33 @@
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
+	exit; // Exit if accessed directly.
 }
 
 // Define YATRA_PLUGIN_FILE.
 if (!defined('YATRA_FILE')) {
-    define('YATRA_FILE', __FILE__);
+	define('YATRA_FILE', __FILE__);
 }
 
 // Define YATRA_VERSION.
 if (!defined('YATRA_VERSION')) {
-    define('YATRA_VERSION', '2.0.8');
+	define('YATRA_VERSION', '2.0.8');
 }
 
 // Define YATRA_PLUGIN_URI.
 if (!defined('YATRA_PLUGIN_URI')) {
-    define('YATRA_PLUGIN_URI', plugins_url('', YATRA_FILE));
+	define('YATRA_PLUGIN_URI', plugins_url('', YATRA_FILE));
 }
 
 // Define YATRA_PLUGIN_DIR.
 if (!defined('YATRA_PLUGIN_DIR')) {
-    define('YATRA_PLUGIN_DIR', plugin_dir_path(YATRA_FILE));
+	define('YATRA_PLUGIN_DIR', plugin_dir_path(YATRA_FILE));
 }
 
 
 // Include the main Yatra class.
 if (!class_exists('Yatra')) {
-    include_once dirname(__FILE__) . '/includes/class-yatra.php';
+	include_once dirname(__FILE__) . '/includes/class-yatra.php';
 }
 
 
@@ -48,13 +48,13 @@ if (!class_exists('Yatra')) {
  *
  * Returns the main instance of Yatra to prevent the need to use globals.
  *
- * @since  1.0.0
  * @return Yatra
+ * @since  1.0.0
  */
-function yatra_instance()
+function yatra()
 {
-    return Yatra::instance();
+	return Yatra::instance();
 }
 
 // Global for backwards compatibility.
-$GLOBALS['yatra-instance'] = yatra_instance();
+$GLOBALS['yatra-instance'] = yatra();
