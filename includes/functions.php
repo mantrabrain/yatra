@@ -206,11 +206,11 @@ if (!function_exists('yatra_locate_template')) {
     function yatra_locate_template($template_name, $template_path = '', $default_path = '')
     {
         if (!$template_path) {
-            $template_path = yatra_instance()->template_path();
+            $template_path = yatra()->template_path();
         }
 
         if (!$default_path) {
-            $default_path = yatra_instance()->plugin_template_path();
+            $default_path = yatra()->plugin_template_path();
         }
 
         // Look within passed path within the theme - this is priority.
@@ -811,3 +811,5 @@ if (!function_exists('yatra_maybeintempty')) {
         return absint($var);
     }
 }
+
+

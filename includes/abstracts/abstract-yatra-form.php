@@ -68,12 +68,12 @@ abstract class Yatra_Form
                 case "required":
 
                     if (empty($value)) {
-                        yatra_instance()->yatra_error->add('yatra_form_validation_errors', $error_message);
+                        yatra()->yatra_error->add('yatra_form_validation_errors', $error_message);
                     }
                     break;
                 case "email":
                     if (!is_email($value)) {
-                        yatra_instance()->yatra_error->add('yatra_form_validation_errors', $error_message);
+                        yatra()->yatra_error->add('yatra_form_validation_errors', $error_message);
                     }
 
                 case "equal_compare":
@@ -85,7 +85,7 @@ abstract class Yatra_Form
 
                         if ($data[$rule_fields[0]] != $data[$rule_fields[1]]) {
 
-                            yatra_instance()->yatra_error->add('yatra_form_validation_errors', $error_message);
+                            yatra()->yatra_error->add('yatra_form_validation_errors', $error_message);
 
                         }
                     }

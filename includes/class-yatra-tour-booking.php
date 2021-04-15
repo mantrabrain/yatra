@@ -14,7 +14,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
         public function book($booking_form_data = array())
         {
-            $cart = yatra_instance()->cart->get_cart();
+            $cart = yatra()->cart->get_cart();
 
             do_action('yatra_before_tour_booking', array('cart' => $cart));
 

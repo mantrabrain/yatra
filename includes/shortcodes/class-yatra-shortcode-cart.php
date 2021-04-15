@@ -50,7 +50,7 @@ class Yatra_Shortcode_Cart
 
         $cart = array();
 
-        $cart = yatra_instance()->cart->get_cart();
+        $cart = yatra()->cart->get_cart();
 
         if (!is_array($cart)) {
             $cart = array();

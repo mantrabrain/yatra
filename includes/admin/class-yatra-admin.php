@@ -16,163 +16,167 @@ defined('ABSPATH') || exit;
 final class Yatra_Admin
 {
 
-    /**
-     * The single instance of the class.
-     *
-     * @var Yatra_Admin
-     * @since 1.0.0
-     */
-    protected static $_instance = null;
+	/**
+	 * The single instance of the class.
+	 *
+	 * @var Yatra_Admin
+	 * @since 1.0.0
+	 */
+	protected static $_instance = null;
 
 
-    /**
-     * Main Yatra_Admin Instance.
-     *
-     * Ensures only one instance of Yatra_Admin is loaded or can be loaded.
-     *
-     * @since 1.0.0
-     * @static
-     * @return Yatra_Admin - Main instance.
-     */
-    public static function instance()
-    {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
-    }
+	/**
+	 * Main Yatra_Admin Instance.
+	 *
+	 * Ensures only one instance of Yatra_Admin is loaded or can be loaded.
+	 *
+	 * @return Yatra_Admin - Main instance.
+	 * @since 1.0.0
+	 * @static
+	 */
+	public static function instance()
+	{
+		if (is_null(self::$_instance)) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
 
 
-    /**
-     * Yatra Constructor.
-     */
-    public function __construct()
-    {
-        $this->includes();
-        $this->init_hooks();
-    }
+	/**
+	 * Yatra Constructor.
+	 */
+	public function __construct()
+	{
+		$this->includes();
+		$this->init_hooks();
+	}
 
-    /**
-     * Hook into actions and filters.
-     *
-     * @since 1.0.0
-     */
-    private function init_hooks()
-    {
+	/**
+	 * Hook into actions and filters.
+	 *
+	 * @since 1.0.0
+	 */
+	private function init_hooks()
+	{
 
-        add_action('admin_menu', array($this, 'admin_menu'));
-        add_action('init', array($this, 'setup_wizard'));
-        add_action('admin_init', array($this, 'admin_redirects'));
+		add_action('admin_menu', array($this, 'admin_menu'));
+		add_action('init', array($this, 'setup_wizard'));
+		add_action('admin_init', array($this, 'admin_redirects'));
 
-    }
+	}
 
-    public function admin_redirects()
-    {
+	public function admin_redirects()
+	{
 
-        if (!get_transient('_yatra_activation_redirect')) {
-            return;
-        }
+		if (!get_transient('_yatra_activation_redirect')) {
+			return;
+		}
 
-        delete_transient('_yatra_activation_redirect');
+		delete_transient('_yatra_activation_redirect');
 
-        if ((!empty($_GET['page']) && in_array($_GET['page'], array('yatra-setup'))) || is_network_admin() || isset($_GET['activate-multi']) || !current_user_can('manage_options')) {
-            return;
-        }
+		if ((!empty($_GET['page']) && in_array($_GET['page'], array('yatra-setup'))) || is_network_admin() || isset($_GET['activate-multi']) || !current_user_can('manage_options')) {
+			return;
+		}
 
-        // If it's the first time
-        if (get_option('yatra_setup_wizard_ran') != '1') {
-            wp_safe_redirect(admin_url('index.php?page=yatra-setup'));
-            exit;
+		// If it's the first time
+		if (get_option('yatra_setup_wizard_ran') != '1') {
+			wp_safe_redirect(admin_url('index.php?page=yatra-setup'));
+			exit;
 
-            // Otherwise, the welcome page
-        } else {
-            wp_safe_redirect(admin_url('edit.php?post_type=tour'));
-            exit;
-        }
-    }
+			// Otherwise, the welcome page
+		} else {
+			wp_safe_redirect(admin_url('edit.php?post_type=tour'));
+			exit;
+		}
+	}
 
-    /**
-     * Include required files
-     *
-     * @return void
-     */
-    public function setup_wizard()
-    {
-        // Setup/welcome
-        if (!empty($_GET['page'])) {
+	/**
+	 * Include required files
+	 *
+	 * @return void
+	 */
+	public function setup_wizard()
+	{
+		// Setup/welcome
+		if (!empty($_GET['page'])) {
 
-            if ('yatra-setup' == $_GET['page']) {
-                include_once YATRA_ABSPATH . 'includes/admin/setup/class-yatra-setup-wizard.php';
-            }
-        }
-    }
+			if ('yatra-setup' == $_GET['page']) {
+				include_once YATRA_ABSPATH . 'includes/admin/setup/class-yatra-setup-wizard.php';
+			}
+		}
+	}
 
-    function admin_menu()
-    {
-        $settings_page = add_submenu_page(
-            'edit.php?post_type=tour',
-            'Settings',
-            'Settings',
-            'manage_options',
-            'yatra-settings',
-            array($this, 'settings')
-        );
-        add_action('load-' . $settings_page, array($this, 'settings_page_init'));
-    }
+	function admin_menu()
+	{
+		$settings_page = add_submenu_page(
+			'edit.php?post_type=tour',
+			'Settings',
+			'Settings',
+			'manage_options',
+			'yatra-settings',
+			array($this, 'settings')
+		);
+		add_action('load-' . $settings_page, array($this, 'settings_page_init'));
+	}
 
-    public function settings()
-    {
-        Yatra_Admin_Settings::output();
-
-
-    }
-
-    public function settings_page_init()
-    {
-        global $current_tab, $current_section;
-
-        // Include settings pages.
-        Yatra_Admin_Settings::get_settings_pages();
-
-        // Get current tab/section.
-        $current_tab = empty($_GET['tab']) ? 'general' : sanitize_title(wp_unslash($_GET['tab'])); // WPCS: input var okay, CSRF ok.
-        $current_section = empty($_REQUEST['section']) ? '' : sanitize_title(wp_unslash($_REQUEST['section'])); // WPCS: input var okay, CSRF ok.
-
-        // Save settings if data has been posted.
-        if ('' !== $current_section && apply_filters("yatra_save_settings_{$current_tab}_{$current_section}", !empty($_POST['save']))) { // WPCS: input var okay, CSRF ok.
-            Yatra_Admin_Settings::save();
-        } elseif ('' === $current_section && apply_filters("yatra_save_settings_{$current_tab}", !empty($_POST['save']))) { // WPCS: input var okay, CSRF ok.
-            Yatra_Admin_Settings::save();
-        }
-
-        // Add any posted messages.
-        if (!empty($_GET['yatra_error'])) { // WPCS: input var okay, CSRF ok.
-            Yatra_Admin_Settings::add_error(wp_kses_post(wp_unslash($_GET['yatra_error']))); // WPCS: input var okay, CSRF ok.
-        }
-
-        if (!empty($_GET['yatra_message'])) { // WPCS: input var okay, CSRF ok.
-            Yatra_Admin_Settings::add_message(wp_kses_post(wp_unslash($_GET['yatra_message']))); // WPCS: input var okay, CSRF ok.
-        }
-
-        do_action('yatra_settings_page_init');
+	public function settings()
+	{
+		Yatra_Admin_Settings::output();
 
 
-    }
+	}
+
+	public function settings_page_init()
+	{
+		global $current_tab, $current_section;
+
+		// Include settings pages.
+		Yatra_Admin_Settings::get_settings_pages();
+
+		// Get current tab/section.
+		$current_tab = empty($_GET['tab']) ? 'general' : sanitize_title(wp_unslash($_GET['tab'])); // WPCS: input var okay, CSRF ok.
+		$current_section = empty($_REQUEST['section']) ? '' : sanitize_title(wp_unslash($_REQUEST['section'])); // WPCS: input var okay, CSRF ok.
+
+		// Save settings if data has been posted.
+		if ('' !== $current_section && apply_filters("yatra_save_settings_{$current_tab}_{$current_section}", !empty($_POST['save']))) { // WPCS: input var okay, CSRF ok.
+			Yatra_Admin_Settings::save();
+		} elseif ('' === $current_section && apply_filters("yatra_save_settings_{$current_tab}", !empty($_POST['save']))) { // WPCS: input var okay, CSRF ok.
+			Yatra_Admin_Settings::save();
+		}
+
+		// Add any posted messages.
+		if (!empty($_GET['yatra_error'])) { // WPCS: input var okay, CSRF ok.
+			Yatra_Admin_Settings::add_error(wp_kses_post(wp_unslash($_GET['yatra_error']))); // WPCS: input var okay, CSRF ok.
+		}
+
+		if (!empty($_GET['yatra_message'])) { // WPCS: input var okay, CSRF ok.
+			Yatra_Admin_Settings::add_message(wp_kses_post(wp_unslash($_GET['yatra_message']))); // WPCS: input var okay, CSRF ok.
+		}
+
+		do_action('yatra_settings_page_init');
 
 
-    /**
-     * Include required core files used in admin.
-     */
-    public function includes()
-    {
-        include_once YATRA_ABSPATH . 'includes/admin/yatra-admin-functions.php';
-        include_once YATRA_ABSPATH . 'includes/admin/dashboard/class-mantrabrain-admin-dashboard.php';
-        include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-assets.php';
-        include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-post-types.php';
-        include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-permalinks.php';
+	}
 
 
-    }
+	/**
+	 * Include required core files used in admin.
+	 */
+	public function includes()
+	{
+		include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-exporter.php';
+		include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-importer.php';
+		include_once YATRA_ABSPATH . 'includes/admin/yatra-admin-functions.php';
+		include_once YATRA_ABSPATH . 'includes/admin/dashboard/class-mantrabrain-admin-dashboard.php';
+		include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-form-handler.php';
+		include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-export-import.php';
+		include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-assets.php';
+		include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-post-types.php';
+		include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-permalinks.php';
+
+
+	}
 
 
 }

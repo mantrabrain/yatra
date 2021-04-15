@@ -234,9 +234,9 @@ if (!function_exists('yatra_account_notices')) {
 
     function yatra_account_notices()
     {
-        if (is_yatra_error(yatra_instance()->yatra_error)) {
+        if (is_yatra_error(yatra()->yatra_error)) {
 
-            $error_messages = yatra_instance()->yatra_error->get_error_messages('yatra_form_validation_errors');
+            $error_messages = yatra()->yatra_error->get_error_messages('yatra_form_validation_errors');
 
             if (count($error_messages) > 0) {
 
@@ -252,9 +252,9 @@ if (!function_exists('yatra_account_notices')) {
 
         }
 
-        if (yatra_instance()->yatra_messages->has_messages('yatra_my_account_messages')) {
+        if (yatra()->yatra_messages->has_messages('yatra_my_account_messages')) {
 
-            $messages = yatra_instance()->yatra_messages->get_messages('yatra_my_account_messages');
+            $messages = yatra()->yatra_messages->get_messages('yatra_my_account_messages');
 
             if (count($messages) > 0) {
 
@@ -281,9 +281,9 @@ if (!function_exists('yatra_login_notices')) {
     function yatra_login_notices()
     {
 
-        if (is_yatra_error(yatra_instance()->yatra_error)) {
+        if (is_yatra_error(yatra()->yatra_error)) {
 
-            $error_messages = yatra_instance()->yatra_error->get_error_messages('yatra_login_error_message');
+            $error_messages = yatra()->yatra_error->get_error_messages('yatra_login_error_message');
 
             if (count($error_messages) > 0) {
 
@@ -305,12 +305,12 @@ if (!function_exists('yatra_checkout_form_error')) {
 
     function yatra_checkout_form_error()
     {
-        if (is_yatra_error(yatra_instance()->yatra_error)) {
+        if (is_yatra_error(yatra()->yatra_error)) {
 
 
-            $form_validation_error = yatra_instance()->yatra_error->get_error_messages('yatra_form_validation_errors');
+            $form_validation_error = yatra()->yatra_error->get_error_messages('yatra_form_validation_errors');
 
-            $checkout_error = yatra_instance()->yatra_error->get_error_messages('yatra_checkout_error');
+            $checkout_error = yatra()->yatra_error->get_error_messages('yatra_checkout_error');
 
             $error_messages = array_merge($form_validation_error, $checkout_error);
 

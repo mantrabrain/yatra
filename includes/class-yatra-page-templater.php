@@ -32,9 +32,9 @@ if (!class_exists('Yatra_Page_Templater')) {
         function page_template($template_path)
         {
 
-            $yatra_template_path = yatra_instance()->template_path();
+            $yatra_template_path = yatra()->template_path();
 
-            $yatra_plugin_template_path = yatra_instance()->plugin_template_path();
+            $yatra_plugin_template_path = yatra()->plugin_template_path();
 
 
             if (get_post_type() == 'tour') {
