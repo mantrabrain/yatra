@@ -4,6 +4,7 @@ defined('ABSPATH') || exit;
 class Yatra_Ajax
 {
 
+
 	private function admin_ajax_actions()
 	{
 		$actions = array(
@@ -47,6 +48,9 @@ class Yatra_Ajax
 
 	public function __construct()
 	{
+
+		add_action('admin_init', array($this, 'import_content'), 15);
+
 		$admin_actions = $this->admin_ajax_actions();
 		$public_ajax_actions = $this->public_ajax_actions();
 		$all_ajax_actions = array_unique(array_merge($admin_actions, $public_ajax_actions));
@@ -192,43 +196,31 @@ class Yatra_Ajax
 
 	public function import_content()
 	{
+		//	return;
+
 		$status = $this->validate_nonce();
 
 		if (!$status) {
-			wp_send_json_error($this->ajax_error());
+			return;
+			//wp_send_json_error($this->ajax_error());
 		}
 
 
 		$target_dir = yatra()->get_upload_dir(true);
 
-		$import_file = isset($_FILES['yatra_import_file']) ? $_FILES['yatra_import_file'] : array();
-
-		if (!isset($import_file['name'])) {
-			wp_send_json_error();
-		}
-
-		$target_file = $target_dir . basename($import_file["name"]);
-
-		$temp_name = $import_file["tmp_name"];
-
-		$file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
-		$yatra_allowed_file_type = $import_file["type"];
-
-		if ($file_type != "json" || $yatra_allowed_file_type != "application/json") {
-			wp_send_json_error(__('Invalid file type. Please use vaild json file.', 'yatra'));
-
-		}
-
-		if (!move_uploaded_file($temp_name, $target_file)) {
-
-			wp_send_json_error(__('File upload failed. Please try again.', 'yatra'));
-		}
+		$target_file = $target_dir . 'file.json';
 
 		$status = yatra()->importer->import($target_file);
 
+		var_dump($status);
+		exit;
 		unlink($target_file);
 
+		if ($status) {
+			wp_send_json_success();
+		} else {
+			wp_send_json_error();
+		}
 	}
 
 

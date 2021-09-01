@@ -32,18 +32,13 @@ class Yatra_Core_Importer
 
 			$yatra_images = isset($yatra_content_array['images']) ? $yatra_content_array['images'] : array();
 
+
 			$this->upload_images($yatra_images);
 
 			foreach ($yatra_terms as $taxonomy => $terms) {
 
 				$this->insert_term($terms);
 			}
-
-			/*echo '<pre>';
-			print_r($this->image_id_mapping);
-			print_r($this->term_id_mapping);
-			exit;*/
-
 
 			foreach ($yatra_custom_post_types as $custom_post_type => $custom_post_type_datas) {
 
@@ -79,13 +74,20 @@ class Yatra_Core_Importer
 									}
 									$cpt_meta_value = @implode(',', $cpt_meta_values_updated);
 
+								} else if ($cpt_meta_id === '_thumbnail_id' && '' != $cpt_meta_value) {
+
+									$cpt_meta_value = $this->get_new_image_id($cpt_meta_value);
 								}
+								$cpt_meta_value = maybe_unserialize($cpt_meta_value);
+
 								add_post_meta($cpt_inserted_id, $cpt_meta_id, $cpt_meta_value);
 
 							}
 
 							foreach ($custom_post_type_terms as $cpt_term_id => $cpt_term_taxonomy) {
+
 								$cpt_term_id = $this->get_new_term_id($cpt_term_id);
+
 								$term_taxonomy_ids = wp_set_object_terms($cpt_inserted_id, $cpt_term_id, $cpt_term_taxonomy);
 							}
 						}
@@ -122,7 +124,14 @@ class Yatra_Core_Importer
 						'parent' => $parent_term_id,
 					)
 				);
+				$inserted_term_id = (!is_wp_error($inserted_term_id) && is_array($inserted_term_id) && @isset($inserted_term_id['term_id'])) ? $inserted_term_id['term_id'] : $inserted_term_id;
+
+			} else {
+				$term = get_term_by('name', $term_data['name'], $term_data['taxonomy']);
+
+				$inserted_term_id = @$term->term_id;
 			}
+
 
 			$metas = isset($term_data['meta']) ? $term_data['meta'] : array();
 
@@ -138,8 +147,7 @@ class Yatra_Core_Importer
 						$meta_value = $this->get_new_image_id($meta_value);
 					}
 
-					add_term_meta($inserted_term_id, $meta_key, $meta_value);
-
+					$status = add_term_meta($inserted_term_id, $meta_key, $meta_value, true);
 				}
 			}
 
@@ -209,6 +217,9 @@ class Yatra_Core_Importer
 
 	private function get_new_image_id($old_image_id = null)
 	{
+		if (is_array($old_image_id)) {
+			$old_image_id = $old_image_id[0];
+		}
 		if (is_null($old_image_id) || '' == $old_image_id) {
 			return null;
 		}

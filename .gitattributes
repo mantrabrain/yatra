@@ -1,0 +1,21 @@
+# Set the default behavior, in case people don't have `core.autocrlf` set.
+* text=auto
+
+# Declare files that will always have LF line endings on checkout.
+*.php text eol=lf
+
+# Remove files for archives generated using `git archive`.
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.github export-ignore
+/.wordpress-org export-ignore
+/package-lock.json  export-ignore
+/package.json  export-ignore
+/Gruntfile.js  export-ignore
+/.jshintrc  export-ignore
+/assets/package.json  export-ignore
+/assets/package-lock.json  export-ignore
+/assets/src  export-ignore
+/assets/node_modules  export-ignore
+/node_modules  export-ignore
+/pax_global_header  export-ignore
