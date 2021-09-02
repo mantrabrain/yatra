@@ -2,8 +2,8 @@
 Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
-Tested up to: 5.4
-Stable tag: 2.0.8
+Tested up to: 5.8
+Stable tag: 2.0.9
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -103,53 +103,6 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
-= 2.0.8 | 2020/04/23 =
-* Fixed - Minor issue fixed & frontend design tweak
-* Added - Tour Start & end date
-* Added - Variable/multi pricing
-
-= 2.0.7 | 2020/02/02 =
-* Fixed - Tour admin design changed
-* Added - Setup wizard
-* Added - Yatri Theme for the plugin
-
-= 2.0.6 | 2019/11/03 =
-* Fixed - Minor design issue fixed
-* Added - Shortcode for activity,destination,discount & deals, tour list
-* Added - Widgets for activity, destination, discount & deals, tour list
-* Added - Featured tour metabox added
-* Fixed - Other minor php related issue fixed
-
-= 2.0.5 | 2019/09/09 =
-* Fixed - Permalink issue fixed
-
-= 2.0.4 | 2019/08/18 =
-* Fixed - Minor issue fixed
-* Added - PayPal payment gateway integrated
-* Added - My Account Feature Added
-* Added - Customer creation feature added
-* Added - User creation feature added
-
-= 2.0.3 | 2019/07/25 =
-* Fixed - Ajax issue for non logged in user fixed
-
-= 2.0.2 | 2019/07/21 =
-* Fixed - Minor css issue fixed
-* Fixed - Currency symbol not showing on booking page issue fixed
-* Added - email notification feature
-
-= 2.0.1 | 2019/07/15 =
-* Fixed - Js issue fixed for repeator field
-* Fixed - Style issue fixed for single page tour
-
-= 2.0.0 | 2019/07/15 =
-* Added - Flexible tab option added
-* Added - Tour Custom attribute added
-* Added - Frontend Tab sortable option
-* Added - Booking detail option on backend
-* Fixed - Major file option updated
-* Fixed - Cart option optimized
-* Fixed - Checkout option optimized
-
-= 1.0.0 | 2019/05/10 =
-* Initial Release
+= 2.0.8 | 2021/09/02 =
+* Fixed - Import & Export Option added
+* Tested - Version Tested
