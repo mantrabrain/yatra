@@ -10,7 +10,7 @@
 			   for="coursesfile"><?php echo esc_html__('Course exported file', 'yatra'); ?></label>
 		<input type="file" id="yatra_import_file" name="yatra_import_file" accept=".json">
 		<input type="submit" name="install-theme-submit" id="install-theme-submit" class="button"
-			   value="<?php echo __('Import Now') ?>"
+			   value="<?php echo __('Import Now', 'yatra') ?>"
 			   disabled="">
 
 		<input type="hidden" value="yatra_import_content" name="action"/>
