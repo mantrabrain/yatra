@@ -10,6 +10,8 @@
 /.github export-ignore
 /.wordpress-org export-ignore
 /package-lock.json  export-ignore
+/composer.json  export-ignore
+/.editorconfig	export-ignore
 /package.json  export-ignore
 /Gruntfile.js  export-ignore
 /.jshintrc  export-ignore
@@ -19,3 +21,4 @@
 /assets/node_modules  export-ignore
 /node_modules  export-ignore
 /pax_global_header  export-ignore
+/yatra.tar  export-ignore
