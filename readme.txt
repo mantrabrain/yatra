@@ -103,6 +103,6 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
-= 2.0.8 | 2021/09/02 =
+= 2.0.9 | 2021/09/02 =
 * Fixed - Import & Export Option added
 * Tested - Version Tested
