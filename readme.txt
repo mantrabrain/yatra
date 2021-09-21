@@ -65,7 +65,7 @@ Shortcode for Discount & Deals Listing:
 <pre>[yatra_discount_and_deals order="asc"]</pre>
 
 Shortcode for Tour Listing:
-<pre>[yatra_tour order="asc" featured="1"]</pre>
+<pre>[yatra_tour order="asc" featured="1" posts_per_page="5"]</pre>
 
 
 == Smart Tags ==

@@ -59,6 +59,8 @@ if (!function_exists('yatra_get_tour_lists')) {
 
 		$featured = isset($atts['featured']) ? absint($atts['featured']) : 2;
 
+		$posts_per_page = isset($atts['posts_per_page']) ? absint($atts['posts_per_page']) : 9;
+
 		$meta_query = array();
 
 
@@ -96,7 +98,7 @@ if (!function_exists('yatra_get_tour_lists')) {
 		$args = array(
 			'post_type' => 'tour',
 			'order' => $order,
-			'posts_per_page' => 9
+			'posts_per_page' => $posts_per_page
 		);
 
 		if (count($meta_query) > 0) {
