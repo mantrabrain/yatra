@@ -194,7 +194,6 @@ class Yatra_Ajax
 
 	public function import_content()
 	{
-
 		$status = $this->validate_nonce();
 
 		if (!$status) {

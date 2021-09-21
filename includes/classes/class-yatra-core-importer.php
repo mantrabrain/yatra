@@ -77,6 +77,31 @@ class Yatra_Core_Importer
 								} else if ($cpt_meta_id === '_thumbnail_id' && '' != $cpt_meta_value) {
 
 									$cpt_meta_value = $this->get_new_image_id($cpt_meta_value);
+
+								} else if ($cpt_meta_id === 'tour_meta_custom_attributes') {
+
+									$cpt_meta_value = maybe_unserialize($cpt_meta_value);
+
+									$new_cpt_meta_value = array();
+
+									if (is_array($cpt_meta_value)) {
+
+										foreach ($cpt_meta_value as $attribute_id => $attribute_content) {
+
+											$new_attribute_id = $this->get_new_term_id($attribute_id);
+
+											if ('' != $new_attribute_id && !is_null($new_attribute_id)) {
+
+												$new_cpt_meta_value[$new_attribute_id] = $attribute_content;
+
+											}
+
+										}
+
+									}
+
+									$cpt_meta_value = $new_cpt_meta_value;
+
 								}
 								$cpt_meta_value = maybe_unserialize($cpt_meta_value);
 
@@ -84,12 +109,17 @@ class Yatra_Core_Importer
 
 							}
 
-							foreach ($custom_post_type_terms as $cpt_term_id => $cpt_term_taxonomy) {
 
-								$cpt_term_id = $this->get_new_term_id($cpt_term_id);
+							foreach ($custom_post_type_terms as $cpt_term_taxonomy => $cpt_term_ids) {
 
-								$term_taxonomy_ids = wp_set_object_terms($cpt_inserted_id, $cpt_term_id, $cpt_term_taxonomy);
+								$new_cpt_term_ids = $this->get_new_term_ids($cpt_term_ids);
+
+								$term_taxonomy_ids = wp_set_object_terms($cpt_inserted_id, $new_cpt_term_ids, $cpt_term_taxonomy);
+
+
 							}
+
+
 						}
 					}
 				}
@@ -239,5 +269,17 @@ class Yatra_Core_Importer
 			return $this->term_id_mapping[$old_term_id];
 		}
 		return $old_term_id;
+	}
+
+	private function get_new_term_ids($old_term_ids = array())
+	{
+		$new_term_ids = array();
+
+		foreach ($old_term_ids as $old_id) {
+
+			$new_term_ids[] = $this->get_new_term_id($old_id);
+		}
+
+		return $new_term_ids;
 	}
 }

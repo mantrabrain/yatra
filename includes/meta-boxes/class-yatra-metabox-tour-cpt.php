@@ -122,7 +122,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         }
 
-        public function attributes_tab_content($content)
+        public function attributes_tab_content()
         {
             $settings = yatra_tour_attributes();
 

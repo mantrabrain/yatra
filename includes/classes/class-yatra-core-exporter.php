@@ -83,7 +83,7 @@ class Yatra_Core_Exporter
 					break;
 			}
 			$term->meta = $meta;
-			
+
 			$children[$term_id] = $term;
 		}
 
@@ -148,11 +148,13 @@ class Yatra_Core_Exporter
 				}
 
 				$post_terms_list = wp_get_object_terms($single_cpt_data->ID, array('destination', 'activity'));
+
 				$post_terms = array();
+
 				if (is_array($post_terms_list) && @count($post_terms_list) > 0) {
 
 					foreach ($post_terms_list as $single_term_item) {
-						$post_terms[$single_term_item->term_id] = $single_term_item->taxonomy;
+						$post_terms[$single_term_item->taxonomy][] = $single_term_item->term_id;
 					}
 				}
 
