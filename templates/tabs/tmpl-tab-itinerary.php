@@ -1,4 +1,4 @@
-<h3 class="tab-title"><?php echo esc_html($title); ?><span class="fa fa-minus"></span></h3>
+<h3 class="tab-title"><?php echo esc_html($title); ?><span class="fa fa-plus"></span></h3>
 <ul class="yatra-list yatra-itinerary-list">
     <?php
 
@@ -8,9 +8,9 @@
 
         echo '<div class="yatra-itinerary-list-item">';
 
-        echo '<h4 class="yatra-heading itinerary-heading">' . esc_html($itinerary_item['itinerary_heading']) . '<span class="icon fa fa-minus"></span></h4>';
+        echo '<h4 class="yatra-heading itinerary-heading">' . esc_html($itinerary_item['itinerary_heading']) . '<span class="icon fa fa-plus"></span></h4>';
 
-        echo '<div class="yatra-content itinerary-content">';
+        echo '<div class="yatra-content itinerary-content" style="display: none">';
 
         echo '<h4 class="itinerary-title">'.esc_html($itinerary_item['itinerary_title']).'</h4>';
 
