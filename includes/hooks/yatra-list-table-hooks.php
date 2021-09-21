@@ -47,7 +47,6 @@ class Yatra_List_Table_Hooks
 
 				$term_content .= " : <strong>" . esc_html($content['shortcode']) . '</strong>';
 			}
-
 			echo $term_content . '<br/>';
 		}
 

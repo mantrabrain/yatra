@@ -1,3 +1,7 @@
+= 2.0.9 | 2021/09/02 =
+* Fixed - Import & Export Option added
+* Tested - Version Tested
+
 = 2.0.8 | 2020/04/23 =
 * Fixed - Minor issue fixed & frontend design tweak
 * Added - Tour Start & end date
