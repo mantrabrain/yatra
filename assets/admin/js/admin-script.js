@@ -16,6 +16,7 @@
 				$(this).closest('ul').find('li').removeClass('active');
 				$(this).addClass('active');
 				var tab_key = $(this).attr('data-tab');
+				$('input#yatra_tour_meta_tour_admin_active_tab').val(tab_key);
 				var content = parent.next('.yatra-admin--tab-content');
 				content.find('.yatra-admin-tab--content-section').removeClass('active');
 				content.find('#' + tab_key).addClass('active');

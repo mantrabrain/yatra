@@ -662,6 +662,12 @@ if (!function_exists('yatra_tour_general_configurations')) {
 				'type' => 'hidden',
 
 			),
+			'yatra_tour_meta_tour_admin_active_tab' => array(
+				'name' => 'yatra_tour_meta_tour_admin_active_tab',
+				'type' => 'hidden',
+				'default' => 'general'
+
+			),
 		);
 		return apply_filters('yatra_tour_general_configurations', $tour_options);
 	}

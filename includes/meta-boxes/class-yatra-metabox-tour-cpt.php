@@ -55,8 +55,13 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
 		public function tour_meta()
 		{
+			global $post;
+
+			$post_id = $post->ID ?? 0;
+
 			$args['tabs'] = yatra_tour_metabox_tabs();
 
+			$args['active_tab'] = get_post_meta($post_id, 'yatra_tour_meta_tour_admin_active_tab', true);
 			yatra_load_admin_template('metabox.tour.tab', $args);
 			yatra_load_admin_template('metabox.tour.tab-content', $args);
 
