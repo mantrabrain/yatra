@@ -675,11 +675,53 @@
 	};
 
 
+	var YatraSettingFrontTabs = {
+		init: function () {
+			this.cacheDom();
+			this.bindEvents();
+		},
+		bindEvents: function () {
+			var that = this;
+			this.button.on('click', function () {
+				that.addNewTab($(this));
+			});
+
+		},
+		cacheDom: function () {
+			this.button = $('#yatra-setting-tab-option-add-new-tab');
+
+		},
+		addNewTab: function ($button) {
+			var wrap = $button.closest('.yatra-setting-tab-options');
+			var length = wrap.find('ul').find('li').length;
+			var index = length;
+
+			var icon_name = wrap.find('ul').attr('data-icon-name');
+			var type_name = wrap.find('ul').attr('data-type-name');
+			var label_name = wrap.find('ul').attr('data-label-name');
+			var li = $('<li/>');
+			//name
+			li.append('Tab Label<input name="' + this.replaceTabName(icon_name, index) + '" type="text"/>');
+			//label
+			li.append('<input name="' + this.replaceTabName(label_name, index) + '" type="text" value="Tab Label"/>');
+			//icon
+			li.append('<input name="' + this.replaceTabName(type_name, index) + '" type="text"/>');
+			wrap.find('ul').append(li);
+		},
+		replaceTabName(text, index) {
+
+			return text.replace('TAB_INDEX', index);
+		}
+
+	};
+
+
 	$(document).ready(function () {
 		YatraAdmin.init();
 		YatraTabs.init();
 		YatraSubTabs.init();
 		YatraTaxonomy.init();
 		YatraTourAttributes.init();
+		YatraSettingFrontTabs.init();
 	});
 }(jQuery));
