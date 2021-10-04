@@ -234,76 +234,7 @@ if (!function_exists('yatra_entry_meta_options')) {
 }
 if (!function_exists('yatra_tour_tab_configurations')) {
 
-	function yatra_tour_tab_configurations($config_key = null)
-	{
-		$all_tab_configs = yatra_tour_tab_default_configurations();
-
-		$available_tabs = get_option('yatra_frontend_tabs_available_options', $all_tab_configs);
-
-		$final_available_tabs = array();
-
-		foreach ($available_tabs as $tab_index => $tab) {
-
-			$type = $tab['type'] ?? '';
-
-			if (isset($all_tab_configs[$type])) {
-
-				$final_available_tabs[$type] = $all_tab_configs[$type];
-
-				$final_available_tabs[$type]['label'] = $tab['label'] ?? '';
-
-				$final_available_tabs[$type]['options'][$type . '_label']['default'] = $tab['label'] ?? '';
-
-				$final_available_tabs[$type]['icon'] = $tab['icon'] ?? '';
-
-			} else {
-				switch ($type) {
-					case "text":
-						$final_available_tabs[$type . '_' . $tab_index] = array(
-							'label' => $tab['label'] ?? '',
-							'icon' => $tab['icon'] ?? '',
-							'type' => $type,
-							'index' => $tab_index,
-							'options' =>
-								array(
-									'text_' . $tab_index . '_label' => array(
-										'name' => 'text_' . $tab_index . '_label',
-										'title' => __('Label Text', 'yatra'),
-										'type' => 'text',
-										'default' => $tab['label'] ?? '',
-									),
-									'text_' . $tab_index . '_content' => array(
-										'name' => 'text_' . $tab_index . '_content',
-										'title' => __('Content', 'yatra'),
-										'type' => 'textarea',
-										'editor' => true
-									)
-								),
-
-						);
-						break;
-				}
-
-			}
-
-		}
-
-		if (!is_null($config_key)) {
-
-			if (isset($final_available_tabs[$config_key])) {
-
-				return $final_available_tabs[$config_key];
-			}
-		}
-		return $final_available_tabs;
-
-
-	}
-}
-
-if (!function_exists('yatra_tour_tab_default_configurations')) {
-
-	function yatra_tour_tab_default_configurations()
+	function yatra_tour_tab_configurations()
 	{
 
 		$tab_config = array(
@@ -485,9 +416,7 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
 					),
 			),
 		);
-
 		return apply_filters('yatra_tour_tab_configurations', $tab_config);
-
 	}
 }
 
@@ -733,12 +662,6 @@ if (!function_exists('yatra_tour_general_configurations')) {
 				'type' => 'hidden',
 
 			),
-			'yatra_tour_meta_tour_admin_active_tab' => array(
-				'name' => 'yatra_tour_meta_tour_admin_active_tab',
-				'type' => 'hidden',
-				'default' => 'general'
-
-			),
 		);
 		return apply_filters('yatra_tour_general_configurations', $tour_options);
 	}
@@ -868,6 +791,7 @@ if (!function_exists('yatra_frontend_tabs')) {
 
 		$frontend_tabs_config = yatra_frontend_tabs_config();
 
+
 		$yatra_tour_tab_configurations = yatra_tour_tab_configurations();
 
 		?>
@@ -884,16 +808,13 @@ if (!function_exists('yatra_frontend_tabs')) {
 			</ul>
 			<?php
 			$loop_index = 0;
-			foreach ($frontend_tabs_config as $tab_content_key => $tab_content_title) { ?>
+			foreach ($frontend_tabs_config as $tab_content_key => $tab_content) { ?>
 				<section id="<?php echo esc_attr($tab_content_key); ?>"
 						 class="yatra-tab-content" <?php if ($loop_index > 0) { ?> aria-hidden="true" <?php } ?>>
 					<div class="tab-inner">
 						<?php
 
-						do_action('yatra_frontend_tab_content_' . $tab_content_key, $tab_content_title, array(
-							'post' => $post,
-							'tab_content_key' => $tab_content_key
-						))
+						do_action('yatra_frontend_tab_content_' . $tab_content_key, $tab_content, $post)
 						?>
 					</div>
 				</section>

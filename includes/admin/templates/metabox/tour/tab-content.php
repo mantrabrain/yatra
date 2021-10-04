@@ -3,9 +3,7 @@
     foreach ($tabs as $tab_key => $content) {
 
         $is_active = isset($content['is_active']) ? $content['is_active'] : false;
-		if ($active_tab != '') {
-			$is_active = $active_tab === $tab_key;
-		}
+
         $class = $is_active ? 'active' : '';
 
         ?>

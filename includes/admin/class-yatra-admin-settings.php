@@ -51,7 +51,6 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 				$settings[] = include 'settings/class-yatra-settings-emails.php';
 				$settings[] = include 'settings/class-yatra-settings-checkout.php';
 				$settings[] = include 'settings/class-yatra-settings-payment-gateways.php';
-				$settings[] = include 'settings/class-yatra-settings-frontend-tabs.php';
 
 
 				self::$settings = apply_filters( 'yatra_get_settings_pages', $settings );
@@ -153,10 +152,6 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 		 * @return mixed
 		 */
 		public static function get_option( $option_name, $default = '' ) {
-			if ( ! $option_name ) {
-				return $default;
-			}
-
 			// Array value.
 			if ( strstr( $option_name, '[' ) ) {
 
@@ -181,7 +176,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 			}
 
 			if ( is_array( $option_value ) ) {
-				$option_value = wp_unslash( $option_value );
+				$option_value = array_map( 'stripslashes', $option_value );
 			} elseif ( ! is_null( $option_value ) ) {
 				$option_value = stripslashes( $option_value );
 			}
@@ -643,58 +638,6 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 						<?php
 						break;
 
-						case 'tab_repeator':
-
-
-
-							$default = $value['default'] ?? array();
-							$repeator_value =  self::get_option( $value['id'], $default );
-							$repeator_value= is_array($repeator_value) ? $repeator_value : array();
-
-
-
-						?>
-						<tr valign="top" class="single_select_page">
-							<th scope="row" class="titledesc">
-								<label><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
-							</th>
-							<td class="forminp">
-								<div class="yatra-setting-tab-options">
-								<?php
-								if(count($repeator_value)>0){
-									echo '<ul
-									data-icon-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][icon]"
-									data-label-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][label]"
-									data-type-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][type]"
-									>';
-								}
-								$rep_index =0;
-
-								foreach($repeator_value as $rep_key=> $rep_val){
-
-									$rep_val['type']=$rep_val['type'] ?? $rep_key;
-									echo '<li>';
-									echo $rep_val['label'];
-									?>
-									<input type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo absint($rep_index); ?>][icon]" value="<?php echo esc_attr($rep_val['icon']) ?>"/>
-									<input type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo absint($rep_index); ?>][label]" value="<?php echo esc_attr($rep_val['label']) ?>"/>
-									<input  type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo absint($rep_index); ?>][type]" value="<?php echo esc_attr($rep_val['type']) ?>"/>
-
-									<?php
-									echo '</li>';
-									$rep_index++;
-								}
-								if(count($repeator_value)>0){
-									echo '</ul>';
-								}
-								?>
-									<button type="button" class="button" id="yatra-setting-tab-option-add-new-tab"><?php echo __( 'Add New' ) ?></button>
-								</div>
-							</td>
-						</tr>
-						<?php
-						break;
-
 
 
 					// Default: run an action.
@@ -818,26 +761,6 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 						}
 						$default = ( empty( $option['default'] ) ? $allowed_values[0] : $option['default'] );
 						$value   = in_array( $raw_value, $allowed_values, true ) ? $raw_value : $default;
-						break;
-					case 'tab_repeator':
-
-						$value = array();
-
-						$raw_value = is_array($raw_value) ? $raw_value: array();
-
-						$all_available_type = array('overview', 'itinerary', 'cost_info', 'faq', 'map', 'gallery', 'text');
-
-						foreach($raw_value as $raw_index => $raw_single_value){
-
-							$type = $raw_single_value['type'] ?? '';
-
-							if(in_array($type, $all_available_type)){
-								$final_value= array();
-								$final_value['icon']= isset($raw_single_value['icon']) ? sanitize_text_field($raw_single_value['icon']): '';
-								$final_value['type']= $type;
-								$final_value['label']=isset($raw_single_value['label']) ? sanitize_text_field($raw_single_value['label']): '';
-								$value[]=$final_value;
-						}}
 						break;
 					default:
 						$value = sanitize_text_field( $raw_value );

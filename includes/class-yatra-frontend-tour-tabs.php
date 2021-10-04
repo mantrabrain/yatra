@@ -31,10 +31,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 			}
 		}
 
-		public function overview($title, $extra_args)
+		public function overview($title, $post)
 		{
-
-			$post = $extra_args['post'];
 
 			$overview = get_post_meta($post->ID, 'overview_description', true);
 
@@ -47,12 +45,9 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 
 		}
 
-		public function itinerary($title, $extra_args)
+		public function itinerary($title, $post)
 		{
-			$post = $extra_args['post'];
-
 			$itinerary = get_post_meta($post->ID, 'itinerary_repeator', true);
-
 			if (!is_array($itinerary)) {
 
 				$itinerary = array();
@@ -82,10 +77,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 			);
 		}
 
-		public function cost_info($title, $extra_args)
+		public function cost_info($title, $post)
 		{
-
-			$post = $extra_args['post'];
 
 			$cost_info['includes_title'] = get_post_meta($post->ID, 'cost_info_price_includes_title', true);
 			$cost_info['includes_description'] = get_post_meta($post->ID, 'cost_info_price_includes_description', true);
@@ -100,9 +93,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 			);
 		}
 
-		public function faq($title, $extra_args)
+		public function faq($title, $post)
 		{
-			$post = $extra_args['post'];
 
 			$faqs = get_post_meta($post->ID, 'faq_repeator', true);
 			if (!is_array($faqs)) {
@@ -133,9 +125,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 			);
 		}
 
-		public function gallery($title, $extra_args)
+		public function gallery($title, $post)
 		{
-			$post = $extra_args['post'];
 
 			$image_ids = get_post_meta($post->ID, 'yatra_tour_meta_gallery', true);
 
@@ -167,10 +158,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 			);
 		}
 
-		function map($title, $extra_args)
+		function map($title, $post)
 		{
-			$post = $extra_args['post'];
-
 			$yatra_tour_meta_map_content = get_post_meta($post->ID, 'yatra_tour_meta_map_content', true);
 
 			yatra_get_template('tabs/tmpl-tab-map.php',
@@ -179,35 +168,6 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 					'title' => $title
 				)
 			);
-		}
-
-		public function misc($title, $extra_args)
-		{
-			$post = $extra_args['post'];
-
-			$tab_content_key = $extra_args['tab_content_key'];
-
-			$configs = yatra_tour_tab_configurations($tab_content_key);
-
-			$type = $configs['type'] ?? 'text';
-
-			switch ($type) {
-				case "text":
-					$index = absint($configs['index']) ?? 0;
-
-					$content_id = "text_{$index}_content";
-
-					$content = get_post_meta($post->ID, $content_id, true);
-
-					yatra_get_template('tabs/misc/text.php',
-						array(
-							'content' => $content,
-							'title' => $title
-						)
-					);
-					break;
-
-			}
 		}
 	}
 
