@@ -99,7 +99,13 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
 				'tab_settings_remove_tab_item_no_button_text' => __('Cancel this process', 'yatra'),
 
-				'font_awesome_icons' => yatra_fontawesome_icon_lists()
+				'font_awesome_icons' => array(
+					'font_awesome' => array(
+						'icons' => yatra_fontawesome_icon_lists(),
+						'title' => __('Font Awesome', 'yatra')
+					)
+				)
+
 
 			);
 

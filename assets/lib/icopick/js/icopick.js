@@ -35,10 +35,10 @@
 			$('#icopick').addClass('picker-active');
 			$('.icopick-control-field .customize-control-icon-picker-value').removeClass('open-input-field');
 			input.addClass('open-input-field');
-			$('#agency-ecommerce-icon-browser ul.agency-ecommerce-icon-list-ul li').removeClass('active');
+			$('#icopick-browser ul.icopick-list-ul li').removeClass('active');
 			var input_val = input.val();
 			if (input_val != '') {
-				$('#agency-ecommerce-icon-browser ul.agency-ecommerce-icon-list-ul li[data-icon="' + input_val + '"]').addClass('active');
+				$('#icopick-browser ul.icopick-list-ul li[data-icon="' + input_val + '"]').addClass('active');
 			}
 		},
 		initClosePickerPanel: function () {
@@ -57,33 +57,33 @@
 
 		},
 		initIconType: function () {
-			$document.on("change", "#agency-ecommerce-icon-type", function () {
+			$document.on("change", "#icopick-type", function () {
 				var wrap = $(this).closest('.icopick-control-field');
 				var type = $(this).val();
 				if (!type || type == "all") {
-					wrap.find("#agency-ecommerce-icon-browser ul.agency-ecommerce-icon-list-ul").show();
+					wrap.find("#icopick-browser ul.icopick-list-ul").show();
 				} else {
-					wrap.find("#agency-ecommerce-icon-browser ul.agency-ecommerce-icon-list-ul").hide();
+					wrap.find("#icopick-browser ul.icopick-list-ul").hide();
 					wrap.find(
-						'#agency-ecommerce-icon-browser ul.agency-ecommerce-icon-list-ul[data-icon-type="' + type + '"]'
+						'#icopick-browser ul.icopick-list-ul[data-icon-type="' + type + '"]'
 					).show();
 				}
 			});
 		},
 		initSearch: function () {
-			$document.on("keyup", "#agency-ecommerce-icon-search-input", function (e) {
+			$document.on("keyup", "#icopick-search-input", function (e) {
 				var v = $(this).val();
 				v = v.trim();
 				var wrap = $(this).closest('#icopick');
 				if (v) {
 
-					wrap.find('#agency-ecommerce-icon-browser li').hide();
+					wrap.find('#icopick-browser li').hide();
 
 					wrap.find(
-						"#agency-ecommerce-icon-browser li[data-icon*='" + v + "']"
+						"#icopick-browser li[data-icon*='" + v + "']"
 					).show();
 				} else {
-					wrap.find('#agency-ecommerce-icon-browser li').show();
+					wrap.find('#icopick-browser li').show();
 				}
 			});
 		},
@@ -129,14 +129,14 @@
 				}
 			});
 
-			$('body').on('click', '#icopick .agency-ecommerce-icon-list-ul li', function () {
+			$('body').on('click', '#icopick .icopick-list-ul li', function () {
 				_that.pickIcon($(this));
 			});
 
 		},
 		lodIcons: function (wrap) {
-			var icon_wrap = wrap.find('#agency-ecommerce-icon-browser');
-			var icon_select = $('#icopick').find('select#agency-ecommerce-icon-type');
+			var icon_wrap = wrap.find('#icopick-browser');
+			var icon_select = $('#icopick').find('select#icopick-type');
 			var icon = this.icons;
 			if (icon_select.find('option').length < 2) {
 				var icon_select_node = $('<select/>');
@@ -144,7 +144,8 @@
 
 				for (var icon_key in icon) {
 
-					var icon_list_node = $('<ul class="agency-ecommerce-icon-list-ul" data-icon-type="' + icon_key + '"/>');
+
+					var icon_list_node = $('<ul class="icopick-list-ul" data-icon-type="' + icon_key + '"/>');
 					var icon_prefix = '';
 					switch (icon_key) {
 						case "font_awesome":
@@ -157,13 +158,14 @@
 						var all_icons = typeof icon[icon_key].icons != undefined ? icon[icon_key].icons : {};
 						icon_select_node.append('<option value="' + icon_key + '">' + title + '</option>');
 
-
 						for (var all_icon_key in all_icons) {
+
 							if (all_icon_key.replace(icon_prefix) != all_icon_key) {
 								icon_prefix = '';
 
 							}
-							icon_list_node.append('<li title="' + all_icon_key + '" data-type="' + icon_key + '" data-icon="' + icon_prefix + all_icon_key + '" style="display: list-item;"><span class="icon-wrapper"><i class="' + icon_prefix + ' ' + all_icon_key + '"></i></span></li>');
+							var icon_content_key_text = all_icons[all_icon_key];
+							icon_list_node.append('<li title="' + all_icon_key + '" data-type="' + icon_key + '" data-icon="' + icon_prefix + all_icon_key + '" style="display: list-item;"><span class="icon-wrapper"><i class="' + icon_content_key_text + '"></i></span></li>');
 						}
 					}
 					all_icon_list.append(icon_list_node);
@@ -188,16 +190,16 @@
 				'<span class="screen-reader-text">Cancel</span>\n' +
 				'</a>\n' +
 				'<div class="icon-type-selector">\n' +
-				'<select id="agency-ecommerce-icon-type">\n' +
+				'<select id="icopick-type">\n' +
 				'<option value="all">All Icon Types</option>\n' +
 				'</select>\n' +
 				'</div>\n' +
 				'</div>\n' +
-				'<div class="agency-ecommerce-icon-search">\n' +
-				'<input type="text" id="agency-ecommerce-icon-search-input"\n' +
+				'<div class="icopick-search">\n' +
+				'<input type="text" id="icopick-search-input"\n' +
 				'placeholder="Type icon name here">\n' +
 				'</div>\n' +
-				'<div id="agency-ecommerce-icon-browser">\n' +
+				'<div id="icopick-browser">\n' +
 				'\n' +
 				'</div>\n' +
 				'</div>';

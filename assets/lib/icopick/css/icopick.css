@@ -16,7 +16,7 @@
 	display: block;
 }
 
-#icopick .agency-ecommerce-icon-list-ul li {
+#icopick .icopick-list-ul li {
 	width: 20%;
 	float: left;
 	font-size: 24px;
@@ -31,7 +31,7 @@
 	width: 100%;
 }
 
-#icopick #agency-ecommerce-icon-browser {
+#icopick #icopick-browser {
 	position: absolute;
 	top: 100px;
 	left: 0px;
@@ -40,8 +40,8 @@
 	overflow: auto;
 }
 
-#icopick .agency-ecommerce-icon-list-ul li:hover span,
-#icopick .agency-ecommerce-icon-list-ul li.active span {
+#icopick .icopick-list-ul li:hover span,
+#icopick .icopick-list-ul li.active span {
 	background: #007cba;
 	color: #fff;
 }
@@ -73,7 +73,7 @@
 	text-decoration: none;
 }
 
-#icopick .agency-ecommerce-icon-list-ul li span {
+#icopick .icopick-list-ul li span {
 	padding: 10px;
 	display: inline-block;
 	border: 1px solid #aaa;
@@ -96,13 +96,13 @@
 	display: block;
 }
 
-#icopick .agency-ecommerce-icon-search {
+#icopick .icopick-search {
 	background: #ffffff;
 	padding: 10px;
 }
 
-.agency-ecommerce-icon-picker-control-field .icon-show,
-.agency-ecommerce-icon-picker-control-field .icon-clear {
+.icopick-picker-control-field .icon-show,
+.icopick-picker-control-field .icon-clear {
 	display: block;
 	height: 30px;
 	width: 30px;
@@ -115,16 +115,16 @@
 	cursor: pointer;
 }
 
-.agency-ecommerce-icon-picker-control-field .icon-clear {
+.icopick-picker-control-field .icon-clear {
 	float: right;
 }
 
-.agency-ecommerce-icon-picker-control-field span.icon-show:hover {
+.icopick-picker-control-field span.icon-show:hover {
 	background: #007cba;
 	color: #fff;
 }
 
-.agency-ecommerce-icon-picker-control-field .customize-control-icon-picker-value {
+.icopick-picker-control-field .customize-control-icon-picker-value {
 	float: left;
 	border-radius: 0;
 	height: 32px;
@@ -136,6 +136,6 @@
 	cursor: pointer;
 }
 
-.agency-ecommerce-icon-picker-control-field .customize-control-icon-picker-value.open-input-field {
+.icopick-picker-control-field .customize-control-icon-picker-value.open-input-field {
 	border: 1px solid #000;
 }
