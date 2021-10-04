@@ -912,7 +912,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 		 */
 		public static function check_download_folder_protection() {
 			$upload_dir      = wp_upload_dir();
-			$downloads_url   = $upload_dir['basedir'] . '/yatra_uploads';
+			$downloads_url   = $upload_dir['basedir'] . '/yatra';
 			$download_method = get_option( 'yatra_file_download_method' );
 
 			if ( 'redirect' === $download_method ) {
