@@ -192,8 +192,10 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 			$type = $configs['type'] ?? 'text';
 
 			switch ($type) {
+
 				case "text":
-					$index = absint($configs['index']) ?? 0;
+
+					$index = sanitize_text_field($configs['index']) ?? '';
 
 					$content_id = "text_{$index}_content";
 

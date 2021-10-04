@@ -285,10 +285,11 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 					case 'number':
 					case 'email':
 					case 'url':
+					case 'hidden':
 					case 'tel':
 						$option_value = self::get_option( $value['id'], $value['default'] );
-
-						?><tr valign="top">
+						$hidden_style = $value['type'] === 'hidden' ? 'style="display:none"': '';
+						?><tr valign="top" <?php echo $hidden_style ?>>
 							<th scope="row" class="titledesc">
 								<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
 							</th>
@@ -645,15 +646,14 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 
 						case 'tab_repeator':
 
-
-
 							$default = $value['default'] ?? array();
-							$repeator_value =  self::get_option( $value['id'], $default );
+							$repeator_value =   self::get_option( $value['id'], $default );
 							$repeator_value= is_array($repeator_value) ? $repeator_value : array();
 
+							$all_tab_configs = yatra_tour_tab_default_configurations();
+							$all_tab_keys = array_keys($all_tab_configs);
 
-
-						?>
+							?>
 						<tr valign="top" class="single_select_page">
 							<th scope="row" class="titledesc">
 								<label><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
@@ -668,22 +668,24 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 									data-type-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][type]"
 									>';
 								}
-								$rep_index =0;
+
 
 								foreach($repeator_value as $rep_key=> $rep_val){
 
 									$rep_val['type']=$rep_val['type'] ?? $rep_key;
-									echo '<li>';
-									echo $rep_val['label'];
+									echo '<li data-tab-type="'.esc_attr($rep_key).'">';
+									echo '<span class="label '.esc_attr($rep_val['icon']).'">'.esc_html($rep_val['label']).'</span>';
 									?>
-									<input type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo absint($rep_index); ?>][icon]" value="<?php echo esc_attr($rep_val['icon']) ?>"/>
-									<input type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo absint($rep_index); ?>][label]" value="<?php echo esc_attr($rep_val['label']) ?>"/>
-									<input  type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo absint($rep_index); ?>][type]" value="<?php echo esc_attr($rep_val['type']) ?>"/>
-
-									<?php
+									<input class="yatra_frontend_tabs_available_options_icon" type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][icon]" value="<?php echo esc_attr($rep_val['icon']) ?>"/>
+									<input type="text" class="yatra_frontend_tabs_available_options_label" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][label]" value="<?php echo esc_attr($rep_val['label']) ?>"/>
+									<input  type="hidden" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][type]" value="<?php echo esc_attr($rep_val['type']) ?>"/>
+									<span>
+									<?php if(!in_array($rep_val['type'], $all_tab_keys)){ ?>
+									<button type="button" class="available-tab-remove-item">x</button>
+									<?php }
+									echo '</span>';
 									echo '</li>';
-									$rep_index++;
-								}
+ 								}
 								if(count($repeator_value)>0){
 									echo '</ul>';
 								}
@@ -823,20 +825,29 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 
 						$value = array();
 
+						$all_tab_configs = yatra_tour_tab_default_configurations();
+
 						$raw_value = is_array($raw_value) ? $raw_value: array();
 
-						$all_available_type = array('overview', 'itinerary', 'cost_info', 'faq', 'map', 'gallery', 'text');
+						if(count($raw_value)<6){
+
+							$raw_value = $all_tab_configs;
+						}
+
+						$all_available_type = array_keys($all_tab_configs);
+
+						array_push($all_available_type, 'text');
 
 						foreach($raw_value as $raw_index => $raw_single_value){
 
-							$type = $raw_single_value['type'] ?? '';
+							$type = $raw_single_value['type'] ?? $raw_index;
 
 							if(in_array($type, $all_available_type)){
 								$final_value= array();
 								$final_value['icon']= isset($raw_single_value['icon']) ? sanitize_text_field($raw_single_value['icon']): '';
 								$final_value['type']= $type;
 								$final_value['label']=isset($raw_single_value['label']) ? sanitize_text_field($raw_single_value['label']): '';
-								$value[]=$final_value;
+ 								$value[$raw_index]=$final_value;
 						}}
 						break;
 					default:

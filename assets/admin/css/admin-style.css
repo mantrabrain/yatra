@@ -711,3 +711,49 @@ table.yatra-booking-meta-customer-info td {
 	margin: 0;
 
 }
+
+.yatra-setting-tab-options ul {
+	background: #fff;
+	padding: 20px;
+	border: 1px solid #ddd;
+	text-align: center;
+}
+
+.yatra-setting-tab-options ul li span.label {
+	text-align: left;
+}
+
+.yatra-setting-tab-options ul li span.label:before {
+	padding: 10px;
+}
+
+.yatra-setting-tab-options ul li {
+	display: flex;
+}
+
+.yatra-setting-tab-options ul li input,
+.yatra-setting-tab-options ul li span {
+	flex-grow: 1;
+	flex-basis: 0;
+}
+
+.yatra-setting-tab-options ul li input {
+	padding: 5px 10px;
+	border-radius: 0;
+	margin: 0 10px;
+}
+
+.yatra-setting-tab-options ul li .available-tab-remove-item {
+
+	border-radius: 100%;
+	height: 30px;
+	width: 30px;
+	border: 1px solid #ccc;
+	text-align: center;
+	cursor: pointer;
+	background: #ddd;
+}
+
+.yatra-setting-tab-options ul li .available-tab-remove-item:hover {
+	background: #aaa;
+}

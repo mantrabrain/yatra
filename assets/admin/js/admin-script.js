@@ -685,6 +685,38 @@
 			this.button.on('click', function () {
 				that.addNewTab($(this));
 			});
+			$('body').on('keyup', 'input.yatra_frontend_tabs_available_options_icon', function () {
+				var className = 'label';
+				className += ' ' + $(this).val();
+				$(this).closest('li').find('span.label').attr('class', className);
+			});
+			$('body').on('keyup', 'input.yatra_frontend_tabs_available_options_label', function () {
+
+				$(this).closest('li').find('span.label').text($(this).val());
+			});
+
+			$('body').on('click', 'button.available-tab-remove-item', function (e) {
+				e.preventDefault();
+				var that = $(this);
+
+				Swal.fire({
+					title: yatra_admin_params.tab_settings_remove_tab_item_confirm_title,
+					icon: 'warning',
+					html: yatra_admin_params.tab_settings_remove_tab_item_confirm_message,
+					showCancelButton: true,
+					focusConfirm: false,
+					focusCancel: true,
+					confirmButtonText: yatra_admin_params.tab_settings_remove_tab_item_yes_button_text,
+					cancelButtonText: yatra_admin_params.tab_settings_remove_tab_item_no_button_text,
+					confirmButtonColor: '#dd3036',
+					width: 650
+				}).then((result) => {
+					if (result.value === true) {
+						that.closest('li').remove();
+					}
+				});
+
+			});
 
 		},
 		cacheDom: function () {
@@ -693,24 +725,45 @@
 		},
 		addNewTab: function ($button) {
 			var wrap = $button.closest('.yatra-setting-tab-options');
-			var length = wrap.find('ul').find('li').length;
-			var index = length;
-
 			var icon_name = wrap.find('ul').attr('data-icon-name');
 			var type_name = wrap.find('ul').attr('data-type-name');
 			var label_name = wrap.find('ul').attr('data-label-name');
-			var li = $('<li/>');
+			var uuid = this.getUniqueID('text_');
+			var li = $('<li data-tab-type="' + uuid + '"/>');
 			//name
-			li.append('Tab Label<input name="' + this.replaceTabName(icon_name, index) + '" type="text"/>');
+			li.append('<span class="label">Tab Label Goes Here</span><input class="yatra_frontend_tabs_available_options_icon" name="' + this.replaceAll(icon_name, uuid) + '" type="text"/>');
 			//label
-			li.append('<input name="' + this.replaceTabName(label_name, index) + '" type="text" value="Tab Label"/>');
+			li.append('<input class="yatra_frontend_tabs_available_options_label" name="' + this.replaceAll(label_name, uuid) + '" type="text" value="Tab Label"/>');
 			//icon
-			li.append('<input name="' + this.replaceTabName(type_name, index) + '" type="text"/>');
+			li.append('<input name="' + this.replaceAll(type_name, uuid) + '" type="hidden" value="text"/>');
+			li.append('<span><button type="button" class="available-tab-remove-item">x</button></span>');
 			wrap.find('ul').append(li);
-		},
-		replaceTabName(text, index) {
+			this.updateTabOrdering();
 
-			return text.replace('TAB_INDEX', index);
+		},
+		replaceAll(text, uuid) {
+			return text.replace('TAB_INDEX', uuid);
+		},
+		getUniqueID: function (prefix = null, suffix = null) {
+			var uuid = Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
+			uuid = prefix !== null ? (prefix + uuid) : uuid;
+			uuid = suffix !== null ? (uuid + suffix) : uuid;
+			return uuid;
+		},
+		updateTabOrdering: function () {
+
+			var sortableItemArray = [];
+
+			var $tab_ul = $('.yatra-setting-tab-options').find('ul');
+
+			$.each($tab_ul.find('li'), function () {
+
+				sortableItemArray.push($(this).attr('data-tab-type'));
+
+			});
+			if (sortableItemArray.length > 0) {
+				$('input#yatra_frontend_tabs_ordering_global').val(sortableItemArray.join());
+			}
 		}
 
 	};

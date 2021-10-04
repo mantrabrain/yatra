@@ -244,7 +244,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
 
 		foreach ($available_tabs as $tab_index => $tab) {
 
-			$type = $tab['type'] ?? '';
+			$type = $tab['type'] ?? $tab_index;
 
 			if (isset($all_tab_configs[$type])) {
 
@@ -255,6 +255,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
 				$final_available_tabs[$type]['options'][$type . '_label']['default'] = $tab['label'] ?? '';
 
 				$final_available_tabs[$type]['icon'] = $tab['icon'] ?? '';
+
 
 			} else {
 				switch ($type) {
@@ -295,6 +296,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
 				return $final_available_tabs[$config_key];
 			}
 		}
+
 		return $final_available_tabs;
 
 
@@ -731,8 +733,9 @@ if (!function_exists('yatra_tour_general_configurations')) {
 			'yatra_tour_meta_tour_tabs_ordering' => array(
 				'name' => 'yatra_tour_meta_tour_tabs_ordering',
 				'type' => 'hidden',
-
+				'default' => yatra_frontend_tour_tabs_ordering('string')
 			),
+
 			'yatra_tour_meta_tour_admin_active_tab' => array(
 				'name' => 'yatra_tour_meta_tour_admin_active_tab',
 				'type' => 'hidden',
@@ -809,15 +812,7 @@ if (!function_exists('yatra_frontend_tabs_config')) {
 
 		$post_id = get_the_ID();
 
-		$yatra_tour_meta_tour_tabs_ordering = get_post_meta($post_id, 'yatra_tour_meta_tour_tabs_ordering', true);
-
-		$yatra_tour_meta_tour_tabs_ordering_array = array();
-
-		if (!is_null($yatra_tour_meta_tour_tabs_ordering) && '' != $yatra_tour_meta_tour_tabs_ordering) {
-
-			$yatra_tour_meta_tour_tabs_ordering_array = explode(',', $yatra_tour_meta_tour_tabs_ordering);
-
-		}
+		$yatra_tour_meta_tour_tabs_ordering_array = yatra_frontend_tour_tabs_ordering('array', $post_id);
 
 		$configs = yatra_tour_tab_configurations();
 
@@ -833,8 +828,6 @@ if (!function_exists('yatra_frontend_tabs_config')) {
 		}
 
 		$frontend_tabs_config = array();
-
-		$active_tab_config = '';
 
 		foreach ($final_ordered_config_keys as $config) {
 
@@ -867,6 +860,7 @@ if (!function_exists('yatra_frontend_tabs')) {
 		global $post;
 
 		$frontend_tabs_config = yatra_frontend_tabs_config();
+
 
 		$yatra_tour_tab_configurations = yatra_tour_tab_configurations();
 

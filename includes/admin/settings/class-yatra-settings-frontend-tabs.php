@@ -83,6 +83,8 @@ class Yatra_Settings_Frontend_Tabs extends Yatra_Admin_Settings_Base
 
 		$tour_tab_configs = yatra_tour_tab_default_configurations();
 
+		$config_keys = array_keys($tour_tab_configs);
+
 		$settings = apply_filters(
 			'yatra_settings_design_css_classes',
 			array(
@@ -98,6 +100,13 @@ class Yatra_Settings_Frontend_Tabs extends Yatra_Admin_Settings_Base
 					'id' => 'yatra_frontend_tabs_available_options',
 					'type' => 'tab_repeator',
 					'default' => $tour_tab_configs,
+				),
+
+				array(
+					'title' => __('Frontend Tab Ordering Global Settings', 'yatra'),
+					'id' => 'yatra_frontend_tabs_ordering_global',
+					'type' => 'hidden',
+					'default' => implode(',', $config_keys)
 				),
 				array(
 					'type' => 'sectionend',
