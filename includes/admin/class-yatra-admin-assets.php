@@ -21,6 +21,15 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
 			// Register Only Script
 
+
+			//ICOPick
+
+			wp_register_style('yatra-icopick-css', YATRA_PLUGIN_URI . '/assets/lib/icopick/css/icopick.css', array(), YATRA_VERSION);
+
+			wp_register_script('yatra-icopick-js', YATRA_PLUGIN_URI . '/assets/lib/icopick/js/icopick.js', array(), YATRA_VERSION);
+
+			//ICOPick
+
 			wp_register_style('yatra-swal-css', YATRA_PLUGIN_URI . '/assets/lib/sweetalert2/css/sweetalert2.css', array(), YATRA_VERSION);
 
 			wp_register_script('yatra-swal-js', YATRA_PLUGIN_URI . '/assets/lib/sweetalert2/js/sweetalert2.js', array(), YATRA_VERSION);
@@ -47,7 +56,9 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
 
 			// Other Register and Enqueue
-			wp_register_style('yatra-admin-style', YATRA_PLUGIN_URI . '/assets/admin/css/admin-style.css', array('yatra-select2css', 'yatra-font-awesome', 'yatra-datepickercss', 'yatra-swal-css'), YATRA_VERSION);
+			wp_register_style('yatra-admin-style', YATRA_PLUGIN_URI . '/assets/admin/css/admin-style.css', array(
+				'yatra-select2css', 'yatra-font-awesome', 'yatra-datepickercss', 'yatra-swal-css', 'yatra-icopick-css'
+			), YATRA_VERSION);
 			wp_enqueue_style('yatra-admin-style');
 
 			switch ($screen_id) {
@@ -61,7 +72,9 @@ if (!class_exists('Yatra_Admin_Assets')) {
 			}
 
 
-			wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array('yatra-select2js', 'jquery', 'yatra-datepicker', 'yatra-swal-js'), YATRA_VERSION);
+			wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array(
+				'yatra-select2js', 'jquery', 'yatra-datepicker', 'yatra-swal-js', 'yatra-icopick-js'
+			), YATRA_VERSION);
 			wp_enqueue_script('yatra-admin-script');
 
 
@@ -84,7 +97,10 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
 				'tab_settings_remove_tab_item_yes_button_text' => __('Yes, Confirm', 'yatra'),
 
-				'tab_settings_remove_tab_item_no_button_text' => __('Cancel this process', 'yatra')
+				'tab_settings_remove_tab_item_no_button_text' => __('Cancel this process', 'yatra'),
+
+				'font_awesome_icons' => yatra_fontawesome_icon_lists()
+
 			);
 
 			wp_localize_script('yatra-admin-script', 'yatra_admin_params', $yatra_admin_params);

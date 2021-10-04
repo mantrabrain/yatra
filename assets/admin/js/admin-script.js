@@ -731,7 +731,7 @@
 			var uuid = this.getUniqueID('text_');
 			var li = $('<li data-tab-type="' + uuid + '"/>');
 			//name
-			li.append('<span class="label">Tab Label Goes Here</span><input class="yatra_frontend_tabs_available_options_icon" name="' + this.replaceAll(icon_name, uuid) + '" type="text"/>');
+			li.append('<span class="label">Tab Label Goes Here</span><input class="yatra_frontend_tabs_available_options_icon icopick" name="' + this.replaceAll(icon_name, uuid) + '" type="text"/>');
 			//label
 			li.append('<input class="yatra_frontend_tabs_available_options_label" name="' + this.replaceAll(label_name, uuid) + '" type="text" value="Tab Label"/>');
 			//icon
