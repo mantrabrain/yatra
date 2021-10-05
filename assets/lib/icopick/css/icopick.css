@@ -1,29 +1,52 @@
 #icopick {
-	position: fixed;
 	display: none;
-	border-right: 1px solid #ddd;
+	height: 100vh;
+	width: 100%;
+	background: rgba(0, 0, 0, 0.5);
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+
+#icopick:after {
+	content: "";
+	display: inline-block;
+	clear: both;
+}
+
+#icopick .icopick-inner {
+	position: fixed;
 	-webkit-transition: all .5s ease;
 	transition: all .5s ease;
-	width: 300px;
-	bottom: 0px;
-	top: 0px;
+	width: 650px;
 	z-index: 999999;
 	background: #EBEBEB;
+	margin: 0 auto;
+	height: 650px;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	border: 2px solid #000;
 
 }
 
-#icopick.picker-active {
-	display: block;
+#icopick .icopick-inner:after {
+	content: "";
+	clear: both;
 }
+
 
 #icopick .icopick-list-ul li {
-	width: 20%;
+	width: 10%;
 	float: left;
 	font-size: 24px;
 	text-align: center;
 	padding: 0;
 	overflow: hidden;
 	cursor: pointer;
+	height: 50px;
 }
 
 #icopick * {
@@ -52,7 +75,7 @@
 	border-bottom: 1px solid #ddd;
 }
 
-#icopick .customize-controls-icon-close {
+#icopick .icon-close {
 	display: block;
 	position: absolute;
 	top: 0;
@@ -74,7 +97,7 @@
 }
 
 #icopick .icopick-list-ul li span {
-	padding: 10px;
+	padding: 9px;
 	display: inline-block;
 	border: 1px solid #aaa;
 	text-align: center;
@@ -83,7 +106,7 @@
 	width: 50px;
 }
 
-#icopick .customize-controls-icon-close:before {
+#icopick .icon-close:before {
 	font: 400 22px/45px dashicons;
 	content: "\f335";
 	position: relative;

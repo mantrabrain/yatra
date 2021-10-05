@@ -10,68 +10,33 @@
 
 			this.initPicker();
 
-			this.initSearch();
+			this.bindEvents();
 
-			this.initIconType();
-
-			this.initClosePickerPanel();
-
-			this.clearIcon();
-
+			this.active_el = null;
 		},
-		clearIcon: function () {
-			$document.on('click', '.icopick-control-field .icon-clear', function () {
-				var wrap = $(this).closest('.icopick-control-field');
-				wrap.find('.customize-control-icon-picker-value').val('').trigger('change');
-				wrap.find('.icon-show').attr('class', 'icon-show');
-
-			});
-		},
-		closePicker: function () {
-			$('#icopick').find('.picker-header .customize-controls-icon-close').trigger('click');
-			$('.icopick-control-field .customize-control-icon-picker-value').removeClass('open-input-field');
-		},
-		openPicker: function (input) {
-			$('#icopick').addClass('picker-active');
-			$('.icopick-control-field .customize-control-icon-picker-value').removeClass('open-input-field');
-			input.addClass('open-input-field');
-			$('#icopick-browser ul.icopick-list-ul li').removeClass('active');
-			var input_val = input.val();
-			if (input_val != '') {
-				$('#icopick-browser ul.icopick-list-ul li[data-icon="' + input_val + '"]').addClass('active');
-			}
-		},
-		initClosePickerPanel: function () {
-			$document.on('click', '.picker-header .customize-controls-icon-close', function () {
-				$('#icopick').removeClass('picker-active');
-
-			});
-		},
-		pickIcon: function ($this) {
+		initPicker: function () {
 			var _that = this;
-			var icon = $this.attr('data-icon');
-			var input = $('.icopick-control-field .customize-control-icon-picker-value.open-input-field');
-			input.val(icon).trigger('change');
-			input.closest('.icopick-control-field').find('.icon-show').attr('class', 'icon-show ' + icon);
-			_that.closePicker();
+			_that.renderTemplate();
+			var picker_wrap = $('#icopick');
+			_that.lodIcons(picker_wrap);
+
 
 		},
-		initIconType: function () {
-			$document.on("change", "#icopick-type", function () {
-				var wrap = $(this).closest('.icopick-control-field');
-				var type = $(this).val();
-				if (!type || type == "all") {
-					wrap.find("#icopick-browser ul.icopick-list-ul").show();
+
+		bindEvents: function () {
+			var _that = this;
+			$('body').on('click', '.icopick', function () {
+				var default_icon = $(this).val();
+				if (!_that.isPickerActive()) {
+					_that.showPicker(default_icon);
+					_that.active_el = $(this);
 				} else {
-					wrap.find("#icopick-browser ul.icopick-list-ul").hide();
-					wrap.find(
-						'#icopick-browser ul.icopick-list-ul[data-icon-type="' + type + '"]'
-					).show();
+					_that.hidePicker();
 				}
+
 			});
-		},
-		initSearch: function () {
-			$document.on("keyup", "#icopick-search-input", function (e) {
+
+			$('body').on("keyup", "#icopick-search-input", function (e) {
 				var v = $(this).val();
 				v = v.trim();
 				var wrap = $(this).closest('#icopick');
@@ -86,54 +51,52 @@
 					wrap.find('#icopick-browser li').show();
 				}
 			});
-		},
-		initPicker: function () {
-			var _that = this;
-			_that.renderTemplate();
-			var picker_wrap = $('#icopick');
-			_that.lodIcons(picker_wrap);
-			$document.on('click', ".customize-control-icon-picker-value, .icopick-control-field .icon-show", function () {
-				var input = $(this).closest('.icopick-control-field').find('input.customize-control-icon-picker-value');
-				var width_customizer = $(this).closest('#customize-controls');
-
-
-				if (picker_wrap.hasClass('picker-active')) {
-					_that.closePicker();
-					picker_wrap
-						.css({
-							'left': width_customizer.width() + 'px'
-						});
-				} else {
-					_that.openPicker(input);
-					picker_wrap.css({
-						'left': width_customizer.width() + 'px'
-					});
-				}
-
-
-			});
-			$(document).on('click', 'body *', function (e) {
-
-				if ($(e.target).closest('#icopick').length > 0) {
-					return;
-				}
-				if ($(e.target).closest('.icopick-control-field').length > 0) {
-					return;
-				}
-				_that.closePicker();
-			});
-
 			$(document).on('keyup', function (e) {
 				if (e.which === 27) {
-					_that.closePicker();
+					_that.hidePicker();
 				}
 			});
 
 			$('body').on('click', '#icopick .icopick-list-ul li', function () {
+
 				_that.pickIcon($(this));
 			});
 
+			$('body').on('click', '#icopick .picker-header .icon-close', function () {
+				_that.hidePicker();
+			});
 		},
+		showPicker: function (default_icon = null) {
+			$('#icopick').show();
+			$('#icopick').find('ul.icopick-list-ul').find('li').removeClass('active');
+			if (null != default_icon) {
+
+				$('#icopick').find('ul.icopick-list-ul').find('li[data-icon="' + default_icon + '"]').addClass('active');
+
+			}
+		},
+		hidePicker: function () {
+			$('#icopick').hide();
+		},
+		isPickerActive: function () {
+			if ($('#icopick').is(":hidden")) {
+				return false;
+			}
+			return true;
+
+		},
+		pickIcon: function ($this) {
+			var _that = this;
+			var icon = $this.attr('data-icon');
+			if (null === _that.active_el) {
+				return;
+			}
+			_that.active_el.val(icon).trigger('change').focus();
+			_that.hidePicker();
+
+		},
+
+
 		lodIcons: function (wrap) {
 			var icon_wrap = wrap.find('#icopick-browser');
 			var icon_select = $('#icopick').find('select#icopick-type');
@@ -165,7 +128,7 @@
 
 							}
 							var icon_content_key_text = all_icons[all_icon_key];
-							icon_list_node.append('<li title="' + all_icon_key + '" data-type="' + icon_key + '" data-icon="' + icon_prefix + all_icon_key + '" style="display: list-item;"><span class="icon-wrapper"><i class="' + icon_content_key_text + '"></i></span></li>');
+							icon_list_node.append('<li title="' + icon_content_key_text + '" data-type="' + icon_key + '" data-icon="' + icon_content_key_text + '" style="display: list-item;"><span class="icon-wrapper"><i class="' + icon_content_key_text + '"></i></span></li>');
 						}
 					}
 					all_icon_list.append(icon_list_node);
@@ -185,8 +148,9 @@
 			}
 
 			var template = '<div id="icopick" class="icopick-picker-container">\n' +
+				'<div class="icopick-inner">\n' +
 				'<div class="picker-header">\n' +
-				'<a class="customize-controls-icon-close" href="#">\n' +
+				'<a class="icon-close" href="#">\n' +
 				'<span class="screen-reader-text">Cancel</span>\n' +
 				'</a>\n' +
 				'<div class="icon-type-selector">\n' +
@@ -201,6 +165,7 @@
 				'</div>\n' +
 				'<div id="icopick-browser">\n' +
 				'\n' +
+				'</div>\n' +
 				'</div>\n' +
 				'</div>';
 			$('body').append(template);

@@ -685,7 +685,7 @@
 			this.button.on('click', function () {
 				that.addNewTab($(this));
 			});
-			$('body').on('keyup', 'input.yatra_frontend_tabs_available_options_icon', function () {
+			$('body').on('change', 'input.yatra_frontend_tabs_available_options_icon', function () {
 				var className = 'label';
 				className += ' ' + $(this).val();
 				$(this).closest('li').find('span.label').attr('class', className);

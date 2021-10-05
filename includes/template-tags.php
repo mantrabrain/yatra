@@ -871,7 +871,7 @@ if (!function_exists('yatra_frontend_tabs')) {
 				<?php foreach ($frontend_tabs_config as $tab_key => $tab) { ?>
 					<li class="item"><a
 							href="#<?php echo esc_attr($tab_key); ?>"><?php if (isset($yatra_tour_tab_configurations[$tab_key]) && isset($yatra_tour_tab_configurations[$tab_key]['icon'])) {
-								echo !empty($yatra_tour_tab_configurations[$tab_key]['icon']) ? '<span class="' . esc_attr($yatra_tour_tab_configurations[$tab_key]['icon']) . '"></span>' : '';
+								echo !empty($yatra_tour_tab_configurations[$tab_key]['icon']) ? '<span class="icon ' . esc_attr($yatra_tour_tab_configurations[$tab_key]['icon']) . '"></span>' : '';
 							}
 							echo esc_html($tab); ?></a></li>
 				<?php } ?>

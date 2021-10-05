@@ -215,7 +215,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 						$active_tab_config = $config;
 					}
 
-					$icon = isset($setting['icon']) ? '<span class="' . esc_attr($setting['icon']) . '"></span>' : '';
+					$icon = isset($setting['icon']) ? '<span class="icon ' . esc_attr($setting['icon']) . '"></span>' : '';
 
 					$eye_icon_class = 'dashicons-visibility';
 

@@ -257,7 +257,9 @@
 	border-bottom: 1px solid #aaa;
 }
 
-.mb-meta-vertical-tab li .fa, .mb-meta-vertical-tab li svg {
+.mb-meta-vertical-tab li .fa,
+.mb-meta-vertical-tab li svg,
+.mb-meta-vertical-tab li .icon {
 	margin-right: 10px;
 	line-height: 22px;
 }
@@ -741,6 +743,11 @@ table.yatra-booking-meta-customer-info td {
 	padding: 5px 10px;
 	border-radius: 0;
 	margin: 0 10px;
+
+}
+
+.yatra-setting-tab-options ul li input.icopick {
+	cursor: pointer;
 }
 
 .yatra-setting-tab-options ul li .available-tab-remove-item {

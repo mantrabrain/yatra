@@ -12,6 +12,7 @@ if (!function_exists('yatra_fontawesome_icon_lists')) {
 		 * @date 20181231
 		 */
 
+
 		$fontawesome = array(
 			'fab fa-500px',
 			'fab fa-accessible-icon',
