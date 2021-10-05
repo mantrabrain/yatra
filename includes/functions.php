@@ -492,13 +492,13 @@ if (!function_exists('yatra_get_final_tour_price')) {
 			$type = 'multi';
 		}
 
-		$yatra_tour_meta_regular_price = get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
+		$yatra_tour_meta_regular_price = absint(get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true));
 
-		$yatra_tour_meta_sales_price = get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
+		$yatra_tour_meta_sales_price = absint(get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true));
 
 		$yatra_tour_meta_price_per = get_post_meta($tour_id, 'yatra_tour_meta_price_per', true);
 
-		$yatra_tour_meta_group_size = get_post_meta($tour_id, 'yatra_tour_meta_group_size', true);
+		$yatra_tour_meta_group_size = absint(get_post_meta($tour_id, 'yatra_tour_meta_group_size', true));
 
 		if ($yatra_tour_meta_group_size == 0) {
 

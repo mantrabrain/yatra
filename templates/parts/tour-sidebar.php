@@ -4,7 +4,9 @@
 			<ul class="yatra-tab-wrap" role="tablist">
 				<li class="item active" role="presentation"><a href="#yatra-tour-booking-form" role="tab" tabindex="0"
 															   aria-controls="yatra-tour-booking-form"
-															   data-aria-selected="true"><?php echo __('Booking Form', 'yatra') ?></a>
+															   data-aria-selected="true">
+						<?php echo esc_html(get_option('yatra_booking_form_title_text', __('Booking Form', 'yatra'))); ?>
+					</a>
 				</li>
 
 
