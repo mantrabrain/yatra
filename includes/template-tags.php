@@ -260,21 +260,21 @@ if (!function_exists('yatra_tour_tab_configurations')) {
 			} else {
 				switch ($type) {
 					case "text":
-						$final_available_tabs[$type . '_' . $tab_index] = array(
+						$final_available_tabs[$tab_index] = array(
 							'label' => $tab['label'] ?? '',
 							'icon' => $tab['icon'] ?? '',
 							'type' => $type,
 							'index' => $tab_index,
 							'options' =>
 								array(
-									'text_' . $tab_index . '_label' => array(
-										'name' => 'text_' . $tab_index . '_label',
+									$tab_index . '_label' => array(
+										'name' => $tab_index . '_label',
 										'title' => __('Label Text', 'yatra'),
 										'type' => 'text',
 										'default' => $tab['label'] ?? '',
 									),
-									'text_' . $tab_index . '_content' => array(
-										'name' => 'text_' . $tab_index . '_content',
+									$tab_index . '_content' => array(
+										'name' => $tab_index . '_content',
 										'title' => __('Content', 'yatra'),
 										'type' => 'textarea',
 										'editor' => true
@@ -296,7 +296,7 @@ if (!function_exists('yatra_tour_tab_configurations')) {
 				return $final_available_tabs[$config_key];
 			}
 		}
-
+ 
 		return $final_available_tabs;
 
 
@@ -816,6 +816,7 @@ if (!function_exists('yatra_frontend_tabs_config')) {
 
 		$configs = yatra_tour_tab_configurations();
 
+
 		$config_array_keys = array_keys($configs);
 
 		$array_diff = array_diff($config_array_keys, $yatra_tour_meta_tour_tabs_ordering_array);
@@ -868,7 +869,9 @@ if (!function_exists('yatra_frontend_tabs')) {
 		<div class="yatra-tabs" id="yatra-tour-tabs">
 
 			<ul class="yatra-tab-wrap">
-				<?php foreach ($frontend_tabs_config as $tab_key => $tab) { ?>
+				<?php foreach ($frontend_tabs_config as $tab_key => $tab) {
+
+					?>
 					<li class="item"><a
 							href="#<?php echo esc_attr($tab_key); ?>"><?php if (isset($yatra_tour_tab_configurations[$tab_key]) && isset($yatra_tour_tab_configurations[$tab_key]['icon'])) {
 								echo !empty($yatra_tour_tab_configurations[$tab_key]['icon']) ? '<span class="icon ' . esc_attr($yatra_tour_tab_configurations[$tab_key]['icon']) . '"></span>' : '';
