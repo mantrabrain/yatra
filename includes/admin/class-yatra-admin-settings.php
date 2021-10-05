@@ -690,7 +690,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 									echo '</ul>';
 								}
 								?>
-									<button type="button" class="button" id="yatra-setting-tab-option-add-new-tab"><?php echo __( 'Add New' ) ?></button>
+									<button type="button" class="button" id="yatra-setting-tab-option-add-new-tab"><?php echo __( 'Add New', 'yatra' ) ?></button>
 								</div>
 							</td>
 						</tr>
