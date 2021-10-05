@@ -197,7 +197,7 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 
 					$index = sanitize_text_field($configs['index']) ?? '';
 
-					$content_id = "text_{$index}_content";
+					$content_id = "{$index}_content";
 
 					$content = get_post_meta($post->ID, $content_id, true);
 

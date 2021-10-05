@@ -676,8 +676,8 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 									echo '<li data-tab-type="'.esc_attr($rep_key).'">';
 									echo '<span class="label '.esc_attr($rep_val['icon']).'">'.esc_html($rep_val['label']).'</span>';
 									?>
-									<input class="yatra_frontend_tabs_available_options_icon icopick" type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][icon]" value="<?php echo esc_attr($rep_val['icon']) ?>"/>
 									<input type="text" class="yatra_frontend_tabs_available_options_label" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][label]" value="<?php echo esc_attr($rep_val['label']) ?>"/>
+									<input class="yatra_frontend_tabs_available_options_icon icopick" type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][icon]" value="<?php echo esc_attr($rep_val['icon']) ?>"/>
 									<input  type="hidden" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][type]" value="<?php echo esc_attr($rep_val['type']) ?>"/>
 									<span>
 									<?php if(!in_array($rep_val['type'], $all_tab_keys)){ ?>

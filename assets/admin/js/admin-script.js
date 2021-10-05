@@ -730,10 +730,11 @@
 			var label_name = wrap.find('ul').attr('data-label-name');
 			var uuid = this.getUniqueID('text_');
 			var li = $('<li data-tab-type="' + uuid + '"/>');
-			//name
-			li.append('<span class="label">Tab Label Goes Here</span><input class="yatra_frontend_tabs_available_options_icon icopick" name="' + this.replaceAll(icon_name, uuid) + '" type="text"/>');
+
 			//label
 			li.append('<input class="yatra_frontend_tabs_available_options_label" name="' + this.replaceAll(label_name, uuid) + '" type="text" value="Tab Label"/>');
+			//name
+			li.append('<span class="label">Tab Label Goes Here</span><input class="yatra_frontend_tabs_available_options_icon icopick" name="' + this.replaceAll(icon_name, uuid) + '" type="text"/>');
 			//icon
 			li.append('<input name="' + this.replaceAll(type_name, uuid) + '" type="hidden" value="text"/>');
 			li.append('<span><button type="button" class="available-tab-remove-item">x</button></span>');
