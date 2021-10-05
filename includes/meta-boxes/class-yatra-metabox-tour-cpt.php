@@ -55,9 +55,16 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
 		public function tour_meta()
 		{
+			global $post;
+
+			$post_id = $post->ID ?? 0;
+
 			$args['tabs'] = yatra_tour_metabox_tabs();
 
+			$args['active_tab'] = get_post_meta($post_id, 'yatra_tour_meta_tour_admin_active_tab', true);
+
 			yatra_load_admin_template('metabox.tour.tab', $args);
+
 			yatra_load_admin_template('metabox.tour.tab-content', $args);
 
 		}
@@ -168,7 +175,9 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 		public function tour_tabs_tab_content($content)
 		{
 
-			$settings = isset($content['settings']) ? $content['settings'] : array();
+			//yatra_frontend_tour_tabs_ordering();
+
+			$settings = $content['settings'] ?? array();
 
 			echo '<ul  class="mb-meta-vertical-tab">';
 
@@ -178,16 +187,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
 			$post_id = $post->ID;
 
-			$yatra_tour_meta_tour_tabs_ordering = get_post_meta($post_id, 'yatra_tour_meta_tour_tabs_ordering', true);
-
-
-			$yatra_tour_meta_tour_tabs_ordering_array = array();
-
-			if (!is_null($yatra_tour_meta_tour_tabs_ordering) && '' != $yatra_tour_meta_tour_tabs_ordering) {
-
-				$yatra_tour_meta_tour_tabs_ordering_array = explode(',', $yatra_tour_meta_tour_tabs_ordering);
-
-			}
+			$yatra_tour_meta_tour_tabs_ordering_array = yatra_frontend_tour_tabs_ordering('array', $post_id);
 
 			$config_array_keys = array_keys($settings);
 
@@ -215,7 +215,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 						$active_tab_config = $config;
 					}
 
-					$icon = isset($setting['icon']) ? '<span class="' . esc_attr($setting['icon']) . '"></span>' : '';
+					$icon = isset($setting['icon']) ? '<span class="icon ' . esc_attr($setting['icon']) . '"></span>' : '';
 
 					$eye_icon_class = 'dashicons-visibility';
 

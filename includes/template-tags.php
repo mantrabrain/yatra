@@ -234,7 +234,78 @@ if (!function_exists('yatra_entry_meta_options')) {
 }
 if (!function_exists('yatra_tour_tab_configurations')) {
 
-	function yatra_tour_tab_configurations()
+	function yatra_tour_tab_configurations($config_key = null)
+	{
+		$all_tab_configs = yatra_tour_tab_default_configurations();
+
+		$available_tabs = get_option('yatra_frontend_tabs_available_options', $all_tab_configs);
+
+		$final_available_tabs = array();
+
+		foreach ($available_tabs as $tab_index => $tab) {
+
+			$type = $tab['type'] ?? $tab_index;
+
+			if (isset($all_tab_configs[$type])) {
+
+				$final_available_tabs[$type] = $all_tab_configs[$type];
+
+				$final_available_tabs[$type]['label'] = $tab['label'] ?? '';
+
+				$final_available_tabs[$type]['options'][$type . '_label']['default'] = $tab['label'] ?? '';
+
+				$final_available_tabs[$type]['icon'] = $tab['icon'] ?? '';
+
+
+			} else {
+				switch ($type) {
+					case "text":
+						$final_available_tabs[$tab_index] = array(
+							'label' => $tab['label'] ?? '',
+							'icon' => $tab['icon'] ?? '',
+							'type' => $type,
+							'index' => $tab_index,
+							'options' =>
+								array(
+									$tab_index . '_label' => array(
+										'name' => $tab_index . '_label',
+										'title' => __('Label Text', 'yatra'),
+										'type' => 'text',
+										'default' => $tab['label'] ?? '',
+									),
+									$tab_index . '_content' => array(
+										'name' => $tab_index . '_content',
+										'title' => __('Content', 'yatra'),
+										'type' => 'textarea',
+										'editor' => true
+									)
+								),
+
+						);
+						break;
+				}
+
+			}
+
+		}
+
+		if (!is_null($config_key)) {
+
+			if (isset($final_available_tabs[$config_key])) {
+
+				return $final_available_tabs[$config_key];
+			}
+		}
+ 
+		return $final_available_tabs;
+
+
+	}
+}
+
+if (!function_exists('yatra_tour_tab_default_configurations')) {
+
+	function yatra_tour_tab_default_configurations()
 	{
 
 		$tab_config = array(
@@ -416,7 +487,9 @@ if (!function_exists('yatra_tour_tab_configurations')) {
 					),
 			),
 		);
+
 		return apply_filters('yatra_tour_tab_configurations', $tab_config);
+
 	}
 }
 
@@ -660,6 +733,13 @@ if (!function_exists('yatra_tour_general_configurations')) {
 			'yatra_tour_meta_tour_tabs_ordering' => array(
 				'name' => 'yatra_tour_meta_tour_tabs_ordering',
 				'type' => 'hidden',
+				'default' => yatra_frontend_tour_tabs_ordering('string')
+			),
+
+			'yatra_tour_meta_tour_admin_active_tab' => array(
+				'name' => 'yatra_tour_meta_tour_admin_active_tab',
+				'type' => 'hidden',
+				'default' => 'general'
 
 			),
 		);
@@ -732,17 +812,10 @@ if (!function_exists('yatra_frontend_tabs_config')) {
 
 		$post_id = get_the_ID();
 
-		$yatra_tour_meta_tour_tabs_ordering = get_post_meta($post_id, 'yatra_tour_meta_tour_tabs_ordering', true);
-
-		$yatra_tour_meta_tour_tabs_ordering_array = array();
-
-		if (!is_null($yatra_tour_meta_tour_tabs_ordering) && '' != $yatra_tour_meta_tour_tabs_ordering) {
-
-			$yatra_tour_meta_tour_tabs_ordering_array = explode(',', $yatra_tour_meta_tour_tabs_ordering);
-
-		}
+		$yatra_tour_meta_tour_tabs_ordering_array = yatra_frontend_tour_tabs_ordering('array', $post_id);
 
 		$configs = yatra_tour_tab_configurations();
+
 
 		$config_array_keys = array_keys($configs);
 
@@ -756,8 +829,6 @@ if (!function_exists('yatra_frontend_tabs_config')) {
 		}
 
 		$frontend_tabs_config = array();
-
-		$active_tab_config = '';
 
 		foreach ($final_ordered_config_keys as $config) {
 
@@ -798,23 +869,28 @@ if (!function_exists('yatra_frontend_tabs')) {
 		<div class="yatra-tabs" id="yatra-tour-tabs">
 
 			<ul class="yatra-tab-wrap">
-				<?php foreach ($frontend_tabs_config as $tab_key => $tab) { ?>
+				<?php foreach ($frontend_tabs_config as $tab_key => $tab) {
+
+					?>
 					<li class="item"><a
 							href="#<?php echo esc_attr($tab_key); ?>"><?php if (isset($yatra_tour_tab_configurations[$tab_key]) && isset($yatra_tour_tab_configurations[$tab_key]['icon'])) {
-								echo !empty($yatra_tour_tab_configurations[$tab_key]['icon']) ? '<span class="' . esc_attr($yatra_tour_tab_configurations[$tab_key]['icon']) . '"></span>' : '';
+								echo !empty($yatra_tour_tab_configurations[$tab_key]['icon']) ? '<span class="icon ' . esc_attr($yatra_tour_tab_configurations[$tab_key]['icon']) . '"></span>' : '';
 							}
 							echo esc_html($tab); ?></a></li>
 				<?php } ?>
 			</ul>
 			<?php
 			$loop_index = 0;
-			foreach ($frontend_tabs_config as $tab_content_key => $tab_content) { ?>
+			foreach ($frontend_tabs_config as $tab_content_key => $tab_content_title) { ?>
 				<section id="<?php echo esc_attr($tab_content_key); ?>"
 						 class="yatra-tab-content" <?php if ($loop_index > 0) { ?> aria-hidden="true" <?php } ?>>
 					<div class="tab-inner">
 						<?php
 
-						do_action('yatra_frontend_tab_content_' . $tab_content_key, $tab_content, $post)
+						do_action('yatra_frontend_tab_content_' . $tab_content_key, $tab_content_title, array(
+							'post' => $post,
+							'tab_content_key' => $tab_content_key
+						))
 						?>
 					</div>
 				</section>

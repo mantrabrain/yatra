@@ -51,6 +51,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 				$settings[] = include 'settings/class-yatra-settings-emails.php';
 				$settings[] = include 'settings/class-yatra-settings-checkout.php';
 				$settings[] = include 'settings/class-yatra-settings-payment-gateways.php';
+				$settings[] = include 'settings/class-yatra-settings-frontend-tabs.php';
 
 
 				self::$settings = apply_filters( 'yatra_get_settings_pages', $settings );
@@ -152,6 +153,10 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 		 * @return mixed
 		 */
 		public static function get_option( $option_name, $default = '' ) {
+			if ( ! $option_name ) {
+				return $default;
+			}
+
 			// Array value.
 			if ( strstr( $option_name, '[' ) ) {
 
@@ -176,7 +181,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 			}
 
 			if ( is_array( $option_value ) ) {
-				$option_value = array_map( 'stripslashes', $option_value );
+				$option_value = wp_unslash( $option_value );
 			} elseif ( ! is_null( $option_value ) ) {
 				$option_value = stripslashes( $option_value );
 			}
@@ -280,10 +285,11 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 					case 'number':
 					case 'email':
 					case 'url':
+					case 'hidden':
 					case 'tel':
 						$option_value = self::get_option( $value['id'], $value['default'] );
-
-						?><tr valign="top">
+						$hidden_style = $value['type'] === 'hidden' ? 'style="display:none"': '';
+						?><tr valign="top" <?php echo $hidden_style ?>>
 							<th scope="row" class="titledesc">
 								<label for="<?php echo esc_attr( $value['id'] ); ?>"><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
 							</th>
@@ -638,6 +644,59 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 						<?php
 						break;
 
+						case 'tab_repeator':
+
+							$default = $value['default'] ?? array();
+							$repeator_value =   self::get_option( $value['id'], $default );
+							$repeator_value= is_array($repeator_value) ? $repeator_value : array();
+
+							$all_tab_configs = yatra_tour_tab_default_configurations();
+							$all_tab_keys = array_keys($all_tab_configs);
+
+							?>
+						<tr valign="top" class="single_select_page">
+							<th scope="row" class="titledesc">
+								<label><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
+							</th>
+							<td class="forminp">
+								<div class="yatra-setting-tab-options">
+								<?php
+								if(count($repeator_value)>0){
+									echo '<ul
+									data-icon-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][icon]"
+									data-label-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][label]"
+									data-type-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][type]"
+									>';
+								}
+
+
+								foreach($repeator_value as $rep_key=> $rep_val){
+
+									$rep_val['type']=$rep_val['type'] ?? $rep_key;
+									echo '<li data-tab-type="'.esc_attr($rep_key).'">';
+									echo '<span class="label '.esc_attr($rep_val['icon']).'">'.esc_html($rep_val['label']).'</span>';
+									?>
+									<input type="text" class="yatra_frontend_tabs_available_options_label" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][label]" value="<?php echo esc_attr($rep_val['label']) ?>"/>
+									<input class="yatra_frontend_tabs_available_options_icon icopick" type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][icon]" value="<?php echo esc_attr($rep_val['icon']) ?>"/>
+									<input  type="hidden" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][type]" value="<?php echo esc_attr($rep_val['type']) ?>"/>
+									<span>
+									<?php if(!in_array($rep_val['type'], $all_tab_keys)){ ?>
+									<button type="button" class="available-tab-remove-item">x</button>
+									<?php }
+									echo '</span>';
+									echo '</li>';
+ 								}
+								if(count($repeator_value)>0){
+									echo '</ul>';
+								}
+								?>
+									<button type="button" class="button" id="yatra-setting-tab-option-add-new-tab"><?php echo __( 'Add New', 'yatra' ) ?></button>
+								</div>
+							</td>
+						</tr>
+						<?php
+						break;
+
 
 
 					// Default: run an action.
@@ -762,6 +821,35 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 						$default = ( empty( $option['default'] ) ? $allowed_values[0] : $option['default'] );
 						$value   = in_array( $raw_value, $allowed_values, true ) ? $raw_value : $default;
 						break;
+					case 'tab_repeator':
+
+						$value = array();
+
+						$all_tab_configs = yatra_tour_tab_default_configurations();
+
+						$raw_value = is_array($raw_value) ? $raw_value: array();
+
+						if(count($raw_value)<6){
+
+							$raw_value = $all_tab_configs;
+						}
+
+						$all_available_type = array_keys($all_tab_configs);
+
+						array_push($all_available_type, 'text');
+
+						foreach($raw_value as $raw_index => $raw_single_value){
+
+							$type = $raw_single_value['type'] ?? $raw_index;
+
+							if(in_array($type, $all_available_type)){
+								$final_value= array();
+								$final_value['icon']= isset($raw_single_value['icon']) ? sanitize_text_field($raw_single_value['icon']): '';
+								$final_value['type']= $type;
+								$final_value['label']=isset($raw_single_value['label']) ? sanitize_text_field($raw_single_value['label']): '';
+ 								$value[$raw_index]=$final_value;
+						}}
+						break;
 					default:
 						$value = sanitize_text_field( $raw_value );
 						break;
@@ -824,7 +912,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 		 */
 		public static function check_download_folder_protection() {
 			$upload_dir      = wp_upload_dir();
-			$downloads_url   = $upload_dir['basedir'] . '/yatra_uploads';
+			$downloads_url   = $upload_dir['basedir'] . '/yatra';
 			$download_method = get_option( 'yatra_file_download_method' );
 
 			if ( 'redirect' === $download_method ) {

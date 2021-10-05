@@ -211,9 +211,9 @@ if (!function_exists('yatra_cart_pricing_details')) {
 				}
 				break;
 			case "single":
-				$sales_price = isset($booking_pricing_details[0]['sales_price']) && '' != $booking_pricing_details[0]['sales_price'] ? $booking_pricing_details[0]['sales_price'] : $booking_pricing_details[0]['regular_price'];
+				$sales_price = isset($booking_pricing_details[0]['sales_price']) && '' != $booking_pricing_details[0]['sales_price'] ? absint($booking_pricing_details[0]['sales_price']) : absint($booking_pricing_details[0]['regular_price']);
 				$price_per = isset($booking_pricing_details[0]['pricing_per']) ? $booking_pricing_details[0]['pricing_per'] : 'single';
-				$group_size = isset($booking_pricing_details[0]['group_size']) ? $booking_pricing_details[0]['group_size'] : 1;
+				$group_size = isset($booking_pricing_details[0]['group_size']) ? absint($booking_pricing_details[0]['group_size']) : 1;
 				$person_count = !is_array($number_of_person) ? (absint($number_of_person)) : 0;
 				$booking_pricing_details[0]['number_of_person'] = $person_count;
 				$person_count = $price_per == 'person' ? $person_count : ceil($person_count / $group_size);
