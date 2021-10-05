@@ -241,7 +241,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
 			}
 
-			$wrap_class .= !$is_visible ? ' yatra-hide' : '';
+			$wrap_class .= !$is_visible || $field['type'] === 'hidden' ? ' yatra-hide' : '';
 			echo '<div class="yatra-field-wrap ' . esc_attr($wrap_class) . '" data-wrap-id="' . esc_attr($field_key) . '">';
 
 			$field_class = isset($field['class']) ? 'widefat ' . $field['class'] : 'widefat';
