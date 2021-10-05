@@ -175,8 +175,6 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 		public function tour_tabs_tab_content($content)
 		{
 
-			//yatra_frontend_tour_tabs_ordering();
-
 			$settings = $content['settings'] ?? array();
 
 			echo '<ul  class="mb-meta-vertical-tab">';

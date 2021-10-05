@@ -1,3 +1,6 @@
+= 2.0.13 | 2021/10/05 =
+* Fixed - PHP error on extra tab
+
 = 2.0.12 | 2021/10/05 =
 * Fixed - Dynamic Tab Creation
 * Fixed  - Null pricing error

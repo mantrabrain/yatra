@@ -823,12 +823,12 @@ if (!function_exists('yatra_frontend_tour_tabs_ordering')) {
 
 			$ordering_string = get_post_meta($post_ID, 'yatra_tour_meta_tour_tabs_ordering', true);
 		}
-		if (is_null($ordering_string) || '' === $ordering_string) {
+		if (!$ordering_string) {
 
 			$ordering_string = get_option('yatra_frontend_tabs_ordering_global');
 		}
 
-		if (is_null($ordering_string) || '' === $ordering_string) {
+		if (!$ordering_string) {
 
 			$tour_tab_configs = yatra_tour_tab_default_configurations();
 
