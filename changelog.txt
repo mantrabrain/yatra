@@ -1,3 +1,9 @@
+= 2.0.12 | 2021/10/05 =
+* Fixed - Dynamic Tab Creation
+* Fixed  - Null pricing error
+* Tested - Version Tested
+* Added - Booking Form Title
+
 = 2.0.11 | 2021/09/28 =
 * Fixed - Tab Ordering Option 
 * Added - Enable/Disable tab for each tour
