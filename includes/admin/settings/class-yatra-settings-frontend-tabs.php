@@ -7,11 +7,11 @@
  */
 
 if (!defined('ABSPATH')) {
-	exit;
+    exit;
 }
 
 if (class_exists('Yatra_Settings_Frontend_Tabs', false)) {
-	return new Yatra_Settings_Frontend_Tabs();
+    return new Yatra_Settings_Frontend_Tabs();
 }
 
 /**
@@ -20,106 +20,107 @@ if (class_exists('Yatra_Settings_Frontend_Tabs', false)) {
 class Yatra_Settings_Frontend_Tabs extends Yatra_Admin_Settings_Base
 {
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct()
-	{
-		$this->id = 'frontend-tabs';
-		$this->label = __('Tab Setting', 'yatra');
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->id = 'frontend-tabs';
+        $this->label = __('Tab Setting', 'yatra');
 
-		parent::__construct();
-	}
+        parent::__construct();
+    }
 
-	/**
-	 * Get sections.
-	 *
-	 * @return array
-	 */
-	public function get_sections()
-	{
-		$sections = array(
-			'' => __('Frontend Tab Setings', 'yatra'),
-		);
+    /**
+     * Get sections.
+     *
+     * @return array
+     */
+    public function get_sections()
+    {
+        $sections = array(
+            '' => __('Frontend Tab Setings', 'yatra'),
+        );
 
-		return apply_filters('yatra_get_sections_' . $this->id, $sections);
-	}
+        return apply_filters('yatra_get_sections_' . $this->id, $sections);
+    }
 
-	/**
-	 * Output the settings.
-	 */
-	public function output()
-	{
-		global $current_section;
+    /**
+     * Output the settings.
+     */
+    public function output()
+    {
+        global $current_section;
 
-		$settings = $this->get_settings($current_section);
+        $settings = $this->get_settings($current_section);
 
-		Yatra_Admin_Settings::output_fields($settings);
-	}
+        Yatra_Admin_Settings::output_fields($settings);
+    }
 
-	/**
-	 * Save settings.
-	 */
-	public function save()
-	{
-		global $current_section;
+    /**
+     * Save settings.
+     */
+    public function save()
+    {
+        global $current_section;
 
-		$settings = $this->get_settings($current_section);
-		Yatra_Admin_Settings::save_fields($settings);
+        $settings = $this->get_settings($current_section);
+        Yatra_Admin_Settings::save_fields($settings);
 
-		if ($current_section) {
-			do_action('yatra_update_options_' . $this->id . '_' . $current_section);
-		}
-	}
+        if ($current_section) {
+            do_action('yatra_update_options_' . $this->id . '_' . $current_section);
+        }
+    }
 
-	/**
-	 * Get settings array.
-	 *
-	 * @param string $current_section Current section name.
-	 * @return array
-	 */
-	public function get_settings($current_section = '')
-	{
+    /**
+     * Get settings array.
+     *
+     * @param string $current_section Current section name.
+     * @return array
+     */
+    public function get_settings($current_section = '')
+    {
 
-		$tour_tab_configs = yatra_tour_tab_default_configurations();
+        $tour_tab_configs = yatra_tour_tab_default_configurations();
 
-		$config_keys = array_keys($tour_tab_configs);
+        $config_keys = array_keys($tour_tab_configs);
 
-		$settings = apply_filters(
-			'yatra_settings_design_css_classes',
-			array(
-				array(
-					'title' => __('Tab Settings', 'yatra'),
-					'type' => 'title',
-					'desc' => '',
-					'id' => 'yatra_frontend_tabs_general_options',
-				),
-				array(
-					'title' => __('Available Tabs', 'yatra'),
-					'desc' => __('This option allows you to checkout without login. User will not created if you tick this option..', 'yatra'),
-					'id' => 'yatra_frontend_tabs_available_options',
-					'type' => 'tab_repeator',
-					'default' => $tour_tab_configs,
-				),
+        $settings = apply_filters(
+            'yatra_settings_design_css_classes',
+            array(
+                array(
+                    'title' => __('Tab Settings', 'yatra'),
+                    'type' => 'title',
+                    'desc' => '',
+                    'id' => 'yatra_frontend_tabs_general_options',
+                ),
+                array(
+                    'title' => __('Available Tabs', 'yatra'),
+                    'desc' => __('This option allows you to checkout without login. User will not created if you tick this option..', 'yatra'),
+                    'id' => 'yatra_frontend_tabs_available_options',
+                    'type' => 'tab_repeator',
+                    'default' => $tour_tab_configs,
+                    'value_callback' => 'yatra_frontend_tabs_available_options'
+                ),
 
-				array(
-					'title' => __('Frontend Tab Ordering Global Settings', 'yatra'),
-					'id' => 'yatra_frontend_tabs_ordering_global',
-					'type' => 'hidden',
-					'default' => implode(',', $config_keys)
-				),
-				array(
-					'type' => 'sectionend',
-					'id' => 'yatra_frontend_tabs_general_options',
-				),
+                array(
+                    'title' => __('Frontend Tab Ordering Global Settings', 'yatra'),
+                    'id' => 'yatra_frontend_tabs_ordering_global',
+                    'type' => 'hidden',
+                    'default' => implode(',', $config_keys)
+                ),
+                array(
+                    'type' => 'sectionend',
+                    'id' => 'yatra_frontend_tabs_general_options',
+                ),
 
-			)
+            )
 
-		);
+        );
 
 
-		return apply_filters('yatra_get_settings_' . $this->id, $settings, $current_section);
-	}
+        return apply_filters('yatra_get_settings_' . $this->id, $settings, $current_section);
+    }
 }
 
 return new Yatra_Settings_Frontend_Tabs();

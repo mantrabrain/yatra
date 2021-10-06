@@ -238,9 +238,11 @@ if (!function_exists('yatra_tour_tab_configurations')) {
     {
         $all_tab_configs = yatra_tour_tab_default_configurations();
 
-        $available_tabs = get_option('yatra_frontend_tabs_available_options', $all_tab_configs);
+        $available_tabs = yatra_frontend_tabs_available_options();
 
         $final_available_tabs = array();
+
+        $yatra_tour_tabs_additional_types = yatra_tour_tabs_additional_types();
 
         foreach ($available_tabs as $tab_index => $tab) {
 
@@ -254,35 +256,43 @@ if (!function_exists('yatra_tour_tab_configurations')) {
 
                 $final_available_tabs[$type]['options'][$type . '_label']['default'] = $tab['label'] ?? '';
 
+                $final_available_tabs[$type]['options'][$type . '_visibility']['default'] = $tab['visibility'] && boolval($tab['visibility']);
+
                 $final_available_tabs[$type]['icon'] = $tab['icon'] ?? '';
 
 
             } else {
-                switch ($type) {
-                    case "text":
-                        $final_available_tabs[$tab_index] = array(
-                            'label' => $tab['label'] ?? '',
-                            'icon' => $tab['icon'] ?? '',
-                            'type' => $type,
-                            'index' => $tab_index,
-                            'options' =>
-                                array(
-                                    $tab_index . '_label' => array(
-                                        'name' => $tab_index . '_label',
-                                        'title' => __('Label Text', 'yatra'),
-                                        'type' => 'text',
-                                        'default' => $tab['label'] ?? '',
-                                    ),
-                                    $tab_index . '_content' => array(
-                                        'name' => $tab_index . '_content',
-                                        'title' => __('Content', 'yatra'),
-                                        'type' => 'textarea',
-                                        'editor' => true
-                                    )
-                                ),
 
-                        );
-                        break;
+
+                if (in_array("text", $yatra_tour_tabs_additional_types)) {
+
+                    $final_available_tabs[$tab_index] = array(
+                        'label' => $tab['label'] ?? '',
+                        'icon' => $tab['icon'] ?? '',
+                        'type' => $type,
+                        'options' =>
+                            array(
+                                $tab_index . '_visibility' => array(
+                                    'name' => $tab_index . '_visibility',
+                                    'title' => '',
+                                    'type' => 'hidden',
+                                    'default' => $tab['visibility'] && boolval($tab['visibility']),
+                                ),
+                                $tab_index . '_label' => array(
+                                    'name' => $tab_index . '_label',
+                                    'title' => __('Label Text', 'yatra'),
+                                    'type' => 'text',
+                                    'default' => $tab['label'] ?? '',
+                                ),
+                                $tab_index . '_content' => array(
+                                    'name' => $tab_index . '_content',
+                                    'title' => __('Content', 'yatra'),
+                                    'type' => 'textarea',
+                                    'editor' => true
+                                )
+                            ),
+
+                    );
                 }
 
             }
@@ -314,6 +324,12 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
                 'icon' => 'fa fa-atom',
                 'options' =>
                     array(
+                        'overview_visibility' => array(
+                            'name' => 'overview_visibility',
+                            'title' => '',
+                            'type' => 'hidden',
+                            'default' => true,
+                        ),
                         'overview_label' => array(
                             'name' => 'overview_label',
                             'title' => __('Label Text', 'yatra'),
@@ -334,6 +350,12 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
                 'icon' => 'fa fa-gopuram',
                 'options' =>
                     array(
+                        'itinerary_visibility' => array(
+                            'name' => 'itinerary_visibility',
+                            'title' => '',
+                            'type' => 'hidden',
+                            'default' => true,
+                        ),
                         'itinerary_label' => array(
                             'name' => 'itinerary_label',
                             'title' => __('Label', 'yatra'),
@@ -375,6 +397,12 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
                 'icon' => 'fa fa-dollar-sign',
                 'options' =>
                     array(
+                        'cost_info_visibility' => array(
+                            'name' => 'cost_info_visibility',
+                            'title' => '',
+                            'type' => 'hidden',
+                            'default' => true,
+                        ),
                         'cost_info_label' => array(
                             'name' => 'cost_info_label',
                             'title' => __('Label', 'yatra'),
@@ -414,6 +442,12 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
                 'icon' => 'fa fa-comment-dots',
                 'options' =>
                     array(
+                        'faq_visibility' => array(
+                            'name' => 'faq_visibility',
+                            'title' => '',
+                            'type' => 'hidden',
+                            'default' => true,
+                        ),
                         'faq_label' => array(
                             'name' => 'faq_label',
                             'title' => __('Label', 'yatra'),
@@ -451,6 +485,12 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
                 'icon' => 'fa fa-directions',
                 'options' =>
                     array(
+                        'map_visibility' => array(
+                            'name' => 'map_visibility',
+                            'title' => '',
+                            'type' => 'hidden',
+                            'default' => true,
+                        ),
                         'map_label' => array(
                             'name' => 'map_label',
                             'title' => __('Label', 'yatra'),
@@ -472,6 +512,12 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
                 'icon' => 'fa fa-images',
                 'options' =>
                     array(
+                        'gallery_visibility' => array(
+                            'name' => 'gallery_visibility',
+                            'title' => '',
+                            'type' => 'hidden',
+                            'default' => true,
+                        ),
                         'gallery_label' => array(
                             'name' => 'gallery_label',
                             'title' => __('Label', 'yatra'),
@@ -834,7 +880,7 @@ if (!function_exists('yatra_frontend_tabs_config')) {
 
             if (isset($configs[$config])) {
 
-                if (count($yatra_tour_meta_tour_tabs_ordering_array) == 0 || in_array($config, $yatra_tour_meta_tour_tabs_ordering_array)) {
+                if (yatra_has_tab_visible($config, $post_id)) {
 
                     $setting = $configs[$config];
 

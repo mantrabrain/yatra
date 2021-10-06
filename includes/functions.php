@@ -831,6 +831,14 @@ if (!function_exists('yatra_maybeintempty')) {
     }
 }
 
+if (!function_exists('yatra_tour_tabs_additional_types')) {
+    function yatra_tour_tabs_additional_types()
+    {
+        return apply_filters('yatra_tour_tabs_additional_types', ["text"]);
+    }
+}
+
+
 if (!function_exists('yatra_frontend_tour_tabs_ordering')) {
 
     function yatra_frontend_tour_tabs_ordering($type = 'array', $post_ID = null)
@@ -859,3 +867,82 @@ if (!function_exists('yatra_frontend_tour_tabs_ordering')) {
     }
 }
 
+
+if (!function_exists('yatra_has_tab_visible')) {
+
+    function yatra_has_tab_visible($tab_key, $post_id = null): bool
+    {
+        $post_id = is_null($post_id) ? get_the_ID() : $post_id;
+
+        $visibility_key = sanitize_text_field(($tab_key . '_visibility'));
+
+        $visibility = get_post_meta($post_id, $visibility_key, true);
+
+        if ($visibility == '' || is_null($visibility)) {
+
+            $available_tabs = yatra_frontend_tabs_available_options();
+
+            $tab = $available_tabs[$tab_key] ?? array();
+
+            $visibility = isset($tab['visibility']) && (boolean)$tab['visibility'];
+        }
+
+
+        return $visibility;
+
+    }
+}
+
+if (!function_exists('yatra_frontend_tabs_available_options')) {
+
+    function yatra_frontend_tabs_available_options($post_id = null)
+    {
+        $all_valid_available_tabs = get_option('yatra_frontend_tabs_available_options', false);
+
+        $tour_tab_configs = yatra_tour_tab_default_configurations();
+
+        $all_valid_available_tabs_keys = !$all_valid_available_tabs ? array() : array_keys($all_valid_available_tabs);
+
+        $yatra_tour_tabs_additional_types = yatra_tour_tabs_additional_types();
+
+        foreach ($tour_tab_configs as $config_key => $config) {
+
+            $visibility = true;
+
+            if (isset($config['options'])) {
+
+
+                $visibility = isset($config['options'][$config_key . '_visibility']) && isset($config['options'][$config_key . '_visibility']['default']) && (boolean)$config['options'][$config_key . '_visibility']['default'];
+
+                unset($config['options']);
+            }
+
+            if (!in_array($config_key, $all_valid_available_tabs_keys)) {
+
+                $all_valid_available_tabs[$config_key] = $config;
+
+                $all_valid_available_tabs[$config_key]['type'] = $config_key;
+
+                $all_valid_available_tabs[$config_key]['visibility'] = $visibility;
+
+            }
+        };
+        foreach ($all_valid_available_tabs as $tab_index => $tab) {
+
+            $type = $tab['type'] ?? $tab_index;
+
+            if (!isset($tour_tab_configs[$type])) {
+
+                if (!in_array($type, $yatra_tour_tabs_additional_types)) {
+
+                    unset($all_valid_available_tabs[$tab_index]);
+                }
+
+            }
+        }
+
+
+        return $all_valid_available_tabs;
+
+    }
+}

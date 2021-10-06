@@ -647,25 +647,34 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 						case 'tab_repeator':
 
 							$default = $value['default'] ?? array();
-							$repeator_value =   self::get_option( $value['id'], $default );
-							$repeator_value= is_array($repeator_value) ? $repeator_value : array();
 
+							$repeator_value =   self::get_option( $value['id'], $default );
+
+                            if(isset($value['value_callback'])){
+                                if(is_callable($value['value_callback'])){
+                                    $repeator_value = call_user_func($value['value_callback']);
+                                }
+                            }
+							$repeator_value= is_array($repeator_value) ? $repeator_value : array();
 							$all_tab_configs = yatra_tour_tab_default_configurations();
 							$all_tab_keys = array_keys($all_tab_configs);
+
 
 							?>
 						<tr valign="top" class="single_select_page">
 							<th scope="row" class="titledesc">
-								<label><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
+                            <label><?php echo esc_html( $value['title'] ); ?> <?php echo $tooltip_html; // WPCS: XSS ok. ?></label>
 							</th>
 							<td class="forminp">
 								<div class="yatra-setting-tab-options">
+
 								<?php
 								if(count($repeator_value)>0){
 									echo '<ul
 									data-icon-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][icon]"
 									data-label-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][label]"
 									data-type-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][type]"
+									data-visibility-name="'.esc_attr( $value['id'] ).'[TAB_INDEX][visibility]"
 									>';
 								}
 
@@ -673,11 +682,16 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 								foreach($repeator_value as $rep_key=> $rep_val){
 
 									$rep_val['type']=$rep_val['type'] ?? $rep_key;
-									echo '<li data-tab-type="'.esc_attr($rep_key).'">';
+									$rep_val['visibility']=isset($rep_val['visibility']) ?(boolean)$rep_val['visibility']: 0;
+                                    echo '<li data-tab-type="'.esc_attr($rep_key).'">';
 									echo '<span class="label '.esc_attr($rep_val['icon']).'">'.esc_html($rep_val['label']).'</span>';
 									?>
 									<input type="text" class="yatra_frontend_tabs_available_options_label" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][label]" value="<?php echo esc_attr($rep_val['label']) ?>"/>
 									<input class="yatra_frontend_tabs_available_options_icon icopick" type="text" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][icon]" value="<?php echo esc_attr($rep_val['icon']) ?>"/>
+                                    <label class="yatra-switch-control">
+                                    <input class="widefat" id="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][visibility]" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][visibility]" type="checkbox" value="1" <?php checked(1, $rep_val['visibility']) ?>>
+                                    <span class="slider round" data-on="show" data-off="hide"></span>
+                                    </label>
 									<input  type="hidden" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][type]" value="<?php echo esc_attr($rep_val['type']) ?>"/>
 									<span>
 									<?php if(!in_array($rep_val['type'], $all_tab_keys)){ ?>
@@ -847,6 +861,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 								$final_value['icon']= isset($raw_single_value['icon']) ? sanitize_text_field($raw_single_value['icon']): '';
 								$final_value['type']= $type;
 								$final_value['label']=isset($raw_single_value['label']) ? sanitize_text_field($raw_single_value['label']): '';
+								$final_value['visibility']=isset($raw_single_value['visibility'])  &&  boolval($raw_single_value['visibility']);
  								$value[$raw_index]=$final_value;
 						}}
 						break;
