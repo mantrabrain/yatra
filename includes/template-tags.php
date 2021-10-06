@@ -902,95 +902,22 @@ if (!function_exists('yatra_frontend_tabs')) {
         <?php
     }
 }
-if (!function_exists('yatra_frontend_options')) {
-    function yatra_frontend_options($attribute_only = false)
+if (!function_exists('yatra_tour_custom_attributes_template')) {
+    function yatra_tour_custom_attributes_template()
     {
         $post_id = get_the_ID();
-        $yatra_tour_meta_price_per = get_post_meta($post_id, 'yatra_tour_meta_price_per', true);
-        $yatra_tour_meta_group_size = get_post_meta($post_id, 'yatra_tour_meta_group_size', true);
-        $yatra_tour_meta_regular_price = get_post_meta($post_id, 'yatra_tour_meta_regular_price', true);
-        $yatra_tour_meta_sales_price = get_post_meta($post_id, 'yatra_tour_meta_sales_price', true);
-        $yatra_tour_meta_tour_duration_days = get_post_meta($post_id, 'yatra_tour_meta_tour_duration_days', true);
-        $yatra_tour_meta_tour_duration_nights = get_post_meta($post_id, 'yatra_tour_meta_tour_duration_nights', true);
-        $yatra_tour_meta_tour_country = get_post_meta($post_id, 'yatra_tour_meta_tour_country', true);
-
-
-        $currency = get_option('yatra_currency');
-
-        $currency_symbol = yatra_get_currency_symbols($currency);
-
-        if (!empty($yatra_tour_meta_tour_country)) {
-
-            $country_string = '';
-
-
-            foreach ($yatra_tour_meta_tour_country as $country_item) {
-
-                $country = yatra_get_countries($country_item);
-
-
-                $country_string .= $country . ', ';
-            }
-            $country_string = trim($country_string, ', ');
-
-            $meta_frontend[] =
-                array(
-                    'icon' => 'fa fa-map',
-                    'text' => $country_string,
-                    'title' => __('Country', 'yatra')
-
-                );
-
-        }
-        $price_string = $currency_symbol . absint($yatra_tour_meta_regular_price);
-        if ($yatra_tour_meta_sales_price > 0) {
-
-            $price_string = '<del>' . $price_string . '</del> &nbsp;' . $currency_symbol . $yatra_tour_meta_sales_price;
-        }
-        if (!$attribute_only) {
-            ?>
-            <h3><?php echo __('Tour Options', 'yatra') ?></h3>
-            <table>
-                <tr>
-                    <th><?php echo __('Price per', 'yatra') ?></th>
-                    <td><?php echo esc_html(ucwords($yatra_tour_meta_price_per)) ?></td>
-                </tr>
-                <tr>
-                    <th><?php echo __('Group Size', 'yatra') ?></th>
-                    <td><?php echo absint($yatra_tour_meta_group_size) ?></td>
-                </tr>
-                <tr>
-                    <th><?php echo __('Price', 'yatra') ?></th>
-                    <td><?php echo $price_string; ?></td>
-                </tr>
-                <tr>
-                    <th><?php echo __('Tour Duration', 'yatra') ?></th>
-                    <td><?php echo absint($yatra_tour_meta_tour_duration_days); ?>
-                        Days <?php echo absint($yatra_tour_meta_tour_duration_nights) ?> Nights
-                    </td>
-                </tr>
-                <tr>
-                    <th><?php echo __('Country', 'yatra') ?></th>
-                    <td><?php echo esc_html($country_string); ?></td>
-                </tr>
-            </table>
-
-            <?php
-        }
-
         $tour_meta_custom_attributes = get_post_meta($post_id, 'tour_meta_custom_attributes', true);
         if (count($tour_meta_custom_attributes) > 0) {
-            echo '<h3>' . __('Attributes', 'yatra') . '</h3>';
+            echo '<h3>' . esc_html(get_option('yatra_custom_attributes_title_text', 'Attributes')) . '</h3>';
             $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
             ?>
             <table>
                 <?php foreach ($tour_meta_custom_attributes as $term_id => $content) {
                     $term = get_term($term_id);
                     $field_key = get_term_meta($term_id, 'attribute_field_type', true);
-                    $field = isset($yatra_tour_attribute_type_options[$field_key]) ? $yatra_tour_attribute_type_options[$field_key] : array();
-                    $field_option = isset($field['options']) ? $field['options'] : array();
+                    $field = $yatra_tour_attribute_type_options[$field_key] ?? array();
+                    $field_option = $field['options'] ?? array();
                     if (isset($term->name)) {
-
                         $args['term'] = $term;
                         $args['content'] = $content;
                         $args['field_option'] = $field_option;
