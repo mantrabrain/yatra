@@ -18,7 +18,9 @@
     </div>
 
 </div>
-<div class="yatra-tour-attribute-info">
-    <?php
-    yatra_frontend_options(true); ?>
-</div>
+<?php if (yatra_tour_has_attributes()) { ?>
+    <div class="yatra-tour-attribute-info">
+        <?php
+        yatra_frontend_options(true); ?>
+    </div>
+<?php } ?>
