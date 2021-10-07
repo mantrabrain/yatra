@@ -40,28 +40,36 @@
 
                 });
                 $('body').on('click',
-                    '.yatra-itinerary-list-item .itinerary-heading svg, .yatra-itinerary-list-item .itinerary-heading .fa, .yatra-faq-list-item .faq-heading svg, .yatra-faq-list-item .faq-heading .fa', function () {
+                    '.yatra-itinerary-list-item .itinerary-heading, .yatra-itinerary-list-item .itinerary-heading, .yatra-faq-list-item .faq-heading, .yatra-faq-list-item .faq-heading', function () {
 
-                        if ($(this).hasClass('fa-minus')) {
+                        if ($(this).find('.icon').length === 0 && $(this).find('svg').length === 0) {
+                            return;
+                        }
+                        var toggle_node = $(this).find('.icon').length!==0 ? $(this).find('.icon'): $(this).find('svg');
 
-                            $this.toggleYatraList($(this), 'close');
+                        if (toggle_node.hasClass('fa-minus')) {
+
+                            $this.toggleYatraList(toggle_node, 'close');
                         } else {
-                            $this.toggleYatraList($(this), 'open');
+                            $this.toggleYatraList(toggle_node, 'open');
                         }
                     });
-                $('body').on('click', '.yatra-tab-content .tab-title svg, .yatra-tab-content .tab-title .fa', function () {
+                $('body').on('click', '.yatra-tab-content .tab-title, .yatra-tab-content .tab-title', function () {
 
-                    var toggle_node = $(this);
+                    if ($(this).find('.icon').length === 0 && $(this).find('svg').length === 0) {
+                        return;
+                    }
+                    var toggle_node = $(this).find('.icon').length!==0 ? $(this).find('.icon'): $(this).find('svg');
                     var span = $('<span class=""/>');
                     var heading = toggle_node.closest('h3');
                     toggle_node.hide();
                     var toggle_status = 'close';
                     if (toggle_node.hasClass('fa-minus')) {
                         toggle_status = 'close';
-                        span.addClass('fa fa-plus');
+                        span.addClass('icon fa fa-plus');
                     } else {
                         toggle_status = 'open';
-                        span.addClass('fa fa-minus');
+                        span.addClass('icon fa fa-minus');
                     }
 
                     $.each(toggle_node.closest('.yatra-tab-content').find('ul.yatra-list li.yatra-list-item .yatra-heading'), function () {
@@ -77,6 +85,8 @@
                     toggle_node.remove();
 
                 });
+
+
             },
             initLib: function () {
 

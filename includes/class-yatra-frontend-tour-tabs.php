@@ -191,6 +191,9 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 
             $type = $configs['type'] ?? 'text';
 
+            echo '<pre>';
+            print_r($configs);
+            echo '</pre>';
             switch ($type) {
 
                 case "text":

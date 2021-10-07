@@ -1,7 +1,6 @@
-<h3 class="tab-title"><?php echo esc_html($title); ?><span class="fa fa-plus"></span></h3>
+<h3 class="tab-title"><?php echo esc_html($title); ?><span class="icon fa fa-plus"></span></h3>
 <ul class="yatra-list yatra-itinerary-list">
     <?php
-
     foreach ($itinerary as $itinerary_item) {
 
         echo '<li class="yatra-list-item">';

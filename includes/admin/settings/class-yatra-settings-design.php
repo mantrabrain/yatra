@@ -40,7 +40,7 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
     {
         $sections = array(
             '' => __('CSS Classes', 'yatra'),
-            'templates' => __('Templates', 'yatra'),
+            'layouts' => __('Layouts', 'yatra'),
         );
 
         return apply_filters('yatra_get_sections_' . $this->id, $sections);
@@ -81,15 +81,26 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
      */
     public function get_settings($current_section = '')
     {
-        if ('templates' === $current_section) {
+        if ('layouts' === $current_section) {
             $settings = apply_filters(
-                'yatra_settings_design_templates',
+                'yatra_settings_design_layouts',
                 array(
                     array(
-                        'title' => __('Templates Settings', 'yatra'),
+                        'title' => __('Layout Settings', 'yatra'),
                         'type' => 'title',
                         'desc' => '',
                         'id' => 'yatra_templates_options',
+                    ),
+                    array(
+                        'title' => __('Tab Layout for tour page', 'yatra'),
+                        'desc' => __('Tab layout for single tour page', 'yatra'),
+                        'id' => 'yatra_setting_layouts_single_tour_tab_layout',
+                        'type' => 'select',
+                        'options' => array(
+                            '' => __('Tab Style Layout', 'yatra'),
+                            'heading_and_content' => __('Heading & Content Style Tab')
+                        ),
+                        'default' => ''
                     ),
                     array(
                         'type' => 'sectionend',

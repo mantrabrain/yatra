@@ -652,19 +652,28 @@
             });
 
             $('body').on('click', '.mb-remove-item', function () {
+                var _that = $(this);
+                Swal.fire({
+                    title: yatra_admin_params.remove_attribute_confirm_title,
+                    icon: 'warning',
+                    html: '<br/>',
+                    showCancelButton: true,
+                    focusConfirm: false,
+                    focusCancel: true,
+                    confirmButtonText: yatra_admin_params.remove_attribute_confirm_yes_button_text,
+                    cancelButtonText: yatra_admin_params.remove_attribute_confirm_no_button_text,
+                    confirmButtonColor: '#dd3036',
+                    width: 650
+                }).then((result) => {
+                    if (result.value === true) {
+                        var term_id = $(this).closest('.mb-tour-attributes-fields').attr('data-term-id');
 
-                var confirm = window.confirm('Are you sure want to delete attribute?');
+                        $(this).closest('.mb-tour-attributes-fields').remove();
 
-                if (!confirm) {
+                        $this.$yatra_tab_section.find('#tour_attributes').find('option[value="' + term_id + '"]').removeAttr('disabled');
+                    }
+                });
 
-                    return;
-                }
-
-                var term_id = $(this).closest('.mb-tour-attributes-fields').attr('data-term-id');
-
-                $(this).closest('.mb-tour-attributes-fields').remove();
-
-                $this.$yatra_tab_section.find('#tour_attributes').find('option[value="' + term_id + '"]').removeAttr('disabled');
             });
             $.each($this.$yatra_tab_section.find('.mb-tour-attributes-fields'), function () {
 

@@ -72,7 +72,7 @@
 
 .yatra-tabs > ul li a[data-aria-selected]:before {
   /*-webkit-transform: translateZ(0) translateY(0);
-	transform: translateZ(0) translateY(0);*/ }
+  transform: translateZ(0) translateY(0);*/ }
 
 .yatra-tabs > section[aria-hidden="true"] {
   display: none; }
@@ -130,6 +130,21 @@
     display: block; }
   .yatra-field-row {
     display: block; } }
+
+.yatra-tabs.heading-and-content .yatra-tab-item {
+  display: block; }
+  .yatra-tabs.heading-and-content .yatra-tab-item .yatra-tab-content {
+    padding: 15px 0;
+    border-bottom: 1px solid #aaa; }
+    .yatra-tabs.heading-and-content .yatra-tab-item .yatra-tab-content .tab-title {
+      padding: 5px 5px 10px 5px; }
+      .yatra-tabs.heading-and-content .yatra-tab-item .yatra-tab-content .tab-title .icon {
+        float: right;
+        cursor: pointer; }
+    .yatra-tabs.heading-and-content .yatra-tab-item .yatra-tab-content .cost-info-half li {
+      line-height: unset; }
+  .yatra-tabs.heading-and-content .yatra-tab-item:last-child .yatra-tab-content {
+    border-bottom: none; }
 
 .yatra-account-messages {
   list-style: square;
@@ -329,11 +344,9 @@
   padding: 15px;
   padding-top: 0; }
   .yatra-tabs .yatra-tab-content .cost-info-half li {
-    padding-bottom: 10px;
     list-style-type: none;
     position: relative;
     padding: 0 0 0 25px;
-    line-height: 18px;
     color: #555542;
     margin: 5px 0 15px; }
     .yatra-tabs .yatra-tab-content .cost-info-half li:before {
