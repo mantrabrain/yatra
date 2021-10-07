@@ -173,8 +173,7 @@ final class Yatra_Install
             'yatra_booking_notification_email_content_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_message(),
             'yatra_enable_booking_notification_email_for_customer' => 'yes',
             'yatra_enable_guest_checkout' => 'yes',
-            'yatra_frontend_tabs_ordering_global' => implode(',', $config_keys),
-            'yatra_custom_attributes_title_text' => 'Attributes'
+             'yatra_custom_attributes_title_text' => 'Attributes'
         );
 
         foreach ($options as $option_key => $option_value) {

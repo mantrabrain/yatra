@@ -862,7 +862,6 @@ if (!function_exists('yatra_frontend_tabs_config')) {
 
         $configs = yatra_tour_tab_configurations();
 
-
         $config_array_keys = array_keys($configs);
 
         $array_diff = array_diff($config_array_keys, $yatra_tour_meta_tour_tabs_ordering_array);
@@ -932,7 +931,7 @@ if (!function_exists('yatra_frontend_tabs')) {
                     $icon = '<span class="tab-icon ' . esc_attr($yatra_tour_tab_configurations[$tab_content_key]['icon']) . '"></span> ';
                 }
 
-                 echo '<div class="yatra-tab-content">';
+                echo '<div class="yatra-tab-content">';
 
                 do_action('yatra_frontend_tab_content_' . $tab_content_key, $tab_content_title, array(
                     'post' => $post,

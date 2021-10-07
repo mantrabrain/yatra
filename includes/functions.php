@@ -851,7 +851,9 @@ if (!function_exists('yatra_frontend_tour_tabs_ordering')) {
         }
         if (!$ordering_string) {
 
-            $ordering_string = get_option('yatra_frontend_tabs_ordering_global');
+            $ordering_string_array = array_keys(yatra_frontend_tabs_available_options());
+
+            $ordering_string = implode(',', $ordering_string_array);
         }
 
         if (!$ordering_string) {
