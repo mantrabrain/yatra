@@ -98,7 +98,7 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
                         'type' => 'select',
                         'options' => array(
                             '' => __('Tab Style Layout', 'yatra'),
-                            'heading_and_content' => __('Heading & Content Style Tab')
+                            'heading_and_content' => __('Heading & Content Style Tab', 'yatra')
                         ),
                         'default' => ''
                     ),
