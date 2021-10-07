@@ -1,4 +1,6 @@
-<h3 class="tab-title"><?php echo esc_html($title); ?><span class="icon fa fa-plus"></span></h3>
+<h3 class="tab-title"><?php echo wp_kses($icon, array(
+        'span' => array('class' => array())
+    )) ?><?php echo esc_html($title); ?><span class="icon fa fa-plus"></span></h3>
 <ul class="yatra-list yatra-faq-list">
     <?php
 

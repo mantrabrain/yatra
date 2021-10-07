@@ -180,7 +180,6 @@
 
       .yatra-tab-content {
         padding: 15px 0;
-        border-bottom: 1px solid #aaa;
 
         .tab-title {
           padding: 5px 5px 10px 5px;
@@ -193,12 +192,6 @@
 
         .cost-info-half li {
           line-height: unset;
-        }
-      }
-
-      &:last-child {
-        .yatra-tab-content {
-          border-bottom: none;
         }
       }
     }

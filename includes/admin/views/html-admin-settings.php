@@ -13,9 +13,6 @@ if (!defined('ABSPATH')) {
 $tab_exists = isset($tabs[$current_tab]) || has_action('yatra_sections_' . $current_tab) || has_action('yatra_settings_' . $current_tab) || has_action('yatra_settings_tabs_' . $current_tab);
 $current_tab_label = isset($tabs[$current_tab]) ? $tabs[$current_tab] : '';
 
-/*echo '<pre>';
-print_r($tab_exists);
-exit;*/
 if (!$tab_exists) {
     wp_safe_redirect(admin_url('admin.php?page=yatra-settings'));
     exit;

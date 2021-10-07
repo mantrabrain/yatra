@@ -20,12 +20,13 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 
                 $hook = 'yatra_frontend_tab_content_' . $config_key;
 
-                if (!method_exists($this, $config_key)) {
-
-                    $config_key = 'misc';
-                }
 
                 $action = apply_filters('yatra_frontend_tab_content_callback', array($this, $config_key));
+
+                if (!method_exists($action[0], $action[1])) {
+
+                    $action[1] = 'misc';
+                }
 
                 add_action($hook, $action, 10, 2);
             }
@@ -41,7 +42,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
             yatra_get_template('tabs/tmpl-tab-overview.php',
                 array(
                     'overview' => $overview,
-                    'title' => $title
+                    'title' => $title,
+                    'icon' => $extra_args['icon']
                 )
             );
 
@@ -77,7 +79,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
             yatra_get_template('tabs/tmpl-tab-itinerary.php',
                 array(
                     'itinerary' => $formatted_itnierary,
-                    'title' => $title
+                    'title' => $title,
+                    'icon' => $extra_args['icon']
                 )
             );
         }
@@ -95,7 +98,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
             yatra_get_template('tabs/tmpl-tab-cost-info.php',
                 array(
                     'cost_info' => $cost_info,
-                    'title' => $title
+                    'title' => $title,
+                    'icon' => $extra_args['icon']
                 )
             );
         }
@@ -128,7 +132,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
             yatra_get_template('tabs/tmpl-tab-faq.php',
                 array(
                     'faqs' => $formatted_faqs,
-                    'title' => $title
+                    'title' => $title,
+                    'icon' => $extra_args['icon']
                 )
             );
         }
@@ -161,8 +166,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
             yatra_get_template('tabs/tmpl-tab-gallery.php',
                 array(
                     'attachments' => $attachment_datas,
-
-                    'title' => $title
+                    'title' => $title,
+                    'icon' => $extra_args['icon']
                 )
             );
         }
@@ -176,7 +181,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
             yatra_get_template('tabs/tmpl-tab-map.php',
                 array(
                     'map' => $yatra_tour_meta_map_content,
-                    'title' => $title
+                    'title' => $title,
+                    'icon' => $extra_args['icon']
                 )
             );
         }
@@ -191,9 +197,6 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
 
             $type = $configs['type'] ?? 'text';
 
-            echo '<pre>';
-            print_r($configs);
-            echo '</pre>';
             switch ($type) {
 
                 case "text":
@@ -207,7 +210,8 @@ if (!class_exists('Yatra_Frontend_Tour_Tabs')) {
                     yatra_get_template('tabs/misc/text.php',
                         array(
                             'content' => $content,
-                            'title' => $title
+                            'title' => $title,
+                            'icon' => $extra_args['icon']
                         )
                     );
                     break;
