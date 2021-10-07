@@ -748,11 +748,11 @@
             //name
             li.append('<span class="label">Tab Label Goes Here</span><input class="yatra_frontend_tabs_available_options_label" name="' + this.replaceAll(label_name, uuid) + '" type="text" value="Tab Label"/>');
             //label
-            li.append('<input class="yatra_frontend_tabs_available_options_icon icopick" name="' + this.replaceAll(icon_name, uuid) + '" type="text"/>');
+            li.append('<input class="yatra_frontend_tabs_available_options_icon icopick" name="' + this.replaceAll(icon_name, uuid) + '" type="text" value=""/>');
             //visbility
 
             li.append('<label class="yatra-switch-control">\n' +
-                '<input class="widefat" id="' + this.replaceAll(icon_name, uuid) + '" name="' + this.replaceAll(icon_name, uuid) + '" type="checkbox" value="1">\n' +
+                '<input class="widefat" id="' + this.replaceAll(icon_name, uuid) + '" name="' + this.replaceAll(visibility_name, uuid) + '" type="checkbox" value="1">\n' +
                 '<span class="slider round" data-on="show" data-off="hide"></span>\n' +
                 '</label>')
 
