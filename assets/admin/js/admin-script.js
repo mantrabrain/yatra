@@ -692,6 +692,7 @@
         init: function () {
             this.cacheDom();
             this.bindEvents();
+            this.sortableSetting();
         },
         bindEvents: function () {
             var _that = this;
@@ -790,6 +791,12 @@
             if (sortableItemArray.length > 0) {
                 $('input#yatra_frontend_tabs_ordering_global').val(sortableItemArray.join());
             }
+        },
+        sortableSetting: function () {
+            $('.yatra-setting-tab-options ul').sortable({
+                update: function (event, ui) {
+                },
+            });
         }
 
     };

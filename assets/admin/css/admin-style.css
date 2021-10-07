@@ -723,14 +723,22 @@ table.yatra-booking-meta-customer-info td {
 
 .yatra-setting-tab-options ul li span.label {
     text-align: left;
+    padding-left: 10px;
+    font-weight: bold;
 }
 
 .yatra-setting-tab-options ul li span.label:before {
     padding: 10px;
+    padding-left: 0;
 }
 
 .yatra-setting-tab-options ul li {
     display: flex;
+    border: 1px solid #aaa;
+    padding: 5px;
+    background: #eee;
+    cursor: move;
+    align-items: center;
 }
 
 .yatra-setting-tab-options ul li input,
@@ -763,10 +771,6 @@ table.yatra-booking-meta-customer-info td {
 
 .yatra-setting-tab-options ul li .available-tab-remove-item:hover {
     background: #aaa;
-}
-
-.yatra-setting-tab-options .yatra-switch-control {
-    margin-top: 10px;
 }
 
 .yatra-setting-tab-options .yatra-switch-control .slider {
