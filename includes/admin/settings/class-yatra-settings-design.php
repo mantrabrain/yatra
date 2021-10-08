@@ -82,56 +82,49 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
     public function get_settings($current_section = '')
     {
         if ('layouts' === $current_section) {
-            $settings = apply_filters(
-                'yatra_settings_design_layouts',
+            $settings = array(
                 array(
-                    array(
-                        'title' => __('Layout Settings', 'yatra'),
-                        'type' => 'title',
-                        'desc' => '',
-                        'id' => 'yatra_templates_options',
+                    'title' => __('Layout Settings', 'yatra'),
+                    'type' => 'title',
+                    'desc' => '',
+                    'id' => 'yatra_templates_options',
+                ),
+                array(
+                    'title' => __('Tab Layout for tour page', 'yatra'),
+                    'desc' => __('Tab layout for single tour page', 'yatra'),
+                    'id' => 'yatra_setting_layouts_single_tour_tab_layout',
+                    'type' => 'select',
+                    'options' => array(
+                        '' => __('Tab Style Layout', 'yatra'),
+                        'heading_and_content' => __('Heading & Content Style Tab', 'yatra')
                     ),
-                    array(
-                        'title' => __('Tab Layout for tour page', 'yatra'),
-                        'desc' => __('Tab layout for single tour page', 'yatra'),
-                        'id' => 'yatra_setting_layouts_single_tour_tab_layout',
-                        'type' => 'select',
-                        'options' => array(
-                            '' => __('Tab Style Layout', 'yatra'),
-                            'heading_and_content' => __('Heading & Content Style Tab', 'yatra')
-                        ),
-                        'default' => ''
-                    ),
-                    array(
-                        'type' => 'sectionend',
-                        'id' => 'yatra_templates_options',
-                    ),
+                    'default' => ''
+                ),
+                array(
+                    'type' => 'sectionend',
+                    'id' => 'yatra_templates_options',
+                ),
 
-                )
             );
 
         } else {
-            $settings = apply_filters(
-                'yatra_settings_design_css_classes',
+            $settings = array(
                 array(
-                    array(
-                        'title' => __('CSS Classes Settings', 'yatra'),
-                        'type' => 'title',
-                        'desc' => '',
-                        'id' => 'yatra_css_classes_options',
-                    ),
-                    array(
-                        'title' => __('Page Container Class', 'yatra'),
-                        'desc' => __('Container class for all page templates for yatra plugin.', 'yatra'),
-                        'id' => 'yatra_page_container_class',
-                        'type' => 'text',
-                    ),
-                    array(
-                        'type' => 'sectionend',
-                        'id' => 'yatra_css_classes_options',
-                    ),
-
-                )
+                    'title' => __('CSS Classes Settings', 'yatra'),
+                    'type' => 'title',
+                    'desc' => '',
+                    'id' => 'yatra_css_classes_options',
+                ),
+                array(
+                    'title' => __('Page Container Class', 'yatra'),
+                    'desc' => __('Container class for all page templates for yatra plugin.', 'yatra'),
+                    'id' => 'yatra_page_container_class',
+                    'type' => 'text',
+                ),
+                array(
+                    'type' => 'sectionend',
+                    'id' => 'yatra_css_classes_options',
+                ),
 
             );
         }

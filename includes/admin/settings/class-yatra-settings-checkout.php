@@ -81,33 +81,27 @@ class Yatra_Settings_Checkout extends Yatra_Admin_Settings_Base
     public function get_settings($current_section = '')
     {
 
-        $settings = apply_filters(
-            'yatra_settings_design_css_classes',
+
+        return apply_filters('yatra_get_settings_' . $this->id, array(
             array(
-                array(
-                    'title' => __('Checkout Settings', 'yatra'),
-                    'type' => 'title',
-                    'desc' => '',
-                    'id' => 'yatra_checkout_general_options',
-                ),
-                array(
-                    'title' => __('Enable Guest Checkout', 'yatra'),
-                    'desc' => __('This option allows you to checkout without login. User will not created if you tick this option..', 'yatra'),
-                    'id' => 'yatra_enable_guest_checkout',
-                    'type' => 'checkbox',
-                    'default' => 'yes',
-                ),
-                array(
-                    'type' => 'sectionend',
-                    'id' => 'yatra_checkout_general_options',
-                ),
+                'title' => __('Checkout Settings', 'yatra'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'yatra_checkout_general_options',
+            ),
+            array(
+                'title' => __('Enable Guest Checkout', 'yatra'),
+                'desc' => __('This option allows you to checkout without login. User will not created if you tick this option..', 'yatra'),
+                'id' => 'yatra_enable_guest_checkout',
+                'type' => 'checkbox',
+                'default' => 'yes',
+            ),
+            array(
+                'type' => 'sectionend',
+                'id' => 'yatra_checkout_general_options',
+            ),
 
-            )
-
-        );
-
-
-        return apply_filters('yatra_get_settings_' . $this->id, $settings, $current_section);
+        ), $current_section);
     }
 }
 

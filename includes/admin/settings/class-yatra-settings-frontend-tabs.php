@@ -83,34 +83,27 @@ class Yatra_Settings_Frontend_Tabs extends Yatra_Admin_Settings_Base
 
         $tour_tab_configs = yatra_tour_tab_default_configurations();
 
-        $settings = apply_filters(
-            'yatra_settings_design_css_classes',
+        return apply_filters('yatra_get_settings_' . $this->id, array(
             array(
-                array(
-                    'title' => __('Tab Settings', 'yatra'),
-                    'type' => 'title',
-                    'desc' => '',
-                    'id' => 'yatra_frontend_tabs_general_options',
-                ),
-                array(
-                    'title' => __('Available Tabs', 'yatra'),
-                    'desc' => __('This option allows you to checkout without login. User will not created if you tick this option..', 'yatra'),
-                    'id' => 'yatra_frontend_tabs_available_options',
-                    'type' => 'tab_repeator',
-                    'default' => $tour_tab_configs,
-                    'value_callback' => 'yatra_frontend_tabs_available_options'
-                ),
-                array(
-                    'type' => 'sectionend',
-                    'id' => 'yatra_frontend_tabs_general_options',
-                ),
+                'title' => __('Tab Settings', 'yatra'),
+                'type' => 'title',
+                'desc' => '',
+                'id' => 'yatra_frontend_tabs_general_options',
+            ),
+            array(
+                'title' => __('Available Tabs', 'yatra'),
+                'desc' => __('This option allows you to checkout without login. User will not created if you tick this option..', 'yatra'),
+                'id' => 'yatra_frontend_tabs_available_options',
+                'type' => 'tab_repeator',
+                'default' => $tour_tab_configs,
+                'value_callback' => 'yatra_frontend_tabs_available_options'
+            ),
+            array(
+                'type' => 'sectionend',
+                'id' => 'yatra_frontend_tabs_general_options',
+            ),
 
-            )
-
-        );
-
-
-        return apply_filters('yatra_get_settings_' . $this->id, $settings, $current_section);
+        ), $current_section);
     }
 }
 

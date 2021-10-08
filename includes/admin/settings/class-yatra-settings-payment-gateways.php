@@ -83,36 +83,32 @@ class Yatra_Settings_Payment_Gateways extends Yatra_Admin_Settings_Base
         $settings = array();
 
 
-         if ('' === $current_section) {
-             $settings = apply_filters(
-                'yatra_settings_payment_gateways_general',
+        if ('' === $current_section) {
+            $settings = array(
                 array(
-                    array(
-                        'title' => __('Payment Gateways General Settings', 'yatra'),
-                        'type' => 'title',
-                        'desc' => '',
-                        'id' => 'yatra_payment_gateways_general_options',
-                    ),
-                    array(
-                        'title' => __('Test Mode', 'yatra'),
-                        'desc' => __(' While in test mode no live transactions are processed. To fully use test mode, you must have a sandbox (test) account for the payment gateway you are testing.', 'yatra'),
-                        'id' => 'yatra_payment_gateway_test_mode',
-                        'type' => 'checkbox',
-                    ),
-                    array(
-                        'title' => __('Payment Gateways', 'yatra'),
-                        'id' => 'yatra_payment_gateways',
-                        'type' => 'multicheckbox',
-                        'options' => yatra_get_payment_gateways()
+                    'title' => __('Payment Gateways General Settings', 'yatra'),
+                    'type' => 'title',
+                    'desc' => '',
+                    'id' => 'yatra_payment_gateways_general_options',
+                ),
+                array(
+                    'title' => __('Test Mode', 'yatra'),
+                    'desc' => __(' While in test mode no live transactions are processed. To fully use test mode, you must have a sandbox (test) account for the payment gateway you are testing.', 'yatra'),
+                    'id' => 'yatra_payment_gateway_test_mode',
+                    'type' => 'checkbox',
+                ),
+                array(
+                    'title' => __('Payment Gateways', 'yatra'),
+                    'id' => 'yatra_payment_gateways',
+                    'type' => 'multicheckbox',
+                    'options' => yatra_get_payment_gateways()
 
-                    ),
+                ),
 
-                    array(
-                        'type' => 'sectionend',
-                        'id' => 'yatra_payment_gateways_general_options',
-                    ),
-
-                )
+                array(
+                    'type' => 'sectionend',
+                    'id' => 'yatra_payment_gateways_general_options',
+                ),
 
             );
 
