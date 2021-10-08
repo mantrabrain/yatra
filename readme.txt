@@ -20,7 +20,7 @@ Compatible theme [Yatri](https://wpyatri.com/?ref=yatrapluginorg)is live now
 == Installation ==
 
 1. Install the plugin either via the WordPress.org plugin directory, or by uploading the files to your server (in the /wp-content/plugins/ directory).
-2. Activate the Mantra Audience plugin through the 'Plugins' menu in WordPress.
+2. Activate the Yatra plugin through the 'Plugins' menu in WordPress.
 
 
 == Yatra - Features ==
