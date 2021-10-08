@@ -99,6 +99,17 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     break;
 
             }
+            /**
+             * Sanitize the value of an option.
+             *
+             */
+            $updated_value = apply_filters('yatra_metabox_settings_sanitize_type_' . $meta_field['type'], $updated_value, $meta_field, $field_value);
+
+            /**
+             * Sanitize the value of an option by option name.
+             *
+             */
+            $updated_value = apply_filters("yatra_metabox_settings_sanitize_option_" . $meta_field['name'], $updated_value, $meta_field, $field_value);
 
 
             return $updated_value;
