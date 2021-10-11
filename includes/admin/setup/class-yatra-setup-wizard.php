@@ -370,6 +370,24 @@ class Yatra_Setup_Wizard
                         ]); ?>
                     </td>
                 </tr>
+                <tr>
+                    <th scope="row"><label
+                                for="yatra_setting_layouts_single_tour_tab_layout"><?php _e('Tab Layout for tour page	', 'yatra'); ?></label>
+                    </th>
+
+                    <td>
+                        <?php yatra_html_form_input([
+                            'name' => 'yatra_setting_layouts_single_tour_tab_layout',
+                            'type' => 'select',
+                            'value' => get_option('yatra_setting_layouts_single_tour_tab_layout', ''),
+                            'help' => __('Tab layout for single tour page.', 'yatra'),
+                            'options' => array(
+                                '' => __('Tab Style Layout', 'yatra'),
+                                'heading_and_content' => __('Heading & Content Style Tab', 'yatra'),
+                            )
+                        ]); ?>
+                    </td>
+                </tr>
             </table>
 
             <?php $this->next_step_buttons(); ?>
@@ -384,7 +402,10 @@ class Yatra_Setup_Wizard
 
         $yatra_page_container_class = sanitize_text_field($_POST['yatra_page_container_class']);
 
+        $yatra_setting_layouts_single_tour_tab_layout = sanitize_text_field($_POST['yatra_setting_layouts_single_tour_tab_layout']);
+
         update_option('yatra_page_container_class', $yatra_page_container_class);
+        update_option('yatra_setting_layouts_single_tour_tab_layout', $yatra_setting_layouts_single_tour_tab_layout);
 
         wp_redirect(esc_url_raw($this->get_next_step_link()));
         exit;

@@ -354,16 +354,25 @@
                 this.changeTab();
             }.bind(this));
 
-            $('body').on('click', '.mb-repeator-heading span.toggle', function () {
+            $('body').on('click', '.mb-repeator-heading', function (e) {
 
+                if ($(e.target).hasClass('add') || $(e.target).hasClass('remove')) {
+                    return;
+                }
                 $(this).closest('.mb-repeator').find('.mb-repeator-fields').slideToggle('slow', function () {
-
+                    if ($(this).closest('.mb-repeator').find('.toggle').hasClass('dashicons-arrow-down-alt2')) {
+                        $(this).closest('.mb-repeator').find('.toggle').removeClass('dashicons-arrow-down-alt2')
+                        $(this).closest('.mb-repeator').find('.toggle').addClass('dashicons-arrow-up-alt2')
+                    } else {
+                        $(this).closest('.mb-repeator').find('.toggle').removeClass('dashicons-arrow-up-alt2')
+                        $(this).closest('.mb-repeator').find('.toggle').addClass('dashicons-arrow-down-alt2')
+                    }
                 });
             });
 
             $('body').on('click', '.mb-repeator-heading span.add', function () {
 
-                $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').after($(this).closest('.mb-repeator').clone());
+                $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').closest('.yatra-field-wrap').after($(this).closest('.yatra-field-wrap').clone());
 
                 var node = $(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator:last').find('.mb-repeator-heading-input');
 
@@ -495,6 +504,7 @@
 
             this.$tabPanel.removeClass('active');
             this.$tabList.closest('section').find('.mb-meta-vertical-tab-content-item[data-tab-content="' + data_tab_content_id + '"]').addClass('active');
+            $('input#yatra_tour_meta_tour_admin_subtab_active_tab').val(data_tab_content_id);
         },
         tabReordering: function () {
             var $this = this;

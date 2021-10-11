@@ -60,7 +60,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             $post_id = $post->ID ?? 0;
 
             $args['tabs'] = yatra_tour_metabox_tabs();
-            
+
             $args['active_tab'] = get_post_meta($post_id, 'yatra_tour_meta_tour_admin_active_tab', true);
 
             yatra_load_admin_template('metabox.tour.tab', $args);
@@ -198,7 +198,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 $final_ordered_config_keys = array_merge($yatra_tour_meta_tour_tabs_ordering_array, $array_diff);
             }
 
-            $active_tab_config = '';
+            $active_tab_config = get_post_meta($post_id, 'yatra_tour_meta_tour_admin_subtab_active_tab', true);
 
             foreach ($final_ordered_config_keys as $config) {
 
@@ -206,17 +206,15 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
                     $setting = $settings[$config];
 
-                    $class = $index === 0 ? 'active' : '';
+                    if ($active_tab_config === '' || !$active_tab_config) {
 
-                    if ($index === 0) {
-
-                        $active_tab_config = $config;
+                        $active_tab_config = $index == 0 ? $config : '';
                     }
+                    $class = $config === $active_tab_config ? 'active wowitsworking' : '';
 
                     $icon = isset($setting['icon']) ? '<span class="icon ' . esc_attr($setting['icon']) . '"></span>' : '';
 
                     $eye_icon_class = 'dashicons-visibility';
-
 
                     if (!yatra_has_tab_visible($config, $post_id)) {
 
