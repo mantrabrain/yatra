@@ -29,6 +29,15 @@ if (!class_exists('Yatra_Admin_Assets')) {
             wp_register_script('yatra-icopick-js', YATRA_PLUGIN_URI . '/assets/lib/icopick/js/icopick.js', array(), YATRA_VERSION);
 
             //ICOPick
+            //
+
+            //Full Calendar
+
+            wp_register_style('yatra-fullcalendar-css', YATRA_PLUGIN_URI . '/assets/lib/fullcalendar/lib/main.css', array(), YATRA_VERSION);
+
+            wp_register_script('yatra-fullcalendar-js', YATRA_PLUGIN_URI . '/assets/lib/fullcalendar/lib/main.js', array(), YATRA_VERSION);
+
+            //ICOPick
 
             wp_register_style('yatra-swal-css', YATRA_PLUGIN_URI . '/assets/lib/sweetalert2/css/sweetalert2.css', array(), YATRA_VERSION);
 

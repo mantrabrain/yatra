@@ -1,0 +1,27 @@
+#yatra-availability-calendar {
+    background: #fff;
+    display: inline-block;
+    width: 100%;
+    min-height: 100vh;
+}
+
+#yatra-availability-calendar:after {
+    content: "";
+    display: inline-block;
+    width: 100%;
+    clear: both;
+
+}
+#calendar-container {
+
+}
+
+.fc-header-toolbar {
+    /*
+    the calendar will be butting up against the edges,
+    but let's scoot in the header's buttons
+    */
+    padding-top: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+}
