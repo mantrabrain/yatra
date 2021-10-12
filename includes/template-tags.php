@@ -104,9 +104,7 @@ if (!function_exists('yatra_get_current_currency_symbol')) {
     {
         $currency = get_option('yatra_currency');
 
-        $currency_symbol = yatra_get_currency_symbols($currency);
-
-        return $currency_symbol;
+        return yatra_get_currency_symbols($currency);
     }
 }
 

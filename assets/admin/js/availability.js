@@ -1,84 +1,61 @@
+// @var yatra_availability_params
+
 document.addEventListener('DOMContentLoaded', function () {
     var YatraAvailability = {
 
         init: function () {
 
             var calendarEl = document.getElementById('yatra-availability-calendar');
-
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                height: '100%',
-                expandRows: true,
-                slotMinTime: '08:00',
-                slotMaxTime: '20:00',
                 headerToolbar: {
-                    left: 'prev,next today',
+                    left: '',
                     center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                    right: 'today prev,next'
                 },
-                initialView: 'dayGridMonth',
-                initialDate: '2020-09-12',
-                navLinks: true, // can click day/week names to navigate views
-                editable: true,
-                selectable: true,
-                nowIndicator: true,
-                dayMaxEvents: true, // allow "more" link when too many events
-                events: [
-                    {
-                        title: 'All Day Event',
-                        start: '2020-09-01',
+                initialDate: '2021-10-10',
+                editable: false,
+                navLinks: false, // can click day/week names to navigate views
+                dayMaxEvents: true, // allow "more" link when too many events,
+                events: {
+                    method: 'post',
+                    extraParams: function () {
+                        return {
+                            action: yatra_availability_params.tour_availability.action,
+                            yatra_nonce: yatra_availability_params.tour_availability.nonce,
+                        }
                     },
-                    {
-                        title: 'Long Event',
-                        start: '2020-09-07',
-                        end: '2020-09-10'
+                    url: yatra_availability_params.ajax_url,
+                    failure: function () {
+                        document.getElementById('script-warning').style.display = 'block'
                     },
-                    {
-                        groupId: 999,
-                        title: 'Repeating Event',
-                        start: '2020-09-09T16:00:00'
-                    },
-                    {
-                        groupId: 999,
-                        title: 'Repeating Event',
-                        start: '2020-09-16T16:00:00'
-                    },
-                    {
-                        title: 'Conference',
-                        start: '2020-09-11',
-                        end: '2020-09-13'
-                    },
-                    {
-                        title: 'Meeting',
-                        start: '2020-09-12T10:30:00',
-                        end: '2020-09-12T12:30:00'
-                    },
-                    {
-                        title: 'Lunch',
-                        start: '2020-09-12T12:00:00'
-                    },
-                    {
-                        title: 'Meeting',
-                        start: '2020-09-12T14:30:00'
-                    },
-                    {
-                        title: 'Happy Hour',
-                        start: '2020-09-12T17:30:00'
-                    },
-                    {
-                        title: 'Dinner',
-                        start: '2020-09-12T20:00:00'
-                    },
-                    {
-                        title: 'Birthday Party',
-                        start: '2020-09-13T07:00:00'
-                    },
-                    {
-                        title: 'Click for Google',
-                        url: 'http://google.com/',
-                        start: '2020-09-28'
-                    }
-                ]
+
+                },
+                loading: function (bool) {
+                    /*document.getElementById('loading').style.display =
+                        bool ? 'block' : 'none';*/
+                },
+                /*  eventSourceSuccess: function (content, xhr) {
+
+                      return content.eventArray;
+                  }*/
+                eventRender: function (info) {
+                    console.log(info);
+                },
+
+                eventDidMount: function (info) {
+
+                    tippy(info.el, {
+                        content: info.event.extendedProps.description,
+                        allowHTML: true,
+                    });
+
+
+                    jQuery(info.el).find('.fc-event-title').html(info.event.title);
+
+                },
+
             });
+
 
             calendar.render();
 

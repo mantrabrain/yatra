@@ -1,27 +1,42 @@
-#yatra-availability-calendar {
-    background: #fff;
-    display: inline-block;
-    width: 100%;
-    min-height: 100vh;
-}
-
-#yatra-availability-calendar:after {
+#yatra-availability-calendar-container:after {
     content: "";
     display: inline-block;
     width: 100%;
     clear: both;
 
 }
-#calendar-container {
+
+#yatra-availability-calendar-container {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid;
 
 }
 
-.fc-header-toolbar {
-    /*
-    the calendar will be butting up against the edges,
-    but let's scoot in the header's buttons
-    */
-    padding-top: 1em;
-    padding-left: 1em;
-    padding-right: 1em;
+#yatra-availability-calendar {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 10px;
+}
+
+#yatra-availability-calendar .fc-daygrid-day-events {
+
+    padding: 10px;
+}
+
+#yatra-availability-calendar .fc-event {
+
+    border-radius: 0;
+    background: none !important;
+    border: none;
+    font-size: 14px;
+}
+
+#yatra-availability-calendar .fc-event .fc-event-title {
+    padding: 2px 5px;
+    border-radius: 0;
+    background: #2991ff;
+    color: white;
+    display: inline-block;
+    width: 100%;
 }
