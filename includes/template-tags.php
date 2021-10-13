@@ -823,9 +823,9 @@ if (!function_exists('yatra_tour_pricing_configurations')) {
                 'extra_attributes' => array(
                     'placeholder' => __('Group Size', 'yatra'),
                 ),
-                'conditional_and_display' =>
-
-                    array(array('yatra_tour_meta_price_per', '=', 'group')),
+                'visibility_condition' => array(
+                    'yatra_tour_meta_price_per' => 'group'
+                ),
                 // 'row_end' => true,
             ),
             'yatra_tour_meta_regular_price' => array(

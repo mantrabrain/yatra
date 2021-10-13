@@ -202,6 +202,9 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
             $post_meta = get_post_meta($post_id, $field_key, true);
 
+            $conditional_display = isset($field['conditional_display']) ? $field['conditional_display'] : '';
+
+
             if (!isset($field['repeator_id']) && metadata_exists('post', $post_id, $field_key)) {
 
                 $value = $post_meta;
@@ -232,9 +235,12 @@ if (!class_exists('Yatra_Metabox_Base')) {
             }
             $is_visible = true;
 
+            $additional_class = '';
+
             if (isset($field['visibility_condition'])) {
 
                 $visibility_total = 0;
+
                 $visibility_condition = $field['visibility_condition'];
 
                 foreach ($visibility_condition as $visibility_meta_key => $visibility_meta_val) {
@@ -242,20 +248,24 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     $visibility_post_meta = get_post_meta($post_id, $visibility_meta_key, true);
 
                     if ($visibility_post_meta == $visibility_meta_val) {
+
                         $visibility_total++;
                     }
 
                 }
                 if (!$visibility_total == count($visibility_condition)) {
+
                     $is_visible = false;
                 }
 
             }
 
             $wrap_class .= !$is_visible || $field['type'] === 'hidden' ? ' yatra-hide' : '';
+
             echo '<div class="yatra-field-wrap ' . esc_attr($wrap_class) . '" data-wrap-id="' . esc_attr($field_key) . '">';
 
             $field_class = isset($field['class']) ? 'widefat ' . $field['class'] : 'widefat';
+
             switch ($field['type']) {
                 case "heading":
                     ?>

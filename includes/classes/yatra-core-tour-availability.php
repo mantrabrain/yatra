@@ -109,7 +109,7 @@ class Yatra_Core_Tour_Availability
 
                     $title .= "{$pricing_label}: {$current_currency_symbol}{$final_pricing} <br/> ";
 
-                    $description .= "{$pricing_label}: {$current_currency_symbol}{$final_pricing} <br/> ";
+                    $description .= "{$pricing_label}&nbsp;:&nbsp; <strong style='float:right;'>{$current_currency_symbol}{$final_pricing}</strong> <br/> ";
 
                 }
                 $response[] = array(
