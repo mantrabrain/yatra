@@ -310,6 +310,14 @@
                     $(this).closest('.yatra-pricing-group-wrap-container').remove();
                 }
             });
+            $('body').on('change', '.yatra_multiple_pricing_price_per', function () {
+                var val = $(this).val();
+                if (val === 'group') {
+                    $(this).closest('.yatra-pricing-group-wrap').find('.yatra_multiple_pricing_group_size').removeClass('yatra-hide');
+                } else {
+                    $(this).closest('.yatra-pricing-group-wrap').find('.yatra_multiple_pricing_group_size').addClass('yatra-hide');
+                }
+            });
         },
         uniqid: function () {
             return '_' + Math.random().toString(36).substr(2, 9);

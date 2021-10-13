@@ -725,7 +725,8 @@ body.single .yatra-single-tour:after {
         font-weight: 500; }
       #yatra-tour-booking-form-fields .yatra-traveler-info-wrap .yatra-traveler-price span {
         display: block;
-        font-size: 12px; }
+        font-size: 12px;
+        color: #5e6d77; }
   #yatra-tour-booking-form-fields .yatra-form-fields:last-child .yatra-traveler-info-wrap {
     border-bottom: none;
     margin-bottom: 0; }

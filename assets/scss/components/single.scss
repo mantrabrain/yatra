@@ -5,10 +5,12 @@ body.single {
       float: left;
       padding: 10px;
     }
+
     .yatra-tour-info {
       float: right;
       width: 35%;
       padding: 10px;
+
       .yatra-tour-info-inner {
         box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
         -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
@@ -16,6 +18,7 @@ body.single {
         padding: 10px;
       }
     }
+
     &:after {
       clear: both;
       content: '';
@@ -28,18 +31,21 @@ body.single {
   padding: 10px;
   background: #f9f9f9;
   border: 1px solid #ddd;
+
   .yatra-tour-additional-info-item {
     font-weight: 500;
     font-size: 15px;
     padding: 5px 0;
     width: 50%;
     float: left;
+
     .icon {
       width: 30px;
       display: inline-block;
       margin-right: 4px;
     }
   }
+
   &:after {
     clear: both;
     content: '';
@@ -50,6 +56,7 @@ body.single {
 #yatra-tour-booking-form-fields {
   display: block;
   width: 100%;
+
   .yatra-traveler-info-wrap {
     border-bottom: 1px solid #ddd;
     margin-bottom: 25px;
@@ -65,9 +72,11 @@ body.single {
       display: flex;
       flex: initial;
       align-items: center;
+
       span {
         font-weight: 500;
       }
+
       .yatra-traveler-number-inner {
         width: 60px;
         height: 35px;
@@ -82,20 +91,25 @@ body.single {
         }
       }
     }
+
     .yatra-traveler-price {
 
       text-align: right;
       flex: 1;
+
       ins {
         font-weight: 500;
       }
+
       span {
         display: block;
         font-size: 12px;
+        color: #5e6d77;
       }
     }
 
   }
+
   .yatra-form-fields:last-child {
     .yatra-traveler-info-wrap {
       border-bottom: none;
@@ -109,6 +123,7 @@ body.single {
   background: #f9f9f9;
   border: 1px solid #ddd;
   margin: 5px 0;
+
   table, td, th, tr {
     padding: 0;
     border: 0;

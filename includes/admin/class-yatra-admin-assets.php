@@ -44,8 +44,8 @@ if (!class_exists('Yatra_Admin_Assets')) {
             }
 
             // Register Only Script
-            wp_register_script('yatra-popper', 'https://unpkg.com/@popperjs/core@2', array(), YATRA_VERSION);
-            wp_register_script('yatra-tippy', 'https://unpkg.com/tippy.js@6', array(), YATRA_VERSION);
+            wp_register_script('yatra-popper', YATRA_PLUGIN_URI . '/assets/lib/popperjs/popper.js', array(), YATRA_VERSION);
+            wp_register_script('yatra-tippy', YATRA_PLUGIN_URI . '/assets/lib/tippyjs/tippy.js', array(), YATRA_VERSION);
 
             //ICOPick
 
