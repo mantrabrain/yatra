@@ -7,6 +7,41 @@
                 this.cacheDom();
                 this.bindEvents();
                 this.initLib();
+                this.initNiceNumber();
+            },
+            initNiceNumber: function () {
+                var _that = this;
+                $('body').on('click', '.yatra-nice-input-number button.plus-button', function () {
+                    var input = $(this).closest('.yatra-nice-input-number').find('input');
+                    _that.calculateNiceNumber(input, 'plus');
+                });
+                $('body').on('click', '.yatra-nice-input-number button.minus-button', function () {
+                    var input = $(this).closest('.yatra-nice-input-number').find('input');
+                    _that.calculateNiceNumber(input, 'minus');
+                });
+            },
+            calculateNiceNumber: function (input, type) {
+                var step = input.attr('data-step') === undefined ? 1 : parseInt(input.attr('data-step'));
+                var max = input.attr('data-max') === undefined ? 99999 : parseInt(input.attr('data-max'));
+                var min = input.attr('data-min') === undefined ? 0 : parseInt(input.attr('data-min'));
+                var current = parseInt(input.val());
+
+                if (type === 'plus') {
+                    current = current + step;
+                } else {
+                    current = current - step;
+                }
+
+                if (current >= max) {
+                    input.val(max).trigger('change');
+                    return;
+                }
+                if (current < min) {
+                    input.val(min).trigger('change');
+                    return;
+                }
+
+                input.val(current).trigger('change');
             },
             cacheDom: function () {
                 this.$booking_form = $('#yatra-tour-booking-form-fields');
@@ -31,7 +66,7 @@
 
                     $this.update_cart(form_data, $(this));
                 });
-                $('body').on('click', 'table.yatra_cart_table input.yatra-number-of-person-field', function (e) {
+                $('body').on('change', 'table.yatra_cart_table input.yatra-number-of-person-field', function (e) {
                     e.preventDefault();
 
                     var yatra_cart_table = $(this).closest('.yatra_cart_table');
@@ -45,7 +80,7 @@
                         if ($(this).find('.icon').length === 0 && $(this).find('svg').length === 0) {
                             return;
                         }
-                        var toggle_node = $(this).find('.icon').length!==0 ? $(this).find('.icon'): $(this).find('svg');
+                        var toggle_node = $(this).find('.icon').length !== 0 ? $(this).find('.icon') : $(this).find('svg');
 
                         if (toggle_node.hasClass('fa-minus')) {
 
@@ -59,7 +94,7 @@
                     if ($(this).find('.icon').length === 0 && $(this).find('svg').length === 0) {
                         return;
                     }
-                    var toggle_node = $(this).find('.icon').length!==0 ? $(this).find('.icon'): $(this).find('svg');
+                    var toggle_node = $(this).find('.icon').length !== 0 ? $(this).find('.icon') : $(this).find('svg');
                     var span = $('<span class=""/>');
                     var heading = toggle_node.closest('h3');
                     toggle_node.hide();

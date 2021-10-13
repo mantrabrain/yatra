@@ -10,12 +10,27 @@
                 <div class="yatra-traveler-number">
                     <div class="yatra-traveler-number-inner">
 
-                        <input id="<?php echo esc_attr($booking_pricing_args['name']) ?>"
+                       <!-- <input id="<?php /*echo esc_attr($booking_pricing_args['name']) */?>"
                                type="number"
-                               name="<?php echo esc_attr($booking_pricing_args['name']) ?>"
-                               value="<?php echo esc_attr($booking_pricing_args['number_of_person']) ?>"
+                               name="<?php /*echo esc_attr($booking_pricing_args['name']) */?>"
+                               value="<?php /*echo esc_attr($booking_pricing_args['number_of_person']) */?>"
                                class="yatra-number-of-person-field"
-                        />
+                        />-->
+                        <div class="yatra-nice-input-number">
+                            <button type="button" class="fa fa-plus nice-button plus-button"></button>
+
+                            <input readonly
+                                   data-step="1"
+                                   data-max="<?php echo $booking_pricing_args['maximum_pax'] == '' ? 9999 : absint($booking_pricing_args['maximum_pax']) ?>"
+                                   data-min="<?php echo $booking_pricing_args['minimum_pax'] == '' ? 0 : absint($booking_pricing_args['minimum_pax']) ?>"
+                                   id="<?php echo esc_attr($booking_pricing_args['name']) ?>"
+                                   type="number"
+                                   class="yatra-number-of-person-field"
+                                   name="<?php echo esc_attr($booking_pricing_args['name']) ?>"
+                                   value="<?php echo $booking_pricing_args['number_of_person'] == '' ? absint($booking_pricing_args['minimum_pax']) : absint($booking_pricing_args['number_of_person']) ?>"
+                            />
+                            <button type="button" class="fa fa-minus nice-button minus-button"></button>
+                        </div>
 
                     </div>
                     <span><?php echo esc_html($booking_pricing_args['pricing_label']) ?></span>

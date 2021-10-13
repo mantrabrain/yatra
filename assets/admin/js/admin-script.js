@@ -157,6 +157,7 @@
             this.conditionalVisibility();
             this.initDateTimePicker();
 
+
         },
         initElement: function () {
             this.gallery_upload_frame = '';

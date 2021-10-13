@@ -73,16 +73,12 @@ body.single {
       flex: initial;
       align-items: center;
 
-      span {
-        font-weight: 500;
-      }
 
       .yatra-traveler-number-inner {
-        width: 60px;
+        width: 100px;
         height: 35px;
         border-radius: 0px;
-        margin-right: 5px;
-        border: 1px solid #ddd;
+        margin-right: 10px;
 
         input {
           height: 100%;

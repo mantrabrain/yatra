@@ -152,6 +152,8 @@ if (!function_exists('yatra_booking_pricing_details')) {
         $yatra_multiple_pricing = get_post_meta($tour_id, 'yatra_multiple_pricing', true);
         $yatra_tour_meta_price_per = get_post_meta($tour_id, 'yatra_tour_meta_price_per', true);
         $yatra_tour_meta_group_size = get_post_meta($tour_id, 'yatra_tour_meta_group_size', true);
+        $yatra_tour_minimum_pax = get_post_meta($tour_id, 'yatra_tour_minimum_pax', true);
+        $yatra_tour_maximum_pax = get_post_meta($tour_id, 'yatra_tour_maximum_pax', true);
         $pricing_details = array();
         if (is_array($yatra_multiple_pricing)) {
             if (count($yatra_multiple_pricing) > 0) {
@@ -162,13 +164,13 @@ if (!function_exists('yatra_booking_pricing_details')) {
                         'name' => 'yatra_number_of_person[multi_pricing][' . $pricing_id . ']',
                         'pricing_label' => $pricing['pricing_label'],
                         'pricing_description' => $pricing['pricing_description'],
-                        'minimum_pax' => $pricing['minimum_pax'],
-                        'maximum_pax' => $pricing['maximum_pax'],
+                        'minimum_pax' => $pricing['minimum_pax'] == '' ? $yatra_tour_minimum_pax : $pricing['minimum_pax'],
+                        'maximum_pax' => $pricing['maximum_pax'] == '' ? $yatra_tour_maximum_pax : $pricing['maximum_pax'],
                         'pricing_per' => $pricing['price_per'] === '' ? $yatra_tour_meta_price_per : $pricing['price_per'],
                         'group_size' => $pricing['price_per'] === '' ? $yatra_tour_meta_group_size : $pricing['group_size'],
                         'regular_price' => $regular_price,
                         'sales_price' => $sales_price,
-                        
+
                     );
                 }
                 return $pricing_details;
