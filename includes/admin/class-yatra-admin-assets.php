@@ -19,6 +19,30 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
             $screen_id = isset($screen->id) ? $screen->id : '';
 
+            $visibility_conditions = array();
+
+            $yatra_tour_metabox_tabs = yatra_tour_metabox_tabs();
+
+            foreach ($yatra_tour_metabox_tabs as $tab) {
+
+                $settings = $tab['settings'] ?? array();
+
+                foreach ($settings as $setting_id => $setting_values) {
+
+                    $setting_visibility_condition = $setting_values['visibility_condition'] ?? array();
+
+                    foreach ($setting_visibility_condition as $single_condition => $condition_value) {
+
+                        $visibility_conditions[$single_condition][] = array(
+                            'value' => $condition_value,
+                            'target' => $setting_id
+                        );
+
+                    }
+
+                }
+            }
+
             // Register Only Script
 
 
@@ -119,7 +143,8 @@ if (!class_exists('Yatra_Admin_Assets')) {
                         'icons' => yatra_fontawesome_icon_lists(),
                         'title' => __('Font Awesome', 'yatra')
                     )
-                )
+                ),
+                'visibility_conditions' => $visibility_conditions
 
 
             );

@@ -154,7 +154,7 @@
             this.initLib();
             this.initGalleryBuilder();
             this.groupPricing();
-            this.fixedDeparture();
+            this.conditionalVisibility();
             this.initDateTimePicker();
         },
         initElement: function () {
@@ -166,6 +166,56 @@
                 $('.yatra-select2').select2();
             }
         },
+        conditionalVisibility: function () {
+
+            var _that = this;
+            var conditions = yatra_admin_params.visibility_conditions;
+
+            for (var eventTarget in conditions) {
+
+                if (conditions.hasOwnProperty(eventTarget)) {
+
+                    $('body').on('change', '#' + eventTarget, function (event) {
+
+                        var type = event.target.type;
+
+                        var currentValue = $(this).val();
+
+                        var id = $(this).attr('id');
+
+                        if (type === "checkbox") {
+                            currentValue = $(this).prop("checked");
+                        }
+
+                        _that.applyConditionalVisibility(id, currentValue);
+
+                    });
+                }
+            }
+            //  console.log(conditions);
+        },
+
+        applyConditionalVisibility: function (id, currentValue) {
+
+
+            var all_values = yatra_admin_params.visibility_conditions[id];
+
+            var loopIndex = 0;
+            for (loopIndex = 0; loopIndex < all_values.length; ++loopIndex) {
+                var value = all_values[loopIndex].value;
+                var target = all_values[loopIndex].target;
+                if ($('#' + target).length > 0) {
+                    console.log(value === currentValue);
+                    console.log(target);
+                    if (value === currentValue) {
+                        $('#' + target).closest('.yatra-field-wrap').removeClass('yatra-hide');
+                    } else {
+                        $('#' + target).closest('.yatra-field-wrap').addClass('yatra-hide');
+                    }
+                }
+            }
+        },
+
         initGalleryBuilder: function () {
             var uploadBtn = $('.mb-gallery-add');
             var parent = uploadBtn.closest('.mb-admin-gallery');
@@ -260,25 +310,7 @@
         _replaceAll: function (str, toReplace, replaceWith) {
             return str ? str.split(toReplace).join(replaceWith) : '';
         },
-        fixedDeparture: function () {
-            $('#yatra_tour_meta_tour_fixed_departure').on('click', function () {
 
-                if ($(this).prop('checked') == true) {
-                    $('div[data-wrap-id="yatra_tour_meta_tour_start_date"]').removeClass('yatra-hide');
-                    $('div[data-wrap-id="yatra_tour_meta_tour_end_date"]').removeClass('yatra-hide');
-
-                    $('div[data-wrap-id="yatra_tour_meta_tour_duration_days"]').addClass('yatra-hide');
-                    $('div[data-wrap-id="yatra_tour_meta_tour_duration_nights"]').addClass('yatra-hide');
-                } else {
-                    $('div[data-wrap-id="yatra_tour_meta_tour_start_date"]').addClass('yatra-hide');
-                    $('div[data-wrap-id="yatra_tour_meta_tour_end_date"]').addClass('yatra-hide');
-
-                    $('div[data-wrap-id="yatra_tour_meta_tour_duration_days"]').removeClass('yatra-hide');
-                    $('div[data-wrap-id="yatra_tour_meta_tour_duration_nights"]').removeClass('yatra-hide');
-                }
-            });
-
-        },
         initDateTimePicker: function () {
 
             if ($.fn.yatra_datepicker) {

@@ -815,6 +815,7 @@ if (!function_exists('yatra_tour_pricing_configurations')) {
                     'person' => __('Person', 'yatra'),
                     'group' => __('Group', 'yatra')
                 ),
+               
             ), 'yatra_tour_meta_group_size' => array(
                 'name' => 'yatra_tour_meta_group_size',
                 'title' => __('Group Size', 'yatra'),

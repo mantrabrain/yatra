@@ -202,8 +202,6 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
             $post_meta = get_post_meta($post_id, $field_key, true);
 
-            $conditional_display = isset($field['conditional_display']) ? $field['conditional_display'] : '';
-
 
             if (!isset($field['repeator_id']) && metadata_exists('post', $post_id, $field_key)) {
 
@@ -235,9 +233,9 @@ if (!class_exists('Yatra_Metabox_Base')) {
             }
             $is_visible = true;
 
-            $additional_class = '';
 
             if (isset($field['visibility_condition'])) {
+
 
                 $visibility_total = 0;
 
