@@ -157,16 +157,20 @@
       -ms-flex-align: center;
           align-items: center; }
   .yatra-nice-input-number .nice-button {
-    background: none;
+    background: none !important;
     border: none;
-    color: #000;
+    color: #000 !important;
     height: 35px;
     width: 30px;
     border: 1px solid #aaa;
     border-radius: 0;
     position: relative;
     font-size: 17px;
-    font-weight: 900; }
+    font-weight: 900;
+    margin: 0;
+    padding: 0; }
+    .yatra-nice-input-number .nice-button:focus, .yatra-nice-input-number .nice-button:hover {
+      outline: none; }
     .yatra-nice-input-number .nice-button:before {
       position: absolute;
       width: 100%;
@@ -177,6 +181,8 @@
       right: 0;
       bottom: 0;
       line-height: 35px; }
+    .yatra-nice-input-number .nice-button:hover {
+      border-color: #000; }
     .yatra-nice-input-number .nice-button .icon {
       font-weight: 900 !important; }
     .yatra-nice-input-number .nice-button:hover, .yatra-nice-input-number .nice-button:focus, .yatra-nice-input-number .nice-button:active {
@@ -185,8 +191,8 @@
   .yatra-nice-input-number input[type="number"] {
     width: 40px !important;
     height: 35px !important;
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     border: 0;
     text-align: center;
     -webkit-appearance: none;
@@ -198,7 +204,8 @@
     .yatra-nice-input-number input[type="number"]:focus, .yatra-nice-input-number input[type="number"]:hover {
       border: none;
       -webkit-appearance: none;
-      -moz-appearance: textfield; }
+      -moz-appearance: textfield;
+      outline: none; }
     .yatra-nice-input-number input[type="number"]::-webkit-inner-spin-button, .yatra-nice-input-number input[type="number"]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       -moz-appearance: textfield; }
@@ -833,7 +840,7 @@ body.single .yatra-single-tour:after {
       display: -ms-flexbox;
       display: flex;
       position: relative;
-      padding-right: 20px; }
+      width: 50%; }
       #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-number span {
         font-weight: 500;
         font-size: 14px; }
@@ -848,16 +855,15 @@ body.single .yatra-single-tour:after {
           border: none;
           padding: 0 10px; }
     #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-price {
-      text-align: center;
-      -webkit-box-flex: 1;
-         -moz-box-flex: 1;
-          -ms-flex: 1;
-              flex: 1; }
+      width: 30%; }
       #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-price ins {
         font-weight: 500; }
       #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-price span {
         display: block;
-        font-size: 12px; }
+        font-size: 12px;
+        color: #5e6d77; }
+    #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-total-price {
+      width: 20%; }
   #yatra-tour-cart-edit-form-fields .yatra-form-fields:last-child .yatra-traveler-info-wrap {
     border-bottom: none;
     margin-bottom: 0; }
