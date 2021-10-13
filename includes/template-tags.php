@@ -687,6 +687,7 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 'name' => 'yatra_tour_meta_tour_fixed_departure',
                 'title' => esc_html__('Fixed Departure', 'yatra'),
                 'type' => 'switch',
+                'description' => esc_html__('This option let you enable/disable fix depdeparture option for this tour package. ', 'yatra'),
                 //'wrap_class' => 'yatra-right',
                 //'row_end' => true,
 
@@ -720,7 +721,8 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 )
                 //'row_start' => true,
 
-            ), 'yatra_tour_meta_tour_duration_days' => array(
+            ),
+            'yatra_tour_meta_tour_duration_days' => array(
                 'name' => 'yatra_tour_meta_tour_duration_days',
                 'title' => esc_html__('Tour Duration Days', 'yatra'),
                 'description' => esc_html__('Total duration days for this tour', 'yatra'),
@@ -770,10 +772,60 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 'name' => 'yatra_tour_meta_tour_featured',
                 'title' => esc_html__('Feature this tour', 'yatra'),
                 'type' => 'switch',
+                'description' => esc_html__('This option let you enable/disable feature option for this tour package. ', 'yatra'),
+
                 //'wrap_class' => 'yatra-right',
                 //'row_end' => true,
 
             ),
+            'yatra_tour_minimum_pax' => array(
+                'name' => 'yatra_tour_minimum_pax',
+                'title' => esc_html__('Minimum People (Pax)', 'yatra'),
+                'description' => esc_html__('Minimum number of people per booking. Leave it blank to ignore minimum limit per booking.', 'yatra'),
+                'type' => 'number',
+                // 'wrap_class' => 'yatra-left',
+                'extra_attributes' => array(
+                    'placeholder' => __('Minimum number of people per booking', 'yatra'),
+                ),
+
+            ),
+            'yatra_tour_maximum_pax' => array(
+                'name' => 'yatra_tour_maximum_pax',
+                'title' => esc_html__('Maximum People (Pax)', 'yatra'),
+                'description' => esc_html__('Maximum number of people per booking. Leave it blank to ignore maximum limit per booking.', 'yatra'),
+                'type' => 'number',
+                // 'wrap_class' => 'yatra-left',
+                'extra_attributes' => array(
+                    'placeholder' => __('Maximum number of people per booking', 'yatra'),
+                ),
+
+            ),
+
+            'yatra_tour_enable_max_num_of_traveller' => array(
+                'name' => 'yatra_tour_enable_max_num_of_traveller',
+                'title' => esc_html__('Enable max number of traveller', 'yatra'),
+                'type' => 'switch',
+                'description' => esc_html__('This option let you enable/disable total max number of traveller limit for this tour', 'yatra'),
+                //'wrap_class' => 'yatra-right',
+                //'row_end' => true,
+
+            ),
+
+            'yatra_tour_maximum_number_of_traveller' => array(
+                'name' => 'yatra_tour_maximum_number_of_traveller',
+                'title' => esc_html__('Maximum number of traveller', 'yatra'),
+                'description' => esc_html__('Maximum number of traveller for this tour package.', 'yatra'),
+                'type' => 'number',
+                // 'wrap_class' => 'yatra-left',
+                'extra_attributes' => array(
+                    'placeholder' => __('Maximum number of traveller for this tour package.', 'yatra'),
+                ),
+                'visibility_condition' => array(
+                    'yatra_tour_enable_max_num_of_traveller' => true
+                )
+
+            ),
+
             'yatra_tour_meta_tour_tabs_ordering' => array(
                 'name' => 'yatra_tour_meta_tour_tabs_ordering',
                 'type' => 'hidden',
@@ -815,7 +867,7 @@ if (!function_exists('yatra_tour_pricing_configurations')) {
                     'person' => __('Person', 'yatra'),
                     'group' => __('Group', 'yatra')
                 ),
-               
+
             ), 'yatra_tour_meta_group_size' => array(
                 'name' => 'yatra_tour_meta_group_size',
                 'title' => __('Group Size', 'yatra'),

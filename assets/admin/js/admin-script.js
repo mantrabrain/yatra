@@ -156,6 +156,7 @@
             this.groupPricing();
             this.conditionalVisibility();
             this.initDateTimePicker();
+
         },
         initElement: function () {
             this.gallery_upload_frame = '';
@@ -165,10 +166,16 @@
             if (typeof "select2" !== 'undefined') {
                 $('.yatra-select2').select2();
             }
+
+            tippy('.yatra-tippy-tooltip', {
+                //content: "Hello World",
+                allowHTML: true,
+            });
         },
         conditionalVisibility: function () {
 
             var _that = this;
+
             var conditions = yatra_admin_params.visibility_conditions;
 
             for (var eventTarget in conditions) {

@@ -260,7 +260,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
             $wrap_class .= !$is_visible || $field['type'] === 'hidden' ? ' yatra-hide' : '';
 
-            echo '<div class="yatra-field-wrap ' . esc_attr($wrap_class) . '" data-wrap-id="' . esc_attr($field_key) . '">';
+            echo '<div class="yatra-field-wrap' . esc_attr($wrap_class) . '" data-wrap-id="' . esc_attr($field_key) . '">';
 
             $field_class = isset($field['class']) ? 'widefat ' . $field['class'] : 'widefat';
 
@@ -543,6 +543,12 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     do_action('yatra_metabox_html_' . sanitize_text_field($field['type']), $field, $post_id);
                     break;
 
+            }
+
+            $description = isset($field['description']) ? sanitize_text_field($field['description']) : '';
+
+            if ('' !== $description) {
+                echo '<span class="yatra-tippy-tooltip dashicons dashicons-editor-help" data-tippy-content="' . esc_attr($description) . '"></span>';
             }
             echo "</div>";
 

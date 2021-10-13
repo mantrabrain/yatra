@@ -17,16 +17,16 @@ class Yatra_Core_Tour_Availability
 
         $screen_id = isset($screen->id) ? $screen->id : '';
 
+
         if ($screen_id != 'tour_page_yatra-availability') {
             return;
         }
         wp_enqueue_style('yatra-availability-style', YATRA_PLUGIN_URI . '/assets/admin/css/availability.css', array(
             'yatra-fullcalendar-css'
         ), YATRA_VERSION);
-        wp_register_script('yatra-popperjs', 'https://unpkg.com/@popperjs/core@2', array(), YATRA_VERSION);
-        wp_register_script('yatra-tippy', 'https://unpkg.com/tippy.js@6', array(), YATRA_VERSION);
+
         wp_enqueue_script('yatra-availability-script', YATRA_PLUGIN_URI . '/assets/admin/js/availability.js',
-            array('yatra-fullcalendar-js', 'yatra-popperjs', 'yatra-tippy')
+            array('yatra-fullcalendar-js', 'yatra-popper', 'yatra-tippy')
             , YATRA_VERSION);
 
         $yatra_availability_params = array(

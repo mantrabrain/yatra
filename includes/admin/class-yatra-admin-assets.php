@@ -44,7 +44,8 @@ if (!class_exists('Yatra_Admin_Assets')) {
             }
 
             // Register Only Script
-
+            wp_register_script('yatra-popper', 'https://unpkg.com/@popperjs/core@2', array(), YATRA_VERSION);
+            wp_register_script('yatra-tippy', 'https://unpkg.com/tippy.js@6', array(), YATRA_VERSION);
 
             //ICOPick
 
@@ -106,7 +107,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
 
             wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array(
-                'yatra-select2js', 'jquery', 'yatra-datepicker', 'yatra-swal-js', 'yatra-icopick-js'
+                'yatra-select2js', 'jquery', 'yatra-datepicker', 'yatra-swal-js', 'yatra-icopick-js', 'yatra-popper', 'yatra-tippy'
             ), YATRA_VERSION);
             wp_enqueue_script('yatra-admin-script');
 

@@ -1,5 +1,5 @@
 .yatra-hide {
-    display: none;
+    display: none !important;
 }
 
 .yatra-pricing-group-wrap {
@@ -544,6 +544,22 @@ table.yatra-booking-meta-customer-info td {
 
 .yatra-admin-tab--content-section .yatra-field-wrap {
     padding: 10px 15px;
+    display: flex;
+    align-items: center;
+}
+
+.yatra-admin-tab--content-section .mb-meta-vertical-tab-content .yatra-field-wrap {
+    padding: 10px 15px;
+    display: block;
+    align-items: center;
+}
+
+.yatra-admin-tab--content-section .mb-meta-vertical-tab-content .yatra-field-wrap .yatra-tippy-tooltip {
+    display: none;
+}
+
+.yatra-tippy-tooltip {
+    margin-left: 10px;
 }
 
 .yatra-admin-tab--content-section .yatra-field-wrap label:not(.yatra-switch-control) {
