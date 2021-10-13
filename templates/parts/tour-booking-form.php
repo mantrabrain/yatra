@@ -50,10 +50,10 @@
                         ?></ins>
                     <?php
                     if (strtolower($booking_pricing_args['pricing_per']) == 'group') {
-                        $pricing_per_string = 'Per ' . $booking_pricing_args['group_size'] . ' ' . $booking_pricing_args['pricing_label'];
+                        $pricing_per_string = $currency_symbol . $booking_pricing_args['final_price'] . ' Per ' . $booking_pricing_args['group_size'] . ' ' . $booking_pricing_args['pricing_label'];
                     } else {
 
-                        $pricing_per_string = 'Per ' . $booking_pricing_args['pricing_label'];
+                        $pricing_per_string = $currency_symbol . $booking_pricing_args['final_price'] . ' Per ' . $booking_pricing_args['pricing_label'];
                     }
 
                     if ($booking_pricing_args['pricing_description'] != '') {
