@@ -11,23 +11,28 @@ do_action('yatra_checkout_before_form_fields');
 
 ?>
 
-    <form method="post" class="yatra-checkout-form"><?php
+    <form method="post" class="yatra-checkout-form">
 
-        do_action('yatra_checkout_form_fields');
+        <div class="yatra-checkout-form-fields"><?php
 
-        echo '<div class="mb-clear"></div>';
+            do_action('yatra_checkout_form_fields');
 
+            ?>
+        </div>
 
-        yatra()->cart->get_cart_order_table();
-        ?>
-        <p>
-            <?php wp_nonce_field('yatra_book_selected_tour_nonce', 'yatra-book-selected-tour-nonce'); ?>
-            <input type="submit" class="yatra-button button" name="book_selected_tour_nonce"
-                   value="<?php echo esc_attr(get_option('yatra_order_booking_text', 'Order Booking')); ?>"/>
-            <input type="hidden" name="action" value="yatra_book_selected_tour_nonce"/>
-        </p>
+        <div class="yatra-checkout-order-table">
+            <?php
 
+            yatra()->cart->get_cart_order_table();
+            ?>
+            <p>
+                <?php wp_nonce_field('yatra_book_selected_tour_nonce', 'yatra-book-selected-tour-nonce'); ?>
+                <input type="submit" class="yatra-button button" name="book_selected_tour_nonce"
+                       value="<?php echo esc_attr(get_option('yatra_order_booking_text', 'Order Booking')); ?>"/>
+                <input type="hidden" name="action" value="yatra_book_selected_tour_nonce"/>
+            </p>
 
+        </div>
     </form>
 <?php
 do_action('yatra_checkout_after_form_fields');

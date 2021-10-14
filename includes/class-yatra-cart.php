@@ -189,6 +189,7 @@ if (!class_exists('Yatra_Cart')) {
                 $cart_items = $this->get_cart();
             }
             ob_start();
+
             yatra_get_template('tmpl-order-table.php', array('cart_items' => $cart_items));
 
             $content = ob_get_clean();

@@ -29,6 +29,7 @@ class Yatra_Checkout_Form extends Yatra_Form
 
 
         $form_fields = apply_filters('tour_checkout_form_fields', array(
+
                 'fullname' => array(
                     'name' => 'fullname',
                     'title' => __('Your full name', 'yatra'),
@@ -47,7 +48,8 @@ class Yatra_Checkout_Form extends Yatra_Form
                     ),
                     'group_id' => 'yatra_tour_customer_info',
                     'row_start' => true,
-                ), 'email' => array(
+                ),
+                'email' => array(
                     'name' => 'email',
                     'title' => __('Email', 'yatra'),
                     'type' => 'email',
@@ -59,7 +61,7 @@ class Yatra_Checkout_Form extends Yatra_Form
                         'required' => 'required'
                     ),
 
-                    'row_start' => true,
+                    'row_end' => true,
                     'validation' => array(
                         'required' => array(
                             'message' => __('Email field is required.', 'yatra'),
@@ -68,7 +70,8 @@ class Yatra_Checkout_Form extends Yatra_Form
                         ),
 
                     ),
-                ), 'country' => array(
+                ),
+                'country' => array(
                     'name' => 'country',
                     'title' => __('Country', 'yatra'),
                     'type' => 'select',
@@ -77,7 +80,8 @@ class Yatra_Checkout_Form extends Yatra_Form
                     'wrap_class' => 'yatra-left',
                     'row_start' => true,
                     'select2' => true
-                ), 'phone_number' => array(
+                ),
+                'phone_number' => array(
                     'name' => 'phone_number',
                     'title' => __('Phone Number', 'yatra'),
                     'type' => 'text',
@@ -87,7 +91,7 @@ class Yatra_Checkout_Form extends Yatra_Form
                     'extra_attributes' => array(
                         'placeholder' => __('Your contact number', 'yatra'),
                     ),
-                    'row_start' => true,
+                    'row_end' => true,
                 )
             )
         );

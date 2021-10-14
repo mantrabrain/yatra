@@ -1,8 +1,44 @@
 form.yatra-checkout-form {
   label {
     display: block;
+    padding: 5px 0;
   }
 
+  .yatra-field-wrap {
+    p {
+      margin: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 10px !important;
+    }
+
+    input, select {
+      width: 100%;
+      -webkit-appearance: none;
+      color: #4a5568;
+      border: 1px solid #cbd5e0;
+      border-radius: 3px;
+      padding: 0.4em 0.5em;
+      max-width: 100%;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      padding: 0.4em 0.5em;
+      color: #4a5568;
+
+    }
+
+    .select2-container--default .select2-selection--single {
+      height: auto;
+      border: 1px solid #cbd5e0;
+      border-radius: 3px;
+      color: #4a5568;
+
+    }
+  }
+
+  .yatra-checkout-form-fields, .yatra-checkout-order-table {
+    padding: 10px 0;
+  }
 }
 
 .select2-container {
