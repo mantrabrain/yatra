@@ -51,7 +51,9 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
             $booking_id = $args->ID;
 
             $yatra_booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
+
             $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
+
             $yatra_tour_customer_info = isset($yatra_booking_meta_params['yatra_tour_customer_info']) ? $yatra_booking_meta_params['yatra_tour_customer_info'] : array();
 
             ?>
@@ -69,9 +71,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         <th><?php echo __('Durations', 'yatra'); ?></th>
                     </tr>
                     <?php
-
                     $yatra_booking_meta = !is_array($yatra_booking_meta) ? array() : $yatra_booking_meta;
-
 
                     foreach ($yatra_booking_meta as $id => $booking) {
 
@@ -96,7 +96,12 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         // Tour Name
                         echo '<td>';
 
-                        echo '<a href="' . esc_url(admin_url('post.php?post=' . absint($id)) . '&action=edit') . '">' . esc_html($yatra_tour_name) . '</a>';
+                        if (FALSE === get_post_status($id) || "trash" === get_post_status($id)) {
+                            $tour_url_attribute = '';
+                        } else {
+                            $tour_url_attribute = 'href="' . esc_url(admin_url('post.php?post=' . absint($id)) . '&action=edit') . '" ';
+                        }
+                        echo '<a ' . $tour_url_attribute . '>' . esc_html($yatra_tour_name) . '</a>';
 
                         echo '</td>';
 
@@ -108,6 +113,14 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                             echo '<table class="sub">';
 
                             foreach ($yatra_multiple_pricing as $pricing_id => $pricing) {
+
+                                $variable_pricing_per = isset($pricing['price_per']) ? $pricing['price_per'] : '';
+                                $variable_group_size = isset($pricing['group_size']) ? $pricing['group_size'] : '';
+                                $variable_group_size = $variable_pricing_per == '' ? absint($yatra_tour_meta_group_size) : absint($variable_group_size);
+                                $variable_group_size = $variable_group_size == 0 ? 1 : $variable_group_size;
+                                $variable_pricing_per = $variable_pricing_per === '' ? $yatra_tour_meta_price_per : $variable_pricing_per;
+
+
                                 echo '<tr>';
                                 echo '<td>';
                                 echo '<span>' . esc_html($number_of_person[$pricing_id]) . '</span>';
@@ -117,16 +130,16 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                                 echo '</td>';
                                 echo '<td>';
                                 echo '<span>' . esc_html($yatra_currency_symbol) . absint($pricing['sales_price']) . ' per ';
-                                if ($yatra_tour_meta_price_per == 'group') {
-                                    echo absint($yatra_tour_meta_group_size) . ' ';
+                                if ($variable_group_size == 'group') {
+                                    echo absint($variable_group_size) . ' ';
                                 }
                                 echo esc_html($pricing['pricing_label']) . '</span>';
                                 echo '</td>';
 
                                 echo '<td>';
                                 echo '<span>' . esc_html($yatra_currency_symbol) . absint($pricing['regular_price']) . ' per ';
-                                if ($yatra_tour_meta_price_per == 'group') {
-                                    echo absint($yatra_tour_meta_group_size) . ' ';
+                                if ($variable_pricing_per == 'group') {
+                                    echo absint($variable_group_size) . ' ';
                                 }
                                 echo esc_html($pricing['pricing_label']) . '</span>';
                                 echo '</td>';
