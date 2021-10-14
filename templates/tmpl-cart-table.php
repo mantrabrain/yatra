@@ -35,7 +35,11 @@ if (count($cart_items) < 1) {
 
             $remove_item = md5($tour_cart->ID);
 
-            $remove_url = yatra_get_cart_page(true) . '?yatra_cart_remove_item=' . $remove_item . '&yatra_cart_remove_nonce=' . $yatra_cart_remove_nonce;
+            $remove_url = add_query_arg(array(
+                'yatra_cart_remove_item' => $remove_item,
+                'yatra_cart_remove_nonce' => $yatra_cart_remove_nonce
+
+            ), yatra_get_cart_page(true));
             ?>
             <td class="tour-remove">
                 <a href="<?php echo $remove_url; ?>"

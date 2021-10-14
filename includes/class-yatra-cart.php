@@ -148,6 +148,7 @@ if (!class_exists('Yatra_Cart')) {
 
             if (!empty($remove_item) && !empty($nonce)) {
 
+
                 $status = wp_verify_nonce($nonce, 'yatra_cart_remove_tour_item');
 
                 $tour_id = $this->is_valid_id_hash($remove_item);
