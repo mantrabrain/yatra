@@ -435,6 +435,8 @@ ul.mb-selected-gallery-list li img {
     margin: 0 !important;
     padding: 0;
     margin-bottom: 20px;
+    border-collapse: collapse;
+
 }
 
 table.yatra-booking-meta-info th,
@@ -443,6 +445,22 @@ table.yatra-booking-meta-customer-info th,
 table.yatra-booking-meta-customer-info td {
     border: 1px solid #ddd;
     padding: 10px;
+}
+
+table.yatra-booking-meta-customer-info tr {
+    text-align: center;
+}
+
+table.yatra-booking-meta-info tr {
+    text-align: center;
+}
+
+table.yatra-booking-meta-info tr.new-item {
+    border-top: 2px solid #828282
+}
+
+table.yatra-booking-meta-info tr:last-child {
+    border-bottom: 3px solid #828282
 }
 
 .yatra-booking-meta-information h2 {

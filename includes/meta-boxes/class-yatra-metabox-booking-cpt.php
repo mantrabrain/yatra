@@ -63,8 +63,9 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                     <tr>
                         <th><?php echo __('Tour', 'yatra'); ?></th>
                         <th><?php echo __('Number of person', 'yatra'); ?></th>
-                        <th><?php echo __('Sales Price', 'yatra'); ?></th>
+                        <th><?php echo __('Pricing Label', 'yatra'); ?></th>
                         <th><?php echo __('Regular Price', 'yatra'); ?></th>
+                        <th><?php echo __('Sales Price', 'yatra'); ?></th>
                         <th><?php echo __('Price Per', 'yatra'); ?></th>
                         <th><?php echo __('Group Size', 'yatra'); ?></th>
                         <th><?php echo __('Toal Price', 'yatra'); ?></th>
@@ -73,9 +74,9 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                     <?php
                     $yatra_booking_meta = !is_array($yatra_booking_meta) ? array() : $yatra_booking_meta;
 
+
                     foreach ($yatra_booking_meta as $id => $booking) {
 
-                        echo '<tr>';
 
                         $yatra_tour_name = isset($booking['yatra_tour_name']) ? $booking['yatra_tour_name'] : '';
                         $yatra_tour_meta_regular_price = isset($booking['yatra_tour_meta_regular_price']) ? $booking['yatra_tour_meta_regular_price'] : '';
@@ -93,24 +94,14 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         $yatra_multiple_pricing = isset($booking['yatra_multiple_pricing']) ? $booking['yatra_multiple_pricing'] : '';
                         $yatra_multiple_pricing = is_array($yatra_multiple_pricing) && @count($yatra_multiple_pricing) > 0 ? $yatra_multiple_pricing : null;
 
-                        // Tour Name
-                        echo '<td>';
-
-                        if (FALSE === get_post_status($id) || "trash" === get_post_status($id)) {
-                            $tour_url_attribute = '';
+                        if (!$yatra_tour_meta_tour_fixed_departure) {
+                            $durations = absint($yatra_tour_meta_tour_duration_days) . ' Days ' . absint($yatra_tour_meta_tour_duration_nights) . ' Nights';
                         } else {
-                            $tour_url_attribute = 'href="' . esc_url(admin_url('post.php?post=' . absint($id)) . '&action=edit') . '" ';
+                            $durations = esc_html($yatra_tour_meta_tour_start_date) . ' to ' . esc_html($yatra_tour_meta_tour_end_date);
                         }
-                        echo '<a ' . $tour_url_attribute . '>' . esc_html($yatra_tour_name) . '</a>';
-
-                        echo '</td>';
-
-                        // Number Of Person
                         if (is_array($yatra_multiple_pricing) && !is_null($yatra_multiple_pricing)) {
 
-                            echo '<td colspan="3">';
-
-                            echo '<table class="sub">';
+                            $multiple_pricing_index = 0;
 
                             foreach ($yatra_multiple_pricing as $pricing_id => $pricing) {
 
@@ -120,88 +111,37 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                                 $variable_group_size = $variable_group_size == 0 ? 1 : $variable_group_size;
                                 $variable_pricing_per = $variable_pricing_per === '' ? $yatra_tour_meta_price_per : $variable_pricing_per;
 
-
-                                echo '<tr>';
-                                echo '<td>';
-                                echo '<span>' . esc_html($number_of_person[$pricing_id]) . '</span>';
-                                echo '</td>';
-                                echo '<td>';
-                                echo '<span>' . esc_html($pricing['pricing_label']) . '</span>';
-                                echo '</td>';
-                                echo '<td>';
-                                echo '<span>' . esc_html($yatra_currency_symbol) . absint($pricing['sales_price']) . ' per ';
-                                if ($variable_group_size == 'group') {
-                                    echo absint($variable_group_size) . ' ';
-                                }
-                                echo esc_html($pricing['pricing_label']) . '</span>';
-                                echo '</td>';
-
-                                echo '<td>';
-                                echo '<span>' . esc_html($yatra_currency_symbol) . absint($pricing['regular_price']) . ' per ';
-                                if ($variable_pricing_per == 'group') {
-                                    echo absint($variable_group_size) . ' ';
-                                }
-                                echo esc_html($pricing['pricing_label']) . '</span>';
-                                echo '</td>';
-
-                                echo '</tr>';
+                                $this->generate_table_row(
+                                    $yatra_tour_name,
+                                    $number_of_person[$pricing_id],
+                                    $pricing['pricing_label'],
+                                    $yatra_currency_symbol . $pricing['regular_price'],
+                                    $yatra_currency_symbol . $pricing['sales_price'],
+                                    $variable_pricing_per,
+                                    $variable_group_size,
+                                    $yatra_currency_symbol . $total_tour_price,
+                                    $durations,
+                                    $id,
+                                    array('index' => $multiple_pricing_index, 'count' => count($yatra_multiple_pricing))
+                                );
+                                $multiple_pricing_index++;
                             }
-
-                            echo '</table>';
                         } else {
 
-                            echo '<td>';
-                            echo '<span>' . absint($number_of_person) . '</span>';
 
+                            $this->generate_table_row(
+                                $yatra_tour_name,
+                                $number_of_person,
+                                'pricing label',
+                                $yatra_currency_symbol . $yatra_tour_meta_regular_price,
+                                $yatra_currency_symbol . $yatra_tour_meta_sales_price,
+                                $yatra_tour_meta_price_per,
+                                $yatra_tour_meta_group_size,
+                                $yatra_currency_symbol . $total_tour_price,
+                                $durations,
+                                $id
+                            );
                         }
-
-                        echo '</td>';
-
-                        if (!is_array($yatra_multiple_pricing) || is_null($yatra_multiple_pricing)) {
-                            // Sales Price
-                            echo '<td>';
-
-                            echo '<span>' . esc_html($yatra_currency_symbol) . absint($yatra_tour_meta_sales_price) . '</span>';
-
-                            echo '</td>';
-
-                            // Regular Price
-                            echo '<td>';
-
-                            echo '<span>' . esc_html($yatra_currency_symbol) . absint($yatra_tour_meta_regular_price) . '</span>';
-
-                            echo '</td>';
-                        }
-                        // Price Per
-                        echo '<td>';
-
-                        echo '<span>' . esc_html($yatra_tour_meta_price_per) . '</span>';
-
-                        echo '</td>';
-                        // Group Size
-                        echo '<td>';
-
-                        echo '<span>' . absint($yatra_tour_meta_group_size) . '</span>';
-
-                        echo '</td>';
-
-                        // Total Tour Price
-                        echo '<td>';
-
-                        echo '<span>' . esc_html($yatra_currency_symbol) . absint($total_tour_price) . '</span>';
-
-                        echo '</td>';
-                        // Duration Days
-                        echo '<td>';
-
-                        if (!$yatra_tour_meta_tour_fixed_departure) {
-                            echo '<span>' . absint($yatra_tour_meta_tour_duration_days) . ' Days ' . absint($yatra_tour_meta_tour_duration_nights) . ' Nights </span>';
-                        } else {
-                            echo '<span>' . esc_html($yatra_tour_meta_tour_start_date) . ' to ' . esc_html($yatra_tour_meta_tour_end_date) . '</span>';
-                        }
-                        echo '</td>';
-
-                        echo '<tr>';
                     } ?>
                 </table>
 
@@ -296,6 +236,57 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
             </div>
             <?php
 
+        }
+
+        public function generate_table_row(
+            $tour_title,
+            $number_of_person,
+            $pricing_label,
+            $regular_price,
+            $sales_price,
+            $price_per,
+            $group_size,
+            $total_price,
+            $durations,
+            $id,
+            $multiple_pricing = array()
+        )
+        {
+            $index = isset($multiple_pricing['index']) ? absint($multiple_pricing['index']) : '';
+            $count = isset($multiple_pricing['count']) ? absint($multiple_pricing['count']) : '';
+            $row_merge_text = $index == '' && $count == '' ? '' : ' rowspan="' . absint($count) . '" ';
+            $row_class = $index == 0 || $index == '' ? 'new-item' : '';
+            ?>
+            <tr class="<?php echo esc_attr($row_class); ?>">
+                <?php
+                if (FALSE === get_post_status($id) || "trash" === get_post_status($id)) {
+                    $tour_url_attribute = '';
+                } else {
+                    $tour_url_attribute = 'href="' . esc_url(admin_url('post.php?post=' . absint($id)) . '&action=edit') . '" ';
+                }
+                if ($index == 0 || ($index == '' && $count == '')) {
+                    ?>
+                    <td <?php echo $row_merge_text; ?>>
+                        <?php echo '<a ' . $tour_url_attribute . '>' . esc_html($tour_title) . '</a>';
+                        ?>
+                    </td>
+                    <?php
+                }
+                ?>
+                <td><span><?php echo absint($number_of_person) ?></span></td>
+                <td><span><?php echo esc_html($pricing_label) ?></span></td>
+                <td><span><?php echo esc_html($regular_price) ?></span></td>
+                <td><span><?php echo esc_html($sales_price) ?></span></td>
+                <td><span><?php echo esc_html($price_per) ?></span></td>
+                <td><span><?php echo esc_html($group_size) ?></span></td>
+                <?php if ($index == 0 || ($index == '' && $count == '')) {
+                    ?>
+                    <td <?php echo $row_merge_text; ?>><span><?php echo esc_html($total_price) ?></span></td>
+                    <td <?php echo $row_merge_text; ?>><span><?php echo esc_html($durations) ?></span></td>
+                <?php } ?>
+
+            </tr>
+            <?php
         }
 
         /**
