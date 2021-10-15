@@ -170,7 +170,6 @@ if (!function_exists('yatra_account_bookings')) {
             $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
 
 
-
             yatra_get_template('myaccount/tmpl-booking-details.php', array('yatra_booking_meta' => $yatra_booking_meta));
 
         } else {
@@ -370,14 +369,38 @@ if (!function_exists('yatra_cart_edit_person_pricing_details')) {
 
     function yatra_cart_edit_person_pricing_details($cart_id, $cart_items, $tour_id)
     {
-        $booking_pricing_info = yatra_cart_pricing_details($tour_id, $cart_items);
+        $number_of_person = isset($cart_items['number_of_person']) ? $cart_items['number_of_person'] : 0;
+
+        yatra()->tour->maybe_initialize($tour_id);
+
+        $booking_pricing_info = yatra()->tour->get_pricing($number_of_person);
+
+        yatra()->tour->maybe_flush();
 
         yatra_get_template('tmpl-cart-edit-form.php',
             array(
                 'yatra_booking_pricing_info' => $booking_pricing_info,
+                'tour_id' => $tour_id
             )
         );
 
+    }
+}
+
+if (!function_exists('yatra_get_price')) {
+
+    function yatra_get_price($currency, $price, $echo = false)
+    {
+        $currency_price_separator = apply_filters('yatra_currency_price_separator', '');
+
+        $price_string = ($currency . $currency_price_separator . $price);
+
+        if (!$echo) {
+            return $price_string;
+        }
+        if ($echo) {
+            echo esc_html($price_string);
+        }
     }
 }
 

@@ -78,7 +78,7 @@ if (!class_exists('Yatra_Cart')) {
                 unset($yatra_tour_cart[$tour_id]);
 
             }
-
+            
             $status = yatra_set_session('yatra_tour_cart', $yatra_tour_cart);
 
             return $status;

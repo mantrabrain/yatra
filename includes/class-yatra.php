@@ -53,7 +53,14 @@ final class Yatra
      */
     public $exporter = null;
 
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Tour
+     * @since 1.0.0
+     */
 
+    public $tour = null;
     /**
      * Yatra_Core_Importer instance.
      *
@@ -213,7 +220,7 @@ final class Yatra
          * Class autoloader.
          */
         include_once YATRA_ABSPATH . 'includes/class-yatra-autoloader.php';
-
+        include_once YATRA_ABSPATH . 'includes/classes/class-yatra-tour.php';
         include_once YATRA_ABSPATH . 'includes/payment-gateways/class-yatra-gateways-core.php';
         include_once YATRA_ABSPATH . 'includes/functions.php';
         include_once YATRA_ABSPATH . 'includes/yatra-hooks.php';
@@ -256,6 +263,8 @@ final class Yatra
     {
         // Before init action.
         do_action('before_yatra_init');
+
+        $this->tour = Yatra_Tour::get_instance();
 
         // Set up localisation.
         $this->load_plugin_textdomain();
