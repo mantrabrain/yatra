@@ -13,7 +13,8 @@
                     <div class="yatra-traveler-number-inner">
 
                         <div class="yatra-nice-input-number">
-                            <button type="button" class="fa fa-plus nice-button plus-button"></button>
+                            <button type="button" class="fa fa-minus nice-button minus-button"></button>
+
 
                             <?php
                             $field_name = $booking_pricing_args['type'] === "multi" ? "yatra_number_of_person[multi_pricing][{$pricing_id}]" : "yatra_number_of_person[single_pricing]"; ?>
@@ -26,7 +27,8 @@
                                    name="<?php echo esc_attr($field_name) ?>"
                                    value="<?php echo $booking_pricing_args['minimum_pax'] == '' ? 1 : absint($booking_pricing_args['minimum_pax']) ?>"
                             />
-                            <button type="button" class="fa fa-minus nice-button minus-button"></button>
+                            <button type="button" class="fa fa-plus nice-button plus-button"></button>
+
                         </div>
 
                     </div>
