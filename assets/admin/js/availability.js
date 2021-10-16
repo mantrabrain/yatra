@@ -53,6 +53,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     jQuery(info.el).find('.fc-event-title').html(info.event.title);
 
                 },
+                dayCellDidMount: function (info) {
+                    jQuery(info.el).find('.fc-daygrid-day-top').append('<input type="checkbox" class="yatra-cal-checkbox"/>');
+                }
+                // eventContent: "Some Text"
 
             });
 

@@ -40,3 +40,12 @@
     display: inline-block;
     width: 100%;
 }
+
+#yatra-availability-calendar .fc-daygrid-day-top {
+    justify-content: space-between;
+}
+
+#yatra-availability-calendar .fc-daygrid-day-top .yatra-cal-checkbox {
+    margin: 5px;
+    border: 1px solid #000;
+}
