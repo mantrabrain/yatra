@@ -5,6 +5,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         init: function () {
 
+            this.initCalendar();
+            this.bindEvents();
+        },
+        initCalendar: function () {
+
             var calendarEl = document.getElementById('yatra-availability-calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
@@ -55,6 +60,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 dayCellDidMount: function (info) {
                     jQuery(info.el).find('.fc-daygrid-day-top').append('<input type="checkbox" class="yatra-cal-checkbox"/>');
+                },
+                dayHeaderDidMount(info) {
+                    jQuery(info.el).find('.fc-scrollgrid-sync-inner').append('<input type="checkbox" class="yatra-cal-header-checkbox"/>');
                 }
                 // eventContent: "Some Text"
 
@@ -64,6 +72,16 @@ document.addEventListener('DOMContentLoaded', function () {
             calendar.render();
 
         },
+        bindEvents: function () {
+            jQuery('body').on('click', '.yatra-cal-header-checkbox', function () {
+                var tdIndex = jQuery(this).closest('th').index();
+                if (jQuery(this).is(':checked')) {
+
+                } else {
+
+                }
+            });
+        }
 
 
     };

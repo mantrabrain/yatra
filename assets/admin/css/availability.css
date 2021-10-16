@@ -48,4 +48,16 @@
 #yatra-availability-calendar .fc-daygrid-day-top .yatra-cal-checkbox {
     margin: 5px;
     border: 1px solid #000;
+    border-radius: 0;
+}
+
+#yatra-availability-calendar .yatra-cal-header-checkbox {
+    border-radius: 0;
+    float: left;
+    margin: 5px;
+
+}
+
+#yatra-availability-calendar .fc-col-header-cell {
+    padding: 20px 0;
 }
