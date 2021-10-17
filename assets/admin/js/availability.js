@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         bindEvents: function () {
             jQuery('body').on('click', '.yatra-cal-header-checkbox', function () {
+                var _that = jQuery(this);
                 var tdIndex = jQuery(this).closest('th').index();
                 var wrap = jQuery(this).closest('#yatra-availability-calendar-container').find('table.fc-scrollgrid-sync-table');
                 var checked = false;
@@ -86,6 +87,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         jQuery(indexedTd).find('input.yatra-cal-checkbox').prop('checked', checked);
                     }
                 });
+                _that.trigger('yatra_calendar_header_change', _that.prop('checked'));
+            });
+            jQuery('body').on('yatra_calendar_header_change', '.yatra-cal-header-checkbox', function (event, checkbox_value) {
+                alert(checkbox_value);
             });
         }
 
