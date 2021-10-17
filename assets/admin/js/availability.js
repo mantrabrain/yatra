@@ -75,11 +75,17 @@ document.addEventListener('DOMContentLoaded', function () {
         bindEvents: function () {
             jQuery('body').on('click', '.yatra-cal-header-checkbox', function () {
                 var tdIndex = jQuery(this).closest('th').index();
+                var wrap = jQuery(this).closest('#yatra-availability-calendar-container').find('table.fc-scrollgrid-sync-table');
+                var checked = false;
                 if (jQuery(this).is(':checked')) {
-
-                } else {
-
+                    checked = true;
                 }
+                jQuery.each(wrap.find('tr'), function () {
+                    var indexedTd = jQuery(this).find('td').eq(tdIndex);
+                    if (!jQuery(indexedTd).hasClass('fc-day-other')) {
+                        jQuery(indexedTd).find('input.yatra-cal-checkbox').prop('checked', checked);
+                    }
+                });
             });
         }
 
