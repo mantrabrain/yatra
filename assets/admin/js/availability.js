@@ -55,11 +55,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
 
 
+                    jQuery(info.el).closest('td').find('.yatra-cal-checkbox').prop('checked', true);
                     jQuery(info.el).find('.fc-event-title').html(info.event.title);
 
                 },
                 dayCellDidMount: function (info) {
-                    jQuery(info.el).find('.fc-daygrid-day-top').append('<input type="checkbox" class="yatra-cal-checkbox"/>');
+
+                    jQuery(info.el).find('.fc-daygrid-day-top').append('<input type="checkbox" class="yatra-cal-checkbox" />');
                 },
                 dayHeaderDidMount(info) {
                     jQuery(info.el).find('.fc-scrollgrid-sync-inner').append('<input type="checkbox" class="yatra-cal-header-checkbox"/>');
