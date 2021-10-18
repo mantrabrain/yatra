@@ -63,10 +63,32 @@ class Yatra_Core_Tour_Availability
 
     }
 
-    public static function get_availability($tour_id): array
+    public static function get_availability($tour_id)
     {
         $start_date = get_post_meta($tour_id, 'yatra_tour_meta_tour_start_date', true);
 
+        $yatra_tour_availability = yatra_tour_availability($tour_id);
+
+        $all_responses = array();
+
+        foreach ($yatra_tour_availability as $availability) {
+
+            $begin = new DateTime($availability['start']);
+            $end = new DateTime($availability['end']);
+
+            for ($i = $begin; $i <= $end; $i->modify('+1 day')) {
+                $single_date = $i->format("Y-m-d");
+
+                $all_responses[] = self::get_single_availability($single_date, $tour_id);
+            }
+        }
+
+
+        return $all_responses;
+    }
+
+    private static function get_single_availability($start_date, $tour_id)
+    {
         $response = array();
 
         if ('' != $start_date) {
@@ -85,7 +107,7 @@ class Yatra_Core_Tour_Availability
 
                 $current_currency_symbol = '$';//yatra_get_current_currency_symbol();
 
-                $response[] = array(
+                $response = array(
                     "title" => "{$pricing_label}: {$current_currency_symbol}{$final_pricing}",
                     "start" => $start_date,
                     "description" => "{$pricing_label}: {$current_currency_symbol}{$final_pricing}",
@@ -94,7 +116,9 @@ class Yatra_Core_Tour_Availability
                 );
             } else {
                 $title = '';
+
                 $description = '';
+
                 foreach ($yatra_multiple_pricing as $single_pricing) {
 
                     $regular = $single_pricing['regular_price'];
@@ -112,7 +136,7 @@ class Yatra_Core_Tour_Availability
                     $description .= "{$pricing_label}&nbsp;:&nbsp; <strong style='float:right;'>{$current_currency_symbol}{$final_pricing}</strong> <br/> ";
 
                 }
-                $response[] = array(
+                $response = array(
                     "title" => $title,
                     "event" => $title,
                     "start" => $start_date,

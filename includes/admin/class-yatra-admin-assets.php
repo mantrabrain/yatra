@@ -148,11 +148,9 @@ if (!class_exists('Yatra_Admin_Assets')) {
                         'title' => __('Font Awesome', 'yatra')
                     )
                 ),
-                'visibility_conditions' => $visibility_conditions
-
+                'visibility_conditions' => $visibility_conditions,
 
             );
-
             wp_localize_script('yatra-admin-script', 'yatra_admin_params', $yatra_admin_params);
 
         }

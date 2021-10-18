@@ -315,20 +315,31 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     <?php
                     break;
                 case "date_range":
-                    $field_class .= ' yatra-daterange-picker';
                     ?>
                     <label
                             for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
                     </label>
 
+                    <span class="yatra-daterange-picker dashicons dashicons-calendar"></span>
                     <input autocomplete="off"
                            class="<?php echo esc_attr($field_class) ?>"
                            id="<?php echo esc_attr(($field_key)); ?>"
                            name="<?php echo esc_attr(($field_key)); ?>"
-                           type="text"
+                           type="hidden"
                            value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+                    <?php $range_array = yatra_maybe_json_decode($value);
+                    
+                    ?>
                     <ul class="yatra-daterange-list">
 
+                        <?php foreach ($range_array as $range) { ?>
+                            <li class="yatra-tippy-tooltip"
+                                data-tippy-content="<?php echo esc_attr($range['start'] . ' - ' . $range['end']); ?>"
+                                data-start-date="<?php echo esc_attr($range['start']); ?>"
+                                data-end-date="<?php echo esc_attr($range['end']); ?>"><small
+                                        class="dashicons dashicons-no"></small><span><?php echo esc_html($range['start'] . ' - ' . $range['end']); ?></span>
+                            </li>
+                        <?php } ?>
                     </ul>
 
                     <?php

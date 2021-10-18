@@ -811,3 +811,41 @@ table.yatra-booking-meta-info tr:last-child {
 .yatra-setting-tab-options .yatra-switch-control .slider {
     line-height: 19px;
 }
+
+ul.yatra-daterange-list {
+    padding: 10px;
+}
+
+ul.yatra-daterange-list li {
+    float: left;
+    padding: 2px 5px;
+    background: #e9e9e9;
+    margin: 1px;
+    color: #000;
+    border-radius: 0;
+    border: 1px solid #aaa;
+    position: relative;
+}
+
+ul.yatra-daterange-list li small.dashicons {
+    position: absolute;
+    background: #000;
+    color: #fff;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+    height: 100%;
+    display: none;
+}
+
+ul.yatra-daterange-list li:hover small.dashicons {
+    display: block;
+}
+
+.yatra-daterange-picker {
+    cursor: pointer;
+    font-size: 30px;
+    height: 30px;
+    width: 30px;
+}

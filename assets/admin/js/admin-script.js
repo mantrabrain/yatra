@@ -148,6 +148,7 @@
 
     var YatraAdmin = {
 
+
         init: function () {
 
             this.initElement();
@@ -171,8 +172,11 @@
 
             tippy('.yatra-tippy-tooltip', {
                 //content: "Hello World",
+
                 allowHTML: true,
             });
+
+
         },
         conditionalVisibility: function () {
 
@@ -214,8 +218,6 @@
                 var value = all_values[loopIndex].value;
                 var target = all_values[loopIndex].target;
                 if ($('#' + target).length > 0) {
-                    console.log(value === currentValue);
-                    console.log(target);
                     if (value === currentValue) {
                         $('#' + target).closest('.yatra-field-wrap').removeClass('yatra-hide');
                     } else {
@@ -376,28 +378,114 @@
             }
         },
         initDateRangePicker: function () {
+            var _that = this;
             var start = moment().subtract(29, 'days');
             var end = moment();
+            var dateFormat = 'YYYY-MM-DD';
 
             var drpconfig = {
-                ranges: {
-                    'Today': [new Date(), new Date()],
-                    'Tomorrow': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                    'Last 7 Days': [moment().subtract(6, 'days'), new Date()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), new Date()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-                },
                 opens: 'right',
                 locale: {
-                    format: 'YYYY-MM-DD',
+                    format: dateFormat,
                 },
-                startDate: start,
-                endDate: end
+                minDate: new Date(),
+                selectPastInvalidDate: false,
+                isInvalidDate: function (date, log) {
+                    return _that.getSelectedDateRanges($('#yatra_tour_meta_availability')).reduce(function (bool, range) {
+                        return bool || (date >= moment(range.start) && date <= moment(range.end));
+                    }, false);
+                },
             };
-            $('.yatra-daterange-picker').daterangepicker(drpconfig, function (start, end) {
-                $('#daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            $('.yatra-daterange-picker').daterangepicker(drpconfig);
+            $('.yatra-daterange-picker').on('apply.daterangepicker', function (event, picker) {
+
+                var start_date = picker.startDate.format(dateFormat);
+                var end_date = picker.endDate.format(dateFormat);
+                var wrap_ul = $(this).closest('.yatra-field-wrap').find('ul.yatra-daterange-list');
+
+                var updateStatus = _that.updateSelectedDateRanges(start_date, end_date, $(this).closest('.yatra-field-wrap').find('input'));
+                if (updateStatus) {
+                    var list_item = $('<li class="yatra-tippy-tooltip"  data-tippy-content="' + start_date + ' - ' + end_date + '" data-start-date="' + start_date + '" data-end-date="' + end_date + '"/>');
+                    list_item.append('<small class="dashicons dashicons-no"></small><span>' + start_date + ' - ' + end_date + '</span>');
+                    wrap_ul.append(list_item);
+                    tippy('.yatra-daterange-list li', {
+                        allowHTML: true,
+                    });
+                }
+
             });
+            $('body').on('click', 'ul.yatra-daterange-list li small.dashicons', function () {
+
+
+                _that.deleteSelectedDateRanges($(this));
+                $(this).closest('li').remove();
+            });
+        },
+        getSelectedDateRanges: function (el) {
+
+
+            var ranges = el.val();
+
+
+            return ranges == null || ranges === "" ? [] : Object.values(JSON.parse(ranges));
+
+        },
+        deleteSelectedDateRanges: function (el) {
+
+            var start_date = el.closest('li').attr('data-start-date');
+            var end_date = el.closest('li').attr('data-end-date');
+            var selectedDateRanges = this.getSelectedDateRanges(el.closest('.yatra-field-wrap').find('input'));
+            var updatedRanges = [];
+            selectedDateRanges.every(function (arr_obj, number) {
+                var arrStartDate = arr_obj.start;
+                var arrEndDate = arr_obj.end;
+                if (start_date !== arrStartDate && end_date !== arrEndDate) {
+                    updatedRanges.push(arr_obj);
+                }
+
+            });
+            var rangesString = JSON.stringify(updatedRanges);
+            el.closest('.yatra-field-wrap').find('input').val(rangesString);
+        },
+        updateSelectedDateRanges: function (start_date, end_date, el) {
+            var _that = this;
+            var status = true;
+            var selectedDateRanges = (this.getSelectedDateRanges(el.closest('.yatra-field-wrap').find('input')));
+
+            selectedDateRanges.every(function (arr_obj) {
+                var arrStartDate = arr_obj.start;
+                var arrEndDate = arr_obj.end;
+                var isOverlap = _that.isDateRangeOverlaps(start_date, end_date, arrStartDate, arrEndDate);
+                if (isOverlap) {
+
+                    status = false;
+                    alert('You cant select that range because one of the selected date range already included into this range.');
+                    return status;
+                }
+
+            });
+            if (!status) {
+                return false;
+            }
+            selectedDateRanges.push({
+                'start': start_date,
+                'end': end_date
+            });
+            var sortedDateRanges = selectedDateRanges.sort((a, b) => moment(a.start) - moment(b.start))
+            var rangesString = JSON.stringify(sortedDateRanges);
+            el.closest('.yatra-field-wrap').find('input').val(rangesString);
+
+            return status;
+        },
+        isDateRangeOverlaps: function (a_start, a_end, b_start, b_end) {
+            a_start = moment(a_start);
+            a_end = moment(a_end);
+            b_start = moment(b_start);
+            b_end = moment(b_end);
+            if (a_start < b_start && b_start < a_end) return true; // b starts in a
+            if (a_start < b_end && b_end < a_end) return true; // b ends in a
+            if (b_start < a_start && a_end < b_end) return true; // a in b
+            return false;
         }
 
     };
