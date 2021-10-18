@@ -156,6 +156,7 @@
             this.groupPricing();
             this.conditionalVisibility();
             this.initDateTimePicker();
+            this.initDateRangePicker();
 
 
         },
@@ -373,6 +374,30 @@
 
                 });
             }
+        },
+        initDateRangePicker: function () {
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+
+            var drpconfig = {
+                ranges: {
+                    'Today': [new Date(), new Date()],
+                    'Tomorrow': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), new Date()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), new Date()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                },
+                opens: 'right',
+                locale: {
+                    format: 'YYYY-MM-DD',
+                },
+                startDate: start,
+                endDate: end
+            };
+            $('.yatra-daterange-picker').daterangepicker(drpconfig, function (start, end) {
+                $('#daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            });
         }
 
     };

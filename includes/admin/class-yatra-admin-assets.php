@@ -74,10 +74,13 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
             wp_register_script('yatra-datepicker', YATRA_PLUGIN_URI . '/assets/lib/datepicker/js/datepicker.js', array('yatra-moment'), YATRA_VERSION);
 
+            wp_register_script('yatra-daterangepicker', YATRA_PLUGIN_URI . '/assets/lib/daterangepicker/daterangepicker.js', array('yatra-moment'), YATRA_VERSION);
+
 
             // Register Only Styles
             wp_register_style('yatra-select2css', YATRA_PLUGIN_URI . '/assets/lib/select2/css/select2.min.css', false, YATRA_VERSION);
             wp_register_style('yatra-datepickercss', YATRA_PLUGIN_URI . '/assets/lib/datepicker/css/datepicker.min.css', false, YATRA_VERSION);
+            wp_register_style('yatra-daterangepickercss', YATRA_PLUGIN_URI . '/assets/lib/daterangepicker/daterangepicker.css', false, YATRA_VERSION);
 
             // Font Awesome
             wp_register_style('yatra-font-awesome', YATRA_PLUGIN_URI . '/assets/lib/font-awesome/css/fontawesome.min.css', false, YATRA_VERSION);
@@ -91,7 +94,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
             // Other Register and Enqueue
             wp_register_style('yatra-admin-style', YATRA_PLUGIN_URI . '/assets/admin/css/admin-style.css', array(
-                'yatra-select2css', 'yatra-font-awesome', 'yatra-datepickercss', 'yatra-swal-css', 'yatra-icopick-css'
+                'yatra-select2css', 'yatra-font-awesome', 'yatra-datepickercss', 'yatra-swal-css', 'yatra-icopick-css', 'yatra-daterangepickercss'
             ), YATRA_VERSION);
             wp_enqueue_style('yatra-admin-style');
 
@@ -107,7 +110,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
 
             wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array(
-                'yatra-select2js', 'jquery', 'yatra-datepicker', 'yatra-swal-js', 'yatra-icopick-js', 'yatra-popper', 'yatra-tippy'
+                'yatra-select2js', 'jquery', 'yatra-datepicker', 'yatra-swal-js', 'yatra-icopick-js', 'yatra-popper', 'yatra-tippy', 'yatra-daterangepicker'
             ), YATRA_VERSION);
             wp_enqueue_script('yatra-admin-script');
 

@@ -722,6 +722,18 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 //'row_start' => true,
 
             ),
+
+            'yatra_tour_meta_availability' => array(
+                'name' => 'yatra_tour_meta_availability',
+                'title' => esc_html__('Tour Availability', 'yatra'),
+                'description' => esc_html__('You can choose date range slot for availability.', 'yatra'),
+                'type' => 'date_range',
+                'visibility_condition' => array(
+                    'yatra_tour_meta_tour_fixed_departure' => true
+                )
+                //'row_start' => true,
+
+            ),
             'yatra_tour_meta_tour_duration_days' => array(
                 'name' => 'yatra_tour_meta_tour_duration_days',
                 'title' => esc_html__('Tour Duration Days', 'yatra'),

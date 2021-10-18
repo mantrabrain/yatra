@@ -314,6 +314,25 @@ if (!class_exists('Yatra_Metabox_Base')) {
 
                     <?php
                     break;
+                case "date_range":
+                    $field_class .= ' yatra-daterange-picker';
+                    ?>
+                    <label
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']); ?>
+                    </label>
+
+                    <input autocomplete="off"
+                           class="<?php echo esc_attr($field_class) ?>"
+                           id="<?php echo esc_attr(($field_key)); ?>"
+                           name="<?php echo esc_attr(($field_key)); ?>"
+                           type="text"
+                           value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+                    <ul class="yatra-daterange-list">
+
+                    </ul>
+
+                    <?php
+                    break;
                 case "checkbox":
                     ?>
 
