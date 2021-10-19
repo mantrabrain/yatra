@@ -106,6 +106,12 @@
     justify-content: space-between;
     font-size: 20px;
     border-bottom: 1px solid #ddd;
+    padding-bottom: 15px;
+}
+
+#yatra-admin-popup .yatra-admin-popup-header-title {
+    margin: 0;
+    padding: 0;
 }
 
 #yatra-admin-popup .yatra-admin-popup-close {
