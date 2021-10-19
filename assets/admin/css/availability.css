@@ -122,7 +122,7 @@
 #yatra-admin-popup .yatra-pricing-group-wrap-container select {
 
     width: 100%;
-    max-width: 250px;
+    max-width: 200px;
     box-shadow: none;
     border: 1px solid #aaa;
     border-radius: 0;
@@ -130,4 +130,39 @@
     height: 35px;
     outline: 0;
     border-left: 3px solid #aaa;
+    margin-right: 5px;
+}
+
+#yatra-admin-popup .yatra-pricing-group-wrap-container label {
+    vertical-align: middle;
+    padding: 5px 0;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+#yatra-admin-popup .yatra-field-wrap {
+
+    width: 25%;
+
+}
+
+#yatra-admin-popup .yatra-pricing-group-wrap-container {
+
+    margin-top: 10px;
+}
+
+#yatra-admin-popup fieldset {
+    border: 1px solid #ddd;
+    padding: 15px;
+    background: #f9f9f9;
+}
+
+#yatra-admin-popup legend {
+    font-size: 15px;
+    font-weight: 600;
+    padding: 5px;
+    background: #000;
+    color: #fff;
+    border: 1px solid #ddd;
 }

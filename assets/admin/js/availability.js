@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
             this.data = source.data;
             this.renderPopUp();
             this.initEvents();
+            this.initTooltip();
         },
         renderPopUp: function () {
             var _that = this;
@@ -54,6 +55,11 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         closePopup: function () {
             $('#' + this.id).remove();
+        },
+        initTooltip: function () {
+            tippy('.yatra-tippy-tooltip', {
+                allowHTML: true,
+            });
         }
     };
     var YatraAvailability = {
@@ -128,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         dataType: 'json',
 
                         success: function (response) {
-                            
+
                             var data = {
                                 'title': response.title,
                                 'data': response.data
