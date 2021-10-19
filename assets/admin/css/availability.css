@@ -35,7 +35,7 @@
 #yatra-availability-calendar .fc-event .fc-event-title {
     padding: 2px 5px;
     border-radius: 0;
-    background: #2991ff;
+    background: #0e7a01;
     color: white;
     display: inline-block;
     width: 100%;
@@ -60,4 +60,74 @@
 
 #yatra-availability-calendar .fc-col-header-cell {
     padding: 20px 0;
+}
+
+#yatra-admin-popup {
+
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+}
+
+#yatra-admin-popup .yatra-admin-popup-overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 500ms;
+    visibility: visible;
+    opacity: 1;
+}
+
+#yatra-admin-popup .yatra-admin-popup-content {
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 900px;
+    height: 700px;
+    overflow-x: scroll;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    transition: all 5s ease-in-out;
+    z-index: 999;
+}
+
+#yatra-admin-popup .yatra-admin-popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+#yatra-admin-popup .yatra-admin-popup-close {
+    cursor: pointer;
+    font-size: 30px;
+}
+
+#yatra-admin-popup .yatra-pricing-group-wrap-container .yatra-pricing-row {
+    display: flex;
+}
+
+#yatra-admin-popup .yatra-pricing-group-wrap-container input[type="text"],
+#yatra-admin-popup .yatra-pricing-group-wrap-container input[type="number"],
+#yatra-admin-popup .yatra-pricing-group-wrap-container select {
+
+    width: 100%;
+    max-width: 250px;
+    box-shadow: none;
+    border: 1px solid #aaa;
+    border-radius: 0;
+    padding: 4px 12px;
+    height: 35px;
+    outline: 0;
+    border-left: 3px solid #aaa;
 }

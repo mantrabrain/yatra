@@ -11,7 +11,8 @@ class Yatra_Ajax
 
             'change_tour_attribute',
             'import_content',
-            'tour_availability'
+            'tour_availability',
+            'day_wise_tour_availability'
         );
 
         return $actions;
@@ -251,14 +252,32 @@ class Yatra_Ajax
             wp_send_json_error($this->ajax_error());
         }
 
+        $start_date = isset($_POST['start']) ? sanitize_text_field($_POST['start']) : '';
+
+        $end_date = isset($_POST['end']) ? sanitize_text_field($_POST['end']) : '';
+
         $tour_id = 27;
 
-        $availability = Yatra_Core_Tour_Availability::get_availability($tour_id);
+        $availability = Yatra_Core_Tour_Availability::get_availability($tour_id, $start_date, $end_date);
         if (!is_wp_error($availability)) {
             echo json_encode($availability);
         }
         exit;
 
+
+    }
+
+    public function day_wise_tour_availability()
+    {
+        $status = $this->validate_nonce();
+
+        if (!$status) {
+            wp_send_json_error($this->ajax_error());
+        }
+
+        Yatra_Core_Tour_Availability::get_day_wise_availability_form();
+
+        exit;
 
     }
 

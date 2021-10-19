@@ -903,11 +903,9 @@ if (!function_exists('yatra_frontend_tabs_available_options')) {
     }
 }
 if (!function_exists('yatra_tour_availability')) {
+
     function yatra_tour_availability($tour_id)
     {
-        $start_date = get_post_meta($tour_id, 'yatra_tour_meta_tour_start_date', true);
-
-        $end_date = get_post_meta($tour_id, 'yatra_tour_meta_tour_end_date', true);
 
         $availability = get_post_meta($tour_id, 'yatra_tour_meta_availability', true);
 

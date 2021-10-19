@@ -2,7 +2,7 @@
     display: none !important;
 }
 
-.yatra-pricing-group-wrap {
+.yatra-admin-tab--content-section .yatra-pricing-group-wrap {
     border: 1px solid #000;
     box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.02);
     padding: 25px 0;
@@ -11,7 +11,7 @@
     position: relative;
 }
 
-.yatra-pricing-group-wrap .pricing-delete {
+.yatra-admin-tab--content-section .yatra-pricing-group-wrap .pricing-delete {
     position: absolute;
     right: 10px;
     top: 10px;

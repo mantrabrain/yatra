@@ -11,6 +11,7 @@ class Yatra_Core_Tour_Availability
 
     }
 
+
     public function load_admin_scripts()
     {
         $screen = get_current_screen();
@@ -35,6 +36,10 @@ class Yatra_Core_Tour_Availability
             'tour_availability' => array(
                 'action' => 'yatra_tour_availability',
                 'nonce' => wp_create_nonce('wp_yatra_tour_availability_nonce')
+            ),
+            'day_wise_tour_availability' => array(
+                'action' => 'yatra_day_wise_tour_availability',
+                'nonce' => wp_create_nonce('wp_yatra_day_wise_tour_availability_nonce')
             )
         );
 
@@ -63,11 +68,23 @@ class Yatra_Core_Tour_Availability
 
     }
 
-    public static function get_availability($tour_id)
+    public static function get_availability($tour_id, $start_date, $end_date)
     {
-        $start_date = get_post_meta($tour_id, 'yatra_tour_meta_tour_start_date', true);
+        $fixed_departure = (boolean)get_post_meta($tour_id, 'yatra_tour_meta_tour_fixed_departure', true);
 
         $yatra_tour_availability = yatra_tour_availability($tour_id);
+
+        if (!$fixed_departure || (count($yatra_tour_availability) < 1)) {
+            $start_date = new DateTime($start_date);
+            $end_date = new DateTime($end_date);
+            $end_date->modify('-1 day');
+            $yatra_tour_availability = array(
+                array(
+                    'start' => $start_date->format("Y-m-d"),
+                    'end' => $end_date->format("Y-m-d")
+                )
+            );
+        }
 
         $all_responses = array();
 
@@ -150,6 +167,54 @@ class Yatra_Core_Tour_Availability
 
 
         return $response;
+    }
+
+    public static function get_day_wise_availability_form()
+    {
+        $post_id = 27;
+
+        $multiple_pricing = $post_id != '' ? get_post_meta($post_id, 'yatra_multiple_pricing', true) : array();
+
+        $multiple_pricing = is_array($multiple_pricing) ? $multiple_pricing : array();
+        $default_pricing =
+            array(
+                'pricing_label' => '',
+                'pricing_description' => '',
+                'minimum_pax' => '',
+                'maximum_pax' => '',
+                'regular_price' => '',
+                'sales_price' => '',
+                'price_per' => '',
+                'group_size' => ''
+            );
+        $currency = get_option('yatra_currency');
+
+        $currency_symbol = yatra_get_currency_symbols($currency);
+
+        $template = '';
+
+        foreach ($multiple_pricing as $pricing_option_id => $pricing) {
+
+            ob_start();
+            $pricing = wp_parse_args($pricing, $default_pricing);
+
+            yatra_load_admin_template('metabox.tour.pricing.group-pricing-calendar', array(
+                'id' => $pricing_option_id,
+                'currency_symbol' => $currency_symbol,
+                'pricing_option_id' => 'yatra_multiple_pricing[' . $pricing_option_id . ']',
+                'multiple_pricing' => $pricing
+            ));
+
+            $template .= ob_get_clean();
+        }
+
+
+        $response = array(
+            'title' => "This is Sample Title",
+            'data' => $template
+        );
+        echo json_encode($response);
+        exit;
     }
 }
 
