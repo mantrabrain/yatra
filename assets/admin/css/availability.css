@@ -92,7 +92,8 @@
     transform: translate(-50%, -50%);
     width: 900px;
     height: 700px;
-    overflow-x: scroll;
+    max-height: 80vh;
+    overflow-x: auto;
     padding: 20px;
     background: #fff;
     border-radius: 5px;
@@ -159,7 +160,7 @@
 }
 
 #yatra-admin-popup fieldset {
-    border: 1px solid #ddd;
+    border: 1px solid #000;
     padding: 15px;
     background: #f9f9f9;
 }
@@ -170,5 +171,5 @@
     padding: 5px;
     background: #000;
     color: #fff;
-    border: 1px solid #ddd;
+    border: 1px solid #000;
 }

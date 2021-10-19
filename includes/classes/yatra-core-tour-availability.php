@@ -175,34 +175,25 @@ class Yatra_Core_Tour_Availability
 
         $multiple_pricing = $post_id != '' ? get_post_meta($post_id, 'yatra_multiple_pricing', true) : array();
 
-        $multiple_pricing = is_array($multiple_pricing) ? $multiple_pricing : array();
-        $default_pricing =
-            array(
-                'pricing_label' => '',
-                'pricing_description' => '',
-                'minimum_pax' => '',
-                'maximum_pax' => '',
-                'regular_price' => '',
-                'sales_price' => '',
-                'price_per' => '',
-                'group_size' => ''
-            );
+        yatra()->tour->maybe_initialize($post_id);
+        $pricings = yatra()->tour->get_pricing();
+        yatra()->tour->maybe_flush();
+        
         $currency = get_option('yatra_currency');
 
         $currency_symbol = yatra_get_currency_symbols($currency);
 
         $template = '';
 
-        foreach ($multiple_pricing as $pricing_option_id => $pricing) {
+        foreach ($pricings as $pricing_option_id => $pricing) {
 
             ob_start();
-            $pricing = wp_parse_args($pricing, $default_pricing);
 
-            yatra_load_admin_template('metabox.tour.pricing.group-pricing-calendar', array(
+            yatra_load_admin_template('availability.group-pricing-calendar', array(
                 'id' => $pricing_option_id,
                 'currency_symbol' => $currency_symbol,
                 'pricing_option_id' => 'yatra_multiple_pricing[' . $pricing_option_id . ']',
-                'multiple_pricing' => $pricing
+                'pricing' => $pricing
             ));
 
             $template .= ob_get_clean();
