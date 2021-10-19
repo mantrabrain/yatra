@@ -57,7 +57,6 @@ class Yatra_Tour
 
     public function get_pricing($number_of_people = null)
     {
-
         $meta_regular_price = get_post_meta($this->ID, 'yatra_tour_meta_regular_price', true);
         $meta_sales_price = get_post_meta($this->ID, 'yatra_tour_meta_sales_price', true);
         $multiple_pricing = get_post_meta($this->ID, 'yatra_multiple_pricing', true);
