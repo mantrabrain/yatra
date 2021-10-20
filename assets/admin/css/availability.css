@@ -90,7 +90,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 900px;
-    height: 700px;
+    min-height: 400px;
     max-height: 80vh;
     overflow-x: auto;
     padding: 20px;
@@ -253,7 +253,8 @@
     font-size: 30px;
     height: 30px;
     width: 30px;
-    margin-right: 5px;}
+    margin-right: 5px;
+}
 
 body.yatra-popup-open {
     overflow-y: hidden;
