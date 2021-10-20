@@ -19,12 +19,34 @@
  * For more information, see the following discussion:
  * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
- * 
+ *
  * @since      1.0.0
  * * @package    Yatra
  */
 
 // If uninstall not called from WordPress, then exit.
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	exit;
+if (!defined('WP_UNINSTALL_PLUGIN')) {
+    exit;
+}
+
+
+if (!defined('YATRA_REMOVE_ALL_DATA')) {
+
+    define('YATRA_REMOVE_ALL_DATA', true);
+}
+
+/*
+ * Only remove ALL demo importer data if YATRA_REMOVE_ALL_DATA constant is set to true in user's
+ * wp-config.php. This is to prevent data loss when deleting the plugin from the backend
+ * and to ensure only the site owner can perform this action.
+ */
+if (defined('YATRA_REMOVE_ALL_DATA') && true === YATRA_REMOVE_ALL_DATA && apply_filters('yatra_remove_all_data_on_uninstall', false)) {
+
+    global $wpdb, $wp_version;
+
+
+    include_once dirname(__FILE__) . '/includes/class-yatra-install.php';
+
+    Yatra_Install::drop_tables();
+
 }

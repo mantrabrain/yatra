@@ -16,25 +16,33 @@ defined('ABSPATH') || exit;
 final class Yatra_Install
 {
 
+    private static $update_callbacks = array(
+        '2.0.16' => array(
+            'yatra_update_2016_tour_dates_table_create',
+        )
+    );
+
     public static function install()
     {
+
         $yatra_version = get_option('yatra_plugin_version');
 
         if (empty($yatra_version)) {
-            self::install_content_and_options();
+            self::create_tables();
+            self::create_options();
             if (empty($yatra_version) && apply_filters('yatra_enable_setup_wizard', true)) {
                 set_transient('_yatra_activation_redirect', 1, 30);
             }
         }
-        update_option('yatra_plugin_version', YATRA_VERSION);
-        update_option('yatra_plugin_db_version', YATRA_VERSION);
-
         //save install date
         if (false == get_option('yatra_install_date')) {
             update_option('yatra_install_date', current_time('timestamp'));
         }
 
         self::setup_environment();
+        self::versionwise_update();
+        self::update_yatra_version();
+
 
         do_action('yatra_flush_rewrite_rules');
 
@@ -54,7 +62,7 @@ final class Yatra_Install
         $taxonomy->attribute_taxonomy->register();
     }
 
-    private static function install_content_and_options()
+    private static function create_options()
     {
         $pages = array(
 
@@ -173,7 +181,7 @@ final class Yatra_Install
             'yatra_booking_notification_email_content_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_message(),
             'yatra_enable_booking_notification_email_for_customer' => 'yes',
             'yatra_enable_guest_checkout' => 'yes',
-             'yatra_custom_attributes_title_text' => 'Attributes'
+            'yatra_custom_attributes_title_text' => 'Attributes'
         );
 
         foreach ($options as $option_key => $option_value) {
@@ -183,9 +191,157 @@ final class Yatra_Install
 
     }
 
+    private static function versionwise_update()
+    {
+        $yatra_version = get_option('yatra_plugin_version', null);
+
+        if ($yatra_version == '' || $yatra_version == null || empty($yatra_version)) {
+            return;
+        }
+        if (version_compare($yatra_version, YATRA_VERSION, '<')) { // 2.0.15 < 2.0.16
+
+            foreach (self::$update_callbacks as $version => $callbacks) {
+
+                if (version_compare($yatra_version, $version, '<')) { // 2.0.15 < 2.0.16
+
+                    self::exe_update_callback($callbacks);
+                }
+            }
+        }
+    }
+
+    private static function exe_update_callback($callbacks)
+    {
+        include_once YATRA_ABSPATH . 'includes/yatra-update-functions.php';
+
+        foreach ($callbacks as $callback) {
+
+            call_user_func($callback);
+
+        }
+    }
+
+    /**
+     * Update Yatra version to current.
+     */
+    private static function update_yatra_version()
+    {
+        delete_option('yatra_plugin_version');
+        delete_option('yatra_plugin_db_version');
+        add_option('yatra_plugin_version', YATRA_VERSION);
+        add_option('yatra_plugin_db_version', YATRA_VERSION);
+    }
+
     public static function init()
     {
 
+        add_action('init', array(__CLASS__, 'check_version'), 5);
+
+
+    }
+
+    public static function check_version()
+    {
+        if (!defined('IFRAME_REQUEST') && version_compare(get_option('yatra_plugin_version'), YATRA_VERSION, '<')) {
+            self::install();
+            do_action('yatra_updated');
+        }
+    }
+
+    private static function create_tables()
+    {
+        global $wpdb;
+
+        $wpdb->hide_errors();
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+
+        $all_schemes = self::get_schema();
+
+        foreach ($all_schemes as $scheme) {
+            dbDelta($scheme);
+        }
+
+
+    }
+
+    private static function get_schema()
+    {
+        global $wpdb;
+
+        $table_prefix = $wpdb->prefix . 'yatra_';
+
+        $collate = '';
+
+        if ($wpdb->has_cap('collation')) {
+            $collate = $wpdb->get_charset_collate();
+        }
+        // User Item Meta Table
+        $tables[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}tour_dates (
+		  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+		  tour_id BIGINT(20) UNSIGNED NOT NULL,
+		  start_date timestamp NULL DEFAULT NULL,
+		  end_date timestamp NULL DEFAULT NULL,
+		  price decimal(12,2) DEFAULT NULL,
+		  pricing LONGTEXT DEFAULT NULL,
+		  pricing_type VARCHAR(50) DEFAULT NULL,
+		  max_travellers int DEFAULT NULL,
+		  active tinyint DEFAULT '0',
+		  availability VARCHAR(50) DEFAULT NULL,
+		  note_to_customer TEXT DEFAULT NULL,
+		  note_to_admin TEXT DEFAULT NULL,
+		  created_by BIGINT(20) UNSIGNED NOT NULL,
+		  updated_by BIGINT(20) UNSIGNED NOT NULL,
+		  created_at timestamp NULL DEFAULT NULL,
+		  updated_at timestamp NULL DEFAULT NULL,
+		  PRIMARY KEY  (id)
+		  ) $collate;
+		  ";
+
+        return $tables;
+    }
+
+    public static function get_tables()
+    {
+        global $wpdb;
+
+        $table_prefix = $wpdb->prefix . 'yatra_';
+
+        $tables = array(
+            "{$table_prefix}tour_dates",
+        );
+
+        /**
+         * Filter the list of known Sikshya tables.
+         *
+         * If Sikshya plugins need to add new tables, they can inject them here.
+         *
+         * @param array $tables An array of Sikshya-specific database table names.
+         */
+        $tables = apply_filters('sikshya_install_get_tables', $tables);
+
+        return $tables;
+    }
+
+    public static function verify_base_tables($execute = false)
+    {
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+        if ($execute) {
+            self::create_tables();
+        }
+    }
+
+    public static function drop_tables()
+    {
+        global $wpdb;
+
+        $tables = self::get_tables();
+
+        foreach ($tables as $table) {
+            $wpdb->query("DROP TABLE IF EXISTS {$table}"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        }
     }
 
 
