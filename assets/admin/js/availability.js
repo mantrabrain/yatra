@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             var popupHeader = $('<div class="yatra-admin-popup-header"/>');
             popupHeader.append($('<h2 class="yatra-admin-popup-header-title"/>').text(_that.title));
+            popupHeader.append($('<button type="button" class="button button-primary yatra-day-wise-availability-save"/>').text("Save"));
             popupHeader.append('<span class="yatra-admin-popup-close dashicons dashicons-no-alt"></span>');
             var popupBody = $('<div class="yatra-admin-popup-body"/>');
             popupBody.html(content);
@@ -171,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
             };
 
 
-             $.ajax(ajax_options);
+            $.ajax(ajax_options);
         },
         bindEvents: function () {
             var _that = this;
@@ -204,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             $('body').on('change', '#yatra-admin-popup .yatra_availability_date', function () {
+                var that_item = $(this);
                 var value_json_string = $(this).val();
                 var json_object = JSON.parse(value_json_string);
                 if (typeof json_object.start !== undefined && typeof json_object.end !== undefined) {
@@ -218,6 +220,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             content_only: true,
 
                         },
+                        beforeSend: function () {
+                            $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').addClass('yatra-overlay');
+                            that_item.closest('.yatra-field-wrap').append('<span class="spinner" style="visibility: visible"/>');
+                        },
+                        complete: function () {
+                            $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').removeClass('yatra-overlay');
+                            that_item.closest('.yatra-field-wrap').find('.spinner').remove();
+                        },
                         success: function (response) {
 
                             $('#yatra-admin-popup').find('h2.yatra-admin-popup-header-title').text(response.title);
@@ -228,7 +238,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
             });
-        }
+
+            $('body').on('click', '.yatra-day-wise-availability-save', function () {
+                var that_item = $(this);
+                $.ajax({
+                    url: yatra_availability_params.ajax_url,
+                    data: $("#yatra-availability-calendar-popup-form").serialize(),
+                    method: 'post',
+                    beforeSend: function () {
+                        $("#yatra-availability-calendar-popup-form").addClass('loading');
+                        that_item.addClass('updating-message');
+                    },
+                    complete: function () {
+                        that_item.removeClass('updating-message');
+                        $("#yatra-availability-calendar-popup-form").removeClass('loading');
+                    },
+                    success: function (response) {
+                    },
+                    error: function (e) {
+
+                    }
+                });
+            });
+        },
 
 
     };

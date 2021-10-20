@@ -12,7 +12,8 @@ class Yatra_Ajax
             'change_tour_attribute',
             'import_content',
             'tour_availability',
-            'day_wise_tour_availability'
+            'day_wise_tour_availability',
+            'day_wise_tour_availability_save'
         );
 
         return $actions;
@@ -298,6 +299,19 @@ class Yatra_Ajax
 
         exit;
 
+    }
+
+    public function day_wise_tour_availability_save()
+    {
+        $status = $this->validate_nonce();
+
+        if (!$status) {
+            wp_send_json_error($this->ajax_error());
+        }
+
+        echo '<pre>';
+        print_r($_POST);
+        exit;
     }
 
 

@@ -190,6 +190,8 @@ class Yatra_Core_Tour_Availability
 
         ob_start();
 
+        echo '<form id="yatra-availability-calendar-popup-form">';
+
         if (!$content_only) {
 
             $yatra_tour_meta_availability = yatra_tour_availability($tour_id);
@@ -219,7 +221,14 @@ class Yatra_Core_Tour_Availability
 
 
         }
+
+        wp_nonce_field('wp_yatra_day_wise_tour_availability_save_nonce', 'yatra_nonce', true, true);
+
+        echo '<input type="hidden" name="action" value="yatra_day_wise_tour_availability_save"/>';
+
         echo '</div>';
+
+        echo '</form>';
 
         $template .= ob_get_clean();
 
