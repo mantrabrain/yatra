@@ -125,7 +125,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 eventClick: function (info) {
                     var td = $(info.el).closest('td.fc-day');
-                    _that.ajaxPopUp(td);
+                    var ajax_data = {
+                        data: {
+                            yatra_nonce: yatra_availability_params.day_wise_tour_availability.nonce,
+                            action: yatra_availability_params.day_wise_tour_availability.action,
+                            tour_id: $('#yatra-availability-calendar-tour-id').val(),
+                            start_date: td.attr('data-date'),
+                            end_date: td.attr('data-date'),
+
+                        }
+                    }
+                    _that.ajaxPopUp(ajax_data);
                 }
 
 
@@ -135,17 +145,11 @@ document.addEventListener('DOMContentLoaded', function () {
             calendar.render();
 
         },
-        ajaxPopUp: function (td) {
-            $.ajax({
-                url: yatra_availability_params.ajax_url,
-                data: {
-                    yatra_nonce: yatra_availability_params.day_wise_tour_availability.nonce,
-                    action: yatra_availability_params.day_wise_tour_availability.action,
-                    tour_id: $('#yatra-availability-calendar-tour-id').val(),
-                    start_date: td.attr('data-date'),
-                    end_date: td.attr('data-date')
+        ajaxPopUp: function (options) {
 
-                },
+            let default_options = {
+                url: yatra_availability_params.ajax_url,
+                data: {},
                 method: 'post',
                 dataType: 'json',
 
@@ -160,9 +164,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 error: function (e) {
 
                 }
-            });
+            };
+            let ajax_options = {
+                ...default_options,
+                ...options
+            };
+
+
+             $.ajax(ajax_options);
         },
         bindEvents: function () {
+            var _that = this;
             jQuery('body').on('click', '.yatra-cal-header-checkbox', function () {
                 var _that = jQuery(this);
                 var tdIndex = jQuery(this).closest('th').index();
@@ -189,6 +201,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     $(this).closest('.yatra-pricing-row').find('.yatra-field-wrap.yatra_pricing_group_size').addClass('yatra-hide');
                 }
+            });
+
+            $('body').on('change', '#yatra-admin-popup .yatra_availability_date', function () {
+                var value_json_string = $(this).val();
+                var json_object = JSON.parse(value_json_string);
+                if (typeof json_object.start !== undefined && typeof json_object.end !== undefined) {
+
+                    var ajax_data = {
+                        data: {
+                            yatra_nonce: yatra_availability_params.day_wise_tour_availability.nonce,
+                            action: yatra_availability_params.day_wise_tour_availability.action,
+                            tour_id: $('#yatra-availability-calendar-tour-id').val(),
+                            start_date: json_object.start,
+                            end_date: json_object.end,
+                            content_only: true,
+
+                        },
+                        success: function (response) {
+
+                            $('#yatra-admin-popup').find('h2.yatra-admin-popup-header-title').text(response.title);
+                            $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').html(response.data);
+                        },
+                    }
+                    _that.ajaxPopUp(ajax_data);
+                }
+
             });
         }
 

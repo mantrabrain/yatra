@@ -2,7 +2,7 @@
     <div class="yatra-field-row">
         <div class="yatra-field-wrap" data-wrap-id="yatra_tour_meta_availability">
             <span class="yatra-daterange-picker dashicons dashicons-calendar"></span>
-            <select class="widefat yatra_pricing_pricing_per" id="yatra_multiple_pricing[_x4h9zjsns][pricing_per]"
+            <select class="widefat yatra_availability_date" id="yatra_multiple_pricing[_x4h9zjsns][pricing_per]"
                     name="yatra_multiple_pricing[_x4h9zjsns][pricing_per]">
                 <option selected data-date-start="<?php echo esc_attr($selected_dates['start']) ?>"
                         data-date-end="<?php echo esc_attr($selected_dates['end']) ?>"
@@ -55,7 +55,7 @@
         </div>
         <div class="yatra-field-wrap" data-wrap-id="yatra_tour_enable_max_num_of_traveller"><label
                     for="yatra_tour_enable_max_num_of_traveller">Availability for</label>
-            <select class="widefat yatra_pricing_pricing_per" id="yatra_multiple_pricing[_x4h9zjsns][pricing_per]"
+            <select class="widefat yatra_availability_for" id="yatra_multiple_pricing[_x4h9zjsns][pricing_per]"
                     name="yatra_multiple_pricing[_x4h9zjsns][pricing_per]">
                 <option value=""></option>
                 <option selected="selected" value="person">For Enquiry</option>

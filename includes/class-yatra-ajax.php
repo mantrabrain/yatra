@@ -281,14 +281,20 @@ class Yatra_Ajax
         }
 
         $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : '';
+
         $start_date = isset($_POST['start_date']) ? sanitize_text_field($_POST['start_date']) : '';
+
         $end_date = isset($_POST['end_date']) ? sanitize_text_field($_POST['end_date']) : '';
 
+
+        $content_only = isset($_POST['content_only']) ? (boolean)($_POST['content_only']) : false;
+
         if ('' == $tour_id || $start_date == '' || $end_date == '') {
+
             wp_send_json_error();
 
         }
-        Yatra_Core_Tour_Availability::get_day_wise_availability_form($tour_id, $start_date, $end_date);
+        Yatra_Core_Tour_Availability::get_day_wise_availability_form($tour_id, $start_date, $end_date, $content_only);
 
         exit;
 
