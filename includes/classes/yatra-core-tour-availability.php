@@ -196,8 +196,7 @@ class Yatra_Core_Tour_Availability
 
             $yatra_tour_meta_availability = yatra_tour_availability($tour_id);
 
-
-            yatra_load_admin_template('availability.availability-calendar-header', array(
+            yatra_load_admin_template('availability.availability-calendar-date', array(
                 'selected_dates' => array(
                     'start' => $start_date,
                     'end' => $end_date
@@ -205,9 +204,12 @@ class Yatra_Core_Tour_Availability
                 'availability_dates' => $yatra_tour_meta_availability
             ));
 
+
         }
 
         echo '<div class="yatra-availability-calendar-pricing-content">';
+
+        yatra_load_admin_template('availability.availability-calendar-header');
 
         foreach ($pricings as $pricing_option_id => $pricing) {
 

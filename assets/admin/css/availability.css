@@ -119,7 +119,8 @@
 }
 
 #yatra-admin-popup .yatra-pricing-availability-calendar-header .yatra-field-row,
-#yatra-admin-popup .yatra-pricing-group-wrap-container .yatra-pricing-row {
+#yatra-admin-popup .yatra-pricing-group-wrap-container .yatra-field-row,
+#yatra-admin-popup .yatra-pricing-availability-calendar-date .yatra-field-row {
     display: flex;
 }
 
@@ -128,6 +129,7 @@
 #yatra-admin-popup .yatra-pricing-group-wrap-container input[type="number"],
 #yatra-admin-popup .yatra-pricing-availability-calendar-header input[type="number"],
 #yatra-admin-popup .yatra-pricing-group-wrap-container select,
+#yatra-admin-popup .yatra-pricing-availability-calendar-date select,
 #yatra-admin-popup .yatra-pricing-availability-calendar-header select {
 
     width: 100%;
@@ -178,7 +180,7 @@
 
 #yatra-admin-popup .yatra-pricing-availability-calendar-header .yatra-field-wrap {
     align-items: center;
-    width: 50%;
+    width: 33.33%;
     margin-bottom: 15px;
     display: flex;
 }
@@ -200,7 +202,7 @@
 #yatra-admin-popup .yatra-pricing-availability-calendar-header input[type="text"],
 #yatra-admin-popup .yatra-pricing-availability-calendar-header select,
 #yatra-admin-popup .yatra-pricing-availability-calendar-header input[type="number"] {
-    width: 300px;
+    width: 150px;
     display: block;
     max-width: 300px;
 }
@@ -258,4 +260,20 @@
 
 body.yatra-popup-open {
     overflow-y: hidden;
+}
+
+#yatra-admin-popup .yatra-pricing-availability-calendar-date {
+    margin: 20px 0;
+}
+
+#yatra-admin-popup .yatra-pricing-availability-calendar-date .yatra-field-wrap {
+
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+#yatra-admin-popup .yatra-pricing-availability-calendar-date select {
+    width: 300px;
+    max-width: 300px;
 }

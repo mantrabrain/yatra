@@ -3,7 +3,7 @@
     <fieldset>
         <legend><?php echo esc_html($pricing ['pricing_label']); ?></legend>
 
-        <div class="yatra-pricing-row">
+        <div class="yatra-field-row">
 
             <div class="yatra-field-wrap">
                 <label for="<?php echo $pricing_option_id . '[pricing_per]'; ?>"><?php echo __('Price Per', 'yatra') ?>
@@ -62,7 +62,7 @@
                    name="<?php echo $pricing_option_id . '[option_id]'; ?>" value="<?php echo esc_attr($id); ?>"
             />
         </div>
-        <div class="yatra-pricing-row">
+        <div class="yatra-field-row">
 
             <div class="yatra-field-wrap yatra-hide">
                 <label for="<?php echo $pricing_option_id . '[pricing_label]'; ?>"><?php echo __('Pricing Label', 'yatra') ?>

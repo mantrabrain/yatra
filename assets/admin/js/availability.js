@@ -244,9 +244,9 @@ document.addEventListener('DOMContentLoaded', function () {
             $('body').on('change', '#yatra-admin-popup .yatra_pricing_pricing_per', function () {
                 var val = $(this).val();
                 if (val === 'group') {
-                    $(this).closest('.yatra-pricing-row').find('.yatra-field-wrap.yatra_pricing_group_size').removeClass('yatra-hide');
+                    $(this).closest('.yatra-field-row').find('.yatra-field-wrap.yatra_pricing_group_size').removeClass('yatra-hide');
                 } else {
-                    $(this).closest('.yatra-pricing-row').find('.yatra-field-wrap.yatra_pricing_group_size').addClass('yatra-hide');
+                    $(this).closest('.yatra-field-row').find('.yatra-field-wrap.yatra_pricing_group_size').addClass('yatra-hide');
                 }
             });
 
