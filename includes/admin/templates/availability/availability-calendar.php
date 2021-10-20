@@ -11,7 +11,7 @@
                           data-tippy-content="<?php echo __('Maximum number of people per booking for this pricing. Leave it blank to use this tour\'s maximum people (pax) ( From General & Date Settings ).', 'yatra') ?>"></span>
                 </label>
                 <select
-                        class="widefat yatra_multiple_pricing_pricing_per"
+                        class="widefat yatra_pricing_pricing_per"
                         id="<?php echo $pricing_option_id . '[pricing_per]'; ?>"
                         name="<?php echo $pricing_option_id . '[pricing_per]'; ?>">
                     <?php
@@ -30,7 +30,7 @@
 
                 </select>
             </div>
-            <div class="yatra-field-wrap <?php echo $pricing ['pricing_per'] === 'group' ? '' : 'yatra-hide'; ?> yatra_multiple_pricing_group_size">
+            <div class="yatra-field-wrap <?php echo $pricing ['pricing_per'] === 'group' ? '' : 'yatra-hide'; ?> yatra_pricing_group_size">
                 <label for="<?php echo $pricing_option_id . '[group_size]'; ?>"><?php echo __('Group Size', 'yatra') ?>
                     <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
                           data-tippy-content="<?php echo __('Number of people for one group for this pricing option.', 'yatra') ?>"></span>

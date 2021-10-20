@@ -22,7 +22,7 @@
             <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
                   data-tippy-content="You can choose date range slot for availability."></span>
         </div>
-        <div class="yatra-field-wrap  yatra_multiple_pricing_group_size">
+        <div class="yatra-field-wrap  yatra_pricing_group_size">
             <label for="yatra_multiple_pricing[_umxtp8hpg][group_size]">Max Number of Traveller <span
                         class="yatra-tippy-tooltip dashicons dashicons-editor-help"
                         data-tippy-content="Number of people for one group for this pricing option."></span>

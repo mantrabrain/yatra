@@ -174,6 +174,14 @@ document.addEventListener('DOMContentLoaded', function () {
             jQuery('body').on('yatra_calendar_header_change', '.yatra-cal-header-checkbox', function (event, checkbox_value) {
                 alert(checkbox_value);
             });
+            $('body').on('change', '#yatra-admin-popup .yatra_pricing_pricing_per', function () {
+                var val = $(this).val();
+                if (val === 'group') {
+                    $(this).closest('.yatra-pricing-row').find('.yatra-field-wrap.yatra_pricing_group_size').removeClass('yatra-hide');
+                } else {
+                    $(this).closest('.yatra-pricing-row').find('.yatra-field-wrap.yatra_pricing_group_size').addClass('yatra-hide');
+                }
+            });
         }
 
 
