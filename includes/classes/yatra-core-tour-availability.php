@@ -172,8 +172,9 @@ class Yatra_Core_Tour_Availability
         return $response;
     }
 
-    public static function get_day_wise_availability_form($tour_id, $clicked_date)
+    public static function get_day_wise_availability_form($tour_id, $start_date, $end_date)
     {
+
         yatra()->tour->maybe_initialize($tour_id);
 
         $pricings = yatra()->tour->get_pricing();
@@ -187,9 +188,17 @@ class Yatra_Core_Tour_Availability
 
         $template = '';
 
+        $yatra_tour_meta_availability = yatra_tour_availability($tour_id);
+
         ob_start();
 
-        yatra_load_admin_template('availability.availability-calendar-header', array());
+        yatra_load_admin_template('availability.availability-calendar-header', array(
+            'selected_dates' => array(
+                'start' => $start_date,
+                'end' => $end_date
+            ),
+            'availability_dates' => $yatra_tour_meta_availability
+        ));
 
         $template .= ob_get_clean();
 
@@ -209,7 +218,7 @@ class Yatra_Core_Tour_Availability
 
 
         $response = array(
-            'title' => $clicked_date,
+            'title' => $start_date . ' - ' . $end_date,
             'data' => $template
         );
         echo json_encode($response);

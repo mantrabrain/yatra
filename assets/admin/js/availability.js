@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         initCalendar: function () {
 
+            var _that = this;
             var calendarEl = document.getElementById('yatra-availability-calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
@@ -123,38 +124,43 @@ document.addEventListener('DOMContentLoaded', function () {
                     jQuery(info.el).find('.fc-scrollgrid-sync-inner').append('<input type="checkbox" class="yatra-cal-header-checkbox"/>');
                 },
                 eventClick: function (info) {
-                    $.ajax({
-                        url: yatra_availability_params.ajax_url,
-                        data: {
-                            yatra_nonce: yatra_availability_params.day_wise_tour_availability.nonce,
-                            action: yatra_availability_params.day_wise_tour_availability.action,
-                            tour_id: $('#yatra-availability-calendar-tour-id').val(),
-                            date: $(info.el).closest('td.fc-day').attr('data-date')
-
-                        },
-                        method: 'post',
-                        dataType: 'json',
-
-                        success: function (response) {
-
-                            var data = {
-                                'title': response.title,
-                                'data': response.data
-                            };
-                            YatraPopUp.init(data);
-                        },
-                        error: function (e) {
-
-                        }
-                    });
+                    var td = $(info.el).closest('td.fc-day');
+                    _that.ajaxPopUp(td);
                 }
-                // eventContent: "Some Text"
+
 
             });
 
 
             calendar.render();
 
+        },
+        ajaxPopUp: function (td) {
+            $.ajax({
+                url: yatra_availability_params.ajax_url,
+                data: {
+                    yatra_nonce: yatra_availability_params.day_wise_tour_availability.nonce,
+                    action: yatra_availability_params.day_wise_tour_availability.action,
+                    tour_id: $('#yatra-availability-calendar-tour-id').val(),
+                    start_date: td.attr('data-date'),
+                    end_date: td.attr('data-date')
+
+                },
+                method: 'post',
+                dataType: 'json',
+
+                success: function (response) {
+
+                    var data = {
+                        'title': response.title,
+                        'data': response.data
+                    };
+                    YatraPopUp.init(data);
+                },
+                error: function (e) {
+
+                }
+            });
         },
         bindEvents: function () {
             jQuery('body').on('click', '.yatra-cal-header-checkbox', function () {
