@@ -15,7 +15,7 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 Get [free support](https://mantrabrain.com/support-forum/)
 Wanna [contribute](https://github.com/mantrabrain/yatra/)
 Feature [request](https://mantrabrain.com/request-new-feature/)
-Compatible theme [Yatri](https://wpyatri.com/?ref=yatrapluginorg)is live now
+Compatible theme [Yatri](https://wpyatri.com/?ref=yatrapluginorg) is live now
 
 == Installation ==
 
