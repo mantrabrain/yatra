@@ -118,13 +118,17 @@
     font-size: 30px;
 }
 
+#yatra-admin-popup .yatra-pricing-availability-calendar-header .yatra-field-row,
 #yatra-admin-popup .yatra-pricing-group-wrap-container .yatra-pricing-row {
     display: flex;
 }
 
 #yatra-admin-popup .yatra-pricing-group-wrap-container input[type="text"],
+#yatra-admin-popup .yatra-pricing-availability-calendar-header input[type="text"],
 #yatra-admin-popup .yatra-pricing-group-wrap-container input[type="number"],
-#yatra-admin-popup .yatra-pricing-group-wrap-container select {
+#yatra-admin-popup .yatra-pricing-availability-calendar-header input[type="number"],
+#yatra-admin-popup .yatra-pricing-group-wrap-container select,
+#yatra-admin-popup .yatra-pricing-availability-calendar-header select {
 
     width: 100%;
     max-width: 200px;

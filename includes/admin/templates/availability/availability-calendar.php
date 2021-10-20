@@ -1,7 +1,8 @@
 <div class="yatra-pricing-group-wrap-container">
+    
     <fieldset>
         <legend><?php echo esc_html($pricing ['pricing_label']); ?></legend>
-        
+
         <div class="yatra-pricing-row">
 
             <div class="yatra-field-wrap">

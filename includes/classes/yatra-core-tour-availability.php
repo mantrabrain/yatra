@@ -172,7 +172,7 @@ class Yatra_Core_Tour_Availability
     public static function get_day_wise_availability_form()
     {
         $post_id = 27;
-        
+
         yatra()->tour->maybe_initialize($post_id);
 
         $pricings = yatra()->tour->get_pricing();
@@ -183,13 +183,23 @@ class Yatra_Core_Tour_Availability
 
         $currency_symbol = yatra_get_currency_symbols($currency);
 
+
+
         $template = '';
+
+        ob_start();
+
+        yatra_load_admin_template('availability.availability-calendar-header', array(
+
+        ));
+
+        $template .= ob_get_clean();
 
         foreach ($pricings as $pricing_option_id => $pricing) {
 
             ob_start();
 
-            yatra_load_admin_template('availability.group-pricing-calendar', array(
+            yatra_load_admin_template('availability.availability-calendar', array(
                 'id' => $pricing_option_id,
                 'currency_symbol' => $currency_symbol,
                 'pricing_option_id' => 'yatra_multiple_pricing[' . $pricing_option_id . ']',
