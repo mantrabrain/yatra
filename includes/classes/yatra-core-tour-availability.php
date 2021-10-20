@@ -179,6 +179,8 @@ class Yatra_Core_Tour_Availability
 
         $pricings = yatra()->tour->get_pricing();
 
+        $pricing_type = yatra()->tour->get_pricing_type();
+
         yatra()->tour->maybe_flush();
 
         $currency = get_option('yatra_currency');
@@ -209,10 +211,14 @@ class Yatra_Core_Tour_Availability
 
         echo '<div class="yatra-availability-calendar-pricing-content">';
 
-        yatra_load_admin_template('availability.availability-calendar-header');
+        yatra_load_admin_template('availability.availability-calendar-header', array(
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'pricing_type' => $pricing_type,
+            'tour_id' => $tour_id
+        ));
 
         foreach ($pricings as $pricing_option_id => $pricing) {
-
 
             yatra_load_admin_template('availability.availability-calendar', array(
                 'id' => $pricing_option_id,

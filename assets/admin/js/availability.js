@@ -278,6 +278,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             $('#yatra-admin-popup').find('h2.yatra-admin-popup-header-title').text(response.title);
                             $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').html(response.data);
+
+                            let new_date_ranges = [];
+
+                            $.each(that_item.find('option'), function () {
+
+                                var start = $(this).attr('data-date-start');
+                                var end = $(this).attr('data-date-end');
+                                var date_object = {
+                                    start: start,
+                                    end: end
+                                };
+                                new_date_ranges.push(date_object);
+                            });
+                            var date_ranges_string = JSON.stringify(new_date_ranges);
+                            that_item.closest('.yatra-field-wrap').find('input').val(date_ranges_string);
                         },
                     }
                     _that.ajaxPopUp(ajax_data);

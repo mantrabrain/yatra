@@ -93,7 +93,6 @@ class Yatra_Tour
                         'sales_price' => $sales_price,
                         'final_price' => $final_price * $person_count
 
-
                     );
                 }
                 return $final_pricing_details;
@@ -143,6 +142,21 @@ class Yatra_Tour
 
         return $final_price_amount;
 
+
+    }
+
+    public function get_pricing_type()
+    {
+        $multiple_pricing = get_post_meta($this->ID, 'yatra_multiple_pricing', true);
+
+        if (is_array($multiple_pricing)) {
+
+            if (count($multiple_pricing) > 0) {
+
+                return 'multi';
+            }
+        }
+        return 'single';
 
     }
 
