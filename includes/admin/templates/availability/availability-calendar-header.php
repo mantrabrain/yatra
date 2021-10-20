@@ -27,11 +27,11 @@
                     data-tippy-content="Number of people for one group for this pricing option."></span>
         </div>
         <div class="yatra-field-wrap"><label
-                    for="yatra_availability[user_tour_settings]">Use Tour Settings</label>
+                    for="yatra_availability[use_tour_settings]">Use Tour Settings</label>
             <div class="yatra-switch-control-wrap">
                 <label class="yatra-switch-control">
-                    <input class="widefat" id="yatra_availability[user_tour_settings]"
-                           name="yatra_availability[user_tour_settings]" type="checkbox" value="1" checked="checked">
+                    <input class="widefat" id="yatra_availability[use_tour_settings]"
+                           name="yatra_availability[use_tour_settings]" type="checkbox" value="1" checked="checked">
                     <span class="slider round" data-on="yes" data-off="no"></span>
                 </label>
             </div>
