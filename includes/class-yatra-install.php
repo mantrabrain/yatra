@@ -24,6 +24,9 @@ final class Yatra_Install
 
     public static function install()
     {
+        if ( ! is_blog_installed() ) {
+            return;
+        }
 
         $yatra_version = get_option('yatra_plugin_version');
 
