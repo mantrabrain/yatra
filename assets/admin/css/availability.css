@@ -69,7 +69,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 9999;
+    z-index: 999;
 }
 
 #yatra-admin-popup .yatra-admin-popup-overlay {
@@ -246,4 +246,15 @@
     left: 0;
     bottom: 0;
     z-index: 9;
+}
+
+#yatra-admin-popup .yatra-avilability-daterange-picker {
+    cursor: pointer;
+    font-size: 30px;
+    height: 30px;
+    width: 30px;
+    margin-right: 5px;}
+
+body.yatra-popup-open {
+    overflow-y: hidden;
 }

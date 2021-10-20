@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             this.renderPopUp();
             this.initEvents();
             this.initTooltip();
+            this.initDateRangePicker();
         },
         renderPopUp: function () {
             var _that = this;
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
             popupWrap.append('<div class="yatra-admin-popup-overlay"/>');
             $('body').find('#' + id).remove();
             $('body').append(popupWrap);
+            $('body').addClass('yatra-popup-open');
         },
         initEvents: function () {
             var _that = this;
@@ -56,12 +58,42 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         closePopup: function () {
             $('#' + this.id).remove();
+            $('body').removeClass('yatra-popup-open');
         },
         initTooltip: function () {
             tippy('.yatra-tippy-tooltip', {
                 allowHTML: true,
             });
-        }
+        },
+        initDateRangePicker: function () {
+            var _that = this;
+            var start = moment().subtract(29, 'days');
+            var end = moment();
+            var dateFormat = 'YYYY-MM-DD';
+
+            var drpconfig = {
+                opens: 'right',
+                locale: {
+                    format: dateFormat,
+                },
+                minDate: new Date(),
+                selectPastInvalidDate: false,
+                /*  isInvalidDate: function (date, log) {
+                      /!*return _that.getSelectedDateRanges($('#yatra_tour_meta_availability')).reduce(function (bool, range) {
+                          return bool || (date >= moment(range.start) && date <= moment(range.end));
+                      }, false);*!/
+                  },*/
+            };
+            $('.yatra-avilability-daterange-picker').daterangepicker(drpconfig).bind('#yatra-admin-popup');
+            $('.yatra-avilability-daterange-picker').on('apply.daterangepicker', function (event, picker) {
+
+                var start_date = picker.startDate.format(dateFormat);
+                var end_date = picker.endDate.format(dateFormat);
+
+
+            });
+
+        },
     };
     var YatraAvailability = {
 

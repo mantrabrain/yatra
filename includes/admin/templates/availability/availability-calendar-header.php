@@ -1,7 +1,7 @@
 <div class="yatra-pricing-availability-calendar-header">
     <div class="yatra-field-row">
         <div class="yatra-field-wrap" data-wrap-id="yatra_tour_meta_availability">
-            <span class="yatra-daterange-picker dashicons dashicons-calendar"></span>
+            <span class="yatra-avilability-daterange-picker dashicons dashicons-calendar"></span>
             <select class="widefat yatra_availability_date" id="yatra_multiple_pricing[_x4h9zjsns][pricing_per]"
                     name="yatra_multiple_pricing[_x4h9zjsns][pricing_per]">
                 <option selected data-date-start="<?php echo esc_attr($selected_dates['start']) ?>"
