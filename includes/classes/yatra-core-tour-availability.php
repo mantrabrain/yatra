@@ -59,7 +59,10 @@ class Yatra_Core_Tour_Availability
 
     private function calendar()
     {
+        $id = isset($_GET['tour_id']) ? absint($_GET['tour_id']) : 27;
+
         echo '<div  id="yatra-availability-calendar-container">';
+        echo '<input type="text" value="' . esc_attr($id) . '" id="yatra-availability-calendar-tour-id"/>';
         echo '<div  id="yatra-availability-calendar">';
 
         echo '</div>';
@@ -169,11 +172,9 @@ class Yatra_Core_Tour_Availability
         return $response;
     }
 
-    public static function get_day_wise_availability_form()
+    public static function get_day_wise_availability_form($tour_id, $clicked_date)
     {
-        $post_id = 27;
-
-        yatra()->tour->maybe_initialize($post_id);
+        yatra()->tour->maybe_initialize($tour_id);
 
         $pricings = yatra()->tour->get_pricing();
 
@@ -184,14 +185,11 @@ class Yatra_Core_Tour_Availability
         $currency_symbol = yatra_get_currency_symbols($currency);
 
 
-
         $template = '';
 
         ob_start();
 
-        yatra_load_admin_template('availability.availability-calendar-header', array(
-
-        ));
+        yatra_load_admin_template('availability.availability-calendar-header', array());
 
         $template .= ob_get_clean();
 
@@ -211,7 +209,7 @@ class Yatra_Core_Tour_Availability
 
 
         $response = array(
-            'title' => "This is Sample Title",
+            'title' => $clicked_date,
             'data' => $template
         );
         echo json_encode($response);

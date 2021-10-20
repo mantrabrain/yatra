@@ -175,3 +175,25 @@
     color: #fff;
     border: 1px solid #000;
 }
+
+#yatra-admin-popup .yatra-pricing-availability-calendar-header .yatra-field-wrap {
+    display: flex;
+    align-items: center;
+}
+
+#yatra-admin-popup .yatra-pricing-availability-calendar-header {
+    padding: 20px 0 0 0;
+}
+
+#yatra-admin-popup .yatra-pricing-availability-calendar-header .yatra_pricing_group_size input {
+    width: 80px;
+}
+
+#yatra-admin-popup .yatra-pricing-availability-calendar-header .yatra-tippy-tooltip {
+    margin-left: 0;
+}
+
+#yatra-admin-popup .yatra-pricing-availability-calendar-header label {
+    font-weight: 700;
+    margin-right: 5px;
+}

@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         return {
                             action: yatra_availability_params.tour_availability.action,
                             yatra_nonce: yatra_availability_params.tour_availability.nonce,
+                            tour_id: $('#yatra-availability-calendar-tour-id').val()
                             // current_date: jQuery('#yatra-availability-calendar').FullCalendar('getDate')
 
                         }
@@ -122,12 +123,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     jQuery(info.el).find('.fc-scrollgrid-sync-inner').append('<input type="checkbox" class="yatra-cal-header-checkbox"/>');
                 },
                 eventClick: function (info) {
-
                     $.ajax({
                         url: yatra_availability_params.ajax_url,
                         data: {
                             yatra_nonce: yatra_availability_params.day_wise_tour_availability.nonce,
                             action: yatra_availability_params.day_wise_tour_availability.action,
+                            tour_id: $('#yatra-availability-calendar-tour-id').val(),
+                            date: $(info.el).closest('td.fc-day').attr('data-date')
 
                         },
                         method: 'post',

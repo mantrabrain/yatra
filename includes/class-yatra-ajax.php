@@ -256,7 +256,12 @@ class Yatra_Ajax
 
         $end_date = isset($_POST['end']) ? sanitize_text_field($_POST['end']) : '';
 
-        $tour_id = 27;
+        $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : '';
+
+        if ('' == $tour_id) {
+            wp_send_json_error();
+
+        }
 
         $availability = Yatra_Core_Tour_Availability::get_availability($tour_id, $start_date, $end_date);
         if (!is_wp_error($availability)) {
@@ -275,7 +280,14 @@ class Yatra_Ajax
             wp_send_json_error($this->ajax_error());
         }
 
-        Yatra_Core_Tour_Availability::get_day_wise_availability_form();
+        $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : '';
+        $date = isset($_POST['date']) ? sanitize_text_field($_POST['date']) : '';
+
+        if ('' == $tour_id || $date == '') {
+            wp_send_json_error();
+
+        }
+        Yatra_Core_Tour_Availability::get_day_wise_availability_form($tour_id, $date);
 
         exit;
 
