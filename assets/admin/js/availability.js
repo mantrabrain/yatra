@@ -90,10 +90,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 var start_date = picker.startDate.format(dateFormat);
                 var end_date = picker.endDate.format(dateFormat);
 
+                if (!_that.isDateRangeOverlaps()) {
+                    var select_field = $(this).closest('.yatra-field-wrap').find('select.yatra_availability_date');
+                    var date_obj = {start: start_date, end: end_date};
+                    var object_string = JSON.stringify(date_obj);
+                    select_field.find('option').removeAttr('selected');
+                    var option = $('<option  data-date-start="' + start_date + '" data-date-end="' + end_date + '" selected>' + start_date + ' - ' + end_date + '</option>');
+                    option.attr('value', object_string);
+                    select_field.append(option);
+                    $(this).closest('.yatra-field-wrap').find('select.yatra_availability_date').trigger('change');
+                }
+
 
             });
 
         },
+        isDateRangeOverlaps: function () {
+            return false;
+        }
     };
     var YatraAvailability = {
 
