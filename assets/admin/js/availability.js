@@ -80,6 +80,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 minDate: new Date(),
                 selectPastInvalidDate: false,
                 isInvalidDate: function (date, log) {
+                    if (availability_date_ranges.length == 0) {
+                        return false;
+                    }
                     return !_that.isDateInRange(availability_date_ranges, date);
                 }
             };
