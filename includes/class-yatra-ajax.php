@@ -309,9 +309,7 @@ class Yatra_Ajax
             wp_send_json_error($this->ajax_error());
         }
 
-        echo '<pre>';
-        print_r($_POST);
-        exit;
+
         $date_ranges = isset($_POST['yatra_availability_selected_date_ranges']) ? $_POST['yatra_availability_selected_date_ranges'] : "";
 
         $date_ranges = (yatra_maybe_json_decode(stripslashes($date_ranges), true));

@@ -147,9 +147,9 @@ class Yatra_Core_DB
 
     }
 
-    public static function save_data()
+    public static function save_data($data)
     {
-        $response = self::insert('tour_dates', array(
+        $default = array(
             'tour_id' => 27,
             'slot_group_id' => 3,
             'start_date' => date('Y-m-d') . ' 00:00:00',
@@ -166,7 +166,8 @@ class Yatra_Core_DB
             'updated_by' => 1,
             'created_at' => current_time('mysql'),
             'updated_at' => current_time('mysql')
-        ));
+        );
+        $response = self::insert('tour_dates', $data);
         echo '<pre>';
         print_r($response);
         echo '</pre>';
