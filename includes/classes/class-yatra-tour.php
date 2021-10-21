@@ -160,9 +160,32 @@ class Yatra_Tour
 
     }
 
+    public function update_availability($start_date, $end_date, $yatra_availability, $yatra_pricing)
+    {
+        $yatra_availability_defaults = array(
+            'tour_id' => null,
+            'slot_group_id' => null,
+            'start_date' => $start_date . ' 00:00:00',
+            'end_date' => $end_date . ' 00:00:00',
+            'price' => null,
+            'pricing' => null,
+            'pricing_type' => null,
+            'max_travellers' => null,
+            'active' => 1,
+            'availability' => null,
+            'note_to_customer' => null,
+            'note_to_admin' => null,
+            'created_by' => get_current_user_id(),
+            'updated_by' => get_current_user_id(),
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        );
+
+    }
+
     public function get_availability()
     {
-        
+
     }
 
 }

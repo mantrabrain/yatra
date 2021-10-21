@@ -312,6 +312,24 @@ class Yatra_Ajax
         echo '<pre>';
         print_r($_POST);
         exit;
+        $date_ranges = isset($_POST['yatra_availability_selected_date_ranges']) ? $_POST['yatra_availability_selected_date_ranges'] : "";
+
+        $date_ranges = (yatra_maybe_json_decode(stripslashes($date_ranges), true));
+
+        $start_date = isset($date_ranges['start']) ? $date_ranges['start'] : '';
+
+        $end_date = isset($date_ranges['end']) ? $date_ranges['end'] : $start_date;
+
+        $yatra_availability = isset($_POST['yatra_availability']) ? $_POST['yatra_availability'] : array();
+
+        $tour_id = isset($_POST['yatra_tour_id']) ? absint($_POST['yatra_tour_id']) : 0;
+
+        $yatra_pricing = isset($_POST['yatra_multiple_pricing']) ? array_map('sanitize_text_field', $_POST['yatra_multiple_pricing']) : array();
+
+        yatra()->tour->maybe_initialize($tour_id);
+        yatra()->tour->update_availability($start_date, $end_date, $yatra_availability, $yatra_pricing);
+        yatra()->tour->maybe_flush();
+
     }
 
 

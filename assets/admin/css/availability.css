@@ -291,3 +291,7 @@ body.yatra-popup-open {
     width: 300px;
     max-width: 300px;
 }
+
+#yatra-admin-popup .daterangepicker {
+    box-shadow: 5px 3px 20px rgb(0 0 0 / 50%);
+}

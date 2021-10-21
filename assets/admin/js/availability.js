@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var dateFormat = 'YYYY-MM-DD';
 
             var drpconfig = {
+                parentEl:"#yatra-admin-popup",
                 opens: 'right',
                 locale: {
                     format: dateFormat,

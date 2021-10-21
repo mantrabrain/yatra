@@ -101,34 +101,43 @@ class Yatra_Core_DB
 
     private static function insert($table, $data = array())
     {
-        $user_id = $user_id < 1 ? get_current_user_id() : $user_id;
 
-        if ($user_id < 1 || $order_item_id < 1 || $course_id < 1) {
-
-            return false;
-        }
+        /*
+         * $data = array(
+         * pricing|string=>''
+         * )
+         */
         global $wpdb;
 
+        $insert_query = "INSERT INTO " . self::get_table($table) . " (";
+
+        $values_query = "";
+
+        foreach ($data as $column => $column_value) {
+
+            $column_type = gettype($column_value);
+
+            $values_query .= $column_type === "integer" ? "%d" : "%s";
+
+            $values_query .= ", ";
+
+            $insert_query .= sanitize_text_field($column) . ", ";
+
+        }
+        $values_query = rtrim(trim($values_query), ",");
+
+        $insert_query = rtrim(trim($insert_query), ",");
+
+        $insert_query .= " ) VALUES({$values_query})";
+
+        $insert_values = array_values($data);
+
         $sql = $wpdb->prepare(
-            "INSERT INTO " . self::get_table($table) . "
-            (user_id, item_id, start_time, start_time_gmt, end_time,end_time_gmt, item_type, status,reference_id,reference_type,parent_id)
-            values
-            (%d, %d, %s, %s, %s, %s, %s, %s, %d, %s, %d)",
-            $user_id,
-            $course_id,
-            current_time('mysql'),
-            current_time('mysql', true),
-            current_time('mysql'),
-            current_time('mysql', true),
-            SIKSHYA_COURSES_CUSTOM_POST_TYPE,
-            'enrolled',
-            $order_item_id,
-            SIKSHYA_ORDERS_CUSTOM_POST_TYPE,
-            0
+            $insert_query,
+            ...$insert_values
 
 
         );
-
         return $wpdb->query($sql);
     }
 
@@ -136,6 +145,31 @@ class Yatra_Core_DB
     private static function update($yatra_table_name)
     {
 
+    }
+
+    public static function save_data()
+    {
+        $response = self::insert('tour_dates', array(
+            'tour_id' => 27,
+            'slot_group_id' => 3,
+            'start_date' => date('Y-m-d') . ' 00:00:00',
+            'end_date' => date('Y-m-d') . ' 00:00:00',
+            'price' => 512.00,
+            'pricing' => 'pricing_text',
+            'pricing_type' => 'single',
+            'max_travellers' => 20,
+            'active' => 1,
+            'availability' => 'booking',
+            'note_to_customer' => 'note',
+            'note_to_admin' => 'note to admin',
+            'created_by' => 1,
+            'updated_by' => 1,
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql')
+        ));
+        echo '<pre>';
+        print_r($response);
+        echo '</pre>';
     }
 
     public static function get_data()

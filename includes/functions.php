@@ -979,4 +979,23 @@ if (!function_exists('yatra_get_unique_date_ranges')) { // Get ranges with not o
 
 
 }
+if (!function_exists('yatra_parse_args')) {
 
+    function yatra_parse_args($args, $defaults = array(), $limited_to_defaults = false)
+    {
+        $parsed = wp_parse_args($args, $defaults);
+
+        if ($limited_to_defaults) {
+            return $parsed;
+        }
+        $final_parsed = array();
+
+        foreach ($defaults as $array_key => $array_value) {
+
+            $final_parsed[$array_key] = isset($parsed[$array_key]) ? $parsed[$array_key] : $defaults[$array_key];
+        }
+
+
+        return $final_parsed;
+    }
+}
