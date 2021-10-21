@@ -160,5 +160,9 @@ class Yatra_Tour
 
     }
 
+    public function get_availability()
+    {
+        
+    }
 
 }

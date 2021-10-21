@@ -221,6 +221,7 @@ final class Yatra
          */
         include_once YATRA_ABSPATH . 'includes/class-yatra-autoloader.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-install.php';
+        include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-db.php';
 
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-tour.php';
         include_once YATRA_ABSPATH . 'includes/payment-gateways/class-yatra-gateways-core.php';

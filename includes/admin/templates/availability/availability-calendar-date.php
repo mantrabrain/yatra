@@ -7,7 +7,7 @@
                    type="text"
                    value="<?php echo esc_attr($selected_dates['start'] . ' - ' . $selected_dates['end']); ?>"
                    data-start-date="<?php echo esc_attr($selected_dates['start']) ?>"
-                   data-end-date="<?php echo esc_attr($selected_dates['end']) ?>"
+                   data-end-date="<?php echo esc_attr($selected_dates['end']) ?>" readonly
             />
 
             <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
@@ -19,6 +19,19 @@
                    value="<?php echo esc_attr(json_encode($selected_dates)) ?>"/>
 
 
+        </div>
+
+        <div class="yatra-field-wrap"><label
+                    for="yatra_availability[use_tour_settings]">Use Tour Settings</label>
+            <div class="yatra-switch-control-wrap">
+                <label class="yatra-switch-control">
+                    <input class="widefat yatra_availability_use_tour_settings" id="yatra_availability[use_tour_settings]"
+                           name="yatra_availability[use_tour_settings]" type="checkbox" value="1" checked="checked">
+                    <span class="slider round" data-on="yes" data-off="no"></span>
+                </label>
+            </div>
+            <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
+                  data-tippy-content="This option let you enable/disable total max number of traveller limit for this tour"></span>
         </div>
 
     </div>

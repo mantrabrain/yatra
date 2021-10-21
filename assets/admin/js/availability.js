@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         start: start_date,
                         end: end_date
                     };
-                     $(this).closest('.yatra-field-wrap').find('.yatra_availability_selected_date').trigger('change');
+                    $(this).closest('.yatra-field-wrap').find('.yatra_availability_selected_date').trigger('change');
                     $(this).closest('.yatra-field-wrap').find('#yatra_availability_selected_date_ranges').val(JSON.stringify(date_obj));
                 }
 
@@ -330,6 +330,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
             });
+
+            $('body').on('click', '#yatra_availability_selected_date', function () {
+                $(this).closest('.yatra-field-wrap').find('.yatra-avilability-daterange-picker').trigger('click');
+            })
+            $('body').on('change', '.yatra_availability_use_tour_settings', function () {
+
+                var form = $(this).closest('form');
+                if ($(this).prop('checked')) {
+                    form.find('fieldset').addClass('disablssssed');
+                }
+                form.find('fieldset').removeClass('disablssssed');
+            })
         },
 
 
