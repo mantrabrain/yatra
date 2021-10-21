@@ -40,7 +40,8 @@ class Yatra_Core_Tour_Availability
             'day_wise_tour_availability' => array(
                 'action' => 'yatra_day_wise_tour_availability',
                 'nonce' => wp_create_nonce('wp_yatra_day_wise_tour_availability_nonce')
-            )
+            ),
+            ''
         );
 
         wp_localize_script('yatra-availability-script', 'yatra_availability_params', $yatra_availability_params);
@@ -243,7 +244,8 @@ class Yatra_Core_Tour_Availability
 
         $response = array(
             'title' => $start_date . ' - ' . $end_date,
-            'data' => $template
+            'data' => $template,
+            'fixed_date_ranges' => yatra_tour_meta_availability_date_ranges($tour_id)
         );
         echo json_encode($response);
         exit;

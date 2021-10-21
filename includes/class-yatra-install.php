@@ -24,7 +24,7 @@ final class Yatra_Install
 
     public static function install()
     {
-        if ( ! is_blog_installed() ) {
+        if (!is_blog_installed()) {
             return;
         }
 
@@ -284,6 +284,7 @@ final class Yatra_Install
         $tables[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}tour_dates (
 		  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 		  tour_id BIGINT(20) UNSIGNED NOT NULL,
+		  slot_group_id BIGINT(20) UNSIGNED NOT NULL,
 		  start_date timestamp NULL DEFAULT NULL,
 		  end_date timestamp NULL DEFAULT NULL,
 		  price decimal(12,2) DEFAULT NULL,

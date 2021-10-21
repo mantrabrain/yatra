@@ -2,6 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     var $ = jQuery;
+    var availability_date_ranges = [];
 
     var YatraPopUp = {
 
@@ -78,11 +79,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 minDate: new Date(),
                 selectPastInvalidDate: false,
-                /*  isInvalidDate: function (date, log) {
-                      /!*return _that.getSelectedDateRanges($('#yatra_tour_meta_availability_date_ranges')).reduce(function (bool, range) {
-                          return bool || (date >= moment(range.start) && date <= moment(range.end));
-                      }, false);*!/
-                  },*/
+                isInvalidDate: function (date, log) {
+                    return !_that.isDateInRange(availability_date_ranges, date);
+                }
             };
             $('.yatra-avilability-daterange-picker').daterangepicker(drpconfig).bind('#yatra-admin-popup');
             $('.yatra-avilability-daterange-picker').on('apply.daterangepicker', function (event, picker) {
@@ -91,19 +90,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 var end_date = picker.endDate.format(dateFormat);
 
                 if (!_that.isDateRangeOverlaps()) {
-                    var select_field = $(this).closest('.yatra-field-wrap').find('select.yatra_availability_date');
-                    var date_obj = {start: start_date, end: end_date};
-                    var object_string = JSON.stringify(date_obj);
-                    select_field.find('option').removeAttr('selected');
-                    var option = $('<option  data-date-start="' + start_date + '" data-date-end="' + end_date + '" selected>' + start_date + ' - ' + end_date + '</option>');
-                    option.attr('value', object_string);
-                    select_field.append(option);
-                    $(this).closest('.yatra-field-wrap').find('select.yatra_availability_date').trigger('change');
+                    var input_field = $(this).closest('.yatra-field-wrap').find('.yatra_availability_selected_date');
+                    var selected_date_string = start_date + ' - ' + end_date;
+                    input_field.val(selected_date_string)
+                    input_field.attr('data-start-date', start_date);
+                    input_field.attr('data-end-date', end_date);
+                    var date_obj = {
+                        start: start_date,
+                        end: end_date
+                    };
+                     $(this).closest('.yatra-field-wrap').find('.yatra_availability_selected_date').trigger('change');
+                    $(this).closest('.yatra-field-wrap').find('#yatra_availability_selected_date_ranges').val(JSON.stringify(date_obj));
                 }
 
 
             });
 
+        },
+        isDateInRange: function (ranges, date) {
+
+            var status = false;
+
+            for (let range of ranges) {
+
+                if (date >= moment(range.start) && date <= moment(range.end)) {
+
+                    status = true;
+                    break;
+
+                }
+
+
+            }
+            return status;
         },
         isDateRangeOverlaps: function () {
             return false;
@@ -159,16 +178,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
 
 
-                    jQuery(info.el).closest('td').find('.yatra-cal-checkbox').prop('checked', true);
+                    // jQuery(info.el).closest('td').find('.yatra-cal-checkbox').prop('checked', true);
                     jQuery(info.el).find('.fc-event-title').html(info.event.title);
 
                 },
                 dayCellDidMount: function (info) {
 
-                    jQuery(info.el).find('.fc-daygrid-day-top').append('<input type="checkbox" class="yatra-cal-checkbox" />');
+                    //jQuery(info.el).find('.fc-daygrid-day-top').append('<input type="checkbox" class="yatra-cal-checkbox" />');
                 },
                 dayHeaderDidMount(info) {
-                    jQuery(info.el).find('.fc-scrollgrid-sync-inner').append('<input type="checkbox" class="yatra-cal-header-checkbox"/>');
+                    //jQuery(info.el).find('.fc-scrollgrid-sync-inner').append('<input type="checkbox" class="yatra-cal-header-checkbox"/>');
                 },
                 eventClick: function (info) {
                     var td = $(info.el).closest('td.fc-day');
@@ -206,6 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         'title': response.title,
                         'data': response.data
                     };
+                    availability_date_ranges = response.fixed_date_ranges;
                     YatraPopUp.init(data);
                 },
                 error: function (e) {
@@ -250,10 +270,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            $('body').on('change', '#yatra-admin-popup .yatra_availability_date', function () {
+            $('body').on('change', '#yatra-admin-popup .yatra_availability_selected_date', function () {
                 var that_item = $(this);
-                var value_json_string = $(this).val();
-                var json_object = JSON.parse(value_json_string);
+
+                var json_object = {
+                    start: $(this).attr('data-start-date'),
+                    end: $(this).attr('data-end-date'),
+                }
                 if (typeof json_object.start !== undefined && typeof json_object.end !== undefined) {
 
                     var ajax_data = {
@@ -279,20 +302,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             $('#yatra-admin-popup').find('h2.yatra-admin-popup-header-title').text(response.title);
                             $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').html(response.data);
 
-                            let new_date_ranges = [];
-
-                            $.each(that_item.find('option'), function () {
-
-                                var start = $(this).attr('data-date-start');
-                                var end = $(this).attr('data-date-end');
-                                var date_object = {
-                                    start: start,
-                                    end: end
-                                };
-                                new_date_ranges.push(date_object);
-                            });
-                            var date_ranges_string = JSON.stringify(new_date_ranges);
-                            that_item.closest('.yatra-field-wrap').find('input').val(date_ranges_string);
                         },
                     }
                     _that.ajaxPopUp(ajax_data);
