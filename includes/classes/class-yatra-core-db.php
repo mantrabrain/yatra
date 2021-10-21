@@ -99,6 +99,40 @@ class Yatra_Core_DB
 
     }
 
+    private static function insert($table, $data = array())
+    {
+        $user_id = $user_id < 1 ? get_current_user_id() : $user_id;
+
+        if ($user_id < 1 || $order_item_id < 1 || $course_id < 1) {
+
+            return false;
+        }
+        global $wpdb;
+
+        $sql = $wpdb->prepare(
+            "INSERT INTO " . self::get_table($table) . "
+            (user_id, item_id, start_time, start_time_gmt, end_time,end_time_gmt, item_type, status,reference_id,reference_type,parent_id)
+            values
+            (%d, %d, %s, %s, %s, %s, %s, %s, %d, %s, %d)",
+            $user_id,
+            $course_id,
+            current_time('mysql'),
+            current_time('mysql', true),
+            current_time('mysql'),
+            current_time('mysql', true),
+            SIKSHYA_COURSES_CUSTOM_POST_TYPE,
+            'enrolled',
+            $order_item_id,
+            SIKSHYA_ORDERS_CUSTOM_POST_TYPE,
+            0
+
+
+        );
+
+        return $wpdb->query($sql);
+    }
+
+
     private static function update($yatra_table_name)
     {
 
