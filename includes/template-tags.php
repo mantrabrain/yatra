@@ -723,9 +723,9 @@ if (!function_exists('yatra_tour_general_configurations')) {
 
             ),
 
-            'yatra_tour_meta_availability' => array(
-                'name' => 'yatra_tour_meta_availability',
-                'title' => esc_html__('Tour Availability', 'yatra'),
+            'yatra_tour_meta_availability_date_ranges' => array(
+                'name' => 'yatra_tour_meta_availability_date_ranges',
+                'title' => esc_html__('Tour Availability Date', 'yatra'),
                 'description' => esc_html__('You can choose date range slot for availability.', 'yatra'),
                 'type' => 'date_range',
                 'visibility_condition' => array(

@@ -785,6 +785,7 @@ if (!function_exists('yatra_maybe_json_decode')) {
     }
 }
 
+
 if (!function_exists('yatra_tour_tabs_additional_types')) {
     function yatra_tour_tabs_additional_types()
     {
@@ -904,11 +905,77 @@ if (!function_exists('yatra_frontend_tabs_available_options')) {
 }
 if (!function_exists('yatra_tour_availability')) {
 
-    function yatra_tour_availability($tour_id)
+    function yatra_tour_meta_availability_date_ranges($tour_id)
     {
 
-        $availability = get_post_meta($tour_id, 'yatra_tour_meta_availability', true);
+        $availability = get_post_meta($tour_id, 'yatra_tour_meta_availability_date_ranges', true);
 
         return yatra_maybe_json_decode($availability);
     }
+}
+
+if (!function_exists('yatra_is_date_overlap')) {
+
+    function yatra_is_date_overlap($start_one, $end_one, $start_two, $end_two)
+    {
+
+        if ($start_one <= $end_two && $end_one >= $start_two) { //If the dates overlap
+            return min($end_one, $end_two)->diff(max($start_two, $start_one))->days + 1; //return how many days overlap
+        }
+
+        return 0; //Return 0 if there is no overlap
+    }
+}
+
+if (!function_exists('yatra_is_date_overlapped')) {
+    function yatra_is_date_range_overlap($date_ranges, $input_range)
+    {
+        $start = new DateTime($input_range['start']);
+
+        $end = new DateTime($input_range['end']);
+
+        $overlaped_ranges = array();
+
+        foreach ($date_ranges as $range) {
+
+            $range_start = new DateTime($range['start']);
+
+            $range_end = new DateTime($range['end']);
+
+            $status = yatra_is_date_overlap($start, $end, $range_start, $range_end);
+
+            if ($status) {
+
+                $overlaped_ranges[] = $range;
+            }
+
+        }
+
+        return $overlaped_ranges;
+    }
+
+
+}
+if (!function_exists('yatra_get_unique_date_ranges')) { // Get ranges with not overlapped each other
+    function yatra_get_unique_date_ranges($date_ranges)
+    {
+        $unique_ranges = array();
+
+        foreach ($date_ranges as $range_index => $range) {
+
+            $new_ranges = $date_ranges;
+
+            unset($new_ranges[$range_index]);
+
+            if (!yatra_is_date_range_overlap($new_ranges, $range)) {
+                $unique_ranges[] = $range;
+            }
+
+        }
+        return $unique_ranges;
+
+
+    }
+
+
 }

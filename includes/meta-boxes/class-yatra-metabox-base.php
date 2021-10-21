@@ -94,6 +94,13 @@ if (!class_exists('Yatra_Metabox_Base')) {
                         $updated_value = wp_kses_post(sanitize_text_field($field_value));
                     }
                     break;
+                case "date_range":
+
+                    $field_value_array = (yatra_maybe_json_decode(stripslashes($field_value), JSON_UNESCAPED_SLASHES));
+
+                    $updated_value = json_encode(yatra_get_unique_date_ranges($field_value_array));
+
+                    break;
                 default:
                     $updated_value = wp_kses_post(sanitize_text_field($field_value));
                     break;
@@ -328,7 +335,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                            type="hidden"
                            value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
                     <?php $range_array = yatra_maybe_json_decode($value);
-                    
+
                     ?>
                     <ul class="yatra-daterange-list">
 

@@ -75,7 +75,7 @@ class Yatra_Core_Tour_Availability
     {
         $fixed_departure = (boolean)get_post_meta($tour_id, 'yatra_tour_meta_tour_fixed_departure', true);
 
-        $yatra_tour_availability = yatra_tour_availability($tour_id);
+        $yatra_tour_availability = yatra_tour_meta_availability_date_ranges($tour_id);
 
         if (!$fixed_departure || (count($yatra_tour_availability) < 1)) {
             $start_date = new DateTime($start_date);
@@ -196,14 +196,14 @@ class Yatra_Core_Tour_Availability
 
         if (!$content_only) {
 
-            $yatra_tour_meta_availability = yatra_tour_availability($tour_id);
+            $yatra_tour_meta_availability_date_ranges = yatra_tour_meta_availability_date_ranges($tour_id);
 
             yatra_load_admin_template('availability.availability-calendar-date', array(
                 'selected_dates' => array(
                     'start' => $start_date,
                     'end' => $end_date
                 ),
-                'availability_dates' => $yatra_tour_meta_availability
+                'availability_dates' => $yatra_tour_meta_availability_date_ranges
             ));
 
 

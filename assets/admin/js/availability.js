@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 minDate: new Date(),
                 selectPastInvalidDate: false,
                 /*  isInvalidDate: function (date, log) {
-                      /!*return _that.getSelectedDateRanges($('#yatra_tour_meta_availability')).reduce(function (bool, range) {
+                      /!*return _that.getSelectedDateRanges($('#yatra_tour_meta_availability_date_ranges')).reduce(function (bool, range) {
                           return bool || (date >= moment(range.start) && date <= moment(range.end));
                       }, false);*!/
                   },*/
