@@ -96,7 +96,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     break;
                 case "date_range":
 
-                    $field_value_array = (yatra_maybe_json_decode(stripslashes($field_value), JSON_UNESCAPED_SLASHES));
+                    $field_value_array = (yatra_maybe_json_decode(stripslashes($field_value), true));
 
                     $updated_value = json_encode(yatra_get_unique_date_ranges($field_value_array));
 
