@@ -147,7 +147,7 @@ class Yatra_Core_DB
 
     }
 
-    public static function save_data($data)
+    public static function save_data($data, $save_ignore = array(), $where = array(), $update_ignore = array())
     {
         $default = array(
             'tour_id' => 27,
@@ -173,7 +173,8 @@ class Yatra_Core_DB
         echo '</pre>';
     }
 
-    public static function get_data()
+    public
+    static function get_data()
     {
         $data = self::fetch('posts', array(
             'ID|POST_ID',
