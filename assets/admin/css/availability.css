@@ -35,14 +35,22 @@
 #yatra-availability-calendar .fc-event .fc-event-title {
     padding: 2px 5px;
     border-radius: 0;
-    background: #0e7a01;
+    background: #246c1c;
     color: white;
     display: inline-block;
     width: 100%;
 }
 
 #yatra-availability-calendar .fc-event .fc-event-title.fc-sticky.yatra-active-event {
-    background: #11a59e;
+    background: #4cb111;
+}
+
+#yatra-availability-calendar .fc-event .fc-event-title.fc-sticky.yatra-availability-enquiry {
+    background: #008bb5;
+}
+
+#yatra-availability-calendar .fc-event .fc-event-title.fc-sticky.yatra-availability-none {
+    background: #aaa;
 }
 
 #yatra-availability-calendar .fc-daygrid-day-top {

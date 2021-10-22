@@ -129,6 +129,10 @@ class Yatra_Core_Tour_Availability
 
         $is_active = isset($availability_data_array['active']) ? (boolean)$availability_data_array['active'] : false;
 
+        $availability = isset($availability_data_array['availability']) ? sanitize_text_field($availability_data_array['availability']) : 'booking';
+
+        $availability_label = yatra_tour_availability_status($availability);
+
         $pricing = isset($availability_data_array['pricing']) ? $availability_data_array['pricing'] : array();
 
 
@@ -153,15 +157,16 @@ class Yatra_Core_Tour_Availability
                 $response = array(
                     "title" => "{$pricing_label}: {$current_currency_symbol}{$final_pricing}",
                     "start" => $start_date,
-                    "description" => "{$pricing_label}: {$current_currency_symbol}{$final_pricing}",
-                    "is_active" => $is_active
+                    "description" => "<strong>{$availability_label}</strong><hr/>{$pricing_label}: {$current_currency_symbol}{$final_pricing}",
+                    "is_active" => $is_active,
+                    "availability" => $availability,
 
 
                 );
             } else {
                 $title = '';
 
-                $description = '';
+                $description = "<strong>{$availability_label}</strong><hr/>";
 
                 foreach ($yatra_multiple_pricing as $pricing_index => $single_pricing) {
 
@@ -187,7 +192,9 @@ class Yatra_Core_Tour_Availability
                     "event" => $title,
                     "start" => $start_date,
                     "description" => $description,
-                    "is_active" => $is_active
+                    "is_active" => $is_active,
+                    "availability" => $availability,
+
 
                 );
             }
@@ -222,7 +229,7 @@ class Yatra_Core_Tour_Availability
             $yatra_availability['max_travellers'] = isset($availability_pricing_today['max_travellers']) ? absint($availability_pricing_today['max_travellers']) : $max_traveller;
 
             $yatra_availability['availability_for'] = isset($availability_pricing_today['availability']) ? sanitize_text_field($availability_pricing_today['availability']) : $availability_for;
- 
+
 
         }
         $pricings = isset($availability_pricing[$availability_pricing_index]) ? $availability_pricing[$availability_pricing_index] : yatra()->tour->get_pricing();

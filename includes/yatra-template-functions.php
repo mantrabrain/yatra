@@ -404,3 +404,21 @@ if (!function_exists('yatra_get_price')) {
     }
 }
 
+if (!function_exists('yatra_tour_availability_status')) {
+    function yatra_tour_availability_status($key = null)
+    {
+
+        $status = apply_filters('yatra_tour_availability_status', array(
+            'booking' => __('For Booking', 'yatra'),
+            'enquiry' => __('For Enquiry Only', 'yatra'),
+            'none' => __('Not Available', 'yatra'),
+        ));
+        if ($key != '') {
+            if (isset($status[$key])) {
+                return $status[$key];
+            }
+            return '';
+        }
+        return $status;
+    }
+}

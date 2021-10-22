@@ -16,7 +16,7 @@
                id="yatra_tour_id"
                name="yatra_tour_id"
         />
-      
+
         <div class="yatra-field-row">
 
 
@@ -34,11 +34,7 @@
             <div class="yatra-field-wrap"><label
                         for="yatra_availability[availability_for]">Availability for</label>
                 <?php
-                $yatra_availability_for = array(
-                    'booking' => __('For Booking', 'yatra'),
-                    'enquiry' => __('For Enquiry Only', 'yatra'),
-                    'none' => __('Not Available', 'yatra'),
-                );
+                $yatra_availability_for = yatra_tour_availability_status();
                 ?>
                 <select class="widefat yatra_availability_for" id="yatra_availability[availability_for]"
                         name="yatra_availability[availability_for]">

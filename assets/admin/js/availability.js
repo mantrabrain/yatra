@@ -183,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                     var active_class = info.event.extendedProps.is_active ? 'yatra-active-event' : '';
+                    active_class += ' yatra-availability-' + info.event.extendedProps.availability;
                     // jQuery(info.el).closest('td').find('.yatra-cal-checkbox').prop('checked', true);
                     jQuery(info.el).find('.fc-event-title').html(info.event.title);
                     jQuery(info.el).find('.fc-event-title').addClass(active_class);
