@@ -53,7 +53,7 @@ class Yatra_Core_DB
 
         if (empty($where)) {
 
-            $select_text = $select_text . " WHERE 1=%d";
+            $select_text = $select_text . " WHERE 1=%d ";
 
             $prepare_args = array(
                 '1'
@@ -64,14 +64,25 @@ class Yatra_Core_DB
 
             foreach ($where as $wh => $wh_value) {
 
-                $where_query .= sanitize_text_field($wh) . "=%s AND ";
+
+                $wh_cond_array = explode('|', $wh);
+
+                $left_field = sanitize_text_field(wp_unslash($wh_cond_array[0]));
+
+                $operator = isset($wh_cond_array[1]) ? $wh_cond_array[1] : "=";
+
+                $operator = in_array($operator, array(">", "<", "=", ">=", "<=")) ? $operator : "=";
+
+                $right_field = isset($wh_cond_array[2]) ? sanitize_text_field(wp_unslash($wh_cond_array[2])) : "%s";
+
+                $where_query .= "{$left_field}{$operator}{$right_field} AND ";
 
                 array_push($prepare_args, $wh_value);
             }
 
-            $where_query = rtrim($where_query, "AND ");
+            $where_query = rtrim(trim($where_query), "AND");
 
-            $select_text .= $where_query;
+            $select_text .= " " . $where_query;
 
 
         }
@@ -99,29 +110,30 @@ class Yatra_Core_DB
 
     }
 
-    private static function insert($table, $data = array())
+    private static function insert($table, $data = array(), $save_ignore = array())
     {
-
-        /*
-         * $data = array(
-         * pricing|string=>''
-         * )
-         */
         global $wpdb;
 
         $insert_query = "INSERT INTO " . self::get_table($table) . " (";
 
         $values_query = "";
 
+        $filtered_data = array();
+
         foreach ($data as $column => $column_value) {
 
             $column_type = gettype($column_value);
 
-            $values_query .= $column_type === "integer" ? "%d" : "%s";
+            if (!in_array($column, $save_ignore)) {
 
-            $values_query .= ", ";
+                $filtered_data[$column] = $column_value;
 
-            $insert_query .= sanitize_text_field($column) . ", ";
+                $values_query .= $column_type === "integer" ? "%d" : "%s";
+
+                $values_query .= ", ";
+
+                $insert_query .= sanitize_text_field($column) . ", ";
+            }
 
         }
         $values_query = rtrim(trim($values_query), ",");
@@ -130,7 +142,7 @@ class Yatra_Core_DB
 
         $insert_query .= " ) VALUES({$values_query})";
 
-        $insert_values = array_values($data);
+        $insert_values = array_values($filtered_data);
 
         $sql = $wpdb->prepare(
             $insert_query,
@@ -140,7 +152,6 @@ class Yatra_Core_DB
         );
         return $wpdb->query($sql);
     }
-
 
     private static function update($table, $data = array(), $where = array(), $update_ignore = array())
     {
@@ -164,9 +175,10 @@ class Yatra_Core_DB
 
                 array_push($prepare_arg_values, $column_value);
 
-                $update_query .= sanitize_text_field($column) . "={$column_value_type}";
+                $update_query .= sanitize_text_field($column) . "={$column_value_type}, ";
             }
         }
+        $update_query = rtrim(trim($update_query), ',');
 
         $update_query .= ' WHERE ';
 
@@ -178,6 +190,7 @@ class Yatra_Core_DB
 
             array_push($prepare_arg_values, $wh_value);
         }
+        $update_query = rtrim(trim($update_query), 'AND');
 
         $sql = $wpdb->prepare(
             $update_query,
@@ -188,10 +201,9 @@ class Yatra_Core_DB
         return $wpdb->query($sql);
     }
 
-
-    public static function data_exists($table, $data = array(), $where = array())
+    public static function data_exists($table, $where = array())
     {
-        $existing_data = self::fetch('tour_dates', array(), $where);
+        $existing_data = self::fetch($table, array(), $where);
 
         if (count($existing_data) > 0) {
             return true;
@@ -201,61 +213,20 @@ class Yatra_Core_DB
 
     public static function update_data($table, $data = array(), $where = array(), $update_ignore = array())
     {
-
+        return self::update($table, $data, $where, $update_ignore);
     }
 
     public static function save_data($table, $data = array(), $save_ignore = array())
     {
+        return self::insert($table, $data, $save_ignore);
 
     }
 
-    public static function save_data($data, $save_ignore = array(), $where = array(), $update_ignore = array())
+    public static function get_data($table, $select = array(), $where = array(), $additional_args = array())
     {
+        return self::fetch($table, $select, $where, $additional_args);
 
-        $default = array(
-            'tour_id' => 27,
-            'slot_group_id' => 3,
-            'start_date' => date('Y-m-d') . ' 00:00:00',
-            'end_date' => date('Y-m-d') . ' 00:00:00',
-            'price' => 512.00,
-            'pricing' => 'pricing_text',
-            'pricing_type' => 'single',
-            'max_travellers' => 20,
-            'active' => 1,
-            'availability' => 'booking',
-            'note_to_customer' => 'note',
-            'note_to_admin' => 'note to admin',
-            'created_by' => 1,
-            'updated_by' => 1,
-            'created_at' => current_time('mysql'),
-            'updated_at' => current_time('mysql')
-        );
-        $response = self::insert('tour_dates', $data);
-        echo '<pre>';
-        print_r($response);
-        echo '</pre>';
     }
 
-    public
-    static function get_data()
-    {
-        $data = self::fetch('posts', array(
-            'ID|POST_ID',
-            'post_author|POST_AUTHOR',
-            'post_date|WOW_DATE',
-            'post_title|cCHECKING'
-        ), array(
-            'post_author' => 1
-        ), array(
-            'order_by' => 'ID',
-            'order' => 'asc',
-            'limit' => 3,
-            'offset' => 2
-        ));
-
-        echo '<pre>';
-        print_r($data);
-        echo '</pre>';
-    }
 
 }

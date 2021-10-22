@@ -22,11 +22,12 @@
         </div>
 
         <div class="yatra-field-wrap"><label
-                    for="yatra_availability[use_tour_settings]">Use Tour Settings</label>
+                    for="yatra_availability[activate]">Activate</label>
             <div class="yatra-switch-control-wrap">
                 <label class="yatra-switch-control">
-                    <input class="widefat yatra_availability_use_tour_settings" id="yatra_availability[use_tour_settings]"
-                           name="yatra_availability[use_tour_settings]" type="checkbox" value="1" checked="checked">
+                    <input class="widefat yatra_availability_activate"
+                           id="yatra_availability[activate]"
+                           name="yatra_availability[activate]" type="checkbox" value="1" checked="checked">
                     <span class="slider round" data-on="yes" data-off="no"></span>
                 </label>
             </div>

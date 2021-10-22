@@ -1,8 +1,18 @@
 <div class="yatra-pricing-group-wrap-container">
-    
+
     <fieldset>
         <legend><?php echo esc_html($pricing ['pricing_label']); ?></legend>
 
+        <input value="<?php echo esc_attr($pricing ['pricing_label']); ?>"
+               type="hidden"
+               class="widefat"
+               name="<?php echo $pricing_option_id . '[pricing_label]'; ?>"
+        />
+        <input value="<?php echo esc_attr($pricing ['pricing_description']); ?>"
+               type="hidden"
+               class="widefat"
+               name="<?php echo $pricing_option_id . '[pricing_description]'; ?>"
+        />
         <div class="yatra-field-row">
 
             <div class="yatra-field-wrap">
@@ -58,9 +68,6 @@
                        name="<?php echo $pricing_option_id . '[sales_price]'; ?>" type="number"
                        placeholder="<?php echo sprintf(__('Please enter sales price (%s)', 'yatra'), $currency_symbol) ?>">
             </div>
-            <input type="hidden"
-                   name="<?php echo $pricing_option_id . '[option_id]'; ?>" value="<?php echo esc_attr($id); ?>"
-            />
         </div>
         <div class="yatra-field-row">
 

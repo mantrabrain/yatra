@@ -95,12 +95,23 @@ class Yatra_Core_Tour_Availability
         foreach ($yatra_tour_availability as $availability) {
 
             $begin = new DateTime($availability['start']);
+
             $end = new DateTime($availability['end']);
 
+            $availability_data = yatra()->tour->get_availability_pricing(
+                1, $begin->format("Y-m-d"), $end->format("Y-m-d"), array(
+                'pricing',
+                'sales_price',
+                'label'
+            ),
+                $tour_id
+            );
+
             for ($i = $begin; $i <= $end; $i->modify('+1 day')) {
+
                 $single_date = $i->format("Y-m-d");
 
-                $all_responses[] = self::get_single_availability($single_date, $tour_id);
+                $all_responses[] = self::get_single_availability($single_date, $tour_id, $availability_data);
             }
         }
 
@@ -108,9 +119,16 @@ class Yatra_Core_Tour_Availability
         return $all_responses;
     }
 
-    private static function get_single_availability($start_date, $tour_id)
+    private static function get_single_availability($start_date, $tour_id, $availability_data)
     {
         $response = array();
+
+        $availability_data_index = str_replace(' ', '', ($start_date . '00:00:00_' . $start_date . '23:59:59'));
+
+        $availability_data_array = isset($availability_data[$availability_data_index]) ? $availability_data[$availability_data_index] : array();
+
+        $pricing = isset($availability_data_array['pricing']) ? $availability_data_array['pricing'] : array();
+
 
         if ('' != $start_date) {
 
@@ -118,9 +136,9 @@ class Yatra_Core_Tour_Availability
 
             if (!$yatra_multiple_pricing) {
 
-                $regular = get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
+                $regular = isset($pricing['regular_price']) ? $pricing['regular_price'] : get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
 
-                $discounted = get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
+                $discounted = isset($pricing['sales_price']) ? $pricing['sales_price'] : get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
 
                 $final_pricing = '' === $discounted ? $regular : $discounted;
 
@@ -140,7 +158,9 @@ class Yatra_Core_Tour_Availability
 
                 $description = '';
 
-                foreach ($yatra_multiple_pricing as $single_pricing) {
+                foreach ($yatra_multiple_pricing as $pricing_index => $single_pricing) {
+
+                    $single_pricing = isset($pricing[$pricing_index]) ? $pricing[$pricing_index] : $single_pricing;
 
                     $regular = $single_pricing['regular_price'];
 
@@ -224,7 +244,7 @@ class Yatra_Core_Tour_Availability
             yatra_load_admin_template('availability.availability-calendar', array(
                 'id' => $pricing_option_id,
                 'currency_symbol' => $currency_symbol,
-                'pricing_option_id' => 'yatra_multiple_pricing[' . $pricing_option_id . ']',
+                'pricing_option_id' => 'yatra_availability_pricing[' . $pricing_option_id . ']',
                 'pricing' => $pricing
             ));
 
