@@ -31,11 +31,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             var popupHeader = $('<div class="yatra-admin-popup-header"/>');
             popupHeader.append($('<h2 class="yatra-admin-popup-header-title"/>').text(_that.title));
-            popupHeader.append($('<button type="button" class="button button-primary yatra-day-wise-availability-save"/>').text("Save"));
             popupHeader.append('<span class="yatra-admin-popup-close dashicons dashicons-no-alt"></span>');
             var popupBody = $('<div class="yatra-admin-popup-body"/>');
             popupBody.html(content);
             var popupFooter = $('<div class="yatra-admin-popup-footer"/>');
+            popupFooter.append('<button type="button" class="button button-primary yatra-day-wise-availability-save">Save the changes</button>');
             contentEl.append(popupHeader);
             contentEl.append(popupBody);
             contentEl.append(popupFooter);

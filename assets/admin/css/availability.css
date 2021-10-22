@@ -102,13 +102,26 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 900px;
-    min-height: 400px;
-    max-height: 80vh;
-    overflow-x: auto;
-    padding: 20px;
+    max-width: 900px;
     background: #fff;
     border-radius: 5px;
     z-index: 999;
+    overflow: hidden;
+
+}
+
+#yatra-admin-popup .yatra-admin-popup-body {
+    min-height: 350px;
+    max-height: 75vh;
+    overflow-x: auto;
+}
+
+#yatra-admin-popup .yatra-admin-popup-footer {
+    padding: 10px 20px;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-end;
 }
 
 #yatra-admin-popup .yatra-admin-popup-header {
@@ -117,7 +130,7 @@
     justify-content: space-between;
     font-size: 20px;
     border-bottom: 1px solid #ddd;
-    padding-bottom: 15px;
+    padding: 20px;
 }
 
 #yatra-admin-popup .yatra-admin-popup-header-title {
@@ -252,6 +265,11 @@
 
 #yatra-admin-popup .spinner {
     margin-top: 0px;
+}
+
+
+#yatra-admin-popup form#yatra-availability-calendar-popup-form {
+    padding: 20px;
 }
 
 #yatra-admin-popup form#yatra-availability-calendar-popup-form.loading {
