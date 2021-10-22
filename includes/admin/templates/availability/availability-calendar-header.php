@@ -16,15 +16,16 @@
                id="yatra_tour_id"
                name="yatra_tour_id"
         />
-
+      
         <div class="yatra-field-row">
 
 
             <div class="yatra-field-wrap">
-                <label for="yatra_availability[max_traveller]">Max. Traveller &nbsp;
+                <label for="yatra_availability[max_travellers]">Max. Traveller &nbsp;
                 </label>
-                <input value="10" type="number" class="widefat" id="yatra_availability[max_traveller]"
-                       name="yatra_availability[max_traveller]"/>
+                <input value="<?php echo esc_attr($yatra_availability['max_travellers']) ?>" type="number"
+                       class="widefat" id="yatra_availability[max_travellers]"
+                       name="yatra_availability[max_travellers]"/>
                 <span
                         class="yatra-tippy-tooltip dashicons dashicons-editor-help"
                         data-tippy-content="Number of people for one group for this pricing option."></span>
@@ -32,12 +33,22 @@
 
             <div class="yatra-field-wrap"><label
                         for="yatra_availability[availability_for]">Availability for</label>
+                <?php
+                $yatra_availability_for = array(
+                    'booking' => __('For Booking', 'yatra'),
+                    'enquiry' => __('For Enquiry Only', 'yatra'),
+                    'none' => __('Not Available', 'yatra'),
+                );
+                ?>
                 <select class="widefat yatra_availability_for" id="yatra_availability[availability_for]"
                         name="yatra_availability[availability_for]">
-                    <option value=""></option>
-                    <option selected="selected" value="enquiry">For Enquiry</option>
-                    <option value="booking">For Booking</option>
-                    <option value="none">Not Available</option>
+                    <?php foreach ($yatra_availability_for as $single_availability_for_key => $single_availability_for) { ?>
+                        <option value="<?php echo esc_attr($single_availability_for_key); ?>" <?php selected($single_availability_for_key, $yatra_availability['availability_for']) ?>><?php
+
+                            echo esc_html($single_availability_for);
+                            ?>
+                        </option>
+                    <?php } ?>
 
 
                 </select>
