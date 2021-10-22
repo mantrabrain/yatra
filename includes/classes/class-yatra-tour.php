@@ -178,6 +178,16 @@ class Yatra_Tour
 
             $end_date_value = $date->format("Y-m-d H:i:s");
 
+            $where = array(
+                'start_date',
+                'end_date',
+                'tour_id'
+            );
+
+            $update_ignore = array('start_date', 'end_date', 'tour_id', 'created_at');
+
+            $save_ignore = array('updated_by', 'created_at');
+
             $data = array(
                 'tour_id' => $this->ID,
                 'slot_group_id' => 3,
@@ -196,7 +206,12 @@ class Yatra_Tour
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql')
             );
-            Yatra_Core_DB::save_data($data);
+            if (Yatra_Core_DB::data_exists('tour_dates', $data, $where)) {
+                // Upudate
+            } else {
+
+                Yatra_Core_DB::save_data($data);
+            }
         }
 
 

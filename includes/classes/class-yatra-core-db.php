@@ -142,13 +142,76 @@ class Yatra_Core_DB
     }
 
 
-    private static function update($yatra_table_name)
+    private static function update($table, $data = array(), $where = array(), $update_ignore = array())
+    {
+        if (count($where) === 0) {
+            return false;
+        }
+
+        global $wpdb;
+
+        $update_query = "UPDATE " . self::get_table($table) . " SET ";
+
+        $prepare_arg_values = array();
+
+        foreach ($data as $column => $column_value) {
+
+            $column_type = gettype($column_value);
+
+            $column_value_type = $column_type === "integer" ? "%d" : "%s";
+
+            if (!in_array($column, $update_ignore)) {
+
+                array_push($prepare_arg_values, $column_value);
+
+                $update_query .= sanitize_text_field($column) . "={$column_value_type}";
+            }
+        }
+
+        $update_query .= ' WHERE ';
+
+        foreach ($where as $wh => $wh_value) {
+
+            $wh_column_value_type = $wh_value === "integer" ? "%d" : "%s";
+
+            $update_query .= sanitize_text_field($wh) . "={$wh_column_value_type} AND ";
+
+            array_push($prepare_arg_values, $wh_value);
+        }
+
+        $sql = $wpdb->prepare(
+            $update_query,
+            ...$prepare_arg_values
+
+
+        );
+        return $wpdb->query($sql);
+    }
+
+
+    public static function data_exists($table, $data = array(), $where = array())
+    {
+        $existing_data = self::fetch('tour_dates', array(), $where);
+
+        if (count($existing_data) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function update_data($table, $data = array(), $where = array(), $update_ignore = array())
+    {
+
+    }
+
+    public static function save_data($table, $data = array(), $save_ignore = array())
     {
 
     }
 
     public static function save_data($data, $save_ignore = array(), $where = array(), $update_ignore = array())
     {
+
         $default = array(
             'tour_id' => 27,
             'slot_group_id' => 3,
