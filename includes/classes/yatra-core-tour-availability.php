@@ -219,6 +219,10 @@ class Yatra_Core_Tour_Availability
 
         $yatra_availability['availability_for'] = 'booking';
 
+        $pricings = yatra()->tour->get_pricing();
+
+        $pricing_type = yatra()->tour->get_pricing_type();
+
 
         if ($start_date == $end_date) {
 
@@ -226,15 +230,20 @@ class Yatra_Core_Tour_Availability
 
             $availability_pricing_today = isset($availability_pricing[$availability_pricing_index]) ? $availability_pricing[$availability_pricing_index] : array();
 
-            $yatra_availability['max_travellers'] = isset($availability_pricing_today['max_travellers']) ? absint($availability_pricing_today['max_travellers']) : $max_traveller;
+            $yatra_availability['max_travellers'] = isset($availability_pricing_today['max_travellers']) ? absint($availability_pricing_today['max_travellers']) : $yatra_availability['max_travellers'];
 
-            $yatra_availability['availability_for'] = isset($availability_pricing_today['availability']) ? sanitize_text_field($availability_pricing_today['availability']) : $availability_for;
+            $yatra_availability['availability_for'] = isset($availability_pricing_today['availability']) ? sanitize_text_field($availability_pricing_today['availability']) : $yatra_availability['availability_for'];
 
+            $dynamic_pricing_type = isset($availability_pricing_today['pricing_type']) ? sanitize_text_field($availability_pricing_today['pricing_type']) : '';
 
+            $dynamic_pricing = isset($availability_pricing_today['pricing']) ? ($availability_pricing_today['pricing']) : array();
+
+            if ($dynamic_pricing_type === $pricing_type) {
+
+                $pricings = wp_parse_args($dynamic_pricing, yatra()->tour->get_pricing());
+            }
         }
-        $pricings = isset($availability_pricing[$availability_pricing_index]) ? $availability_pricing[$availability_pricing_index] : yatra()->tour->get_pricing();
 
-        $pricing_type = yatra()->tour->get_pricing_type();
 
         yatra()->tour->maybe_flush();
 
@@ -247,7 +256,7 @@ class Yatra_Core_Tour_Availability
 
         ob_start();
 
-        echo '<form id="yatra-availability-calendar-popup-form">';
+        echo '<form id="yatra-availability-calendar-popup-form" method="post">';
 
         if (!$content_only) {
 
@@ -273,7 +282,6 @@ class Yatra_Core_Tour_Availability
             'tour_id' => $tour_id,
             'yatra_availability' => $yatra_availability
         ));
-
         foreach ($pricings as $pricing_option_id => $pricing) {
 
             yatra_load_admin_template('availability.availability-calendar', array(
@@ -289,6 +297,7 @@ class Yatra_Core_Tour_Availability
         wp_nonce_field('wp_yatra_day_wise_tour_availability_save_nonce', 'yatra_nonce', true, true);
 
         echo '<input type="hidden" name="action" value="yatra_day_wise_tour_availability_save"/>';
+        echo '<input type="submit" style="display: none"/>';
 
         echo '</div>';
 

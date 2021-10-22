@@ -3,6 +3,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     var $ = jQuery;
     var availability_date_ranges = [];
+    var availability_calendar;
 
     var YatraPopUp = {
 
@@ -56,10 +57,98 @@ document.addEventListener('DOMContentLoaded', function () {
                     _that.closePopup();
                 }
             });
+
+            $('body').on('submit', 'form#yatra-availability-calendar-popup-form', function (event) {
+                $(this).closest('#yatra-admin-popup').find('.yatra-day-wise-availability-save').trigger('click');
+                event.preventDefault();
+            });
+
+            $('body').on('change', '#yatra-admin-popup .yatra_pricing_pricing_per', function () {
+                var val = $(this).val();
+                if (val === 'group') {
+                    $(this).closest('.yatra-field-row').find('.yatra-field-wrap.yatra_pricing_group_size').removeClass('yatra-hide');
+                } else {
+                    $(this).closest('.yatra-field-row').find('.yatra-field-wrap.yatra_pricing_group_size').addClass('yatra-hide');
+                }
+            });
+
+            $('body').on('change', '#yatra-admin-popup .yatra_availability_selected_date', function () {
+                var that_item = $(this);
+
+                var json_object = {
+                    start: $(this).attr('data-start-date'),
+                    end: $(this).attr('data-end-date'),
+                }
+                if (typeof json_object.start !== undefined && typeof json_object.end !== undefined) {
+
+                    var ajax_data = {
+                        data: {
+                            yatra_nonce: yatra_availability_params.day_wise_tour_availability.nonce,
+                            action: yatra_availability_params.day_wise_tour_availability.action,
+                            tour_id: $('#yatra-availability-calendar-tour-id').val(),
+                            start_date: json_object.start,
+                            end_date: json_object.end,
+                            content_only: true,
+
+                        },
+                        beforeSend: function () {
+                            $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').addClass('yatra-overlay');
+                            that_item.closest('.yatra-field-wrap').append('<span class="spinner" style="visibility: visible"/>');
+                        },
+                        complete: function () {
+                            $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').removeClass('yatra-overlay');
+                            that_item.closest('.yatra-field-wrap').find('.spinner').remove();
+                        },
+                        success: function (response) {
+
+                            $('#yatra-admin-popup').find('h2.yatra-admin-popup-header-title').text(response.title);
+                            $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').html(response.data);
+
+                        },
+                    }
+                    _that.ajaxPopUp(ajax_data);
+                }
+
+            });
+
+            $('body').on('click', '.yatra-day-wise-availability-save', function () {
+                var that_item = $(this);
+                $.ajax({
+                    url: yatra_availability_params.ajax_url,
+                    data: $("#yatra-availability-calendar-popup-form").serialize(),
+                    method: 'post',
+                    beforeSend: function () {
+                        $("#yatra-availability-calendar-popup-form").addClass('loading');
+                        that_item.addClass('updating-message');
+                    },
+                    complete: function () {
+                        that_item.removeClass('updating-message');
+                        $("#yatra-availability-calendar-popup-form").removeClass('loading');
+                    },
+                    success: function (response) {
+                    },
+                    error: function (e) {
+
+                    }
+                });
+            });
+
+            $('body').on('click', '#yatra_availability_selected_date', function () {
+                $(this).closest('.yatra-field-wrap').find('.yatra-avilability-daterange-picker').trigger('click');
+            })
+            $('body').on('change', '.yatra_availability_use_tour_settings', function () {
+
+                var form = $(this).closest('form');
+                if ($(this).prop('checked')) {
+                    form.find('fieldset').addClass('disablssssed');
+                }
+                form.find('fieldset').removeClass('disablssssed');
+            })
         },
         closePopup: function () {
             $('#' + this.id).remove();
             $('body').removeClass('yatra-popup-open');
+            availability_calendar.refetchEvents();
         },
         initTooltip: function () {
             tippy('.yatra-tippy-tooltip', {
@@ -143,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             var _that = this;
             var calendarEl = document.getElementById('yatra-availability-calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            availability_calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
                     left: '',
                     center: 'title',
@@ -215,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
 
-            calendar.render();
+            availability_calendar.render();
 
         },
         ajaxPopUp: function (options) {
@@ -249,106 +338,8 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         bindEvents: function () {
             var _that = this;
-            jQuery('body').on('click', '.yatra-cal-header-checkbox', function () {
-                var _that = jQuery(this);
-                var tdIndex = jQuery(this).closest('th').index();
-                var wrap = jQuery(this).closest('#yatra-availability-calendar-container').find('table.fc-scrollgrid-sync-table');
-                var checked = false;
-                if (jQuery(this).is(':checked')) {
-                    checked = true;
-                }
-                jQuery.each(wrap.find('tr'), function () {
-                    var indexedTd = jQuery(this).find('td').eq(tdIndex);
-                    if (!jQuery(indexedTd).hasClass('fc-day-other')) {
-                        jQuery(indexedTd).find('input.yatra-cal-checkbox').prop('checked', checked);
-                    }
-                });
-                _that.trigger('yatra_calendar_header_change', _that.prop('checked'));
-            });
-            jQuery('body').on('yatra_calendar_header_change', '.yatra-cal-header-checkbox', function (event, checkbox_value) {
-                alert(checkbox_value);
-            });
-            $('body').on('change', '#yatra-admin-popup .yatra_pricing_pricing_per', function () {
-                var val = $(this).val();
-                if (val === 'group') {
-                    $(this).closest('.yatra-field-row').find('.yatra-field-wrap.yatra_pricing_group_size').removeClass('yatra-hide');
-                } else {
-                    $(this).closest('.yatra-field-row').find('.yatra-field-wrap.yatra_pricing_group_size').addClass('yatra-hide');
-                }
-            });
 
-            $('body').on('change', '#yatra-admin-popup .yatra_availability_selected_date', function () {
-                var that_item = $(this);
 
-                var json_object = {
-                    start: $(this).attr('data-start-date'),
-                    end: $(this).attr('data-end-date'),
-                }
-                if (typeof json_object.start !== undefined && typeof json_object.end !== undefined) {
-
-                    var ajax_data = {
-                        data: {
-                            yatra_nonce: yatra_availability_params.day_wise_tour_availability.nonce,
-                            action: yatra_availability_params.day_wise_tour_availability.action,
-                            tour_id: $('#yatra-availability-calendar-tour-id').val(),
-                            start_date: json_object.start,
-                            end_date: json_object.end,
-                            content_only: true,
-
-                        },
-                        beforeSend: function () {
-                            $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').addClass('yatra-overlay');
-                            that_item.closest('.yatra-field-wrap').append('<span class="spinner" style="visibility: visible"/>');
-                        },
-                        complete: function () {
-                            $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').removeClass('yatra-overlay');
-                            that_item.closest('.yatra-field-wrap').find('.spinner').remove();
-                        },
-                        success: function (response) {
-
-                            $('#yatra-admin-popup').find('h2.yatra-admin-popup-header-title').text(response.title);
-                            $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').html(response.data);
-
-                        },
-                    }
-                    _that.ajaxPopUp(ajax_data);
-                }
-
-            });
-
-            $('body').on('click', '.yatra-day-wise-availability-save', function () {
-                var that_item = $(this);
-                $.ajax({
-                    url: yatra_availability_params.ajax_url,
-                    data: $("#yatra-availability-calendar-popup-form").serialize(),
-                    method: 'post',
-                    beforeSend: function () {
-                        $("#yatra-availability-calendar-popup-form").addClass('loading');
-                        that_item.addClass('updating-message');
-                    },
-                    complete: function () {
-                        that_item.removeClass('updating-message');
-                        $("#yatra-availability-calendar-popup-form").removeClass('loading');
-                    },
-                    success: function (response) {
-                    },
-                    error: function (e) {
-
-                    }
-                });
-            });
-
-            $('body').on('click', '#yatra_availability_selected_date', function () {
-                $(this).closest('.yatra-field-wrap').find('.yatra-avilability-daterange-picker').trigger('click');
-            })
-            $('body').on('change', '.yatra_availability_use_tour_settings', function () {
-
-                var form = $(this).closest('form');
-                if ($(this).prop('checked')) {
-                    form.find('fieldset').addClass('disablssssed');
-                }
-                form.find('fieldset').removeClass('disablssssed');
-            })
         },
 
 
