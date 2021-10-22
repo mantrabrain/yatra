@@ -144,7 +144,7 @@ class Yatra_Core_Tour_Availability
 
                 $final_pricing = '' === $discounted ? $regular : $discounted;
 
-                $pricing_label = __('Default Pricing', 'yatra');
+                $pricing_label = __('Guest', 'yatra');
 
                 $current_currency_symbol = '$';//yatra_get_current_currency_symbol();
 
