@@ -238,9 +238,16 @@ class Yatra_Core_Tour_Availability
 
             $dynamic_pricing = isset($availability_pricing_today['pricing']) ? ($availability_pricing_today['pricing']) : array();
 
-            if ($dynamic_pricing_type === $pricing_type) {
+            if (count($dynamic_pricing) > 0) {
 
-                $pricings = wp_parse_args($dynamic_pricing, yatra()->tour->get_pricing());
+                if ($dynamic_pricing_type === $pricing_type && $pricing_type == "single") {
+
+                    $pricings = $dynamic_pricing;
+
+                } else if ($dynamic_pricing_type === $pricing_type && $pricing_type == "multi") {
+
+                    $pricings = yatra_parse_args($dynamic_pricing, $pricings, true);
+                }
             }
         }
 

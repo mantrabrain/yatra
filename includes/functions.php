@@ -985,7 +985,7 @@ if (!function_exists('yatra_parse_args')) {
     {
         $parsed = wp_parse_args($args, $defaults);
 
-        if ($limited_to_defaults) {
+        if (!$limited_to_defaults) {
             return $parsed;
         }
         $final_parsed = array();

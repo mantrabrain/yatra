@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         },
                     }
-                    _that.ajaxPopUp(ajax_data);
+                    YatraAvailability.ajaxPopUp(ajax_data);
                 }
 
             });
