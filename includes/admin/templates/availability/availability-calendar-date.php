@@ -27,12 +27,13 @@
                 <label class="yatra-switch-control">
                     <input class="widefat yatra_availability_activate"
                            id="yatra_availability[activate]"
-                           name="yatra_availability[activate]" type="checkbox" value="1" checked="checked">
+                           name="yatra_availability[activate]" type="checkbox"
+                           value="1" <?php checked(true, $active_status) ?>>
                     <span class="slider round" data-on="yes" data-off="no"></span>
                 </label>
             </div>
             <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
-                  data-tippy-content="This option let you enable/disable total max number of traveller limit for this tour"></span>
+                  data-tippy-content="Activate the following options to the date for selected tour."></span>
         </div>
 
     </div>

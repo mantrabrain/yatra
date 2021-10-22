@@ -26,7 +26,6 @@
                         name="<?php echo $pricing_option_id . '[pricing_per]'; ?>">
                     <?php
                     $pricing_per_array = array(
-                        '' => __('Use Tours price Per', 'yatra'),
                         'person' => __('Person', 'yatra'),
                         'group' => __('Group', 'yatra'),
                     );
