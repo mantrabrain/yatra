@@ -127,6 +127,8 @@ class Yatra_Core_Tour_Availability
 
         $availability_data_array = isset($availability_data[$availability_data_index]) ? $availability_data[$availability_data_index] : array();
 
+        $is_active = isset($availability_data_array['active']) ? (boolean)$availability_data_array['active'] : false;
+
         $pricing = isset($availability_data_array['pricing']) ? $availability_data_array['pricing'] : array();
 
 
@@ -150,6 +152,7 @@ class Yatra_Core_Tour_Availability
                     "title" => "{$pricing_label}: {$current_currency_symbol}{$final_pricing}",
                     "start" => $start_date,
                     "description" => "{$pricing_label}: {$current_currency_symbol}{$final_pricing}",
+                    "is_active" => $is_active
 
 
                 );
@@ -181,7 +184,8 @@ class Yatra_Core_Tour_Availability
                     "title" => $title,
                     "event" => $title,
                     "start" => $start_date,
-                    "description" => $description
+                    "description" => $description,
+                    "is_active" => $is_active
 
                 );
             }

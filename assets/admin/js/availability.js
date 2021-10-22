@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var dateFormat = 'YYYY-MM-DD';
 
             var drpconfig = {
-                parentEl:"#yatra-admin-popup",
+                parentEl: "#yatra-admin-popup",
                 opens: 'right',
                 locale: {
                     format: dateFormat,
@@ -182,8 +182,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
 
 
+                    var active_class = info.event.extendedProps.is_active ? 'yatra-active-event' : '';
                     // jQuery(info.el).closest('td').find('.yatra-cal-checkbox').prop('checked', true);
                     jQuery(info.el).find('.fc-event-title').html(info.event.title);
+                    jQuery(info.el).find('.fc-event-title').addClass(active_class);
 
                 },
                 dayCellDidMount: function (info) {

@@ -41,6 +41,10 @@
     width: 100%;
 }
 
+#yatra-availability-calendar .fc-event .fc-event-title.fc-sticky.yatra-active-event {
+    background: #11a59e;
+}
+
 #yatra-availability-calendar .fc-daygrid-day-top {
     justify-content: space-between;
 }
