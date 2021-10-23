@@ -257,14 +257,14 @@ class Yatra_Ajax
 
         $end_date = isset($_POST['end']) ? sanitize_text_field($_POST['end']) : '';
 
-        $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : '';
+        $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
 
-        if ('' == $tour_id) {
+        if ($tour_id < 1) {
             wp_send_json_error();
 
         }
 
-         $availability = Yatra_Core_Tour_Availability::get_availability($tour_id, $start_date, $end_date);
+        $availability = Yatra_Core_Tour_Availability::get_availability($tour_id, $start_date, $end_date);
 
         if (!is_wp_error($availability)) {
             echo json_encode($availability);
@@ -282,7 +282,7 @@ class Yatra_Ajax
             wp_send_json_error($this->ajax_error());
         }
 
-        $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : '';
+        $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
 
         $start_date = isset($_POST['start_date']) ? sanitize_text_field($_POST['start_date']) : '';
 
@@ -291,13 +291,13 @@ class Yatra_Ajax
 
         $content_only = isset($_POST['content_only']) ? (boolean)($_POST['content_only']) : false;
 
-        if ('' == $tour_id || $start_date == '' || $end_date == '') {
+        if ($tour_id < 1 || $start_date == '' || $end_date == '') {
 
             wp_send_json_error();
 
         }
 
-         Yatra_Core_Tour_Availability::get_day_wise_availability_form($tour_id, $start_date, $end_date, $content_only);
+        Yatra_Core_Tour_Availability::get_day_wise_availability_form($tour_id, $start_date, $end_date, $content_only);
 
         exit;
 
@@ -323,6 +323,11 @@ class Yatra_Ajax
         $yatra_availability = isset($_POST['yatra_availability']) ? $_POST['yatra_availability'] : array();
 
         $tour_id = isset($_POST['yatra_tour_id']) ? absint($_POST['yatra_tour_id']) : 0;
+
+        if ($tour_id < 1) {
+            wp_send_json_error();
+
+        }
 
         $yatra_pricing = isset($_POST['yatra_availability_pricing']) ? $_POST['yatra_availability_pricing'] : array();
 

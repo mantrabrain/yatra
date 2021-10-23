@@ -9,6 +9,8 @@ class Yatra_Core_Tour_Availability
 
         add_action('admin_enqueue_scripts', array($this, 'load_admin_scripts'), 11);
 
+        add_action('yatra_availability_calendar_tour_list', array($this, 'calendar_tour_list'));
+
     }
 
 
@@ -60,18 +62,28 @@ class Yatra_Core_Tour_Availability
 
     private function calendar()
     {
-        $id = isset($_GET['tour_id']) ? absint($_GET['tour_id']) : 27;
-
         echo '<div  id="yatra-availability-calendar-container">';
         echo '<div class="yatra-availability-calendar-header">';
-        echo '<input type="hidden" value="' . esc_attr($id) . '" id="yatra-availability-calendar-tour-id"/>';
+        echo '<input type="hidden" value="" id="yatra-availability-calendar-tour-id"/>';
         echo '<ul class="symbol">';
         echo '<li class="yatra-tippy-tooltip booking" data-tippy-content="Available for booking">For Booking</li>';
         echo '<li class="yatra-tippy-tooltip enquery" data-tippy-content="Available for enquiry only">For Enquiry Only</li>';
         echo '<li class="yatra-tippy-tooltip not-available" data-tippy-content="Booking & enquiry not available">Not Available for Booking & Enquiry</li>';
         echo '</ul>';
         echo '</div>';
+
+        echo '<div class="yatra-availability-calendar-content-body">';
+
+        do_action('yatra_availability_calendar_tour_list');
+
+        echo '<div  id="yatra-availability-calendar-wrap">';
+
         echo '<div  id="yatra-availability-calendar">';
+
+
+        echo '</div>';
+
+        echo '</div>';
 
         echo '</div>';
 
@@ -364,6 +376,25 @@ class Yatra_Core_Tour_Availability
         );
         echo json_encode($response);
         exit;
+    }
+
+    public function calendar_tour_list()
+    {
+        $the_query = new WP_Query(
+            array('posts_per_page' => 30,
+                'post_type' => 'tour',
+                'paged' => get_query_var('paged') ? get_query_var('paged') : 1)
+        );
+        echo '<ul class="yatra-availability-tour-lists">';
+        while ($the_query->have_posts()):
+
+            $the_query->the_post();
+            echo '<li>';
+            echo '<a data-id="' . absint(get_the_ID()) . '" target="_blank" href="' . esc_url(get_the_permalink()) . '">' . esc_html(get_the_title()) . '</a>';
+            echo '</li>';
+
+        endwhile;
+        echo '</ul>';
     }
 }
 

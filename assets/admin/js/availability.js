@@ -369,8 +369,13 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         bindEvents: function () {
             var _that = this;
+            $('body').on('click', '.yatra-availability-tour-lists li a', function (event) {
+                event.preventDefault();
+                var tour_id = $(this).attr('data-id');
+                $('#yatra-availability-calendar-tour-id').val(tour_id);
+                availability_calendar.refetchEvents();
 
-
+            });
         },
 
 

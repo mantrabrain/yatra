@@ -7,16 +7,13 @@
 }
 
 #yatra-availability-calendar-container {
-    padding: 20px;
+    padding: 50px 20px;
     background: #fff;
     border: 1px solid;
 
 }
 
 #yatra-availability-calendar {
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 0 10px;
     position: relative;
 }
 
@@ -423,4 +420,37 @@ body.yatra-popup-open {
     bottom: 0;
     background: rgba(0, 0, 0, 0.1);
     z-index: 9;
+}
+
+#yatra-availability-calendar-wrap {
+    max-width: 75%;
+    width: 75%;
+    float: right;
+}
+
+#yatra-availability-calendar-container .yatra-availability-tour-lists {
+    max-width: 25%;
+    width: 25%;
+    float: left;
+    margin-top: 54px;
+    background: #fff;
+    border: 1px solid #ddd;
+}
+
+#yatra-availability-calendar-container .yatra-availability-tour-lists li {
+    margin: 0;
+    padding: 0 10px;
+}
+
+#yatra-availability-calendar-container .yatra-availability-tour-lists li a {
+
+    padding: 10px 0;
+    width: 100%;
+    display: inline-block;
+
+}
+
+#yatra-availability-calendar-container .yatra-availability-calendar-content-body {
+    display: flex;
+    width: 100%;
 }
