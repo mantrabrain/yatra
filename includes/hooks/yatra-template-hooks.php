@@ -35,6 +35,7 @@ class Yatra_Template_Hooks
 
         yatra_get_template('parts/tour-booking-form.php',
             array(
+                'pricing_type' => yatra()->tour->get_pricing_type(),
                 'yatra_booking_pricing_info' => yatra()->tour->get_pricing(),
             )
         );

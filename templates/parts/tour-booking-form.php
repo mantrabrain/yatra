@@ -4,6 +4,7 @@
     <input type="hidden" name="yatra_nonce" value="<?php echo wp_create_nonce('wp_yatra_tour_add_to_cart_nonce'); ?>"/>
     <input type="hidden" name="tour_id" value="<?php echo get_the_ID(); ?>"/>
     <?php
+
     $currency_symbol = yatra_get_current_currency_symbol();
     foreach ($yatra_booking_pricing_info as $pricing_id => $booking_pricing_args) { ?>
 
@@ -14,10 +15,8 @@
 
                         <div class="yatra-nice-input-number">
                             <button type="button" class="fa fa-minus nice-button minus-button"></button>
-
-
                             <?php
-                            $field_name = $booking_pricing_args['type'] === "multi" ? "yatra_number_of_person[multi_pricing][{$pricing_id}]" : "yatra_number_of_person[single_pricing]"; ?>
+                            $field_name = $pricing_type === "multi" ? "yatra_number_of_person[multi_pricing][{$pricing_id}]" : "yatra_number_of_person[single_pricing]"; ?>
                             <input readonly
                                    data-step="1"
                                    data-max="<?php echo $booking_pricing_args['maximum_pax'] == '' ? 9999 : absint($booking_pricing_args['maximum_pax']) ?>"

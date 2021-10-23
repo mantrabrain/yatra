@@ -444,13 +444,21 @@ body.yatra-popup-open {
 
 #yatra-availability-calendar-container .yatra-availability-tour-lists li a {
 
-    padding: 10px 0;
+    padding: 10px;
     width: 100%;
+    max-width: 100%;
     display: inline-block;
+    text-decoration: none;
+    outline: none;
 
 }
 
 #yatra-availability-calendar-container .yatra-availability-calendar-content-body {
     display: flex;
     width: 100%;
+}
+
+#yatra-availability-calendar-container .yatra-availability-tour-lists li.active-tour a {
+    background: #ccc;
+    border: 1px solid #aaa;
 }

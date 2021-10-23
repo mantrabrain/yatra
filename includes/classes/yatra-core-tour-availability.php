@@ -390,7 +390,7 @@ class Yatra_Core_Tour_Availability
 
             $the_query->the_post();
             echo '<li>';
-            echo '<a data-id="' . absint(get_the_ID()) . '" target="_blank" href="' . esc_url(get_the_permalink()) . '">' . esc_html(get_the_title()) . '</a>';
+            echo '<a data-id="' . absint(get_the_ID()) . '" target="_blank" href="' . esc_url(get_the_permalink()) . '">#' . absint(get_the_ID()) . ' - ' . esc_html(get_the_title()) . '</a>';
             echo '</li>';
 
         endwhile;
