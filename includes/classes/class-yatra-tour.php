@@ -60,6 +60,8 @@ class Yatra_Tour
     {
         $meta_regular_price = get_post_meta($this->ID, 'yatra_tour_meta_regular_price', true);
         $meta_sales_price = get_post_meta($this->ID, 'yatra_tour_meta_sales_price', true);
+        $meta_pricing_label = sanitize_text_field(get_post_meta($this->ID, 'yatra_tour_meta_pricing_label', true));
+        $meta_pricing_description = sanitize_text_field(get_post_meta($this->ID, 'yatra_tour_meta_pricing_description', true));
         $multiple_pricing = get_post_meta($this->ID, 'yatra_multiple_pricing', true);
         $meta_price_per = get_post_meta($this->ID, 'yatra_tour_meta_price_per', true);
         $meta_group_size = get_post_meta($this->ID, 'yatra_tour_meta_group_size', true);
@@ -112,8 +114,8 @@ class Yatra_Tour
         $person_count = $meta_price_per == 'person' ? $person_count : ceil($person_count / $meta_group_size);
         $final_pricing_details[] = array(
             'pricing_type' => "single",
-            'pricing_label' => $meta_price_per === 'group' ? 'Group' : 'Person',
-            'pricing_description' => '',
+            'pricing_label' => $meta_pricing_label,
+            'pricing_description' => $meta_pricing_description,
             'minimum_pax' => $meta_minimum_pax,
             'maximum_pax' => $meta_maximum_pax,
             'pricing_per' => $meta_price_per,

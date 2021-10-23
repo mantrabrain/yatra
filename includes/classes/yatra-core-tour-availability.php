@@ -177,13 +177,13 @@ class Yatra_Core_Tour_Availability
 
                 $pricing = isset($pricing[0]) ? $pricing[0] : array();
 
-                $regular = isset($pricing[0]['regular_price']) ? $pricing['regular_price'] : get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
+                $regular = isset($pricing['regular_price']) ? $pricing['regular_price'] : get_post_meta($tour_id, 'yatra_tour_meta_regular_price', true);
 
                 $discounted = isset($pricing['sales_price']) ? $pricing['sales_price'] : get_post_meta($tour_id, 'yatra_tour_meta_sales_price', true);
 
-                $final_pricing = '' === $discounted ? $regular : $discounted;
+                $pricing_label = get_post_meta($tour_id, 'yatra_tour_meta_pricing_label', true);
 
-                $pricing_label = __('Guest', 'yatra');
+                $final_pricing = '' === $discounted ? $regular : $discounted;
 
                 $current_currency_symbol = '$';//yatra_get_current_currency_symbol();
 
@@ -271,8 +271,7 @@ class Yatra_Core_Tour_Availability
         $pricing_type = yatra()->tour->get_pricing_type();
 
         $active_status = false;
-
-
+        
         if ($start_date == $end_date) {
 
             $availability_pricing = yatra()->tour->get_availability_pricing(1, $start_date, $end_date, array(), $tour_id);

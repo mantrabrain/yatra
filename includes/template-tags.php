@@ -901,6 +901,26 @@ if (!function_exists('yatra_tour_pricing_configurations')) {
                 ),
                 //'row_end' => true,
             ),
+            'yatra_tour_meta_pricing_label' => array(
+                'name' => 'yatra_tour_meta_pricing_label',
+                'title' => __('Pricing Label', 'yatra'),
+                'type' => 'text',
+                'default' => __('Guest', 'yatra'),
+                'extra_attributes' => array(
+                    'placeholder' => __('Pricing Label', 'yatra'),
+                ),
+                //'row_end' => true,
+            ),
+            'yatra_tour_meta_pricing_description' => array(
+                'name' => 'yatra_tour_meta_pricing_description',
+                'title' => __('Pricing Description', 'yatra'),
+                'type' => 'text',
+                //'wrap_class' => 'yatra-right',
+                'extra_attributes' => array(
+                    'placeholder' => __('Pricing Description', 'yatra'),
+                ),
+                //'row_end' => true,
+            )
         );
         return apply_filters('yatra_tour_general_configurations', $tour_options);
     }
