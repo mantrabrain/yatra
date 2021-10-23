@@ -308,11 +308,35 @@ class Yatra_Tour
         return $single_pricing;
     }
 
-    public function get_availability_pricing($number_of_people, $start_date, $end_date, $return_fields = array(), $tour_id = null)
+    private function has_availability($start_date, $end_date)
     {
+        if (absint($this->ID) < 1) {
+            return false;
+        }
+        $where = array(
+            'start_date' => $start_date . ' 00:00:00',
+            'end_date' => $end_date . ' 23:59:59',
+            'tour_id' => $this->ID
+        );
+        $active_data = Yatra_Core_DB::get_data('tour_dates', array('active'), $where);
+
+        if (count($active_data) > 0)
+
+            if (isset($active_data[0]->active)) {
+
+                return (boolean)$active_data[0]->active;
+            }
+        return false;
+
+    }
+
+    public function get_availability_pricing($number_of_people, $start_date, $end_date, $tour_id = null)
+    {
+
         if (!is_null($tour_id)) {
             $this->ID = $tour_id;
         }
+
 
         if (is_null($this->ID)) {
             return array();
@@ -366,6 +390,17 @@ class Yatra_Tour
         }
 
         return $final_availability_data;
+    }
+
+    public function get_pricing_by_date($start_date, $end_date, $number_of_people)
+    {
+        if ($this->has_availability($start_date, $end_date)) {
+
+            return $this->get_availability_pricing($number_of_people, $start_date, $end_date);
+        } else {
+
+            return $this->get_pricing($number_of_people);
+        }
     }
 
 }

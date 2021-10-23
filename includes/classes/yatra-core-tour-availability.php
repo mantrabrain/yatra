@@ -119,11 +119,7 @@ class Yatra_Core_Tour_Availability
             $end = new DateTime($availability['end']);
 
             $availability_data = yatra()->tour->get_availability_pricing(
-                1, $begin->format("Y-m-d"), $end->format("Y-m-d"), array(
-                'pricing',
-                'sales_price',
-                'label'
-            ),
+                1, $begin->format("Y-m-d"), $end->format("Y-m-d"),
                 $tour_id
             );
 
@@ -274,7 +270,7 @@ class Yatra_Core_Tour_Availability
 
         if ($start_date == $end_date) {
 
-            $availability_pricing = yatra()->tour->get_availability_pricing(1, $start_date, $end_date, array(), $tour_id);
+            $availability_pricing = yatra()->tour->get_availability_pricing(1, $start_date, $end_date, $tour_id);
 
             $availability_pricing_today = isset($availability_pricing[$availability_pricing_index]) ? $availability_pricing[$availability_pricing_index] : array();
 
