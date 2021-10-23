@@ -126,6 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     complete: function () {
                         that_item.removeClass('updating-message');
                         $("#yatra-availability-calendar-popup-form").removeClass('loading');
+                        _that.closePopup();
                     },
                     success: function (response) {
                     },
@@ -168,10 +169,9 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         initDateRangePicker: function () {
             var _that = this;
-            var start = moment().subtract(29, 'days');
-            var end = moment();
-            var dateFormat = 'YYYY-MM-DD';
 
+            var start_date = $('#yatra_availability_selected_date').attr('data-start-date');
+            var dateFormat = 'YYYY-MM-DD';
             var drpconfig = {
                 parentEl: "#yatra-admin-popup",
                 opens: 'right',
@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     format: dateFormat,
                 },
                 minDate: new Date(),
+                startDate: new Date(start_date),
                 selectPastInvalidDate: false,
                 isInvalidDate: function (date, log) {
                     if (availability_date_ranges.length == 0) {
