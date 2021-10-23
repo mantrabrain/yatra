@@ -271,7 +271,7 @@ class Yatra_Core_Tour_Availability
         $pricing_type = yatra()->tour->get_pricing_type();
 
         $active_status = false;
-        
+
         if ($start_date == $end_date) {
 
             $availability_pricing = yatra()->tour->get_availability_pricing(1, $start_date, $end_date, array(), $tour_id);
@@ -292,6 +292,8 @@ class Yatra_Core_Tour_Availability
 
                 if ($dynamic_pricing_type === $pricing_type && $pricing_type == "single") {
 
+                    $dynamic_pricing[0]['pricing_label'] = $pricings[0]['pricing_label'];
+                    $dynamic_pricing[0]['pricing_description'] = $pricings[0]['pricing_description'];
                     $pricings = $dynamic_pricing;
 
                 } else if ($dynamic_pricing_type === $pricing_type && $pricing_type == "multi") {
@@ -313,9 +315,7 @@ class Yatra_Core_Tour_Availability
 
         $form_class = $active_status === false ? 'form yatra-deactivate-form' : 'form';
 
-
         ob_start();
-
 
         echo '<form id="yatra-availability-calendar-popup-form" method="post" class="' . esc_attr($form_class) . '">';
 
