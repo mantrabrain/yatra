@@ -98,6 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         complete: function () {
                             $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').removeClass('yatra-overlay');
                             that_item.closest('.yatra-field-wrap').find('.spinner').remove();
+                            $('#yatra-availability-calendar').removeClass('yatra-loading');
+
                         },
                         success: function (response) {
 
@@ -261,6 +263,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         }
                     },
+                    isLoading: function (bool) {
+                        alert(bool);
+                        $('#yatra-availability-calendar').addClass('yatra-loading');
+                    },
                     url: yatra_availability_params.ajax_url,
                     failure: function () {
                         document.getElementById('script-warning').style.display = 'block'
@@ -268,8 +274,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 },
                 loading: function (bool) {
-                    /*document.getElementById('loading').style.display =
-                        bool ? 'block' : 'none';*/
+                    if (bool) {
+                        $('#yatra-availability-calendar').addClass('yatra-loading');
+
+                    } else {
+                        $('#yatra-availability-calendar').removeClass('yatra-loading');
+
+                    }
                 },
 
                 eventDidMount: function (info) {
@@ -318,6 +329,8 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         ajaxPopUp: function (options) {
 
+            $('#yatra-availability-calendar').addClass('yatra-loading');
+
             let default_options = {
                 url: yatra_availability_params.ajax_url,
                 data: {},
@@ -335,6 +348,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 error: function (e) {
 
+                },
+                complete: function () {
+                    $('#yatra-availability-calendar').removeClass('yatra-loading');
                 }
             };
             let ajax_options = {

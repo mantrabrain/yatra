@@ -18,7 +18,7 @@
             <div class="yatra-field-wrap">
                 <label for="<?php echo $pricing_option_id . '[pricing_per]'; ?>"><?php echo __('Price Per', 'yatra') ?>
                     <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
-                          data-tippy-content="<?php echo __('Maximum number of people per booking for this pricing. Leave it blank to use this tour\'s maximum people (pax) ( From General & Date Settings ).', 'yatra') ?>"></span>
+                          data-tippy-content="<?php echo __('Price Per', 'yatra') ?>"></span>
                 </label>
                 <select
                         class="widefat yatra_pricing_pricing_per"
@@ -42,7 +42,7 @@
             <div class="yatra-field-wrap <?php echo $pricing ['pricing_per'] === 'group' ? '' : 'yatra-hide'; ?> yatra_pricing_group_size">
                 <label for="<?php echo $pricing_option_id . '[group_size]'; ?>"><?php echo __('Group Size', 'yatra') ?>
                     <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
-                          data-tippy-content="<?php echo __('Number of people for one group for this pricing option.', 'yatra') ?>"></span>
+                          data-tippy-content="<?php echo __('Number of people for one group', 'yatra') ?>"></span>
                 </label>
                 <input value="<?php echo esc_attr($pricing ['group_size']); ?>"
                        type="number"
@@ -88,7 +88,7 @@
                 <label for="<?php echo $pricing_option_id . '[minimum_pax]'; ?>"><?php echo __('Minimum People (Pax)', 'yatra') ?>
 
                     <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
-                          data-tippy-content="<?php echo __('Minimum number of people per booking for this pricing. Leave it blank to use this tour\'s minimum people (pax) ( From General & Date Settings ).', 'yatra') ?>"></span>
+                          data-tippy-content="<?php echo __('Minimum number of people per booking.', 'yatra') ?>"></span>
                 </label>
                 <input value="<?php echo esc_attr($pricing ['minimum_pax']); ?>"
                        type="number"
@@ -102,7 +102,7 @@
             <div class="yatra-field-wrap">
                 <label for="<?php echo $pricing_option_id . '[maximum_pax]'; ?>"><?php echo __('Maximum People (Pax)', 'yatra') ?>
                     <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
-                          data-tippy-content="<?php echo __('Maximum number of people per booking for this pricing. Leave it blank to use this tour\'s maximum people (pax) ( From General & Date Settings ).', 'yatra') ?>"></span>
+                          data-tippy-content="<?php echo __('Maximum number of people per booking', 'yatra') ?>"></span>
                 </label>
                 <input value="<?php echo esc_attr($pricing ['maximum_pax']); ?>"
                        type="number"

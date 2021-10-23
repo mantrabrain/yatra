@@ -11,7 +11,7 @@
             />
 
             <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
-                  data-tippy-content="You can choose date range slot for availability."></span>
+                  data-tippy-content="You can change the date range to save below data."></span>
             <?php $availability_dates[] = $selected_dates; ?>
             <input autocomplete="off" class="widefat" id="yatra_availability_selected_date_ranges"
                    name="yatra_availability_selected_date_ranges"
@@ -22,7 +22,7 @@
         </div>
 
         <div class="yatra-field-wrap"><label
-                    for="yatra_availability[activate]">Activate</label>
+                    for="yatra_availability[activate]"><?php echo esc_html__('Activate', 'yatra') ?></label>
             <div class="yatra-switch-control-wrap">
                 <label class="yatra-switch-control">
                     <input class="widefat yatra_availability_activate"
@@ -33,7 +33,7 @@
                 </label>
             </div>
             <span class="yatra-tippy-tooltip dashicons dashicons-editor-help"
-                  data-tippy-content="Activate the following options to the date for selected tour."></span>
+                  data-tippy-content="<?php echo esc_attr__('Activate the following options to the date for selected tour. If you disable this option pricing settings will applied from tour pricing options.', 'yatra') ?>"></span>
         </div>
 
     </div>

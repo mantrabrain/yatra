@@ -181,7 +181,7 @@ class Yatra_Tour
 
         $pricing_type = isset($yatra_availability['pricing_type']) ? sanitize_text_field($yatra_availability['pricing_type']) : 'single';
 
-        $max_traveller = isset($yatra_availability['max_travellers']) ? absint($yatra_availability['max_travellers']) : 0;
+        $max_traveller = isset($yatra_availability['max_travellers']) ? yatra_maybeintempty($yatra_availability['max_travellers']) : '';
 
         $availability_for = isset($yatra_availability['availability_for']) ? sanitize_text_field($yatra_availability['availability_for']) : '';
 

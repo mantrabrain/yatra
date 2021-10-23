@@ -813,27 +813,15 @@ if (!function_exists('yatra_tour_general_configurations')) {
 
             ),
 
-            'yatra_tour_enable_max_num_of_traveller' => array(
-                'name' => 'yatra_tour_enable_max_num_of_traveller',
-                'title' => esc_html__('Enable max number of traveller', 'yatra'),
-                'type' => 'switch',
-                'description' => esc_html__('This option let you enable/disable total max number of traveller limit for this tour', 'yatra'),
-                //'wrap_class' => 'yatra-right',
-                //'row_end' => true,
-
-            ),
 
             'yatra_tour_maximum_number_of_traveller' => array(
                 'name' => 'yatra_tour_maximum_number_of_traveller',
                 'title' => esc_html__('Maximum number of traveller', 'yatra'),
-                'description' => esc_html__('Maximum number of traveller for this tour package.', 'yatra'),
+                'description' => esc_html__('Maximum number of traveller', 'yatra'),
                 'type' => 'number',
                 // 'wrap_class' => 'yatra-left',
                 'extra_attributes' => array(
                     'placeholder' => __('Maximum number of traveller for this tour package.', 'yatra'),
-                ),
-                'visibility_condition' => array(
-                    'yatra_tour_enable_max_num_of_traveller' => true
                 )
 
             ),

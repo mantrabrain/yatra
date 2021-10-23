@@ -264,7 +264,7 @@ class Yatra_Ajax
 
         }
 
-        $availability = Yatra_Core_Tour_Availability::get_availability($tour_id, $start_date, $end_date);
+         $availability = Yatra_Core_Tour_Availability::get_availability($tour_id, $start_date, $end_date);
 
         if (!is_wp_error($availability)) {
             echo json_encode($availability);
@@ -296,7 +296,8 @@ class Yatra_Ajax
             wp_send_json_error();
 
         }
-        Yatra_Core_Tour_Availability::get_day_wise_availability_form($tour_id, $start_date, $end_date, $content_only);
+
+         Yatra_Core_Tour_Availability::get_day_wise_availability_form($tour_id, $start_date, $end_date, $content_only);
 
         exit;
 
