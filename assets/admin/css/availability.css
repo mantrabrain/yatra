@@ -26,8 +26,8 @@
     right: 0;
     z-index: 999;
     padding: 20px;
-    top: -20px;
-    left: -20px;
+    top: 0;
+    left: 0;
     bottom: 0;
     border: 1px solid #aaa;
 }
@@ -432,7 +432,7 @@ body.yatra-popup-open {
     max-width: 25%;
     width: 25%;
     float: left;
-    margin-top: 54px;
+    margin-top: 52px;
     background: #fff;
     border: 1px solid #ddd;
 }
