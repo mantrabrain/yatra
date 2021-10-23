@@ -81,6 +81,7 @@ class Yatra_Core_Tour_Availability
 
     public static function get_availability($tour_id, $start_date, $end_date)
     {
+
         $fixed_departure = (boolean)get_post_meta($tour_id, 'yatra_tour_meta_tour_fixed_departure', true);
 
         $yatra_tour_availability = yatra_tour_meta_availability_date_ranges($tour_id);
@@ -114,11 +115,14 @@ class Yatra_Core_Tour_Availability
                 $tour_id
             );
 
+
             for ($i = $begin; $i <= $end; $i->modify('+1 day')) {
 
                 $single_date = $i->format("Y-m-d");
 
+
                 $all_responses[] = self::get_single_availability($single_date, $tour_id, $availability_data);
+
             }
         }
 
@@ -128,6 +132,9 @@ class Yatra_Core_Tour_Availability
 
     private static function get_single_availability($start_date, $tour_id, $availability_data)
     {
+
+        $current_date = date('Y-m-d');
+
         $response = array();
 
         $availability_data_index = str_replace(' ', '', ($start_date . '00:00:00_' . $start_date . '23:59:59'));
@@ -136,12 +143,19 @@ class Yatra_Core_Tour_Availability
 
         $is_active = isset($availability_data_array['active']) ? (boolean)$availability_data_array['active'] : false;
 
+        $max_travellers = isset($availability_data_array['max_travellers']) ? yatra_maybeintempty($availability_data_array['max_travellers']) : '';
+
+        $booked_travellers = isset($availability_data_array['booked_travellers']) ? yatra_maybeintempty($availability_data_array['booked_travellers']) : '';
+
         $availability = isset($availability_data_array['availability']) ? sanitize_text_field($availability_data_array['availability']) : 'booking';
 
         $availability_label = yatra_tour_availability_status($availability);
 
         $pricing = isset($availability_data_array['pricing']) ? $availability_data_array['pricing'] : array();
 
+        $is_full = $max_travellers <= $booked_travellers && $booked_travellers != '' & $max_travellers != '';
+
+        $is_expired = (strtotime($start_date) < strtotime($current_date));
 
         if ('' != $start_date) {
 
@@ -161,16 +175,25 @@ class Yatra_Core_Tour_Availability
 
                 $current_currency_symbol = '$';//yatra_get_current_currency_symbol();
 
+                $title = "{$pricing_label}: {$current_currency_symbol}{$final_pricing}";
+
+                if ($is_full) {
+                    $title = __('Booking Full', 'yatra');
+                }
+
                 $response = array(
-                    "title" => "{$pricing_label}: {$current_currency_symbol}{$final_pricing}",
+                    "title" => $title,
                     "start" => $start_date,
                     "description" => "<strong>{$availability_label}</strong><hr/>{$pricing_label}: {$current_currency_symbol}{$final_pricing}",
                     "is_active" => $is_active,
                     "availability" => $availability,
+                    'is_full' => $is_full,
+                    'is_expired' => $is_expired
 
 
                 );
             } else {
+
                 $title = '';
 
                 $description = "<strong>{$availability_label}</strong><hr/>";
@@ -194,13 +217,18 @@ class Yatra_Core_Tour_Availability
                     $description .= "{$pricing_label}&nbsp;:&nbsp; <strong style='float:right;'>{$current_currency_symbol}{$final_pricing}</strong> <br/> ";
 
                 }
+                if ($is_full) {
+                    $title = __('Booking Full', 'yatra');
+                }
                 $response = array(
                     "title" => $title,
-                    "event" => $title,
+                    //"event" => $title,
                     "start" => $start_date,
                     "description" => $description,
                     "is_active" => $is_active,
                     "availability" => $availability,
+                    'is_full' => $is_full,
+                    'is_expired' => $is_expired
 
 
                 );

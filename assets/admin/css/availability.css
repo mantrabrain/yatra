@@ -118,6 +118,11 @@
     background: #2f582b;
 }
 
+#yatra-availability-calendar .fc-event .fc-event-title.yatra-booking-full {
+    background: #e67e22;
+    text-align: center;
+}
+
 #yatra-availability-calendar .fc-daygrid-day-top {
     justify-content: space-between;
 }
@@ -401,4 +406,21 @@ body.yatra-popup-open {
     width: 100%;
     background: rgba(0, 0, 0, 0.2);
     content: "";
+}
+
+#yatra-availability-calendar td.yatra-expired-date {
+    position: relative;
+}
+
+#yatra-availability-calendar td.yatra-expired-date:before {
+    position: absolute;
+    content: "";
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 9;
 }

@@ -291,11 +291,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
 
 
-                    var active_class = info.event.extendedProps.is_active ? 'yatra-active-event' : 'yatra-inactive-event';
-                    active_class += ' yatra-availability-' + info.event.extendedProps.availability;
+                    var title_class = info.event.extendedProps.is_active ? 'yatra-active-event' : 'yatra-inactive-event';
+                    title_class += ' yatra-availability-' + info.event.extendedProps.availability;
+                    title_class += info.event.extendedProps.is_full ? ' yatra-booking-full' : ' ';
+
+                    var td_class = info.event.extendedProps.is_expired ? 'yatra-expired-date' : '';
+
                     // jQuery(info.el).closest('td').find('.yatra-cal-checkbox').prop('checked', true);
                     jQuery(info.el).find('.fc-event-title').html(info.event.title);
-                    jQuery(info.el).find('.fc-event-title').addClass(active_class);
+                    jQuery(info.el).find('.fc-event-title').addClass(title_class);
+                    jQuery(info.el).closest('td').addClass(td_class);
 
                 },
                 dayCellDidMount: function (info) {
