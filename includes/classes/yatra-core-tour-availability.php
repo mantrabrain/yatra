@@ -63,7 +63,14 @@ class Yatra_Core_Tour_Availability
         $id = isset($_GET['tour_id']) ? absint($_GET['tour_id']) : 27;
 
         echo '<div  id="yatra-availability-calendar-container">';
-        echo '<input type="text" value="' . esc_attr($id) . '" id="yatra-availability-calendar-tour-id"/>';
+        echo '<div class="yatra-availability-calendar-header">';
+        echo '<input type="hidden" value="' . esc_attr($id) . '" id="yatra-availability-calendar-tour-id"/>';
+        echo '<ul class="symbol">';
+        echo '<li class="yatra-tippy-tooltip booking" data-tippy-content="Available for booking">For Booking</li>';
+        echo '<li class="yatra-tippy-tooltip enquery" data-tippy-content="Available for enquiry only">For Enquiry Only</li>';
+        echo '<li class="yatra-tippy-tooltip not-available" data-tippy-content="Booking & enquiry not available">Not Available for Booking & Enquiry</li>';
+        echo '</ul>';
+        echo '</div>';
         echo '<div  id="yatra-availability-calendar">';
 
         echo '</div>';
@@ -265,7 +272,7 @@ class Yatra_Core_Tour_Availability
 
         $template = '';
 
-        $form_class = $active_status === false ? 'yatra-deactivate-form' : '';
+        $form_class = $active_status === false ? 'form yatra-deactivate-form' : 'form';
 
 
         ob_start();

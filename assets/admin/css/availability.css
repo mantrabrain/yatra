@@ -35,22 +35,71 @@
 #yatra-availability-calendar .fc-event .fc-event-title {
     padding: 2px 5px;
     border-radius: 0;
-    background: #246c1c;
+    background: #2f582b;
     color: white;
     display: inline-block;
     width: 100%;
 }
 
-#yatra-availability-calendar .fc-event .fc-event-title.fc-sticky.yatra-active-event {
-    background: #4cb111;
+#yatra-availability-calendar-container .yatra-availability-calendar-header {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
 }
 
-#yatra-availability-calendar .fc-event .fc-event-title.fc-sticky.yatra-availability-enquiry {
+#yatra-availability-calendar-container .yatra-availability-calendar-header ul {
+    display: flex;
+}
+
+#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li.active:before {
+
+    background-color: #4cb111;
+}
+
+#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li.booking:before {
+    background-color: #2f582b;
+}
+
+#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li.enquery:before {
+    background-color: #008bb5;
+}
+
+#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li.not-available:before {
+    background-color: #aaa;
+}
+
+#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li:before {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 8px;
+    background: #ddd;
+    margin: 0 10px;
+}
+
+#yatra-availability-calendar .fc-event .fc-event-title.yatra-active-event {
+}
+
+#yatra-availability-calendar .fc-event .fc-event-title.yatra-availability-enquiry {
     background: #008bb5;
 }
 
-#yatra-availability-calendar .fc-event .fc-event-title.fc-sticky.yatra-availability-none {
+#yatra-availability-calendar .fc-event .fc-event-title.yatra-availability-none {
     background: #aaa;
+}
+
+#yatra-availability-calendar .fc-event .fc-event-title.yatra-inactive-event {
+    background: #2f582b;
 }
 
 #yatra-availability-calendar .fc-daygrid-day-top {

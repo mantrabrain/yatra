@@ -144,6 +144,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 form.find('fieldset').removeClass('disablssssed');
             })
+            $("body").on('change', '.yatra_availability_activate', function () {
+                var form = $(this).closest('form');
+                if ($(this).is(':checked')) {
+                    form.removeClass('yatra-deactivate-form');
+                } else {
+                    form.addClass('yatra-deactivate-form');
+                }
+            });
+
         },
         closePopup: function () {
             $('#' + this.id).remove();
@@ -271,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
 
 
-                    var active_class = info.event.extendedProps.is_active ? 'yatra-active-event' : '';
+                    var active_class = info.event.extendedProps.is_active ? 'yatra-active-event' : 'yatra-inactive-event';
                     active_class += ' yatra-availability-' + info.event.extendedProps.availability;
                     // jQuery(info.el).closest('td').find('.yatra-cal-checkbox').prop('checked', true);
                     jQuery(info.el).find('.fc-event-title').html(info.event.title);
