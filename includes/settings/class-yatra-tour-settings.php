@@ -51,7 +51,10 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
         $dates_data = new Yatra_Dates($ID, $start_date, $end_date);
 
+        // If Date rage is one day ( 24 to 24 example ) then only get the date data else go for only  details only
+
         $all_date_data = $dates_data->getAllDateWiseData();
+
 
         if (count($all_date_data) < 1) {
 
@@ -61,7 +64,6 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
 
         echo '<pre>';
-        print_r($pricing);
         print_r($all_date_data);
         echo '</pre>';
     }
