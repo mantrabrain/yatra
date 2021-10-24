@@ -45,6 +45,9 @@ class Yatra_Template_Hooks
 
         $final_pricing = isset($final_pricing_array['pricing']) ? $final_pricing_array['pricing'] : array();
 
+        $settings = new Yatra_Tour_Options();
+
+        $settings->getPricing();
 
         yatra_get_template('parts/tour-booking-form.php',
             array(

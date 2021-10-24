@@ -261,21 +261,9 @@
   border: 2px solid #1abc9c;
   border-radius: 0; }
 
-.yatra-content-area .yatra-book-now-btn {
-  line-height: 1.5em;
-  padding: 10px 20px;
-  display: block;
-  width: 100%;
-  margin: 15px 0;
-  background: none;
-  border: 2px solid #1abc9c;
-  color: #484848;
-  font-size: 15px;
-  margin-left: 0;
-  border-radius: 0; }
-  .yatra-content-area .yatra-book-now-btn:hover {
-    background: #1abc9c;
-    color: #fff; }
+.yatra-content-area .yatra-book-now-btn:hover {
+  background: #1abc9c;
+  color: #fff; }
 
 .yatra-content-area .fa, .yatra-content-area .far, .yatra-content-area .fas {
   font-family: "Font Awesome 5 Free" !important;
@@ -362,24 +350,6 @@
 
 .yatra-page-wrapper .navigation.pagination {
   padding: 0 0 30px; }
-
-.yatra-page-wrapper .navigation .nav-links a,
-.yatra-page-wrapper .navigation .nav-links span.current,
-.yatra-page-wrapper .navigation .nav-links span.dots,
-.yatra-page-wrapper .bttn, .yatra-page-wrapper button {
-  background: blue;
-  color: #ffffff;
-  cursor: pointer;
-  /* Improves usability and consistency of cursor style between image-type 'input' and others */
-  font-size: 14px;
-  line-height: 13px;
-  height: 33px;
-  padding: 10px 15px;
-  font-weight: 400;
-  display: inline-block;
-  position: relative;
-  text-shadow: none;
-  border: 1px solid blue; }
 
 .yatra-page-wrapper .navigation .nav-links span.current,
 .yatra-page-wrapper .navigation .nav-links span.dots {

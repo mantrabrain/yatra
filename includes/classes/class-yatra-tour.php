@@ -72,8 +72,8 @@ class Yatra_Tour
         if (is_array($multiple_pricing)) {
             if (count($multiple_pricing) > 0) {
                 foreach ($multiple_pricing as $pricing_id => $pricing) {
-                    $variable_group_size = $pricing['price_per'] === '' ? $meta_group_size : $pricing['group_size'];
-                    $variable_pricing_per = $pricing['price_per'] === '' ? $meta_price_per : $pricing['price_per'];
+                    $variable_group_size = $pricing['pricing_per'] === '' ? $meta_group_size : $pricing['group_size'];
+                    $variable_pricing_per = $pricing['pricing_per'] === '' ? $meta_price_per : $pricing['pricing_per'];
                     $variable_minimum_pax = $pricing['minimum_pax'] == '' ? $meta_minimum_pax : $pricing['minimum_pax'];
                     $variable_maximum_pax = $pricing['maximum_pax'] == '' ? $meta_maximum_pax : $pricing['maximum_pax'];
                     $regular_price = $pricing['regular_price'];
@@ -399,7 +399,12 @@ class Yatra_Tour
             return $this->get_availability_pricing($number_of_people, $start_date, $end_date);
         } else {
 
-            return $this->get_pricing($number_of_people);
+            $pricing = array();
+
+            $pricing[trim($start_date . '00:00:00_' . trim($end_date) . '23:59:59')]['pricing'] = $this->get_pricing($number_of_people);
+
+            return $pricing;
+
         }
     }
 

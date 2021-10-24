@@ -111,7 +111,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                     'maximum_pax' => '',
                     'regular_price' => '',
                     'sales_price' => '',
-                    'price_per' => '',
+                    'pricing_per' => '',
                     'group_size' => ''
 
                 )
@@ -125,7 +125,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                     'maximum_pax' => '',
                     'regular_price' => '',
                     'sales_price' => '',
-                    'price_per' => '',
+                    'pricing_per' => '',
                     'group_size' => ''
                 );
             // Load Original Data
@@ -422,7 +422,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                     $description = isset($pricing['pricing_description']) ? sanitize_text_field($pricing['pricing_description']) : '';
                     $minimum_pax = isset($pricing['minimum_pax']) ? yatra_maybeintempty($pricing['minimum_pax']) : '';
                     $maximum_pax = isset($pricing['maximum_pax']) ? yatra_maybeintempty($pricing['maximum_pax']) : '';
-                    $price_per = isset($pricing['price_per']) ? sanitize_text_field($pricing['price_per']) : '';
+                    $price_per = isset($pricing['pricing_per']) ? sanitize_text_field($pricing['pricing_per']) : '';
                     $group_size = isset($pricing['group_size']) ? yatra_maybeintempty($pricing['group_size']) : '';
                     $regular_price = isset($pricing['regular_price']) ? absint($pricing['regular_price']) : '';
                     $sales_price = isset($pricing['sales_price']) ? ($pricing['sales_price']) : '';
@@ -433,7 +433,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                         $pricing_array[$pricing_key]['pricing_description'] = $description;
                         $pricing_array[$pricing_key]['minimum_pax'] = $minimum_pax;
                         $pricing_array[$pricing_key]['maximum_pax'] = $maximum_pax;
-                        $pricing_array[$pricing_key]['price_per'] = $price_per;
+                        $pricing_array[$pricing_key]['pricing_per'] = $price_per;
                         $pricing_array[$pricing_key]['group_size'] = $group_size;
                         $pricing_array[$pricing_key]['regular_price'] = $regular_price;
                         $pricing_array[$pricing_key]['sales_price'] = $sales_price;

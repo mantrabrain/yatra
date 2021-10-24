@@ -49,11 +49,11 @@
         </div>
 
         <div class="yatra-field-wrap">
-            <label for="<?php echo $pricing_option_id . '[price_per]'; ?>"><?php echo __('Price Per', 'yatra') ?></label>
+            <label for="<?php echo $pricing_option_id . '[pricing_per]'; ?>"><?php echo __('Price Per', 'yatra') ?></label>
             <select
                     class="widefat yatra_multiple_pricing_price_per"
-                    id="<?php echo $pricing_option_id . '[price_per]'; ?>"
-                    name="<?php echo $pricing_option_id . '[price_per]'; ?>">
+                    id="<?php echo $pricing_option_id . '[pricing_per]'; ?>"
+                    name="<?php echo $pricing_option_id . '[pricing_per]'; ?>">
                 <?php
                 $price_per_array = array(
                     '' => __('Use Tours price Per', 'yatra'),
@@ -63,14 +63,14 @@
 
                 foreach ($price_per_array as $group_id => $group_label) {
                     ?>
-                    <option <?php selected($multiple_pricing ['price_per'], $group_id) ?>
+                    <option <?php selected($multiple_pricing ['pricing_per'], $group_id) ?>
                             value="<?php echo esc_attr($group_id) ?>"><?php echo esc_html($group_label) ?></option>
                 <?php } ?>
 
 
             </select>
         </div>
-        <div class="yatra-field-wrap <?php echo $multiple_pricing ['price_per'] === 'group' ? '' : 'yatra-hide'; ?> yatra_multiple_pricing_group_size">
+        <div class="yatra-field-wrap <?php echo $multiple_pricing ['pricing_per'] === 'group' ? '' : 'yatra-hide'; ?> yatra_multiple_pricing_group_size">
             <label for="<?php echo $pricing_option_id . '[group_size]'; ?>"><?php echo __('Group Size', 'yatra') ?></label>
             <input value="<?php echo esc_attr($multiple_pricing ['group_size']); ?>"
                    type="number"

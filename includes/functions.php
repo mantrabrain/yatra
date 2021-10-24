@@ -999,3 +999,20 @@ if (!function_exists('yatra_parse_args')) {
         return $final_parsed;
     }
 }
+
+if (!function_exists('yatra_get_pricing_type')) {
+
+    function yatra_get_pricing_type($tourID)
+    {
+        $multiple_pricing = get_post_meta($tourID, 'yatra_multiple_pricing', true);
+
+        if (is_array($multiple_pricing)) {
+
+            if (count($multiple_pricing) > 0) {
+
+                return 'multi';
+            }
+        }
+        return 'single';
+    }
+}

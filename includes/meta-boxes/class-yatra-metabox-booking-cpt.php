@@ -105,7 +105,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
                             foreach ($yatra_multiple_pricing as $pricing_id => $pricing) {
 
-                                $variable_pricing_per = isset($pricing['price_per']) ? $pricing['price_per'] : '';
+                                $variable_pricing_per = isset($pricing['pricing_per']) ? $pricing['pricing_per'] : '';
                                 $variable_group_size = isset($pricing['group_size']) ? $pricing['group_size'] : '';
                                 $variable_group_size = $variable_pricing_per == '' ? absint($yatra_tour_meta_group_size) : absint($variable_group_size);
                                 $variable_group_size = $variable_group_size == 0 ? 1 : $variable_group_size;

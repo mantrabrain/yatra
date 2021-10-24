@@ -1153,7 +1153,7 @@ if (!function_exists('yatra_tour_additional_info')) {
             $tour_duration_string = $yatra_tour_meta_tour_start_date . ' to ' . $yatra_tour_meta_tour_end_date;
         }
         $additional_info = array(
-            'price_per' => ucwords($yatra_tour_meta_price_per),
+            'pricing_per' => ucwords($yatra_tour_meta_price_per),
             'group_size' => $yatra_tour_meta_group_size,
             'price' => $price_string,
             'tour_duration' => $tour_duration_string,

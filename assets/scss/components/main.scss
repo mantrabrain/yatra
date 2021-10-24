@@ -31,17 +31,6 @@
   }
 
   .yatra-book-now-btn {
-    line-height: 1.5em;
-    padding: 10px 20px;
-    display: block;
-    width: 100%;
-    margin: 15px 0;
-    background: none;
-    border: 2px solid #1abc9c;
-    color: #484848;
-    font-size: 15px;
-    margin-left: 0;
-    border-radius: 0;
 
 
     &:hover {
@@ -175,19 +164,7 @@
   .navigation .nav-links span.current,
   .navigation .nav-links span.dots,
   .bttn, button {
-    background: blue;
-    color: #ffffff;
-    cursor: pointer;
-    /* Improves usability and consistency of cursor style between image-type 'input' and others */
-    font-size: 14px;
-    line-height: 13px;
-    height: 33px;
-    padding: 10px 15px;
-    font-weight: 400;
-    display: inline-block;
-    position: relative;
-    text-shadow: none;
-    border: 1px solid blue;
+  
   }
 
   .navigation .nav-links span.current,
