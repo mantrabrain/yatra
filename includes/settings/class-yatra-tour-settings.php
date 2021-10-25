@@ -45,27 +45,18 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
         $this->attributes = $attributes->getAllAtributes();
 
-        $start_date = '2021-10-24';
+        $start_date = '2021-10-25';
 
-        $end_date = '2021-10-24';
+        $end_date = '2021-10-25';
 
         $dates_data = new Yatra_Dates($ID, $start_date, $end_date);
 
-        // If Date rage is one day ( 24 to 24 example ) then only get the date data else go for only  details only
-
         $all_date_data = $dates_data->getAllDateWiseData();
-
-
-        if (count($all_date_data) < 1) {
-
-            $pricing = new Yatra_Pricing($ID);
-
-        }
-
 
         echo '<pre>';
         print_r($all_date_data);
         echo '</pre>';
+
     }
 }
 

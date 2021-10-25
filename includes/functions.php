@@ -1016,3 +1016,54 @@ if (!function_exists('yatra_get_pricing_type')) {
         return 'single';
     }
 }
+
+if (!function_exists('yatra_get_tour_base_multiple_pricing')) {
+
+    function yatra_get_tour_base_multiple_pricing($tourID, $override_overridable_fields_from_base = false)
+    {
+        $multiple_pricing = get_post_meta($tourID, 'yatra_multiple_pricing', true);
+
+        if (is_array($multiple_pricing)) {
+
+            if ($override_overridable_fields_from_base) {
+
+                $base_pricing = yatra_get_tour_base_single_pricing($tourID);
+
+                foreach ($multiple_pricing as $pricing_id => $pricing) {
+                    $multiple_pricing[$pricing_id]['group_size'] = $pricing['pricing_per'] === '' ? $base_pricing['group_size'] : $pricing['group_size'];
+                    $multiple_pricing[$pricing_id]['pricing_per'] = $pricing['pricing_per'] === '' ? $base_pricing['pricing_per'] : $pricing['pricing_per'];
+                    $multiple_pricing[$pricing_id]['minimum_pax'] = $pricing['minimum_pax'] === '' ? $base_pricing['minimum_pax'] : $pricing['minimum_pax'];
+                    $multiple_pricing[$pricing_id]['maximum_pax'] = $pricing['maximum_pax'] === '' ? $base_pricing['maximum_pax'] : $pricing['maximum_pax'];
+
+                }
+
+            }
+            return $multiple_pricing;
+        }
+        return array();
+    }
+}
+
+if (!function_exists('yatra_get_tour_base_single_pricing')) {
+
+    function yatra_get_tour_base_single_pricing($tourID, $pricing_key = null)
+    {
+        $pricing = array();
+        $pricing['regular_price'] = get_post_meta($tourID, 'yatra_tour_meta_regular_price', true);
+        $pricing['sales_price'] = get_post_meta($tourID, 'yatra_tour_meta_sales_price', true);
+        $pricing['pricing_label'] = sanitize_text_field(get_post_meta($tourID, 'yatra_tour_meta_pricing_label', true));
+        $pricing['pricing_description'] = sanitize_text_field(get_post_meta($tourID, 'yatra_tour_meta_pricing_description', true));
+        $pricing['pricing_per'] = get_post_meta($tourID, 'yatra_tour_meta_price_per', true);
+        $pricing['group_size'] = get_post_meta($tourID, 'yatra_tour_meta_group_size', true);
+        $pricing['minimum_pax'] = get_post_meta($tourID, 'yatra_tour_minimum_pax', true);
+        $pricing['maximum_pax'] = get_post_meta($tourID, 'yatra_tour_maximum_pax', true);
+        if (!is_null($pricing_key)) {
+
+            if (isset($pricing[$pricing_key])) {
+
+                return $pricing[$pricing_key];
+            }
+        }
+        return $pricing;
+    }
+}

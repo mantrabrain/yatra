@@ -39,6 +39,8 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
 
     public function map($date_wise_data = array(), $multiple_pricing = array(), $pricing_label = '', $pricing_description = '')
     {
+        $pricing_instance = new Yatra_Pricing();
+
         foreach ($date_wise_data as $index => $value) {
 
             if (property_exists($this, $index)) {
@@ -46,8 +48,6 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
                 if ($index === "pricing") {
 
                     $pricing_value_array = $this->map_pricing($value, $multiple_pricing, $pricing_label, $pricing_description);
-
-                    $pricing_instance = new Yatra_Pricing();
 
                     $tour_id = isset($date_wise_data->tour_id) ? $date_wise_data->tour_id : '';
 
@@ -58,6 +58,7 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
                 $this->$index = $value;
             }
         }
+
         return $this;
 
     }

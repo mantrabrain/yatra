@@ -25,16 +25,18 @@ class Yatra_Dates
             'tour_id' => $tourID
         );
 
-        $this->multiple_pricing = get_post_meta($tourID, 'yatra_multiple_pricing', true);
+        $this->multiple_pricing = yatra_get_tour_base_multiple_pricing($tourID);
 
-        $this->multiple_pricing = !is_array($this->multiple_pricing) ? array() : $this->multiple_pricing;
+        $this->pricing_label = yatra_get_tour_base_single_pricing($tourID, 'pricing_label');
 
-        $this->pricing_label = get_post_meta($tourID, 'yatra_tour_meta_pricing_label', true);
-
-        $this->pricing_description = get_post_meta($tourID, 'yatra_tour_meta_pricing_description', true);
+        $this->pricing_description = yatra_get_tour_base_single_pricing($tourID, 'pricing_description');
 
         $this->all_date_wise_data = Yatra_Core_DB::get_data('tour_dates', '', $where);
 
+
+        if (count($this->all_date_wise_data) < 1) {
+
+        }
 
     }
 
@@ -43,9 +45,10 @@ class Yatra_Dates
 
         $all_processed_data = array();
 
-        foreach ($this->all_date_wise_data as $single_data_row) {
 
-            $tour_dates = new Yatra_Tour_Dates();
+        $tour_dates = new Yatra_Tour_Dates();
+
+        foreach ($this->all_date_wise_data as $single_data_row) {
 
             $all_processed_data[] = $tour_dates->map($single_data_row, $this->multiple_pricing, $this->pricing_label, $this->pricing_description);
 
