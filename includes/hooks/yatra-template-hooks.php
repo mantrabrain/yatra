@@ -45,15 +45,14 @@ class Yatra_Template_Hooks
 
         $final_pricing = isset($final_pricing_array['pricing']) ? $final_pricing_array['pricing'] : array();
 
+        //echo current_time('timestamp')."<br/>";
         $settings = new Yatra_Tour_Options(get_the_ID(), $start, $end);
 
         $pricing = $settings->getPricing();
         $pricing_type = $settings->getPricingType();
 
-        echo '<pre>';
-        print_r($pricing_type);
-        print_r($pricing);
-        echo '</pre>';
+        //echo current_time('timestamp');
+
 
         yatra_get_template('parts/tour-booking-form.php',
             array(

@@ -1,7 +1,8 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
+
 interface Yatra_Tour_Dates_Interface
 {
     public function getID();
@@ -24,18 +25,18 @@ interface Yatra_Tour_Dates_Interface
 
     public function isActive();
 
-    public function availabilityFor();
+    public function getAvailabilityFor();
 
-    public function noteToCustomer();
+    public function getNoteToCustomer();
 
-    public function noteToAdmin();
+    public function getNoteToAdmin();
 
-    public function createdBy();
+    public function getCreatedBy();
 
-    public function updatedBy();
+    public function getUpdatedBy();
 
-    public function createdAt();
+    public function getCreatedAt();
 
-    public function updatedAt();
+    public function getUpdatedAt();
 
 }

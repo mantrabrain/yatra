@@ -69,12 +69,11 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
             $this->maximumNumberOfTravellers = $all_date_data->getMaxTravellers();
 
-            $this->availabilityFor = $all_date_data->availabilityFor();
+            $this->availabilityFor = $all_date_data->getAvailabilityFor();
 
-        } else {
-
-            $this->allDynamicDataByDateRange = $all_date_data;
         }
+
+        $this->allDynamicDataByDateRange = $all_date_data;
 
         $this->tourData = Yatra_Dates::getSingleTourData($ID);
 
@@ -104,6 +103,7 @@ class Yatra_Tour_Options extends Yatra_Tour_Settings
                 return $this->allDynamicDataByDateRange[$date_index];
             }
         }
+        return $this->allDynamicDataByDateRange;
     }
 
     public function isFixedDeparture()

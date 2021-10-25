@@ -1,7 +1,8 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
+
 class Yatra_Tour_Dates extends Yatra_Tour_Dates_Abstract
 {
 
@@ -55,37 +56,37 @@ class Yatra_Tour_Dates extends Yatra_Tour_Dates_Abstract
         return $this->active;
     }
 
-    public function availabilityFor()
+    public function getAvailabilityFor()
     {
         return $this->availability;
     }
 
-    public function noteToCustomer()
+    public function getNoteToCustomer()
     {
         return $this->note_to_customer;
     }
 
-    public function noteToAdmin()
+    public function getNoteToAdmin()
     {
         return $this->note_to_admin;
     }
 
-    public function createdBy()
+    public function getCreatedBy()
     {
         return $this->created_by;
     }
 
-    public function updatedBy()
+    public function getUpdatedBy()
     {
         return $this->updated_by;
     }
 
-    public function createdAt()
+    public function getCreatedAt()
     {
         return $this->created_at;
     }
 
-    public function updatedAt()
+    public function getUpdatedAt()
     {
         return $this->updated_at;
     }

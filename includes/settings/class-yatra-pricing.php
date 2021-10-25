@@ -126,7 +126,7 @@ class Yatra_Pricing
             'pricing_per' => $base_pricing['pricing_per'],
             'group_size' => $base_pricing['group_size'],
             'number_of_person' => $number_of_person,
-            'regular_price' => $regular_price * $person_count,
+            'regular_price' => $regular_price,
             'sales_price' => $sales_price,
             'final_price' => $final_price * $person_count
         );

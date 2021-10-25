@@ -782,7 +782,7 @@ if (!function_exists('yatra_maybe_json_decode')) {
             return array();
         }
         if (is_array($var)) {
-            
+
             return $var;
         }
         return json_decode($var, $assoc);
@@ -1056,6 +1056,8 @@ if (!function_exists('yatra_get_tour_base_single_pricing')) {
         $pricing['regular_price'] = get_post_meta($tourID, 'yatra_tour_meta_regular_price', true);
         $pricing['sales_price'] = get_post_meta($tourID, 'yatra_tour_meta_sales_price', true);
         $pricing['pricing_label'] = sanitize_text_field(get_post_meta($tourID, 'yatra_tour_meta_pricing_label', true));
+
+        $pricing['pricing_label'] = $pricing['pricing_label'] ? $pricing['pricing_label'] : __('Guest', 'yatra');
         $pricing['pricing_description'] = sanitize_text_field(get_post_meta($tourID, 'yatra_tour_meta_pricing_description', true));
         $pricing['pricing_per'] = get_post_meta($tourID, 'yatra_tour_meta_price_per', true);
         $pricing['group_size'] = get_post_meta($tourID, 'yatra_tour_meta_group_size', true);

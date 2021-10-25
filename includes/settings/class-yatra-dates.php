@@ -47,6 +47,7 @@ class Yatra_Dates
             return $this->getSingleTourData($this->tour_id);
         }
 
+
         foreach ($this->all_date_wise_data as $single_data_row) {
 
             $tour_dates = new Yatra_Tour_Dates();
@@ -56,17 +57,13 @@ class Yatra_Dates
             $all_processed_data[$single_date_wise_index] = $tour_dates->map($single_data_row);
 
         }
+
         $date_wise_index = str_replace(' ', '', trim($this->start_date . '_' . $this->end_date));
 
-
         if (isset($all_processed_data[$date_wise_index])) {
+            
+            return $all_processed_data[$date_wise_index];
 
-            if ((boolean)$all_processed_data[$date_wise_index]->isActive()) {
-
-                return $all_processed_data[$date_wise_index];
-
-            }
-            return $this->getSingleTourData($this->tour_id);
         }
         return $all_processed_data;
     }
