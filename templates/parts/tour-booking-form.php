@@ -1,3 +1,6 @@
+<?php
+/* @var Yatra_Tour_Dates $yatra_booking_pricing_info */
+?>
 <form method="post" id="yatra-tour-booking-form-fields" action="<?php echo admin_url('admin-ajax.php') ?>">
 
     <input type="hidden" name="action" value="yatra_tour_add_to_cart"/>
@@ -5,64 +8,27 @@
     <input type="hidden" name="tour_id" value="<?php echo get_the_ID(); ?>"/>
     <?php
 
-    $currency_symbol = yatra_get_current_currency_symbol();
-    foreach ($yatra_booking_pricing_info as $pricing_id => $booking_pricing_args) { ?>
+    $pricing = $yatra_booking_pricing_info->getPricing();;
+    if ($pricing instanceof Yatra_Tour_Pricing) {
 
-        <div class="yatra-form-fields">
-            <div class="yatra-traveler-info-wrap">
-                <div class="yatra-traveler-number">
-                    <div class="yatra-traveler-number-inner">
+        yatra_get_template('parts/booking-pricing-item.php',
+            array(
+                'pricing_type' => $pricing_type,
+                'yatra_booking_pricing' => $pricing,
+            )
+        );
+    } else {
 
-                        <div class="yatra-nice-input-number">
-                            <button type="button" class="fa fa-minus nice-button minus-button"></button>
-                            <?php
-                            $field_name = $pricing_type === "multi" ? "yatra_number_of_person[multi_pricing][{$pricing_id}]" : "yatra_number_of_person[single_pricing]"; ?>
-                            <input readonly
-                                   data-step="1"
-                                   data-max="<?php echo $booking_pricing_args['maximum_pax'] == '' ? 9999 : absint($booking_pricing_args['maximum_pax']) ?>"
-                                   data-min="<?php echo $booking_pricing_args['minimum_pax'] == '' ? 0 : absint($booking_pricing_args['minimum_pax']) ?>"
-                                   id="<?php echo esc_attr($field_name) ?>"
-                                   type="number"
-                                   name="<?php echo esc_attr($field_name) ?>"
-                                   value="<?php echo $booking_pricing_args['minimum_pax'] == '' ? 1 : absint($booking_pricing_args['minimum_pax']) ?>"
-                            />
-                            <button type="button" class="fa fa-plus nice-button plus-button"></button>
+        foreach ($pricing as $booking_pricing_args) {
+            yatra_get_template('parts/booking-pricing-item.php',
+                array(
+                    'pricing_type' => $pricing_type,
+                    'yatra_booking_pricing' => $booking_pricing_args,
+                )
+            );
+        }
+    }
 
-                        </div>
-
-                    </div>
-                    <span><?php echo esc_html($booking_pricing_args['pricing_label']) ?></span>
-                </div>
-                <div class="yatra-traveler-price">
-                    <?php
-                    if ($booking_pricing_args['regular_price'] != '') { ?>
-                        <del><?php echo esc_html(yatra_get_price($currency_symbol, $booking_pricing_args['regular_price'])) ?></del>
-                    <?php } ?>
-                    <ins><?php
-
-
-                        echo esc_html(yatra_get_price($currency_symbol, $booking_pricing_args['final_price']));
-
-
-                        ?></ins>
-                    <?php
-                    if (strtolower($booking_pricing_args['pricing_per']) == 'group') {
-
-                        $pricing_per_string = yatra_get_price($currency_symbol, $booking_pricing_args['sales_price']) . ' Per ' . $booking_pricing_args['group_size'] . ' ' . $booking_pricing_args['pricing_label'];
-                    } else {
-
-                        $pricing_per_string = yatra_get_price($currency_symbol, $booking_pricing_args['sales_price']) . ' Per ' . $booking_pricing_args['pricing_label'];
-                    }
-
-                    if ($booking_pricing_args['pricing_description'] != '') {
-                        ?>
-                        <span class="yatra-booking-pricing-desc"><?php echo esc_html($booking_pricing_args['pricing_description']); ?></span>
-                    <?php } ?>
-                    <span class="yatra-booking-pricing-info"><?php echo esc_html($pricing_per_string); ?></span>
-                </div>
-            </div>
-        </div>
-    <?php }
     yatra_book_now_button()
     ?>
 

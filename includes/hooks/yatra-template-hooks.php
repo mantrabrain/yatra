@@ -45,19 +45,32 @@ class Yatra_Template_Hooks
 
         $final_pricing = isset($final_pricing_array['pricing']) ? $final_pricing_array['pricing'] : array();
 
-        //echo current_time('timestamp')."<br/>";
-        $settings = new Yatra_Tour_Options(get_the_ID(), $start, $end);
+        $yatra_tour_options = new Yatra_Tour_Options(get_the_ID(), $start, $end);
 
-        $pricing = $settings->getPricing();
-        $pricing_type = $settings->getPricingType();
+        $dynamicData = ($yatra_tour_options->getAllDynamicDataByDateRange());
+
+        if (!$dynamicData instanceof Yatra_Tour_Dates) {
+
+            $dynamicData = $yatra_tour_options->getTourData();
+        } else {
+
+            $dynamicData = (boolean)$dynamicData->isActive() ? $dynamicData : $yatra_tour_options->getTourData();
+        }
+
+
+        //$yatra_tour_options->get
+
+        $pricing = $yatra_tour_options->getPricing();
+        
+        $pricing_type = $yatra_tour_options->getPricingType();
 
         //echo current_time('timestamp');
 
 
         yatra_get_template('parts/tour-booking-form.php',
             array(
-                'pricing_type' => yatra()->tour->get_pricing_type(),
-                'yatra_booking_pricing_info' => $final_pricing,
+                'pricing_type' => $dynamicData->getPricingType(),
+                'yatra_booking_pricing_info' => $dynamicData,
             )
         );
 
