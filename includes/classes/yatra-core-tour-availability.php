@@ -144,19 +144,21 @@ class Yatra_Core_Tour_Availability
     {
         $date_index = str_replace(' ', '', trim($start_date . '00:00:00_' . $start_date . '23:59:59'));
 
+        $todayDataSettings = null;
+
         if ($settings instanceof Yatra_Tour_Dates) {
 
             $todayDataSettings = $settings;
 
         } else if (is_array($settings) && isset($settings[$date_index])) {
 
-            $todayDataSetting = $settings[$date_index];
+            $todayDataSettings = $settings[$date_index];
 
         }
 
-        if ($todayDataSetting instanceof Yatra_Tour_Dates) {
+        if ($todayDataSettings instanceof Yatra_Tour_Dates) {
 
-            $todayData = (boolean)$todayDataSetting->isActive() ? $todayDataSetting : $tourData;
+            $todayData = (boolean)$todayDataSettings->isActive() ? $todayDataSettings : $tourData;
 
         } else {
 
@@ -184,7 +186,7 @@ class Yatra_Core_Tour_Availability
         $availability_label = yatra_tour_availability_status($availability);
 
         $pricing = $todayData->getPricing();
-        
+
         $is_full = $max_travellers <= $booked_travellers && $booked_travellers != '' & $max_travellers != '';
 
         $is_expired = (strtotime($start_date) < strtotime($current_date));
@@ -336,10 +338,16 @@ class Yatra_Core_Tour_Availability
             'tour_id' => $tour_id,
             'yatra_availability' => $yatra_availability
         ));
-        foreach ($pricings as $pricing_option_id => $pricing) {
 
-            if ($pricing instanceof Yatra_Tour_Pricing) {
-                self::load_pricing($pricing, $currency);
+        if ($pricings instanceof Yatra_Tour_Pricing) {
+            self::load_pricing($pricings, $currency);
+
+        } else {
+            foreach ($pricings as $pricing_option_id => $pricing) {
+
+                if ($pricing instanceof Yatra_Tour_Pricing) {
+                    self::load_pricing($pricing, $currency);
+                }
             }
         }
 
