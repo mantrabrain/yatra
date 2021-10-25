@@ -22,7 +22,7 @@ abstract class Yatra_Tour_Pricing_Abstract implements Yatra_Tour_Pricing_Interfa
 
     protected $maximum_pax;
 
-    public function map($pricing, $pricing_type, $pricing_id = 0)
+    public function map($pricing, $pricing_id = 0)
     {
         foreach ($pricing as $index => $value) {
 

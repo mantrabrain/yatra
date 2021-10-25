@@ -47,7 +47,13 @@ class Yatra_Template_Hooks
 
         $settings = new Yatra_Tour_Options();
 
-        $settings->getPricing();
+        $pricing = $settings->getPricing();
+        $pricing_type = $settings->getPricingType();
+
+        echo '<pre>';
+        print_r($pricing_type);
+        print_r($pricing);
+        echo '</pre>';
 
         yatra_get_template('parts/tour-booking-form.php',
             array(

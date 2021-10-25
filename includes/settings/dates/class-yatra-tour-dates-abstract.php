@@ -37,7 +37,7 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
     protected $updated_at;
 
 
-    public function map($date_wise_data = array(), $multiple_pricing = array(), $pricing_label = '', $pricing_description = '')
+    public function map($date_wise_data = array())
     {
         $pricing_instance = new Yatra_Pricing();
 
@@ -47,7 +47,8 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
 
                 if ($index === "pricing") {
 
-                    $pricing_value_array = $this->map_pricing($value, $multiple_pricing, $pricing_label, $pricing_description);
+                    $pricing_value_array = yatra_maybe_json_decode($value);
+
 
                     $tour_id = isset($date_wise_data->tour_id) ? $date_wise_data->tour_id : '';
 
@@ -63,41 +64,4 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
 
     }
 
-    private function map_pricing($value, $multiple_pricing, $pricing_label, $pricing_description)
-    {
-        $pricing_value_array = yatra_maybe_json_decode($value);
-
-        if (count($multiple_pricing) < 1) {
-
-
-            $pricing_value_array['pricing_label'] = $pricing_label;
-
-            $pricing_value_array['pricing_description'] = $pricing_description;
-
-            return $pricing_value_array;
-
-        } else {
-
-            $pricing_value_array_multiple = array();
-
-            foreach ($multiple_pricing as $pricing_id => $pricing) {
-
-                if (isset($pricing_value_array[$pricing_id])) {
-
-                    $pricing = $pricing_value_array[$pricing_id];
-
-                    $pricing['pricing_label'] = $multiple_pricing[$pricing_id]['pricing_label'];
-
-                    $pricing['pricing_description'] = $multiple_pricing[$pricing_id]['pricing_description'];
-
-
-                }
-
-                $pricing_value_array_multiple[$pricing_id] = $pricing;
-            }
-            return $pricing_value_array_multiple;
-        }
-
-
-    }
 }

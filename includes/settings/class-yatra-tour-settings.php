@@ -9,7 +9,7 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 {
     protected $isFixedDeparture;
 
-    protected $availabilityDateRanges = array();
+    protected $availabilityDateRanges;
 
     protected $countries = array();
 
@@ -17,7 +17,13 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
     protected $maximumNumberOfTravellers;
 
+    protected $bookedTravellers;
+
+    protected $availabilityFor;
+
     protected $pricing;
+
+    protected $pricingType;
 
     protected $attributes;
 
@@ -51,11 +57,19 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
         $dates_data = new Yatra_Dates($ID, $start_date, $end_date);
 
-        $all_date_data = $dates_data->getAllDateWiseData();
+        $all_date_data = $dates_data->getAllTourData();
 
-        echo '<pre>';
-        print_r($all_date_data);
-        echo '</pre>';
+        if ($all_date_data instanceof Yatra_Tour_Dates) {
+
+            $this->pricing = $all_date_data->getPricing();
+
+            $this->pricingType = $all_date_data->getPricingType();
+
+            $this->maximumNumberOfTravellers = $all_date_data->getMaxTravellers();
+
+            $this->availabilityFor = $all_date_data->availabilityFor();
+
+        }
 
     }
 }
@@ -95,12 +109,12 @@ class Yatra_Tour_Options extends Yatra_Tour_Settings
 
     public function getBookedTravellers()
     {
-        // TODO: Implement getBookedTravellers() method.
+        return $this->bookedTravellers;
     }
 
     public function getAvailabilityFor()
     {
-        // TODO: Implement getAvailabilityFor() method.
+        return $this->availabilityFor;
     }
 
     public function getPricing()
@@ -110,7 +124,8 @@ class Yatra_Tour_Options extends Yatra_Tour_Settings
 
     public function getPricingType()
     {
-        // TODO: Implement getPricingType() method.
+
+        return $this->pricingType;
     }
 
     public function getAttributes()

@@ -12,11 +12,12 @@ class Yatra_Pricing
     {
         $pricing_array = $this->getPricing($tourID);
 
-        $yatra_tour_pricing = new Yatra_Tour_Pricing();
 
         $base_pricing_type = yatra_get_pricing_type($tourID);
 
         if ($base_pricing_type === "single") {
+
+            $yatra_tour_pricing = new Yatra_Tour_Pricing();
 
             return $yatra_tour_pricing->map($pricing_array, $base_pricing_type);
         } else {
@@ -24,6 +25,8 @@ class Yatra_Pricing
             $pricing_instance = array();
 
             foreach ($pricing_array as $pricing_id => $pricing) {
+
+                $yatra_tour_pricing = new Yatra_Tour_Pricing();
 
                 $pricing_instance[] = $yatra_tour_pricing->map($pricing, $base_pricing_type, $pricing_id);
             }
@@ -39,19 +42,25 @@ class Yatra_Pricing
 
         $datewise_pricing_array = $base_pricing_type === "multi" ? $this->getMultiplePricing($tour_id, null, $datewise_pricing_array) : $this->getSinglePricing($datewise_pricing_array);
 
-        $yatra_tour_pricing = new Yatra_Tour_Pricing();
 
         if ($base_pricing_type === "single") {
 
-            return $yatra_tour_pricing->map($datewise_pricing_array, $base_pricing_type);
+            $yatra_tour_pricing = new Yatra_Tour_Pricing();
+
+            return $yatra_tour_pricing->map($datewise_pricing_array);
+
         } else {
+
 
             $pricing_instance = array();
 
             foreach ($datewise_pricing_array as $pricing_id => $pricing) {
 
-                $pricing_instance[] = $yatra_tour_pricing->map($pricing, $base_pricing_type, $pricing_id);
+                $yatra_tour_pricing = new Yatra_Tour_Pricing();
+
+                $pricing_instance[] = $yatra_tour_pricing->map($pricing, $pricing_id);
             }
+
             return $pricing_instance;
         }
 
@@ -74,16 +83,16 @@ class Yatra_Pricing
 
     private function getMultiplePricing($tourID, $number_of_people = null, $date_wise_pricing = array())
     {
-
         $base_multiple_pricing = yatra_get_tour_base_multiple_pricing($tourID, true);
 
         $final_pricing_details = array();
+
 
         foreach ($base_multiple_pricing as $pricing_id => $pricing) {
 
             if (is_array($date_wise_pricing) && count($date_wise_pricing) > 0) {
 
-                $pricing = isset($base_pricing[$pricing_id]) ? $base_pricing[$pricing_id] : $pricing;
+                $pricing = isset($date_wise_pricing[$pricing_id]) ? $date_wise_pricing[$pricing_id] : $pricing;
 
                 $pricing['pricing_label'] = $base_multiple_pricing[$pricing_id]['pricing_label'];
 
@@ -94,6 +103,7 @@ class Yatra_Pricing
 
             $final_pricing_details[$pricing_id] = $this->getSinglePricing($pricing, $number_of_people);
         }
+
 
         return apply_filters('yatra_tour_final_pricing_details', $final_pricing_details);
 
