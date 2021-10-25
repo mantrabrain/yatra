@@ -1,5 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
 include_once "class-yatra-tour-interface.php";
@@ -9,9 +9,13 @@ include_once "class-yatra-pricing.php";
 
 abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 {
+    protected $tourData;
+
     protected $isFixedDeparture;
 
     protected $availabilityDateRanges;
+
+    protected $allDynamicDataByDateRange = array();
 
     protected $countries = array();
 
@@ -53,10 +57,6 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
         $this->attributes = $attributes->getAllAtributes();
 
-      /*  $start_date = '2021-10-25';
-
-        $end_date = '2021-10-25';*/
-
         $dates_data = new Yatra_Dates($ID, $start_date, $end_date);
 
         $all_date_data = $dates_data->getAllTourData();
@@ -71,7 +71,12 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
             $this->availabilityFor = $all_date_data->availabilityFor();
 
+        } else {
+
+            $this->allDynamicDataByDateRange = $all_date_data;
         }
+
+        $this->tourData = Yatra_Dates::getSingleTourData($ID);
 
     }
 }
@@ -84,9 +89,31 @@ class Yatra_Tour_Options extends Yatra_Tour_Settings
         parent::__construct($tourID, $start_date, $end_date);
     }
 
+    public function getAllDynamicDataByDateRange($start_date = null, $end_date = null)
+    {
+        if (is_null($start_date) || is_null($end_date)) {
+
+            return $this->allDynamicDataByDateRange;
+        }
+        $date_index = str_replace(' ', '', trim($start_date . '00:00:00_' . $end_date . '23:59:59'));
+
+        if (isset($this->allDynamicDataByDateRange[$date_index])) {
+
+            if ($this->allDynamicDataByDateRange[$date_index] instanceof Yatra_Tour_Dates) {
+
+                return $this->allDynamicDataByDateRange[$date_index];
+            }
+        }
+    }
+
     public function isFixedDeparture()
     {
         return $this->isFixedDeparture;
+    }
+
+    public function getTourData()
+    {
+        return $this->tourData;
     }
 
     public function getAvailabilityDateRanges()

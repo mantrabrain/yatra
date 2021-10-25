@@ -45,7 +45,7 @@ class Yatra_Template_Hooks
 
         $final_pricing = isset($final_pricing_array['pricing']) ? $final_pricing_array['pricing'] : array();
 
-        $settings = new Yatra_Tour_Options();
+        $settings = new Yatra_Tour_Options(get_the_ID(), $start, $end);
 
         $pricing = $settings->getPricing();
         $pricing_type = $settings->getPricingType();

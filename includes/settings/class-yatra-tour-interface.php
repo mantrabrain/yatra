@@ -1,9 +1,14 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
+
 interface Yatra_Tour_Interface
 {
+    public function getTourData();
+
+    public function getAllDynamicDataByDateRange($start_date = null, $end_date = null);
+
     public function isFixedDeparture();
 
     public function getAvailabilityDateRanges();

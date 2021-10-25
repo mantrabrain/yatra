@@ -1,5 +1,5 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
 include_once "pricing/class-yatra-tour-pricing-interface.php";
@@ -13,7 +13,6 @@ class Yatra_Pricing
     public function getTourPricing($tourID)
     {
         $pricing_array = $this->getPricing($tourID);
-
 
         $base_pricing_type = yatra_get_pricing_type($tourID);
 
@@ -68,7 +67,7 @@ class Yatra_Pricing
 
     }
 
-    private function getPricing($tourID, $number_of_people = null)
+    public function getPricing($tourID, $number_of_people = null)
     {
 
         if (yatra_get_pricing_type($tourID) === "multi") {
@@ -79,16 +78,15 @@ class Yatra_Pricing
 
         $base_pricing = yatra_get_tour_base_single_pricing($tourID);
 
+
         return $this->getSinglePricing($base_pricing);
     }
-
 
     private function getMultiplePricing($tourID, $number_of_people = null, $date_wise_pricing = array())
     {
         $base_multiple_pricing = yatra_get_tour_base_multiple_pricing($tourID, true);
 
         $final_pricing_details = array();
-
 
         foreach ($base_multiple_pricing as $pricing_id => $pricing) {
 

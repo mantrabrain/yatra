@@ -781,6 +781,10 @@ if (!function_exists('yatra_maybe_json_decode')) {
         if ($var == '') {
             return array();
         }
+        if (is_array($var)) {
+            
+            return $var;
+        }
         return json_decode($var, $assoc);
     }
 }
