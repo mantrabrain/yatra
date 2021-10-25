@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 class Yatra_Attributes extends Yatra_Attribute_Abstract
 {
     public function __construct($tourID, $attributeID)

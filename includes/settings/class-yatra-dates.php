@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 include_once "dates/class-yatra-tour-dates-interface.php";
 include_once "dates/class-yatra-tour-dates-abstract.php";
 include_once "dates/class-yatra-tour-dates.php";

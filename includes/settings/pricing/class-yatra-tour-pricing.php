@@ -1,5 +1,8 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 class Yatra_Tour_Pricing extends Yatra_Tour_Pricing_Abstract
 {
 

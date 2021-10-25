@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 interface Yatra_Attribute_Interface
 {
     public function getID();

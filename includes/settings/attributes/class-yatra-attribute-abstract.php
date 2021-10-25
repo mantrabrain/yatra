@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 abstract class Yatra_Attribute_Abstract implements Yatra_Attribute_Interface
 {
     protected $id;

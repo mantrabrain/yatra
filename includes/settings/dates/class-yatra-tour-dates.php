@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 class Yatra_Tour_Dates extends Yatra_Tour_Dates_Abstract
 {
 

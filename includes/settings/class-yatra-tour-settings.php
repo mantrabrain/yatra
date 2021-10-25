@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 include_once "class-yatra-tour-interface.php";
 include_once "class-yatra-tour-attributes.php";
 include_once "class-yatra-dates.php";
@@ -51,9 +53,9 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
         $this->attributes = $attributes->getAllAtributes();
 
-        $start_date = '2021-10-25';
+      /*  $start_date = '2021-10-25';
 
-        $end_date = '2021-10-25';
+        $end_date = '2021-10-25';*/
 
         $dates_data = new Yatra_Dates($ID, $start_date, $end_date);
 

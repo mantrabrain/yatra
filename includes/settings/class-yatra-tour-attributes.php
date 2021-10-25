@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 include_once "attributes/class-yatra-attribute-interface.php";
 include_once "attributes/class-yatra-attribute-abstract.php";
 include_once "attributes/class-yatra-attributes.php";

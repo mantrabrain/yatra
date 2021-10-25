@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 interface Yatra_Tour_Interface
 {
     public function isFixedDeparture();

@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 abstract class Yatra_Tour_Pricing_Abstract implements Yatra_Tour_Pricing_Interface
 {
     protected $id;

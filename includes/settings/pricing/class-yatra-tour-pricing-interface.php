@@ -1,5 +1,7 @@
 <?php
-
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 interface Yatra_Tour_Pricing_Interface
 {
     public function getID();
