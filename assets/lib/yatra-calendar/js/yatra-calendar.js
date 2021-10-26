@@ -21,6 +21,8 @@
 
             },
             onMonthChange: function (month, year) {
+            }, // Callback on month change,
+            onBeforeMonthChange: function (month, year) {
             }, // Callback on month change
             onDateSelect: function (date) {
             }, // Callback on date selection
@@ -159,6 +161,7 @@
         },
         changeMonth: function (value) {
             this.currentDate.setMonth(this.currentDate.getMonth() + value, 1);
+            this.settings.onBeforeMonthChange(this.currentDate.getMonth(), this.currentDate.getFullYear())
             this.buildCalendar(this.currentDate, $(this.element).find('.yatra-calendar'));
             this.updateHeader(this.currentDate, $(this.element).find('.yatra-calendar header'));
             this.settings.onMonthChange(this.currentDate.getMonth(), this.currentDate.getFullYear())
@@ -218,7 +221,16 @@
 
                 return true;
             }
-            if ($.inArray(this.formatDate(d), plugin.settings.enable) !== -1) {
+
+            var enable = [];
+
+            if (typeof plugin.settings.enable === "function") {
+
+                enable = plugin.settings.enable(d);
+            } else if (typeof plugin.settings.enable === "array") {
+                enable = plugin.settings.enable;
+            }
+            if ($.inArray(this.formatDate(d), enable) !== -1) {
 
                 return true;
             }

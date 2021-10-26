@@ -71,7 +71,9 @@ if (!class_exists('Yatra_Assets')) {
                     'enabled_dates' => $enabled_date,
                     'all_available_date_data' => $yatra_available_date_data,
                     'availability_action' => 'yatra_tour_frontend_availability',
-                    'availability_nonce' => wp_create_nonce('wp_yatra_tour_frontend_availability_nonce')
+                    'availability_nonce' => wp_create_nonce('wp_yatra_tour_frontend_availability_nonce'),
+                    'availability_month_action' => 'yatra_tour_frontend_availability_month',
+                    'availability_month_nonce' => wp_create_nonce('wp_yatra_tour_frontend_availability_month_nonce')
                 )
             );
 
