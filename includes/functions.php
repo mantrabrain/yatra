@@ -1056,7 +1056,6 @@ if (!function_exists('yatra_get_tour_base_single_pricing')) {
         $pricing['regular_price'] = get_post_meta($tourID, 'yatra_tour_meta_regular_price', true);
         $pricing['sales_price'] = get_post_meta($tourID, 'yatra_tour_meta_sales_price', true);
         $pricing['pricing_label'] = sanitize_text_field(get_post_meta($tourID, 'yatra_tour_meta_pricing_label', true));
-
         $pricing['pricing_label'] = $pricing['pricing_label'] ? $pricing['pricing_label'] : __('Guest', 'yatra');
         $pricing['pricing_description'] = sanitize_text_field(get_post_meta($tourID, 'yatra_tour_meta_pricing_description', true));
         $pricing['pricing_per'] = get_post_meta($tourID, 'yatra_tour_meta_price_per', true);
@@ -1072,4 +1071,40 @@ if (!function_exists('yatra_get_tour_base_single_pricing')) {
         }
         return $pricing;
     }
+}
+
+function yatra_get_current_month_start_and_end_date($year = null, $month = null, $week_start_from = 0)
+{
+    $year = is_null($year) ? date('Y') : $year;
+
+    $month = is_null($month) ? date('m') : $month;
+
+    $first_day = 1;
+
+    $week_start_from = absint($week_start_from);
+
+    $month_start = $year . '-' . $month . '-' . $first_day;
+
+    $first_day_of_week = absint(date('w', strtotime($month_start)));
+
+    $modified_date = new DateTime($month_start);
+
+    while ($first_day_of_week !== $week_start_from) {
+
+        $modified_date->modify('-1 day');
+
+        $first_day_of_week = absint(date('w', strtotime($modified_date->format('Y-m-d'))));
+
+    }
+    $start_date_string = $modified_date->format('Y-m-d');
+
+    $modified_date->modify('+41 day');
+
+    $end_date_string = $modified_date->format('Y-m-d');
+
+    return [
+        'start' => $start_date_string,
+        'end' => $end_date_string
+    ];
+
 }

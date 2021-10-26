@@ -14,6 +14,13 @@ if (!class_exists('Yatra_Assets')) {
             wp_enqueue_script('jquery-ui-datepicker');
             wp_enqueue_style('jquery-ui-datepicker');
 
+            wp_register_script('yatra-popper', YATRA_PLUGIN_URI . '/assets/lib/popperjs/popper.js', array(), YATRA_VERSION);
+
+            wp_register_script('yatra-tippy', YATRA_PLUGIN_URI . '/assets/lib/tippyjs/tippy.js', array(), YATRA_VERSION);
+
+            wp_register_script('yatra-moment', YATRA_PLUGIN_URI . '/assets/lib/moment/js/moment.min.js', false, YATRA_VERSION);
+
+
             wp_register_style('yatra-flatpickrcss', YATRA_PLUGIN_URI . '/assets/lib/flatpickr/css/flatpickr.min.css', false, YATRA_VERSION);
             wp_register_script('yatra-flatpickrjs', YATRA_PLUGIN_URI . '/assets/lib/flatpickr/js/flatpickr.js', false, YATRA_VERSION);
 
@@ -39,8 +46,18 @@ if (!class_exists('Yatra_Assets')) {
             wp_enqueue_style('yatra-select2css');
 
             wp_register_script('yatra-script', YATRA_PLUGIN_URI . '/assets/js/yatra.js',
-                array('jquery', 'lightbox-script', 'yatra-flatpickrjs'), YATRA_VERSION);
+                array('jquery', 'lightbox-script', 'yatra-moment', 'yatra-popper', 'yatra-tippy', 'yatra-flatpickrjs'), YATRA_VERSION);
             wp_enqueue_script('yatra-script');
+
+
+            $date_range = yatra_get_current_month_start_and_end_date();
+
+            $yatra_available_date_data = Yatra_Core_Tour_Availability::get_availability(get_the_ID(), $date_range['start'], $date_range['end'], array(
+                'is_expired' => false,
+                'is_full' => false
+            ), true);
+
+            $enabled_date = array_keys($yatra_available_date_data);
 
             $yatra_params = array(
 
@@ -48,6 +65,10 @@ if (!class_exists('Yatra_Assets')) {
                 'booking_params' => array(
                     'booking_action' => 'yatra_tour_add_to_cart',
                     'booking_nonce' => wp_create_nonce('wp_yatra_tour_add_to_cart_nonce')
+                ),
+                'single_tour' => array(
+                    'enabled_dates' => $enabled_date,
+                    'all_available_date_data' => $yatra_available_date_data
                 )
             );
 

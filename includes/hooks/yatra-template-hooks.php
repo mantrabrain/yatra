@@ -27,23 +27,13 @@ class Yatra_Template_Hooks
         );
     }
 
-
     public function single_tour_booking_form()
     {
-
-        yatra()->tour->maybe_initialize();
 
         $start = date('Y-m-d');
 
         $end = date('Y-m-d');
 
-        $pricing_index = $start . '00:00:00_' . $end . '23:59:59';
-
-        $pricing = yatra()->tour->get_pricing_by_date($start, $end, null);
-
-        $final_pricing_array = isset($pricing[$pricing_index]) ? $pricing[$pricing_index] : array();
-
-        $final_pricing = isset($final_pricing_array['pricing']) ? $final_pricing_array['pricing'] : array();
 
         $yatra_tour_options = new Yatra_Tour_Options(get_the_ID(), $start, $end);
 
@@ -58,15 +48,6 @@ class Yatra_Template_Hooks
         }
 
 
-        //$yatra_tour_options->get
-
-        $pricing = $yatra_tour_options->getPricing();
-        
-        $pricing_type = $yatra_tour_options->getPricingType();
-
-        //echo current_time('timestamp');
-
-
         yatra_get_template('parts/tour-booking-form.php',
             array(
                 'pricing_type' => $dynamicData->getPricingType(),
@@ -74,7 +55,6 @@ class Yatra_Template_Hooks
             )
         );
 
-        yatra()->tour->maybe_flush();
 
     }
 

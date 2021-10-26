@@ -91,7 +91,11 @@ class Yatra_Core_Tour_Availability
 
     }
 
-    public static function get_availability($tour_id, $start_date, $end_date)
+    /*
+     * $filter_condition  = array('is_expired'=>false, is_full=>false, is_
+     */
+
+    public static function get_availability($tour_id, $start_date, $end_date, $filter_condition = array(), $date_index = false)
     {
 
         $fixed_departure = (boolean)get_post_meta($tour_id, 'yatra_tour_meta_tour_fixed_departure', true);
@@ -131,8 +135,27 @@ class Yatra_Core_Tour_Availability
                 $single_date = $i->format("Y-m-d");
 
 
-                $all_responses[] = self::get_single_availability($single_date, $settings, $tourData);
+                $single_response = self::get_single_availability($single_date, $settings, $tourData);
 
+                $condition_index = 0;
+
+                foreach ($filter_condition as $condition_array_index => $condition_value) {
+                    if (isset($single_response[$condition_array_index])) {
+                        if ($single_response[$condition_array_index] === $condition_value) {
+                            $condition_index++;
+                        }
+                    }
+
+
+                }
+
+                if ($condition_index === count($filter_condition)) {
+                    if ($date_index) {
+                        $all_responses[$single_date] = $single_response;
+                    } else {
+                        $all_responses[] = $single_response;
+                    }
+                }
             }
         }
 
@@ -175,7 +198,7 @@ class Yatra_Core_Tour_Availability
 
         $response = array();
 
-        $is_active = $todayData->isActive();
+        $is_active = (boolean)$todayData->isActive();
 
         $max_travellers = $todayData->getMaxTravellers();
 
