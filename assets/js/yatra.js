@@ -272,7 +272,7 @@
                                 yatra_nonce: yatra_params.single_tour.availability_nonce
                             },
                             beforeSend: function () {
-                                $('.yatra-tour-booking-pricing-wrap').addClass('yatra-loading');
+                                $('.yatra-calendar').addClass('yatra-loading');
                             },
                             success: function (data) {
 
@@ -285,7 +285,7 @@
                             },
                             complete: function () {
 
-                                $('.yatra-tour-booking-pricing-wrap').removeClass('yatra-loading');
+                                $('.yatra-calendar').removeClass('yatra-loading');
                             }
                         });
                     }

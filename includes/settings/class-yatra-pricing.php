@@ -111,7 +111,8 @@ class Yatra_Pricing
 
     private function getSinglePricing($base_pricing, $number_of_people = null)
     {
-        $regular_price = $base_pricing['regular_price'];
+        $base_pricing['group_size'] = absint($base_pricing['group_size']) == 0 ? 1 : $base_pricing['group_size'];
+        $regular_price = absint($base_pricing['regular_price']);
         $sales_price = $base_pricing['sales_price'];
         $final_price = '' != $sales_price ? $sales_price : $regular_price;
         $person_count = '' != $base_pricing['minimum_pax'] ? absint($base_pricing['minimum_pax']) : 1;
