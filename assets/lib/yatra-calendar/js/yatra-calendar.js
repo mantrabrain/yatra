@@ -22,7 +22,7 @@
             },
             onMonthChange: function (month, year) {
             }, // Callback on month change
-            onDateSelect: function (date, events) {
+            onDateSelect: function (date) {
             }, // Callback on date selection
             onEventSelect: function () {
             },              // Callback fired when an event is selected     - see $(this).data('event')
@@ -180,10 +180,11 @@
             });
 
             //Binding day event
-            $(plugin.element).on('click', '.day', function (e) {
+            $(plugin.element).on('click', '.day:not(.disabled)', function (e) {
                 var date = new Date($(this).data('date'));
-                var events = plugin.getDateEvents(date);
-                plugin.settings.onDateSelect(date, events);
+                $(this).closest('table').find('td').removeClass('active');
+                $(this).closest('td').addClass('active');
+                plugin.settings.onDateSelect(plugin.formatDate(date));
             });
 
 

@@ -250,7 +250,7 @@
 
                         var object = yatra_params.single_tour.all_available_date_data[date];
                         if (object !== undefined && !$(el).hasClass('disabled')) {
-                            var class_name = 'yatra-tippy-tooltip yatra-availability-'+object.availability;
+                            var class_name = 'yatra-tippy-tooltip yatra-availability-' + object.availability;
                             $(el).addClass(class_name).attr('data-tippy-content', object.description);
                         }
                     },
@@ -258,6 +258,9 @@
                         tippy('.yatra-tippy-tooltip', {
                             allowHTML: true,
                         });
+                    },
+                    onDateSelect: function (date) {
+                        $(".yatra_tour_start_date").find('input').attr('data-selected-date', date).val(date);
                     }
 
                 });
