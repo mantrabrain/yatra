@@ -24,7 +24,8 @@ class Yatra_Ajax
     {
         $actions = array(
             'tour_add_to_cart',
-            'update_cart'
+            'update_cart',
+            'tour_frontend_availability',
         );
         return $actions;
     }
@@ -341,6 +342,42 @@ class Yatra_Ajax
             $status
         );
 
+    }
+
+    public function tour_frontend_availability()
+    {
+        $status = $this->validate_nonce();
+
+        if (!$status) {
+            wp_send_json_error($this->ajax_error());
+        }
+        $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
+
+        $selected_date = isset($_POST['selected_date']) ? sanitize_text_field($_POST['selected_date']) : '';
+
+        if ($tour_id < 1 || '' === $selected_date) {
+            wp_send_json_error();
+
+        }
+
+        $yatra_tour_options = new Yatra_Tour_Options($tour_id, $selected_date, $selected_date);
+
+        $dynamicData = ($yatra_tour_options->getAllDynamicDataByDateRange());
+
+        if (!$dynamicData instanceof Yatra_Tour_Dates) {
+
+            $dynamicData = $yatra_tour_options->getTourData();
+        } else {
+
+            $dynamicData = (boolean)$dynamicData->isActive() ? $dynamicData : $yatra_tour_options->getTourData();
+        }
+
+        $pricing = $dynamicData->getPricing();
+        $pricing_type = $dynamicData->getPricingType();
+        ob_start();
+        Yatra_Template_Hooks::tour_booking_pricing_content($pricing, $pricing_type);
+        $content = ob_get_clean();
+        wp_send_json_success($content);
     }
 
 

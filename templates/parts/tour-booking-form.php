@@ -10,29 +10,12 @@
         <span class="fa fa-calendar-alt"></span>
         <input type="text" name="yatra_tour_start_date"/>
     </div>
-    <?php
-    $pricing = $yatra_booking_pricing_info->getPricing();;
-    if ($pricing instanceof Yatra_Tour_Pricing) {
+    <div class="yatra-tour-booking-pricing-wrap">
+        <?php
 
-        yatra_get_template('parts/booking-pricing-item.php',
-            array(
-                'pricing_type' => $pricing_type,
-                'yatra_booking_pricing' => $pricing,
-            )
-        );
-    } else {
+        do_action('yatra_tour_booking_pricing_content', $yatra_booking_pricing_info->getPricing(), $pricing_type);
+        
+        ?>
 
-        foreach ($pricing as $booking_pricing_args) {
-            yatra_get_template('parts/booking-pricing-item.php',
-                array(
-                    'pricing_type' => $pricing_type,
-                    'yatra_booking_pricing' => $booking_pricing_args,
-                )
-            );
-        }
-    }
-
-    yatra_book_now_button()
-    ?>
-
+    </div>
 </form>

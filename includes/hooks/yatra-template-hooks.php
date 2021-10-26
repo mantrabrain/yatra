@@ -7,6 +7,7 @@ class Yatra_Template_Hooks
         add_action('yatra_main_content', array($this, 'single_tour_info'), 15);
         add_action('single_tour_info', array($this, 'tour_info'), 10);
         add_action('yatra_single_tour_booking_form', array($this, 'single_tour_booking_form'), 10);
+        add_action('yatra_tour_booking_pricing_content', array(__class__, 'tour_booking_pricing_content'), 10, 2);
         add_action('yatra_single_tour_enquiry_form', array($this, 'single_tour_enquiry_form'), 10);
     }
 
@@ -56,6 +57,32 @@ class Yatra_Template_Hooks
         );
 
 
+    }
+
+    public static function tour_booking_pricing_content($pricing, $pricing_type)
+    {
+
+        if ($pricing instanceof Yatra_Tour_Pricing) {
+
+            yatra_get_template('parts/booking-pricing-item.php',
+                array(
+                    'pricing_type' => $pricing_type,
+                    'yatra_booking_pricing' => $pricing,
+                )
+            );
+        } else {
+
+            foreach ($pricing as $booking_pricing_args) {
+                yatra_get_template('parts/booking-pricing-item.php',
+                    array(
+                        'pricing_type' => $pricing_type,
+                        'yatra_booking_pricing' => $booking_pricing_args,
+                    )
+                );
+            }
+        }
+
+        yatra_book_now_button();
     }
 
     public function single_tour_enquiry_form()

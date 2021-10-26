@@ -261,6 +261,33 @@
                     },
                     onDateSelect: function (date) {
                         $(".yatra_tour_start_date").find('input').attr('data-selected-date', date).val(date);
+
+                        $.ajax({
+                            type: "POST",
+                            url: yatra_params.ajax_url,
+                            data: {
+                                tour_id: $('form#yatra-tour-booking-form-fields').find('input[name="tour_id"]').val(),
+                                selected_date: date,
+                                action: yatra_params.single_tour.availability_action,
+                                yatra_nonce: yatra_params.single_tour.availability_nonce
+                            },
+                            beforeSend: function () {
+                                $('.yatra-tour-booking-pricing-wrap').addClass('yatra-loading');
+                            },
+                            success: function (data) {
+
+                                if (typeof data.success !== undefined) {
+                                    if (data.success) {
+                                        $('.yatra-tour-booking-pricing-wrap').html(data.data);
+                                    }
+                                }
+
+                            },
+                            complete: function () {
+
+                                $('.yatra-tour-booking-pricing-wrap').removeClass('yatra-loading');
+                            }
+                        });
                     }
 
                 });
