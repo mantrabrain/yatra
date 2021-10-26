@@ -52,6 +52,9 @@
     color: white;
     display: inline-block;
     width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #yatra-availability-calendar-container .yatra-availability-calendar-header {

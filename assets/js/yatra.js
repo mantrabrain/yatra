@@ -8,6 +8,7 @@
                 this.bindEvents();
                 this.initLib();
                 this.initNiceNumber();
+                this.initDateTimePicker();
             },
             initNiceNumber: function () {
                 var _that = this;
@@ -230,7 +231,17 @@
                         $this.removeLoading($btn);
                     }
                 });
-            }
+            },
+            initDateTimePicker: function () {
+
+                if ($.fn.flatpickr) {
+                    var config = {
+                        minDate: 'today'
+                    };
+                    $(".yatra_tour_start_date").flatpickr(config);
+                }
+            },
+
 
         };
     }(jQuery);

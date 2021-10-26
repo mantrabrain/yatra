@@ -79,6 +79,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
             // Register Only Styles
             wp_register_style('yatra-select2css', YATRA_PLUGIN_URI . '/assets/lib/select2/css/select2.min.css', false, YATRA_VERSION);
+
             wp_register_style('yatra-datepickercss', YATRA_PLUGIN_URI . '/assets/lib/datepicker/css/datepicker.min.css', false, YATRA_VERSION);
             wp_register_style('yatra-daterangepickercss', YATRA_PLUGIN_URI . '/assets/lib/daterangepicker/daterangepicker.css', false, YATRA_VERSION);
 
