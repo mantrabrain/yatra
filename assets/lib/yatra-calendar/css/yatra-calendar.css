@@ -1,0 +1,205 @@
+.yatra-calendar {
+    position: relative;
+    overflow: hidden;
+    text-transform: capitalize;
+    text-align: center;
+    font: 15px/1em inherit;
+    color: #545a5c;
+}
+
+.yatra-calendar a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.yatra-calendar header .yatra-calendar-btn {
+    display: inline-block;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    color: #cbd1d2;
+    border-radius: 50%;
+    border: 2px solid #cbd1d2;
+}
+
+.yatra-calendar header .yatra-calendar-btn:hover {
+    background: #cbd1d2;
+    color: white;
+}
+
+.yatra-calendar header .yatra-calendar-btn:before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 8px;
+    width: 8px;
+    height: 8px;
+    border-style: solid;
+    border-width: 3px 3px 0 0;
+    transform: rotate(45deg);
+    transform-origin: center center;
+}
+
+.yatra-calendar header .btn-prev {
+    top: 0;
+    left: 0;
+    transform: rotate(-180deg);
+}
+
+.yatra-calendar header .btn-next {
+    top: 0;
+    right: 0;
+}
+
+.yatra-calendar header .btn-next:before {
+    transform: rotate(45deg);
+}
+
+.yatra-calendar header .month {
+    padding: 0;
+    margin: 0;
+}
+
+.yatra-calendar header .month .year {
+    font-size: 0.6em;
+    font-weight: 100;
+}
+
+.yatra-calendar table {
+    width: 100%;
+    margin: 20px 0;
+    border-spacing: 0px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.yatra-calendar thead {
+    font-size: 1.2em;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+}
+
+.yatra-calendar td {
+    padding: 0.8em 0.1em;
+    border: 1px solid #ddd;
+}
+
+.yatra-calendar .day {
+    position: relative;
+    display: inline-block;
+    width: 2.5em;
+    height: 2.5em;
+    line-height: 2.5em;
+    border-radius: 0;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.yatra-calendar .day:hover {
+    border: 2px solid #6691cc;
+}
+
+.yatra-calendar .day.today {
+    background: rgba(255, 255, 41, 0.2);
+    border: 1px solid #ddd;
+}
+
+
+.yatra-calendar .day.wrong-month,
+.yatra-calendar .day.disabled {
+    color: #aaa;
+}
+
+.yatra-calendar .day.wrong-month.disabled {
+    color: #ddd;
+}
+
+.yatra-calendar .day.wrong-month:hover,
+.yatra-calendar .day.disabled:hover {
+    border: 2px solid transparent;
+}
+
+.yatra-calendar .day.disabled {
+    cursor: default;
+}
+
+
+.yatra-calendar .event-container {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 70px;
+    background: #545a5c;
+    box-sizing: border-box;
+}
+
+.yatra-calendar .event-container .event-wrapper {
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+.yatra-calendar .event-container .close {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.yatra-calendar .event-container .close:before, .yatra-calendar .event-container .close:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background-color: #cbd1d2;
+}
+
+.yatra-calendar .event-container .close:before {
+    transform: rotate(45deg);
+}
+
+.yatra-calendar .event-container .close:after {
+    transform: rotate(-45deg);
+}
+
+.yatra-calendar .event-container .event {
+    position: relative;
+    width: 100%;
+    padding: 1em;
+    margin-bottom: 1em;
+    background: #6691cc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+    text-align: left;
+    color: white;
+}
+
+.yatra-calendar .event-container .event-date {
+    margin-bottom: 1em;
+}
+
+.yatra-calendar .event-container .event-hour {
+    float: right;
+}
+
+.yatra-calendar .event-container .event-summary {
+    font-weight: 600;
+}
+
+.yatra-calendar .filler {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: #545a5c;
+    transform: translate(-50%, -50%);
+}

@@ -766,6 +766,18 @@ body.single .yatra-single-tour:after {
     padding: 0;
     border: 0; }
 
+.day.yatra-availability-booking {
+  border: 2px solid #2f582b !important;
+  border-bottom: 5px solid #2f582b !important; }
+
+.day.yatra-availability-enquiry {
+  border: 2px solid #008bb5 !important;
+  border-bottom: 5px solid #008bb5 !important; }
+
+.day.yatra-availability-none {
+  border: 2px solid #aaa !important;
+  border-bottom: 5px solid #aaa !important; }
+
 .yatra-shortcode-wrapper form.yatra-cart-form {
   position: relative; }
   .yatra-shortcode-wrapper form.yatra-cart-form .actions {

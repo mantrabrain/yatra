@@ -238,61 +238,29 @@
                     return;
                 }
                 var single_tour = yatra_params.single_tour;
-                if ($.fn.flatpickr) {
-                    var config = {
-                        minDate: 'today',
-                        //defaultDate: '2022-02-15',
-                        inline: true,
-                        onReady: function (event, date) {
 
-                        },
-                        enable: single_tour.enabled_dates,
-                        disables: [
-                            {
-                                from: "2021-10-28",
-                                to: "2021-10-30"
-                            },
-                            {
-                                from: "2021-11-05",
-                                to: "2021-11-15"
-                            }
-                        ],
-                        onReady: function (de, check) {
+                let container = $(".yatra_tour_start_date").YatraCalendar({
 
-                        },
-                        onMonthChange: function (selecteDate, sateStr, instance) {
+                    fixedStartDay: 0, // begin weeks by sunday
 
-                        },
-                        onDayCreate: function (dObj, dStr, fp, dayElem) {
+                    enable: single_tour.enabled_dates,
 
-                            var day = $(dayElem).attr("aria-label");
+                    onDayCreate: function (el, fullDate, day, month, year) {
+                        var date = fullDate.trim();
 
-                            var cal_date = new Date(day);
-                            var date = cal_date.toISOString().split('T')[0].trim();
-                            var object = yatra_params.single_tour.all_available_date_data[date];
+                        var object = yatra_params.single_tour.all_available_date_data[date];
+                        if (object !== undefined && !$(el).hasClass('disabled')) {
+                            var class_name = 'yatra-tippy-tooltip yatra-availability-'+object.availability;
+                            $(el).addClass(class_name).attr('data-tippy-content', object.description);
+                        }
+                    },
+                    onCalendarLoad: function () {
+                        tippy('.yatra-tippy-tooltip', {
+                            allowHTML: true,
+                        });
+                    }
 
-                            if (object !== undefined) {
-                                console.log(date);
-                                console.log(day);
-                                console.log(object);
-                                console.log(dayElem);
-                                $(dayElem).addClass('yatra-tippy-tooltip').attr('data-tippy-content', object.description);
-                            }
-
-                        },
-                        onOpen: [
-                            function (selectedDates, dateStr, instance) {
-                                console.log(selectedDates);
-                                console.log(dateStr);
-                                console.log(instance);
-                            },
-                            function (selectedDates, dateStr, instance) {
-                                //...
-                            }
-                        ],
-                    };
-                    $(".yatra_tour_start_date").flatpickr(config);
-                }
+                });
 
                 tippy('.yatra-tippy-tooltip', {
                     allowHTML: true,
