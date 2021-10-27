@@ -275,8 +275,7 @@
                                 yatra_nonce: yatra_params.single_tour.availability_nonce
                             },
                             beforeSend: function () {
-                                $('.yatra-tour-booking-pricing-wrap').addClass('yatra-loading');
-                                $('.yatra-calendar').addClass('yatra-loading');
+                                $("#yatra-tour-booking-form").addClass('yatra-loading');
                             },
                             success: function (data) {
 
@@ -289,8 +288,7 @@
                             },
                             complete: function () {
 
-                                $('.yatra-tour-booking-pricing-wrap').removeClass('yatra-loading');
-                                $('.yatra-calendar').removeClass('yatra-loading');
+                                $("#yatra-tour-booking-form").removeClass('yatra-loading');
                             }
                         });
                     },
@@ -298,7 +296,7 @@
                     onBeforeMonthChange: function (month, year) {
                         var _that = this;
                         var selected_date = year + '-' + (month + 1) + '-01';
-                        $('.yatra-form-fields.yatra_tour_start_date').addClass('yatra-loading');
+                        $("#yatra-tour-booking-form").addClass('yatra-loading');
                         $.ajax({
                             type: "POST",
                             url: yatra_params.ajax_url,
@@ -322,7 +320,7 @@
                             complete: function () {
                             }
                         });
-                        $('.yatra-form-fields.yatra_tour_start_date').removeClass('yatra-loading');
+                        $("#yatra-tour-booking-form").removeClass('yatra-loading');
                     }
 
                 });
