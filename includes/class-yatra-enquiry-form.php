@@ -149,7 +149,11 @@ class Yatra_Enquiry_Form extends Yatra_Form
         if (yatra()->yatra_error->has_errors()) {
             return false;
         }
+        do_action('yatra_enquiry_response_before_saved', $valid_data);
+
         $status = Yatra_Core_DB::save_data(Yatra_Tables::TOUR_ENQUIRIES, $valid_data);
+
+        do_action('yatra_enquiry_response_after_saved', $valid_data, $status);
 
         return $status;
 
