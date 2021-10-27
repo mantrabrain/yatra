@@ -116,6 +116,17 @@ if (!function_exists('yatra_after_main_content_loop_callback')) {
     add_action('yatra_after_main_content_loop', 'yatra_after_main_content_loop_callback');
 }
 
+if (!function_exists('yatra_enquiry_form_fields')) {
+
+    function yatra_enquiry_form_fields()
+    {
+
+        Yatra_Enquiry_Form::get_instance()->get_form();
+    }
+
+    add_action('yatra_checkout_form_fields', 'yatra_checkout_form_fields');
+}
+
 function yatra_book_now_button($availability)
 {
     do_action('yatra_before_booking_button', $availability);

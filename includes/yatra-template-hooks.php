@@ -13,3 +13,7 @@ add_action('yatra_before_customer_login_form', 'yatra_login_notices');
 add_action('yatra_registration_form_start', 'yatra_registration_form_fields');
 add_action('yatra_checkout_before_form_fields', 'yatra_checkout_form_error');
 add_action('yatra_checkout_form_fields', 'yatra_payment_gateway_fields');
+
+// Single Tour
+
+add_action('yatra_enquiry_form_fields', 'yatra_enquiry_form_fields');

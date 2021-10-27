@@ -16,7 +16,7 @@ class Yatra_Checkout_Form extends Yatra_Form
 
     }
 
-    public function chekcout_form_fields()
+    public function checkout_form_fields()
     {
         $country_list = yatra_get_countries();
 
@@ -102,7 +102,7 @@ class Yatra_Checkout_Form extends Yatra_Form
     public function tour_checkout_form()
     {
 
-        $form_fields = $this->chekcout_form_fields();
+        $form_fields = $this->checkout_form_fields();
 
         foreach ($form_fields as $field) {
 
@@ -112,7 +112,7 @@ class Yatra_Checkout_Form extends Yatra_Form
 
     public function valid_tour_checkout_form($data = array())
     {
-        return $this->valid_data($data, $this->chekcout_form_fields());
+        return $this->valid_data($data, $this->checkout_form_fields());
 
     }
 
