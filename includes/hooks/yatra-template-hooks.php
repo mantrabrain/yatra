@@ -59,8 +59,13 @@ class Yatra_Template_Hooks
 
     }
 
-    public static function tour_booking_pricing_content($pricing, $pricing_type)
+    public static function tour_booking_pricing_content($date_wise_info, $pricing_type)
     {
+        if (!$date_wise_info instanceof Yatra_Tour_Dates) {
+            return;
+        }
+
+        $pricing = $date_wise_info->getPricing();
 
         if ($pricing instanceof Yatra_Tour_Pricing) {
 
@@ -82,7 +87,7 @@ class Yatra_Template_Hooks
             }
         }
 
-        yatra_book_now_button();
+        yatra_book_now_button($date_wise_info->getAvailabilityFor());
     }
 
     public function single_tour_enquiry_form()

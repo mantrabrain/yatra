@@ -373,10 +373,9 @@ class Yatra_Ajax
             $dynamicData = (boolean)$dynamicData->isActive() ? $dynamicData : $yatra_tour_options->getTourData();
         }
 
-        $pricing = $dynamicData->getPricing();
         $pricing_type = $dynamicData->getPricingType();
         ob_start();
-        Yatra_Template_Hooks::tour_booking_pricing_content($pricing, $pricing_type);
+        Yatra_Template_Hooks::tour_booking_pricing_content($dynamicData, $pricing_type);
         $content = ob_get_clean();
         wp_send_json_success($content);
     }
