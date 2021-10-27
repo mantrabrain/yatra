@@ -423,6 +423,11 @@ class Yatra_Ajax
             wp_send_json_error($this->ajax_error());
         }
         $status = Yatra_Enquiry_Form::get_instance()->save_enquiry($_POST);
+
+        if (yatra()->yatra_error->has_errors()) {
+            wp_send_json_error(yatra()->yatra_error->get_error_messages());
+
+        }
         if (!$status) {
             wp_send_json_error(__('Something wrong, please try again.', 'yatra'));
         }
