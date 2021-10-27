@@ -20,7 +20,7 @@ class Yatra_Template_Hooks
 
     public function tour_info()
     {
-        yatra_get_template('parts/tour-sidebar.php',
+        yatra_get_template('tour/sidebar.php',
             array(
                 //'map' => $yatra_tour_meta_map_content,
                 //'title' => $title
@@ -49,7 +49,7 @@ class Yatra_Template_Hooks
         }
 
 
-        yatra_get_template('parts/tour-booking-form.php',
+        yatra_get_template('tour/booking-form.php',
             array(
                 'pricing_type' => $dynamicData->getPricingType(),
                 'yatra_booking_pricing_info' => $dynamicData,
@@ -64,7 +64,7 @@ class Yatra_Template_Hooks
 
         if ($pricing instanceof Yatra_Tour_Pricing) {
 
-            yatra_get_template('parts/booking-pricing-item.php',
+            yatra_get_template('tour/pricing-item.php',
                 array(
                     'pricing_type' => $pricing_type,
                     'yatra_booking_pricing' => $pricing,
@@ -73,7 +73,7 @@ class Yatra_Template_Hooks
         } else {
 
             foreach ($pricing as $booking_pricing_args) {
-                yatra_get_template('parts/booking-pricing-item.php',
+                yatra_get_template('tour/pricing-item.php',
                     array(
                         'pricing_type' => $pricing_type,
                         'yatra_booking_pricing' => $booking_pricing_args,
@@ -87,7 +87,7 @@ class Yatra_Template_Hooks
 
     public function single_tour_enquiry_form()
     {
-        yatra_get_template('parts/tour-enquiry-form.php',
+        yatra_get_template('tour/enquiry-form.php',
             array(
                 //'map' => $yatra_tour_meta_map_content,
                 //'title' => $title

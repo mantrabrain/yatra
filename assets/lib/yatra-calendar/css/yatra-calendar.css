@@ -12,6 +12,10 @@
     color: inherit;
 }
 
+.yatra-calendar header {
+    margin: 0 !important;
+}
+
 .yatra-calendar header .yatra-calendar-btn {
     display: inline-block;
     position: absolute;
@@ -25,8 +29,8 @@
 }
 
 .yatra-calendar header .yatra-calendar-btn:hover {
-    background: #cbd1d2;
-    color: white;
+    background: #cbd1d2 !important;
+    color: white !important;
 }
 
 .yatra-calendar header .yatra-calendar-btn:before {
@@ -60,16 +64,18 @@
 .yatra-calendar header .month {
     padding: 0;
     margin: 0;
+    font-size: 30px;
 }
 
 .yatra-calendar header .month .year {
-    font-size: 0.6em;
-    font-weight: 100;
+    font-size: 25px;
+    font-weight: 500;
+    margin: 10px 0;
 }
 
 .yatra-calendar table {
     width: 100%;
-    margin: 20px 0;
+    margin: 0;
     border-spacing: 0px;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
@@ -82,7 +88,7 @@
 }
 
 .yatra-calendar td {
-    padding: 0.8em 0.1em;
+    padding: 5px;
     border: 1px solid #ddd;
 }
 

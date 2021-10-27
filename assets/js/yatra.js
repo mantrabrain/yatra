@@ -296,7 +296,7 @@
                     onBeforeMonthChange: function (month, year) {
                         var _that = this;
                         var selected_date = year + '-' + (month + 1) + '-01';
-                        $('.yatra-calendar').addClass('yatra-loading');
+                        $('.yatra-form-fields.yatra_tour_start_date').addClass('yatra-loading');
                         $.ajax({
                             type: "POST",
                             url: yatra_params.ajax_url,
@@ -320,7 +320,7 @@
                             complete: function () {
                             }
                         });
-                        $('.yatra-calendar').removeClass('yatra-loading');
+                        $('.yatra-form-fields.yatra_tour_start_date').removeClass('yatra-loading');
                     }
 
                 });

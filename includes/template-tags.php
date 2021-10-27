@@ -1078,7 +1078,7 @@ if (!function_exists('yatra_tour_custom_attributes_template')) {
                         $args['term'] = $term;
                         $args['content'] = $content;
                         $args['field_option'] = $field_option;
-                        yatra_get_template('parts/additional/attributes.php', $args);
+                        yatra_get_template('tour/attributes.php', $args);
                     }
                 } ?>
             </table>
