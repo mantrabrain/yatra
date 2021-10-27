@@ -791,6 +791,37 @@ body.single .yatra-single-tour:after {
     z-index: 9;
     padding: 20px; }
 
+.yatra-tour-enquiry-form-wrap label {
+  display: block;
+  margin1: 0; }
+
+.yatra-tour-enquiry-form-wrap p {
+  margin: 0;
+  margin-bottom: 15px; }
+
+.yatra-tour-enquiry-form-wrap .yatra-field-wrap {
+  width: 100%;
+  display: inline-block; }
+
+.yatra-tour-enquiry-form-wrap input, .yatra-tour-enquiry-form-wrap select {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 10px !important;
+  border-color: #ddd;
+  border-radius: 0; }
+
+.yatra-tour-enquiry-form-wrap .select2-container--default .select2-selection--single {
+  border-radius: 0;
+  border-color: #ddd;
+  height: 45px; }
+
+.yatra-tour-enquiry-form-wrap .select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 45px; }
+
+.yatra-tour-enquiry-form-wrap .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 40px;
+  right: 6px; }
+
 .yatra-shortcode-wrapper form.yatra-cart-form {
   position: relative; }
   .yatra-shortcode-wrapper form.yatra-cart-form .actions {

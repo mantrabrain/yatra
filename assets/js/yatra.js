@@ -118,8 +118,14 @@
                     });
 
 
+
                     heading.append(span);
                     toggle_node.remove();
+
+                });
+                $('body').on('click', '.yatra-enquiry-now-btn', function (event) {
+                     $('#yatra-tour-sidebar-tabs').find('.yatra-tab-wrap li').find('a[aria-controls="yatra-tour-enquiry-form"]').trigger('click');
+                    event.preventDefault();
 
                 });
 
@@ -364,16 +370,16 @@
                     },
 
                     bindEvents: function () {
-                        this.$tabLink.on('click', function () {
+                        this.$tabLink.on('click', function (e) {
 
-                            this.changeTab();
+                            this.changeTab(e);
                         }.bind(this));
                         this.$tabLink.on('keydown', function () {
-                            this.changeTabKey();
+                            this.changeTabKey(e);
                         }.bind(this));
                     },
 
-                    changeTab: function () {
+                    changeTab: function (event) {
                         var self = $(event.target);
                         event.preventDefault();
                         this.removeTabFocus();
@@ -382,7 +388,7 @@
                         this.setSelectedTabPanel(self);
                     },
 
-                    changeTabKey: function () {
+                    changeTabKey: function (event) {
                         var self = $(event.target),
                             $target = this.setKeyboardDirection(self, event.keyCode);
 

@@ -35,7 +35,6 @@ class Yatra_Enquiry_Form extends Yatra_Form
                     'title' => __('Full Name', 'yatra'),
                     'type' => 'text',
                     'value' => '',
-                    'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
                         'placeholder' => __('Your full name', 'yatra'),
                         'required' => 'required'
@@ -46,22 +45,17 @@ class Yatra_Enquiry_Form extends Yatra_Form
                         ),
 
                     ),
-                    'group_id' => 'yatra_tour_customer_info',
-                    'row_start' => true,
                 ),
                 'email' => array(
                     'name' => 'email',
                     'title' => __('Email', 'yatra'),
                     'type' => 'email',
                     'value' => '',
-                    'group_id' => 'yatra_tour_customer_info',
-                    'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
                         'placeholder' => __('Email address', 'yatra'),
                         'required' => 'required'
                     ),
 
-                    'row_end' => true,
                     'validation' => array(
                         'required' => array(
                             'message' => __('Email field is required.', 'yatra'),
@@ -75,59 +69,46 @@ class Yatra_Enquiry_Form extends Yatra_Form
                     'name' => 'country',
                     'title' => __('Country', 'yatra'),
                     'type' => 'select',
-                    'group_id' => 'yatra_tour_customer_info',
                     'options' => $countries,
-                    'wrap_class' => 'yatra-left',
-                    'row_start' => true,
                     'select2' => true
                 ),
                 'phone_number' => array(
                     'name' => 'phone_number',
                     'title' => __('Phone Number', 'yatra'),
                     'type' => 'text',
-                    'group_id' => 'yatra_tour_customer_info',
                     'value' => '',
-                    'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
                         'placeholder' => __('Your contact number', 'yatra'),
                     ),
-                    'row_end' => true,
                 ),
                 'number_of_adults' => array(
                     'name' => 'phone_number',
-                    'title' => __('Phone Number', 'yatra'),
+                    'title' => __('Number of Adults', 'yatra'),
                     'type' => 'text',
-                    'group_id' => 'yatra_tour_customer_info',
                     'value' => '',
-                    'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
-                        'placeholder' => __('Your contact number', 'yatra'),
+                        'placeholder' => __('Number of Adults', 'yatra'),
                     ),
-                    'row_end' => true,
                 ),
                 'number_of_children' => array(
                     'name' => 'number_of_children',
-                    'title' => __('Phone Number', 'yatra'),
+                    'title' => __('Number of Children', 'yatra'),
                     'type' => 'text',
-                    'group_id' => 'yatra_tour_customer_info',
                     'value' => '',
-                    'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
-                        'placeholder' => __('Your contact number', 'yatra'),
+                        'placeholder' => __('Number of Children', 'yatra'),
                     ),
-                    'row_end' => true,
                 ),
                 'message' => array(
                     'name' => 'message',
-                    'title' => __('Phone Number', 'yatra'),
-                    'type' => 'text',
-                    'group_id' => 'yatra_tour_customer_info',
+                    'title' => __('Message', 'yatra'),
+                    'type' => 'textarea',
                     'value' => '',
-                    'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
-                        'placeholder' => __('Your contact number', 'yatra'),
+                        'placeholder' => __('Message', 'yatra'),
+                        'cols' => 8,
+                        'rows' => 8
                     ),
-                    'row_end' => true,
                 )
             )
         );

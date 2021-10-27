@@ -285,6 +285,7 @@ final class Yatra_Install
 		  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 		  tour_id BIGINT(20) UNSIGNED NOT NULL,
 		  slot_group_id BIGINT(20) UNSIGNED NOT NULL,
+    	  user_id BIGINT(20) UNSIGNED NOT NULL,
 		  start_date timestamp NULL DEFAULT NULL,
 		  end_date timestamp NULL DEFAULT NULL,
 		  pricing LONGTEXT DEFAULT NULL,

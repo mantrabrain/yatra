@@ -241,12 +241,13 @@ class Yatra_Tour
                 'tour_id' => $this->ID
             );
 
-            $update_ignore = array('start_date', 'end_date', 'tour_id', 'created_at', 'created_by', 'booked_travellers');
+            $update_ignore = array('user_id', 'start_date', 'end_date', 'tour_id', 'created_at', 'created_by', 'booked_travellers');
 
             $save_ignore = array('booked_travellers');
 
             $data = array(
                 'tour_id' => $this->ID,
+                'user_id' => $user_id,
                 'slot_group_id' => $slot_group_id,
                 'start_date' => $start_date_value,
                 'end_date' => $end_date_value,
