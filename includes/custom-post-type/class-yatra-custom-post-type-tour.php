@@ -24,7 +24,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'not_found' => __('No Tours found', 'yatra'),
                 'not_found_in_trash' => __('No Tours found in the Trash', 'yatra'),
                 'parent_item_colon' => '',
-                'menu_name' => __('Tours', 'yatra'),
+                'menu_name' => __('Yatra', 'yatra'),
             );
             $args = array(
                 'labels' => $labels,

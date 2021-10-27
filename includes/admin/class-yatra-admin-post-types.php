@@ -97,7 +97,7 @@ class Yatra_Admin_Post_Types
     /**
      * Change messages when a post type is updated.
      *
-     * @param  array $messages Array of messages.
+     * @param array $messages Array of messages.
      * @return array
      */
     public function post_updated_messages($messages)
@@ -131,8 +131,8 @@ class Yatra_Admin_Post_Types
     /**
      * Specify custom bulk actions messages for different post types.
      *
-     * @param  array $bulk_messages Array of messages.
-     * @param  array $bulk_counts Array of how many objects were updated.
+     * @param array $bulk_messages Array of messages.
+     * @param array $bulk_counts Array of how many objects were updated.
      * @return array
      */
     public function bulk_post_updated_messages($bulk_messages, $bulk_counts)
@@ -199,9 +199,9 @@ class Yatra_Admin_Post_Types
      * Offers a way to hook into save post without causing an infinite loop
      * when quick/bulk saving product info.
      *
-     * @since 3.0.0
      * @param int $post_id Post ID being saved.
      * @param object $post Post object being saved.
+     * @since 3.0.0
      */
     public function bulk_and_quick_edit_hook($post_id, $post)
     {
@@ -307,8 +307,8 @@ class Yatra_Admin_Post_Types
     /**
      * Hidden default Meta-Boxes.
      *
-     * @param  array $hidden Hidden boxes.
-     * @param  object $screen Current screen.
+     * @param array $hidden Hidden boxes.
+     * @param object $screen Current screen.
      * @return array
      */
     public function hidden_meta_boxes($hidden, $screen)

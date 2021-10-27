@@ -25,7 +25,15 @@ class Yatra_Core_DB
         if (empty($select)) {
 
             $select_text = "SELECT * FROM " . self::get_table($table);
+
+        } else if (gettype($select) === "string") {
+
+            $select = trim($select);
+
+            $select_text = "SELECT {$select} FROM " . self::get_table($table);
+
         } else {
+
             $select_text = "SELECT ";
 
             foreach ($select as $select_field_index => $select_field) {
@@ -225,6 +233,20 @@ class Yatra_Core_DB
     public static function get_data($table, $select = array(), $where = array(), $additional_args = array())
     {
         return self::fetch($table, $select, $where, $additional_args);
+
+    }
+
+    public static function get_count($table, $where = array(), $additional_args = array())
+    {
+        $data = self::fetch($table, " count(*) as total ", $where, $additional_args);
+
+        if (isset($data[0])) {
+            if (isset($data[0]->total)) {
+
+                return absint($data['0']->total);
+            }
+        }
+        return 0;
 
     }
 

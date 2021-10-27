@@ -198,6 +198,7 @@ final class Yatra_Admin
         include_once YATRA_ABSPATH . 'includes/admin/yatra-admin-functions.php';
         include_once YATRA_ABSPATH . 'includes/admin/dashboard/class-mantrabrain-admin-dashboard.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-form-handler.php';
+        include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-tour-enquiries.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-export-import.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-assets.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-post-types.php';
