@@ -276,6 +276,7 @@
                             },
                             beforeSend: function () {
                                 $('.yatra-tour-booking-pricing-wrap').addClass('yatra-loading');
+                                $('.yatra-calendar').addClass('yatra-loading');
                             },
                             success: function (data) {
 
@@ -289,6 +290,7 @@
                             complete: function () {
 
                                 $('.yatra-tour-booking-pricing-wrap').removeClass('yatra-loading');
+                                $('.yatra-calendar').removeClass('yatra-loading');
                             }
                         });
                     },

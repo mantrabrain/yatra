@@ -64,11 +64,11 @@
 .yatra-calendar header .month {
     padding: 0;
     margin: 0;
-    font-size: 30px;
+    font-size: 25px;
 }
 
 .yatra-calendar header .month .year {
-    font-size: 25px;
+    font-size: 20px;
     font-weight: 500;
     margin: 10px 0;
 }
@@ -85,15 +85,17 @@
     font-size: 1.2em;
     font-weight: 600;
     border-bottom: 1px solid #ddd;
+    background: #eafffb;
 }
 
 .yatra-calendar td {
     padding: 5px;
     border: 1px solid #ddd;
+    text-align: center;
 }
 
 .yatra-calendar td.active {
-    background: #edebff;
+    background: #eafffb;
 }
 
 .yatra-calendar .day {
@@ -105,6 +107,7 @@
     border-radius: 0;
     border: 2px solid transparent;
     cursor: pointer;
+    text-align: center;
 }
 
 .yatra-calendar .day:hover {
