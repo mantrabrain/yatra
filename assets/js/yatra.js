@@ -47,6 +47,7 @@
             },
             cacheDom: function () {
                 this.$booking_form = $('#yatra-tour-booking-form-fields');
+                this.$enquiry_form = $('#yatra-tour-enquiry-form-fields');
                 this.$yatra_update_cart = $('.yatra_update_cart');
             },
 
@@ -57,6 +58,12 @@
                     var tour_id = $(this).attr('data-tour-id');
                     var form_data = $(this).serialize();
                     $this.bookTour(form_data);
+                });
+
+                this.$enquiry_form.on('submit', function (e) {
+                    e.preventDefault();
+                    var form_data = $(this).serialize();
+                    $this.sendEnquiry(form_data);
                 });
 
                 $('body').on('click', '.yatra_update_cart', function (e) {
@@ -118,13 +125,12 @@
                     });
 
 
-
                     heading.append(span);
                     toggle_node.remove();
 
                 });
                 $('body').on('click', '.yatra-enquiry-now-btn', function (event) {
-                     $('#yatra-tour-sidebar-tabs').find('.yatra-tab-wrap li').find('a[aria-controls="yatra-tour-enquiry-form"]').trigger('click');
+                    $('#yatra-tour-sidebar-tabs').find('.yatra-tab-wrap li').find('a[aria-controls="yatra-tour-enquiry-form"]').trigger('click');
                     event.preventDefault();
 
                 });
@@ -236,6 +242,32 @@
                     },
                     complete: function () {
                         $this.removeLoading($btn);
+                    }
+                });
+            },
+
+            sendEnquiry: function (form_data) {
+                var $this = this;
+                $.ajax({
+                    type: "POST",
+                    url: yatra_params.ajax_url,
+                    data: form_data,
+                    beforeSend: function () {
+                        $this.$enquiry_form.find('fieldset').prop('disabled', true);
+                    },
+                    success: function (data) {
+                        var el = $('.yatra-enquiry-submit-btn-wrapper');
+
+                        if (data.success === true) {
+                            YatraMessages.showSuccess(el, data.data);
+                            $this.$enquiry_form[0].reset();
+
+                        } else {
+                            YatraMessages.showError(el, data.data);
+                        }
+                    },
+                    complete: function () {
+                        $this.$enquiry_form.find('fieldset').prop('disabled', false);
                     }
                 });
             },
@@ -482,6 +514,53 @@
 
         // allow jQuery chaining
         return this;
+    };
+
+
+    var YatraMessages = {
+
+        getMessageHTML: function (messages) {
+            var message_html = $("<ul/>");
+
+            if (typeof messages === "object") {
+                messages.forEach((value, index) => {
+                    var li = $('<li/>').text(value);
+                    message_html.append(li);
+                });
+            } else if (typeof messages === "string") {
+                var li = $('<li/>').text(messages);
+                message_html.append(li);
+            }
+            return message_html;
+        },
+        showError: function (el, messages) {
+
+            var message_html = this.getMessageHTML(messages);
+
+            var error_html = $('<div class="yatra-message yatra-error"/>');
+
+            error_html.append(message_html);
+
+            $(el).find('.yatra-message').remove();
+
+            $(el).append(error_html);
+
+            $(el).find('.yatra-message').delay(5000).fadeOut(800);
+        },
+        showSuccess: function (el, messages) {
+
+            var message_html = this.getMessageHTML(messages);
+
+            var error_html = $('<div class="yatra-message yatra-success"/>');
+
+            error_html.append(message_html);
+
+            $(el).find('.yatra-message').remove();
+
+            $(el).append(error_html);
+
+            $(el).find('.yatra-message').delay(5000).fadeOut(800);
+        }
     };
 
     $(document).ready(function () {

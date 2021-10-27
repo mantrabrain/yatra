@@ -10,6 +10,18 @@
   padding: 15px 10px 15px 50px;
   background-repeat: no-repeat;
   background-position: 10px center;
+  text-align: left;
+
+  ul {
+    margin: 0;
+    padding: 0;
+
+    li {
+      margin: 0;
+      padding: 0;
+      list-style: disc !important;
+    }
+  }
 }
 
 .yatra-info {
@@ -35,4 +47,4 @@
 .yatra-validation {
   color: #D63301;
   background-color: #FFCCBA;
- }
+}

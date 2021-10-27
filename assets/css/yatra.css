@@ -214,7 +214,15 @@
   margin: 10px 0px;
   padding: 15px 10px 15px 50px;
   background-repeat: no-repeat;
-  background-position: 10px center; }
+  background-position: 10px center;
+  text-align: left; }
+  .yatra-info ul, .yatra-success ul, .yatra-warning ul, .yatra-error ul, .yatra-validation ul {
+    margin: 0;
+    padding: 0; }
+    .yatra-info ul li, .yatra-success ul li, .yatra-warning ul li, .yatra-error ul li, .yatra-validation ul li {
+      margin: 0;
+      padding: 0;
+      list-style: disc !important; }
 
 .yatra-info {
   color: #00529B;
@@ -236,7 +244,7 @@
   color: #D63301;
   background-color: #FFCCBA; }
 
-.yatra-book-btn-wrapper, .yatra-enquiry-btn-wrapper {
+.yatra-book-btn-wrapper, .yatra-enquiry-btn-wrapper, .yatra-enquiry-submit-btn-wrapper {
   text-align: right; }
 
 .mb-clear {
@@ -821,6 +829,14 @@ body.single .yatra-single-tour:after {
 .yatra-tour-enquiry-form-wrap .select2-container--default .select2-selection--single .select2-selection__arrow {
   height: 40px;
   right: 6px; }
+
+#yatra-tour-enquiry-form-fields fieldset {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  border: none;
+  margin: 0;
+  padding: 0; }
 
 .yatra-shortcode-wrapper form.yatra-cart-form {
   position: relative; }

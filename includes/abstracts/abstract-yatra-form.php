@@ -21,7 +21,6 @@ abstract class Yatra_Form
     {
         $valid_data = array();
 
-
         foreach ($form_fields_all as $field_option) {
 
 
@@ -67,7 +66,7 @@ abstract class Yatra_Form
 
                 case "required":
 
-                    if (empty($value)) {
+                    if (empty($value) || $value == '' || is_null($value)) {
                         yatra()->yatra_error->add('yatra_form_validation_errors', $error_message);
                     }
                     break;
@@ -281,7 +280,7 @@ abstract class Yatra_Form
                 ?>
                 <p>
                 <label
-                        for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']).$required_indicator; ?>
+                        for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']) . $required_indicator; ?>
                     :</label>
                 <?php
                 if ($editor) {
@@ -304,7 +303,7 @@ abstract class Yatra_Form
                 ?>
                 <p>
                     <label
-                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']).$required_indicator; ?>
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']) . $required_indicator; ?>
                         :</label>
                     <?php
                     $options = isset($field['options']) ? $field['options'] : array();
@@ -350,7 +349,7 @@ abstract class Yatra_Form
             case "image":
                 ?>
                 <p><label
-                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']).$required_indicator; ?>
+                            for="<?php echo esc_attr(($field_key)); ?>"><?php echo esc_html($field['title']) . $required_indicator; ?>
                         :</label>
                 <div class="media-uploader" id="<?php echo('background_image'); ?>">
                     <div class="custom_media_preview <?php echo esc_attr($class); ?>">

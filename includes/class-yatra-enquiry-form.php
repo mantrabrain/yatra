@@ -82,18 +82,18 @@ class Yatra_Enquiry_Form extends Yatra_Form
                     ),
                 ),
                 'number_of_adults' => array(
-                    'name' => 'phone_number',
+                    'name' => 'number_of_adults',
                     'title' => __('Number of Adults', 'yatra'),
-                    'type' => 'text',
+                    'type' => 'number',
                     'value' => '',
                     'extra_attributes' => array(
                         'placeholder' => __('Number of Adults', 'yatra'),
                     ),
                 ),
-                'number_of_children' => array(
-                    'name' => 'number_of_children',
+                'number_of_childs' => array(
+                    'name' => 'number_of_childs',
                     'title' => __('Number of Children', 'yatra'),
-                    'type' => 'text',
+                    'type' => 'number',
                     'value' => '',
                     'extra_attributes' => array(
                         'placeholder' => __('Number of Children', 'yatra'),
@@ -109,6 +109,7 @@ class Yatra_Enquiry_Form extends Yatra_Form
                         'cols' => 8,
                         'rows' => 8
                     ),
+                    'allowed_tags' => array()
                 )
             )
         );
@@ -130,6 +131,27 @@ class Yatra_Enquiry_Form extends Yatra_Form
     public function validate($data = array())
     {
         return $this->valid_data($data, $this->get_form_fields());
+
+    }
+
+    public function save_enquiry($post_data = array())
+    {
+        $tour_id = $post_data['tour_id'] ? absint($post_data['tour_id']) : '';
+
+        $valid_data = $this->validate($post_data);
+
+        $valid_data['tour_id'] = $tour_id;
+
+        $valid_data['created_at'] = current_time('mysql');
+
+        $valid_data['subject'] = 'Tour Booking Enquiry';
+
+        if (yatra()->yatra_error->has_errors()) {
+            return false;
+        }
+        $status = Yatra_Core_DB::save_data(Yatra_Tables::TOUR_ENQUIRIES, $valid_data);
+
+        return $status;
 
     }
 

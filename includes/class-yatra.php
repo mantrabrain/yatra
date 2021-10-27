@@ -212,6 +212,7 @@ final class Yatra
          * Abstract Class
          */
 
+        include_once YATRA_ABSPATH . 'includes/static/class-yatra-tables.php';
         include_once YATRA_ABSPATH . 'includes/abstracts/abstract-yatra-form.php';
         include_once YATRA_ABSPATH . 'includes/abstracts/abstract-yatra-payment-gateways.php';
 

@@ -27,6 +27,7 @@ class Yatra_Ajax
             'update_cart',
             'tour_frontend_availability',
             'tour_frontend_availability_month',
+            'tour_enquiry',
         );
         return $actions;
     }
@@ -412,6 +413,22 @@ class Yatra_Ajax
 
         }
         wp_send_json_success(array('enable_dates' => $enabled_date, 'available_data' => $yatra_available_date_data));
+    }
+
+    public function tour_enquiry()
+    {
+        $status = $this->validate_nonce();
+
+        if (!$status) {
+            wp_send_json_error($this->ajax_error());
+        }
+        $status = Yatra_Enquiry_Form::get_instance()->save_enquiry($_POST);
+        if (!$status) {
+            wp_send_json_error(__('Something wrong, please try again.', 'yatra'));
+        }
+        wp_send_json_success(__(
+            'Thank you for your query. We will get back to you soon'
+            , 'yatra'));
     }
 
 

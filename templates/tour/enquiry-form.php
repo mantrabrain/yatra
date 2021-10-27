@@ -2,7 +2,16 @@
     <input type="hidden" name="action" value="yatra_tour_enquiry"/>
     <input type="hidden" name="yatra_nonce" value="<?php echo wp_create_nonce('wp_yatra_tour_enquiry_nonce'); ?>"/>
     <input type="hidden" name="tour_id" value="<?php echo get_the_ID(); ?>"/>
-    <div class="yatra-tour-enquiry-form-wrap">
-        <?php do_action('yatra_enquiry_form_fields'); ?>
-    </div>
+    <fieldset>
+        <div class="yatra-tour-enquiry-form-wrap">
+
+            <?php do_action('yatra_enquiry_form_fields'); ?>
+
+        </div>
+        <div class="yatra-enquiry-submit-btn-wrapper">
+            <button type="submit" class="btn primary-btn yatra-enquiry-submit-now-btn" data-text="Book Now"
+            >Send Enquiry Now
+            </button>
+        </div>
+    </fieldset>
 </form>

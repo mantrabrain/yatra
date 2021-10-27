@@ -281,7 +281,7 @@ final class Yatra_Install
             $collate = $wpdb->get_charset_collate();
         }
         // User Item Meta Table
-        $tables[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}tour_dates (
+        $tables[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}" . Yatra_Tables::TOUR_DATES . " (
 		  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 		  tour_id BIGINT(20) UNSIGNED NOT NULL,
 		  slot_group_id BIGINT(20) UNSIGNED NOT NULL,
@@ -300,6 +300,24 @@ final class Yatra_Install
 		  updated_by BIGINT(20) UNSIGNED NOT NULL,
 		  created_at timestamp NULL DEFAULT NULL,
 		  updated_at timestamp NULL DEFAULT NULL,
+		  PRIMARY KEY  (id)
+		  ) $collate;
+		  ";
+
+
+        $tables[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}" . Yatra_Tables::TOUR_ENQUIRIES . " (
+		  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+		  tour_id BIGINT(20) NULL DEFAULT NULL,
+		  fullname VARCHAR(255)  NOT NULL,
+		  email VARCHAR(100)  NOT NULL,
+		  country VARCHAR(20) NULL DEFAULT NULL,
+		  phone_number VARCHAR(20) DEFAULT NULL,
+		  number_of_adults int DEFAULT NULL,
+		  number_of_childs int DEFAULT NULL,
+		  message TEXT NOT NULL,
+          subject TEXT NOT NULL,
+          additional_fields TEXT DEFAULT NULL,
+		  created_at timestamp NULL DEFAULT NULL,
 		  PRIMARY KEY  (id)
 		  ) $collate;
 		  ";
