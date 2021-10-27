@@ -251,3 +251,31 @@ if (!function_exists('yatra_html_show_notice')) {
         <?php
     }
 }
+if (!function_exists('yatra_nice_input_number_field')) {
+    function yatra_nice_input_number_field($field_name, $max = '', $min = '')
+    {
+        $max = $max === '' ? 9999 : absint($max);
+        $min = $min === '' ? 0 : absint($min);
+        ?>
+        <div class="yatra-nice-input-number">
+            <button type="button" class="nice-button minus-button">
+                <span class="icon fa fa-minus"></span>
+            </button>
+
+            <input readonly
+                   data-step="1"
+                   data-max="<?php echo esc_attr($max); ?>"
+                   data-min="<?php echo esc_attr($min) ?>"
+                   id="<?php echo esc_attr($field_name) ?>"
+                   type="number"
+                   name="<?php echo esc_attr($field_name) ?>"
+                   value="<?php echo absint($min) ?>"
+            />
+            <button type="button" class="nice-button plus-button">
+                <span class="icon fa fa-plus"></span>
+            </button>
+
+        </div>
+        <?php
+    }
+}

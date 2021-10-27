@@ -7,24 +7,12 @@ $currency_symbol = yatra_get_current_currency_symbol();
     <div class="yatra-traveler-info-wrap">
         <div class="yatra-traveler-number">
             <div class="yatra-traveler-number-inner">
+                <?php
+                $field_name = $pricing_type === "multi" ? "yatra_number_of_person[multi_pricing][{$yatra_booking_pricing->getID()}]" : "yatra_number_of_person[single_pricing]";
 
-                <div class="yatra-nice-input-number">
-                    <button type="button" class="fa fa-minus nice-button minus-button"></button>
-                    <?php
-                    $field_name = $pricing_type === "multi" ? "yatra_number_of_person[multi_pricing][{$yatra_booking_pricing->getID()}]" : "yatra_number_of_person[single_pricing]"; ?>
-                    <input readonly
-                           data-step="1"
-                           data-max="<?php echo $yatra_booking_pricing->getMaximumPax() == '' ? 9999 : absint($yatra_booking_pricing->getMaximumPax()) ?>"
-                           data-min="<?php echo $yatra_booking_pricing->getMinimumPax() == '' ? 0 : absint($yatra_booking_pricing->getMinimumPax()) ?>"
-                           id="<?php echo esc_attr($field_name) ?>"
-                           type="number"
-                           name="<?php echo esc_attr($field_name) ?>"
-                           value="<?php echo $yatra_booking_pricing->getMinimumPax() == '' ? 1 : absint($yatra_booking_pricing->getMinimumPax()) ?>"
-                    />
-                    <button type="button" class="fa fa-plus nice-button plus-button"></button>
+                yatra_nice_input_number_field($field_name, $yatra_booking_pricing->getMaximumPax(), $yatra_booking_pricing->getMinimumPax());
 
-                </div>
-
+                ?>
             </div>
             <span><?php echo esc_html($yatra_booking_pricing->getLabel()) ?></span>
         </div>

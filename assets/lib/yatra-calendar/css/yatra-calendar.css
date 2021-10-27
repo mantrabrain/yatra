@@ -3,8 +3,9 @@
     overflow: hidden;
     text-transform: capitalize;
     text-align: center;
-    font: 15px/1em inherit;
+    font-size: 16px;
     color: #545a5c;
+    margin-bottom: 15px;
 }
 
 .yatra-calendar a {
@@ -83,7 +84,7 @@
 
 .yatra-calendar thead {
     font-size: 1.2em;
-    font-weight: 600;
+    font-weight: 500;
     border-bottom: 1px solid #ddd;
     background: #eafffb;
 }
