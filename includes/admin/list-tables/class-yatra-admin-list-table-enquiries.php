@@ -182,7 +182,7 @@ class Yatra_Admin_List_Table_Enquiries extends WP_List_Table
     {
         // Set defaults
         $orderby = 'id';
-        $order = 'asc';
+        $order = 'DESC';
 
         // If orderby is set, use this as the sort column
         if (!empty($_GET['orderby'])) {
@@ -199,7 +199,7 @@ class Yatra_Admin_List_Table_Enquiries extends WP_List_Table
             $orderby = 'id';
         }
         if (!in_array(strtoupper($order), array('ASC', 'DESC'))) {
-            $order = 'asc';
+            $order = 'DESC';
         }
         return [
             'order' => $order,
