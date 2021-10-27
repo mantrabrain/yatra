@@ -317,6 +317,7 @@ final class Yatra_Install
 		  message TEXT NOT NULL,
           subject TEXT NOT NULL,
           additional_fields TEXT DEFAULT NULL,
+          ip_address varchar(255) DEFAULT NULL,
 		  created_at timestamp NULL DEFAULT NULL,
 		  PRIMARY KEY  (id)
 		  ) $collate;

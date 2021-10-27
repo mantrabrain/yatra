@@ -146,6 +146,8 @@ class Yatra_Enquiry_Form extends Yatra_Form
 
         $valid_data['subject'] = 'Tour Booking Enquiry';
 
+        $valid_data['ip_address'] = sanitize_text_field(yatra_get_visitor_ip_address());
+
         if (yatra()->yatra_error->has_errors()) {
             return false;
         }

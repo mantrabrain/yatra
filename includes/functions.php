@@ -1108,3 +1108,32 @@ function yatra_get_current_month_start_and_end_date($year = null, $month = null,
     ];
 
 }
+
+
+if (!function_exists('yatra_get_visitor_ip_address')) {
+
+    function yatra_get_visitor_ip_address()
+    {
+
+        if (getenv('HTTP_CLIENT_IP')) {
+            $ip_address = getenv('HTTP_CLIENT_IP');
+        } else if (getenv('HTTP_X_FORWARDED_FOR')) {
+            $ip_address = getenv('HTTP_X_FORWARDED_FOR');
+        } else if (getenv('HTTP_X_FORWARDED')) {
+            $ip_address = getenv('HTTP_X_FORWARDED');
+        } else if (getenv('HTTP_FORWARDED_FOR')) {
+            $ip_address = getenv('HTTP_FORWARDED_FOR');
+        } else if (getenv('HTTP_FORWARDED')) {
+            $ip_address = getenv('HTTP_FORWARDED');
+        } else if (getenv('REMOTE_ADDR')) {
+            $ip_address = getenv('REMOTE_ADDR');
+        } else {
+            $ip_address = 'UNKNOWN';
+        }
+        if (apply_filters('yatra_track_visitor_ip_address', true)) {
+
+            return $ip_address;
+        }
+        return 'TRACKING_DISABLED';
+    }
+}
