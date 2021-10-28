@@ -65,6 +65,10 @@ class Yatra_Customers
         }
         update_post_meta($customer_id, 'yatra_customer_booking_meta', $booking_meta_params_from_db);
 
+        $current_user_id = get_current_user_id();
+
+        update_post_meta($customer_id, 'yatra_user_id', $current_user_id);
+
         return $customer_id;
     }
 

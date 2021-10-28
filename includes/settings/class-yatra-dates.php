@@ -32,9 +32,9 @@ class Yatra_Dates
 
         if (!is_null($start_date) && !is_null($end_date)) {
 
-            $this->all_date_wise_data = Yatra_Core_DB::get_data('tour_dates', '', $where);
-        }
+            $this->all_date_wise_data = Yatra_Core_DB::get_tour_dates_data($where);
 
+        }
 
     }
 
@@ -61,7 +61,7 @@ class Yatra_Dates
         $date_wise_index = str_replace(' ', '', trim($this->start_date . '_' . $this->end_date));
 
         if (isset($all_processed_data[$date_wise_index])) {
-            
+
             return $all_processed_data[$date_wise_index];
 
         }

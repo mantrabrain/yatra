@@ -77,6 +77,14 @@ class Yatra_Ajax
         if (!$status) {
             wp_send_json_error($this->ajax_error());
         }
+
+        $start_date = isset($_POST['yatra_tour_start_date']) ? sanitize_text_field($_POST['yatra_tour_start_date']) : '';
+
+        if ($start_date == '') {
+
+            wp_send_json_error('Invalid Date');
+        }
+
         $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
 
         $number_of_persons = isset($_POST['yatra_number_of_person']) ? ($_POST['yatra_number_of_person']) : array();
@@ -90,6 +98,7 @@ class Yatra_Ajax
         if (!isset($number_of_persons['single_pricing']) && !isset($number_of_persons['multi_pricing'])) {
             wp_send_json_error();
         }
+
 
         $type = 'single';
 
@@ -107,7 +116,17 @@ class Yatra_Ajax
             $number_of_persons = 0;
         }
 
+        $isAvailabilityValid = Yatra_Core_Tour_Availability::availability_check($tour_id, $start_date, $number_of_persons);
 
+        if (!$isAvailabilityValid) {
+            if (yatra()->yatra_error->has_errors()) {
+                wp_send_json_error(yatra()->yatra_error->get_error_messages());
+
+            }
+        }
+
+
+        wp_send_json_error('error occur');
         $tour = get_post($tour_id);
 
         if (!isset($tour->post_type) || $tour->post_type != 'tour') {

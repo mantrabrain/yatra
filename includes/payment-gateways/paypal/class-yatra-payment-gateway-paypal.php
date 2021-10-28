@@ -217,7 +217,9 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
                 update_post_meta($payment_id, 'yatra_total_paid_currency', $_POST['mc_currency']);
 
-                do_action('yatra_after_successful_payment', $booking_id, $message);
+                update_post_meta($payment_id, 'yatra_payment_gateway', $this->id);
+
+                do_action('yatra_after_successful_payment', $booking_id, $message, $payment_id, $this->id);
 
             } else {
 
@@ -234,8 +236,8 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
             file_put_contents('yatra-ipn_errors.log', print_r($errors, true) . PHP_EOL, LOCK_EX | FILE_APPEND);
 
-            do_action('yatra_after_failed_payment', $booking_id, $message);
-
+            do_action('yatra_after_failed_payment', $booking_id, $message, $this->id);
+            
         }
         file_put_contents('yatra-ipn_message.log', print_r($message, true) . PHP_EOL, LOCK_EX | FILE_APPEND);
 

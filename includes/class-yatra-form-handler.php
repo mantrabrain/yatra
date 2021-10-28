@@ -41,7 +41,7 @@ class Yatra_Form_Handler
             return;
         }
 
-        if (yatra_enable_guest_checkout()) {
+        if (yatra_enable_guest_checkout() && !is_user_logged_in()) {
 
             $valid_data = Yatra_Checkout_Form::get_instance()->valid_tour_checkout_form($_POST);
 

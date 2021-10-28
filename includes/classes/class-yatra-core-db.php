@@ -233,7 +233,6 @@ class Yatra_Core_DB
     public static function get_data($table, $select = array(), $where = array(), $additional_args = array())
     {
         return self::fetch($table, $select, $where, $additional_args);
-
     }
 
     public static function get_count($table, $where = array(), $additional_args = array())
@@ -250,5 +249,80 @@ class Yatra_Core_DB
 
     }
 
+    public static function get_tour_dates_data($where = array())
+    {
 
+        $query = "SELECT
+     yd.*,
+     yb.booked_travellers
+ FROM
+     " . self::get_table(Yatra_Tables::TOUR_DATES) . " AS yd
+ LEFT JOIN(
+         SELECT
+         tour_id,
+         booked_date,
+         SUM(total_number_of_pax) AS booked_travellers
+     FROM
+         " . self::get_table(Yatra_Tables::TOUR_BOOKING_STATS) . "
+     GROUP BY
+         tour_id,
+         booked_date
+ ) AS yb
+ ON
+     yd.tour_id = yb.tour_id AND date(yd.start_date) = date(yb.booked_date) and date(yd.end_date) = date(yb.booked_date)";
+
+        global $wpdb;
+
+        $where_query = ' WHERE ';
+
+        $prepare_args = array();
+
+        foreach ($where as $wh => $wh_value) {
+
+            $wh_cond_array = explode('|', $wh);
+
+            $left_field = 'yd.' . sanitize_text_field(wp_unslash($wh_cond_array[0]));
+
+            $operator = isset($wh_cond_array[1]) ? $wh_cond_array[1] : "=";
+
+            $operator = in_array($operator, array(">", "<", "=", ">=", "<=")) ? $operator : "=";
+
+            $right_field = isset($wh_cond_array[2]) ? 'yd.' . sanitize_text_field(wp_unslash($wh_cond_array[2])) : "%s";
+
+            $where_query .= "{$left_field}{$operator}{$right_field} AND ";
+
+            array_push($prepare_args, $wh_value);
+        }
+
+        $where_query = rtrim(trim($where_query), "AND");
+
+        $select_text = $query . $where_query;
+
+        $query = $wpdb->prepare($select_text, $prepare_args);
+
+        return $wpdb->get_results($query);
+    }
+
+
+    public function query()
+    {
+        /* SELECT
+     yd.*,
+     yb.total_pax
+ FROM
+     wp_yatra_tour_dates AS yd
+ LEFT JOIN(
+             SELECT
+         tour_id,
+         booked_date,
+         SUM(total_number_of_pax) AS total_pax
+     FROM
+         wp_yatra_tour_booking_stats
+     GROUP BY
+         tour_id,
+         booked_date
+ ) AS yb
+ ON
+     yd.tour_id = yb.tour_id AND date(yd.start_date) = date(yb.booked_date) and date(yd.end_date) = date(yb.booked_date)*/
+    }
 }

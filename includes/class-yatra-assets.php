@@ -58,6 +58,7 @@ if (!class_exists('Yatra_Assets')) {
                 'is_full' => false
             ), true);
 
+          
             $enabled_date = array_keys($yatra_available_date_data);
 
             $yatra_params = array(

@@ -161,6 +161,11 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
             $user = get_user_by('email', $email);
 
             $fullname = $user->first_name . ' ' . $user->last_name;
+
+            if (trim($fullname) == '') {
+                
+                $fullname = $user->nickname;
+            }
         }
 
         printf('<span>%s</span>', esc_html($fullname));

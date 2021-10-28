@@ -241,9 +241,7 @@ class Yatra_Tour
                 'tour_id' => $this->ID
             );
 
-            $update_ignore = array('user_id', 'start_date', 'end_date', 'tour_id', 'created_at', 'created_by', 'booked_travellers');
-
-            $save_ignore = array('booked_travellers');
+            $update_ignore = array('user_id', 'start_date', 'end_date', 'tour_id', 'created_at', 'created_by');
 
             $data = array(
                 'tour_id' => $this->ID,
@@ -254,7 +252,6 @@ class Yatra_Tour
                 'pricing' => json_encode($yatra_final_pricing),
                 'pricing_type' => $pricing_type,
                 'max_travellers' => $max_traveller,
-                'booked_travellers' => '',
                 'active' => $activate,
                 'availability' => $availability_for,
                 'note_to_customer' => '',
@@ -272,7 +269,7 @@ class Yatra_Tour
 
             } else {
 
-                $action_status = Yatra_Core_DB::save_data('tour_dates', $data, $save_ignore);
+                $action_status = Yatra_Core_DB::save_data('tour_dates', $data);
 
 
             }

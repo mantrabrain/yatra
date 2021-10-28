@@ -31,22 +31,11 @@ class Yatra_Template_Hooks
     public function single_tour_booking_form()
     {
 
-        $start = date('Y-m-d');
+        $yatra_tour_options = new Yatra_Tour_Options(get_the_ID(), null, null);
 
-        $end = date('Y-m-d');
+        $dynamicData = $yatra_tour_options->getTourData();
 
-
-        $yatra_tour_options = new Yatra_Tour_Options(get_the_ID(), $start, $end);
-
-        $dynamicData = ($yatra_tour_options->getAllDynamicDataByDateRange());
-
-        if (!$dynamicData instanceof Yatra_Tour_Dates) {
-
-            $dynamicData = $yatra_tour_options->getTourData();
-        } else {
-
-            $dynamicData = (boolean)$dynamicData->isActive() ? $dynamicData : $yatra_tour_options->getTourData();
-        }
+        $dynamicData = (boolean)$dynamicData->isActive() ? $dynamicData : $yatra_tour_options->getTourData();
 
 
         yatra_get_template('tour/booking-form.php',

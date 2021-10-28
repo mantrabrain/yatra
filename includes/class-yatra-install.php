@@ -290,8 +290,7 @@ final class Yatra_Install
 		  end_date timestamp NULL DEFAULT NULL,
 		  pricing LONGTEXT DEFAULT NULL,
 		  pricing_type VARCHAR(50) DEFAULT NULL,
-		  max_travellers int DEFAULT NULL,
-		  booked_travellers int DEFAULT NULL,
+		  max_travellers INT DEFAULT NULL,
 		  active tinyint DEFAULT '0',
 		  availability VARCHAR(50) DEFAULT NULL,
 		  note_to_customer TEXT DEFAULT NULL,
@@ -312,11 +311,27 @@ final class Yatra_Install
 		  email VARCHAR(100)  NOT NULL,
 		  country VARCHAR(20) NULL DEFAULT NULL,
 		  phone_number VARCHAR(20) DEFAULT NULL,
-		  number_of_adults int DEFAULT NULL,
-		  number_of_childs int DEFAULT NULL,
+		  number_of_adults INT DEFAULT NULL,
+		  number_of_childs INT DEFAULT NULL,
 		  message TEXT NOT NULL,
           subject TEXT NOT NULL,
           additional_fields TEXT DEFAULT NULL,
+          ip_address varchar(255) DEFAULT NULL,
+		  created_at timestamp NULL DEFAULT NULL,
+		  PRIMARY KEY  (id)
+		  ) $collate;
+		  ";
+
+        $tables[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}" . Yatra_Tables::TOUR_BOOKING_STATS . " (
+		  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    	  booking_id BIGINT(20) UNSIGNED NOT NULL,
+    	  tour_id BIGINT(20) UNSIGNED NOT NULL,
+    	  customer_id BIGINT(20) UNSIGNED NOT NULL,
+    	  booked_date TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
+		  currency VARCHAR(50)  NOT NULL,
+ 		  total_number_of_pax INT NOT NULL DEFAULT 0,
+		  gross_total_price DOUBLE NOT NULL DEFAULT 0,
+		  net_total_price DOUBLE NOT NULL DEFAULT 0,
           ip_address varchar(255) DEFAULT NULL,
 		  created_at timestamp NULL DEFAULT NULL,
 		  PRIMARY KEY  (id)

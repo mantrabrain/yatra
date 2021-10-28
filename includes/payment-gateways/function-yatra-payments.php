@@ -42,8 +42,11 @@ function yatra_update_payment_status($booking_id)
         return;
     }
     $payment_id = get_post_meta($booking_id, 'yatra_payment_id', true);
+
     if (!$payment_id) {
+
         $title = 'Payment - #' . $booking_id;
+
         $post_array = array(
             'post_title' => $title,
             'post_content' => '',

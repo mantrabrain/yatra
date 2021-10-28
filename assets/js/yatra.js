@@ -234,9 +234,13 @@
                     },
                     success: function (data) {
 
+                        var el = $('.yatra-book-btn-wrapper.book-btn');
                         if (data.success === true) {
 
-                            window.location = data.data.cart_page_url;
+                            //  window.location = data.data.cart_page_url;
+
+                        } else {
+                            YatraMessages.showError(el, data.data);
 
                         }
                     },

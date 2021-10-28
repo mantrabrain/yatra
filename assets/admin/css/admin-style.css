@@ -474,6 +474,25 @@ table.yatra-booking-meta-info tr:last-child {
     text-transform: uppercase;
 }
 
+.yatra-booking-meta-information h2 {
+
+    padding-left: 0 !important;
+    margin-top: 20px !important;
+
+}
+
+.yatra-booking-meta-information .yatra-booking-payment-information {
+    padding: 5px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+
+}
+
+body.post-type-yatra-booking #title {
+    pointer-events: none;
+}
+
+
 /* Custom Post Type Meta Box Box Design
 
  */

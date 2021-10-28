@@ -215,7 +215,6 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                     echo '<tr>';
                     ?>
                 </table>
-
                 <div style="clear:both; margin-top:20px;"></div>
                 <label><strong><?php echo __('Booking Status', 'yatra') ?></strong></label>
                 <?php
@@ -233,6 +232,18 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
                 <input type="hidden" value="<?php echo wp_create_nonce('yatra_booking_post_type_metabox_nonce') ?>"
                        name="yatra_booking_post_type_metabox_nonce"/>
+
+                <?php
+                $payment_log = get_post_meta($booking_id, 'yatra_payment_message', true);
+                if ($payment_log != '' && !empty($payment_log)) {
+                    ?>
+                    <h2><?php echo __('Payment Log', 'yatra') ?></h2>
+                    <div class="yatra-booking-payment-information">
+                        <p><?php
+                            echo esc_html($payment_log);
+                            ?></p>
+                    </div>
+                <?php } ?>
             </div>
             <?php
 

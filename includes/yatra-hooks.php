@@ -7,9 +7,14 @@ if (!function_exists('yatra_checkout_form_fields')) {
 
     function yatra_checkout_form_fields()
     {
-        if (!yatra_enable_guest_checkout()) {
 
-            if (!is_user_logged_in()) {
+        if (is_user_logged_in()) {
+
+            echo '<h2>You are already logged in, please proceed to checkout.</h2>';
+
+        } else {
+
+            if (!yatra_enable_guest_checkout()) {
 
                 yatra_get_template('myaccount/tmpl-form-login.php', array());
 
@@ -19,13 +24,8 @@ if (!function_exists('yatra_checkout_form_fields')) {
 
             } else {
 
-                echo '<h2>You are already loged in, please proceed to checkout.</h2>';
-
+                Yatra_Checkout_Form::get_instance()->tour_checkout_form();
             }
-
-        } else {
-
-            Yatra_Checkout_Form::get_instance()->tour_checkout_form();
         }
     }
 
