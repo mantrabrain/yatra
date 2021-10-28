@@ -22,7 +22,7 @@ class Yatra_Core_Tour_Availability
         $pricing_type = $tour_options->getPricingType();
 
         $pricing = $tour_options->getPricing();
-
+        
         $booked_travellers = $tour_options->getBookedTravellers();
 
         $max_travellers = $tour_options->getMaximumNumberOfTravellers();
