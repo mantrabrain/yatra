@@ -82,7 +82,7 @@ class Yatra_Ajax
 
         if ($start_date == '') {
 
-            wp_send_json_error('Invalid Date');
+            wp_send_json_error('Please select proper date from above calendar');
         }
 
         $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
@@ -105,35 +105,43 @@ class Yatra_Ajax
         if (isset($number_of_persons['single_pricing'])) {
 
             $number_of_persons = $number_of_persons['single_pricing'];
+
             $type = 'single';
 
         } else if (isset($number_of_persons['multi_pricing'])) {
 
             $number_of_persons = $number_of_persons['multi_pricing'];
+
             $type = 'multi';
 
         } else {
             $number_of_persons = 0;
         }
 
-        $isAvailabilityValid = Yatra_Core_Tour_Availability::availability_check($tour_id, $start_date, $number_of_persons);
+        $booking_validation = new Yatra_Tour_Availability_Validation($tour_id, $start_date, $number_of_persons);
 
-        if (!$isAvailabilityValid) {
+        $isAvailabilityValid = $booking_validation->validate();
+
+        if (!$isAvailabilityValid || yatra()->yatra_error->has_errors()) {
+
             if (yatra()->yatra_error->has_errors()) {
+
                 wp_send_json_error(yatra()->yatra_error->get_error_messages());
 
+            } else {
+                wp_send_json_error("Something wrong, please try again");
             }
         }
 
 
-        wp_send_json_error('error occur');
         $tour = get_post($tour_id);
 
         if (!isset($tour->post_type) || $tour->post_type != 'tour') {
+
             wp_send_json_error($this->ajax_error());
         }
-        $status = yatra()->cart->update_cart($tour_id, $number_of_persons, $type);
 
+        $status = yatra()->cart->update_cart($tour_id, $number_of_persons, $type, $start_date);
 
         if ($status) {
 
@@ -383,20 +391,26 @@ class Yatra_Ajax
 
         $yatra_tour_options = new Yatra_Tour_Options($tour_id, $selected_date, $selected_date);
 
-        $dynamicData = ($yatra_tour_options->getAllDynamicDataByDateRange());
+        $todayDataSettings = $yatra_tour_options->getTodayData($selected_date);
 
-        if (!$dynamicData instanceof Yatra_Tour_Dates) {
+        if ($todayDataSettings instanceof Yatra_Tour_Dates) {
 
-            $dynamicData = $yatra_tour_options->getTourData();
+            $todayData = (boolean)$todayDataSettings->isActive() ? $todayDataSettings : $yatra_tour_options->getTourData();
+
         } else {
 
-            $dynamicData = (boolean)$dynamicData->isActive() ? $dynamicData : $yatra_tour_options->getTourData();
+            $todayData = $yatra_tour_options->getTourData();
         }
 
-        $pricing_type = $dynamicData->getPricingType();
+
+        $pricing_type = $todayData->getPricingType();
+
         ob_start();
-        Yatra_Template_Hooks::tour_booking_pricing_content($dynamicData, $pricing_type);
+
+        Yatra_Template_Hooks::tour_booking_pricing_content($todayData, $pricing_type);
+
         $content = ob_get_clean();
+
         wp_send_json_success($content);
     }
 

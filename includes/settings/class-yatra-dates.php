@@ -16,13 +16,17 @@ class Yatra_Dates
 
     private $tour_id;
 
-    public function __construct($tourID, $start_date = null, $end_date = null)
+    protected $number_of_people;
+
+    public function __construct($tourID, $start_date = null, $end_date = null, $number_of_people = null)
     {
         $this->start_date = trim($start_date . ' 00:00:00');
 
         $this->end_date = trim($end_date . ' 23:59:59');
 
         $this->tour_id = $tourID;
+
+        $this->number_of_people = $number_of_people;
 
         $where = array(
             'start_date |>=' => $this->start_date,
@@ -44,7 +48,7 @@ class Yatra_Dates
 
         if (count($this->all_date_wise_data) < 1) {
 
-            return $this->getSingleTourData($this->tour_id);
+            return $this->getSingleTourData($this->tour_id, $this->number_of_people);
         }
 
 
@@ -54,7 +58,7 @@ class Yatra_Dates
 
             $single_date_wise_index = str_replace(' ', '', trim($single_data_row->start_date . '_' . $single_data_row->end_date));
 
-            $all_processed_data[$single_date_wise_index] = $tour_dates->map($single_data_row);
+            $all_processed_data[$single_date_wise_index] = $tour_dates->map($single_data_row, $this->number_of_people);
 
         }
 
@@ -68,12 +72,12 @@ class Yatra_Dates
         return $all_processed_data;
     }
 
-    public static function getSingleTourData($tourID)
+    public static function getSingleTourData($tourID, $number_of_people = null)
     {
         $yatra_pricing = new Yatra_Pricing();
         $all_date_wise_data = new stdClass();
         $all_date_wise_data->tour_id = $tourID;
-        $all_date_wise_data->pricing = $yatra_pricing->getPricing($tourID);
+        $all_date_wise_data->pricing = $yatra_pricing->getPricing($tourID, $number_of_people);
         $all_date_wise_data->pricing_type = yatra_get_pricing_type($tourID);
         $all_date_wise_data->max_travellers = get_post_meta($tourID, 'yatra_tour_maximum_number_of_traveller', true);
         $all_date_wise_data->booked_travellers = 0;

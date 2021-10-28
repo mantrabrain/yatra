@@ -7,6 +7,8 @@ interface Yatra_Tour_Interface
 {
     public function getTourData();
 
+    public function getTodayData($today);
+
     public function getAllDynamicDataByDateRange($start_date = null, $end_date = null);
 
     public function isFixedDeparture();

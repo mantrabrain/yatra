@@ -371,22 +371,64 @@ if (!function_exists('yatra_cart_edit_person_pricing_details')) {
     {
         $number_of_person = isset($cart_items['number_of_person']) ? $cart_items['number_of_person'] : 0;
 
-        yatra()->tour->maybe_initialize($tour_id);
+        $selected_date = isset($cart_items['selected_date']) ? $cart_items['selected_date'] : '';
 
-        $booking_pricing_info = yatra()->tour->get_pricing($number_of_person);
+        if ($selected_date == '') {
+            return;
+        }
 
-        yatra()->tour->maybe_flush();
+        $tour_options = new Yatra_Tour_Options($tour_id, $selected_date, $selected_date, $number_of_person);
+
+        $tourData = $tour_options->getTourData();
+
+        $todayDataSettings = $tour_options->getTodayData($selected_date);
+
+        if ($todayDataSettings instanceof Yatra_Tour_Dates) {
+
+            $todayData = (boolean)$todayDataSettings->isActive() ? $todayDataSettings : $tourData;
+
+        } else {
+
+            $todayData = $tourData;
+        }
+
+        $booking_pricing_info = $todayData->getPricing();
 
         yatra_get_template('tmpl-cart-edit-form.php',
             array(
                 'yatra_booking_pricing_info' => $booking_pricing_info,
-                'tour_id' => $tour_id
+                'tour_id' => $tour_id,
+                'number_of_person' => $number_of_person
             )
         );
 
     }
 }
 
+if (!function_exists('yatra_cart_edit_item')) {
+
+    function yatra_cart_edit_item($pricing_item, $currency, $tour_id, $number_of_person)
+    {
+        $person = $number_of_person;
+
+        if ($pricing_item instanceof Yatra_Tour_Pricing) {
+
+            $person = is_array($number_of_person) ? 0 : absint($number_of_person);
+
+            yatra_get_template('tmpl-cart-item.php', array('pricing' => $pricing_item, 'currency' => $currency, 'tour_id' => $tour_id, 'pricing_type' => 'single', 'person' => $person));
+        } else {
+            foreach ($pricing_item as $pricing) {
+
+                $person = is_array($number_of_person) && isset($number_of_person[$pricing->getID()]) ? $number_of_person[$pricing->getID()] : 1;
+
+                yatra_get_template('tmpl-cart-item.php', array('pricing' => $pricing, 'currency' => $currency, 'tour_id' => $tour_id, 'pricing_type' => 'multi', 'person' => $person));
+            }
+        }
+
+
+    }
+
+}
 if (!function_exists('yatra_get_price')) {
 
     function yatra_get_price($currency, $price, $echo = false)

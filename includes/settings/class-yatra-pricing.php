@@ -9,39 +9,13 @@ include_once "pricing/class-yatra-tour-pricing.php";
 
 class Yatra_Pricing
 {
-
-    public function getTourPricing($tourID)
-    {
-        $pricing_array = $this->getPricing($tourID);
-
-        $base_pricing_type = yatra_get_pricing_type($tourID);
-
-        if ($base_pricing_type === "single") {
-
-            $yatra_tour_pricing = new Yatra_Tour_Pricing();
-
-            return $yatra_tour_pricing->map($pricing_array, $base_pricing_type);
-        } else {
-
-            $pricing_instance = array();
-
-            foreach ($pricing_array as $pricing_id => $pricing) {
-
-                $yatra_tour_pricing = new Yatra_Tour_Pricing();
-
-                $pricing_instance[] = $yatra_tour_pricing->map($pricing, $base_pricing_type, $pricing_id);
-            }
-            return $pricing_instance;
-        }
-    }
-
-    public function getDateWisePricing($datewise_pricing_array = array(), $tour_id, $pricing_type)
+    public function getDateWisePricing($datewise_pricing_array = array(), $tour_id, $pricing_type, $number_of_people = null)
     {
         $base_pricing_type = yatra_get_pricing_type($tour_id);
 
         $datewise_pricing_array = $base_pricing_type !== $pricing_type ? $this->getPricing($tour_id) : $datewise_pricing_array;
 
-        $datewise_pricing_array = $base_pricing_type === "multi" ? $this->getMultiplePricing($tour_id, null, $datewise_pricing_array) : $this->getSinglePricing($datewise_pricing_array);
+        $datewise_pricing_array = $base_pricing_type === "multi" ? $this->getMultiplePricing($tour_id, $number_of_people, $datewise_pricing_array) : $this->getSinglePricing($datewise_pricing_array, $number_of_people);
 
 
         if ($base_pricing_type === "single") {
@@ -79,7 +53,7 @@ class Yatra_Pricing
         $base_pricing = yatra_get_tour_base_single_pricing($tourID);
 
 
-        return $this->getSinglePricing($base_pricing);
+        return $this->getSinglePricing($base_pricing, $number_of_people);
     }
 
     private function getMultiplePricing($tourID, $number_of_people = null, $date_wise_pricing = array())

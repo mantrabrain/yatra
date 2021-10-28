@@ -33,15 +33,12 @@ class Yatra_Template_Hooks
 
         $yatra_tour_options = new Yatra_Tour_Options(get_the_ID(), null, null);
 
-        $dynamicData = $yatra_tour_options->getTourData();
-
-        $dynamicData = (boolean)$dynamicData->isActive() ? $dynamicData : $yatra_tour_options->getTourData();
-
+        $tourData = $yatra_tour_options->getTourData();
 
         yatra_get_template('tour/booking-form.php',
             array(
-                'pricing_type' => $dynamicData->getPricingType(),
-                'yatra_booking_pricing_info' => $dynamicData,
+                'pricing_type' => $tourData->getPricingType(),
+                'yatra_booking_pricing_info' => $tourData,
             )
         );
 

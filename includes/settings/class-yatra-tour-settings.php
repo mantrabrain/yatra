@@ -33,7 +33,7 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
     protected $attributes;
 
-    public function __construct($ID = null, $start_date = null, $end_date = null)
+    public function __construct($ID = null, $start_date = null, $end_date = null, $number_of_people = null)
     {
         $ID = $ID == null ? get_the_ID() : $ID;
 
@@ -57,7 +57,7 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
         $this->attributes = $attributes->getAllAtributes();
 
-        $dates_data = new Yatra_Dates($ID, $start_date, $end_date);
+        $dates_data = new Yatra_Dates($ID, $start_date, $end_date, $number_of_people);
 
         $all_date_data = $dates_data->getAllTourData();
 
@@ -83,9 +83,29 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 class Yatra_Tour_Options extends Yatra_Tour_Settings
 {
 
-    public function __construct($tourID = null, $start_date = null, $end_date = null)
+    public function __construct($tourID = null, $start_date = null, $end_date = null, $number_of_people = null)
     {
-        parent::__construct($tourID, $start_date, $end_date);
+        parent::__construct($tourID, $start_date, $end_date, $number_of_people);
+    }
+
+    public function getTodayData($today)
+    {
+        $date_index = str_replace(' ', '', trim($today . '00:00:00_' . $today . '23:59:59'));
+
+        $todayDataSettings = null;
+
+        $settings = $this->getAllDynamicDataByDateRange();
+
+        if ($settings instanceof Yatra_Tour_Dates) {
+
+            $todayDataSettings = $settings;
+
+        } else if (is_array($settings) && isset($settings[$date_index])) {
+
+            $todayDataSettings = $settings[$date_index];
+
+        }
+        return $todayDataSettings;
     }
 
     public function getAllDynamicDataByDateRange($start_date = null, $end_date = null)
@@ -105,6 +125,7 @@ class Yatra_Tour_Options extends Yatra_Tour_Settings
         }
         return $this->allDynamicDataByDateRange;
     }
+
 
     public function isFixedDeparture()
     {

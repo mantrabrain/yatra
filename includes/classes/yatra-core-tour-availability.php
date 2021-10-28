@@ -13,42 +13,6 @@ class Yatra_Core_Tour_Availability
 
     }
 
-    public static function availability_check($tour_id, $start_date, $number_of_persons = null)
-    {
-        $total_person_count = is_array($number_of_persons) ? array_sum($number_of_persons) : absint($number_of_persons);
-
-        $tour_options = new Yatra_Tour_Options($tour_id, $start_date, $start_date);
-
-        $pricing_type = $tour_options->getPricingType();
-
-        $pricing = $tour_options->getPricing();
-        
-        $booked_travellers = $tour_options->getBookedTravellers();
-
-        $max_travellers = $tour_options->getMaximumNumberOfTravellers();
-
-        $availability = $tour_options->getAvailabilityFor();
-
-        if (absint($max_travellers) > 0 && absint($booked_travellers) == absint($max_travellers)) {
-
-            yatra()->yatra_error->add('yatra_booking_full', __('Booking already fulled, please try another available date.', 'yatra'));
-
-            return false;
-
-        } elseif (absint($max_travellers) > 0 && absint($booked_travellers + $total_person_count) > absint($max_travellers)) {
-
-            yatra()->yatra_error->add('yatra_booking_full', __('Total number of persons exceeds with available travellers for this date.', 'yatra'));
-
-            return false;
-
-        } else if ($availability !== "booking") {
-
-            yatra()->yatra_error->add('yatra_booking_invalid_availability', __('You cant book on this date', 'yatra'));
-
-            return false;
-        }
-    }
-
 
     public function load_admin_scripts()
     {
@@ -164,17 +128,14 @@ class Yatra_Core_Tour_Availability
 
             $tour_options = new Yatra_Tour_Options($tour_id, $begin->format("Y-m-d"), $end->format("Y-m-d"));
 
-            $settings = $tour_options->getAllDynamicDataByDateRange();
-
             $tourData = $tour_options->getTourData();
-
 
             for ($i = $begin; $i <= $end; $i->modify('+1 day')) {
 
                 $single_date = $i->format("Y-m-d");
 
 
-                $single_response = self::get_single_availability($single_date, $settings, $tourData);
+                $single_response = self::get_single_availability($single_date, $tour_options, $tourData);
 
                 $condition_index = 0;
 
@@ -202,22 +163,12 @@ class Yatra_Core_Tour_Availability
         return $all_responses;
     }
 
-    private
-    static function get_single_availability($start_date, $settings, $tourData)
+    /* @var $tour_options Yatra_Tour_Options */
+    private static function get_single_availability($start_date, $tour_options, $tourData)
     {
-        $date_index = str_replace(' ', '', trim($start_date . '00:00:00_' . $start_date . '23:59:59'));
 
-        $todayDataSettings = null;
+        $todayDataSettings = $tour_options->getTodayData($start_date);
 
-        if ($settings instanceof Yatra_Tour_Dates) {
-
-            $todayDataSettings = $settings;
-
-        } else if (is_array($settings) && isset($settings[$date_index])) {
-
-            $todayDataSettings = $settings[$date_index];
-
-        }
 
         if ($todayDataSettings instanceof Yatra_Tour_Dates) {
 
@@ -232,7 +183,6 @@ class Yatra_Core_Tour_Availability
 
             return array();
         }
-
 
         $current_date = date('Y-m-d');
 
@@ -344,8 +294,7 @@ class Yatra_Core_Tour_Availability
         return $response;
     }
 
-    public
-    static function get_day_wise_availability_form($tour_id, $start_date, $end_date, $content_only = false)
+    public static function get_day_wise_availability_form($tour_id, $start_date, $end_date, $content_only = false)
     {
 
         $tour_options = new Yatra_Tour_Options($tour_id, $start_date, $end_date);
@@ -357,6 +306,7 @@ class Yatra_Core_Tour_Availability
             $tourData = $tour_options->getTourData();
 
         }
+
         $yatra_availability['max_travellers'] = $tourData->getMaxTravellers();
 
         $yatra_availability['availability_for'] = $tourData->getAvailabilityFor();

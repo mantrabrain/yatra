@@ -40,7 +40,7 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
     protected $updated_at;
 
 
-    public function map($date_wise_data = array())
+    public function map($date_wise_data = array(), $number_of_people = null)
     {
         foreach ($date_wise_data as $index => $value) {
 
@@ -56,7 +56,7 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
 
                     $pricing_type = isset($date_wise_data->pricing_type) ? $date_wise_data->pricing_type : '';
 
-                    $value = $pricing_instance->getDateWisePricing($pricing_value_array, $tour_id, $pricing_type);
+                    $value = $pricing_instance->getDateWisePricing($pricing_value_array, $tour_id, $pricing_type, $number_of_people);
                 }
                 $this->$index = $value;
             }

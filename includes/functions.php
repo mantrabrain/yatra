@@ -485,11 +485,40 @@ if (!function_exists('yatra_tour_price')) {
 
 if (!function_exists('yatra_get_final_tour_price')) {
 
-    function yatra_get_final_tour_price($tour_id, $number_of_people = 1, $type = 'single')
+    function yatra_get_final_tour_price($tour_id, $number_of_people, $selected_date)
     {
+        $tour_options = new Yatra_Tour_Options($tour_id, $selected_date, $selected_date, $number_of_people);
 
-        return yatra()->tour->get_final_price($tour_id, $number_of_people);
+        $tourData = $tour_options->getTourData();
 
+        $todayDataSettings = $tour_options->getTodayData($selected_date);
+
+        if ($todayDataSettings instanceof Yatra_Tour_Dates) {
+
+            $todayData = (boolean)$todayDataSettings->isActive() ? $todayDataSettings : $tourData;
+
+        } else {
+
+            $todayData = $tourData;
+        }
+
+        $pricing = $todayData->getPricing();
+
+        $final_pricing = 0;
+
+        if ($pricing instanceof Yatra_Tour_Pricing) {
+
+            $final_pricing += $pricing->getFinalPrice();
+
+        } else {
+
+            foreach ($pricing as $pricing_item) {
+
+                $final_pricing += $pricing_item->getFinalPrice();
+            }
+
+        }
+        return absint($final_pricing);
     }
 }
 

@@ -28,7 +28,7 @@ if (!class_exists('Yatra_Cart')) {
             return $yatra_tour_cart;
         }
 
-        public function update_cart($tour_id, $number_of_persons, $type = 'single')
+        public function update_cart($tour_id, $number_of_persons, $type = 'single', $selected_date)
         {
             $yatra_tour_cart = yatra_get_session('yatra_tour_cart');
 
@@ -44,17 +44,20 @@ if (!class_exists('Yatra_Cart')) {
 
                 'number_of_person' => $number_of_persons,
 
-                'tour_final_price' => yatra_get_final_tour_price($tour_id, $number_of_persons, $type),
+                'tour_final_price' => yatra_get_final_tour_price($tour_id, $number_of_persons, $selected_date),
 
                 'pricing_type' => $type,
 
-                'multiple_pricing' => $yatra_multiple_pricing
+                'multiple_pricing' => $yatra_multiple_pricing,
+
+                'selected_date' => $selected_date
             );
             $yatra_tour_cart[$tour_id] = $single_cart_item;
 
             $unset_this = false;
 
             if ($type == "single") {
+
                 if ($number_of_persons < 1) {
 
                     $unset_this = true;
@@ -78,7 +81,7 @@ if (!class_exists('Yatra_Cart')) {
                 unset($yatra_tour_cart[$tour_id]);
 
             }
-            
+
             $status = yatra_set_session('yatra_tour_cart', $yatra_tour_cart);
 
             return $status;

@@ -72,7 +72,7 @@ if (count($cart_items) < 1) {
 
             <td class="tour-subtotal" data-title="Total">
                 <span class="yatra-Price-amount amount"><span
-                            class="yatra-price-currencySymbol"><?php echo yatra_get_current_currency_symbol(); ?></span><?php echo yatra_get_final_tour_price($tour_cart->ID, $number_of_person, $pricing_type); ?></span>
+                            class="yatra-price-currencySymbol"><?php echo yatra_get_current_currency_symbol(); ?></span><?php echo yatra_get_final_tour_price($tour_cart->ID, $number_of_person, $cart_item['selected_date']); ?></span>
             </td>
         </tr>
     <?php } ?>
