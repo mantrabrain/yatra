@@ -8,7 +8,7 @@
                 $pricing_id = $pricing->getID();
                 $field_name = $pricing_type === "multi" ? "yatra_number_of_person[{$tour_id}][multi_pricing][{$pricing_id}]" : "yatra_number_of_person[{$tour_id}][single_pricing]";
 
-                yatra_nice_input_number_field($field_name, $pricing->getMaximumPax(), $pricing->getMinimumPax(), $person);
+                yatra_nice_input_number_field($field_name, $pricing->getMaximumPax(), $pricing->getMinimumPax(), $person, 'yatra-number-of-person-field');
                 ?>
 
             </div>
