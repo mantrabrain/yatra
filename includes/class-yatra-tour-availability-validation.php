@@ -50,7 +50,7 @@ class Yatra_Tour_Availability_Validation
         }
         $pricing = $todayData->getPricing();
 
-        $booked_travellers = $todayData->getBookedTravellers();
+        $booked_travellers = $todayData->getBookedTravellers($this->start_date);
 
         $max_travellers = $todayData->getMaxTravellers();
 
@@ -104,7 +104,7 @@ class Yatra_Tour_Availability_Validation
 
     }
 
-    private function pricing_validate(Yatra_Tour_Pricing $pricing, $person, $max_traveler = '')
+    private function pricing_validate(Yatra_Tour_Pricing $pricing, $person, $max_traveller = '')
     {
 
 

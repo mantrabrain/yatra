@@ -491,7 +491,7 @@ if (!function_exists('yatra_get_final_tour_price')) {
         $tour_options = new Yatra_Tour_Options($tour_id, $selected_date, $selected_date, $number_of_people);
 
         $tourData = $tour_options->getTourData();
-        
+
         $todayDataSettings = $tour_options->getTodayData($selected_date);
 
         if ($todayDataSettings instanceof Yatra_Tour_Dates) {
@@ -519,7 +519,24 @@ if (!function_exists('yatra_get_final_tour_price')) {
             }
 
         }
-        return absint($final_pricing);
+        return apply_filters('yatra_tour_booking_final_price', absint($final_pricing), $tour_id, $number_of_people, $selected_date);
+    }
+}
+
+
+if (!function_exists('yatra_get_booking_final_price')) {
+
+    function yatra_get_booking_final_price($booking_parameters = array(), $net_pricing = false)
+    {
+        $total_booking_price = 0;
+
+        foreach ($booking_parameters as $parameter) {
+
+            $total_booking_price = $total_booking_price + absint(yatra_get_final_tour_price($parameter['tour_id'], $parameter['number_of_person'], $parameter['selected_date']));
+
+        }
+
+        return apply_filters('yatra_booking_final_price', $total_booking_price, $booking_parameters, $net_pricing);
     }
 }
 
@@ -639,8 +656,11 @@ if (!function_exists('yatra_customer_smart_tags')) {
 }
 if (!function_exists('yatra_get_date')) {
 
-    function yatra_get_date()
+    function yatra_get_date($date_only = false)
     {
+        if ($date_only) {
+            return date('Y-m-d');
+        }
         return date('Y-m-d H:i:s');
     }
 }

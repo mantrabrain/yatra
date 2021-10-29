@@ -39,7 +39,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
             $booking_post_meta_value = array();
 
-            $total_booking_price = 0;
+            $booking_parameters = array();
 
             $currency = get_option('yatra_currency');
 
@@ -81,20 +81,24 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                         $booking_post_meta['yatra_multiple_pricing'] = get_post_meta($yatra_tour_id, 'yatra_multiple_pricing', true);
 
-
                         $booking_post_meta['yatra_currency'] = $currency;
 
                         $number_of_person = $cart[$yatra_tour_id]['number_of_person'];
 
                         $booking_post_meta['number_of_person'] = $number_of_person;
 
-                        $final_price = yatra_get_final_tour_price($yatra_tour_id, $number_of_person, $cart[$yatra_tour_id['selected_date']]);
+                        $final_price = yatra_get_final_tour_price($yatra_tour_id, $number_of_person, $cart[$yatra_tour_id]['selected_date']);
 
                         $booking_post_meta['total_tour_price'] = $final_price;
 
-                        $total_booking_price += $final_price;
 
                         $booking_post_meta_value[$yatra_tour_id] = $booking_post_meta;
+
+                        array_push($booking_parameters, array(
+                            'tour_id' => $yatra_tour_id,
+                            'selected_date' => $cart[$yatra_tour_id]['selected_date'],
+                            'number_of_person' => $number_of_person
+                        ));
 
                     } else {
                         array_push($booking_failed_tour_ids, $yatra_tour_id);
@@ -118,7 +122,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                 $yatra_booking_meta_params = array(
 
-                    'total_booking_price' => $total_booking_price,
+                    'total_booking_price' => yatra_get_booking_final_price($booking_parameters),
 
                     'currency_symbol' => $currency_symbol,
 
@@ -128,7 +132,11 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                     'yatra_tour_customer_info' => $yatra_tour_customer_info,
 
-                    'booking_code' => $booking_code
+                    'booking_code' => $booking_code,
+
+                    'total_booking_gross_price' => yatra_get_booking_final_price($booking_parameters),
+
+                    'total_booking_net_price' => yatra_get_booking_final_price($booking_parameters, true)
 
                 );
                 update_post_meta($booking_id, 'yatra_booking_meta_params', $yatra_booking_meta_params);
@@ -144,10 +152,37 @@ if (!class_exists('Yatra_Tour_Booking')) {
                     update_post_meta($booking_id, 'yatra_user_id', $current_user_id);
 
                 }
-
                 update_post_meta($booking_id, 'yatra_customer_id', $customer_id);
 
-                do_action('yatra_after_tour_booking_completed', array('tour_ids' => $tour_ids, 'booking_id' => $booking_id));
+
+                foreach ($booking_parameters as $parameter) {
+
+                    $number_of_person = $parameter['number_of_person'];
+
+                    $total_number_of_pax = is_array($number_of_person) ? array_sum($number_of_person) : absint($number_of_person);
+
+                    Yatra_Core_DB::save_data(Yatra_Tables::TOUR_BOOKING_STATS, array(
+                        'booking_id' => $booking_id,
+                        'tour_id' => $parameter['tour_id'],
+                        'customer_id' => $customer_id,
+                        'booked_date' => $parameter['selected_date'],
+                        'currency' => $currency,
+                        'total_number_of_pax' => $total_number_of_pax,
+                        'gross_total_price' => yatra_get_final_tour_price($parameter['tour_id'], $number_of_person, $parameter['selected_date']),
+                        'net_total_price' => yatra_get_final_tour_price($parameter['tour_id'], $number_of_person, $parameter['selected_date']),
+                        'ip_address' => yatra_get_visitor_ip_address(),
+                        'created_at' => current_time('mysql')
+                    ));
+                }
+
+                do_action('yatra_after_tour_booking_completed', array(
+
+                    'tour_ids' => $tour_ids,
+
+                    'booking_id' => $booking_id,
+
+
+                ));
 
                 return $booking_id;
             }

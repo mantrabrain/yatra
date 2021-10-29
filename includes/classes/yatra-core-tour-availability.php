@@ -133,7 +133,6 @@ class Yatra_Core_Tour_Availability
 
                 $single_date = $i->format("Y-m-d");
 
-
                 $single_response = self::get_single_availability($single_date, $tour_options, $tourData);
 
                 $condition_index = 0;
@@ -168,16 +167,13 @@ class Yatra_Core_Tour_Availability
 
         $todayDataSettings = $tour_options->getTodayData($start_date);
 
-
         if ($todayDataSettings instanceof Yatra_Tour_Dates) {
 
             $todayData = (boolean)$todayDataSettings->isActive() ? $todayDataSettings : $tourData;
 
         } else {
-
             $todayData = $tourData;
         }
-
         if (!$todayData instanceof Yatra_Tour_Dates) {
 
             return array();
@@ -191,7 +187,7 @@ class Yatra_Core_Tour_Availability
 
         $max_travellers = $todayData->getMaxTravellers();
 
-        $booked_travellers = $todayData->getBookedTravellers();
+        $booked_travellers = $todayData->getBookedTravellers($start_date);
 
         $availability = $todayData->getAvailabilityFor();
 

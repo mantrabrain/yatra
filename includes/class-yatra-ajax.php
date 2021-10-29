@@ -441,7 +441,6 @@ class Yatra_Ajax
             $todayData = $yatra_tour_options->getTourData();
         }
 
-
         $pricing_type = $todayData->getPricingType();
 
         ob_start();

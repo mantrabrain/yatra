@@ -13,7 +13,7 @@ if (count($cart_items) < 1) {
         <th class="tour-remove">&nbsp;</th>
         <th class="tour-thumbnail">&nbsp;</th>
         <th class="tour-name"><?php echo __('Tour', 'yatra'); ?></th>
-        <th class="tour-person"><?php echo __('Person - Pricing', 'yatra'); ?></th>
+        <th class="tour-person"><?php echo __('Person - Per - Pricing', 'yatra'); ?></th>
         <th class="tour-subtotal"><?php echo __('Total', 'yatra'); ?></th>
     </tr>
     </thead>
@@ -24,7 +24,6 @@ if (count($cart_items) < 1) {
             <?php
 
             $tour_cart = isset($cart_item['tour']) ? $cart_item['tour'] : array();
-
 
             $number_of_person = isset($cart_item['number_of_person']) ? $cart_item['number_of_person'] : 1;
 

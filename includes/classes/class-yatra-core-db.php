@@ -304,25 +304,46 @@ class Yatra_Core_DB
     }
 
 
-    public function query()
+    public static function get_booked_pax($tour_id, $start_date, $end_date)
     {
-        /* SELECT
-     yd.*,
-     yb.total_pax
- FROM
-     wp_yatra_tour_dates AS yd
- LEFT JOIN(
-             SELECT
-         tour_id,
-         booked_date,
-         SUM(total_number_of_pax) AS total_pax
+
+        $start_date = new DateTime($start_date);
+
+        $end_date = new DateTime($end_date);
+
+        $start_date = $start_date->format('Y-m-d');
+
+        $end_date = $end_date->format('Y-m-d');
+
+        $select_text = " SELECT
+        date(booked_date) as booked_date,
+         SUM(total_number_of_pax) AS booked_travellers
      FROM
-         wp_yatra_tour_booking_stats
+         " . self::get_table(Yatra_Tables::TOUR_BOOKING_STATS) . "
      GROUP BY
          tour_id,
-         booked_date
- ) AS yb
- ON
-     yd.tour_id = yb.tour_id AND date(yd.start_date) = date(yb.booked_date) and date(yd.end_date) = date(yb.booked_date)*/
+         booked_date HAVING tour_id=%d and (date(booked_date) between %s and %s)";
+
+        $prepare_args = array(
+            'tour_id' => absint($tour_id),
+            'start_date' => trim($start_date),
+            'end_date' => trim($end_date)
+        );
+        global $wpdb;
+
+        $query = $wpdb->prepare($select_text, $prepare_args);
+
+        $results = $wpdb->get_results($query);
+
+        $final_results = array();
+
+        foreach ($results as $result) {
+
+            $final_results[$result->booked_date] = absint($result->booked_travellers);
+        }
+
+        return $final_results;
+
     }
+
 }

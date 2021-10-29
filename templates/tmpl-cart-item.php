@@ -1,8 +1,8 @@
 <?php /*** @var $pricing Yatra_Tour_Pricing ** */ ?>
 <div class="yatra-form-fields">
-    <div class="yatra-traveler-info-wrap">
-        <div class="yatra-traveler-number">
-            <div class="yatra-traveler-number-inner">
+    <div class="yatra-traveller-info-wrap">
+        <div class="yatra-traveller-number">
+            <div class="yatra-traveller-number-inner">
 
                 <?php
                 $pricing_id = $pricing->getID();
@@ -14,8 +14,7 @@
             </div>
             <span><?php echo esc_html($pricing->getLabel()) ?></span>
         </div>
-
-        <div class="yatra-traveler-price">
+        <div class="yatra-traveller-price">
             <?php if ($pricing->getRegularPrice() != '') { ?>
                 <del><?php echo esc_html(yatra_get_price($currency, $pricing->getRegularPrice())) ?></del>
             <?php } ?>
@@ -37,7 +36,5 @@
             ?>
             <span class=""><?php echo esc_html($pricing_per_string); ?></span>
         </div>
-
-
     </div>
 </div>

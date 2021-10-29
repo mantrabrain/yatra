@@ -4,9 +4,9 @@ $currency_symbol = yatra_get_current_currency_symbol();
 
 ?>
 <div class="yatra-form-fields">
-    <div class="yatra-traveler-info-wrap">
-        <div class="yatra-traveler-number">
-            <div class="yatra-traveler-number-inner">
+    <div class="yatra-traveller-info-wrap">
+        <div class="yatra-traveller-number">
+            <div class="yatra-traveller-number-inner">
                 <?php
                 $field_name = $pricing_type === "multi" ? "yatra_number_of_person[multi_pricing][{$yatra_booking_pricing->getID()}]" : "yatra_number_of_person[single_pricing]";
 
@@ -16,7 +16,7 @@ $currency_symbol = yatra_get_current_currency_symbol();
             </div>
             <span><?php echo esc_html($yatra_booking_pricing->getLabel()) ?></span>
         </div>
-        <div class="yatra-traveler-price">
+        <div class="yatra-traveller-price">
             <?php
             if ($yatra_booking_pricing->getRegularPrice() != '') { ?>
                 <del><?php echo esc_html(yatra_get_price($currency_symbol, $yatra_booking_pricing->getRegularPrice())) ?></del>

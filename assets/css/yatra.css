@@ -703,7 +703,7 @@ body.single .yatra-single-tour:after {
 #yatra-tour-booking-form-fields {
   display: block;
   width: 100%; }
-  #yatra-tour-booking-form-fields .yatra-traveler-info-wrap {
+  #yatra-tour-booking-form-fields .yatra-traveller-info-wrap {
     border-bottom: 1px solid #ddd;
     margin-bottom: 25px;
     padding-bottom: 25px;
@@ -716,7 +716,7 @@ body.single .yatra-single-tour:after {
         -ms-flex-align: center;
             align-items: center;
     overflow: hidden; }
-    #yatra-tour-booking-form-fields .yatra-traveler-info-wrap .yatra-traveler-number {
+    #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-number {
       -webkit-box-flex: 1;
          -moz-box-flex: 1;
           -ms-flex: 1;
@@ -735,28 +735,28 @@ body.single .yatra-single-tour:after {
          -moz-box-align: center;
           -ms-flex-align: center;
               align-items: center; }
-      #yatra-tour-booking-form-fields .yatra-traveler-info-wrap .yatra-traveler-number .yatra-traveler-number-inner {
+      #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-number .yatra-traveller-number-inner {
         width: 100px;
         height: 35px;
         border-radius: 0px;
         margin-right: 10px; }
-        #yatra-tour-booking-form-fields .yatra-traveler-info-wrap .yatra-traveler-number .yatra-traveler-number-inner input {
+        #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-number .yatra-traveller-number-inner input {
           height: 100%;
           margin: 0;
           border: none; }
-    #yatra-tour-booking-form-fields .yatra-traveler-info-wrap .yatra-traveler-price {
+    #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-price {
       text-align: right;
       -webkit-box-flex: 1;
          -moz-box-flex: 1;
           -ms-flex: 1;
               flex: 1; }
-      #yatra-tour-booking-form-fields .yatra-traveler-info-wrap .yatra-traveler-price ins {
+      #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-price ins {
         font-weight: 500; }
-      #yatra-tour-booking-form-fields .yatra-traveler-info-wrap .yatra-traveler-price span {
+      #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-price span {
         display: block;
         font-size: 12px;
         color: #5e6d77; }
-  #yatra-tour-booking-form-fields .yatra-form-fields:last-child .yatra-traveler-info-wrap {
+  #yatra-tour-booking-form-fields .yatra-form-fields:last-child .yatra-traveller-info-wrap {
     border-bottom: none;
     margin-bottom: 0; }
 
@@ -848,7 +848,7 @@ body.single .yatra-single-tour:after {
 #yatra-tour-cart-edit-form-fields {
   display: block;
   width: 100%; }
-  #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap {
+  #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap {
     border-bottom: 1px solid #f8f8f8;
     margin-bottom: 0;
     display: -webkit-box;
@@ -861,37 +861,37 @@ body.single .yatra-single-tour:after {
             align-items: center;
     overflow: hidden;
     padding: 0 20px; }
-    #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-number {
+    #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-number {
       display: -webkit-box;
       display: -moz-box;
       display: -ms-flexbox;
       display: flex;
       position: relative;
       width: 50%; }
-      #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-number span {
+      #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-number span {
         font-weight: 500;
         font-size: 14px; }
-      #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-number .yatra-traveler-number-inner {
+      #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-number .yatra-traveller-number-inner {
         width: 100px;
         height: 35px;
         border-radius: 0px;
         margin-right: 18px; }
-        #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-number .yatra-traveler-number-inner input {
+        #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-number .yatra-traveller-number-inner input {
           height: 100%;
           margin: 0;
           border: none;
           padding: 0 10px; }
-    #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-price {
+    #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-price {
       width: 30%; }
-      #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-price ins {
+      #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-price ins {
         font-weight: 500; }
-      #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-price span {
+      #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-price span {
         display: block;
         font-size: 12px;
         color: #5e6d77; }
-    #yatra-tour-cart-edit-form-fields .yatra-traveler-info-wrap .yatra-traveler-total-price {
+    #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-total-price {
       width: 20%; }
-  #yatra-tour-cart-edit-form-fields .yatra-form-fields:last-child .yatra-traveler-info-wrap {
+  #yatra-tour-cart-edit-form-fields .yatra-form-fields:last-child .yatra-traveller-info-wrap {
     border-bottom: none;
     margin-bottom: 0; }
 

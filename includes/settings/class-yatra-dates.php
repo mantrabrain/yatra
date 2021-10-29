@@ -48,7 +48,7 @@ class Yatra_Dates
 
         if (count($this->all_date_wise_data) < 1) {
 
-            return $this->getSingleTourData($this->tour_id, $this->number_of_people);
+            return $this->getSingleTourData($this->tour_id, $this->number_of_people, $this->start_date, $this->end_date);
         }
 
 
@@ -72,15 +72,26 @@ class Yatra_Dates
         return $all_processed_data;
     }
 
-    public static function getSingleTourData($tourID, $number_of_people = null)
+    public static function getSingleTourData($tourID, $number_of_people = null, $start_date = null, $end_date = null)
     {
+
+
+        $end_date = $end_date === null ? $start_date : $end_date;
+
+        $booked_travellers = null;
+
+        if (!is_null($start_date) && !is_null($end_date)) {
+
+            $booked_travellers = Yatra_Core_DB::get_booked_pax($tourID, $start_date, $end_date);
+        }
+
         $yatra_pricing = new Yatra_Pricing();
         $all_date_wise_data = new stdClass();
         $all_date_wise_data->tour_id = $tourID;
         $all_date_wise_data->pricing = $yatra_pricing->getPricing($tourID, $number_of_people);
         $all_date_wise_data->pricing_type = yatra_get_pricing_type($tourID);
         $all_date_wise_data->max_travellers = get_post_meta($tourID, 'yatra_tour_maximum_number_of_traveller', true);
-        $all_date_wise_data->booked_travellers = 0;
+        $all_date_wise_data->booked_travellers = $booked_travellers;
         $all_date_wise_data->availability = 'booking';
         $tour_dates = new Yatra_Tour_Dates();
         return $tour_dates->map($all_date_wise_data, $number_of_people);

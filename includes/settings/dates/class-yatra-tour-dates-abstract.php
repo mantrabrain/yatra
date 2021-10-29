@@ -42,6 +42,7 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
 
     public function map($date_wise_data = array(), $number_of_people = null)
     {
+
         foreach ($date_wise_data as $index => $value) {
 
             $pricing_instance = new Yatra_Pricing();

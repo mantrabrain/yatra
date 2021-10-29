@@ -21,7 +21,7 @@ interface Yatra_Tour_Dates_Interface
 
     public function getMaxTravellers();
 
-    public function getBookedTravellers();
+    public function getBookedTravellers($start_date);
 
     public function isActive();
 

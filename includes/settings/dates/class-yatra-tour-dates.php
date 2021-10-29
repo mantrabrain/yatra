@@ -46,8 +46,22 @@ class Yatra_Tour_Dates extends Yatra_Tour_Dates_Abstract
         return $this->max_travellers;
     }
 
-    public function getBookedTravellers()
+    public function getBookedTravellers($start_date)
     {
+        $date = new DateTime($start_date);
+
+        $start_date = $date->format('Y-m-d');
+
+        if (is_array($this->booked_travellers)) {
+
+            if (isset($this->booked_travellers[$start_date])) {
+
+                return $this->booked_travellers[$start_date];
+            }
+
+            return null;
+        }
+
         return $this->booked_travellers;
     }
 

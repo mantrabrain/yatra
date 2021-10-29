@@ -56,7 +56,7 @@ body.single {
   display: block;
   width: 100%;
 
-  .yatra-traveler-info-wrap {
+  .yatra-traveller-info-wrap {
     border-bottom: 1px solid #ddd;
     margin-bottom: 25px;
     padding-bottom: 25px;
@@ -64,7 +64,7 @@ body.single {
     align-items: center;
     overflow: hidden;
 
-    .yatra-traveler-number {
+    .yatra-traveller-number {
       flex: 1;
       position: relative;
       padding-right: 20px;
@@ -73,7 +73,7 @@ body.single {
       align-items: center;
 
 
-      .yatra-traveler-number-inner {
+      .yatra-traveller-number-inner {
         width: 100px;
         height: 35px;
         border-radius: 0px;
@@ -87,7 +87,7 @@ body.single {
       }
     }
 
-    .yatra-traveler-price {
+    .yatra-traveller-price {
 
       text-align: right;
       flex: 1;
@@ -106,7 +106,7 @@ body.single {
   }
 
   .yatra-form-fields:last-child {
-    .yatra-traveler-info-wrap {
+    .yatra-traveller-info-wrap {
       border-bottom: none;
       margin-bottom: 0;
     }
