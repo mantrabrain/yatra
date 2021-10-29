@@ -88,7 +88,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                         $booking_post_meta['number_of_person'] = $number_of_person;
 
-                        $final_price = yatra_get_final_tour_price($yatra_tour_id, $number_of_person);
+                        $final_price = yatra_get_final_tour_price($yatra_tour_id, $number_of_person, $cart[$yatra_tour_id['selected_date']]);
 
                         $booking_post_meta['total_tour_price'] = $final_price;
 
