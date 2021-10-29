@@ -9,7 +9,8 @@
 #yatra-availability-calendar-container {
     padding: 50px 20px;
     background: #fff;
-    border: 1px solid;
+    border: 1px solid #ddd;
+    margin: 0 20px 0 0;
 
 }
 

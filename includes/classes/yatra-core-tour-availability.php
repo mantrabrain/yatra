@@ -415,7 +415,8 @@ class Yatra_Core_Tour_Availability
 
         $the_query = new WP_Query(
 
-            array('posts_per_page' => absint($config['per_page']),
+            array(
+                'posts_per_page' => absint($config['per_page']),
                 'post_type' => 'tour',
                 'paged' => absint($config['current'])
             )
