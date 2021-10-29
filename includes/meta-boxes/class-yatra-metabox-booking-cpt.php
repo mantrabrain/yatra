@@ -69,80 +69,79 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         <th><?php echo __('Price Per', 'yatra'); ?></th>
                         <th><?php echo __('Group Size', 'yatra'); ?></th>
                         <th><?php echo __('Toal Price', 'yatra'); ?></th>
-                        <th><?php echo __('Durations', 'yatra'); ?></th>
+                        <th><?php echo __('Booked Date', 'yatra'); ?></th>
                     </tr>
                     <?php
                     $yatra_booking_meta = !is_array($yatra_booking_meta) ? array() : $yatra_booking_meta;
 
-
                     foreach ($yatra_booking_meta as $id => $booking) {
 
+                        if (!isset($booking['yatra_selected_date'])) {
+                            $this->old_version_compatibility($args);
 
-                        $yatra_tour_name = isset($booking['yatra_tour_name']) ? $booking['yatra_tour_name'] : '';
-                        $yatra_tour_meta_regular_price = isset($booking['yatra_tour_meta_regular_price']) ? $booking['yatra_tour_meta_regular_price'] : '';
-                        $yatra_tour_meta_sales_price = isset($booking['yatra_tour_meta_sales_price']) ? $booking['yatra_tour_meta_sales_price'] : '';
-                        $yatra_tour_meta_group_size = isset($booking['yatra_tour_meta_group_size']) ? $booking['yatra_tour_meta_group_size'] : '';
-                        $yatra_tour_meta_price_per = isset($booking['yatra_tour_meta_price_per']) ? $booking['yatra_tour_meta_price_per'] : '';
-                        $number_of_person = isset($booking['number_of_person']) ? $booking['number_of_person'] : '';
-                        $total_tour_price = isset($booking['total_tour_price']) ? $booking['total_tour_price'] : yatra_get_final_tour_price($id, $number_of_person);
-                        $yatra_tour_meta_tour_duration_nights = isset($booking['yatra_tour_meta_tour_duration_nights']) ? $booking['yatra_tour_meta_tour_duration_nights'] : '';
-                        $yatra_tour_meta_tour_duration_days = isset($booking['yatra_tour_meta_tour_duration_days']) ? $booking['yatra_tour_meta_tour_duration_days'] : '';
-                        $yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['yatra_currency_symbol'] : '';
-                        $yatra_tour_meta_tour_fixed_departure = isset($booking['yatra_tour_meta_tour_fixed_departure']) ? (boolean)$booking['yatra_tour_meta_tour_fixed_departure'] : false;
-                        $yatra_tour_meta_tour_start_date = isset($booking['yatra_tour_meta_tour_start_date']) ? $booking['yatra_tour_meta_tour_start_date'] : '';
-                        $yatra_tour_meta_tour_end_date = isset($booking['yatra_tour_meta_tour_end_date']) ? $booking['yatra_tour_meta_tour_end_date'] : '';
-                        $yatra_multiple_pricing = isset($booking['yatra_multiple_pricing']) ? $booking['yatra_multiple_pricing'] : '';
-                        $yatra_multiple_pricing = is_array($yatra_multiple_pricing) && @count($yatra_multiple_pricing) > 0 ? $yatra_multiple_pricing : null;
-
-                        if (!$yatra_tour_meta_tour_fixed_departure) {
-                            $durations = absint($yatra_tour_meta_tour_duration_days) . ' Days ' . absint($yatra_tour_meta_tour_duration_nights) . ' Nights';
                         } else {
-                            $durations = esc_html($yatra_tour_meta_tour_start_date) . ' to ' . esc_html($yatra_tour_meta_tour_end_date);
-                        }
-                        if (is_array($yatra_multiple_pricing) && !is_null($yatra_multiple_pricing)) {
 
-                            $multiple_pricing_index = 0;
+                            $yatra_pricing = isset($booking['yatra_pricing']) ? $booking['yatra_pricing'] : array();
 
-                            foreach ($yatra_multiple_pricing as $pricing_id => $pricing) {
+                            $number_of_person = isset($booking['number_of_person']) ? $booking['number_of_person'] : 1;
 
-                                $variable_pricing_per = isset($pricing['pricing_per']) ? $pricing['pricing_per'] : '';
-                                $variable_group_size = isset($pricing['group_size']) ? $pricing['group_size'] : '';
-                                $variable_group_size = $variable_pricing_per == '' ? absint($yatra_tour_meta_group_size) : absint($variable_group_size);
-                                $variable_group_size = $variable_group_size == 0 ? 1 : $variable_group_size;
-                                $variable_pricing_per = $variable_pricing_per === '' ? $yatra_tour_meta_price_per : $variable_pricing_per;
+                            $yatra_tour_name = isset($booking['yatra_tour_name']) ? $booking['yatra_tour_name'] : '';
+
+                            $total_tour_price = isset($booking['total_tour_price']) ? $booking['total_tour_price'] : null;
+
+                            $yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['yatra_currency_symbol'] : '';
+
+                            $durations = $booking['yatra_selected_date'];
+
+                            if (is_array($yatra_pricing) && (!$yatra_pricing instanceof Yatra_Tour_Pricing)) {
+
+                                $multiple_pricing_index = 0;
+
+                                /* @var $pricing Yatra_Tour_Pricing */
+                                foreach ($yatra_pricing as $pricing) {
+
+
+                                    $variable_pricing_per = $pricing->getPricingPer();
+
+                                    $variable_group_size = $variable_pricing_per == "person" ? null : $pricing->getGroupSize();
+
+                                    $person = isset($number_of_person[$pricing->getID()]) ? $number_of_person[$pricing->getID()] : 1;
+
+                                    $this->generate_table_row(
+                                        $yatra_tour_name,
+                                        $person,
+                                        $pricing->getLabel(),
+                                        $yatra_currency_symbol . $pricing->getRegularPrice(),
+                                        $yatra_currency_symbol . $pricing->getSalesPrice(),
+                                        $variable_pricing_per,
+                                        $variable_group_size,
+                                        $yatra_currency_symbol . $total_tour_price,
+                                        $durations,
+                                        $id,
+                                        array('index' => $multiple_pricing_index, 'count' => count($yatra_pricing))
+                                    );
+                                    $multiple_pricing_index++;
+                                }
+                            } else {
+
+                                /* @var $yatra_pricing Yatra_Tour_Pricing */
 
                                 $this->generate_table_row(
                                     $yatra_tour_name,
-                                    $number_of_person[$pricing_id],
-                                    $pricing['pricing_label'],
-                                    $yatra_currency_symbol . $pricing['regular_price'],
-                                    $yatra_currency_symbol . $pricing['sales_price'],
-                                    $variable_pricing_per,
-                                    $variable_group_size,
+                                    $number_of_person,
+                                    $yatra_pricing->getLabel(),
+                                    $yatra_currency_symbol . $yatra_pricing->getRegularPrice(),
+                                    $yatra_currency_symbol . $yatra_pricing->getSalesPrice(),
+                                    $yatra_pricing->getPricingPer(),
+                                    $yatra_pricing->getGroupSize(),
                                     $yatra_currency_symbol . $total_tour_price,
                                     $durations,
-                                    $id,
-                                    array('index' => $multiple_pricing_index, 'count' => count($yatra_multiple_pricing))
+                                    $id
                                 );
-                                $multiple_pricing_index++;
                             }
-                        } else {
-
-
-                            $this->generate_table_row(
-                                $yatra_tour_name,
-                                $number_of_person,
-                                'pricing label',
-                                $yatra_currency_symbol . $yatra_tour_meta_regular_price,
-                                $yatra_currency_symbol . $yatra_tour_meta_sales_price,
-                                $yatra_tour_meta_price_per,
-                                $yatra_tour_meta_group_size,
-                                $yatra_currency_symbol . $total_tour_price,
-                                $durations,
-                                $id
-                            );
                         }
-                    } ?>
+                    }
+                    ?>
                 </table>
 
                 <h2><?php echo __('Booking Customer Information', 'yatra'); ?></h2>
@@ -298,6 +297,88 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
             </tr>
             <?php
+        }
+
+        /* FOR Version Less than 2.0.16 */
+        public function old_version_compatibility($args)
+        {
+            $booking_id = $args->ID;
+
+            $yatra_booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
+
+            $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
+
+            $yatra_tour_customer_info = isset($yatra_booking_meta_params['yatra_tour_customer_info']) ? $yatra_booking_meta_params['yatra_tour_customer_info'] : array();
+            $yatra_booking_meta = !is_array($yatra_booking_meta) ? array() : $yatra_booking_meta;
+
+            foreach ($yatra_booking_meta as $id => $booking) {
+
+                $yatra_tour_name = isset($booking['yatra_tour_name']) ? $booking['yatra_tour_name'] : '';
+                $yatra_tour_meta_regular_price = isset($booking['yatra_tour_meta_regular_price']) ? $booking['yatra_tour_meta_regular_price'] : '';
+                $yatra_tour_meta_sales_price = isset($booking['yatra_tour_meta_sales_price']) ? $booking['yatra_tour_meta_sales_price'] : '';
+                $yatra_tour_meta_group_size = isset($booking['yatra_tour_meta_group_size']) ? $booking['yatra_tour_meta_group_size'] : '';
+                $yatra_tour_meta_price_per = isset($booking['yatra_tour_meta_price_per']) ? $booking['yatra_tour_meta_price_per'] : '';
+                $number_of_person = isset($booking['number_of_person']) ? $booking['number_of_person'] : '';
+                $total_tour_price = isset($booking['total_tour_price']) ? $booking['total_tour_price'] : yatra_get_final_tour_price($id, $number_of_person);
+                $yatra_tour_meta_tour_duration_nights = isset($booking['yatra_tour_meta_tour_duration_nights']) ? $booking['yatra_tour_meta_tour_duration_nights'] : '';
+                $yatra_tour_meta_tour_duration_days = isset($booking['yatra_tour_meta_tour_duration_days']) ? $booking['yatra_tour_meta_tour_duration_days'] : '';
+                $yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['yatra_currency_symbol'] : '';
+                $yatra_tour_meta_tour_fixed_departure = isset($booking['yatra_tour_meta_tour_fixed_departure']) ? (boolean)$booking['yatra_tour_meta_tour_fixed_departure'] : false;
+                $yatra_tour_meta_tour_start_date = isset($booking['yatra_tour_meta_tour_start_date']) ? $booking['yatra_tour_meta_tour_start_date'] : '';
+                $yatra_tour_meta_tour_end_date = isset($booking['yatra_tour_meta_tour_end_date']) ? $booking['yatra_tour_meta_tour_end_date'] : '';
+                $yatra_multiple_pricing = isset($booking['yatra_multiple_pricing']) ? $booking['yatra_multiple_pricing'] : '';
+                $yatra_multiple_pricing = is_array($yatra_multiple_pricing) && @count($yatra_multiple_pricing) > 0 ? $yatra_multiple_pricing : null;
+
+                if (!$yatra_tour_meta_tour_fixed_departure) {
+                    $durations = absint($yatra_tour_meta_tour_duration_days) . ' Days ' . absint($yatra_tour_meta_tour_duration_nights) . ' Nights';
+                } else {
+                    $durations = esc_html($yatra_tour_meta_tour_start_date) . ' to ' . esc_html($yatra_tour_meta_tour_end_date);
+                }
+                if (is_array($yatra_multiple_pricing) && !is_null($yatra_multiple_pricing)) {
+
+                    $multiple_pricing_index = 0;
+
+                    foreach ($yatra_multiple_pricing as $pricing_id => $pricing) {
+
+                        $variable_pricing_per = isset($pricing['pricing_per']) ? $pricing['pricing_per'] : '';
+                        $variable_group_size = isset($pricing['group_size']) ? $pricing['group_size'] : '';
+                        $variable_group_size = $variable_pricing_per == '' ? absint($yatra_tour_meta_group_size) : absint($variable_group_size);
+                        $variable_group_size = $variable_group_size == 0 ? 1 : $variable_group_size;
+                        $variable_pricing_per = $variable_pricing_per === '' ? $yatra_tour_meta_price_per : $variable_pricing_per;
+
+                        $this->generate_table_row(
+                            $yatra_tour_name,
+                            $number_of_person[$pricing_id],
+                            $pricing['pricing_label'],
+                            $yatra_currency_symbol . $pricing['regular_price'],
+                            $yatra_currency_symbol . $pricing['sales_price'],
+                            $variable_pricing_per,
+                            $variable_group_size,
+                            $yatra_currency_symbol . $total_tour_price,
+                            $durations,
+                            $id,
+                            array('index' => $multiple_pricing_index, 'count' => count($yatra_multiple_pricing))
+                        );
+                        $multiple_pricing_index++;
+                    }
+                } else {
+
+
+                    $this->generate_table_row(
+                        $yatra_tour_name,
+                        $number_of_person,
+                        'pricing label',
+                        $yatra_currency_symbol . $yatra_tour_meta_regular_price,
+                        $yatra_currency_symbol . $yatra_tour_meta_sales_price,
+                        $yatra_tour_meta_price_per,
+                        $yatra_tour_meta_group_size,
+                        $yatra_currency_symbol . $total_tour_price,
+                        $durations,
+                        $id
+                    );
+                }
+            }
+
         }
 
         /**

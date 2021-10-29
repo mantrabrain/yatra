@@ -152,7 +152,7 @@ class Yatra_Ajax
             wp_send_json_success($return_data);
         }
 
-        wp_send_json_error();
+        wp_send_json_error('Something wrong, please try again.');
 
     }
 

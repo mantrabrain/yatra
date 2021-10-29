@@ -27,7 +27,7 @@ class Yatra_Tour_Availability_Validation
     {
         $date_now = date("Y-m-d"); // this format is string comparable
 
-        if ($date_now < $this->start_date) {
+        if ($date_now > $this->start_date) {
 
             yatra()->yatra_error->add('yatra_booking_invalid_date', __('Invalid date, please choose valid date.', 'yatra'));
 
@@ -35,6 +35,12 @@ class Yatra_Tour_Availability_Validation
 
         }
         $total_person_count = is_array($this->number_of_person) ? array_sum($this->number_of_person) : absint($this->number_of_person);
+
+        if ($total_person_count < 1) {
+            yatra()->yatra_error->add('yatra_booking_invalid_number_of_person', __('At least one traveller need to add on cart.', 'yatra'));
+
+            return false;
+        }
 
         $tour_options = new Yatra_Tour_Options($this->id, $this->start_date, $this->end_date);
 

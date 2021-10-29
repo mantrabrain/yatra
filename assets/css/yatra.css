@@ -834,6 +834,17 @@ body.single .yatra-single-tour:after {
   margin: 0;
   padding: 0; }
 
+.yatra-booking-calendar-choosen-date {
+  border: none !important;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 30px !important;
+  text-align: center;
+  margin-bottom: 21px !important;
+  border-bottom: 1px solid #ddd !important;
+  padding-bottom: 10px !important; }
+
 .yatra-shortcode-wrapper form.yatra-cart-form {
   position: relative; }
   .yatra-shortcode-wrapper form.yatra-cart-form .actions {
