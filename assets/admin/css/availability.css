@@ -140,10 +140,6 @@
 
 }
 
-#yatra-availability-calendar .fc-col-header-cell {
-    padding: 20px 0;
-}
-
 #yatra-admin-popup {
 
     position: fixed;
@@ -429,9 +425,15 @@ body.yatra-popup-open {
     max-width: 75%;
     width: 75%;
     float: right;
+
 }
 
-#yatra-availability-calendar-container .yatra-availability-tour-lists {
+#yatra-availability-calendar {
+    height: 800px;
+    max-height: 800px;
+}
+
+#yatra-availability-calendar-container .yatra-availability-tour-list-wrap {
     max-width: 25%;
     width: 25%;
     float: left;
@@ -464,4 +466,9 @@ body.yatra-popup-open {
 #yatra-availability-calendar-container .yatra-availability-tour-lists li.active-tour a {
     background: #ccc;
     border: 1px solid #aaa;
+}
+
+.yatra-availability-calendar-content-footer {
+    padding: 30px;
+    text-align: center;
 }

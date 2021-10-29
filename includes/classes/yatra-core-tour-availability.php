@@ -11,6 +11,8 @@ class Yatra_Core_Tour_Availability
 
         add_action('yatra_availability_calendar_tour_list', array($this, 'calendar_tour_list'));
 
+        add_action('yatra_availability_calendar_tour_list_footer', array($this, 'calendar_tour_list_pagination'));
+
     }
 
 
@@ -86,6 +88,12 @@ class Yatra_Core_Tour_Availability
         echo '</div>';
 
         echo '</div>';
+
+        echo '</div>';
+
+        echo '<div class="yatra-availability-calendar-content-footer">';
+
+        do_action('yatra_availability_calendar_tour_list_footer');
 
         echo '</div>';
 
@@ -400,14 +408,19 @@ class Yatra_Core_Tour_Availability
 
     }
 
-    public
-    function calendar_tour_list()
+    public function calendar_tour_list()
     {
+
+        $config = $this->pagination_config();
+
         $the_query = new WP_Query(
-            array('posts_per_page' => 30,
+
+            array('posts_per_page' => absint($config['per_page']),
                 'post_type' => 'tour',
-                'paged' => get_query_var('paged') ? get_query_var('paged') : 1)
+                'paged' => absint($config['current'])
+            )
         );
+        echo '<div class="yatra-availability-tour-list-wrap">';
         echo '<ul class="yatra-availability-tour-lists">';
         while ($the_query->have_posts()):
 
@@ -417,7 +430,158 @@ class Yatra_Core_Tour_Availability
             echo '</li>';
 
         endwhile;
+
         echo '</ul>';
+
+
+        echo '</div>';
+    }
+
+    public function pagination_config()
+    {
+        $post_per_page = 15;
+
+        $total_count_query = new WP_Query(
+            array('posts_per_page' => 3,
+                'post_type' => 'tour'
+            ));
+
+        $current_page_number = isset($_GET['paged']) ? absint($_GET['paged']) : 1;
+
+        $total_number_of_posts = $total_count_query->found_posts;
+
+        $total_page_numbers = ceil($total_number_of_posts / $post_per_page);
+
+        $current_page_number = $current_page_number > $total_page_numbers || $current_page_number < 1 ? 1 : $current_page_number;
+
+        return [
+            'current' => $current_page_number,
+            'total_pages' => $total_page_numbers,
+            'total_posts' => $total_number_of_posts,
+            'per_page' => $post_per_page
+
+        ];
+
+    }
+
+    public function calendar_tour_list_pagination()
+    {
+        $config = $this->pagination_config();
+
+        $this->pagination($config['total_posts'], $config['total_pages'], $config['current']);
+    }
+
+    protected function pagination($total_items, $total_pages, $current)
+    {
+
+
+        $output = '<span class="displaying-num">' . sprintf(
+            /* translators: %s: Number of items. */
+                _n('%s item', '%s items', $total_items),
+                number_format_i18n($total_items)
+            ) . '</span>';
+
+
+        $removable_query_args = wp_removable_query_args();
+
+        $current_url = set_url_scheme('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+
+        $current_url = remove_query_arg($removable_query_args, $current_url);
+
+        $page_links = array();
+
+        $total_pages_after = '</span></span>';
+
+        $disable_first = false;
+        $disable_last = false;
+        $disable_prev = false;
+        $disable_next = false;
+
+        if (1 == $current) {
+            $disable_first = true;
+            $disable_prev = true;
+        }
+        if (2 == $current) {
+            $disable_first = true;
+        }
+        if ($total_pages == $current) {
+            $disable_last = true;
+            $disable_next = true;
+        }
+        if ($total_pages - 1 == $current) {
+            $disable_last = true;
+        }
+
+        if ($disable_first) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a class='first-page button' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+                esc_url(remove_query_arg('paged', $current_url)),
+                __('First page'),
+                '&laquo;'
+            );
+        }
+
+        if ($disable_prev) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a class='prev-page button' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+                esc_url(add_query_arg('paged', max(1, $current - 1), $current_url)),
+                __('Previous page'),
+                '&lsaquo;'
+            );
+        }
+
+
+        $html_current_page = $current;
+        $total_pages_before = '<span class="screen-reader-text">' . __('Current Page') . '</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">';
+
+        $html_total_pages = sprintf("<span class='total-pages'>%s</span>", number_format_i18n($total_pages));
+        $page_links[] = $total_pages_before . sprintf(
+            /* translators: 1: Current page, 2: Total pages. */
+                _x('%1$s of %2$s', 'paging'),
+                $html_current_page,
+                $html_total_pages
+            ) . $total_pages_after;
+
+        if ($disable_next) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a class='next-page button' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+                esc_url(add_query_arg('paged', min($total_pages, $current + 1), $current_url)),
+                __('Next page'),
+                '&rsaquo;'
+            );
+        }
+
+        if ($disable_last) {
+            $page_links[] = '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&raquo;</span>';
+        } else {
+            $page_links[] = sprintf(
+                "<a class='last-page button' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+                esc_url(add_query_arg('paged', $total_pages, $current_url)),
+                __('Last page'),
+                '&raquo;'
+            );
+        }
+
+        $pagination_links_class = 'pagination-links';
+        if (!empty($infinite_scroll)) {
+            $pagination_links_class .= ' hide-if-js';
+        }
+        $output .= "\n<span class='$pagination_links_class'>" . implode("\n", $page_links) . '</span>';
+
+        if ($total_pages) {
+            $page_class = $total_pages < 2 ? ' one-page' : '';
+        } else {
+            $page_class = ' no-pages';
+        }
+        $pagination = "<div class='tablenav-pages{$page_class}'>$output</div>";
+
+        echo $pagination;
     }
 }
 
