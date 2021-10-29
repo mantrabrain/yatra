@@ -212,12 +212,43 @@ body.single {
 .yatra-booking-calendar-choosen-date {
   border: none !important;
   width: 100%;
-  margin: 0!important;
-  padding: 0!important;
-  font-size: 30px!important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 30px !important;
   text-align: center;
-  margin-bottom: 21px!important;
-  border-bottom: 1px solid #ddd!important;
-  padding-bottom: 10px!important;
+  margin-bottom: 21px !important;
+  border-bottom: 1px solid #ddd !important;
+  padding-bottom: 10px !important;
+
+}
+
+.yatra-tour-info-pricing-wrap {
+
+  border: 1px solid #ddd;
+  padding: 0;
+  border-bottom: none;
+  border-top: 4px solid #1abc9c;
+
+  .tour-info-pricing-header {
+    padding: 10px 15px;
+    background: #dffff9;
+
+    h2 {
+      font-weight: 500;
+      text-align: center;
+    }
+  }
+
+  .tour-info-pricing-content {
+    border-top: 1px solid #ddd;
+    padding: 15px;
+    background: #fff;
+
+    p {
+      font-size: 20px;
+      text-align: center;
+      color: #1abc9c;
+    }
+  }
 
 }

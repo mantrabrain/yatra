@@ -288,7 +288,7 @@
                 }
                 var single_tour = yatra_params.single_tour;
 
-                let container = $(".yatra_tour_start_date").YatraCalendar({
+                let container = $(".yatra-calendar-wrap").YatraCalendar({
 
                     fixedStartDay: 0, // begin weeks by sunday
 

@@ -7,8 +7,11 @@
     <input type="hidden" name="yatra_nonce" value="<?php echo wp_create_nonce('wp_yatra_tour_add_to_cart_nonce'); ?>"/>
     <input type="hidden" name="tour_id" value="<?php echo get_the_ID(); ?>"/>
     <div class="yatra-form-fields yatra_tour_start_date">
-        <input type="text" name="yatra_tour_start_date" class="yatra-booking-calendar-choosen-date" readonly
+        <input type="hidden" name="yatra_tour_start_date" class="yatra-booking-calendar-choosen-date" readonly
                placeholder="<?php echo __('Please pick the date', 'yatra') ?>"/>
+    </div>
+    <div class="yatra-calendar-wrap">
+
     </div>
     <div class="yatra-tour-booking-pricing-wrap">
         <?php

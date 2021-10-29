@@ -1,5 +1,18 @@
 <div class="yatra-tour-info">
     <div class="yatra-tour-info-inner">
+        <div class="yatra-tour-info-pricing-wrap">
+            <div class="tour-info-pricing-header">
+                <h2><?php echo __('Price', 'yatra') ?> - <span>2021-October-23</span></h2>
+            </div>
+
+            <div class="tour-info-pricing-content">
+                <p><span class="icon fa fa-tag"></span><?php echo __(' from ', 'yatra') ?>
+                    <del>$45</del>
+                    <span class="sales-price">$44</span>
+                </p>
+            </div>
+        </div>
+
         <div class="yatra-tabs" id="yatra-tour-sidebar-tabs">
             <ul class="yatra-tab-wrap" role="tablist">
                 <li class="item active" role="presentation">
@@ -36,9 +49,6 @@
                     </div>
                 </div>
             </section>
-
-
         </div>
-
     </div>
 </div>

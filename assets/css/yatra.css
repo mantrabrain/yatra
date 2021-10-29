@@ -845,6 +845,26 @@ body.single .yatra-single-tour:after {
   border-bottom: 1px solid #ddd !important;
   padding-bottom: 10px !important; }
 
+.yatra-tour-info-pricing-wrap {
+  border: 1px solid #ddd;
+  padding: 0;
+  border-bottom: none;
+  border-top: 4px solid #1abc9c; }
+  .yatra-tour-info-pricing-wrap .tour-info-pricing-header {
+    padding: 10px 15px;
+    background: #dffff9; }
+    .yatra-tour-info-pricing-wrap .tour-info-pricing-header h2 {
+      font-weight: 500;
+      text-align: center; }
+  .yatra-tour-info-pricing-wrap .tour-info-pricing-content {
+    border-top: 1px solid #ddd;
+    padding: 15px;
+    background: #fff; }
+    .yatra-tour-info-pricing-wrap .tour-info-pricing-content p {
+      font-size: 20px;
+      text-align: center;
+      color: #1abc9c; }
+
 .yatra-shortcode-wrapper form.yatra-cart-form {
   position: relative; }
   .yatra-shortcode-wrapper form.yatra-cart-form .actions {
