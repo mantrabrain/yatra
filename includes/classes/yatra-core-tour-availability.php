@@ -97,8 +97,7 @@ class Yatra_Core_Tour_Availability
      * $filter_condition  = array('is_expired'=>false, is_full=>false, is_
      */
 
-    public
-    static function get_availability($tour_id, $start_date, $end_date, $filter_condition = array(), $date_index = false)
+    public static function get_availability($tour_id, $start_date, $end_date, $filter_condition = array(), $date_index = false)
     {
 
         $fixed_departure = (boolean)get_post_meta($tour_id, 'yatra_tour_meta_tour_fixed_departure', true);

@@ -487,10 +487,11 @@ if (!function_exists('yatra_get_final_tour_price')) {
 
     function yatra_get_final_tour_price($tour_id, $number_of_people, $selected_date)
     {
+
         $tour_options = new Yatra_Tour_Options($tour_id, $selected_date, $selected_date, $number_of_people);
 
         $tourData = $tour_options->getTourData();
-
+        
         $todayDataSettings = $tour_options->getTodayData($selected_date);
 
         if ($todayDataSettings instanceof Yatra_Tour_Dates) {

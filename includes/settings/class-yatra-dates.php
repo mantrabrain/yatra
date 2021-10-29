@@ -83,7 +83,7 @@ class Yatra_Dates
         $all_date_wise_data->booked_travellers = 0;
         $all_date_wise_data->availability = 'booking';
         $tour_dates = new Yatra_Tour_Dates();
-        return $tour_dates->map($all_date_wise_data);
+        return $tour_dates->map($all_date_wise_data, $number_of_people);
 
     }
 

@@ -257,6 +257,8 @@ if (!function_exists('yatra_nice_input_number_field')) {
         $max = $max === '' ? 9999 : absint($max);
         $min = $min === '' ? 0 : absint($min);
         $value = $value === '' ? $min : absint($value);
+        $value = $value < $min ? $min : $value;
+        $value = $value > $max ? $max : $value;
         ?>
         <div class="yatra-nice-input-number">
             <button type="button" class="nice-button minus-button">

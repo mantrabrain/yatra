@@ -22,6 +22,8 @@ if (count($cart_items) < 1) {
 
     $proceed_to_checkout_button_text = get_option('yatra_proceed_to_checkout_text', 'Proceed to checkout');
     ?>
-    <a href="<?php echo esc_url_raw($checkout_page_url) ?>" class="button yatra-proceed-to-checkout">
-        <?php echo esc_attr($proceed_to_checkout_button_text); ?></a>
+    <div class="yatra-proceed-to-checkout-wrap">
+        <a href="<?php echo esc_url_raw($checkout_page_url) ?>" class="button yatra-proceed-to-checkout">
+            <?php echo esc_attr($proceed_to_checkout_button_text); ?></a>
+    </div>
 </form>

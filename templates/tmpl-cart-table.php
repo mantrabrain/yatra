@@ -13,7 +13,6 @@ if (count($cart_items) < 1) {
         <th class="tour-remove">&nbsp;</th>
         <th class="tour-thumbnail">&nbsp;</th>
         <th class="tour-name"><?php echo __('Tour', 'yatra'); ?></th>
-        <th class="tour-person"><?php echo __('Per', 'yatra'); ?></th>
         <th class="tour-person"><?php echo __('Person - Pricing', 'yatra'); ?></th>
         <th class="tour-subtotal"><?php echo __('Total', 'yatra'); ?></th>
     </tr>
@@ -57,10 +56,6 @@ if (count($cart_items) < 1) {
                 <a href="<?php echo get_permalink($tour_cart->ID); ?>"><?php echo esc_html($tour_cart->post_title) ?></a>
             </td>
 
-            <td class="tour-price" data-title="Per">
-                <span class="yatra-per"><?php echo ucwords(get_post_meta($tour_cart->ID, 'yatra_tour_meta_price_per', true)); ?>
-                </span>
-            </td>
 
             <td class="tour-person" data-title="Quantity">
                 <div class="person">
@@ -73,6 +68,9 @@ if (count($cart_items) < 1) {
             <td class="tour-subtotal" data-title="Total">
                 <span class="yatra-Price-amount amount"><span
                             class="yatra-price-currencySymbol"><?php echo yatra_get_current_currency_symbol(); ?></span><?php echo yatra_get_final_tour_price($tour_cart->ID, $number_of_person, $cart_item['selected_date']); ?></span>
+
+                <input type="hidden" name="yatra_tour_start_date[<?php echo esc_attr($tour_cart->ID) ?>]"
+                       value="<?php echo esc_attr($cart_item['selected_date']) ?>"/>
             </td>
         </tr>
     <?php } ?>

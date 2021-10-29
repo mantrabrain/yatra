@@ -3,7 +3,7 @@
 class Yatra_Tour_Availability_Validation
 {
 
-    private $ID;
+    private $id;
 
     private $start_date;
 
@@ -48,7 +48,6 @@ class Yatra_Tour_Availability_Validation
 
             $todayData = $tour_options->getTourData();
         }
-
         $pricing = $todayData->getPricing();
 
         $booked_travellers = $todayData->getBookedTravellers();

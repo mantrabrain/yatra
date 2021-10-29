@@ -206,11 +206,16 @@
                     },
                     success: function (response) {
 
-
+                        var el = cart_form.closest('.yatra-shortcode-wrapper');
                         if (response.success === true) {
-
+                            var table = response.data.table;
                             cart_form.find('.yatra-cart-table-wrapper').find('table.yatra_cart_table').remove();
-                            cart_form.find('.yatra-cart-table-wrapper').append(response.data)
+                            cart_form.find('.yatra-cart-table-wrapper').append(table)
+                            YatraMessages.showSuccess(el, response.data.message);
+
+                        } else {
+                            YatraMessages.showError(el, response.data);
+
                         }
                         cart_form.find('.yatra-overlay').remove();
                     },

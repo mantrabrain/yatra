@@ -50,17 +50,22 @@ if (!class_exists('Yatra_Assets')) {
                 array('jquery', 'lightbox-script', 'yatra-moment', 'yatra-popper', 'yatra-tippy', 'yatra-calendarjs'), YATRA_VERSION);
             wp_enqueue_script('yatra-script');
 
+            $enabled_date = array();
 
-            $date_range = yatra_get_current_month_start_and_end_date();
+            $yatra_available_date_data = array();
 
-            $yatra_available_date_data = Yatra_Core_Tour_Availability::get_availability(get_the_ID(), $date_range['start'], $date_range['end'], array(
-                'is_expired' => false,
-                'is_full' => false
-            ), true);
+            if (is_singular('tour')) {
+                $date_range = yatra_get_current_month_start_and_end_date();
 
-          
-            $enabled_date = array_keys($yatra_available_date_data);
+                $yatra_available_date_data = Yatra_Core_Tour_Availability::get_availability(get_the_ID(), $date_range['start'], $date_range['end'], array(
+                    'is_expired' => false,
+                    'is_full' => false
+                ), true);
 
+
+                $enabled_date = array_keys($yatra_available_date_data);
+
+            }
             $yatra_params = array(
 
                 'ajax_url' => admin_url('admin-ajax.php'),
