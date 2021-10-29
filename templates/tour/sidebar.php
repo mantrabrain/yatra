@@ -7,7 +7,7 @@
             <div class="tour-info-pricing-content">
                 <p><span class="icon fa fa-tag"></span><?php echo __(' from ', 'yatra') ?>
                     <?php if (absint($min_sales) < 1) { ?>
-                        <span class="sales-price free"><?php echo __("Free"); ?></span>
+                        <span class="sales-price free"><?php echo __("Free", 'yatra'); ?></span>
                     <?php } else { ?>
                         <del class="regular-price"><?php echo yatra_get_price($currency, $min_regular) ?></del>
                         <span class="sales-price"><?php echo yatra_get_price($currency, $min_sales) ?></span>
