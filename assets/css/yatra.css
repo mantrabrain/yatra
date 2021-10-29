@@ -855,10 +855,11 @@ body.single .yatra-single-tour:after {
     background: #dffff9; }
     .yatra-tour-info-pricing-wrap .tour-info-pricing-header h2 {
       font-weight: 500;
+      font-size: 25px;
       text-align: center; }
   .yatra-tour-info-pricing-wrap .tour-info-pricing-content {
     border-top: 1px solid #ddd;
-    padding: 15px;
+    padding: 20px;
     background: #fff; }
     .yatra-tour-info-pricing-wrap .tour-info-pricing-content p {
       font-size: 20px;

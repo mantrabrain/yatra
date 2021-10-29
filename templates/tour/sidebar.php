@@ -2,17 +2,19 @@
     <div class="yatra-tour-info-inner">
         <div class="yatra-tour-info-pricing-wrap">
             <div class="tour-info-pricing-header">
-                <h2><?php echo __('Price', 'yatra') ?> - <span>2021-October-23</span></h2>
+                <h2><?php echo __('Please select date', 'yatra') ?></h2>
             </div>
-
             <div class="tour-info-pricing-content">
                 <p><span class="icon fa fa-tag"></span><?php echo __(' from ', 'yatra') ?>
-                    <del>$45</del>
-                    <span class="sales-price">$44</span>
+                    <?php if (absint($min_sales) < 1) { ?>
+                        <span class="sales-price free"><?php echo __("Free"); ?></span>
+                    <?php } else { ?>
+                        <del class="regular-price"><?php echo yatra_get_price($currency, $min_regular) ?></del>
+                        <span class="sales-price"><?php echo yatra_get_price($currency, $min_sales) ?></span>
+                    <?php } ?>
                 </p>
             </div>
         </div>
-
         <div class="yatra-tabs" id="yatra-tour-sidebar-tabs">
             <ul class="yatra-tab-wrap" role="tablist">
                 <li class="item active" role="presentation">
@@ -35,7 +37,7 @@
                 <div class="tab-inner" tabindex="0">
                     <div class="yatra-tour-booking-form-section">
                         <div class="sec-row row">
-                            <?php do_action('yatra_single_tour_booking_form') ?>
+                            <?php do_action('yatra_single_tour_booking_form', $data) ?>
                         </div><!-- .sec-row -->
                     </div>
                 </div>
@@ -44,7 +46,7 @@
                 <div class="tab-inner" tabindex="0">
                     <div class="yatra-tour-enquiry-form-section">
                         <div class="sec-row row">
-                            <?php do_action('yatra_single_tour_enquiry_form') ?>
+                            <?php do_action('yatra_single_tour_enquiry_form', $data) ?>
                         </div><!-- .sec-row -->
                     </div>
                 </div>

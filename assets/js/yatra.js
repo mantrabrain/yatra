@@ -312,6 +312,12 @@
                     onDateSelect: function (date) {
                         $(".yatra_tour_start_date").find('input').attr('data-selected-date', date).val(date);
 
+                        const date_full = new Date(date);  // 2009-11-10
+                        const month = date_full.toLocaleString('default', {month: 'long'});
+                        
+                        var date_string = month + ' ' + date_full.getDate() + ', ' + date_full.getFullYear();
+
+                        $('.tour-info-pricing-header').find('h2').html(date_string);
                         $.ajax({
                             type: "POST",
                             url: yatra_params.ajax_url,
