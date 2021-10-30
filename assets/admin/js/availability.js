@@ -25,8 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             this.renderPopUp();
 
-            this.initEvents();
-
             this.initTooltip();
 
             this.initDateRangePicker();
@@ -86,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            $('body').on('change', '#yatra-admin-popup .yatra_availability_selected_date', function () {
+            $('body').on('change', '#yatra-admin-popup .yatra_availability_selected_date', function (event) {
                 var that_item = $(this);
 
                 var json_object = {
@@ -106,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         },
                         beforeSend: function () {
+                            $('#yatra_availability_selected_date').attr('disabled', true);
                             $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').addClass('yatra-overlay');
                             that_item.closest('.yatra-field-wrap').append('<span class="spinner" style="visibility: visible"/>');
                         },
@@ -113,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').removeClass('yatra-overlay');
                             that_item.closest('.yatra-field-wrap').find('.spinner').remove();
                             $('#yatra-availability-calendar').removeClass('yatra-loading');
+                            $('#yatra_availability_selected_date').removeAttr('disabled');
 
                         },
                         success: function (response) {
@@ -401,6 +401,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 availability_calendar.refetchEvents();
 
             });
+            YatraPopUp.initEvents();
         },
 
 
