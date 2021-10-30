@@ -1052,9 +1052,8 @@ if (!function_exists('yatra_tour_additional_info')) {
         $yatra_tour_meta_tour_duration_days = get_post_meta($post_id, 'yatra_tour_meta_tour_duration_days', true);
         $yatra_tour_meta_tour_duration_nights = get_post_meta($post_id, 'yatra_tour_meta_tour_duration_nights', true);
         $yatra_tour_meta_tour_country = get_post_meta($post_id, 'yatra_tour_meta_tour_country', true);
-        $yatra_tour_meta_tour_fixed_departure = get_post_meta($post_id, 'yatra_tour_meta_tour_fixed_departure', true);
-
-        $yatra_tour_meta_tour_fixed_departure = $yatra_tour_meta_tour_fixed_departure == 1 ? true : false;
+        $yatra_tour_maximum_number_of_traveller = get_post_meta($post_id, 'yatra_tour_maximum_number_of_traveller', true);
+        $yatra_tour_minimum_pax = get_post_meta($post_id, 'yatra_tour_minimum_pax', true);
 
 
         $currency = get_option('yatra_currency');
@@ -1106,7 +1105,9 @@ if (!function_exists('yatra_tour_additional_info')) {
             'group_size' => $yatra_tour_meta_group_size,
             'price' => $price_string,
             'tour_duration' => $tour_duration_string,
-            'country' => $country_string
+            'country' => $country_string,
+            'max_travellers' => $yatra_tour_maximum_number_of_traveller,
+            'min_pax' => $yatra_tour_minimum_pax
         );
         return $additional_info;
 

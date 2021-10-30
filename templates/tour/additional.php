@@ -1,8 +1,3 @@
-<?php
-echo '<pre>';
-print_r($additional_info);
-echo '</pre>';
-?>
 <div class="yatra-tour-additional-info">
     <div class="yatra-tour-additional-info-item">
         <div class="icon-wrap">
@@ -15,29 +10,31 @@ echo '</pre>';
     </div>
     <div class="yatra-tour-additional-info-item">
         <div class="icon-wrap">
-            <i class="icon fa fa-clock"></i>
+            <i class="icon fa fa-globe"></i>
         </div>
         <div class="icon-content">
             <span class="info-title"><?php echo esc_html__('Country', 'yatra'); ?></span>
             <p class="info-content"><?php echo esc_html($additional_info['country']); ?></p>
         </div>
     </div>
-    <div class="yatra-tour-additional-info-item">
+    <div class="yatra-tour-additional-info-item yatra-tippy-tooltip"
+         data-tippy-content="This might be different as per your booking date.">
         <div class="icon-wrap">
-            <i class="icon fa fa-clock"></i>
+            <i class="icon fa fa-check"></i>
         </div>
         <div class="icon-content">
-            <span class="info-title"><?php echo esc_html__('Country', 'yatra'); ?></span>
-            <p class="info-content"><?php echo esc_html($additional_info['country']); ?></p>
+            <span class="info-title"><?php echo esc_html__('Maximum Traveller', 'yatra'); ?></span>
+            <p class="info-content"><?php echo esc_html($additional_info['max_travellers']); ?></p>
         </div>
     </div>
-    <div class="yatra-tour-additional-info-item">
+    <div class="yatra-tour-additional-info-item yatra-tippy-tooltip"
+         data-tippy-content="This might be different as per your booking date.">
         <div class="icon-wrap">
-            <i class="icon fa fa-clock"></i>
+            <i class="icon fa fa-chair"></i>
         </div>
         <div class="icon-content">
-            <span class="info-title"><?php echo esc_html__('Country', 'yatra'); ?></span>
-            <p class="info-content"><?php echo esc_html($additional_info['country']); ?></p>
+            <span class="info-title"><?php echo esc_html__('Min Pax', 'yatra'); ?></span>
+            <p class="info-content"><?php echo esc_html($additional_info['max_travellers']); ?></p>
         </div>
     </div>
 
