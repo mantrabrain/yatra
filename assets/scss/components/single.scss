@@ -30,18 +30,32 @@ body.single {
   padding: 10px;
   background: #f9f9f9;
   border: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
   .yatra-tour-additional-info-item {
     font-weight: 500;
-    font-size: 15px;
     padding: 5px 0;
-    width: 50%;
-    float: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-    .icon {
-      width: 30px;
-      display: inline-block;
-      margin-right: 4px;
+    .icon-wrap {
+      margin-right: 20px;
+      font-size: 45px;
+      color: #1a2b48;
+    }
+
+    .info-title {
+      color: #1a2b48;
+      margin: 0 0 3px;
+      font-weight: bold;
+    }
+
+    .info-content {
+      color: #5e6d77;
+      margin: 10px 0 0 0;
     }
   }
 
