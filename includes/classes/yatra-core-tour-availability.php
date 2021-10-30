@@ -411,23 +411,52 @@ class Yatra_Core_Tour_Availability
     public function calendar_tour_list()
     {
 
+
         $config = $this->pagination_config();
 
-        $the_query = new WP_Query(
-
+        $query_config =
             array(
                 'posts_per_page' => absint($config['per_page']),
                 'post_type' => 'tour',
                 'paged' => absint($config['current'])
-            )
+            );
+
+        $search_text = '';
+
+        if (isset($_GET['availability_search'])) {
+
+            $search_text = isset($_POST['search']) ? sanitize_text_field($_POST['search']) : '';
+        }
+
+        if ($search_text !== '') {
+            $query_config['s'] = $search_text;
+        }
+
+        $the_query = new WP_Query(
+            $query_config
         );
         echo '<div class="yatra-availability-tour-list-wrap">';
+
+        $removable_query_args = wp_removable_query_args();
+
+        $current_url = set_url_scheme('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+
+        $current_url = remove_query_arg($removable_query_args, $current_url);
+
+        $url = add_query_arg('availability_search', true, $current_url)
+        ?>
+        <form method="post" action="<?php echo esc_url($url); ?>" id="yatra-availability-search-form">
+            <input type="text" name="search" value="<?php echo esc_attr($search_text) ?>"/>
+            <button type="submit" class="button-primary"><?php echo __('Search', 'yatra') ?></button>
+            <?php wp_nonce_field('yatra_availability_search_form_nonce'); ?>
+        </form>
+        <?php
         echo '<ul class="yatra-availability-tour-lists">';
         while ($the_query->have_posts()):
 
             $the_query->the_post();
             echo '<li>';
-            echo '<a data-id="' . absint(get_the_ID()) . '" target="_blank" href="' . esc_url(get_the_permalink()) . '">#' . absint(get_the_ID()) . ' - ' . esc_html(get_the_title()) . '</a>';
+            echo '<a data-title="' . esc_attr(get_the_title()) . '" data-id="' . absint(get_the_ID()) . '" target="_blank" href="' . esc_url(get_the_permalink()) . '">#' . absint(get_the_ID()) . ' - ' . esc_html(get_the_title()) . '</a>';
             echo '</li>';
 
         endwhile;

@@ -203,6 +203,15 @@
 #yatra-admin-popup .yatra-admin-popup-header-title {
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#yatra-admin-popup .yatra-admin-popup-header-title .post-title {
+    font-size: 15px;
+    font-weight: normal;
+    margin-left: 20px;
 }
 
 #yatra-admin-popup .yatra-admin-popup-close {
@@ -438,9 +447,32 @@ body.yatra-popup-open {
     max-width: 25%;
     width: 25%;
     float: left;
-    margin-top: 52px;
     background: #fff;
     border: 1px solid #ddd;
+}
+
+#yatra-availability-calendar-container form#yatra-availability-search-form {
+    height: 51px;
+    background: #f9f9f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+#yatra-availability-calendar-container form#yatra-availability-search-form input {
+    min-height: 40px;
+    width: 280px;
+}
+
+#yatra-availability-calendar-container form#yatra-availability-search-form button {
+    min-height: 40px;
+    width: 80px;
+}
+
+#yatra-availability-calendar-container ul.yatra-availability-tour-lists {
+    border-top: 1px solid #ddd;
+    margin-top: 0;
 }
 
 #yatra-availability-calendar-container .yatra-availability-tour-lists li {
@@ -451,9 +483,8 @@ body.yatra-popup-open {
 #yatra-availability-calendar-container .yatra-availability-tour-lists li a {
 
     padding: 10px;
-    width: 100%;
     max-width: 100%;
-    display: inline-block;
+    display: block;
     text-decoration: none;
     outline: none;
 

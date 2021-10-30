@@ -13,16 +13,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
         id: 'yatra-admin-popup',
 
+        post_title: '[ This is Post Title ]',
+
         init: function (source) {
+
             this.title = source.title;
+
             this.data = source.data;
+
+            this.post_title = source.post_title;
+
             this.renderPopUp();
+
             this.initEvents();
+
             this.initTooltip();
+
             this.initDateRangePicker();
         },
         renderPopUp: function () {
             var _that = this;
+
             var id = this.id;
 
             var content = this.data;
@@ -30,7 +41,10 @@ document.addEventListener('DOMContentLoaded', function () {
             var contentEl = $('<div class="yatra-admin-popup-content"/>');
 
             var popupHeader = $('<div class="yatra-admin-popup-header"/>');
-            popupHeader.append($('<h2 class="yatra-admin-popup-header-title"/>').text(_that.title));
+            var h2 = $('<h2 class="yatra-admin-popup-header-title"/>');
+            h2.append($('<span class="date"/>').text(_that.title));
+            h2.append($('<span class="post-title"/>').text(_that.post_title));
+            popupHeader.append(h2);
             popupHeader.append('<span class="yatra-admin-popup-close dashicons dashicons-no-alt"></span>');
             var popupBody = $('<div class="yatra-admin-popup-body"/>');
             popupBody.html(content);
@@ -103,7 +117,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         },
                         success: function (response) {
 
-                            $('#yatra-admin-popup').find('h2.yatra-admin-popup-header-title').text(response.title);
+                            var id = $('#yatra-availability-calendar-tour-id').val();
+                            var title = $('#yatra-availability-calendar-tour-id').attr('data-title');
+                            var post_title = "[ #" + id + ' - ' + title + ' ]';
+
+                            $('#yatra-admin-popup').find('h2.yatra-admin-popup-header-title .date').text(response.title);
+                            $('#yatra-admin-popup').find('h2.yatra-admin-popup-header-title .post-title').text(post_title);
                             $('#yatra-admin-popup').find('.yatra-availability-calendar-pricing-content').html(response.data);
 
                         },
@@ -345,9 +364,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 success: function (response) {
 
+                    var id = $('#yatra-availability-calendar-tour-id').val();
+                    var title = $('#yatra-availability-calendar-tour-id').attr('data-title');
                     var data = {
                         'title': response.title,
-                        'data': response.data
+                        'data': response.data,
+                        'post_title': "[ #" + id + ' - ' + title + ' ]',
                     };
                     availability_date_ranges = response.fixed_date_ranges;
                     YatraPopUp.init(data);
@@ -375,6 +397,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $(this).closest('li').addClass('active-tour');
                 var tour_id = $(this).attr('data-id');
                 $('#yatra-availability-calendar-tour-id').val(tour_id);
+                $('#yatra-availability-calendar-tour-id').attr('data-title', $(this).attr('data-title'));
                 availability_calendar.refetchEvents();
 
             });
