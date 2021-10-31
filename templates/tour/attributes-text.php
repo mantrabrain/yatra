@@ -1,9 +1,6 @@
 <div class="yatra-attribute-item type-text">
-    <!--<div class="icon-wrap">
-        <span class="attribute-icon fa fa-home"></span>
-    </div>-->
-    <div class="icon-content">
-        <span class="attribute-icon fa fa-pie-chart"></span>
+      <div class="icon-content">
+        <span class="attribute-icon fa fa-text-height"></span>
         <?php if ('' != $title) { ?>
             <span class="attribute-title"><?php echo esc_html($title) ?></span>
         <?php } ?>
