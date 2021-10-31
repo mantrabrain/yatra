@@ -18,7 +18,7 @@
         </div>
     </div>
     <div class="yatra-tour-additional-info-item"
-         >
+    >
         <span class="question yatra-tippy-tooltip fa fa-info-circle"
               data-tippy-content="This might be different as per your booking date"></span>
         <div class="icon-wrap">
@@ -45,7 +45,15 @@
 </div>
 <?php if (yatra_tour_has_attributes()) { ?>
     <div class="yatra-tour-attribute-info">
+
         <?php
+
+        $yatra_custom_attributes_title_text = get_option('yatra_custom_attributes_title_text');
+
+        if ('' !== $yatra_custom_attributes_title_text) {
+
+            echo "<h2>" . esc_html($yatra_custom_attributes_title_text) . "</h2>";
+        }
         yatra_tour_custom_attributes_template(); ?>
     </div>
 <?php } ?>

@@ -36,6 +36,7 @@
   }
 
 }
+
 .yatra-page-wrapper {
   &.template-default {
     article {
@@ -330,10 +331,6 @@
   }
 }
 
-.yatra-single-meta-content {
-  padding: 10px
-}
-
 .yatra-single-meta-options {
   float: right;
   width: 50%;
@@ -537,4 +534,9 @@
     clear: both;
     width: 100%;
   }
+}
+
+.yatra-flex-row {
+  display: flex;
+  justify-content: space-between;
 }
