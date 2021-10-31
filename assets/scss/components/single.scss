@@ -35,7 +35,7 @@ body.single {
   border-right: 0;
 
   .yatra-tour-additional-info-item {
-     padding: 10px;
+    padding: 10px;
     justify-content: flex-start;
     align-items: center;
     flex-grow: 1;
@@ -141,6 +141,7 @@ body.single {
 .yatra-tour-attribute-info {
   padding: 0;
   margin: 15px 0;
+
   .yatra-tour-additional-text-number {
 
 
@@ -151,13 +152,13 @@ body.single {
       flex: 0 0 25%;
       align-items: center;
       justify-content: center;
-      background: #f9f9f9;
+      background: #fff;
       border: 1px solid #ddd;
       display: flex;
       flex-direction: column;
-      margin: 2px;
-      margin-left: 0;
-      margin-top: 0;
+
+      padding: 10px;
+
       .attribute-icon {
         font-size: 30px;
         color: #1abc9c;
@@ -166,8 +167,8 @@ body.single {
       .attribute-title, .attribute-content, .attribute-icon {
         display: block;
         margin: 0 auto;
-        margin-bottom: 10px;
-        margin-top: 10px;
+        margin-bottom: 5px;
+        margin-top: 5px;
       }
 
     }
