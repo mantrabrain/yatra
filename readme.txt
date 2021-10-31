@@ -83,16 +83,18 @@ Shortcode for Tour Listing:
 3. Add new tour and manage frontend tabs while creating new tour - Backend
 4. Custom destination create option - Backend
 5. Custom activity create option - Backend
-6. Custom attribute create option - Backend
+6. Customer enquiries - Backend
 7. Booking listing page - Backend
 8. Booking view option - Backend
 9. General setting page - Backend
-10. General page setting page - Backend
-11. Design setting (Custom container class) page - Backend
-12. Single tour page with all tabs - Frontend
-13. Tour cart page - Frontend
-14. Checkout page - Frontend
-15. Thank you page ( after checkout success ) - Frontend
+10. Dynamic Tab Setting - Backend
+11. Availability options - Backend
+12. Dynamic day wise pricing as per availability - Backend
+13. Tour Single Page with booking calendar
+14. Enquiry form - frontend
+15. Frontend Tour Tab view
+16. Yatra Cart Page
+17. Yatra Checkout Page
 
 
 == IMPORTANT LINKS ==

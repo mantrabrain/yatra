@@ -35,7 +35,9 @@ if ($booking_details) : ?>
         </thead>
 
         <tbody>
-        <?php foreach ($booking_details as $booking) :
+        <?php
+
+        foreach ($booking_details as $booking) :
 
             $item_count = $booking->number_of_tours;
             ?>
@@ -46,19 +48,19 @@ if ($booking_details) : ?>
                             <?php do_action('yatra_my_account_my_booking_column_' . $column_id, $booking); ?>
 
                         <?php elseif ('booking-id' === $column_id) : ?>
-                            <a href="<?php echo  add_query_arg(array(
+                            <a href="<?php echo add_query_arg(array(
                                 'page_type' => 'bookings',
                                 'booking_id' => absint($booking->booking_id),
-                            ), get_permalink());?>">
+                            ), get_permalink()); ?>">
                                 <?php echo _x('#', 'hash before booking number', 'yatra') . $booking->booking_id;
 
                                 ?>
                             </a>
                         <?php elseif ('booking-code' === $column_id) : ?>
-                            <a data-attr="<?php echo $booking->booking_id;?>" href="<?php echo add_query_arg(array(
+                            <a data-attr="<?php echo $booking->booking_id; ?>" href="<?php echo add_query_arg(array(
                                 'page_type' => 'bookings',
                                 'booking_id' => absint($booking->booking_id),
-                            ), get_permalink());?>">
+                            ), get_permalink()); ?>">
                                 <?php echo esc_html($booking->booking_code);
 
                                 ?>
