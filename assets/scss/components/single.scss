@@ -43,8 +43,16 @@ body.single {
     flex-basis: 0;
     border-right: 1px solid #ddd;
     text-align: center;
-    background:#fff;
+    background: #fff;
 
+    position: relative;
+
+    .question {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      color: #aaa;
+    }
 
     .icon-wrap {
       font-size: 45px;

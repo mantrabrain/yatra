@@ -716,7 +716,13 @@ body.single .yatra-single-tour:after {
         flex-basis: 0;
     border-right: 1px solid #ddd;
     text-align: center;
-    background: #fff; }
+    background: #fff;
+    position: relative; }
+    .yatra-tour-additional-info .yatra-tour-additional-info-item .question {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      color: #aaa; }
     .yatra-tour-additional-info .yatra-tour-additional-info-item .icon-wrap {
       font-size: 45px;
       color: #1a2b48; }
