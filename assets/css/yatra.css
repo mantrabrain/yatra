@@ -695,10 +695,6 @@ body.single .yatra-single-tour:after {
      -moz-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  -webkit-box-align: center;
-     -moz-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
   border-right: 0; }
   .yatra-tour-additional-info .yatra-tour-additional-info-item {
     padding: 10px;
