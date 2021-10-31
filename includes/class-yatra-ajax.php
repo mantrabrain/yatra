@@ -400,11 +400,10 @@ class Yatra_Ajax
 
         $yatra_pricing = isset($_POST['yatra_availability_pricing']) ? $_POST['yatra_availability_pricing'] : array();
 
-        yatra()->tour->maybe_initialize($tour_id);
 
-        $status = yatra()->tour->update_availability($start_date, $end_date, $yatra_availability, $yatra_pricing);
-
-        yatra()->tour->maybe_flush();
+        $status = Yatra_Core_Tour_Availability::update_availability(
+            $start_date, $end_date, $yatra_availability, $yatra_pricing, $tour_id
+        );
 
         wp_send_json_success(
             $status

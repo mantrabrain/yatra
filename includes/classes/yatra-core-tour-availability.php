@@ -51,8 +51,7 @@ class Yatra_Core_Tour_Availability
         wp_localize_script('yatra-availability-script', 'yatra_availability_params', $yatra_availability_params);
     }
 
-    public
-    function output()
+    public function output()
     {
 
 
@@ -98,6 +97,120 @@ class Yatra_Core_Tour_Availability
         echo '</div>';
 
         echo '</div>';
+
+    }
+
+    public static function update_availability($start_date, $end_date, $yatra_availability, $yatra_pricing, $tour_id)
+    {
+        $start_date = sanitize_text_field($start_date);
+
+        $end_date = sanitize_text_field($end_date);
+
+        $begin = new DateTime($start_date);
+
+        $end = new DateTime($end_date);
+
+        $user_id = get_current_user_id();
+
+        $activate = isset($yatra_availability['activate']) ? (boolean)$yatra_availability['activate'] : false;
+
+        $pricing_type = isset($yatra_availability['pricing_type']) ? sanitize_text_field($yatra_availability['pricing_type']) : 'single';
+
+        $max_traveller = isset($yatra_availability['max_travellers']) ? yatra_maybeintempty($yatra_availability['max_travellers']) : '';
+
+        $availability_for = isset($yatra_availability['availability_for']) ? sanitize_text_field($yatra_availability['availability_for']) : '';
+
+        $yatra_final_pricing = array();
+
+        $status = false;
+
+        foreach ($yatra_pricing as $pricing_index => $pricing) {
+
+            $yatra_final_pricing_single = array(
+                'pricing_label' => isset($pricing['pricing_label']) ? sanitize_text_field($pricing['pricing_label']) : '',
+                'pricing_description' => isset($pricing['pricing_description']) ? sanitize_text_field($pricing['pricing_description']) : '',
+                'pricing_per' => isset($pricing['pricing_per']) ? sanitize_text_field($pricing['pricing_per']) : 'single',
+                'group_size' => isset($pricing['group_size']) ? yatra_maybeintempty($pricing['group_size']) : '',
+                'regular_price' => isset($pricing['regular_price']) ? yatra_maybeintempty($pricing['regular_price']) : '',
+                'sales_price' => isset($pricing['sales_price']) ? yatra_maybeintempty($pricing['sales_price']) : '',
+                'minimum_pax' => isset($pricing['minimum_pax']) ? yatra_maybeintempty($pricing['minimum_pax']) : '',
+                'maximum_pax' => isset($pricing['maximum_pax']) ? yatra_maybeintempty($pricing['maximum_pax']) : '',
+
+            );
+            if ($pricing_type === "single" || $pricing_index === "0") {
+
+                $yatra_final_pricing = $yatra_final_pricing_single;
+
+            } else {
+
+                $yatra_final_pricing[$pricing_index] = $yatra_final_pricing_single;
+
+            }
+        }
+
+        $slot_group_data = Yatra_Core_DB::get_data('tour_dates', array(
+            'slot_group_id'
+        ), array(), array(
+            'order_by' => 'slot_group_id',
+            'order' => 'DESC',
+            'offset' => '0',
+            'limit' => '1'
+        ));
+
+
+        $slot_group_id = isset($slot_group_data[0]) ? absint($slot_group_data[0]->slot_group_id) : 1;
+
+        $slot_group_id = $slot_group_id + 1;
+
+        for ($date_i = $begin; $date_i <= $end; $date_i->modify('+1 day')) {
+
+            $start_date_value = $date_i->format("Y-m-d H:i:s");
+
+            $end_date_value = $date_i->format("Y-m-d 23:59:59");
+
+            $where = array(
+                'start_date' => $start_date_value,
+                'end_date' => $end_date_value,
+                'tour_id' => $tour_id
+            );
+
+            $update_ignore = array('user_id', 'start_date', 'end_date', 'tour_id', 'created_at', 'created_by');
+
+            $data = array(
+                'tour_id' => $tour_id,
+                'user_id' => $user_id,
+                'slot_group_id' => $slot_group_id,
+                'start_date' => $start_date_value,
+                'end_date' => $end_date_value,
+                'pricing' => json_encode($yatra_final_pricing),
+                'pricing_type' => $pricing_type,
+                'max_travellers' => $max_traveller,
+                'active' => $activate,
+                'availability' => $availability_for,
+                'note_to_customer' => '',
+                'note_to_admin' => '',
+                'created_by' => $user_id,
+                'updated_by' => $user_id,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            );
+
+            if (Yatra_Core_DB::data_exists('tour_dates', $where)) {
+
+                $action_status = Yatra_Core_DB::update_data('tour_dates', $data, $where, $update_ignore);
+
+
+            } else {
+
+                $action_status = Yatra_Core_DB::save_data('tour_dates', $data);
+
+
+            }
+
+            $status = !$status ? $action_status : $status;
+
+        }
+        return $status;
 
     }
 
@@ -396,8 +509,7 @@ class Yatra_Core_Tour_Availability
         exit;
     }
 
-    private
-    static function load_pricing(Yatra_Tour_Pricing $pricing, $currency_symbol)
+    private static function load_pricing(Yatra_Tour_Pricing $pricing, $currency_symbol)
     {
         yatra_load_admin_template('availability.availability-calendar', array(
             'id' => $pricing->getID(),
