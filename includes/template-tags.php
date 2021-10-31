@@ -585,10 +585,9 @@ if (!function_exists('yatra_tour_attribute_type_options')) {
                         'shortcode' => array(
                             'name' => 'shortcode',
                             'title' => __('Shortcode', 'yatra'),
-                            'placeholder' => __('Default value for text field.', 'yatra'),
-                            'description' => __('Default value for text field.', 'yatra'),
+                            'placeholder' => __('Default value for shortcode field.', 'yatra'),
+                            'description' => __('Default value for shortcode field.', 'yatra'),
                             'type' => 'shortcode',
-                            'wrap_class' => 'yatra-left',
 
 
                         )
@@ -1012,16 +1011,46 @@ if (!function_exists('yatra_frontend_tabs')) {
     }
 }
 
+if (!function_exists('yatra_tour_custom_attributes')) {
+    function yatra_tour_custom_attributes()
+    {
+        $all_args = array();
+        $post_id = get_the_ID();
+        $tour_meta_custom_attributes = get_post_meta($post_id, 'tour_meta_custom_attributes', true);
+        if (count($tour_meta_custom_attributes) > 0) {
+            $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
+            foreach ($tour_meta_custom_attributes as $term_id => $content) {
+                $term = get_term($term_id);
+                $field_key = get_term_meta($term_id, 'attribute_field_type', true);
+                $field = $yatra_tour_attribute_type_options[$field_key] ?? array();
+                $field_option = $field['options'] ?? array();
+                if (isset($term->name)) {
+                    //$type = $field_option['content']['type'];
+                    $args['content'] = $content;
+                    $args['field_option'] = $field_option;
+                    $all_args[] = $args;
+                }
+            }
+        }
+        echo '<pre>';
+        print_r($all_args);
+        echo '</pre>';
+        exit;
+
+    }
+}
+
 if (!function_exists('yatra_tour_custom_attributes_template')) {
     function yatra_tour_custom_attributes_template()
     {
+        yatra_tour_custom_attributes();
         $post_id = get_the_ID();
         $tour_meta_custom_attributes = get_post_meta($post_id, 'tour_meta_custom_attributes', true);
         if (count($tour_meta_custom_attributes) > 0) {
             echo '<h3>' . esc_html(get_option('yatra_custom_attributes_title_text', 'Attributes')) . '</h3>';
             $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
             ?>
-            <table>
+            <div class="yatra-attribute-info-inner">
                 <?php foreach ($tour_meta_custom_attributes as $term_id => $content) {
                     $term = get_term($term_id);
                     $field_key = get_term_meta($term_id, 'attribute_field_type', true);
@@ -1034,7 +1063,7 @@ if (!function_exists('yatra_tour_custom_attributes_template')) {
                         yatra_get_template('tour/attributes.php', $args);
                     }
                 } ?>
-            </table>
+            </div>
 
             <?php
         }
