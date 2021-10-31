@@ -38,7 +38,7 @@
         </div>
         <div class="icon-content">
             <span class="info-title"><?php echo esc_html__('Min Pax', 'yatra'); ?></span>
-            <p class="info-content"><?php echo esc_html($additional_info['max_travellers']); ?></p>
+            <p class="info-content"><?php echo esc_html($additional_info['min_pax']); ?></p>
         </div>
     </div>
 

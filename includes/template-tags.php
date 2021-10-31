@@ -123,27 +123,19 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
 
         $yatra_tour_meta_regular_price_string = $currency_symbol . $regular_yatra_tour_meta_regular_price;
 
-        if ((int)$yatra_tour_meta_sales_price > 0) {
-
-            $yatra_tour_meta_regular_price_string = '<del>' . $yatra_tour_meta_regular_price_string . '</del> &nbsp;' . $currency_symbol . $yatra_tour_meta_sales_price;;
-
-        }
-
-        $yatra_tour_meta_tour_fixed_departure = get_post_meta($post_id, 'yatra_tour_meta_tour_fixed_departure', true);
-
-
         $meta_frontend = array(
             array(
-                'icon' => 'fa fa-user',
-                'text' => '{{yatra_tour_meta_price_per}}',
-                'title' => __('Price Per', 'yatra')
-
-            ), array(
-                'icon' => 'fa fa-user-circle',
-                'text' => '{{yatra_tour_meta_group_size}}',
-                'title' => __('Group Size', 'yatra')
+                'icon' => 'fa fa-users',
+                'text' => '{{yatra_tour_maximum_number_of_traveller}}',
+                'title' => __('Maximum Traveller', 'yatra')
 
             ),
+            array(
+                'icon' => 'fa fa-chair',
+                'text' => '{{yatra_tour_minimum_pax}}',
+                'title' => __('Minimum Pax', 'yatra')
+
+            )
 
         );
         if (!empty($yatra_tour_meta_tour_country)) {
@@ -162,7 +154,7 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
 
             $meta_frontend[] =
                 array(
-                    'icon' => 'fa fa-map',
+                    'icon' => 'fa fa-globe',
                     'text' => $country_string,
                     'title' => __('Country', 'yatra')
 

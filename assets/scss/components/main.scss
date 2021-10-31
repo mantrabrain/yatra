@@ -321,6 +321,7 @@
     border: 1px solid #ddd;
     padding: 10px;
     margin: 0;
+    font-weight: 400;
   }
 
   .itinerary-heading, .faq-heading {
@@ -416,7 +417,7 @@
       font-family: 'Montserrat', sans-serif;
       font-weight: 600;
       margin: 0;
-      padding: 23px;
+      padding: 15px;
       pointer-events: none;
       background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 100%);
       white-space: nowrap;
@@ -520,7 +521,7 @@
 
       a {
         border-radius: 50px;
-        padding: 15px 25px;
+        padding: 10px 25px;
         background-color: #1abc9c;
         border: 1px solid #1abc9c;
         color: #fff;

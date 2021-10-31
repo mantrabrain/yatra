@@ -470,7 +470,8 @@
 .yatra-itinerary-list .itinerary-content, .yatra-itinerary-list .itinerary-heading, .yatra-itinerary-list .faq-content, .yatra-itinerary-list .faq-heading, .yatra-faq-list-item .itinerary-content, .yatra-faq-list-item .itinerary-heading, .yatra-faq-list-item .faq-content, .yatra-faq-list-item .faq-heading {
   border: 1px solid #ddd;
   padding: 10px;
-  margin: 0; }
+  margin: 0;
+  font-weight: 400; }
 
 .yatra-itinerary-list .itinerary-heading .fa, .yatra-itinerary-list .itinerary-heading svg, .yatra-itinerary-list .faq-heading .fa, .yatra-itinerary-list .faq-heading svg, .yatra-faq-list-item .itinerary-heading .fa, .yatra-faq-list-item .itinerary-heading svg, .yatra-faq-list-item .faq-heading .fa, .yatra-faq-list-item .faq-heading svg {
   float: right;
@@ -562,7 +563,7 @@
       font-family: 'Montserrat', sans-serif;
       font-weight: 600;
       margin: 0;
-      padding: 23px;
+      padding: 15px;
       pointer-events: none;
       background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0)), to(rgba(0, 0, 0, 0.65)));
       background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 100%);
@@ -651,7 +652,7 @@
       left: 33%; }
       .yatra-destination-wrap .yatra-item-inner .deals-footer a, .yatra-activity-wrap .yatra-item-inner .deals-footer a, .yatra-discount-deals-wrap .yatra-item-inner .deals-footer a, .yatra-tour-list-wrap .yatra-item-inner .deals-footer a {
         border-radius: 50px;
-        padding: 15px 25px;
+        padding: 10px 25px;
         background-color: #1abc9c;
         border: 1px solid #1abc9c;
         color: #fff; }
