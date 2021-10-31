@@ -1,7 +1,7 @@
 <div class="yatra-tour-additional-info">
     <div class="yatra-tour-additional-info-item">
         <div class="icon-wrap">
-            <i class="icon fa fa-user-clock"></i>
+            <i class="icon fa fa-clock"></i>
         </div>
         <div class="icon-content">
             <span class="info-title"><?php echo esc_html__('Duration', 'yatra'); ?></span>
@@ -22,7 +22,7 @@
         <span class="question yatra-tippy-tooltip fa fa-info-circle"
               data-tippy-content="This might be different as per your booking date"></span>
         <div class="icon-wrap">
-            <i class="icon fa fa-check"></i>
+            <i class="icon fa fa-users"></i>
         </div>
         <div class="icon-content">
             <span class="info-title"><?php echo esc_html__('Maximum Traveller', 'yatra'); ?></span>
