@@ -9,10 +9,11 @@ if (count($cart_items) < 1) {
 ?>
 <table class="yatra_cart_table yatra_cart_table_responsive cart yatra-cart-form__contents" cellspacing="0">
     <thead>
-    <tr>
+    <tr style="text-align:left;">
         <th class="tour-remove">&nbsp;</th>
         <th class="tour-thumbnail">&nbsp;</th>
         <th class="tour-name"><?php echo __('Tour', 'yatra'); ?></th>
+        <th class="tour-selected-date"><?php echo __('Date', 'yatra'); ?></th>
         <th class="tour-person"><?php echo __('Person - Per - Pricing', 'yatra'); ?></th>
         <th class="tour-subtotal"><?php echo __('Total', 'yatra'); ?></th>
     </tr>
@@ -53,6 +54,13 @@ if (count($cart_items) < 1) {
 
             <td class="tour-name" data-title="Product">
                 <a href="<?php echo get_permalink($tour_cart->ID); ?>"><?php echo esc_html($tour_cart->post_title) ?></a>
+            </td>
+
+            <td class="tour-selected-date" data-title="Date">
+                <span><?php
+                    echo esc_html($cart_item['selected_date']);
+                    ?>
+                </span>
             </td>
 
 
