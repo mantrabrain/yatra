@@ -3,7 +3,7 @@ Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
 Tested up to: 5.8.1
-Stable tag: 2.0.15
+Stable tag: 2.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -105,8 +105,8 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
-= 2.0.15 | 2021/10/08 =
-* Fixed - Tab Ordering
-* Added - Dynamic Tab and design setting
-
-
+= 2.1.0 | 2021/10/31 =
+* Fixed - Frontend design update
+* Added - Dynamic Pricing option with availability feature
+* Added - User Enquiries feature
+* Added - Availability date range option

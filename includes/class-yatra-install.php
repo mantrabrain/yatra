@@ -17,8 +17,8 @@ final class Yatra_Install
 {
 
     private static $update_callbacks = array(
-        '2.0.16' => array(
-            'yatra_update_2016_tour_dates_table_create',
+        '2.1.0' => array(
+            'yatra_update_2100_tour_dates_table_create',
         )
     );
 
