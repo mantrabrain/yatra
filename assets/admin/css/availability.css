@@ -441,6 +441,9 @@ body.yatra-popup-open {
 #yatra-availability-calendar {
     height: 800px;
     max-height: 800px;
+    max-width: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
 #yatra-availability-calendar-container .yatra-availability-tour-list-wrap {

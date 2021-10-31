@@ -27,21 +27,47 @@ body.single {
 }
 
 .yatra-tour-additional-info {
-  padding: 10px;
-  background: #f9f9f9;
+  padding: 0;
   border: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-right: 0;
 
   .yatra-tour-additional-info-item {
     font-weight: 500;
-    font-size: 15px;
-    padding: 5px 0;
-    width: 50%;
-    float: left;
+    padding: 10px;
+    justify-content: flex-start;
+    align-items: center;
+    flex-grow: 1;
+    flex-basis: 0;
+    border-right: 1px solid #ddd;
+    text-align: center;
+    background: #fff;
 
-    .icon {
-      width: 30px;
-      display: inline-block;
-      margin-right: 4px;
+    position: relative;
+
+    .question {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      color: #aaa;
+    }
+
+    .icon-wrap {
+      font-size: 45px;
+      color: #1a2b48;
+    }
+
+    .info-title {
+      color: #1a2b48;
+      margin: 0 0 3px;
+      font-weight: bold;
+    }
+
+    .info-content {
+      color: #5e6d77;
+      margin: 10px 0 0 0;
     }
   }
 
@@ -124,13 +150,11 @@ body.single {
     border: 0;
   }
 }
-
 .day.yatra-availability-booking {
 
   border: 1px solid #2f582b !important;
   border-bottom: 5px solid #2f582b !important;
 }
-
 .day.yatra-availability-enquiry {
 
   border: 2px solid #008bb5 !important;
@@ -141,7 +165,6 @@ body.single {
   border: 2px solid #aaa !important;
   border-bottom: 5px solid #aaa !important;
 }
-
 .yatra-loading {
   position: relative;
 

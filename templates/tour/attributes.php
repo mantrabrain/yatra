@@ -1,6 +1,6 @@
-<tr>
-    <th><?php echo esc_html($term->name) ?></th>
-    <td><?php
+<div class="yatra-attribute-item">
+    <div class="attribute-title"><?php echo esc_html($term->name) ?></div>
+    <div class="attribute-content"><?php
 
         foreach ($content as $content_key => $content_value) {
 
@@ -29,5 +29,5 @@
                 echo '<p>' . ($value) . '</p>';
             }
         }
-        ?></td>
-</tr>
+        ?></div>
+</div>

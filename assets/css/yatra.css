@@ -682,19 +682,57 @@ body.single .yatra-single-tour:after {
   display: block; }
 
 .yatra-tour-additional-info {
-  padding: 10px;
-  background: #f9f9f9;
-  border: 1px solid #ddd; }
+  padding: 0;
+  border: 1px solid #ddd;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+     -moz-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+     -moz-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border-right: 0; }
   .yatra-tour-additional-info .yatra-tour-additional-info-item {
     font-weight: 500;
-    font-size: 15px;
-    padding: 5px 0;
-    width: 50%;
-    float: left; }
-    .yatra-tour-additional-info .yatra-tour-additional-info-item .icon {
-      width: 30px;
-      display: inline-block;
-      margin-right: 4px; }
+    padding: 10px;
+    -webkit-box-pack: start;
+       -moz-box-pack: start;
+        -ms-flex-pack: start;
+            justify-content: flex-start;
+    -webkit-box-align: center;
+       -moz-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-flex: 1;
+       -moz-box-flex: 1;
+        -ms-flex-positive: 1;
+            flex-grow: 1;
+    -ms-flex-preferred-size: 0;
+        flex-basis: 0;
+    border-right: 1px solid #ddd;
+    text-align: center;
+    background: #fff;
+    position: relative; }
+    .yatra-tour-additional-info .yatra-tour-additional-info-item .question {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      color: #aaa; }
+    .yatra-tour-additional-info .yatra-tour-additional-info-item .icon-wrap {
+      font-size: 45px;
+      color: #1a2b48; }
+    .yatra-tour-additional-info .yatra-tour-additional-info-item .info-title {
+      color: #1a2b48;
+      margin: 0 0 3px;
+      font-weight: bold; }
+    .yatra-tour-additional-info .yatra-tour-additional-info-item .info-content {
+      color: #5e6d77;
+      margin: 10px 0 0 0; }
   .yatra-tour-additional-info:after {
     clear: both;
     content: '';
