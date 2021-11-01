@@ -210,7 +210,7 @@ class Yatra_Setup_Wizard
         <p class="yatra-setup-actions step">
             <a href="<?php echo esc_url($this->get_next_step_link()); ?>"
                class="button-primary button button-large button-next"><?php _e('Let\'s Go!', 'yatra'); ?></a>
-            <a href="<?php echo esc_url(wp_get_referer() ? wp_get_referer() : admin_url('plugins.php')); ?>"
+            <a href="<?php echo esc_url(admin_url('edit.php?post_type=tour')); ?>"
                class="button button-large"><?php _e('Not right now', 'yatra'); ?></a>
         </p>
         <?php
