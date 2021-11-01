@@ -145,6 +145,9 @@
                 if (typeof $().datepicker !== 'undefined') {
                     $('.yatra-date').datepicker();
                 }
+                tippy('.yatra-tippy-tooltip', {
+                    allowHTML: true,
+                });
             },
             toggleYatraList: function ($toggle_node, toggle_status) {
                 var $this = this;

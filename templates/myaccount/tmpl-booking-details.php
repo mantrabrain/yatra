@@ -19,8 +19,8 @@ if (!defined('ABSPATH')) {
     <thead>
     <tr style="text-align:left">
         <th><?php echo __('Tour', 'yatra'); ?></th>
-        <th><?php echo __('Price Per', 'yatra'); ?></th>
-        <th><?php echo __('Group Size', 'yatra'); ?></th>
+        <th><?php echo __('Date', 'yatra'); ?></th>
+        <th><?php echo __('Pricing Details', 'yatra'); ?></th>
         <th><?php echo __('Total Price', 'yatra'); ?></th>
 
     </tr>
@@ -30,6 +30,7 @@ if (!defined('ABSPATH')) {
     foreach ($yatra_booking_meta as $id => $booking) {
 
         echo '<tr>';
+        $pricing = isset($booking['yatra_pricing']) ? $booking['yatra_pricing'] : array();
         $yatra_tour_name = isset($booking['yatra_tour_name']) ? $booking['yatra_tour_name'] : '';
         $yatra_tour_meta_regular_price = isset($booking['yatra_tour_meta_regular_price']) ? $booking['yatra_tour_meta_regular_price'] : '';
         $yatra_tour_meta_sales_price = isset($booking['yatra_tour_meta_sales_price']) ? $booking['yatra_tour_meta_sales_price'] : '';
@@ -50,17 +51,26 @@ if (!defined('ABSPATH')) {
 
         echo '</td>';
 
-
-        // Price Per
+        // Booking Date
         echo '<td>';
 
-        echo '<span>' . esc_html($yatra_tour_meta_price_per) . '</span>';
+        echo '<span>';
+
+        echo isset($booking['yatra_selected_date']) ? esc_html($booking['yatra_selected_date']) : '';
+
+
+        echo '</span>';
 
         echo '</td>';
-        // Group Size
+
+
+        // pricing details
+
         echo '<td>';
 
-        echo '<span>' . absint($yatra_tour_meta_group_size) . '</span>';
+        echo '<button class="fa fa-info yatra-tippy-tooltip" data-tippy-content="' . yatra_pricing_html($pricing) . '">';
+
+        echo '</button>';
 
         echo '</td>';
 

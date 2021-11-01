@@ -283,3 +283,43 @@ if (!function_exists('yatra_nice_input_number_field')) {
         <?php
     }
 }
+if (!function_exists('yatra_pricing_html')) {
+    function yatra_pricing_html($pricing_array)
+    {
+        ob_start();
+
+        if ($pricing_array instanceof Yatra_Tour_Pricing) {
+
+            yatra_get_template('myaccount/tmpl-pricing-header.php');
+
+
+                yatra_get_template('myaccount/tmpl-pricing.php',
+
+                    array(
+                        'pricing' => $pricing_array)
+
+                );
+
+        } else {
+
+            yatra_get_template('myaccount/tmpl-pricing-header.php');
+
+            foreach ($pricing_array as $pricing) {
+
+                if ($pricing instanceof Yatra_Tour_Pricing) {
+
+                    yatra_get_template('myaccount/tmpl-pricing.php',
+
+                        array(
+                            'pricing' => $pricing)
+
+                    );
+
+                }
+            }
+
+        }
+        return ob_get_clean();
+
+    }
+}
