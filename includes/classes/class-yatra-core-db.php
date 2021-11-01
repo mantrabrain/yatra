@@ -158,6 +158,8 @@ class Yatra_Core_DB
 
 
         );
+        $sql = str_ireplace("'__NULL__'", "NULL", $sql);
+
         return $wpdb->query($sql);
     }
 
@@ -166,7 +168,6 @@ class Yatra_Core_DB
         if (count($where) === 0) {
             return false;
         }
-
         global $wpdb;
 
         $update_query = "UPDATE " . self::get_table($table) . " SET ";
@@ -206,6 +207,9 @@ class Yatra_Core_DB
 
 
         );
+
+        $sql = str_ireplace("'__NULL__'", "NULL", $sql);
+
         return $wpdb->query($sql);
     }
 

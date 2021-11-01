@@ -284,34 +284,42 @@ if (!function_exists('yatra_nice_input_number_field')) {
     }
 }
 if (!function_exists('yatra_pricing_html')) {
-    function yatra_pricing_html($pricing_array)
+
+    function yatra_pricing_html($pricing_array, $yatra_currency_symbol, $number_of_person)
     {
         ob_start();
 
+        yatra_get_template('myaccount/tmpl-pricing-header.php');
+
         if ($pricing_array instanceof Yatra_Tour_Pricing) {
 
-            yatra_get_template('myaccount/tmpl-pricing-header.php');
 
+            yatra_get_template('myaccount/tmpl-pricing-item.php',
 
-                yatra_get_template('myaccount/tmpl-pricing.php',
+                array(
+                    'pricing' => $pricing_array,
+                    'currency' => $yatra_currency_symbol,
+                    'person' => $number_of_person
+                )
 
-                    array(
-                        'pricing' => $pricing_array)
-
-                );
+            );
 
         } else {
 
-            yatra_get_template('myaccount/tmpl-pricing-header.php');
 
             foreach ($pricing_array as $pricing) {
 
                 if ($pricing instanceof Yatra_Tour_Pricing) {
 
-                    yatra_get_template('myaccount/tmpl-pricing.php',
+                    $person = isset($number_of_person[$pricing->getID()]) ? $number_of_person[$pricing->getID()] : '';
+
+                    yatra_get_template('myaccount/tmpl-pricing-item.php',
 
                         array(
-                            'pricing' => $pricing)
+                            'pricing' => $pricing,
+                            'currency' => $yatra_currency_symbol,
+                            'person' => $person
+                        )
 
                     );
 
@@ -319,6 +327,8 @@ if (!function_exists('yatra_pricing_html')) {
             }
 
         }
+        yatra_get_template('myaccount/tmpl-pricing-footer.php');
+
         return ob_get_clean();
 
     }

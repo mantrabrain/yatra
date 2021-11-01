@@ -105,14 +105,14 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
                                     $variable_group_size = $variable_pricing_per == "person" ? null : $pricing->getGroupSize();
 
-                                    $person = isset($number_of_person[$pricing->getID()]) ? $number_of_person[$pricing->getID()] : 1;
+                                    $person = isset($number_of_person[$pricing->getID()]) ? $number_of_person[$pricing->getID()] : '';
 
                                     $this->generate_table_row(
                                         $yatra_tour_name,
                                         $person,
                                         $pricing->getLabel(),
-                                        $yatra_currency_symbol . $pricing->getRegularPrice(),
-                                        $yatra_currency_symbol . $pricing->getSalesPrice(),
+                                        yatra_get_price($yatra_currency_symbol, $pricing->getRegularPrice()),
+                                        yatra_get_price($yatra_currency_symbol, $pricing->getSalesPrice()),
                                         $variable_pricing_per,
                                         $variable_group_size,
                                         $yatra_currency_symbol . $total_tour_price,
@@ -130,8 +130,8 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                                     $yatra_tour_name,
                                     $number_of_person,
                                     $yatra_pricing->getLabel(),
-                                    $yatra_currency_symbol . $yatra_pricing->getRegularPrice(),
-                                    $yatra_currency_symbol . $yatra_pricing->getSalesPrice(),
+                                    yatra_get_price($yatra_currency_symbol, $yatra_pricing->getRegularPrice()),
+                                    yatra_get_price($yatra_currency_symbol, $yatra_pricing->getSalesPrice()),
                                     $yatra_pricing->getPricingPer(),
                                     $yatra_pricing->getGroupSize(),
                                     $yatra_currency_symbol . $total_tour_price,
@@ -283,7 +283,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                     <?php
                 }
                 ?>
-                <td><span><?php echo absint($number_of_person) ?></span></td>
+                <td><span><?php echo esc_html($number_of_person) ?></span></td>
                 <td><span><?php echo esc_html($pricing_label) ?></span></td>
                 <td><span><?php echo esc_html($regular_price) ?></span></td>
                 <td><span><?php echo esc_html($sales_price) ?></span></td>

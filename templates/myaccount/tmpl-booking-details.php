@@ -27,6 +27,7 @@ if (!defined('ABSPATH')) {
     </thead>
     <tbody>
     <?php
+
     foreach ($yatra_booking_meta as $id => $booking) {
 
         echo '<tr>';
@@ -68,7 +69,9 @@ if (!defined('ABSPATH')) {
 
         echo '<td>';
 
-        echo '<button class="fa fa-info yatra-tippy-tooltip" data-tippy-content="' . yatra_pricing_html($pricing) . '">';
+        echo '<button class="yatra-tippy-tooltip" data-tippy-content="' . yatra_pricing_html($pricing, $yatra_currency_symbol, $number_of_person) . '">';
+
+        echo '<span class="fa fa-info"></span>';
 
         echo '</button>';
 
@@ -77,7 +80,7 @@ if (!defined('ABSPATH')) {
         // Total Tour Price
         echo '<td>';
 
-        echo '<span>' . esc_html($yatra_currency_symbol) . absint($total_tour_price) . '</span>';
+        echo '<span>' . esc_html(yatra_get_price($yatra_currency_symbol, $total_tour_price)) . '</span>';
 
         echo '</td>';
 

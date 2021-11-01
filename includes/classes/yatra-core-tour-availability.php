@@ -118,6 +118,8 @@ class Yatra_Core_Tour_Availability
 
         $max_traveller = isset($yatra_availability['max_travellers']) ? yatra_maybeintempty($yatra_availability['max_travellers']) : '';
 
+        $max_traveller = '' === $max_traveller ? "__NULL__" : $max_traveller;
+
         $availability_for = isset($yatra_availability['availability_for']) ? sanitize_text_field($yatra_availability['availability_for']) : '';
 
         $yatra_final_pricing = array();
@@ -198,7 +200,6 @@ class Yatra_Core_Tour_Availability
             if (Yatra_Core_DB::data_exists('tour_dates', $where)) {
 
                 $action_status = Yatra_Core_DB::update_data('tour_dates', $data, $where, $update_ignore);
-
 
             } else {
 
@@ -445,10 +446,6 @@ class Yatra_Core_Tour_Availability
 
         echo '<form id="yatra-availability-calendar-popup-form" method="post" class="' . esc_attr($form_class) . '">';
 
-        /* echo '<pre>';
-         print_r($settings);
-         print_r($tourData);
-         echo '</pre>';*/
 
         if (!$content_only) {
 
