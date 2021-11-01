@@ -6,16 +6,18 @@
         float: none;
       }
     }
+
     .yatra-destination-item, .yatra-activity-item, .yatra-item-inner, .yatra-tour-list-item, .yatra-deals-item {
       width: 100%;
       float: none;
     }
   }
-  .yatra-page-wrapper.template-default article {
+  .yatra-page-wrapper.template-default .yatra-tour-archive {
     .thumb-wrap, .content-wrap {
       width: 100%;
       float: none;
     }
+
     .meta-content-wrap {
       display: none;
     }

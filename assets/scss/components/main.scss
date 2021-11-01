@@ -39,7 +39,7 @@
 
 .yatra-page-wrapper {
   &.template-default {
-    article {
+    .yatra-tour-archive {
       position: relative;
       margin-bottom: 60px;
       background-color: #fff;
@@ -543,5 +543,5 @@
 
 .yatra-full-width {
   width: 100% !important;
-  float: none!important;
+  float: none !important;
 }

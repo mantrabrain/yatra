@@ -57,7 +57,7 @@ if (!function_exists('yatra_main_content_callback')) {
     function yatra_main_content_callback()
     {
         ?>
-        <main id="main" class="site-main yatra-site-main">
+        <main id="yatra-main" class="site-main yatra-site-main">
 
             <?php
 
@@ -87,7 +87,7 @@ $class .= is_post_type_archive('tour') ? 'yatra-archive-tour' : '';
 $class .= is_singular('tour') ? 'yatra-single-tour' : '';
 
 ?>
-<section id="primary" class="content-area yatra-content-area <?php echo esc_attr($class); ?>">
+<section class="content-area yatra-content-area <?php echo esc_attr($class); ?>">
     <?php
     }
 

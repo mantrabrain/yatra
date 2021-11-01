@@ -9,7 +9,7 @@
  * @since 1.0.0
  */
 ?>
-<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+<div id="tour-<?php the_ID(); ?>" <?php yatra_tour_class(); ?>>
     <?php
     yatra_single_tour_additional_information();
     if (has_post_thumbnail()) {
@@ -74,4 +74,4 @@
             'after' => '</div>',
         )
     ); ?>
-</article><!-- #post-${ID} -->
+</div><!-- #post-${ID} -->
