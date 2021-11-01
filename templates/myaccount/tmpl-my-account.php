@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
  */
 do_action('yatra_account_navigation'); ?>
 
-<div class="yatra-my-account-content">
+<div class="yatra-my-account-content <?php echo esc_attr($class) ?>">
     <?php
     do_action('yatra_before_account_content');
     /**

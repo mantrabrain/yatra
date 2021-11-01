@@ -17,11 +17,11 @@ if (!defined('ABSPATH')) {
 
 <table class="yatra-booking-table my_account_booking_details">
     <thead>
-    <tr>
+    <tr style="text-align:left">
         <th><?php echo __('Tour', 'yatra'); ?></th>
         <th><?php echo __('Price Per', 'yatra'); ?></th>
         <th><?php echo __('Group Size', 'yatra'); ?></th>
-        <th><?php echo __('Toal Price', 'yatra'); ?></th>
+        <th><?php echo __('Total Price', 'yatra'); ?></th>
 
     </tr>
     </thead>

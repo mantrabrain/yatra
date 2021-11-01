@@ -668,6 +668,10 @@
   display: -ms-flexbox;
   display: flex; }
 
+.yatra-full-width {
+  width: 100% !important;
+  float: none !important; }
+
 body.single .yatra-single-tour .yatra-site-main {
   width: 65%;
   float: left;

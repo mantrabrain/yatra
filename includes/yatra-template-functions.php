@@ -108,6 +108,20 @@ if (!function_exists('yatra_account_navigation')) {
             $current_endpoint = $page_key;
 
         }
+        if ($current_endpoint === "bookings" && isset($_GET['booking_id'])) {
+
+            $current_user_id = get_current_user_id();
+            $booking_id = absint($_GET['booking_id']);
+
+            $user_id = get_post_meta($booking_id, 'yatra_user_id', true);
+
+
+
+            if (absint($user_id) === absint($current_user_id)) {
+
+                return;
+            }
+        }
 
 
         yatra_get_template('myaccount/tmpl-navigation.php', array('current_endpoint' => $current_endpoint));
@@ -169,7 +183,9 @@ if (!function_exists('yatra_account_bookings')) {
 
             $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
 
-            yatra_get_template('myaccount/tmpl-booking-details.php', array('yatra_booking_meta' => $yatra_booking_meta));
+            yatra_get_template('myaccount/tmpl-booking-details.php',
+                array('yatra_booking_meta' => $yatra_booking_meta)
+            );
 
         } else {
             $booking_array = get_posts(apply_filters('yatra_my_account_my_booking_query', array(
