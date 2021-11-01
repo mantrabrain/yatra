@@ -309,6 +309,8 @@ class Yatra_Core_Tour_Availability
 
         $max_travellers = $todayData->getMaxTravellers();
 
+        $max_travellers = is_null($max_travellers) ? '' : $max_travellers;
+
         $booked_travellers = $todayData->getBookedTravellers($start_date);
 
         $availability = $todayData->getAvailabilityFor();

@@ -49,11 +49,13 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                 foreach ($tour_ids as $yatra_tour_id) {
 
-                    if ($this->is_valid_tour_id($yatra_tour_id)) {
+                    $selected_date = $cart[$yatra_tour_id]['selected_date'];
+
+                    $number_of_person = $cart[$yatra_tour_id]['number_of_person'];
+
+                    if ($this->is_valid_tour_id($yatra_tour_id, $selected_date, $number_of_person)) {
 
                         $tour_post = get_post($yatra_tour_id);
-
-                        $selected_date = $cart[$yatra_tour_id]['selected_date'];
 
                         $tour_options = new Yatra_Tour_Options($yatra_tour_id, $selected_date, $selected_date);
 
@@ -90,7 +92,6 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                         $booking_post_meta['yatra_currency'] = $currency;
 
-                        $number_of_person = $cart[$yatra_tour_id]['number_of_person'];
 
                         $booking_post_meta['number_of_person'] = $number_of_person;
 
@@ -203,8 +204,16 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
         }
 
-        private function is_valid_tour_id($tour_id)
+        private function is_valid_tour_id($tour_id, $start_date, $number_of_person)
         {
+            $booking_validation = new Yatra_Tour_Availability_Validation($tour_id, $start_date, $number_of_person);
+
+            $isAvailabilityValid = $booking_validation->validate();
+
+            if (!$isAvailabilityValid || yatra()->yatra_error->has_errors()) {
+                return false;
+            }
+
             $post = get_post($tour_id);
 
             if (!isset($post->ID)) {

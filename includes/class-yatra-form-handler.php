@@ -96,7 +96,18 @@ class Yatra_Form_Handler
 
             exit;
         }
-        yatra()->yatra_error->add('yatra_checkout_error', __('Could not booked, please try again', 'yatra'));
+        $message = __('Something went wrong! Booking could not complete. Please try again later', 'yatra');
+
+        if (yatra()->yatra_error->has_errors()) {
+            $error_message = yatra()->yatra_error->get_error_message();
+            if (is_array($error_message)) {
+                $message = isset($error_message[0]) ? $error_message[0] : $message;
+                
+            } else if (is_string($error_message)) {
+                $message = $error_message;
+            }
+        }
+        yatra()->yatra_error->add('yatra_checkout_error', $message);
 
     }
 
