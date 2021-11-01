@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.0\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-10-31 11:09:42+00:00\n"
+"POT-Creation-Date: 2021-11-01 07:58:46+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -366,7 +366,9 @@ msgid "Tour"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
-#: templates/myaccount/tmpl-booking.php:15
+#: templates/myaccount/tmpl-booking-details.php:22
+#: templates/myaccount/tmpl-booking.php:15 templates/tmpl-cart-table.php:16
+#: templates/tmpl-order-table.php:7
 msgid "Date"
 msgstr ""
 
@@ -391,8 +393,8 @@ msgid "Full name"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
-#: templates/myaccount/tmpl-booking.php:17 templates/tmpl-cart-table.php:17
-#: templates/tmpl-order-table.php:7 templates/tmpl-order-table.php:40
+#: templates/myaccount/tmpl-booking.php:17 templates/tmpl-cart-table.php:18
+#: templates/tmpl-order-table.php:9 templates/tmpl-order-table.php:56
 msgid "Total"
 msgstr ""
 
@@ -1012,14 +1014,13 @@ msgstr ""
 #: includes/admin/templates/availability/availability-calendar.php:24
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:52
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:69
-#: includes/template-tags.php:806
-#: templates/myaccount/tmpl-booking-details.php:22
+#: includes/template-tags.php:806 templates/myaccount/tmpl-pricing-header.php:7
 msgid "Price Per"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:32
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:60
-#: includes/template-tags.php:811
+#: includes/template-tags.php:811 templates/myaccount/tmpl-pricing-header.php:6
 msgid "Person"
 msgstr ""
 
@@ -1033,7 +1034,7 @@ msgstr ""
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:74
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:70
 #: includes/template-tags.php:817 includes/template-tags.php:821
-#: templates/myaccount/tmpl-booking-details.php:23
+#: templates/myaccount/tmpl-pricing-header.php:8
 msgid "Group Size"
 msgstr ""
 
@@ -1168,7 +1169,7 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-yatra-ajax.php:52 includes/class-yatra-ajax.php:503
+#: includes/class-yatra-ajax.php:52 includes/class-yatra-ajax.php:502
 msgid "Something wrong, please try again."
 msgstr ""
 
@@ -1180,7 +1181,7 @@ msgstr ""
 msgid "File upload failed. Please try again."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:505
+#: includes/class-yatra-ajax.php:504
 msgid "Thank you for your query. We will get back to you soon"
 msgstr ""
 
@@ -1287,11 +1288,11 @@ msgstr ""
 msgid "Confirm password  doesn't matched with password"
 msgstr ""
 
-#: includes/class-yatra-compatibility.php:52 includes/class-yatra.php:104
+#: includes/class-yatra-compatibility.php:52 includes/class-yatra.php:96
 msgid "Cloning is forbidden."
 msgstr ""
 
-#: includes/class-yatra-compatibility.php:62 includes/class-yatra.php:114
+#: includes/class-yatra-compatibility.php:62 includes/class-yatra.php:106
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
@@ -1310,30 +1311,30 @@ msgid "Please select at least one payment gateway"
 msgstr ""
 
 #: includes/class-yatra-form-handler.php:99
-msgid "Could not booked, please try again"
+msgid "Something went wrong! Booking could not complete. Please try again later"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:151
+#: includes/class-yatra-form-handler.php:162
 msgid "User profile successfully updated."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:190
+#: includes/class-yatra-form-handler.php:201
 msgid "Old Password doesn't match"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:208
+#: includes/class-yatra-form-handler.php:219
 msgid "Password successfully changed."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:235
+#: includes/class-yatra-form-handler.php:246
 msgid "Username is required."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:299
+#: includes/class-yatra-form-handler.php:310
 msgid "Email or Usrename already exists, please try again.."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:332
+#: includes/class-yatra-form-handler.php:343
 msgid "Something wrong on registration, please check all form fields once."
 msgstr ""
 
@@ -1423,39 +1424,39 @@ msgstr ""
 msgid "Confirm password  not matched with old password"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:235
-#: includes/classes/yatra-core-tour-availability.php:276
+#: includes/classes/yatra-core-tour-availability.php:351
+#: includes/classes/yatra-core-tour-availability.php:392
 msgid "Booking Full"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:450
+#: includes/classes/yatra-core-tour-availability.php:561
 msgid "Search"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:510
+#: includes/classes/yatra-core-tour-availability.php:621
 #. translators: %s: Number of items.
 msgid "%s item"
 msgid_plural "%s items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/classes/yatra-core-tour-availability.php:551
+#: includes/classes/yatra-core-tour-availability.php:662
 msgid "First page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:562
+#: includes/classes/yatra-core-tour-availability.php:673
 msgid "Previous page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:569
+#: includes/classes/yatra-core-tour-availability.php:680
 msgid "Current Page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:585
+#: includes/classes/yatra-core-tour-availability.php:696
 msgid "Next page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:596
+#: includes/classes/yatra-core-tour-availability.php:707
 msgid "Last page"
 msgstr ""
 
@@ -2352,15 +2353,16 @@ msgid "Number of person"
 msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:67
+#: templates/myaccount/tmpl-pricing-header.php:4
 msgid "Regular Price"
 msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:68
+#: templates/myaccount/tmpl-pricing-header.php:5
 msgid "Sales Price"
 msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:71
-#: templates/myaccount/tmpl-booking-details.php:24
 msgid "Toal Price"
 msgstr ""
 
@@ -2600,7 +2602,7 @@ msgstr ""
 
 #: includes/template-tags.php:340 includes/template-tags.php:387
 #: includes/template-tags.php:432 includes/template-tags.php:475
-#: includes/template-tags.php:502
+#: includes/template-tags.php:502 templates/myaccount/tmpl-pricing-header.php:3
 msgid "Label"
 msgstr ""
 
@@ -2918,20 +2920,28 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:455
+#: includes/yatra-template-functions.php:471
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:456
+#: includes/yatra-template-functions.php:472
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:457
+#: includes/yatra-template-functions.php:473
 msgid "Not Available"
 msgstr ""
 
 #: templates/myaccount/tmpl-booking-details.php:16
 msgid "Booking Details"
+msgstr ""
+
+#: templates/myaccount/tmpl-booking-details.php:23
+msgid "Pricing Details"
+msgstr ""
+
+#: templates/myaccount/tmpl-booking-details.php:24
+msgid "Total Price"
 msgstr ""
 
 #: templates/myaccount/tmpl-booking.php:24
@@ -3009,7 +3019,7 @@ msgstr ""
 msgid "Pages:"
 msgstr ""
 
-#: templates/tmpl-cart-table.php:16
+#: templates/tmpl-cart-table.php:17
 msgid "Person - Per - Pricing"
 msgstr ""
 
@@ -3022,7 +3032,11 @@ msgstr ""
 msgid "Your booking"
 msgstr ""
 
-#: templates/tmpl-order-table.php:34
+#: templates/tmpl-order-table.php:8
+msgid "Number of people"
+msgstr ""
+
+#: templates/tmpl-order-table.php:47
 msgid "Subtotal"
 msgstr ""
 
@@ -3098,7 +3112,7 @@ msgctxt "slug"
 msgid "attributes"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:574
+#: includes/classes/yatra-core-tour-availability.php:685
 #. translators: 1: Current page, 2: Total pages.
 msgctxt "paging"
 msgid "%1$s of %2$s"
