@@ -156,15 +156,16 @@
     color: #000 !important;
     height: 35px;
     width: 30px;
-    border: 1px solid #aaa;
+    border: 1px solid #aaa !important;
     border-radius: 0;
     position: relative;
     font-size: 17px;
     font-weight: 900;
     margin: 0;
-    padding: 0; }
+    padding: 0 !important;
+    line-height: 35px; }
     .yatra-nice-input-number .nice-button:focus, .yatra-nice-input-number .nice-button:hover {
-      outline: none; }
+      outline: none !important; }
     .yatra-nice-input-number .nice-button:before {
       position: absolute;
       width: 100%;
@@ -176,7 +177,7 @@
       bottom: 0;
       line-height: 35px; }
     .yatra-nice-input-number .nice-button:hover {
-      border-color: #000; }
+      border-color: #000 !important; }
     .yatra-nice-input-number .nice-button .icon {
       font-weight: 900 !important; }
     .yatra-nice-input-number .nice-button:hover, .yatra-nice-input-number .nice-button:focus, .yatra-nice-input-number .nice-button:active {
