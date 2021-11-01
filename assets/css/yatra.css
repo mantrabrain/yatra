@@ -184,7 +184,9 @@
               box-shadow: none; }
   .yatra-nice-input-number input[type="number"] {
     width: 40px !important;
+    min-width: 40px !important;
     height: 35px !important;
+    min-height: 35px !important;
     margin: 0 !important;
     padding: 0 !important;
     border: 0;
@@ -777,14 +779,7 @@ body.single .yatra-single-tour:after {
           -ms-flex-align: center;
               align-items: center; }
       #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-number .yatra-traveller-number-inner {
-        width: 100px;
-        height: 35px;
-        border-radius: 0px;
         margin-right: 10px; }
-        #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-number .yatra-traveller-number-inner input {
-          height: 100%;
-          margin: 0;
-          border: none; }
     #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-price {
       text-align: right;
       -webkit-box-flex: 1;
@@ -946,16 +941,17 @@ body.single .yatra-single-tour:after {
       text-align: center;
       color: #1abc9c; }
 
-.yatra-shortcode-wrapper form.yatra-cart-form {
-  position: relative; }
-  .yatra-shortcode-wrapper form.yatra-cart-form .actions {
-    text-align: right; }
-  .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra-proceed-to-checkout, .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra_update_cart {
-    padding: 10px; }
-
-.yatra-shortcode-wrapper .yatra-proceed-to-checkout-wrap {
-  text-align: right;
-  margin-top: 15px; }
+.yatra-shortcode-wrapper {
+  display: inline-block; }
+  .yatra-shortcode-wrapper form.yatra-cart-form {
+    position: relative; }
+    .yatra-shortcode-wrapper form.yatra-cart-form .actions {
+      text-align: right; }
+    .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra-proceed-to-checkout, .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra_update_cart {
+      padding: 10px; }
+  .yatra-shortcode-wrapper .yatra-proceed-to-checkout-wrap {
+    text-align: right;
+    margin-top: 15px; }
 
 #yatra-tour-cart-edit-form-fields {
   display: block;

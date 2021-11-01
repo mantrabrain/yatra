@@ -50,7 +50,9 @@
 
   input[type="number"] {
     width: 40px !important;
+    min-width: 40px !important;
     height: 35px !important;
+    min-height: 35px !important;
     margin: 0 !important;
     padding: 0 !important;
     border: 0;

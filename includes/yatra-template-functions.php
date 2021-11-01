@@ -6,7 +6,7 @@ if (!function_exists('yatra_get_account_menu_items')) {
 
         $items = array(
             'my-account' => array(
-                'label' => __('My Account', 'yatra'),
+                'label' => __('Account', 'yatra'),
                 'items' => array(
                     'dashboard' => array(
                         'label' => __('Dashboard', 'yatra'),
@@ -23,7 +23,7 @@ if (!function_exists('yatra_get_account_menu_items')) {
                 )
             ),
             'booking' => array(
-                'label' => __('Tour Bookings', 'yatra'),
+                'label' => __('Bookings', 'yatra'),
                 'items' => array(
                     'bookings' => array(
                         'label' => __('My Bookings', 'yatra'),

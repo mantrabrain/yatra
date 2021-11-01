@@ -87,7 +87,7 @@ $class .= is_post_type_archive('tour') ? 'yatra-archive-tour' : '';
 $class .= is_singular('tour') ? 'yatra-single-tour' : '';
 
 ?>
-<section class="content-area yatra-content-area <?php echo esc_attr($class); ?>">
+<section class="yatra-content-area <?php echo esc_attr($class); ?>">
     <?php
     }
 
