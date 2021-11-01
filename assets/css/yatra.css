@@ -942,7 +942,9 @@ body.single .yatra-single-tour:after {
       color: #1abc9c; }
 
 .yatra-shortcode-wrapper {
-  display: inline-block; }
+  display: inline-block;
+  width: 100%;
+  max-width: 100%; }
   .yatra-shortcode-wrapper form.yatra-cart-form {
     position: relative; }
     .yatra-shortcode-wrapper form.yatra-cart-form .actions {
