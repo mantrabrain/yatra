@@ -19,7 +19,7 @@
 
             <div class="thumb-wrap">
                 <div class="inner">
-                    <?php yatra_post_thumbnail(); ?>
+                    <?php yatra_tour_thumbnail(); ?>
                 </div>
             </div>
 

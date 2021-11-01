@@ -56,13 +56,13 @@ if (!function_exists('yatra_entry_header')) {
     }
 }
 
-if (!function_exists('yatra_post_thumbnail')) {
+if (!function_exists('yatra_tour_thumbnail')) {
 
-    function yatra_post_thumbnail($size = "post-thumbnail")
+    function yatra_tour_thumbnail($size = "post-thumbnail")
     {
         ?>
-        <figure class="post-thumbnail">
-            <a class="post-thumbnail-inner" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
+        <figure class="tour-thumbnail">
+            <a class="tour-thumbnail-inner" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
                 <?php the_post_thumbnail($size); ?>
             </a>
         </figure>
