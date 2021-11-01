@@ -485,6 +485,8 @@ table.yatra-booking-meta-info tr:last-child {
     padding: 5px;
     background: #f9f9f9;
     border: 1px solid #ddd;
+    max-width: 100%;
+    word-break: break-all;
 
 }
 

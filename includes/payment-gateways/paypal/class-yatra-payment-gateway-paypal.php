@@ -162,7 +162,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
             file_put_contents('yatra-ipn_success.log', print_r($transactionData, true) . PHP_EOL, LOCK_EX | FILE_APPEND);
 
-            $message = null;
+            $message = json_encode($transactionData);
             /**
              * Verify seller PayPal email with PayPal email in settings
              *
@@ -220,6 +220,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
                 update_post_meta($payment_id, 'yatra_payment_gateway', $this->id);
 
                 do_action('yatra_after_successful_payment', $booking_id, $message, $payment_id, $this->id);
+
 
             } else {
 
