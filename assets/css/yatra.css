@@ -1082,7 +1082,7 @@ ul.yatra-payment-gateway {
     display: flex; }
   ul.yatra-payment-gateway input {
     height: 25px;
-    width: 30px;
+    width: 25px;
     margin-right: 10px; }
   ul.yatra-payment-gateway:after {
     clear: both;

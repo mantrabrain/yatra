@@ -6,7 +6,7 @@ class Yatra_Core_DB
     {
         global $wpdb;
 
-        return $wpdb->base_prefix . 'yatra_' . $table;
+        return $wpdb->prefix . 'yatra_' . $table;
     }
 
     private static function fetch($table, $select = array(), $where = array(), $additonal_args = array())
