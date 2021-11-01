@@ -317,13 +317,13 @@ class Yatra_Core_Tour_Availability
 
         $pricing = $todayData->getPricing();
 
-        $is_full = $max_travellers <= $booked_travellers && $booked_travellers != '' & $max_travellers != '';
+        $is_full = ((absint($max_travellers) <= absint($booked_travellers) && $booked_travellers != '' & $max_travellers != '') || ($max_travellers != '' && $max_travellers == 0));
 
         $remaining_travellers = $max_travellers == '' && absint($max_travellers) == 0 ? '' : $max_travellers - absint($booked_travellers);
 
         $is_expired = (strtotime($start_date) < strtotime($current_date));
 
-        $available_seat_string = $remaining_travellers === '' ? '' : "<hr/>Available Passenger: " . $remaining_travellers;
+        $available_seat_string = $remaining_travellers === '' ? '' : "<hr/>Available Travellers: " . $remaining_travellers;
 
         if ('' != $start_date) {
 

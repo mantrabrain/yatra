@@ -62,13 +62,13 @@ class Yatra_Tour_Availability_Validation
 
         $availability = $todayData->getAvailabilityFor();
 
-        if (absint($max_travellers) > 0 && absint($booked_travellers) == absint($max_travellers)) {
+        if (absint($booked_travellers) >= absint($max_travellers) && $max_travellers !== '') {
 
             yatra()->yatra_error->add('yatra_booking_full', __('Booking already full, please try another available date.', 'yatra'));
 
             return false;
 
-        } elseif (absint($max_travellers) > 0 && absint($booked_travellers + $total_person_count) > absint($max_travellers)) {
+        } elseif (absint($booked_travellers + $total_person_count) > absint($max_travellers) && $max_travellers !== '') {
 
             yatra()->yatra_error->add('yatra_booking_full', __('Total number of persons exceeds with available travellers for this date.', 'yatra'));
 
