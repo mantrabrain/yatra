@@ -779,9 +779,9 @@ if (!function_exists('yatra_payment_gateway_fields')) {
 
                     echo '<li>';
 
-                    echo '<label>';
+                    echo '<label for="yatra-payment-gateway-' . esc_attr($gateway_id) . '">';
 
-                    echo '<input type="radio" name="yatra-payment-gateway" value="' . esc_attr($gateway_id) . '"/>';
+                    echo '<input type="radio" id="yatra-payment-gateway-' . esc_attr($gateway_id) . '" name="yatra-payment-gateway" value="' . esc_attr($gateway_id) . '"/>';
 
                     echo '&nbsp;<span>' . $gateway['frontend_title'] . '</span>';
 

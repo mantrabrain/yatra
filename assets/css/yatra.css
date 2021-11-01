@@ -1068,11 +1068,22 @@ form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
     display: block; }
 
 ul.yatra-payment-gateway {
-  padding: 15px;
+  padding: 15px !important;
   list-style: none;
   background: #f9f9f9;
   margin-left: 0;
-  font-size: 18px; }
+  font-size: 18px;
+  border: 1px solid #ddd; }
+  ul.yatra-payment-gateway label {
+    cursor: pointer;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex; }
+  ul.yatra-payment-gateway input {
+    height: 25px;
+    width: 30px;
+    margin-right: 10px; }
   ul.yatra-payment-gateway:after {
     clear: both;
     content: '';

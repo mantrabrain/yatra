@@ -1,23 +1,23 @@
 {
   "yatra_all_content": {
     "images": {
-      "18": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/africa.jpg",
-      "19": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/bhutan.jpg",
-      "20": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/china.jpg",
-      "21": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/duba.jpg",
-      "22": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/india.jpg",
-      "23": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/japan.jpg",
-      "24": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/nepal.jpg",
-      "25": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/thailand.jpg",
-      "26": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/city-sightseeing.jpg",
-      "27": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/cultural-tours.jpg",
-      "28": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/cycling.jpg",
-      "29": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/jungle-safari.jpg",
-      "30": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/kayaking.jpg",
-      "31": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/paragliding.jpg",
-      "32": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/peak-climbing.jpg",
-      "33": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/rafting.jpg",
-      "34": "https:\/\/demo.mantrabrain.com\/yatri-default\/wp-content\/uploads\/sites\/9\/2019\/11\/skiing.jpg"
+      "18": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/africa.jpg",
+      "19": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/bhutan.jpg",
+      "20": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/china.jpg",
+      "21": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/duba.jpg",
+      "22": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/india.jpg",
+      "23": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/japan.jpg",
+      "24": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/nepal.jpg",
+      "25": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/thailand.jpg",
+      "26": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/city-sightseeing.jpg",
+      "27": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/cultural-tours.jpg",
+      "28": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/cycling.jpg",
+      "29": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/jungle-safari.jpg",
+      "30": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/kayaking.jpg",
+      "31": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/paragliding.jpg",
+      "32": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/peak-climbing.jpg",
+      "33": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/rafting.jpg",
+      "34": "https:\/\/demo.mantrabrain.com\/yatra-wordpress-plugin\/wp-content\/uploads\/sites\/9\/2019\/11\/skiing.jpg"
     },
     "terms": {
       "destination": {
@@ -354,8 +354,8 @@
           "post_status": "publish",
           "comment_status": "closed",
           "ping_status": "closed",
-          "post_modified": "2019-11-03 10:21:38",
-          "post_modified_gmt": "2019-11-03 10:21:38",
+          "post_modified": "2021-11-01 10:03:50",
+          "post_modified_gmt": "2021-11-01 10:03:50",
           "post_type": "tour",
           "meta": {
             "_thumbnail_id": [
@@ -386,7 +386,7 @@
               "0"
             ],
             "yatra_tour_meta_tour_tabs_ordering": [
-              ""
+              "gallery,overview,itinerary,cost_info,faq,map"
             ],
             "tour_meta_custom_attributes": [
               "a:2:{i:34;a:1:{s:7:\"content\";s:8:\"4300Feet\";}i:35;a:1:{s:7:\"content\";s:9:\"Very Cold\";}}"
@@ -438,6 +438,60 @@
             ],
             "_wp_old_slug": [
               "66"
+            ],
+            "yatra_tour_meta_tour_fixed_departure": [
+              "0"
+            ],
+            "yatra_tour_meta_tour_start_date": [
+              ""
+            ],
+            "yatra_tour_meta_tour_end_date": [
+              ""
+            ],
+            "yatra_tour_meta_tour_admin_active_tab": [
+              "pricing"
+            ],
+            "yatra_multiple_pricing": [
+              "a:2:{s:10:\"_xqurefynd\";a:8:{s:13:\"pricing_label\";s:5:\"Adult\";s:19:\"pricing_description\";s:14:\"Above 10 years\";s:11:\"minimum_pax\";i:1;s:11:\"maximum_pax\";s:0:\"\";s:11:\"pricing_per\";s:0:\"\";s:10:\"group_size\";s:0:\"\";s:13:\"regular_price\";i:11400;s:11:\"sales_price\";i:10000;}s:10:\"_k72ahusaj\";a:8:{s:13:\"pricing_label\";s:5:\"Child\";s:19:\"pricing_description\";s:17:\"Below 2 years old\";s:11:\"minimum_pax\";i:1;s:11:\"maximum_pax\";s:0:\"\";s:11:\"pricing_per\";s:6:\"person\";s:10:\"group_size\";s:0:\"\";s:13:\"regular_price\";i:10000;s:11:\"sales_price\";i:9000;}}"
+            ],
+            "overview_visibility": [
+              "1"
+            ],
+            "itinerary_visibility": [
+              "1"
+            ],
+            "cost_info_visibility": [
+              "1"
+            ],
+            "faq_visibility": [
+              "1"
+            ],
+            "map_visibility": [
+              "1"
+            ],
+            "gallery_visibility": [
+              "1"
+            ],
+            "yatra_tour_meta_availability_date_ranges": [
+              "[]"
+            ],
+            "yatra_tour_minimum_pax": [
+              ""
+            ],
+            "yatra_tour_maximum_pax": [
+              ""
+            ],
+            "yatra_tour_maximum_number_of_traveller": [
+              ""
+            ],
+            "yatra_tour_meta_tour_admin_subtab_active_tab": [
+              "overview"
+            ],
+            "yatra_tour_meta_pricing_label": [
+              "Guest"
+            ],
+            "yatra_tour_meta_pricing_description": [
+              ""
             ]
           },
           "terms": {
@@ -986,8 +1040,8 @@
           "post_status": "publish",
           "comment_status": "closed",
           "ping_status": "closed",
-          "post_modified": "2019-11-03 09:57:18",
-          "post_modified_gmt": "2019-11-03 09:57:18",
+          "post_modified": "2021-10-05 12:27:39",
+          "post_modified_gmt": "2021-10-05 12:27:39",
           "post_type": "tour",
           "meta": {
             "_thumbnail_id": [
@@ -1018,7 +1072,7 @@
               "0"
             ],
             "yatra_tour_meta_tour_tabs_ordering": [
-              ""
+              "overview,gallery,itinerary,cost_info,faq,map"
             ],
             "tour_meta_custom_attributes": [
               "a:2:{i:34;a:1:{s:7:\"content\";s:8:\"4300Feet\";}i:35;a:1:{s:7:\"content\";s:9:\"Very Cold\";}}"
@@ -1070,6 +1124,21 @@
             ],
             "_wp_old_slug": [
               "66"
+            ],
+            "yatra_tour_meta_tour_fixed_departure": [
+              "0"
+            ],
+            "yatra_tour_meta_tour_start_date": [
+              ""
+            ],
+            "yatra_tour_meta_tour_end_date": [
+              ""
+            ],
+            "yatra_tour_meta_tour_admin_active_tab": [
+              "tour_tabs"
+            ],
+            "yatra_multiple_pricing": [
+              "a:0:{}"
             ]
           },
           "terms": {
