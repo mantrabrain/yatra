@@ -5,6 +5,7 @@
         <tr>
             <th class="tour-name"><?php echo __('Tour', 'yatra') ?></th>
             <th class="tour-name"><?php echo __('Date', 'yatra') ?></th>
+            <th class="tour-name"><?php echo __('Number of people', 'yatra') ?></th>
             <th class="tour-total"><?php echo __('Total', 'yatra') ?></th>
         </tr>
         </thead>
@@ -27,6 +28,13 @@
                         echo esc_html($item['selected_date']);
                         ?>
                     </span></td>
+
+                <td><span>
+                        <?php
+                        echo is_array($item['number_of_person']) ? esc_html(array_sum($item['number_of_person'])) : esc_html($item['number_of_person']);
+                        ?>
+                    </span>
+                </td>
                 <td class="tour-total">
                     <span class="yatra-Price-amount amount"><span
                                 class="yatra-Price-currencySymbol"><?php echo yatra_get_current_currency_symbol() ?></span><?php echo $item['tour_final_price']; ?></span>
@@ -37,18 +45,18 @@
         <tfoot>
 
         <tr class="cart-subtotal">
-            <th><?php echo __('Subtotal', 'yatra') ?></th>
-            <td></td>
-            <td colspan="2"><span class="yatra-Price-amount amount"><span
+            <th colspan="3"><?php echo __('Subtotal', 'yatra') ?></th>
+
+            <td><span class="yatra-Price-amount amount"><span
                             class="yatra-Price-currencySymbol"><?php echo yatra_get_current_currency_symbol() ?></span><?php echo $total_price; ?></span>
             </td>
 
 
         </tr>
         <tr class="tour-book-total">
-            <th><?php echo __('Total', 'yatra') ?></th>
-            <td></td>
-            <td colspan="2"><strong><span class="yatra-Price-amount amount"><span
+            <th colspan="3"><?php echo __('Total', 'yatra') ?></th>
+
+            <td><strong><span class="yatra-Price-amount amount"><span
                                 class="yatra-Price-currencySymbol"><?php echo yatra_get_current_currency_symbol() ?></span><?php echo $total_price; ?></span></strong>
             </td>
 

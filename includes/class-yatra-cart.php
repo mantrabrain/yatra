@@ -50,7 +50,8 @@ if (!class_exists('Yatra_Cart')) {
 
                 'multiple_pricing' => $yatra_multiple_pricing,
 
-                'selected_date' => $selected_date
+                'selected_date' => $selected_date,
+
             );
             $yatra_tour_cart[$tour_id] = $single_cart_item;
 
