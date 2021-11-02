@@ -3,7 +3,7 @@ Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
 Tested up to: 5.8.1
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -46,7 +46,7 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 
 11. Smart Tags for email message
 
-12. PayPal payment gateway
+12. PayPal Payment gateway
 
 13. My account section
 
@@ -127,11 +127,8 @@ Coming Soon
 16. Yatra Cart Page
 17. Yatra Checkout Page
 
-
 == Changelog ==
 
-= 2.1.0 | 2021/10/31 =
-* Fixed - Frontend design update
-* Added - Dynamic Pricing option with availability feature
-* Added - User Enquiries feature
-* Added - Availability date range option
+= 2.1.1 | 2021/11/02 =
+* Fixed - Frontend design update & responsive issue fixed
+* Fixed - Multisite issue fixed
