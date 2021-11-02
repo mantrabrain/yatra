@@ -177,6 +177,11 @@ final class Yatra_Install
             'yatra_currency' => 'USD',
             'yatra_booknow_button_text' => 'Book Now',
             'yatra_booknow_loading_text' => 'Loading....',
+            'yatra_booking_form_title_text' => 'Booking Form',
+            'yatra_enquiry_form_title_text' => 'Enquiry Form',
+            'yatra_enquiry_button_text' => 'Send Enquiry',
+            'yatra_select_date_title' => 'Please select date',
+            'yatra_custom_attributes_title_text' => 'Attributes',
             'yatra_update_cart_text' => 'Update Cart',
             'yatra_proceed_to_checkout_text' => 'Proceed to Checkout',
             'yatra_order_booking_text' => 'Order Booking',
@@ -184,7 +189,6 @@ final class Yatra_Install
             'yatra_booking_notification_email_content_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_message(),
             'yatra_enable_booking_notification_email_for_customer' => 'yes',
             'yatra_enable_guest_checkout' => 'yes',
-            'yatra_custom_attributes_title_text' => 'Attributes'
         );
 
         foreach ($options as $option_key => $option_value) {
