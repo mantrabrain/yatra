@@ -16,7 +16,7 @@
     <div class="yatra-tour-booking-pricing-wrap">
         <?php
 
-        do_action('yatra_tour_booking_pricing_content', $yatra_booking_pricing_info, $pricing_type);
+        do_action('yatra_tour_booking_pricing_content', $yatra_booking_pricing_info, $pricing_type, get_the_ID());
 
         ?>
 
