@@ -451,7 +451,15 @@ if (!function_exists('yatra_get_price')) {
     {
         $currency_price_separator = apply_filters('yatra_currency_price_separator', '');
 
+        $currency_position = 'before';
+
         $price_string = ($currency . $currency_price_separator . $price);
+
+        if ($currency_position === "after") {
+
+            $price_string = ($price . $currency_price_separator . $currency);
+
+        }
 
         if (!$echo) {
             return $price_string;

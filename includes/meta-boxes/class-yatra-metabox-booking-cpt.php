@@ -115,7 +115,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                                         yatra_get_price($yatra_currency_symbol, $pricing->getSalesPrice()),
                                         $variable_pricing_per,
                                         $variable_group_size,
-                                        $yatra_currency_symbol . $total_tour_price,
+                                        yatra_get_price($yatra_currency_symbol, $total_tour_price),
                                         $durations,
                                         $id,
                                         array('index' => $multiple_pricing_index, 'count' => count($yatra_pricing))
@@ -134,7 +134,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                                     yatra_get_price($yatra_currency_symbol, $yatra_pricing->getSalesPrice()),
                                     $yatra_pricing->getPricingPer(),
                                     $yatra_pricing->getGroupSize(),
-                                    $yatra_currency_symbol . $total_tour_price,
+                                    yatra_get_price($yatra_currency_symbol, $total_tour_price),
                                     $durations,
                                     $id
                                 );
