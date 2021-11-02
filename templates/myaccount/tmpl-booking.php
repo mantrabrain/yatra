@@ -75,7 +75,7 @@ if ($booking_details) : ?>
                         <?php elseif ('booking-total' === $column_id) : ?>
                             <?php
                             /* translators: 1: formatted booking total 2: total booking items */
-                            printf(_n('%1$s for %2$s tour', '%1$s for %2$s tours', $item_count, 'yatra'), $booking->booking_currency_symbol . '' . $booking->booking_total, $item_count);
+                            printf(_n('%1$s for %2$s tour', '%1$s for %2$s tours', $item_count, 'yatra'), yatra_get_price($booking->booking_currency_symbol, $booking->booking_total), $item_count);
                             ?>
 
                         <?php elseif ('booking-actions' === $column_id) : ?>
