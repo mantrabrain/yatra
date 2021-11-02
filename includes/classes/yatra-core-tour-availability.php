@@ -327,6 +327,8 @@ class Yatra_Core_Tour_Availability
 
         $available_seat_string = $remaining_travellers === '' ? '' : "<hr/>Available Travellers: " . $remaining_travellers;
 
+        $currency_symbol = yatra_get_current_currency_symbol();
+
         if ('' != $start_date) {
 
             if ($todayData->getPricingType() !== 'multi') {
@@ -342,19 +344,19 @@ class Yatra_Core_Tour_Availability
 
                 $final_pricing = '' === $discounted ? $regular : $discounted;
 
-                $current_currency_symbol = '$';//yatra_get_current_currency_symbol();
+                $pricing_string = yatra_get_price($currency_symbol, $final_pricing);
 
-                $title = "{$pricing_label}: {$current_currency_symbol}{$final_pricing}";
-
+                $title = "{$pricing_label}: {$pricing_string}";
 
                 if ($is_full) {
                     $title = __('Booking Full', 'yatra');
                 }
 
+
                 $response = array(
                     "title" => $title,
                     "start" => $start_date,
-                    "description" => "<strong>{$availability_label}</strong><hr/>{$pricing_label}: {$current_currency_symbol}{$final_pricing}{$available_seat_string}",
+                    "description" => "<strong>{$availability_label}</strong><hr/>{$pricing_label}: {$pricing_string}{$available_seat_string}",
                     "is_active" => $is_active,
                     "availability" => $availability,
                     'is_full' => $is_full,
@@ -381,11 +383,11 @@ class Yatra_Core_Tour_Availability
 
                     $pricing_label = $single_pricing->getLabel();
 
-                    $current_currency_symbol = '$';//yatra_get_current_currency_symbol();
+                    $pricing_string = yatra_get_price($currency_symbol, $final_pricing);
 
-                    $title .= "{$pricing_label}: {$current_currency_symbol}{$final_pricing} <br/> ";
+                    $title .= "{$pricing_label}: {$pricing_string} <br/> ";
 
-                    $description .= "{$pricing_label}&nbsp;:&nbsp; <strong style='float:right;'>{$current_currency_symbol}{$final_pricing}</strong> <br/> ";
+                    $description .= "{$pricing_label}&nbsp;:&nbsp; <strong style='float:right;'>{$pricing_string}</strong> <br/> ";
 
                 }
                 if ($is_full) {

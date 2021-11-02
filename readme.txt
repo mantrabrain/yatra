@@ -92,7 +92,6 @@ Shortcode for Tour Listing:
 * [Yatri](https://wpyatri.com/?ref=yatrapluginorg) by MantraBrain
 * [MagazineNP](https://wordpress.org/themes/magazinenp/) by MantraBrain
 * [Zakra](https://wordpress.org/themes/zakra/) by ThemeGrill
-* [CosmosWP](https://wordpress.org/themes/cosmoswp/) by CosmosWP
 * [Astra](https://wordpress.org/themes/astra/) by Brainstorm Force
 * [OceanWP](https://wordpress.org/themes/oceanwp/) by OceanWP
 * [Kadence](https://wordpress.org/themes/kadence/) by Ben Ritner - Kadence WP

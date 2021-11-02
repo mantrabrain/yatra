@@ -57,10 +57,11 @@ class Yatra_Template_Hooks
             }
         }
 
+
         yatra_get_template('tour/sidebar.php',
             array(
                 'data' => $tourData,
-                'currency' => '$',
+                'currency' => yatra_get_current_currency_symbol(),
                 'min_regular' => $min_regular_price,
                 'min_sales' => $min_sales_price
             )
