@@ -13,9 +13,8 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 [Yatra]( https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg) is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
 
 Get [free support](https://mantrabrain.com/support-forum/)
-Wanna [contribute](https://github.com/mantrabrain/yatra/)
+
 Feature [request](https://mantrabrain.com/request-new-feature/)
-Compatible theme [Yatri](https://wpyatri.com/?ref=yatrapluginorg) is live now
 
 == Installation ==
 
@@ -25,25 +24,36 @@ Compatible theme [Yatri](https://wpyatri.com/?ref=yatrapluginorg) is live now
 
 == Yatra - Features ==
 
-1. Unlimited Travel & Tour Package with Activity & Destination pages.
+1. Unlimited Travel & Tour Package with Activity & Destination pages
 
 2. Easy & Smart booking process
 
-3. Unlimited Travel and Tour Categories
+3. Flexible/Dynamic Pricing with pricing label
 
-4. Translation Ready: The plugin is fully translation ready. So feel free to your website in any language.
+4. Dynamic frontend tabs
 
-5. Email notification
+5. Availability calendar with dynamic day wise pricing
 
-6. Smart Tags for email message
+6. Frontend Booking Calendar
 
-7. PayPal payment gateway
+7. Enquiry form
 
-8. My account section
+8. Unlimited Travel and Tour Categories
 
-9. Seperated customer section
+9. Translation Ready: The plugin is fully translation ready. So feel free to your website in any language.
 
-10. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
+10. Email notification
+
+11. Smart Tags for email message
+
+12. PayPal payment gateway
+
+13. My account section
+
+14. Seperated customer section
+
+15. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
+
 
 == Shortcodes ==
 Shortcode for Checkout Page:
@@ -77,6 +87,27 @@ Shortcode for Tour Listing:
 * {{customer_name}} : Get customer name of specific booking
 * {{customer_email}} : Get customer email of specific booking
 
+
+= COMPATIBLE THEMES =
+* [Yatri](https://wpyatri.com/?ref=yatrapluginorg) by MantraBrain
+* [MagazineNP](https://wordpress.org/themes/magazinenp/) by MantraBrain
+* [Zakra](https://wordpress.org/themes/zakra/) by ThemeGrill
+* [CosmosWP](https://wordpress.org/themes/cosmoswp/) by CosmosWP
+* [Astra](https://wordpress.org/themes/astra/) by Brainstorm Force
+* [OceanWP](https://wordpress.org/themes/oceanwp/) by OceanWP
+* [Kadence](https://wordpress.org/themes/kadence/) by Ben Ritner - Kadence WP
+
+
+= Premium addons =
+Coming Soon
+
+== IMPORTANT LINKS ==
+
+* Plugin page: [Click here](https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg)
+* Plugin review/feedback: [Click here](https://wordpress.org/support/plugin/yatra/reviews/)
+* Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
+
+
 == Screenshots ==
 1. Add new tour option - Backend
 2. Add new tour with custom attributes - Backend
@@ -96,12 +127,6 @@ Shortcode for Tour Listing:
 16. Yatra Cart Page
 17. Yatra Checkout Page
 
-
-== IMPORTANT LINKS ==
-
-* Plugin page: [Click here](https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg)
-* Plugin review/feedback: [Click here](https://wordpress.org/support/plugin/yatra/reviews/)
-* Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
 
 == Changelog ==
 
