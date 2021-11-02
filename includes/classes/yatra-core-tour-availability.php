@@ -618,7 +618,7 @@ class Yatra_Core_Tour_Availability
 
         $output = '<span class="displaying-num">' . sprintf(
             /* translators: %s: Number of items. */
-                _n('%s item', '%s items', $total_items),
+                _n('%s item', '%s items', $total_items, 'yatra'),
                 number_format_i18n($total_items)
             ) . '</span>';
 
@@ -659,7 +659,7 @@ class Yatra_Core_Tour_Availability
             $page_links[] = sprintf(
                 "<a class='first-page button' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
                 esc_url(remove_query_arg('paged', $current_url)),
-                __('First page'),
+                __('First page', 'yatra'),
                 '&laquo;'
             );
         }
@@ -670,19 +670,19 @@ class Yatra_Core_Tour_Availability
             $page_links[] = sprintf(
                 "<a class='prev-page button' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
                 esc_url(add_query_arg('paged', max(1, $current - 1), $current_url)),
-                __('Previous page'),
+                __('Previous page', 'yatra'),
                 '&lsaquo;'
             );
         }
 
 
         $html_current_page = $current;
-        $total_pages_before = '<span class="screen-reader-text">' . __('Current Page') . '</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">';
+        $total_pages_before = '<span class="screen-reader-text">' . __('Current Page', 'yatra') . '</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">';
 
         $html_total_pages = sprintf("<span class='total-pages'>%s</span>", number_format_i18n($total_pages));
         $page_links[] = $total_pages_before . sprintf(
             /* translators: 1: Current page, 2: Total pages. */
-                _x('%1$s of %2$s', 'paging'),
+                _x('%1$s of %2$s', 'paging', 'yatra'),
                 $html_current_page,
                 $html_total_pages
             ) . $total_pages_after;
@@ -693,7 +693,7 @@ class Yatra_Core_Tour_Availability
             $page_links[] = sprintf(
                 "<a class='next-page button' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
                 esc_url(add_query_arg('paged', min($total_pages, $current + 1), $current_url)),
-                __('Next page'),
+                __('Next page', 'yatra'),
                 '&rsaquo;'
             );
         }
@@ -704,7 +704,7 @@ class Yatra_Core_Tour_Availability
             $page_links[] = sprintf(
                 "<a class='last-page button' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
                 esc_url(add_query_arg('paged', $total_pages, $current_url)),
-                __('Last page'),
+                __('Last page', 'yatra'),
                 '&raquo;'
             );
         }

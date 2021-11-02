@@ -2,7 +2,13 @@
     <div class="yatra-tour-info-inner">
         <div class="yatra-tour-info-pricing-wrap">
             <div class="tour-info-pricing-header">
-                <h2><?php echo __('Please select date', 'yatra') ?></h2>
+                <h2>
+                    <?php
+
+                    echo esc_html(get_option('yatra_select_date_title', __('Please select date', 'yatra')));
+
+                    ?>
+                </h2>
             </div>
             <div class="tour-info-pricing-content">
                 <p><span class="icon fa fa-tag"></span><?php echo __(' from ', 'yatra') ?>

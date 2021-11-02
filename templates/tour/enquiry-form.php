@@ -9,8 +9,10 @@
 
         </div>
         <div class="yatra-enquiry-submit-btn-wrapper">
-            <button type="submit" class="btn primary-btn yatra-enquiry-submit-now-btn" data-text="Book Now"
-            >Send Enquiry Now
+            <button type="submit" class="btn primary-btn yatra-enquiry-submit-now-btn"
+            ><?php
+                echo esc_html(get_option('yatra_enquiry_button_text', __('Send Enquiry', 'yatra')));
+                ?>
             </button>
         </div>
     </fieldset>

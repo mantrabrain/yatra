@@ -172,6 +172,28 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     'type' => 'text',
                 ),
                 array(
+                    'title' => __('Enquiry Form Title', 'yatra'),
+                    'desc' => __('Title for enquiry form', 'yatra'),
+                    'id' => 'yatra_enquiry_form_title_text',
+                    'default' => __('Enquiry Form', 'yatra'),
+                    'type' => 'text',
+                ),
+
+                array(
+                    'title' => __('Enquiry Button Text', 'yatra'),
+                    'desc' => __('Enquiry Button Text', 'yatra'),
+                    'id' => 'yatra_enquiry_button_text',
+                    'default' => __('Send Enquiry', 'yatra'),
+                    'type' => 'text',
+                ),
+                array(
+                    'title' => __('Select Date Title', 'yatra'),
+                    'desc' => __('Select Date Title', 'yatra'),
+                    'id' => 'yatra_select_date_title',
+                    'default' => __('Please select date', 'yatra'),
+                    'type' => 'text',
+                ),
+                array(
                     'title' => __('Attributes Title', 'yatra'),
                     'desc' => __('Title for custom attributes', 'yatra'),
                     'id' => 'yatra_custom_attributes_title_text',

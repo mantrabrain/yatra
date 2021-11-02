@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.0\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-11-01 10:22:24+00:00\n"
+"POT-Creation-Date: 2021-11-02 07:04:38+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -434,6 +434,7 @@ msgstr ""
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:125
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:82
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:91
+#: includes/yatra-template-functions.php:26
 msgid "Bookings"
 msgstr ""
 
@@ -773,19 +774,52 @@ msgid "Title for booking form"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:171
-#: templates/tour/sidebar.php:24
+#: templates/tour/sidebar.php:30
 msgid "Booking Form"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:175
-msgid "Attributes Title"
+msgid "Enquiry Form Title"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:176
-msgid "Title for custom attributes"
+msgid "Title for enquiry form"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:178
+#: templates/tour/sidebar.php:36
+msgid "Enquiry Form"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:183
+#: includes/admin/settings/class-yatra-settings-general.php:184
+msgid "Enquiry Button Text"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:186
+#: templates/tour/enquiry-button.php:2 templates/tour/enquiry-form.php:14
+msgid "Send Enquiry"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:190
+#: includes/admin/settings/class-yatra-settings-general.php:191
+msgid "Select Date Title"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:193
+#: templates/tour/sidebar.php:8
+msgid "Please select date"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:197
+msgid "Attributes Title"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:198
+msgid "Title for custom attributes"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:200
 #: includes/functions.php:63 includes/hooks/yatra-list-table-hooks.php:19
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:140
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:141
@@ -793,39 +827,39 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:182
+#: includes/admin/settings/class-yatra-settings-general.php:204
 msgid "Update cart button text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:183
+#: includes/admin/settings/class-yatra-settings-general.php:205
 msgid "Text for update cart button"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:185
+#: includes/admin/settings/class-yatra-settings-general.php:207
 msgid "Update Cart"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:189
+#: includes/admin/settings/class-yatra-settings-general.php:211
 msgid "Proceed to checkout text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:190
+#: includes/admin/settings/class-yatra-settings-general.php:212
 msgid "Text for proceed to checkout button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:192
+#: includes/admin/settings/class-yatra-settings-general.php:214
 msgid "Proceed to checkout"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:196
+#: includes/admin/settings/class-yatra-settings-general.php:218
 msgid "Order booking text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:197
+#: includes/admin/settings/class-yatra-settings-general.php:219
 msgid "Text for order booking text."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:199
+#: includes/admin/settings/class-yatra-settings-general.php:221
 msgid "Order Booking"
 msgstr ""
 
@@ -2895,7 +2929,7 @@ msgid "Taxonomy (%s) not found"
 msgstr ""
 
 #: includes/yatra-template-functions.php:9
-msgid "My Account"
+msgid "Account"
 msgstr ""
 
 #: includes/yatra-template-functions.php:12
@@ -2912,23 +2946,19 @@ msgstr ""
 msgid "Change Password"
 msgstr ""
 
-#: includes/yatra-template-functions.php:26
-msgid "Tour Bookings"
-msgstr ""
-
 #: includes/yatra-template-functions.php:29
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:471
+#: includes/yatra-template-functions.php:470
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:472
+#: includes/yatra-template-functions.php:471
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:473
+#: includes/yatra-template-functions.php:472
 msgid "Not Available"
 msgstr ""
 
@@ -3052,24 +3082,12 @@ msgstr ""
 msgid "Please pick the date"
 msgstr ""
 
-#: templates/tour/enquiry-button.php:2
-msgid "Get Enquiry"
-msgstr ""
-
-#: templates/tour/sidebar.php:5
-msgid "Please select date"
-msgstr ""
-
-#: templates/tour/sidebar.php:8
+#: templates/tour/sidebar.php:14
 msgid " from "
 msgstr ""
 
-#: templates/tour/sidebar.php:10
+#: templates/tour/sidebar.php:16
 msgid "Free"
-msgstr ""
-
-#: templates/tour/sidebar.php:30
-msgid "Enquiry Form"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
