@@ -106,6 +106,13 @@ class Yatra_Tour_Availability_Validation
             }
         }
 
+
+        $validation_status = apply_filters('yatra_tour_availability_validation', $pricing_status, $this->id, $todayData, $this->number_of_person);
+
+        if (!$validation_status) {
+            return false;
+        }
+
         return $pricing_status;
 
     }

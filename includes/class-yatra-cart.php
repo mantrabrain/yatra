@@ -83,6 +83,8 @@ if (!class_exists('Yatra_Cart')) {
 
             }
 
+            $yatra_tour_cart = apply_filters('yatra_update_tour_cart', $yatra_tour_cart, $tour_id, $number_of_persons);
+
             $status = yatra_set_session('yatra_tour_cart', $yatra_tour_cart);
 
             return $status;
