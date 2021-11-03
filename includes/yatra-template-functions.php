@@ -417,6 +417,7 @@ if (!function_exists('yatra_cart_edit_person_pricing_details')) {
             )
         );
 
+        do_action('yatra_cart_person_pricing_section', $cart_id, $cart_items, $tour_id);
     }
 }
 
