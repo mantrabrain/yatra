@@ -89,6 +89,8 @@ class Yatra_Template_Hooks
 
         $total_price = 0;
 
+        $person_info = array();
+
         $pricing = $date_wise_info->getPricing();
 
         if ($pricing instanceof Yatra_Tour_Pricing) {
@@ -99,7 +101,13 @@ class Yatra_Template_Hooks
                     'yatra_booking_pricing' => $pricing,
                 )
             );
-            $total_price += $pricing->getFinalPrice();
+            $total_price += $pricing->getMinimumPax() > 0 ? $pricing->getFinalPrice() : 0;
+
+            $total_persons[] = array(
+                'id' => $pricing->getID(),
+                'number_of_person' => $pricing->getMinimumPax(),
+                'price' => $pricing->getSalesPrice() === '' ? $pricing->getRegularPrice() : $pricing->getSalesPrice()
+            );
         } else {
 
             foreach ($pricing as $booking_pricing_args) {
@@ -109,11 +117,17 @@ class Yatra_Template_Hooks
                         'yatra_booking_pricing' => $booking_pricing_args,
                     )
                 );
-                $total_price += $booking_pricing_args->getFinalPrice();
+                $total_price += $booking_pricing_args->getMinimumPax() > 0 ? $booking_pricing_args->getFinalPrice() : 0;
+
+                $total_persons[] = array(
+                    'id' => $booking_pricing_args->getID(),
+                    'number_of_person' => $booking_pricing_args->getMinimumPax(),
+                    'price' => $booking_pricing_args->getSalesPrice() === '' ? $booking_pricing_args->getRegularPrice() : $booking_pricing_args->getSalesPrice()
+                );
             }
         }
 
-        $total_price = apply_filters('yatra_tour_after_pricing_item', $date_wise_info, $tour_id, $total_price);
+        $total_price = apply_filters('yatra_tour_after_pricing_item', $date_wise_info, $tour_id, $total_price, $total_persons);
 
         echo '<div class="yatra-tour-total-price">';
         echo '<strong>' . __('Total Price', 'yatra') . '</strong>';
