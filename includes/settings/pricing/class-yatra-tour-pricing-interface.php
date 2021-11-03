@@ -14,7 +14,7 @@ interface Yatra_Tour_Pricing_Interface
 
     public function getGroupSize();
 
-    public function getRegularPrice();
+    public function getRegularPrice($calculate_total_regular_price = false);
 
     public function getSalesPrice();
 

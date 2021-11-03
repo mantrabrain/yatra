@@ -1,8 +1,9 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
+
 class Yatra_Tour_Pricing extends Yatra_Tour_Pricing_Abstract
 {
 
@@ -31,9 +32,13 @@ class Yatra_Tour_Pricing extends Yatra_Tour_Pricing_Abstract
         return $this->group_size;
     }
 
-    public function getRegularPrice()
+    public function getRegularPrice($calculate_total_regular_price = false)
     {
-        return $this->regular_price;
+        if (!$calculate_total_regular_price) {
+            return $this->regular_price;
+        } else {
+            return (absint($this->regular_price) * absint($this->person_count));
+        }
     }
 
     public function getSalesPrice()

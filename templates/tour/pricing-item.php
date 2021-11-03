@@ -1,16 +1,25 @@
 <?php
 /* @var Yatra_Tour_Pricing $yatra_booking_pricing */
 $currency_symbol = yatra_get_current_currency_symbol();
-
+$number_of_people = absint($yatra_booking_pricing->getMinimumPax()) === 0 ? 1 : absint($yatra_booking_pricing->getMinimumPax());
 ?>
-<div class="yatra-form-fields">
+<div class="yatra-form-fields yatra-price-item-field"
+     data-regular-price="<?php echo esc_attr($yatra_booking_pricing->getRegularPrice()) ?>"
+     data-sales-price="<?php echo esc_attr($yatra_booking_pricing->getSalesPrice()) ?>"
+     data-final-price="<?php echo esc_attr($yatra_booking_pricing->getFinalPrice()) ?>"
+     data-people-count="<?php echo esc_attr($number_of_people) ?>"
+     data-pricing-per="<?php echo esc_attr($yatra_booking_pricing->getPricingPer()) ?>"
+     data-group-size="<?php echo esc_attr($yatra_booking_pricing->getGroupSize()) ?>"
+     data-currency-symbol="<?php echo esc_attr($currency_symbol) ?>"
+
+>
     <div class="yatra-traveller-info-wrap">
         <div class="yatra-traveller-number">
             <div class="yatra-traveller-number-inner">
                 <?php
                 $field_name = $pricing_type === "multi" ? "yatra_number_of_person[multi_pricing][{$yatra_booking_pricing->getID()}]" : "yatra_number_of_person[single_pricing]";
 
-                yatra_nice_input_number_field($field_name, $yatra_booking_pricing->getMaximumPax(), $yatra_booking_pricing->getMinimumPax());
+                yatra_nice_input_number_field($field_name, $yatra_booking_pricing->getMaximumPax(), $yatra_booking_pricing->getMinimumPax(), '', 'yatra-single-tour-number-of-person');
 
                 ?>
             </div>
@@ -19,13 +28,11 @@ $currency_symbol = yatra_get_current_currency_symbol();
         <div class="yatra-traveller-price">
             <?php
             if ($yatra_booking_pricing->getRegularPrice() != '') { ?>
-                <del><?php echo esc_html(yatra_get_price($currency_symbol, $yatra_booking_pricing->getRegularPrice())) ?></del>
+                <del class="regular"><?php echo esc_html(yatra_get_price($currency_symbol, $yatra_booking_pricing->getRegularPrice(true))) ?></del>
             <?php } ?>
-            <ins><?php
-
+            <ins class="final"><?php
 
                 echo esc_html(yatra_get_price($currency_symbol, $yatra_booking_pricing->getFinalPrice()));
-
 
                 ?></ins>
             <?php

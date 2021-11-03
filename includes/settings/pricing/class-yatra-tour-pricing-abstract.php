@@ -1,7 +1,8 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
+
 abstract class Yatra_Tour_Pricing_Abstract implements Yatra_Tour_Pricing_Interface
 {
     protected $id;
@@ -23,6 +24,8 @@ abstract class Yatra_Tour_Pricing_Abstract implements Yatra_Tour_Pricing_Interfa
     protected $minimum_pax;
 
     protected $maximum_pax;
+
+    protected $person_count;
 
     public function map($pricing, $pricing_id = 0)
     {

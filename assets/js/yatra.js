@@ -317,7 +317,7 @@
 
                         const date_full = new Date(date);  // 2009-11-10
                         const month = date_full.toLocaleString('default', {month: 'long'});
-                        
+
                         var date_string = month + ' ' + date_full.getDate() + ', ' + date_full.getFullYear();
 
                         $('.tour-info-pricing-header').find('h2').html(date_string);
@@ -581,8 +581,88 @@
         }
     };
 
+    var YatraPricingCalculator = {
+
+        init: function () {
+
+            this.bindEvents();
+        },
+        bindEvents: function () {
+            var _that = this;
+            $('body').on('change', '.yatra-single-tour-number-of-person', function () {
+                var price_field = $(this).closest('.yatra-price-item-field');
+                var final_price = _that.getPriceItemFinalPrice(price_field);
+                var finalPriceString = _that.getPrice(yatra_params.currency_symbol, final_price.final);
+                var regularPriceString = _that.getPrice(yatra_params.currency_symbol, final_price.regular);
+                price_field.find('.yatra-traveller-price').find('.final').text(finalPriceString);
+                price_field.find('.yatra-traveller-price').find('.regular').text(regularPriceString);
+                var total_price = _that.getTotalTourPrice();
+                $('.yatra-tour-total-price').find('span').text(_that.getPrice(yatra_params.currency_symbol, total_price)).attr('data-total-price', total_price);
+
+            });
+
+        },
+        getPrice(currency, price) {
+            var currency_seperator = '';
+            var currency_position = 'before';
+            if (currency_position === "before") {
+                return currency + currency_seperator + price;
+            }
+            return price + currency_seperator + curency;
+        },
+        getTotalTourPrice: function () {
+
+            var _that = this;
+
+            var total_price = 0;
+
+            $.each($('.yatra-price-item-field'), function () {
+
+                var final_price = _that.getPriceItemFinalPrice($(this));
+
+                total_price += parseInt((final_price.final));
+            });
+
+            return total_price;
+
+
+        },
+
+        getPriceItemFinalPrice: function (price_field) {
+
+            var price = {
+                'regular': price_field.data('regular-price'),
+                'sales': price_field.data('sales-price'),
+                'final': price_field.data('final-price'),
+                'people': price_field.find('.yatra-single-tour-number-of-person').val(),
+                'currency': price_field.data('currency-symbol'),
+                'pricing_per': price_field.data('pricing-per'),
+                'group_size': price_field.data('group-size')
+            }
+
+            var total_people = parseInt(price.people);
+            var pricing_per = price.pricing_per;
+            var person_count = total_people;
+            if (pricing_per === "group" && total_people > 0) {
+                var group_size = parseInt(price.group_size);
+                group_size = group_size < 1 ? 1 : group_size;
+                person_count = Math.ceil(total_people / group_size)
+
+            }
+            var total_regular_price = parseInt(price.regular) * person_count;
+            var total_sales_price = parseInt(price.sales) < 1 ? total_regular_price : parseInt(price.sales) * person_count;
+
+            return {
+                'regular': total_regular_price,
+                'final': total_sales_price
+            };
+
+        }
+    };
+
     $(document).ready(function () {
         YatraFrontend.init();
+        YatraPricingCalculator.init();
         $('#yatra-tour-tabs').YatraTabs();
         $('#yatra-tour-sidebar-tabs').YatraTabs();
 

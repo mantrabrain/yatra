@@ -87,6 +87,8 @@ class Yatra_Template_Hooks
             return;
         }
 
+        $total_price = 0;
+
         $pricing = $date_wise_info->getPricing();
 
         if ($pricing instanceof Yatra_Tour_Pricing) {
@@ -97,6 +99,7 @@ class Yatra_Template_Hooks
                     'yatra_booking_pricing' => $pricing,
                 )
             );
+            $total_price += $pricing->getFinalPrice();
         } else {
 
             foreach ($pricing as $booking_pricing_args) {
@@ -106,10 +109,16 @@ class Yatra_Template_Hooks
                         'yatra_booking_pricing' => $booking_pricing_args,
                     )
                 );
+                $total_price += $booking_pricing_args->getFinalPrice();
             }
         }
 
-        do_action('yatra_tour_after_pricing_item', $date_wise_info, $tour_id);
+        $total_price = apply_filters('yatra_tour_after_pricing_item', $date_wise_info, $tour_id, $total_price);
+
+        echo '<div class="yatra-tour-total-price">';
+        echo '<strong>' . __('Total Price', 'yatra') . '</strong>';
+        echo '<span data-total-price="' . esc_attr($total_price) . '">' . yatra_get_price(yatra_get_current_currency_symbol(), $total_price) . '</span>';
+        echo '</div>';
 
         yatra_book_now_button($date_wise_info->getAvailabilityFor());
     }

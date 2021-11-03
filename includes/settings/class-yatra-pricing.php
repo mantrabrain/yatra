@@ -12,12 +12,13 @@ class Yatra_Pricing
     public function getDateWisePricing($datewise_pricing_array = array(), $tour_id, $pricing_type, $number_of_people = null)
     {
 
+
         $base_pricing_type = yatra_get_pricing_type($tour_id);
 
         $datewise_pricing_array = $base_pricing_type !== $pricing_type ? $this->getPricing($tour_id, $number_of_people) : $datewise_pricing_array;
 
         $datewise_pricing_array = $base_pricing_type === "multi" ? $this->getMultiplePricing($tour_id, $number_of_people, $datewise_pricing_array) : $this->getSinglePricing($datewise_pricing_array, $number_of_people);
-        
+
         if ($base_pricing_type === "single") {
 
             $yatra_tour_pricing = new Yatra_Tour_Pricing();
@@ -85,6 +86,7 @@ class Yatra_Pricing
 
     private function getSinglePricing($base_pricing, $number_of_people = null)
     {
+
         $base_pricing['group_size'] = absint($base_pricing['group_size']) == 0 ? 1 : $base_pricing['group_size'];
         $regular_price = absint($base_pricing['regular_price']);
         $sales_price = $base_pricing['sales_price'];
@@ -101,10 +103,12 @@ class Yatra_Pricing
             'pricing_per' => $base_pricing['pricing_per'],
             'group_size' => $base_pricing['group_size'],
             'number_of_person' => $number_of_person,
-            'regular_price' => $regular_price*$person_count,
+            'regular_price' => $regular_price,
+            'person_count' => $person_count,
             'sales_price' => $sales_price,
             'final_price' => $final_price * $person_count
         );
+
         return apply_filters('yatra_tour_final_pricing_details', $final_pricing_details);
     }
 

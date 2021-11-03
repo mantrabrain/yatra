@@ -73,6 +73,7 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
 
         }
 
+
         $this->allDynamicDataByDateRange = $all_date_data;
 
         $this->tourData = Yatra_Dates::getSingleTourData($ID, $number_of_people, $start_date, $end_date);
