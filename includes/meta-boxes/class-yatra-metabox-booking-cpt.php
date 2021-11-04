@@ -96,11 +96,11 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
         public function tour_item($booking)
         {
-          
+            $total_tour_final_price = !isset($booking['total_tour_final_price']) ? $booking['total_tour_price'] : $booking['total_tour_final_price'];
             echo '<div class="yatra-tour-booking-info-item">';
             echo '<h2 class="tour-name">Tour: ' . esc_html($booking['yatra_tour_name']) . '</h2>';
             echo '<span class="booking-date">Booked Date: ' . esc_html($booking['yatra_selected_date']) . '</span>';
-            echo '<span class="price">Booking Total: ' . esc_html(yatra_get_price($booking['yatra_currency_symbol'], $booking['total_tour_price'])) . '</span>';
+            echo '<span class="price">Booking Total: ' . esc_html(yatra_get_price($booking['yatra_currency_symbol'], $total_tour_final_price)) . '</span>';
             echo '</div>';
 
         }
