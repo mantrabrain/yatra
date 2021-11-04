@@ -429,9 +429,8 @@ ul.mb-selected-gallery-list li img {
     width: 50%;
 }
 
-.yatra-booking-meta-information table {
+#booking_meta_information table {
     width: 100%;
-
     margin: 0 !important;
     padding: 0;
     margin-bottom: 20px;
@@ -442,8 +441,10 @@ ul.mb-selected-gallery-list li img {
 table.yatra-booking-meta-info th,
 table.yatra-booking-meta-info td,
 table.yatra-booking-meta-customer-info th,
-table.yatra-booking-meta-customer-info td {
-    border: 1px solid #ddd;
+table.yatra-booking-meta-customer-info td,
+#booking_meta_information table td,
+#booking_meta_information table th {
+    border: 1px solid #aaa;
     padding: 10px;
 }
 
@@ -451,13 +452,11 @@ table.yatra-booking-meta-customer-info tr {
     text-align: center;
 }
 
-table.yatra-booking-meta-info tr {
+table.yatra-booking-meta-info tr,
+#booking_meta_information table tr {
     text-align: center;
 }
 
-table.yatra-booking-meta-info tr.new-item {
-    border-top: 2px solid #828282
-}
 
 .yatra-tour-booking-info-item {
     display: flex;
