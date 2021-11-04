@@ -38,7 +38,7 @@ if (!defined('ABSPATH')) {
         $yatra_tour_meta_group_size = isset($booking['yatra_tour_meta_group_size']) ? $booking['yatra_tour_meta_group_size'] : '';
         $yatra_tour_meta_price_per = isset($booking['yatra_tour_meta_price_per']) ? $booking['yatra_tour_meta_price_per'] : '';
         $number_of_person = isset($booking['number_of_person']) ? $booking['number_of_person'] : '';
-        $total_tour_price = isset($booking['total_tour_price']) ? $booking['total_tour_price'] : yatra_get_final_tour_price($id, $number_of_person);
+        $total_tour_price = !isset($booking['total_tour_final_price']) ? $booking['total_tour_price'] : $booking['total_tour_final_price'];
         $yatra_tour_meta_tour_duration_nights = isset($booking['yatra_tour_meta_tour_duration_nights']) ? $booking['yatra_tour_meta_tour_duration_nights'] : '';
         $yatra_tour_meta_tour_duration_days = isset($booking['yatra_tour_meta_tour_duration_days']) ? $booking['yatra_tour_meta_tour_duration_days'] : '';
         $yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['yatra_currency_symbol'] : '';
