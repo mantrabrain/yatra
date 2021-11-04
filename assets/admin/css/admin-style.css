@@ -459,8 +459,22 @@ table.yatra-booking-meta-info tr.new-item {
     border-top: 2px solid #828282
 }
 
-table.yatra-booking-meta-info tr:last-child {
-    border-bottom: 3px solid #828282
+.yatra-tour-booking-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    padding: 10px;
+    background: #606060;
+    color: #fff;
+}
+
+.yatra-tour-booking-info-item h2.tour-name {
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #fff;
 }
 
 .yatra-booking-meta-information h2 {
@@ -494,6 +508,12 @@ body.post-type-yatra-booking #title {
     pointer-events: none;
 }
 
+.yatra-booking-tour-information {
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px solid #aaa;
+    margin-bottom: 10px;
+}
 
 /* Custom Post Type Meta Box Box Design
 
