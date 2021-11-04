@@ -17,23 +17,23 @@ $yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['ya
 $duration_string = '' != $yatra_tour_meta_tour_duration_days ? $yatra_tour_meta_tour_duration_days . ' days ' : '';
 
 $duration_string .= '' != $yatra_tour_meta_tour_duration_nights ? $yatra_tour_meta_tour_duration_nights . ' nights' : '';
-
+$duration_string = '' != $duration_string ? __('Duration: ', 'yatra') . $duration_string : '';
 ?>
 <div class="yatra-account-booking-item-row-wrap">
-
-    <div class="yatra-account-booking-item-row">
     <span class="tour-title">
         <?php
         echo '<a target="_blank" href="' . esc_url(get_permalink(absint($id))) . '">' . esc_html($booking['yatra_tour_name']) . '</a>';
         ?>
     </span>
+    <div class="yatra-account-booking-item-row">
+
         <span class="tour-date">
         <?php
-        echo isset($booking['yatra_selected_date']) ? esc_html($booking['yatra_selected_date']) : '';
+        echo isset($booking['yatra_selected_date']) ? __('Date: ', 'yatra') . esc_html($booking['yatra_selected_date']) : '';
 
         ?>
     </span>
-        <span class="person-count"><?php echo esc_html($person_count) ?></span>
+        <span class="person-count"><?php echo __('Persons: ', 'yatra') . esc_html($person_count) ?></span>
         <span class="tour-durations">
         <?php
         echo esc_html($duration_string);
@@ -41,7 +41,7 @@ $duration_string .= '' != $yatra_tour_meta_tour_duration_nights ? $yatra_tour_me
     </span>
         <span class="total-price">
         <?php
-        echo '<span>' . esc_html(yatra_get_price($yatra_currency_symbol, $total_tour_price)) . '</span>';
+        echo '<span>' . __('Total Price: ', 'yatra') . esc_html(yatra_get_price($yatra_currency_symbol, $total_tour_price)) . '</span>';
 
         ?>
     </span>

@@ -1103,17 +1103,22 @@ form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
 
 .yatra-booking-table table, .yatra-booking-table.my_account_booking {
   border-collapse: collapse;
-  width: 100%; }
+  width: 100%;
+  margin: 0 !important; }
 
 .yatra-booking-table table th,
 .yatra-booking-table table td {
-  text-align: center;
+  text-align: center !important;
   border: 1px solid #aaa;
   padding: 5px;
   background: #f9f9f9; }
 
 .yatra-booking-table .yatra-account-booking-item-row-wrap {
   margin-bottom: 20px; }
+
+.yatra-booking-table .yatra-account-booking-item-row-wrap .tour-title {
+  font-weight: bold;
+  font-size: 20px; }
 
 ul.yatra-payment-gateway {
   padding: 15px !important;
