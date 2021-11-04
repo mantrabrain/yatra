@@ -219,6 +219,21 @@ if (!function_exists('yatra_account_bookings')) {
     }
 }
 
+if (!function_exists('yatra_account_bookings_item')) {
+
+    /**
+     * My Account navigation template.
+     */
+    function yatra_account_bookings_item($bookings)
+    {
+        foreach ($bookings as $id => $booking) {
+
+            yatra_get_template('myaccount/tmpl-booking-item.php', array('booking' => $booking, 'id' => $id));
+
+        }
+    }
+}
+
 if (!function_exists('yatra_account_edit_profile')) {
 
     /**

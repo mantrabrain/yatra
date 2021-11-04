@@ -1083,6 +1083,38 @@ form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
   .yatra-my-account-content label {
     display: block; }
 
+.yatra-booking-table .yatra-account-booking-item-row {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+     -moz-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+     -moz-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  background: #ddd;
+  padding: 10px;
+  border: 1px solid #aaa;
+  font-weight: bold; }
+
+.yatra-booking-table table, .yatra-booking-table.my_account_booking {
+  border-collapse: collapse;
+  width: 100%; }
+
+.yatra-booking-table table th,
+.yatra-booking-table table td {
+  text-align: center;
+  border: 1px solid #aaa;
+  padding: 5px;
+  background: #f9f9f9; }
+
+.yatra-booking-table .yatra-account-booking-item-row-wrap {
+  margin-bottom: 20px; }
+
 ul.yatra-payment-gateway {
   padding: 15px !important;
   list-style: none;

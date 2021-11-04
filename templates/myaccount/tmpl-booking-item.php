@@ -1,0 +1,113 @@
+<?php
+
+$pricing = isset($booking['yatra_pricing']) ? $booking['yatra_pricing'] : array();
+
+$number_of_person = isset($booking['number_of_person']) ? $booking['number_of_person'] : '';
+
+$person_count = is_array($number_of_person) ? array_sum($number_of_person) : absint($number_of_person);
+
+$total_tour_price = !isset($booking['total_tour_final_price']) ? $booking['total_tour_price'] : $booking['total_tour_final_price'];
+
+$yatra_tour_meta_tour_duration_nights = isset($booking['yatra_tour_meta_tour_duration_nights']) ? $booking['yatra_tour_meta_tour_duration_nights'] : '';
+
+$yatra_tour_meta_tour_duration_days = isset($booking['yatra_tour_meta_tour_duration_days']) ? $booking['yatra_tour_meta_tour_duration_days'] : '';
+
+$yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['yatra_currency_symbol'] : '';
+
+$duration_string = '' != $yatra_tour_meta_tour_duration_days ? $yatra_tour_meta_tour_duration_days . ' days ' : '';
+
+$duration_string .= '' != $yatra_tour_meta_tour_duration_nights ? $yatra_tour_meta_tour_duration_nights . ' nights' : '';
+
+?>
+<div class="yatra-account-booking-item-row-wrap">
+
+    <div class="yatra-account-booking-item-row">
+    <span class="tour-title">
+        <?php
+        echo '<a target="_blank" href="' . esc_url(get_permalink(absint($id))) . '">' . esc_html($booking['yatra_tour_name']) . '</a>';
+        ?>
+    </span>
+        <span class="tour-date">
+        <?php
+        echo isset($booking['yatra_selected_date']) ? esc_html($booking['yatra_selected_date']) : '';
+
+        ?>
+    </span>
+        <span class="person-count"><?php echo esc_html($person_count) ?></span>
+        <span class="tour-durations">
+        <?php
+        echo esc_html($duration_string);
+        ?>
+    </span>
+        <span class="total-price">
+        <?php
+        echo '<span>' . esc_html(yatra_get_price($yatra_currency_symbol, $total_tour_price)) . '</span>';
+
+        ?>
+    </span>
+
+    </div>
+    <div class="yatra-booking-pricing-additional-services-wrap">
+        <div class="yatra-booking-pricing-table-wrap">
+
+            <table class="yatra-booking-pricing-table">
+                <thead>
+                <tr>
+                    <th>Number of person</th>
+                    <th>Pricing Label</th>
+                    <th>Regular Price</th>
+                    <th>Sales Price</th>
+                    <th>Price Per</th>
+                    <th>Group Size</th>
+                    <th>Toal Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+
+                if ($pricing instanceof Yatra_Tour_Pricing) {
+
+                    yatra_get_template('myaccount/pricing-item.php',
+                        array('pricing' => $pricing,
+                            'number_of_person' => $number_of_person,
+                            'currency' => $yatra_currency_symbol,
+                            'total_price' => $booking['total_tour_price'],
+                            'count' => 1,
+                            'merge' => false
+                        ));
+
+                } else {
+
+                    $merge = true;
+
+                    foreach ($pricing as $pricing_item) {
+
+                        if ($pricing_item instanceof Yatra_Tour_Pricing) {
+
+                            $person = is_array($number_of_person) && isset($number_of_person[$pricing_item->getID()]) ? $number_of_person[$pricing_item->getID()] : '';
+
+                            yatra_get_template('myaccount/pricing-item.php',
+                                array(
+                                    'pricing' => $pricing_item,
+                                    'number_of_person' => $person,
+                                    'currency' => $yatra_currency_symbol,
+                                    'total_price' => $booking['total_tour_price'],
+                                    'count' => count($pricing),
+                                    'merge' => $merge
+                                ));
+                            if ($merge) {
+                                $merge = false;
+                            }
+                        }
+
+                    }
+                }
+                ?>
+                </tbody>
+            </table>
+        </div>
+        <?php
+        do_action('yatra_myaccount_tour_booking_item', $id, $booking);
+        ?>
+    </div>
+</div>

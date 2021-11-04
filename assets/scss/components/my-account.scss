@@ -1,10 +1,12 @@
 .yatra-my-account-navigation {
   width: 30%;
   float: left;
+
   ul {
     list-style: none;
     margin: 0;
     padding: 0;
+
     li {
       .fa, svg {
         margin-right: 5px;
@@ -27,12 +29,37 @@
 .yatra-my-account-content {
   float: right;
   width: 70%;
+
   label {
     display: block;
   }
 }
 
-.yatra-user-content-block {
 
+.yatra-booking-table .yatra-account-booking-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ddd;
+  padding: 10px;
+  border: 1px solid #aaa;
+  font-weight: bold;
+}
+
+.yatra-booking-table table, .yatra-booking-table.my_account_booking {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.yatra-booking-table table th,
+.yatra-booking-table table td {
+  text-align: center;
+  border: 1px solid #aaa;
+  padding: 5px;
+  background: #f9f9f9;
+}
+
+.yatra-booking-table .yatra-account-booking-item-row-wrap {
+  margin-bottom: 20px;
 
 }
