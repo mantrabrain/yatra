@@ -89,6 +89,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
                 'not_found_in_trash' => __('No Bookings found in the Trash', 'yatra'),
                 'parent_item_colon' => '',
                 'menu_name' => __('Bookings', 'yatra'),
+
             );
             $args = array(
                 'labels' => $labels,
@@ -98,6 +99,8 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
                 'show_in_menu' => 'edit.php?post_type=tour',
                 'publicly_queryable' => false,
                 'exclude_from_search' => true,
+                'show_in_admin_bar'   => false,
+
 
 
             );
