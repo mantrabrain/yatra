@@ -904,11 +904,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 
 				$autoload_options[ $option_name ] = isset( $option['autoload'] ) ? (bool) $option['autoload'] : true;
 
-				/**
-				 * Fire an action before saved.
-				 *
-				 * @deprecated 2.4.0 - doesn't allow manipulation of values!
-				 */
+
 				do_action( 'yatra_update_option', $option );
 			}
 

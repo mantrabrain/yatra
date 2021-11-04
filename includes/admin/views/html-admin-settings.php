@@ -39,7 +39,7 @@ if (!$tab_exists) {
         self::show_messages();
 
         do_action('yatra_settings_' . $current_tab);
-        do_action('yatra_settings_tabs_' . $current_tab); // @deprecated hook. @todo remove in 4.0.
+        do_action('yatra_settings_tabs_' . $current_tab);
         ?>
         <p class="submit">
             <?php if (empty($GLOBALS['hide_save_button'])) : ?>

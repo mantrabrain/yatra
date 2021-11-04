@@ -1,10 +1,4 @@
 <?php
-/**
- * My Orders - Deprecated
- *
- * @deprecated 2.6.0 this template file is no longer used. My Account shortcode uses bookings.php.
- */
-
 if (!defined('ABSPATH')) {
     exit;
 }
