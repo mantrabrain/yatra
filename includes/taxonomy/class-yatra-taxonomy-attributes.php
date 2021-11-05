@@ -12,7 +12,27 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
             add_action('attributes_edit_form_fields', array($this, 'edit'), 10, 2);
             add_action('edited_attributes', array($this, 'save'), 10, 2);
             add_action('created_attributes', array($this, 'save'), 10, 2);
+            add_action('manage_attributes_custom_column', array($this, 'custom_columns'), 10, 3);
+            add_action('manage_edit-attributes_columns', array($this, 'column_fields'), 10, 3);
+        }
 
+        public function column_fields($columns)
+        {
+            $columns['icon'] = __('Icon', 'yatra');
+
+            return $columns;
+        }
+
+        public function custom_columns($content, $column_name, $term_id)
+        {
+            switch ($column_name) {
+                case 'icon':
+                    $icon = sanitize_text_field(get_term_meta($term_id, 'icon', true));
+
+                    echo '<span class="attribute-icon ' . esc_attr($icon) . '"></span>';
+                    break;
+
+            }
         }
 
 
@@ -21,6 +41,7 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
 
 
             $attribute_field_type = isset($_POST['attribute_field_type']) ? sanitize_text_field($_POST['attribute_field_type']) : '';
+            $icon = isset($_POST['icon']) ? sanitize_text_field($_POST['icon']) : '';
 
             $yatra_tour_attribute_type_options = yatra_tour_attribute_type_options();
 
@@ -97,13 +118,31 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
                     add_term_meta($term_id, $meta_key, $meta_value, true);
                 }
             }
+            $base = isset($current_screen->base) ? $current_screen->base : '';
+
+            if ($base === "edit-tags") {
+
+                update_term_meta($term_id, 'icon', $icon, '');
+
+            } else {
+                add_term_meta($term_id, 'icon', $icon, true);
+            }
 
         }
 
 
         public function edit($term, $taxonomy)
-        { ?>
+        {
+            $icon = get_term_meta($term->term_id, 'icon', true);
+            ?>
+            <tr class="form-field icon-wrap">
+                <th scope="row"><label for="icon"><?php echo __('Icon', 'yatra') ?></label></th>
+                <td>
+                    <input name="icon" id="icon" class="icopick" type="text" value="<?php echo esc_attr($icon); ?>"
+                           size="40" autocomplete="off">
 
+                </td>
+            </tr>
             <tr class="form-field term-group-wrap">
                 <th scope="row">
                     <label for="attribute_field_type"><?php _e('Attribute Type', 'yatra'); ?></label>
@@ -169,6 +208,11 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
 
         public function form($taxonomy)
         { ?>
+
+            <div class="form-field term-icon-wrap">
+                <label for="icon"><?php echo __('Icon', 'yatra') ?></label>
+                <input name="icon" id="icon" class="icopick" type="text" value="" size="40" autocomplete="off">
+            </div>
 
             <div class="form-field term-group">
                 <label for="attribute_field_type"><?php _e('Attribute Type', 'yatra'); ?></label>

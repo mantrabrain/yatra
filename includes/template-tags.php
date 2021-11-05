@@ -1014,6 +1014,8 @@ if (!function_exists('yatra_tour_custom_attributes')) {
             foreach ($tour_meta_custom_attributes as $term_id => $content) {
                 $term = get_term($term_id);
                 $field_key = get_term_meta($term_id, 'attribute_field_type', true);
+                $icon = get_term_meta($term_id, 'icon', true);
+                $icon = '' === ($icon) ? 'fa fa-hashtag' : $icon;
                 $field = $yatra_tour_attribute_type_options[$field_key] ?? array();
                 $field_option = $field['options'] ?? array();
                 if (isset($term->name)) {
@@ -1028,7 +1030,8 @@ if (!function_exists('yatra_tour_custom_attributes')) {
                             $all_args[$type_index][] = array(
                                 'title' => $term->name,
                                 'content' => $content_value,
-                                'type' => $type
+                                'type' => $type,
+                                'icon' => $icon
 
                             );
                         }
@@ -1047,6 +1050,7 @@ if (!function_exists('yatra_tour_custom_attributes_template')) {
     function yatra_tour_custom_attributes_template()
     {
         $all_args = yatra_tour_custom_attributes();
+
 
         if (count($all_args) > 0) {
 
