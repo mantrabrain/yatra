@@ -25,7 +25,7 @@ interface Yatra_Tour_Dates_Interface
 
     public function isActive();
 
-    public function getAvailabilityFor();
+    public function getAvailabilityFor($tour_id = null, $date = null);
 
     public function getNoteToCustomer();
 

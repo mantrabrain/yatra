@@ -70,7 +70,6 @@ class Yatra_Template_Hooks
 
     public function single_tour_booking_form($tourData)
     {
-
         yatra_get_template('tour/booking-form.php',
             array(
                 'pricing_type' => $tourData->getPricingType(),
@@ -81,7 +80,7 @@ class Yatra_Template_Hooks
 
     }
 
-    public static function tour_booking_pricing_content($date_wise_info, $pricing_type, $tour_id)
+    public static function tour_booking_pricing_content($date_wise_info, $pricing_type, $tour_id, $selected_date = null)
     {
         if (!$date_wise_info instanceof Yatra_Tour_Dates) {
             return;
@@ -134,7 +133,7 @@ class Yatra_Template_Hooks
         echo '<span data-total-price="' . esc_attr($total_price) . '">' . yatra_get_price(yatra_get_current_currency_symbol(), $total_price) . '</span>';
         echo '</div>';
 
-        yatra_book_now_button($date_wise_info->getAvailabilityFor());
+        yatra_book_now_button($date_wise_info->getAvailabilityFor($tour_id, $selected_date));
     }
 
     public function single_tour_enquiry_form($tourData)

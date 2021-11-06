@@ -60,7 +60,7 @@ class Yatra_Tour_Availability_Validation
 
         $max_travellers = $todayData->getMaxTravellers();
 
-        $availability = $todayData->getAvailabilityFor();
+        $availability = $todayData->getAvailabilityFor($this->id, $this->start_date);
 
         if (absint($booked_travellers) >= absint($max_travellers) && $max_travellers !== '' && !is_null($max_travellers)) {
 

@@ -70,9 +70,11 @@ class Yatra_Tour_Dates extends Yatra_Tour_Dates_Abstract
         return $this->active;
     }
 
-    public function getAvailabilityFor()
+    public function getAvailabilityFor($tour_id = null, $date = null)
     {
-        return $this->availability;
+
+        return apply_filters('yatra_tour_dates_availability_status', $this->availability, $tour_id, $date);
+
     }
 
     public function getNoteToCustomer()

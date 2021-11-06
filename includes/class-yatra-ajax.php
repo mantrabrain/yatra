@@ -445,7 +445,7 @@ class Yatra_Ajax
 
         ob_start();
 
-        Yatra_Template_Hooks::tour_booking_pricing_content($todayData, $pricing_type, $tour_id);
+        Yatra_Template_Hooks::tour_booking_pricing_content($todayData, $pricing_type, $tour_id, $selected_date);
 
         $content = ob_get_clean();
 
