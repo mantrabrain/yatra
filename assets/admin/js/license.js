@@ -10,11 +10,10 @@ var YatraLicense = function ($) {
                 var slug = $(this).closest('tr').attr('data-addon-slug');
                 var license_html = '<input type="text" name="' + slug + '_license" placeholder="Please enter your license key here"/>';
                 $(this).closest('td').find('.display-text').remove();
-                $(this).closest('td').prepend(license_html);
+                $(this).closest('td').find('.license-column-inner').prepend(license_html);
                 $(this).text('Update & Activate').addClass('update-license').removeClass('modify-license');
 
             });
-
 
 
             $('body').on('click', '.yatra-license-manager-table .update-license', function () {

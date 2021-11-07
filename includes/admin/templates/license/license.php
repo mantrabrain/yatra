@@ -72,7 +72,7 @@
                 <td>
                     <span class="status <?php echo esc_attr(strtolower($status)) ?>"><?php echo esc_html($status) ?></span>
                 </td>
-                <td><?php echo isset($addon_license['notice']) ? wp_kses($addon_license['notice'], array(
+                <td style="max-width:250px;"><?php echo isset($addon_license['notice']) ? wp_kses($addon_license['notice'], array(
                         'a' => array('href' => array(), 'target' => array()),
                         'strong' => array()
 
