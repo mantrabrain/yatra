@@ -44,23 +44,25 @@
             <tr data-addon-slug="<?php echo esc_attr($addon_slug) ?>">
                 <td><span class="product-name"><?php echo esc_html($addon['label']) ?></span>
                 </td>
-                <td class="license-column"><?php
-                    if ($display_license === '') {
-                        ?>
-                        <input type="text" name="<?php echo esc_attr($addon_slug) ?>_license"
-                               placeholder="<?php echo __('Please enter your license key here', 'yatra') ?>"
-                        />
-                        <?php
-                    } else {
-                        echo '<span class="display-text">' . esc_html($display_license) . '</span>';
+                <td class="license-column">
+                    <div class="license-column-inner"> <?php
+                        if ($display_license === '') {
+                            ?>
+                            <input type="text" name="<?php echo esc_attr($addon_slug) ?>_license"
+                                   placeholder="<?php echo __('Please enter your license key here', 'yatra') ?>"
+                            />
+                            <?php
+                        } else {
+                            echo '<span class="display-text">' . esc_html($display_license) . '</span>';
 
-                        echo '<span class="modify-license button button-secondary">' . __('Modify License', 'yatra') . '</span>';
-                    }
-                    if ($status === 'active') {
-                        ?>
-                        <button style="float:right;" type="button"
-                                class="button button-primary deactivate-license"><?php echo esc_html($button_label) ?></button>
-                    <?php } ?>
+                            echo '<span class="modify-license button button-secondary">' . __('Modify License', 'yatra') . '</span>';
+                        }
+                        if ($status === 'active') {
+                            ?>
+                            <button style="float:right;" type="button"
+                                    class="button button-primary deactivate-license"><?php echo esc_html($button_label) ?></button>
+                        <?php } ?>
+                    </div>
                 </td>
                 <td>
 
@@ -68,7 +70,7 @@
 
                 </td>
                 <td>
-                    <span class="status <?php echo esc_attr(strtolower($status)) ?>"><?php echo  esc_html($status) ?></span>
+                    <span class="status <?php echo esc_attr(strtolower($status)) ?>"><?php echo esc_html($status) ?></span>
                 </td>
                 <td><?php echo isset($addon_license['notice']) ? wp_kses($addon_license['notice'], array(
                         'a' => array('href' => array(), 'target' => array()),

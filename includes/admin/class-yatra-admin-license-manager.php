@@ -66,7 +66,7 @@ class Yatra_Admin_License_Manager
 
             $product_license = apply_filters('yatra_addon_before_license_deactivate', $product_license, $slug);
 
-            $all_license[$slug] = array();
+            $all_license[$slug] = $product_license;
 
             update_option('yatra_license', $all_license);
 
