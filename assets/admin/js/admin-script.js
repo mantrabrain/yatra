@@ -333,34 +333,7 @@
         initDateTimePicker: function () {
 
             if ($.fn.yatra_datepicker) {
-                $('#yatra_tour_meta_tour_start_date').yatra_datepicker({
-                    language: 'en',
-                    dateFormat: 'yyyy-mm-dd',
-                    minDate: new Date(),
-                    onSelect: function (dateStr) {
-                        newMinDate = null;
-                        newMaxDate = new Date();
-                        if ('' !== dateStr) {
-                            // milliseconds = moment( dateStr, wp_travel_drag_drop_uploader.moment_date_format ).format( 'MM/DD/YYYY' );
-                            milliseconds = moment(dateStr, 'YYYY-MM-DD');
-                            new_date_min = new Date(milliseconds);
-                            newMinDate = new Date(new_date_min.setDate(new Date(new_date_min.getDate())));
-
-                        }
-                        $('#yatra_tour_meta_tour_end_date').yatra_datepicker({
-                            minDate: newMinDate,
-                            dateFormat: 'yyyy-mm-dd',
-
-                        });
-                    }
-                });
-
-                $('#yatra_tour_meta_tour_end_date').yatra_datepicker({
-                    language: 'en',
-                    minDate: new Date(),
-                    dateFormat: 'yyyy-mm-dd',
-
-                });
+                
 
                 $('.yatra-datepicker').yatra_datepicker({
                     language: 'en',

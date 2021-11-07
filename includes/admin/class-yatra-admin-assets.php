@@ -13,6 +13,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
         {
 
             wp_enqueue_media();
+
             wp_enqueue_editor();
 
             $screen = get_current_screen();
