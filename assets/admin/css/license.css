@@ -1,0 +1,49 @@
+.yatra-license-manager-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.yatra-license-manager-table th,
+.yatra-license-manager-table td {
+    border: 1px solid #aaa;
+    padding: 15px 10px;
+    text-align: left;
+    font-size: 16px;
+
+}
+
+.yatra-license-manager-table th {
+    text-transform: uppercase;
+    font-weight: bold;
+    background: #ccc;
+}
+
+.yatra-license-manager-table span.status {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 40px;
+}
+
+.yatra-license-manager-table span.status:before {
+    content: "";
+    height: 25px;
+    width: 25px;
+    position: absolute;
+    left: 0;
+    border-radius: 100%;
+
+}
+
+.yatra-license-manager-table span.status.active:before {
+    background: green;
+}
+
+.yatra-license-manager-table span.status.inactive:before {
+    background: red;
+}
+
+.yatra-license-manager-table span.product-name {
+    font-weight: bold;
+}
