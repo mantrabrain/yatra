@@ -30,18 +30,18 @@
 .yatra-license-manager-table span.status {
     position: relative;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-left: 40px;
+    justify-content: unset;
+    align-items: end;
+
     text-transform: capitalize;
+    column-gap: 10px;
 }
+
 
 .yatra-license-manager-table span.status:before {
     content: "";
-    height: 25px;
-    width: 25px;
-    position: absolute;
-    left: 0;
+    height: 15px;
+    width: 15px;
     border-radius: 100%;
 
 }
