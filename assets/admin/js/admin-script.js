@@ -333,12 +333,14 @@
         initDateTimePicker: function () {
 
             if ($.fn.yatra_datepicker) {
-                
+
 
                 $('.yatra-datepicker').yatra_datepicker({
                     language: 'en',
                     minDate: new Date(),
                     dateFormat: 'yyyy-mm-dd',
+                    autoClose: true,
+
 
                 });
 
@@ -346,6 +348,8 @@
                     language: 'en',
                     timepicker: true,
                     onlyTimepicker: true,
+                    autoClose: true,
+
 
                 });
             }
