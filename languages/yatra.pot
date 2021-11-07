@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.1\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-11-02 08:19:11+00:00\n"
+"POT-Creation-Date: 2021-11-07 16:15:43+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,37 +35,47 @@ msgstr ""
 msgid "Select an Image"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:132
+#: includes/admin/class-yatra-admin-assets.php:133
 msgid "Are you sure want to remove this item?"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:134
+#: includes/admin/class-yatra-admin-assets.php:135
 msgid ""
 "%1sWarning%2s: If you remove this tab, all of your contents associated with "
 "this tab will be deleted"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:136
-#: includes/admin/class-yatra-admin-assets.php:142
+#: includes/admin/class-yatra-admin-assets.php:137
+#: includes/admin/class-yatra-admin-assets.php:143
 msgid "Yes, Confirm"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:138
-#: includes/admin/class-yatra-admin-assets.php:144
+#: includes/admin/class-yatra-admin-assets.php:139
+#: includes/admin/class-yatra-admin-assets.php:145
 msgid "Cancel this process"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:140
+#: includes/admin/class-yatra-admin-assets.php:141
 msgid "Are you sure want to delete attribute?"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:149
+#: includes/admin/class-yatra-admin-assets.php:150
 msgid "Font Awesome"
 msgstr ""
 
 #: includes/admin/class-yatra-admin-export-import.php:16
 #: includes/admin/class-yatra-admin-export-import.php:17
 msgid "Import/Export"
+msgstr ""
+
+#: includes/admin/class-yatra-admin-license-manager.php:25
+#: includes/admin/class-yatra-admin-license-manager.php:26
+#: includes/admin/templates/license/license.php:14
+msgid "License"
+msgstr ""
+
+#: includes/admin/class-yatra-admin-license-manager.php:123
+msgid "License updated. Please check license status and notice for more details."
 msgstr ""
 
 #: includes/admin/class-yatra-admin-permalinks.php:68
@@ -351,29 +361,27 @@ msgid "When you receive a new booking, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:155
-#: templates/myaccount/tmpl-booking.php:14
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:212
+#: templates/myaccount/tmpl-booking.php:8
 msgid "Booking Code"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:73
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:16
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:64
-#: templates/myaccount/tmpl-booking-details.php:21
 #: templates/tmpl-cart-table.php:15 templates/tmpl-order-table.php:6
 msgid "Tour"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
-#: templates/myaccount/tmpl-booking-details.php:22
-#: templates/myaccount/tmpl-booking.php:15 templates/tmpl-cart-table.php:16
+#: templates/myaccount/tmpl-booking.php:9 templates/tmpl-cart-table.php:16
 #: templates/tmpl-order-table.php:7
 msgid "Date"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:128
-#: templates/myaccount/tmpl-booking.php:16
+#: includes/admin/templates/license/license.php:16
+#: templates/myaccount/tmpl-booking.php:10
 msgid "Status"
 msgstr ""
 
@@ -383,7 +391,7 @@ msgstr ""
 #: includes/class-yatra-checkout-form.php:141
 #: includes/class-yatra-enquiry-form.php:51
 #: includes/class-yatra-user-form.php:71 includes/class-yatra-user-form.php:72
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:151
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:208
 #: templates/myaccount/tmpl-dashboard.php:32
 msgid "Email"
 msgstr ""
@@ -393,7 +401,7 @@ msgid "Full name"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
-#: templates/myaccount/tmpl-booking.php:17 templates/tmpl-cart-table.php:18
+#: templates/myaccount/tmpl-booking.php:11 templates/tmpl-cart-table.php:18
 #: templates/tmpl-order-table.php:9 templates/tmpl-order-table.php:56
 msgid "Total"
 msgstr ""
@@ -439,7 +447,7 @@ msgid "Bookings"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:126
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:154
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:211
 msgid "Total Booking Price"
 msgstr ""
 
@@ -452,7 +460,7 @@ msgid "Date Created"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:72
-#: templates/myaccount/tmpl-booking.php:13
+#: templates/myaccount/tmpl-booking.php:7
 msgid "ID"
 msgstr ""
 
@@ -466,9 +474,9 @@ msgstr ""
 #: includes/class-yatra-enquiry-form.php:70
 #: includes/class-yatra-user-form.php:29 includes/class-yatra-user-form.php:30
 #: includes/class-yatra-user-form.php:38 includes/class-yatra-user-form.php:44
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:152
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:209
 #: includes/template-tags.php:159 includes/template-tags.php:714
-#: includes/template-tags.php:718 includes/template-tags.php:1149
+#: includes/template-tags.php:718 includes/template-tags.php:1153
 #: templates/myaccount/tmpl-dashboard.php:47 templates/tour/additional.php:16
 msgid "Country"
 msgstr ""
@@ -493,6 +501,7 @@ msgid "Subject"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:81
+#: includes/admin/templates/license/license.php:17
 #: includes/class-yatra-enquiry-form.php:104
 #: includes/class-yatra-enquiry-form.php:108
 msgid "Message"
@@ -821,9 +830,9 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:200
 #: includes/functions.php:63 includes/hooks/yatra-list-table-hooks.php:19
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:140
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:141
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:150
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:179
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:180
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:189
 msgid "Attributes"
 msgstr ""
 
@@ -865,7 +874,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:101
-#: includes/functions.php:770
+#: includes/functions.php:752
 msgid "Payment Gateways"
 msgstr ""
 
@@ -1047,7 +1056,7 @@ msgstr ""
 #: includes/admin/templates/availability/availability-calendar.php:22
 #: includes/admin/templates/availability/availability-calendar.php:24
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:52
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:69
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:119
 #: includes/template-tags.php:806 templates/myaccount/tmpl-pricing-header.php:7
 msgid "Price Per"
 msgstr ""
@@ -1066,7 +1075,7 @@ msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:45
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:74
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:70
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:120
 #: includes/template-tags.php:817 includes/template-tags.php:821
 #: templates/myaccount/tmpl-pricing-header.php:8
 msgid "Group Size"
@@ -1102,7 +1111,7 @@ msgstr ""
 #: includes/admin/templates/availability/availability-calendar.php:78
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:6
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:13
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:66
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:116
 #: includes/template-tags.php:850 includes/template-tags.php:854
 msgid "Pricing Label"
 msgstr ""
@@ -1155,6 +1164,34 @@ msgstr ""
 msgid "Import Now"
 msgstr ""
 
+#: includes/admin/templates/license/license.php:1
+msgid "License Manager"
+msgstr ""
+
+#: includes/admin/templates/license/license.php:13
+msgid "Addon Name"
+msgstr ""
+
+#: includes/admin/templates/license/license.php:15
+msgid "Expire Date"
+msgstr ""
+
+#: includes/admin/templates/license/license.php:41
+msgid "Deactivate"
+msgstr ""
+
+#: includes/admin/templates/license/license.php:52
+msgid "Please enter your license key here"
+msgstr ""
+
+#: includes/admin/templates/license/license.php:58
+msgid "Modify License"
+msgstr ""
+
+#: includes/admin/templates/license/license.php:89
+msgid "Update"
+msgstr ""
+
 #: includes/admin/templates/metabox/tour/pricing/add-new.php:4
 msgid "Add new pricing option"
 msgstr ""
@@ -1203,7 +1240,7 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-yatra-ajax.php:52 includes/class-yatra-ajax.php:502
+#: includes/class-yatra-ajax.php:52 includes/class-yatra-ajax.php:503
 msgid "Something wrong, please try again."
 msgstr ""
 
@@ -1215,7 +1252,7 @@ msgstr ""
 msgid "File upload failed. Please try again."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:504
+#: includes/class-yatra-ajax.php:505
 msgid "Thank you for your query. We will get back to you soon"
 msgstr ""
 
@@ -1458,39 +1495,39 @@ msgstr ""
 msgid "Confirm password  not matched with old password"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:352
-#: includes/classes/yatra-core-tour-availability.php:394
+#: includes/classes/yatra-core-tour-availability.php:357
+#: includes/classes/yatra-core-tour-availability.php:399
 msgid "Booking Full"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:563
+#: includes/classes/yatra-core-tour-availability.php:568
 msgid "Search"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:623
+#: includes/classes/yatra-core-tour-availability.php:628
 #. translators: %s: Number of items.
 msgid "%s item"
 msgid_plural "%s items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/classes/yatra-core-tour-availability.php:664
+#: includes/classes/yatra-core-tour-availability.php:669
 msgid "First page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:675
+#: includes/classes/yatra-core-tour-availability.php:680
 msgid "Previous page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:682
+#: includes/classes/yatra-core-tour-availability.php:687
 msgid "Current Page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:698
+#: includes/classes/yatra-core-tour-availability.php:703
 msgid "Next page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:709
+#: includes/classes/yatra-core-tour-availability.php:714
 msgid "Last page"
 msgstr ""
 
@@ -1713,7 +1750,7 @@ msgstr ""
 msgid "Edit <span class=\"screen-reader-text\">%s</span>"
 msgstr ""
 
-#: includes/functions.php:1109 includes/template-tags.php:852
+#: includes/functions.php:1091 includes/template-tags.php:852
 msgid "Guest"
 msgstr ""
 
@@ -2365,6 +2402,10 @@ msgstr ""
 msgid "Zambian kwacha"
 msgstr ""
 
+#: includes/hooks/yatra-template-hooks.php:132
+msgid "Total Price"
+msgstr ""
+
 #: includes/meta-boxes/class-yatra-metabox-base.php:551
 msgid "Add image(s) to gallery"
 msgstr ""
@@ -2378,50 +2419,42 @@ msgstr ""
 msgid "Booking Additional Information"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:61
-msgid "Tour Information"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:65
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:115
 msgid "Number of person"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:67
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:117
 #: templates/myaccount/tmpl-pricing-header.php:4
 msgid "Regular Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:68
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:118
 #: templates/myaccount/tmpl-pricing-header.php:5
 msgid "Sales Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:71
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:121
 msgid "Toal Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:72
-msgid "Booked Date"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:147
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:204
 msgid "Booking Customer Information"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:150
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:207
 msgid "Fullname"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:153
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:210
 #: templates/myaccount/tmpl-dashboard.php:52
 msgid "Phone"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:218
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:275
 msgid "Booking Status"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:239
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:296
 msgid "Payment Log"
 msgstr ""
 
@@ -2527,40 +2560,46 @@ msgstr ""
 msgid "New Activity Name"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:109
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:174
-msgid "Attribute Type"
-msgstr ""
-
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:142
-msgid "Search Attributes"
-msgstr ""
-
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:143
-msgid "All Attributes"
-msgstr ""
-
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:144
-msgid "Parent Attributes"
-msgstr ""
-
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:145
-msgid "Parent Attributes:"
-msgstr ""
-
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:146
-msgid "Edit Attributes"
-msgstr ""
-
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:147
-msgid "Update Attributes"
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:21
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:139
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:213
+msgid "Icon"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:148
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:218
+msgid "Attribute Type"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:181
+msgid "Search Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:182
+msgid "All Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:183
+msgid "Parent Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:184
+msgid "Parent Attributes:"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:185
+msgid "Edit Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:186
+msgid "Update Attributes"
+msgstr ""
+
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:187
 msgid "Add New Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:149
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:188
 msgid "New Attributes Name"
 msgstr ""
 
@@ -2950,35 +2989,43 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:478
+#: includes/yatra-template-functions.php:494
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:479
+#: includes/yatra-template-functions.php:495
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:480
+#: includes/yatra-template-functions.php:496
 msgid "Not Available"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-details.php:16
+#: templates/myaccount/tmpl-booking-details.php:10
 msgid "Booking Details"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-details.php:23
-msgid "Pricing Details"
+#: templates/myaccount/tmpl-booking-item.php:20
+msgid "Duration: "
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-details.php:24
-msgid "Total Price"
+#: templates/myaccount/tmpl-booking-item.php:32
+msgid "Date: "
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:24
+#: templates/myaccount/tmpl-booking-item.php:36
+msgid "Persons: "
+msgstr ""
+
+#: templates/myaccount/tmpl-booking-item.php:44
+msgid "Total Price: "
+msgstr ""
+
+#: templates/myaccount/tmpl-booking.php:18
 msgid "Recent Bookings"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:78
+#: templates/myaccount/tmpl-booking.php:72
 #. translators: 1: formatted booking total 2: total booking items
 msgid "%1$s for %2$s tour"
 msgid_plural "%1$s for %2$s tours"
@@ -3130,7 +3177,7 @@ msgctxt "slug"
 msgid "attributes"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:687
+#: includes/classes/yatra-core-tour-availability.php:692
 #. translators: 1: Current page, 2: Total pages.
 msgctxt "paging"
 msgid "%1$s of %2$s"
@@ -3168,7 +3215,7 @@ msgctxt "post"
 msgid "Featured"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:55
+#: templates/myaccount/tmpl-booking.php:49
 msgctxt "hash before booking number"
 msgid "#"
 msgstr ""
