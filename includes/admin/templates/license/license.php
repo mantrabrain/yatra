@@ -10,54 +10,71 @@
     <table class="yatra-license-manager-table">
         <thead>
         <tr>
-            <th>Product Name</th>
-            <th>Product License</th>
-            <th>Expire Date</th>
-            <th>Status</th>
-            <th>Notice</th>
+            <th><?php echo __('Addon Name', 'yatra') ?></th>
+            <th><?php echo __('License', 'yatra') ?></th>
+            <th><?php echo __('Expire Date', 'yatra') ?></th>
+            <th><?php echo __('Status', 'yatra') ?></th>
+            <th><?php echo __('Message', 'yatra') ?></th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($addons as $addon_slug => $addon) {
-            $license_sample = array(
-                'yatra-services' => array(
-                    'expire_date' => '2021-10-22',
-                    'license_key' => '',//'c7c40e988e2b3517eebc1a4fd5cf35fa',
-                    'status' => 'inactive',
-                    'notice' => __('Currently Active', 'yatra'),
-                    'id' => 12323,
 
-                ));
-            $license = get_option('yatra_license', $license_sample);
+            $license_details = get_option('yatra_license', array());
 
-            $addon_license = isset($license_sample[$addon_slug]) ? $license_sample[$addon_slug] : array();
+            $addon_license = isset($license_details[$addon_slug]) ? $license_details[$addon_slug] : array();
+
+            $server_response = isset($addon_license['server_response']) ? $addon_license['server_response'] : array();
+
+            $server_response = is_object($server_response) ? (array)$server_response : $server_response;
+
+            $expired_date = isset($server_response['expires']) ? sanitize_text_field($server_response['expires']) : '';
 
             $display_license = isset($addon_license['license_key']) ? sanitize_text_field($addon_license['license_key']) : '';
 
             $display_license = '' != $display_license ? '**********' . substr($display_license, 5, 10) : '';
+
+            $status = isset($addon_license['status']) ? sanitize_text_field($addon_license['status']) : '';
+
+            $status = $status == '' ? 'inactive' : $status;
+
+            $button_label = __('Deactivate', 'yatra');
+
             ?>
-            <tr>
-                <td><span class="product-name"><?php echo esc_html($addon['label']) ?></span></td>
-                <td><?php
+            <tr data-addon-slug="<?php echo esc_attr($addon_slug) ?>">
+                <td><span class="product-name"><?php echo esc_html($addon['label']) ?></span>
+                </td>
+                <td class="license-column"><?php
                     if ($display_license === '') {
                         ?>
                         <input type="text" name="<?php echo esc_attr($addon_slug) ?>_license"
                                placeholder="<?php echo __('Please enter your license key here', 'yatra') ?>"
-                               style="width: 100%"/>
+                        />
                         <?php
                     } else {
-                        echo esc_html($display_license);
+                        echo '<span class="display-text">' . esc_html($display_license) . '</span>';
+
+                        echo '<span class="modify-license button button-secondary">' . __('Modify License', 'yatra') . '</span>';
                     }
-                    ?></td>
+                    if ($status === 'active') {
+                        ?>
+                        <button style="float:right;" type="button"
+                                class="button button-primary deactivate-license"><?php echo esc_html($button_label) ?></button>
+                    <?php } ?>
+                </td>
                 <td>
 
-                    <?php echo isset($addon_license['expire_date']) ? esc_html($addon_license['expire_date']) : '' ?>
+                    <?php echo isset($expired_date) ? esc_html($expired_date) : '' ?>
 
                 </td>
                 <td>
-                    <span class="status <?php echo esc_attr(strtolower($addon_license['status'])) ?>"><?php echo isset($addon_license['status']) ? esc_html($addon_license['status']) : '' ?></span>
+                    <span class="status <?php echo esc_attr(strtolower($status)) ?>"><?php echo  esc_html($status) ?></span>
                 </td>
-                <td><?php echo isset($addon_license['notice']) ? esc_html($addon_license['notice']) : '' ?></td>
+                <td><?php echo isset($addon_license['notice']) ? wp_kses($addon_license['notice'], array(
+                        'a' => array('href' => array(), 'target' => array()),
+                        'strong' => array()
+
+                    )) : '' ?></td>
 
 
             </tr>

@@ -24,6 +24,7 @@
     justify-content: space-between;
     align-items: center;
     padding-left: 40px;
+    text-transform: uppercase;
 }
 
 .yatra-license-manager-table span.status:before {
@@ -36,7 +37,8 @@
 
 }
 
-.yatra-license-manager-table span.status.active:before {
+.yatra-license-manager-table span.status.active:before,
+.yatra-license-manager-table span.status.valid:before {
     background: green;
 }
 
@@ -46,4 +48,10 @@
 
 .yatra-license-manager-table span.product-name {
     font-weight: bold;
+}
+
+.yatra-license-manager-table td.license-column {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
