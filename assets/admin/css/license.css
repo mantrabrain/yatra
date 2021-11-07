@@ -33,7 +33,7 @@
     justify-content: space-between;
     align-items: center;
     padding-left: 40px;
-    text-transform: uppercase;
+    text-transform: capitalize;
 }
 
 .yatra-license-manager-table span.status:before {
