@@ -83,7 +83,7 @@ if (count($cart_items) < 1) {
     <?php } ?>
 
     <tr>
-        <td colspan="7" class="actions">
+        <td colspan="6" class="actions">
 
             <?php $update_cart_value = get_option('yatra_update_cart_text', 'Update Cart'); ?>
             <button type="submit" class="button yatra_update_cart" name="yatra_update_cart"
