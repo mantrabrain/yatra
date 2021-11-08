@@ -2,12 +2,6 @@
 
 class Yatra_Content_Loop
 {
-
-    public function __construct()
-    {
-
-    }
-
     public static function loop()
     {
         if (have_posts()) {
@@ -15,7 +9,7 @@ class Yatra_Content_Loop
 
             if (!is_single()) {
                 ?>
-                <header class="page-header">
+                <header class="yatra-page-header">
                     <?php
                     the_archive_title('<h1 class="page-title">', '</h1>');
                     ?>
