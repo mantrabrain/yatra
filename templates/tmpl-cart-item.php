@@ -14,23 +14,29 @@
             </div>
             <span><?php echo esc_html($pricing->getLabel()) ?></span>
         </div>
+        <?php
+        $regular_price = $pricing->getRegularPrice();
+        $sales_price = $pricing->getSalesPrice();
+        $sales_price = $sales_price === '' ? $regular_price : $sales_price;
+        $final_price = $pricing->getFinalPrice();
+        ?>
         <div class="yatra-traveller-price">
-            <?php if ($pricing->getRegularPrice() != '') { ?>
+            <?php if ($regular_price != '' && ($regular_price != $sales_price)) { ?>
                 <del><?php echo esc_html(yatra_get_price($currency, $pricing->getRegularPrice(true))) ?></del>
             <?php } ?>
             <ins><?php
 
 
-                echo esc_html(yatra_get_price($currency, $pricing->getFinalPrice()));
+                echo esc_html(yatra_get_price($currency, $final_price));
 
 
                 ?></ins>
             <?php
             if (strtolower($pricing->getPricingPer()) == 'group') {
 
-                $pricing_per_string = yatra_get_price($currency, $pricing->getSalesPrice()) . ' Per ' . $pricing->getGroupSize() . ' ' . $pricing->getLabel();
+                $pricing_per_string = yatra_get_price($currency, $sales_price) . ' Per ' . $pricing->getGroupSize() . ' ' . $pricing->getLabel();
             } else {
-                $pricing_per_string = yatra_get_price($currency, $pricing->getSalesPrice()) . ' Per ' . $pricing->getLabel();
+                $pricing_per_string = yatra_get_price($currency, $sales_price) . ' Per ' . $pricing->getLabel();
             }
 
             ?>

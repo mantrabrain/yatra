@@ -43,12 +43,12 @@ class Yatra_Template_Hooks
                 $regular_price = $single->getRegularPrice();
 
                 $sales_price = $single->getSalesPrice();
-
+                
                 $min_pax = $single->getMinimumPax();
 
                 if (absint($min_pax) > 0) {
 
-                    $min_sales_price += $sales_price;
+                    $min_sales_price += absint($sales_price);
 
                     $min_regular_price += $regular_price;
 

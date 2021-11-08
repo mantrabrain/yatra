@@ -27,21 +27,26 @@ $number_of_people = absint($yatra_booking_pricing->getMinimumPax()) === 0 ? 1 : 
         </div>
         <div class="yatra-traveller-price">
             <?php
-            if ($yatra_booking_pricing->getRegularPrice() != '') { ?>
+
+            $regular_price = $yatra_booking_pricing->getRegularPrice();
+            $sales_price = $yatra_booking_pricing->getSalesPrice();
+            $sales_price = $sales_price === '' ? $regular_price : $sales_price;
+            $final_price = $yatra_booking_pricing->getFinalPrice();
+            if ($regular_price != '' && ($regular_price != $sales_price)) { ?>
                 <del class="regular"><?php echo esc_html(yatra_get_price($currency_symbol, $yatra_booking_pricing->getRegularPrice(true))) ?></del>
             <?php } ?>
             <ins class="final"><?php
 
-                echo esc_html(yatra_get_price($currency_symbol, $yatra_booking_pricing->getFinalPrice()));
+                echo esc_html(yatra_get_price($currency_symbol, $final_price));
 
                 ?></ins>
             <?php
             if (strtolower($yatra_booking_pricing->getPricingPer()) == 'group') {
 
-                $pricing_per_string = yatra_get_price($currency_symbol, $yatra_booking_pricing->getSalesPrice()) . ' Per ' . $yatra_booking_pricing->getGroupSize() . ' ' . $yatra_booking_pricing->getLabel();
+                $pricing_per_string = yatra_get_price($currency_symbol, $sales_price) . ' Per ' . $yatra_booking_pricing->getGroupSize() . ' ' . $yatra_booking_pricing->getLabel();
             } else {
 
-                $pricing_per_string = yatra_get_price($currency_symbol, $yatra_booking_pricing->getSalesPrice()) . ' Per ' . $yatra_booking_pricing->getLabel();
+                $pricing_per_string = yatra_get_price($currency_symbol, $sales_price) . ' Per ' . $yatra_booking_pricing->getLabel();
             }
 
             if ($yatra_booking_pricing->getDescription() != '') {

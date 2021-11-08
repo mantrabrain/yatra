@@ -58,7 +58,15 @@ class Yatra_Dates
 
             $single_date_wise_index = str_replace(' ', '', trim($single_data_row->start_date . '_' . $single_data_row->end_date));
 
-            $all_processed_data[$single_date_wise_index] = $tour_dates->map($single_data_row, $this->number_of_people);
+            $pricing_type = isset($single_data_row->pricing_type) ? $single_data_row->pricing_type : '';
+
+            $tour_pricing_type = yatra_get_pricing_type($single_data_row->tour_id);
+
+            if ($tour_pricing_type === $pricing_type) {
+
+                $all_processed_data[$single_date_wise_index] = $tour_dates->map($single_data_row, $this->number_of_people);
+
+            }
 
         }
 

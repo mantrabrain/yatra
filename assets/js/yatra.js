@@ -609,6 +609,7 @@ window.yatra_global_tour_additional_price = 0;
                 price_field.find('.yatra-traveller-price').find('.regular').text(regularPriceString);
                 $(this).trigger('yatra_single_tour_number_of_person_changed', $(this).val());
                 var total_price = _that.getTotalTourPrice();
+
                 $('.yatra-tour-total-price').find('span').text(_that.getPrice(yatra_params.currency_symbol, total_price)).attr('data-total-price', total_price);
 
 
@@ -634,7 +635,7 @@ window.yatra_global_tour_additional_price = 0;
 
                 var final_price = _that.getPriceItemFinalPrice($(this));
 
-                total_price += parseInt((final_price.final));
+                total_price += parseInt(final_price.final);
             });
 
             return ((parseInt(window.yatra_global_tour_additional_price)) + total_price);
@@ -664,7 +665,7 @@ window.yatra_global_tour_additional_price = 0;
 
             }
             var total_regular_price = parseInt(price.regular) * person_count;
-            var total_sales_price = parseInt(price.sales) < 1 ? total_regular_price : parseInt(price.sales) * person_count;
+            var total_sales_price = (price.sales) === '' ? total_regular_price : parseInt(price.sales) * person_count;
 
             return {
                 'regular': total_regular_price,
