@@ -223,7 +223,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
         $yatra_booking_statuses = yatra_get_booking_statuses();
 
         $status = isset($yatra_booking_statuses[$this->object->post_status]) ? $yatra_booking_statuses[$this->object->post_status] : 'Unknown';
-        $background = "#6b6767";
+        $background = "#e47703";
         switch (substr($this->object->post_status, 6)) {
             case "processing":
                 $background = "#033503";
@@ -235,7 +235,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
                 $background = "#0e880e";
                 break;
             case "cancelled":
-                $background = "#e47703";
+                $background = "#6b6767";
                 break;
         }
 
