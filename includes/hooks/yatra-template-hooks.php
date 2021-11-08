@@ -92,6 +92,8 @@ class Yatra_Template_Hooks
 
         $pricing = $date_wise_info->getPricing();
 
+        $total_persons = array();
+
         if ($pricing instanceof Yatra_Tour_Pricing) {
 
             yatra_get_template('tour/pricing-item.php',
@@ -110,23 +112,26 @@ class Yatra_Template_Hooks
         } else {
 
             foreach ($pricing as $booking_pricing_args) {
-                yatra_get_template('tour/pricing-item.php',
-                    array(
-                        'pricing_type' => $pricing_type,
-                        'yatra_booking_pricing' => $booking_pricing_args,
-                    )
-                );
-                $total_price += $booking_pricing_args->getMinimumPax() > 0 ? $booking_pricing_args->getFinalPrice() : 0;
 
-                $total_persons[] = array(
-                    'id' => $booking_pricing_args->getID(),
-                    'number_of_person' => $booking_pricing_args->getMinimumPax(),
-                    'price' => $booking_pricing_args->getSalesPrice() === '' ? $booking_pricing_args->getRegularPrice() : $booking_pricing_args->getSalesPrice()
-                );
+                if ($booking_pricing_args instanceof Yatra_Tour_Pricing) {
+
+                    yatra_get_template('tour/pricing-item.php',
+                        array(
+                            'pricing_type' => $pricing_type,
+                            'yatra_booking_pricing' => $booking_pricing_args,
+                        )
+                    );
+                    $total_price += $booking_pricing_args->getMinimumPax() > 0 ? $booking_pricing_args->getFinalPrice() : 0;
+
+                    $total_persons[] = array(
+                        'id' => $booking_pricing_args->getID(),
+                        'number_of_person' => $booking_pricing_args->getMinimumPax(),
+                        'price' => $booking_pricing_args->getSalesPrice() === '' ? $booking_pricing_args->getRegularPrice() : $booking_pricing_args->getSalesPrice()
+                    );
+                }
             }
         }
-
-        $total_price = apply_filters('yatra_tour_after_pricing_item', $date_wise_info, $tour_id, $total_price, $total_persons);
+        $total_price = apply_filters('yatra_tour_after_pricing_item', $total_price, $tour_id, $total_persons, $date_wise_info);
 
         echo '<div class="yatra-tour-total-price">';
         echo '<strong>' . __('Total Price', 'yatra') . '</strong>';
