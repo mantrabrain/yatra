@@ -240,7 +240,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
         }
 
         printf('<mark 
-    style="padding: 3px 10px 5px 10px;background: %s;color: #fff;border-radius: 5px;display: inline-block;text-align: center;text-transform: capitalize;" 
+    style="padding: 3px 10px 5px 10px;background: %s;color: #fff;border-radius: 4px;display: inline-block;text-align: center;text-transform: capitalize;" 
     class="booking-status %s tips" 
     data-tip="%s"><span>%s</span></mark>', esc_attr($background), esc_attr(sanitize_html_class('status-' . $status)), wp_kses_post($status), esc_html($status));
 
