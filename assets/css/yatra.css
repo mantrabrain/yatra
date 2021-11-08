@@ -247,6 +247,9 @@
   color: #D63301;
   background-color: #FFCCBA; }
 
+#yatra-page-wrapper {
+  padding: 20px 0; }
+
 .yatra-book-btn-wrapper, .yatra-enquiry-btn-wrapper, .yatra-enquiry-submit-btn-wrapper {
   text-align: right; }
 
@@ -932,7 +935,8 @@ body.single .yatra-single-tour:after {
     .yatra-tour-info-pricing-wrap .tour-info-pricing-header h2 {
       font-weight: 500;
       font-size: 25px;
-      text-align: center; }
+      text-align: center;
+      margin: 0; }
   .yatra-tour-info-pricing-wrap .tour-info-pricing-content {
     border-top: 1px solid #ddd;
     padding: 20px;
