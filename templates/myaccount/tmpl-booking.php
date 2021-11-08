@@ -64,7 +64,7 @@ if ($booking_details) : ?>
                             <time datetime="<?php echo esc_attr('date'); ?>"><?php echo esc_html($booking->booking_date); ?></time>
 
                         <?php elseif ('booking-status' === $column_id) : ?>
-                            <?php echo esc_html($booking->booking_status); ?>
+                            <?php echo '<span class="booking-status ' . esc_attr(strtolower($booking->booking_status_key)) . '">' . esc_html($booking->booking_status) . '</span>'; ?>
 
                         <?php elseif ('booking-total' === $column_id) : ?>
                             <?php

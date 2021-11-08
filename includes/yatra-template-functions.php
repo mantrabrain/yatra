@@ -205,6 +205,7 @@ if (!function_exists('yatra_account_bookings')) {
                 $booking_detail = new stdClass();
                 $booking_detail->booking_id = $booking->ID;
                 $booking_detail->booking_status = yatra_get_booking_statuses($booking->post_status);
+                $booking_detail->booking_status_key = @substr($booking->post_status, 6);
                 $booking_detail->booking_code = $booking_meta_params['booking_code'];
                 $booking_detail->booking_date = $booking_meta_params['booking_date'];
                 $booking_detail->booking_total = $booking_meta_params['total_booking_price'];
