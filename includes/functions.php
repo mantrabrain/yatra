@@ -1169,3 +1169,26 @@ if (!function_exists('yatra_get_visitor_ip_address')) {
         return 'TRACKING_DISABLED';
     }
 }
+if (!function_exists('yatra_is_tour_page')) {
+    function yatra_is_tour_page()
+    {
+        if (is_singular('tour')) {
+            return true;
+        }
+        return false;
+    }
+}
+
+if (!function_exists('yatra_is_archive_page')) {
+    
+    function yatra_is_archive_page()
+    {
+        if (is_tax('destination')) {
+            return true;
+        }
+        if (is_tax('activity')) {
+            return true;
+        }
+        return false;
+    }
+}

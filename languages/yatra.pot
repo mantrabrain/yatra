@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.1\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-11-07 16:15:43+00:00\n"
+"POT-Creation-Date: 2021-11-08 07:33:58+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1495,39 +1495,39 @@ msgstr ""
 msgid "Confirm password  not matched with old password"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:357
-#: includes/classes/yatra-core-tour-availability.php:399
+#: includes/classes/class-yatra-core-tour-availability.php:357
+#: includes/classes/class-yatra-core-tour-availability.php:399
 msgid "Booking Full"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:568
+#: includes/classes/class-yatra-core-tour-availability.php:568
 msgid "Search"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:628
+#: includes/classes/class-yatra-core-tour-availability.php:628
 #. translators: %s: Number of items.
 msgid "%s item"
 msgid_plural "%s items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/classes/yatra-core-tour-availability.php:669
+#: includes/classes/class-yatra-core-tour-availability.php:669
 msgid "First page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:680
+#: includes/classes/class-yatra-core-tour-availability.php:680
 msgid "Previous page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:687
+#: includes/classes/class-yatra-core-tour-availability.php:687
 msgid "Current Page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:703
+#: includes/classes/class-yatra-core-tour-availability.php:703
 msgid "Next page"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:714
+#: includes/classes/class-yatra-core-tour-availability.php:714
 msgid "Last page"
 msgstr ""
 
@@ -2402,7 +2402,7 @@ msgstr ""
 msgid "Zambian kwacha"
 msgstr ""
 
-#: includes/hooks/yatra-template-hooks.php:132
+#: includes/hooks/yatra-template-hooks.php:137
 msgid "Total Price"
 msgstr ""
 
@@ -3177,7 +3177,7 @@ msgctxt "slug"
 msgid "attributes"
 msgstr ""
 
-#: includes/classes/yatra-core-tour-availability.php:692
+#: includes/classes/class-yatra-core-tour-availability.php:692
 #. translators: 1: Current page, 2: Total pages.
 msgctxt "paging"
 msgid "%1$s of %2$s"

@@ -231,7 +231,7 @@ final class Yatra
         include_once YATRA_ABSPATH . 'includes/class-yatra-widgets.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-shortcodes.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-ajax.php';
-        include_once YATRA_ABSPATH . 'includes/classes/yatra-core-tour-availability.php';
+        include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-tour-availability.php';
 
 
         // Compatibility

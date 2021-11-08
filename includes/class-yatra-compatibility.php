@@ -30,9 +30,9 @@ final class Yatra_Compatibility
      *
      * Ensures only one instance of Yatra_Compatibility is loaded or can be loaded.
      *
+     * @return Yatra_Compatibility - Main instance.
      * @since 1.0.0
      * @static
-     * @return Yatra_Compatibility - Main instance.
      */
     public static function instance()
     {
@@ -82,7 +82,6 @@ final class Yatra_Compatibility
     {
         $this->includes();
         $this->init_hooks();
-        do_action('yatra_compatibility_loaded');
     }
 
     /**
@@ -92,10 +91,22 @@ final class Yatra_Compatibility
      */
     private function init_hooks()
     {
-
+        add_action('after_setup_theme', array($this, 'theme_file_includes'));
 
     }
 
+    public function theme_file_includes()
+    {
+        $theme = wp_get_theme(get_template());
+
+        $theme_name = $theme->get_template();
+
+        if (file_exists(YATRA_ABSPATH . "includes/compatibility/themes/{$theme_name}/class-yatra-compatibility-themes-{$theme_name}.php")) {
+            
+            include_once YATRA_ABSPATH . "includes/compatibility/themes/{$theme_name}/class-yatra-compatibility-themes-{$theme_name}.php";
+
+        }
+    }
 
     /**
      * Include required core files used in admin.

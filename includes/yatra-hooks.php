@@ -145,13 +145,16 @@ function yatra_book_now_button($availability)
 if (!function_exists('yatra_before_page_content_callback')) {
 function yatra_before_page_content_callback()
 {
-$class = apply_filters('yatra_page_wrapper_class', 'yatra-page-wrapper');
+$class = 'yatra-page-wrapper';
 
 $class = $class . ' ' . get_option('yatra_page_container_class');
 
 if (!is_single()) {
     $class = $class . ' ' . get_option('yatra_archive_template', 'template-default');
 }
+
+$class = apply_filters('yatra_page_wrapper_class', $class);
+
 ?>
 <div id="yatra-page-wrapper" class="<?php echo esc_attr($class); ?>">
     <?php

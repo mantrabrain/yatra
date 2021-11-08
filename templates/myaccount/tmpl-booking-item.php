@@ -17,6 +17,7 @@ $yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['ya
 $duration_string = '' != $yatra_tour_meta_tour_duration_days ? $yatra_tour_meta_tour_duration_days . ' days ' : '';
 
 $duration_string .= '' != $yatra_tour_meta_tour_duration_nights ? $yatra_tour_meta_tour_duration_nights . ' nights' : '';
+
 $duration_string = '' != $duration_string ? __('Duration: ', 'yatra') . $duration_string : '';
 ?>
 <div class="yatra-account-booking-item-row-wrap">
