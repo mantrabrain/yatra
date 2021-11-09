@@ -124,6 +124,9 @@ final class Yatra_Install
             if ($page['post_title'] == 'Yatra My Account') {
                 update_option('yatra_my_account_page', $page_id);
             }
+            if ($page['post_title'] == 'Yatra Transaction Failed') {
+                update_option('yatra_failed_transaction_page', $page_id);
+            }
 
         }
 
@@ -352,17 +355,19 @@ final class Yatra_Install
         $table_prefix = $wpdb->prefix . 'yatra_';
 
         $tables = array(
-            "{$table_prefix}tour_dates",
+            "{$table_prefix}" . Yatra_Tables::TOUR_DATES,
+            "{$table_prefix}" . Yatra_Tables::TOUR_ENQUIRIES,
+            "{$table_prefix}" . Yatra_Tables::TOUR_BOOKING_STATS,
         );
 
         /**
-         * Filter the list of known Sikshya tables.
+         * Filter the list of known yatra tables.
          *
-         * If Sikshya plugins need to add new tables, they can inject them here.
+         * If yatra plugins need to add new tables, they can inject them here.
          *
-         * @param array $tables An array of Sikshya-specific database table names.
+         * @param array $tables An array of yatra-specific database table names.
          */
-        $tables = apply_filters('sikshya_install_get_tables', $tables);
+        $tables = apply_filters('yatra_install_get_tables', $tables);
 
         return $tables;
     }
