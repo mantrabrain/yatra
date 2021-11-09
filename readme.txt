@@ -22,6 +22,10 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 2. Activate the Yatra plugin through the 'Plugins' menu in WordPress.
 
 
+== Video Tour ==
+
+[youtube https://www.youtube.com/watch?v=URdGixOz760]
+
 == Yatra - Features ==
 
 1. Unlimited Travel & Tour Package with Activity & Destination pages
