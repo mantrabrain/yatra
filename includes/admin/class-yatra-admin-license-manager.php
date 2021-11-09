@@ -22,8 +22,8 @@ class Yatra_Admin_License_Manager
     {
         add_submenu_page(
             'edit.php?post_type=tour',
-            __('License', 'yatra'),
-            __('License', 'yatra'),
+            __('Licenses', 'yatra'),
+            __('Licenses', 'yatra'),
             'administrator',
             'yatra-license', array($this, 'license_page'));
 
