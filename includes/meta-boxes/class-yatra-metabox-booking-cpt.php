@@ -62,8 +62,12 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                 <?php
 
                 $this->tour_info($yatra_booking_meta);
-                //$this->pricing_info($yatra_booking_meta);
+
                 $this->customer_info($booking_id, $args, $yatra_tour_customer_info, $yatra_booking_meta_params);
+
+                $this->payment_history($booking_id);
+
+
                 ?>
 
 
@@ -290,6 +294,12 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                    name="yatra_booking_post_type_metabox_nonce"/>
 
             <?php
+
+        }
+
+
+        public function payment_history($booking_id)
+        {
             $payment_log = get_post_meta($booking_id, 'yatra_payment_message', true);
             if ($payment_log != '' && !empty($payment_log)) {
                 ?>
@@ -299,7 +309,8 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                         echo esc_html($payment_log);
                         ?></p>
                 </div>
-            <?php } ?>
+            <?php }
+            ?>
             <?php
         }
 
