@@ -3,7 +3,7 @@ Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
 Tested up to: 5.8.1
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -55,6 +55,15 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 15. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
 
+== Premium Extensions/Addons ==
+
+* [Yatra Downloads](https://mantrabrain.com/downloads/yatra-downloads/)
+* [Yatra Services](https://mantrabrain.com/downloads/yatra-services/)
+* [Yatra Availability Conditions](https://mantrabrain.com/downloads/yatra-availability-conditions/)
+
+[View all Yatra Extensions/Addons](https://mantrabrain.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
+
+
 == Shortcodes ==
 Shortcode for Checkout Page:
 <pre>[yatra_checkout]</pre>
@@ -88,7 +97,7 @@ Shortcode for Tour Listing:
 * {{customer_email}} : Get customer email of specific booking
 
 
-= COMPATIBLE THEMES =
+== COMPATIBLE THEMES ==
 * [Yatri](https://wpyatri.com/?ref=yatrapluginorg) by MantraBrain
 * [MagazineNP](https://wordpress.org/themes/magazinenp/) by MantraBrain
 * [Zakra](https://wordpress.org/themes/zakra/) by ThemeGrill
@@ -96,9 +105,6 @@ Shortcode for Tour Listing:
 * [OceanWP](https://wordpress.org/themes/oceanwp/) by OceanWP
 * [Kadence](https://wordpress.org/themes/kadence/) by Ben Ritner - Kadence WP
 
-
-= Premium addons =
-Coming Soon
 
 == IMPORTANT LINKS ==
 
@@ -128,6 +134,7 @@ Coming Soon
 
 == Changelog ==
 
-= 2.1.1 | 2021/11/02 =
-* Fixed - Frontend design update & responsive issue fixed
-* Fixed - Multisite issue fixed
+= 2.1.2 | 2021/11/09 =
+* Fixed - My Account Page Design fixed
+* Fixed - Minor issue fixed
+* Fixed - Added filters for addons
