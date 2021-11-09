@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.1\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-11-08 07:33:58+00:00\n"
+"POT-Creation-Date: 2021-11-09 07:14:05+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -361,7 +361,7 @@ msgid "When you receive a new booking, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:212
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:216
 #: templates/myaccount/tmpl-booking.php:8
 msgid "Booking Code"
 msgstr ""
@@ -391,7 +391,7 @@ msgstr ""
 #: includes/class-yatra-checkout-form.php:141
 #: includes/class-yatra-enquiry-form.php:51
 #: includes/class-yatra-user-form.php:71 includes/class-yatra-user-form.php:72
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:208
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:212
 #: templates/myaccount/tmpl-dashboard.php:32
 msgid "Email"
 msgstr ""
@@ -447,7 +447,7 @@ msgid "Bookings"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:126
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:211
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:215
 msgid "Total Booking Price"
 msgstr ""
 
@@ -474,7 +474,7 @@ msgstr ""
 #: includes/class-yatra-enquiry-form.php:70
 #: includes/class-yatra-user-form.php:29 includes/class-yatra-user-form.php:30
 #: includes/class-yatra-user-form.php:38 includes/class-yatra-user-form.php:44
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:209
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:213
 #: includes/template-tags.php:159 includes/template-tags.php:714
 #: includes/template-tags.php:718 includes/template-tags.php:1153
 #: templates/myaccount/tmpl-dashboard.php:47 templates/tour/additional.php:16
@@ -1056,7 +1056,7 @@ msgstr ""
 #: includes/admin/templates/availability/availability-calendar.php:22
 #: includes/admin/templates/availability/availability-calendar.php:24
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:52
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:119
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:123
 #: includes/template-tags.php:806 templates/myaccount/tmpl-pricing-header.php:7
 msgid "Price Per"
 msgstr ""
@@ -1075,7 +1075,7 @@ msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:45
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:74
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:120
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:124
 #: includes/template-tags.php:817 includes/template-tags.php:821
 #: templates/myaccount/tmpl-pricing-header.php:8
 msgid "Group Size"
@@ -1111,7 +1111,7 @@ msgstr ""
 #: includes/admin/templates/availability/availability-calendar.php:78
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:6
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:13
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:116
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:120
 #: includes/template-tags.php:850 includes/template-tags.php:854
 msgid "Pricing Label"
 msgstr ""
@@ -2419,42 +2419,42 @@ msgstr ""
 msgid "Booking Additional Information"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:115
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:119
 msgid "Number of person"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:117
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:121
 #: templates/myaccount/tmpl-pricing-header.php:4
 msgid "Regular Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:118
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:122
 #: templates/myaccount/tmpl-pricing-header.php:5
 msgid "Sales Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:121
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:125
 msgid "Toal Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:204
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:208
 msgid "Booking Customer Information"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:207
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:211
 msgid "Fullname"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:210
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:214
 #: templates/myaccount/tmpl-dashboard.php:52
 msgid "Phone"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:275
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:279
 msgid "Booking Status"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:296
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:306
 msgid "Payment Log"
 msgstr ""
 
@@ -2989,15 +2989,15 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:494
+#: includes/yatra-template-functions.php:495
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:495
+#: includes/yatra-template-functions.php:496
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:496
+#: includes/yatra-template-functions.php:497
 msgid "Not Available"
 msgstr ""
 
@@ -3005,19 +3005,19 @@ msgstr ""
 msgid "Booking Details"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-item.php:20
+#: templates/myaccount/tmpl-booking-item.php:21
 msgid "Duration: "
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-item.php:32
+#: templates/myaccount/tmpl-booking-item.php:33
 msgid "Date: "
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-item.php:36
+#: templates/myaccount/tmpl-booking-item.php:37
 msgid "Persons: "
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-item.php:44
+#: templates/myaccount/tmpl-booking-item.php:45
 msgid "Total Price: "
 msgstr ""
 
