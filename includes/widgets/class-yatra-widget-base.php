@@ -45,7 +45,7 @@ if (!class_exists('Yatra_Widget_Base')) {
 
         }
 
-        private function form_single($field_key, $field = array(), $instance)
+        private function form_single($field_key, $field, $instance)
         {
             $field_default = array(
                 'name' => '',

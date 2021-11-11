@@ -334,7 +334,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             }
         }
 
-        private function save_tour_attributes($configs = array(), $post_id)
+        private function save_tour_attributes($configs, $post_id)
         {
 
             $tour_meta_custom_attributes = isset($_POST['tour_meta_custom_attributes']) ? $_POST['tour_meta_custom_attributes'] : array();
@@ -392,7 +392,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         }
 
-        private function save_general_options($configs = array(), $post_id)
+        private function save_general_options($configs, $post_id)
         {
             foreach ($configs as $field_key => $field) {
 
@@ -404,7 +404,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             }
         }
 
-        private function save_pricing_options($configs = array(), $post_id)
+        private function save_pricing_options($configs, $post_id)
         {
             foreach ($configs as $field_key => $field) {
 
@@ -445,7 +445,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             }
         }
 
-        private function save_tour_tabs($configs = array(), $post_id)
+        private function save_tour_tabs($configs, $post_id)
         {
 
             foreach ($configs as $config) {

@@ -9,9 +9,8 @@ include_once "pricing/class-yatra-tour-pricing.php";
 
 class Yatra_Pricing
 {
-    public function getDateWisePricing($datewise_pricing_array = array(), $tour_id, $pricing_type, $number_of_people = null)
+    public function getDateWisePricing($tour_id, $pricing_type, $number_of_people = null, $datewise_pricing_array = array())
     {
-
 
         $base_pricing_type = yatra_get_pricing_type($tour_id);
 

@@ -219,7 +219,7 @@ if (!class_exists('Yatra_Email')) {
          * @param  array $smart_values Array
          * @return void
          */
-        public function send($emails = array(), $subject, $message, $all_smart_tags = array(), $attachment = array(), $is_admin_email = false)
+        public function send($emails, $subject, $message, $all_smart_tags = array(), $attachment = array(), $is_admin_email = false)
         {
 
 

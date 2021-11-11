@@ -57,7 +57,7 @@ abstract class Yatra_Tour_Dates_Abstract implements Yatra_Tour_Dates_Interface
 
                     $pricing_type = isset($date_wise_data->pricing_type) ? $date_wise_data->pricing_type : '';
 
-                    $value = $pricing_instance->getDateWisePricing($pricing_value_array, $tour_id, $pricing_type, $number_of_people);
+                    $value = $pricing_instance->getDateWisePricing($tour_id, $pricing_type, $number_of_people, $pricing_value_array);
                 }
                 $this->$index = $value;
             }
