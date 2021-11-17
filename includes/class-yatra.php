@@ -216,8 +216,10 @@ final class Yatra
 
 
         /**
-         * Class autoloader.
+         * Classes.
          */
+        include_once YATRA_ABSPATH . 'includes/class-yatra-modules.php';
+
         include_once YATRA_ABSPATH . 'includes/class-yatra-install.php';
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-db.php';
 
@@ -405,7 +407,7 @@ final class Yatra
         }
         return $log_dir;
     }
-    
+
     public function get_upload_dir($create_if_not_exists = true)
     {
         $wp_upload_dir = wp_upload_dir();

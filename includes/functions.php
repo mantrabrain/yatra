@@ -1225,21 +1225,8 @@ function yatra_get_logger()
     return $logger;
 }
 
-add_filter('yatra_register_log_handlers', 'yatra_register_default_log_handler');
-
-function yatra_register_default_log_handler($handlers)
-{
-
-    $handler_class = defined('YATRA_LOG_HANDLER') ? YATRA_LOG_HANDLER : null;
-    if (!class_exists($handler_class)) {
-        $handler_class = Yatra_Log_Handler_DB::class;
-    }
-
-    array_push($handlers, new $handler_class());
 
 
-    return $handlers;
-}
 
 add_action('plugins_loaded', function () {
     $logger = yatra_get_logger();

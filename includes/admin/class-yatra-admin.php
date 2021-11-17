@@ -117,6 +117,7 @@ final class Yatra_Admin
             'yatra-settings',
             array($this, 'settings')
         );
+
         add_action('load-' . $settings_page, array($this, 'settings_page_init'));
 
         // availablity menu

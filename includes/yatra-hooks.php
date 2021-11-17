@@ -2,6 +2,7 @@
 
 include_once YATRA_ABSPATH . 'includes/hooks/yatra-template-hooks.php';
 include_once YATRA_ABSPATH . 'includes/hooks/yatra-list-table-hooks.php';
+include_once YATRA_ABSPATH . 'includes/hooks/yatra-log-handler-hooks.php';
 
 if (!function_exists('yatra_checkout_form_fields')) {
 
