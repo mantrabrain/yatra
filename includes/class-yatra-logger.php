@@ -25,8 +25,8 @@ class Yatra_Logger implements Yatra_Interface_Logger
     /**
      * Constructor for the logger.
      *
-     * @param array $handlers Optional. Array of log handlers. If $handlers is not provided, the filter 'woocommerce_register_log_handlers' will be used to define the handlers. If $handlers is provided, the filter will not be applied and the handlers will be used directly.
-     * @param string $threshold Optional. Define an explicit threshold. May be configured via  Yatra_LOG_THRESHOLD. By default, all logs will be processed.
+     * @param array $handlers Optional. Array of log handlers. If $handlers is not provided, the filter 'yatra_register_log_handlers' will be used to define the handlers. If $handlers is provided, the filter will not be applied and the handlers will be used directly.
+     * @param string $threshold Optional. Define an explicit threshold. May be configured via  YATRA_LOG_THRESHOLD. By default, all logs will be processed.
      */
     public function __construct($handlers = null, $threshold = null)
     {
@@ -100,7 +100,7 @@ class Yatra_Logger implements Yatra_Interface_Logger
      */
     public function add($handle, $message, $level = Yatra_Log_Levels::NOTICE)
     {
-        $message = apply_filters('woocommerce_logger_add_message', $message, $handle);
+        $message = apply_filters('yatra_logger_add_message', $message, $handle);
         $this->log(
             $level,
             $message,
@@ -147,7 +147,7 @@ class Yatra_Logger implements Yatra_Interface_Logger
                  * @param object $handler The handler object, such as Yatra_Log_Handler_File. Available since 5.3.
                  * @since 3.1
                  */
-                $message = apply_filters('woocommerce_logger_log_message', $message, $level, $context, $handler);
+                $message = apply_filters('yatra_logger_log_message', $message, $level, $context, $handler);
 
                 if (null !== $message) {
                     $handler->handle($timestamp, $level, $message, $context);
@@ -309,7 +309,7 @@ class Yatra_Logger implements Yatra_Interface_Logger
      */
     public function clear_expired_logs()
     {
-        $days = absint(apply_filters('woocommerce_logger_days_to_retain_logs', 30));
+        $days = absint(apply_filters('yatra_logger_days_to_retain_logs', 30));
         $timestamp = strtotime("-{$days} days");
 
         foreach ($this->handlers as $handler) {

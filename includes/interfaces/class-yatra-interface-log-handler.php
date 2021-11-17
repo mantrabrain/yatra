@@ -2,8 +2,8 @@
 /**
  * Log Handler Interface
  *
- * @version 3.3.0
- * @package WooCommerce\Interface
+ * @version 2.1.3
+ * @package Yatra\Interface
  */
 
 /**

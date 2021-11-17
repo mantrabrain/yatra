@@ -3,7 +3,7 @@
  * Log handling functionality.
  *
  * @class Yatra_Log_Handler
- * @package WooCommerce\Abstracts
+ * @package Yatra\Abstracts
  */
 
 if (!defined('ABSPATH')) {
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
  * Abstract Yatra Log Handler Class
  *
  * @version        1.0.0
- * @package        WooCommerce\Abstracts
+ * @package        Yatra\Abstracts
  */
 abstract class Yatra_Log_Handler implements Yatra_Interface_Log_Handler
 {
@@ -47,7 +47,7 @@ abstract class Yatra_Log_Handler implements Yatra_Interface_Log_Handler
         $entry = "{$time_string} {$level_string} {$message}";
 
         return apply_filters(
-            'woocommerce_format_log_entry',
+            'yatra_format_log_entry',
             $entry,
             array(
                 'timestamp' => $timestamp,
