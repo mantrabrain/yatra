@@ -38,7 +38,7 @@ class Yatra_Autoloader
     /**
      * Take a class name and turn it into a file name.
      *
-     * @param  string $class Class name.
+     * @param string $class Class name.
      * @return string
      */
     private function get_file_name_from_class($class)
@@ -49,7 +49,7 @@ class Yatra_Autoloader
     /**
      * Include a class file.
      *
-     * @param  string $path File path.
+     * @param string $path File path.
      * @return bool Successful or not.
      */
     private function load_file($path)
@@ -98,7 +98,14 @@ class Yatra_Autoloader
             $path = $this->include_path . 'customizer/control/';
         } elseif (0 === strpos($class, 'yatra_helper')) {
             $path = $this->include_path . 'helper/';
+        } elseif (0 === strpos($class, 'yatra_helper')) {
+            $path = $this->include_path . 'helper/';
+        } elseif (0 === strpos($class, 'yatra_interface')) {
+            $path = $this->include_path . 'interfaces/';
+        } elseif (0 === strpos($class, 'yatra_log_handler')) {
+            $path = $this->include_path . 'log-handlers/';
         }
+
         if (empty($path) || !$this->load_file($path . $file)) {
             $this->load_file($this->include_path . $file);
         }

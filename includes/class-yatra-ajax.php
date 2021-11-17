@@ -276,7 +276,7 @@ class Yatra_Ajax
         }
 
 
-        $target_dir = yatra()->get_upload_dir(true);
+        $target_dir = yatra()->get_upload_dir();
 
         $import_file = isset($_FILES['yatra_import_file']) ? $_FILES['yatra_import_file'] : array();
 

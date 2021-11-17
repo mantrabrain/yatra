@@ -18,3 +18,5 @@ add_action('yatra_checkout_form_fields', 'yatra_payment_gateway_fields');
 // Single Tour
 
 add_action('yatra_enquiry_form_fields', 'yatra_enquiry_form_fields');
+
+// Log Hooks

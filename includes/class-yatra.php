@@ -200,6 +200,10 @@ final class Yatra
     {
 
 
+        // Autoloader
+
+        include_once YATRA_ABSPATH . 'includes/class-yatra-autoloader.php';
+
         /*
          * Abstract Class
          */
@@ -207,12 +211,13 @@ final class Yatra
         include_once YATRA_ABSPATH . 'includes/static/class-yatra-tables.php';
         include_once YATRA_ABSPATH . 'includes/abstracts/abstract-yatra-form.php';
         include_once YATRA_ABSPATH . 'includes/abstracts/abstract-yatra-payment-gateways.php';
+        include_once YATRA_ABSPATH . 'includes/abstracts/abstract-yatra-log-levels.php';
+        include_once YATRA_ABSPATH . 'includes/abstracts/abstract-yatra-log-handler.php';
 
 
         /**
          * Class autoloader.
          */
-        include_once YATRA_ABSPATH . 'includes/class-yatra-autoloader.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-install.php';
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-db.php';
 
@@ -373,53 +378,72 @@ final class Yatra
         }
     }
 
-    public function get_upload_dir($create_if_not_exists = false)
+    public function get_log_dir($create_if_not_exists = true)
     {
-        $upload_dir = wp_upload_dir();
+        $wp_upload_dir = wp_upload_dir();
 
-        if ($create_if_not_exists) {
+        $log_dir = $wp_upload_dir['basedir'] . '/yatra-logs/';
 
-            $this->create_files();
+        if (!file_exists(trailingslashit($log_dir) . 'index.html') && $create_if_not_exists) {
+
+            $files = array(
+                array(
+                    'base' => $log_dir,
+                    'file' => 'index.html',
+                    'content' => '',
+                ),
+                array(
+                    'base' => $log_dir,
+                    'file' => '.htaccess',
+                    'content' => 'deny from all',
+                )
+            );
+
+            $this->create_files($files, $log_dir);
+
+
         }
+        return $log_dir;
+    }
+    
+    public function get_upload_dir($create_if_not_exists = true)
+    {
+        $wp_upload_dir = wp_upload_dir();
 
-        return $upload_dir['basedir'] . '/yatra/';
+        $upload_dir = $wp_upload_dir['basedir'] . '/yatra/';
 
+        if (!file_exists(trailingslashit($upload_dir) . 'index.html') && $create_if_not_exists) {
+
+            $files = array(
+                array(
+                    'base' => $upload_dir,
+                    'file' => 'index.html',
+                    'content' => '',
+                ),
+                array(
+                    'base' => $upload_dir,
+                    'file' => '.htaccess',
+                    'content' => 'deny from all',
+                )
+            );
+
+            $this->create_files($files, $upload_dir);
+
+
+        }
+        return $upload_dir;
     }
 
-    private function create_files()
+    private function create_files($files, $base_dir)
     {
         // Bypass if filesystem is read-only and/or non-standard upload system is used.
         if (apply_filters('yatra_install_skip_create_files', false)) {
             return;
         }
 
-        if (file_exists(trailingslashit($this->get_upload_dir()) . 'index.html')) {
+        if (file_exists(trailingslashit($base_dir) . 'index.html')) {
             return true;
         }
-        $files = array(
-            array(
-                'base' => $this->get_upload_dir(),
-                'file' => 'index.html',
-                'content' => '',
-            ),
-            array(
-                'base' => $this->get_upload_dir(),
-                'file' => '.htaccess',
-                'content' => '<FilesMatch ".*\.(css|js)$">
-    Order Allow,Deny
-    Allow from all
-</FilesMatch>',
-            ),
-            array(
-                'base' => $this->get_upload_dir(),
-                'file' => '.htaccess',
-                'content' => '<FilesMatch ".*\.(css|js)$">
-    Order Allow,Deny
-    Allow from all
-</FilesMatch>',
-            )
-        );
-
         $has_created_dir = false;
 
         foreach ($files as $file) {

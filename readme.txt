@@ -26,6 +26,10 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 
 [youtube https://www.youtube.com/watch?v=URdGixOz760]
 
+
+You can Join our [Facebook Community group](https://www.facebook.com/groups/yatrawordpressplugin)
+
+
 == Yatra - Features ==
 
 1. Unlimited Travel & Tour Package with Activity & Destination pages

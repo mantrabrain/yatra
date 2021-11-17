@@ -19,6 +19,9 @@ final class Yatra_Install
     private static $update_callbacks = array(
         '2.1.0' => array(
             'yatra_update_2100_tour_dates_table_create',
+        ),
+        '2.1.3' => array(
+            'yatra_update_2130_logs_update',
         )
     );
 
@@ -345,6 +348,18 @@ final class Yatra_Install
 		  ) $collate;
 		  ";
 
+        $tables[] = "CREATE TABLE IF NOT EXISTS {$table_prefix}" . Yatra_Tables::LOGS . " (
+          log_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+          timestamp datetime NOT NULL,
+          level smallint(4) NOT NULL,
+          source varchar(200) NOT NULL,
+          message longtext NOT NULL,
+          context longtext NULL,
+          PRIMARY KEY (log_id),
+          KEY level (level)
+        ) $collate;
+		  ";
+
         return $tables;
     }
 
@@ -358,6 +373,7 @@ final class Yatra_Install
             "{$table_prefix}" . Yatra_Tables::TOUR_DATES,
             "{$table_prefix}" . Yatra_Tables::TOUR_ENQUIRIES,
             "{$table_prefix}" . Yatra_Tables::TOUR_BOOKING_STATS,
+            "{$table_prefix}" . Yatra_Tables::LOGS,
         );
 
         /**

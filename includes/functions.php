@@ -1180,7 +1180,7 @@ if (!function_exists('yatra_is_tour_page')) {
 }
 
 if (!function_exists('yatra_is_archive_page')) {
-    
+
     function yatra_is_archive_page()
     {
         if (is_tax('destination')) {
@@ -1192,3 +1192,58 @@ if (!function_exists('yatra_is_archive_page')) {
         return false;
     }
 }
+function yatra_get_logger()
+{
+    static $logger = null;
+
+    $class = apply_filters('yatra_logging_class', 'Yatra_Logger');
+
+    if (null !== $logger && is_string($class) && is_a($logger, $class)) {
+        return $logger;
+    }
+
+    $implements = class_implements($class);
+
+    if (is_array($implements) && in_array('Yatra_Interface_Logger', $implements, true)) {
+        $logger = is_object($class) ? $class : new $class();
+    } else {
+        _doing_it_wrong(
+            __FUNCTION__,
+            sprintf(
+            /* translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger */
+                __('The class %1$s provided by %2$s filter must implement %3$s.', 'yatra'),
+                '<code>' . esc_html(is_object($class) ? get_class($class) : $class) . '</code>',
+                '<code>yatra_logging_class</code>',
+                '<code>Yatra_Interface_Logger</code>'
+            ),
+            '3.0'
+        );
+
+        $logger = is_a($logger, 'Yatra_Logger') ? $logger : new Yatra_Logger();
+    }
+
+    return $logger;
+}
+
+add_filter('yatra_register_log_handlers', 'yatra_register_default_log_handler');
+
+function yatra_register_default_log_handler($handlers)
+{
+
+    $handler_class = defined('YATRA_LOG_HANDLER') ? YATRA_LOG_HANDLER : null;
+    if (!class_exists($handler_class)) {
+        $handler_class = Yatra_Log_Handler_DB::class;
+    }
+
+    array_push($handlers, new $handler_class());
+
+
+    return $handlers;
+}
+
+add_action('plugins_loaded', function () {
+    $logger = yatra_get_logger();
+
+
+    $logger->info(sprintf('Checking Log wow '), array('source' => 'email'));
+});
