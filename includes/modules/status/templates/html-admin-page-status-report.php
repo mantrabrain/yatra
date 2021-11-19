@@ -229,12 +229,20 @@ $untested_plugins = array();
     <tbody>
     <tr>
         <td data-export-label="Server Info"><?php esc_html_e('Server info', 'yatra'); ?>:</td>
-        <td class="help"><?php echo(esc_html__('Information about the web server that is currently hosting your site.', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+        <td class="help">
+            <?php
+            yatra_tippy_tooltip(__('Information about the web server that is currently hosting your site.', 'yatra'));
+            ?>
+        </td>
         <td><?php echo esc_html($environment['server_info']); ?></td>
     </tr>
     <tr>
         <td data-export-label="PHP Version"><?php esc_html_e('PHP version', 'yatra'); ?>:</td>
-        <td class="help"><?php echo(esc_html__('The version of PHP installed on your hosting server.', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+        <td class="help">
+            <?php
+            yatra_tippy_tooltip(__('The version of PHP installed on your hosting server.', 'yatra'));
+            ?>
+        </td>
         <td>
             <?php
             if (version_compare($environment['php_version'], '7.2', '>=')) {
@@ -260,27 +268,47 @@ $untested_plugins = array();
     <?php if (function_exists('ini_get')) : ?>
         <tr>
             <td data-export-label="PHP Post Max Size"><?php esc_html_e('PHP post max size', 'yatra'); ?>:</td>
-            <td class="help"><?php echo(esc_html__('The largest filesize that can be contained in one post.', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+            <td class="help">
+                <?php
+                yatra_tippy_tooltip(__('The largest filesize that can be contained in one post.', 'yatra'));
+                ?>
+            </td>
             <td><?php echo esc_html(size_format($environment['php_post_max_size'])); ?></td>
         </tr>
         <tr>
             <td data-export-label="PHP Time Limit"><?php esc_html_e('PHP time limit', 'yatra'); ?>:</td>
-            <td class="help"><?php echo(esc_html__('The amount of time (in seconds) that your site will spend on a single operation before timing out (to avoid server lockups)', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+            <td class="help">
+                <?php
+                yatra_tippy_tooltip(__('The amount of time (in seconds) that your site will spend on a single operation before timing out (to avoid server lockups).', 'yatra'));
+                ?>
+            </td>
             <td><?php echo esc_html($environment['php_max_execution_time']); ?></td>
         </tr>
         <tr>
             <td data-export-label="PHP Max Input Vars"><?php esc_html_e('PHP max input vars', 'yatra'); ?>:</td>
-            <td class="help"><?php echo(esc_html__('The maximum number of variables your server can use for a single function to avoid overloads.', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+            <td class="help">
+                <?php
+                yatra_tippy_tooltip(__('The maximum number of variables your server can use for a single function to avoid overloads.', 'yatra'));
+                ?>
+            </td>
             <td><?php echo esc_html($environment['php_max_input_vars']); ?></td>
         </tr>
         <tr>
             <td data-export-label="cURL Version"><?php esc_html_e('cURL version', 'yatra'); ?>:</td>
-            <td class="help"><?php echo(esc_html__('The version of cURL installed on your server.', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+            <td class="help">
+                <?php
+                yatra_tippy_tooltip(__('The version of cURL installed on your server.', 'yatra'));
+                ?>
+            </td>
             <td><?php echo esc_html($environment['curl_version']); ?></td>
         </tr>
         <tr>
             <td data-export-label="SUHOSIN Installed"><?php esc_html_e('SUHOSIN installed', 'yatra'); ?>:</td>
-            <td class="help"><?php echo(esc_html__('Suhosin is an advanced protection system for PHP installations. It was designed to protect your servers on the one hand against a number of well known problems in PHP applications and on the other hand against potential unknown vulnerabilities within these applications or the PHP core itself. If enabled on your server, Suhosin may need to be configured to increase its data submission limits.', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+            <td class="help">
+                <?php
+                yatra_tippy_tooltip(__('Suhosin is an advanced protection system for PHP installations. It was designed to protect your servers on the one hand against a number of well known problems in PHP applications and on the other hand against potential unknown vulnerabilities within these applications or the PHP core itself. If enabled on your server, Suhosin may need to be configured to increase its data submission limits.', 'yatra'));
+                ?>
+            </td>
             <td><?php echo $environment['suhosin_installed'] ? '<span class="dashicons dashicons-yes"></span>' : '&ndash;'; ?></td>
         </tr>
     <?php endif; ?>
