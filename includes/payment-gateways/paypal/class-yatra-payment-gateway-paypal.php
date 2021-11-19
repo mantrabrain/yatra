@@ -179,7 +179,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
              * Check if the currency that was processed by the IPN matches what is saved as
              * the currency setting
              */
-            if (trim($_POST['mc_currency']) != trim(get_option('yatra_currency'))) {
+            if (trim($_POST['mc_currency']) != trim(yatra_get_current_currency())) {
                 $message .= "\nCurrency does not match those assigned in settings\n";
             }
 

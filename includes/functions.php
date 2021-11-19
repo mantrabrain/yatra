@@ -11,6 +11,7 @@ include_once YATRA_ABSPATH . 'includes/template-tags.php';
 include_once YATRA_ABSPATH . 'includes/yatra-destination-functions.php';
 include_once YATRA_ABSPATH . 'includes/yatra-activity-functions.php';
 include_once YATRA_ABSPATH . 'includes/yatra-misc-functions.php';
+include_once YATRA_ABSPATH . 'includes/yatra-formatting-functions.php';
 
 
 if (!function_exists('yatra_tour_tabs')) {
@@ -1224,8 +1225,6 @@ function yatra_get_logger()
 
     return $logger;
 }
-
-
 
 
 add_action('plugins_loaded', function () {

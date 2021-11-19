@@ -158,6 +158,7 @@ final class Yatra
 
         $this->define('YATRA_ABSPATH', dirname(YATRA_FILE) . '/');
         $this->define('YATRA_BASENAME', plugin_basename(YATRA_FILE));
+        $this->define('YATRA_ROUNDING_PRECISION', 6);
     }
 
     /**

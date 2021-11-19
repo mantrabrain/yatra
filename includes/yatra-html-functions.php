@@ -333,3 +333,15 @@ if (!function_exists('yatra_pricing_html')) {
 
     }
 }
+
+if (!function_exists('yatra_tippy_tooltip')) {
+    function yatra_tippy_tooltip($content, $echo = true)
+    {
+        $tippy_content = '<span class="yatra-tippy-tooltip dashicons dashicons-editor-help" data-tippy-content="' . esc_attr($content) . '"></span>';
+
+        if ($echo) {
+            echo $tippy_content;
+        }
+        return $tippy_content;
+    }
+}

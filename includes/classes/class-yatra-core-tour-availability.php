@@ -443,7 +443,7 @@ class Yatra_Core_Tour_Availability
 
         $active_status = (boolean)$tourData->isActive();
 
-        $currency = get_option('yatra_currency');
+        $currency = yatra_get_current_currency();
 
         $currency_symbol = yatra_get_currency_symbols($currency);
 

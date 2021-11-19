@@ -24,7 +24,6 @@ class Yatra_Module_Status
 
     public function status()
     {
-
         $current_tab = empty($_GET['tab']) ? '' : sanitize_title(wp_unslash($_GET['tab'])); // WPCS: input var okay, CSRF ok.
 
         $current_section = empty($_REQUEST['section']) ? '' : sanitize_title(wp_unslash($_REQUEST['section'])); // WPCS: input var okay, CSRF ok.
@@ -45,15 +44,15 @@ class Yatra_Module_Status
         }
         include YATRA_ABSPATH . 'includes/modules/status/templates/html-admin-status.php';
     }
-
     public static function show_messages()
     {
 
     }
 
+
     public function system_status()
     {
-        echo '<h1>This is System Status Page</h1>';
+        include_once "sections/class-yatra-module-section-system-status.php";
     }
 
     public function logs()
