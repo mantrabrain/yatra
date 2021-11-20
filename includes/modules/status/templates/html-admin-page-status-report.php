@@ -2,7 +2,7 @@
 /**
  * Admin View: Page - Status Report.
  *
- * @package WooCommerce
+ * @package Yatra
  * @var $this Yatra_Module_Status
  */
 
@@ -228,9 +228,9 @@ $untested_plugins = array();
                     $class = 'error';
 
                     if (version_compare($environment['php_version'], '5.4', '<')) {
-                        $notice = '<span class="dashicons dashicons-warning"></span> ' . __('WooCommerce will run under this version of PHP, however, some features such as geolocation are not compatible. Support for this version will be dropped in the next major release. We recommend using PHP version 7.2 or above for greater performance and security.', 'yatra') . $update_link;
+                        $notice = '<span class="dashicons dashicons-warning"></span> ' . __('Yatra will run under this version of PHP, however, some features such as geolocation are not compatible. Support for this version will be dropped in the next major release. We recommend using PHP version 7.2 or above for greater performance and security.', 'yatra') . $update_link;
                     } elseif (version_compare($environment['php_version'], '5.6', '<')) {
-                        $notice = '<span class="dashicons dashicons-warning"></span> ' . __('WooCommerce will run under this version of PHP, however, it has reached end of life. We recommend using PHP version 7.2 or above for greater performance and security.', 'yatra') . $update_link;
+                        $notice = '<span class="dashicons dashicons-warning"></span> ' . __('Yatra will run under this version of PHP, however, it has reached end of life. We recommend using PHP version 7.2 or above for greater performance and security.', 'yatra') . $update_link;
                     } elseif (version_compare($environment['php_version'], '7.2', '<')) {
                         $notice = __('We recommend using PHP version 7.2 or above for greater performance and security.', 'yatra') . $update_link;
                         $class = 'recommendation';
@@ -454,7 +454,7 @@ $untested_plugins = array();
             <td data-export-label="Remote Get"><?php esc_html_e('Remote get', 'yatra'); ?>:</td>
             <td class="help">
                 <?php
-                yatra_tippy_tooltip(__('WooCommerce plugins may use this method of communication when checking for plugin updates.', 'yatra'));
+                yatra_tippy_tooltip(__('Yatra plugins may use this method of communication when checking for plugin updates.', 'yatra'));
                 ?>
             </td>
             <td>
@@ -514,11 +514,11 @@ $untested_plugins = array();
         </thead>
         <tbody>
         <tr>
-            <td data-export-label="WC Database Version"><?php esc_html_e('WooCommerce database version', 'yatra'); ?>
+            <td data-export-label="WC Database Version"><?php esc_html_e('Yatra database version', 'yatra'); ?>
                 :
             </td>
             <td class="help">
-                <?php yatra_tippy_tooltip(esc_html__('The database version for WooCommerce. Note that it may not match WooCommerce core version and that is normal.', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
+                <?php yatra_tippy_tooltip(esc_html__('The database version for Yatra. Note that it may not match Yatra core version and that is normal.', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
             <td><?php echo esc_html($database['wc_database_version']); ?></td>
         </tr>
         <tr>
@@ -593,7 +593,7 @@ $untested_plugins = array();
                 <td>
                     <?php
                     esc_html_e(
-                        'Unable to retrieve database information. Usually, this is not a problem, and it only means that your install is using a class that replaces the WordPress database class (e.g., HyperDB) and WooCommerce is unable to get database information.',
+                        'Unable to retrieve database information. Usually, this is not a problem, and it only means that your install is using a class that replaces the WordPress database class (e.g., HyperDB) and Yatra is unable to get database information.',
                         'yatra'
                     );
                     ?>
@@ -911,7 +911,7 @@ $untested_plugins = array();
                     echo '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
                 } else {
                     /* Translators: %s docs link. */
-                    echo '<span class="dashicons dashicons-no-alt"></span> &ndash; ' . wp_kses_post(sprintf(__('If you are modifying WooCommerce on a parent theme that you did not build personally we recommend using a child theme. See: <a href="%s" target="_blank">How to create a child theme</a>', 'yatra'), 'https://developer.wordpress.org/themes/advanced-topics/child-themes/'));
+                    echo '<span class="dashicons dashicons-no-alt"></span> &ndash; ' . wp_kses_post(sprintf(__('If you are modifying Yatra on a parent theme that you did not build personally we recommend using a child theme. See: <a href="%s" target="_blank">How to create a child theme</a>', 'yatra'), 'https://developer.wordpress.org/themes/advanced-topics/child-themes/'));
                 }
                 ?>
             </td>
@@ -953,7 +953,7 @@ $untested_plugins = array();
                 <h2><?php esc_html_e('Templates', 'yatra'); ?>
 
                     <?php
-                    yatra_tippy_tooltip(esc_html__('This section shows any files that are overriding the default WooCommerce template pages.', 'yatra')); ?>
+                    yatra_tippy_tooltip(esc_html__('This section shows any files that are overriding the default Yatra template pages.', 'yatra')); ?>
                 </h2>
             </th>
         </tr>

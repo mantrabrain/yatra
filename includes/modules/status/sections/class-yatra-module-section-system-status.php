@@ -76,7 +76,7 @@ class Yatra_Module_Section_System_Status
             $core_tables = array_map(array($this, 'add_db_table_prefix'), $core_tables);
 
             /**
-             * Organize WooCommerce and non-WooCommerce tables separately for display purposes later.
+             * Organize Yatra and non-Yatra tables separately for display purposes later.
              *
              * To ensure we include all WC tables, even if they do not exist, pre-populate the WC array with all the tables.
              */
@@ -112,7 +112,7 @@ class Yatra_Module_Section_System_Status
 
         // Return all database info. Described by JSON Schema.
         return array(
-            'wc_database_version' => get_option('woocommerce_db_version'),
+            'wc_database_version' => get_option('yatra_db_version'),
             'database_prefix' => $wpdb->prefix,
             'maxmind_geoip_database' => '',
             'database_tables' => $tables,
@@ -450,27 +450,27 @@ class Yatra_Module_Section_System_Status
             }
         }
 
-        // Check if WooCommerce.com account is connected.
+        // Check if Yatra.com account is connected.
         $woo_com_connected = 'no';
-        $helper_options = get_option('woocommerce_helper_data', array());
+        $helper_options = get_option('yatra_helper_data', array());
         if (array_key_exists('auth', $helper_options) && !empty($helper_options['auth'])) {
             $woo_com_connected = 'yes';
         }
 
         // Return array of useful settings for debugging.
         return array(
-            'api_enabled' => 'yes' === get_option('woocommerce_api_enabled'),
-            'force_ssl' => 'yes' === get_option('woocommerce_force_ssl_checkout'),
+            'api_enabled' => 'yes' === get_option('yatra_api_enabled'),
+            'force_ssl' => 'yes' === get_option('yatra_force_ssl_checkout'),
             'currency' => yatra_get_current_currency(),
             'currency_symbol' => yatra_get_current_currency_symbol(),
-            'currency_position' => get_option('woocommerce_currency_pos'),
+            'currency_position' => get_option('yatra_currency_pos'),
             'thousand_separator' => ',',
             'decimal_separator' => ',',
             'number_of_decimals' => ',',
-            'geolocation_enabled' => in_array(get_option('woocommerce_default_customer_address'), array('geolocation_ajax', 'geolocation'), true),
+            'geolocation_enabled' => in_array(get_option('yatra_default_customer_address'), array('geolocation_ajax', 'geolocation'), true),
             'taxonomies' => $term_response,
             'product_visibility_terms' => $product_visibility_terms,
-            'woocommerce_com_connected' => $woo_com_connected,
+            'yatra_com_connected' => $woo_com_connected,
         );
     }
 
@@ -498,28 +498,28 @@ class Yatra_Module_Section_System_Status
     {
         // WC pages to check against.
         $check_pages = array(
-            _x('Shop base', 'Page setting', 'woocommerce') => array(
-                'option' => 'woocommerce_shop_page_id',
+            _x('Shop base', 'Page setting', 'yatra') => array(
+                'option' => 'yatra_shop_page_id',
                 'shortcode' => '',
                 'block' => '',
             ),
-            _x('Cart', 'Page setting', 'woocommerce') => array(
-                'option' => 'woocommerce_cart_page_id',
-                'shortcode' => '[' . apply_filters('woocommerce_cart_shortcode_tag', 'woocommerce_cart') . ']',
-                'block' => 'woocommerce/cart',
+            _x('Cart', 'Page setting', 'yatra') => array(
+                'option' => 'yatra_cart_page_id',
+                'shortcode' => '[' . apply_filters('yatra_cart_shortcode_tag', 'yatra_cart') . ']',
+                'block' => 'yatra/cart',
             ),
-            _x('Checkout', 'Page setting', 'woocommerce') => array(
-                'option' => 'woocommerce_checkout_page_id',
-                'shortcode' => '[' . apply_filters('woocommerce_checkout_shortcode_tag', 'woocommerce_checkout') . ']',
-                'block' => 'woocommerce/checkout',
+            _x('Checkout', 'Page setting', 'yatra') => array(
+                'option' => 'yatra_checkout_page_id',
+                'shortcode' => '[' . apply_filters('yatra_checkout_shortcode_tag', 'yatra_checkout') . ']',
+                'block' => 'yatra/checkout',
             ),
-            _x('My account', 'Page setting', 'woocommerce') => array(
-                'option' => 'woocommerce_myaccount_page_id',
-                'shortcode' => '[' . apply_filters('woocommerce_my_account_shortcode_tag', 'woocommerce_my_account') . ']',
+            _x('My account', 'Page setting', 'yatra') => array(
+                'option' => 'yatra_myaccount_page_id',
+                'shortcode' => '[' . apply_filters('yatra_my_account_shortcode_tag', 'yatra_my_account') . ']',
                 'block' => '',
             ),
-            _x('Terms and conditions', 'Page setting', 'woocommerce') => array(
-                'option' => 'woocommerce_terms_page_id',
+            _x('Terms and conditions', 'Page setting', 'yatra') => array(
+                'option' => 'yatra_terms_page_id',
                 'shortcode' => '',
                 'block' => '',
             ),
@@ -718,20 +718,20 @@ class Yatra_Module_Section_System_Status
                 // Link the plugin name to the plugin url if available.
                 $plugin_name = esc_html($plugin['name']);
                 if (!empty($plugin['url'])) {
-                    $plugin_name = '<a href="' . esc_url($plugin['url']) . '" aria-label="' . esc_attr__('Visit plugin homepage', 'woocommerce') . '" target="_blank">' . $plugin_name . '</a>';
+                    $plugin_name = '<a href="' . esc_url($plugin['url']) . '" aria-label="' . esc_attr__('Visit plugin homepage', 'yatra') . '" target="_blank">' . $plugin_name . '</a>';
                 }
 
                 $has_newer_version = false;
                 $version_string = $plugin['version'];
                 $network_string = '';
-                if (strstr($plugin['url'], 'woothemes.com') || strstr($plugin['url'], 'woocommerce.com')) {
+                if (strstr($plugin['url'], 'woothemes.com') || strstr($plugin['url'], 'yatra.com')) {
                     if (!empty($plugin['version_latest']) && version_compare($plugin['version_latest'], $plugin['version'], '>')) {
                         /* translators: 1: current version. 2: latest version */
-                        $version_string = sprintf(__('%1$s (update to version %2$s is available)', 'woocommerce'), $plugin['version'], $plugin['version_latest']);
+                        $version_string = sprintf(__('%1$s (update to version %2$s is available)', 'yatra'), $plugin['version'], $plugin['version_latest']);
                     }
 
                     if (false !== $plugin['network_activated']) {
-                        $network_string = ' &ndash; <strong style="color: black;">' . esc_html__('Network enabled', 'woocommerce') . '</strong>';
+                        $network_string = ' &ndash; <strong style="color: black;">' . esc_html__('Network enabled', 'yatra') . '</strong>';
                     }
                 }
                 $untested_string = '';
@@ -739,7 +739,7 @@ class Yatra_Module_Section_System_Status
                     $untested_string = ' &ndash; <strong style="color: #a00;">';
 
                     /* translators: %s: version */
-                    $untested_string .= esc_html(sprintf(__('Installed version not tested with active version of WooCommerce %s', 'woocommerce'), $wc_version));
+                    $untested_string .= esc_html(sprintf(__('Installed version not tested with active version of Yatra %s', 'yatra'), $wc_version));
 
                     $untested_string .= '</strong>';
                 }
@@ -750,7 +750,7 @@ class Yatra_Module_Section_System_Status
                     <td>
                         <?php
                         /* translators: %s: plugin author */
-                        printf(esc_html__('by %s', 'woocommerce'), esc_html($plugin['author_name']));
+                        printf(esc_html__('by %s', 'yatra'), esc_html($plugin['author_name']));
                         echo ' &ndash; ' . esc_html($version_string) . $untested_string . $network_string; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                         ?>
                     </td>
