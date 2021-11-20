@@ -514,14 +514,6 @@ $untested_plugins = array();
         </thead>
         <tbody>
         <tr>
-            <td data-export-label="WC Database Version"><?php esc_html_e('Yatra database version', 'yatra'); ?>
-                :
-            </td>
-            <td class="help">
-                <?php yatra_tippy_tooltip(esc_html__('The database version for Yatra. Note that it may not match Yatra core version and that is normal.', 'yatra')); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?></td>
-            <td><?php echo esc_html($database['wc_database_version']); ?></td>
-        </tr>
-        <tr>
             <td data-export-label="WC Database Prefix"><?php esc_html_e('Database prefix', 'yatra'); ?></td>
             <td class="help">&nbsp;</td>
             <td>
