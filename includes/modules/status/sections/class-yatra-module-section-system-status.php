@@ -708,7 +708,7 @@ class Yatra_Module_Section_System_Status
         );
     }
 
-    private static function output_plugins_info($plugins, $untested_plugins)
+    private static function output_plugins_info($plugins, $untested_plugins=array())
     {
         $wc_version = YATRA_VERSION;
 

@@ -3,7 +3,7 @@
  * Admin View: Page - Status Report.
  *
  * @package Yatra
- * @var $this Yatra_Module_Status
+ * @var $this Yatra_Module_Section_System_Status
  */
 
 defined('ABSPATH') || exit;
@@ -25,6 +25,7 @@ $untested_plugins = array();
 
 ?>
 <div class="yatra-status-table-wrap">
+
     <table class="yatra_status_table widefat" cellspacing="0" id="status">
         <thead>
         <tr>
