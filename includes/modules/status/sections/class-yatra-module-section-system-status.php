@@ -57,7 +57,6 @@ class Yatra_Module_Section_System_Status
                 )
             );
 
-            // WC Core tables to check existence of.
             $core_tables = apply_filters(
                 'yatra_database_tables',
                 array(
@@ -75,11 +74,7 @@ class Yatra_Module_Section_System_Status
              */
             $core_tables = array_map(array($this, 'add_db_table_prefix'), $core_tables);
 
-            /**
-             * Organize Yatra and non-Yatra tables separately for display purposes later.
-             *
-             * To ensure we include all WC tables, even if they do not exist, pre-populate the WC array with all the tables.
-             */
+
             $tables = array(
                 'yatra' => array_fill_keys($core_tables, false),
                 'other' => array(),
@@ -210,7 +205,6 @@ class Yatra_Module_Section_System_Status
             return array();
         }
 
-        // Use WP API to lookup latest updates for plugins. WC_Helper injects updates for premium plugins.
         if (empty($this->available_updates)) {
             $this->available_updates = get_plugin_updates();
         }
@@ -324,10 +318,7 @@ class Yatra_Module_Section_System_Status
             );
         }
 
-        /**
-         * Scan the theme directory for all WC templates to see if our theme
-         * overrides any of them.
-         */
+
         $override_files = array();
         $outdated_templates = false;
         $scan_files = array();
@@ -404,7 +395,7 @@ class Yatra_Module_Section_System_Status
         // Check .org for updates.
         if (is_object($api) && !is_wp_error($api)) {
             $update_theme_version = $api->version;
-        } elseif (strstr($theme->{'Author URI'}, 'mantrabrain')) { // Check WooThemes Theme Version.
+        } elseif (strstr($theme->{'Author URI'}, 'mantrabrain')) { //
             $theme_dir = substr(strtolower(str_replace(' ', '', $theme->Name)), 0, 45); // @codingStandardsIgnoreLine.
             $theme_version_data = get_transient($theme_dir . '_version_data');
 
@@ -505,12 +496,6 @@ class Yatra_Module_Section_System_Status
         );
     }
 
-    /**
-     * Returns a mini-report on WC pages and if they are configured correctly:
-     * Present, visible, and including the correct shortcode or block.
-     *
-     * @return array
-     */
     public function get_pages()
     {
         $check_pages = array(
@@ -723,7 +708,7 @@ class Yatra_Module_Section_System_Status
 
     private static function output_plugins_info($plugins, $untested_plugins = array())
     {
-        $wc_version = YATRA_VERSION;
+        $yatra_version = YATRA_VERSION;
 
 
         foreach ($plugins as $plugin) {
@@ -752,7 +737,7 @@ class Yatra_Module_Section_System_Status
                     $untested_string = ' &ndash; <strong style="color: #a00;">';
 
                     /* translators: %s: version */
-                    $untested_string .= esc_html(sprintf(__('Installed version not tested with active version of Yatra %s', 'yatra'), $wc_version));
+                    $untested_string .= esc_html(sprintf(__('Installed version not tested with active version of Yatra %s', 'yatra'), $yatra_version));
 
                     $untested_string .= '</strong>';
                 }

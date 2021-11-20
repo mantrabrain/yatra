@@ -74,7 +74,7 @@ $untested_plugins = array();
                     echo '<mark class="yes"><span class="dashicons dashicons-yes"></span> <code class="private">' . esc_html($environment['log_directory']) . '</code></mark> ';
                 } else {
                     /* Translators: %1$s: Log directory, %2$s: Log directory constant */
-                    echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf(esc_html__('To allow logging, make %1$s writable or define a custom %2$s.', 'yatra'), '<code>' . esc_html($environment['log_directory']) . '</code>', '<code>WC_LOG_DIR</code>') . '</mark>';
+                    echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf(esc_html__('To allow logging, make %1$s writable or define a custom %2$s.', 'yatra'), '<code>' . esc_html($environment['log_directory']) . '</code>', '<code>yatra()->get_log_dir()</code>') . '</mark>';
                 }
                 ?>
             </td>

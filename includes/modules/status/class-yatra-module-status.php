@@ -61,7 +61,9 @@ class Yatra_Module_Status
 
     public function logs()
     {
-        echo '<h1>This is Log Page</h1>';
+        wp_enqueue_style('yatra-admin-status');
+
+        include_once "sections/class-yatra-module-section-logs.php";
     }
 
     public function load_admin_scripts($id)
