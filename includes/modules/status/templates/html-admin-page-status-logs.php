@@ -31,8 +31,8 @@ if (!defined('ABSPATH')) {
                         $date = sprintf(
                         /* translators: 1: last access date 2: last access time 3: last access timezone abbreviation */
                             __('%1$s at %2$s %3$s', 'woocommerce'),
-                            wp_date(wc_date_format(), $timestamp),
-                            wp_date(wc_time_format(), $timestamp),
+                            wp_date(yatra_date_format(), $timestamp),
+                            wp_date(yatra_time_format(), $timestamp),
                             wp_date('T', $timestamp)
                         );
                         ?>

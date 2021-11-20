@@ -354,7 +354,7 @@ class Yatra_Admin_Log_List_Table extends WP_List_Table
     {
         $valid_orders = array('level', 'source', 'timestamp');
         if (!empty($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], $valid_orders)) {
-            $by = wc_clean($_REQUEST['orderby']);
+            $by = yatra_clean($_REQUEST['orderby']);
         } else {
             $by = 'timestamp';
         }
@@ -388,11 +388,11 @@ class Yatra_Admin_Log_List_Table extends WP_List_Table
         }
         if (!empty($_REQUEST['source'])) {
             $where_conditions[] = 'source = %s';
-            $where_values[] = wc_clean($_REQUEST['source']);
+            $where_values[] = yatra_clean($_REQUEST['source']);
         }
         if (!empty($_REQUEST['s'])) {
             $where_conditions[] = 'message like %s';
-            $where_values[] = '%' . $wpdb->esc_like(wc_clean(wp_unslash($_REQUEST['s']))) . '%';
+            $where_values[] = '%' . $wpdb->esc_like(yatra_clean(wp_unslash($_REQUEST['s']))) . '%';
         }
 
         if (empty($where_conditions)) {
