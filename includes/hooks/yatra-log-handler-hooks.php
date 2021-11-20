@@ -11,7 +11,6 @@ class Yatra_Log_Handler_Hooks
 
     public function update_handler($handlers)
     {
-
         $handler_class = defined('YATRA_LOG_HANDLER') ? YATRA_LOG_HANDLER : null;
 
         if (!class_exists($handler_class)) {

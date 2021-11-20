@@ -7,8 +7,15 @@ if (!class_exists('WP_List_Table')) {
     require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
-class Yatra_Admin_Log_Table_List extends WP_List_Table
+class Yatra_Admin_Log_List_Table extends WP_List_Table
 {
+
+    private function get_table()
+    {
+        global $wpdb;
+
+        return $wpdb->prefix . 'yatra_' . Yatra_Tables::LOGS;
+    }
 
     /**
      * Initialize the log table list.
@@ -34,46 +41,46 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
 
         $levels = array(
             array(
-                'value' => WC_Log_Levels::EMERGENCY,
-                'label' => __('Emergency', 'woocommerce'),
+                'value' => Yatra_Log_Levels::EMERGENCY,
+                'label' => __('Emergency', 'yatra'),
             ),
             array(
-                'value' => WC_Log_Levels::ALERT,
-                'label' => __('Alert', 'woocommerce'),
+                'value' => Yatra_Log_Levels::ALERT,
+                'label' => __('Alert', 'yatra'),
             ),
             array(
-                'value' => WC_Log_Levels::CRITICAL,
-                'label' => __('Critical', 'woocommerce'),
+                'value' => Yatra_Log_Levels::CRITICAL,
+                'label' => __('Critical', 'yatra'),
             ),
             array(
-                'value' => WC_Log_Levels::ERROR,
-                'label' => __('Error', 'woocommerce'),
+                'value' => Yatra_Log_Levels::ERROR,
+                'label' => __('Error', 'yatra'),
             ),
             array(
-                'value' => WC_Log_Levels::WARNING,
-                'label' => __('Warning', 'woocommerce'),
+                'value' => Yatra_Log_Levels::WARNING,
+                'label' => __('Warning', 'yatra'),
             ),
             array(
-                'value' => WC_Log_Levels::NOTICE,
-                'label' => __('Notice', 'woocommerce'),
+                'value' => Yatra_Log_Levels::NOTICE,
+                'label' => __('Notice', 'yatra'),
             ),
             array(
-                'value' => WC_Log_Levels::INFO,
-                'label' => __('Info', 'woocommerce'),
+                'value' => Yatra_Log_Levels::INFO,
+                'label' => __('Info', 'yatra'),
             ),
             array(
-                'value' => WC_Log_Levels::DEBUG,
-                'label' => __('Debug', 'woocommerce'),
+                'value' => Yatra_Log_Levels::DEBUG,
+                'label' => __('Debug', 'yatra'),
             ),
         );
 
         $selected_level = isset($_REQUEST['level']) ? $_REQUEST['level'] : '';
         ?>
         <label for="filter-by-level"
-               class="screen-reader-text"><?php esc_html_e('Filter by level', 'woocommerce'); ?></label>
+               class="screen-reader-text"><?php esc_html_e('Filter by level', 'yatra'); ?></label>
         <select name="level" id="filter-by-level">
             <option<?php selected($selected_level, ''); ?>
-                    value=""><?php esc_html_e('All levels', 'woocommerce'); ?></option>
+                    value=""><?php esc_html_e('All levels', 'yatra'); ?></option>
             <?php
             foreach ($levels as $l) {
                 printf(
@@ -97,10 +104,10 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
     {
         return array(
             'cb' => '<input type="checkbox" />',
-            'timestamp' => __('Timestamp', 'woocommerce'),
-            'level' => __('Level', 'woocommerce'),
-            'message' => __('Message', 'woocommerce'),
-            'source' => __('Source', 'woocommerce'),
+            'timestamp' => __('Timestamp', 'yatra'),
+            'level' => __('Level', 'yatra'),
+            'message' => __('Message', 'yatra'),
+            'source' => __('Source', 'yatra'),
         );
     }
 
@@ -139,16 +146,16 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
      */
     public function column_level($log)
     {
-        $level_key = WC_Log_Levels::get_severity_level($log['level']);
+        $level_key = Yatra_Log_Levels::get_severity_level($log['level']);
         $levels = array(
-            'emergency' => __('Emergency', 'woocommerce'),
-            'alert' => __('Alert', 'woocommerce'),
-            'critical' => __('Critical', 'woocommerce'),
-            'error' => __('Error', 'woocommerce'),
-            'warning' => __('Warning', 'woocommerce'),
-            'notice' => __('Notice', 'woocommerce'),
-            'info' => __('Info', 'woocommerce'),
-            'debug' => __('Debug', 'woocommerce'),
+            'emergency' => __('Emergency', 'yatra'),
+            'alert' => __('Alert', 'yatra'),
+            'critical' => __('Critical', 'yatra'),
+            'error' => __('Error', 'yatra'),
+            'warning' => __('Warning', 'yatra'),
+            'notice' => __('Notice', 'yatra'),
+            'info' => __('Info', 'yatra'),
+            'debug' => __('Debug', 'yatra'),
         );
 
         if (!isset($levels[$level_key])) {
@@ -190,7 +197,7 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
     protected function get_bulk_actions()
     {
         return array(
-            'delete' => __('Delete', 'woocommerce'),
+            'delete' => __('Delete', 'yatra'),
         );
     }
 
@@ -205,7 +212,7 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
             echo '<div class="alignleft actions">';
             $this->level_dropdown();
             $this->source_dropdown();
-            submit_button(__('Filter', 'woocommerce'), '', 'filter-action', false);
+            submit_button(__('Filter', 'yatra'), '', 'filter-action', false);
             echo '</div>';
         }
     }
@@ -235,7 +242,7 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
 
         $sources = $wpdb->get_col(
             "SELECT DISTINCT source
-			FROM {$wpdb->prefix}woocommerce_log
+			FROM " . $this->get_table() . "
 			WHERE source != ''
 			ORDER BY source ASC"
         );
@@ -244,10 +251,10 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
             $selected_source = isset($_REQUEST['source']) ? $_REQUEST['source'] : '';
             ?>
             <label for="filter-by-source"
-                   class="screen-reader-text"><?php esc_html_e('Filter by source', 'woocommerce'); ?></label>
+                   class="screen-reader-text"><?php esc_html_e('Filter by source', 'yatra'); ?></label>
             <select name="source" id="filter-by-source">
                 <option<?php selected($selected_source, ''); ?>
-                        value=""><?php esc_html_e('All sources', 'woocommerce'); ?></option>
+                        value=""><?php esc_html_e('All sources', 'yatra'); ?></option>
                 <?php
                 foreach ($sources as $s) {
                     printf(
@@ -274,7 +281,7 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
 
         $this->prepare_column_headers();
 
-        $per_page = $this->get_items_per_page('woocommerce_status_log_items_per_page', 10);
+        $per_page = $this->get_items_per_page('yatra_status_log_items_per_page', 50);
 
         $where = $this->get_items_query_where();
         $order = $this->get_items_query_order();
@@ -283,13 +290,13 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
 
         $query_items = "
 			SELECT log_id, timestamp, level, message, source
-			FROM {$wpdb->prefix}woocommerce_log
+			FROM " . $this->get_table() . "
 			{$where} {$order} {$limit} {$offset}
 		";
 
         $this->items = $wpdb->get_results($query_items, ARRAY_A);
 
-        $query_count = "SELECT COUNT(log_id) FROM {$wpdb->prefix}woocommerce_log {$where}";
+        $query_count = "SELECT COUNT(log_id) FROM " . $this->get_table() . " {$where}";
         $total_items = $wpdb->get_var($query_count);
 
         $this->set_pagination_args(
@@ -312,7 +319,7 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
     {
         global $wpdb;
 
-        $per_page = $this->get_items_per_page('woocommerce_status_log_items_per_page', 10);
+        $per_page = $this->get_items_per_page('yatra_status_log_items_per_page', 50);
         return $wpdb->prepare('LIMIT %d', $per_page);
     }
 
@@ -327,7 +334,7 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
     {
         global $wpdb;
 
-        $per_page = $this->get_items_per_page('woocommerce_status_log_items_per_page', 10);
+        $per_page = $this->get_items_per_page('yatra_status_log_items_per_page', 10);
         $current_page = $this->get_pagenum();
         if (1 < $current_page) {
             $offset = $per_page * ($current_page - 1);
@@ -375,9 +382,9 @@ class Yatra_Admin_Log_Table_List extends WP_List_Table
 
         $where_conditions = array();
         $where_values = array();
-        if (!empty($_REQUEST['level']) && WC_Log_Levels::is_valid_level($_REQUEST['level'])) {
+        if (!empty($_REQUEST['level']) && Yatra_Log_Levels::is_valid_level($_REQUEST['level'])) {
             $where_conditions[] = 'level >= %d';
-            $where_values[] = WC_Log_Levels::get_level_severity($_REQUEST['level']);
+            $where_values[] = Yatra_Log_Levels::get_level_severity($_REQUEST['level']);
         }
         if (!empty($_REQUEST['source'])) {
             $where_conditions[] = 'source = %s';

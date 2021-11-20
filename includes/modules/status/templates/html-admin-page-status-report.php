@@ -514,7 +514,7 @@ $untested_plugins = array();
         </thead>
         <tbody>
         <tr>
-            <td data-export-label="WC Database Prefix"><?php esc_html_e('Database prefix', 'yatra'); ?></td>
+            <td data-export-label="Database Prefix"><?php esc_html_e('Database prefix', 'yatra'); ?></td>
             <td class="help">&nbsp;</td>
             <td>
                 <?php

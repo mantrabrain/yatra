@@ -61,11 +61,11 @@ class Yatra_Module_Section_Logs
 
     private static function flush_db_logs()
     {
-        if (empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], 'woocommerce-status-logs')) { // WPCS: input var ok, sanitization ok.
+        if (empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], 'yatra-status-logs')) { // WPCS: input var ok, sanitization ok.
             wp_die(esc_html__('Action failed. Please refresh the page and retry.', 'woocommerce'));
         }
 
-        WC_Log_Handler_DB::flush();
+        Yatra_Log_Handler_DB::flush();
 
         wp_safe_redirect(esc_url_raw(admin_url('admin.php?page=yatra-status&tab=logs')));
         exit();
@@ -73,14 +73,14 @@ class Yatra_Module_Section_Logs
 
     private static function log_table_bulk_actions()
     {
-        if (empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], 'woocommerce-status-logs')) { // WPCS: input var ok, sanitization ok.
-            wp_die(esc_html__('Action failed. Please refresh the page and retry.', 'woocommerce'));
+        if (empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], 'yatra-status-logs')) { // WPCS: input var ok, sanitization ok.
+            wp_die(esc_html__('Action failed. Please refresh the page and retry.', 'yatra'));
         }
 
         $log_ids = array_map('absint', (array)isset($_REQUEST['log']) ? wp_unslash($_REQUEST['log']) : array()); // WPCS: input var ok, sanitization ok.
 
         if ((isset($_REQUEST['action']) && 'delete' === $_REQUEST['action']) || (isset($_REQUEST['action2']) && 'delete' === $_REQUEST['action2'])) { // WPCS: input var ok, sanitization ok.
-            WC_Log_Handler_DB::delete($log_ids);
+            Yatra_Log_Handler_DB::delete($log_ids);
             wp_safe_redirect(esc_url_raw(admin_url('admin.php?page=yatra-status&tab=logs')));
             exit();
         }
@@ -95,8 +95,9 @@ class Yatra_Module_Section_Logs
         if (isset($_REQUEST['action']) && isset($_REQUEST['log'])) { // WPCS: input var ok, CSRF ok.
             self::log_table_bulk_actions();
         }
+        include_once YATRA_ABSPATH . 'includes/modules/status/list-tables/class-yatra-admin-log-list-table.php';
 
-        $log_table_list = new Yatra_Admin_Log_Table_List();
+        $log_table_list = new Yatra_Admin_Log_List_Table();
         $log_table_list->prepare_items();
 
         include YATRA_ABSPATH . 'includes/modules/status/templates/html-admin-page-status-logs-db.php';
