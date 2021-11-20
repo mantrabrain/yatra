@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * The Template for displaying all taxonomy destination
+ * @package     Yatra\Templates
+ * @version     2.1.2
+ */
 get_header();
 
 do_action('yatra_before_page_content');

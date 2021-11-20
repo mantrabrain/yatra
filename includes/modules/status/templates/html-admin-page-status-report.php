@@ -10,7 +10,6 @@ defined('ABSPATH') || exit;
 
 global $wpdb;
 
-$report = $this->environment();
 $environment = $this->environment();
 $database = $this->get_database_info();
 $post_type_counts = $this->get_post_type_counts();
@@ -374,7 +373,7 @@ $untested_plugins = array();
                     echo '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
                 } else {
                     /* Translators: %s classname and link. */
-                    echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf(esc_html__('Your server does not have the %s class enabled - some gateway plugins which use SOAP may not work as expected.', 'yatra'), '<a href="https://php.net/manual/en/class.soapclient.php">SoapClient</a>') . '</mark>';
+                    echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf(esc_html__('Your server does not have the %s class enabled.', 'yatra'), '<a href="https://php.net/manual/en/class.soapclient.php">SoapClient</a>') . '</mark>';
                 }
                 ?>
             </td>
@@ -640,7 +639,7 @@ $untested_plugins = array();
                     <mark class="error"><span class="dashicons dashicons-warning"></span>
                         <?php
                         /* Translators: %s: docs link. */
-                        echo wp_kses_post(sprintf(__('Your store is not using HTTPS. <a href="%s" target="_blank">Learn more about HTTPS and SSL Certificates</a>.', 'yatra'), 'https://docs.yatra.com/document/ssl-and-https/'));
+                        echo wp_kses_post(__('Your site is not using HTTPS', 'yatra'));
                         ?>
                     </mark>
                 <?php endif; ?>
@@ -757,13 +756,6 @@ $untested_plugins = array();
         </thead>
         <tbody>
         <tr>
-            <td data-export-label="API Enabled"><?php esc_html_e('API enabled', 'yatra'); ?>:</td>
-            <td class="help">
-                <?php yatra_tippy_tooltip(esc_html__('Does your site have REST API enabled?', 'yatra')); ?>
-            </td>
-            <td><?php echo $settings['api_enabled'] ? '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>' : '<mark class="no">&ndash;</mark>'; ?></td>
-        </tr>
-        <tr>
             <td data-export-label="Force SSL"><?php esc_html_e('Force SSL', 'yatra'); ?>:</td>
             <td class="help">
                 <?php yatra_tippy_tooltip(esc_html__('Does your site force a SSL Certificate for transactions?', 'yatra')); ?>
@@ -812,7 +804,7 @@ $untested_plugins = array();
     <table class="yatra_status_table widefat" cellspacing="0">
         <thead>
         <tr>
-            <th colspan="3" data-export-label="Yatra Pages"><h2><?php esc_html_e('Yatra pages', 'yatra'); ?></h2>
+            <th colspan="3" data-export-label="Yatra Pages"><h2><?php esc_html_e('Yatra Pages', 'yatra'); ?></h2>
             </th>
         </tr>
         </thead>
@@ -831,7 +823,11 @@ $untested_plugins = array();
 
             echo '<tr><td data-export-label="' . esc_attr($page_name) . '">' . wp_kses_post($page_name) . ':</td>';
             /* Translators: %s: page name. */
-            echo '<td class="help">' . (sprintf(esc_html__('The URL of your %s page (along with the Page ID).', 'yatra'), $page_name)) . '</td><td>';
+            echo '<td class="help">';
+
+
+            yatra_tippy_tooltip((sprintf(esc_html__('The URL of your %s page (along with the Page ID).', 'yatra'), $page_name)));
+            echo '</td><td>';
 
             // Page ID check.
             if (!$_page['page_set']) {
@@ -1004,7 +1000,7 @@ $untested_plugins = array();
                     <mark class="error">
                         <span class="dashicons dashicons-warning"></span>
                     </mark>
-                    <a href="https://docs.yatra.com/document/fix-outdated-templates-yatra/" target="_blank">
+                    <a href="https://docs.mantrabrain.com/yatra-wordpress-plugin/" target="_blank">
                         <?php esc_html_e('Learn how to update', 'yatra'); ?>
                     </a>
                 </td>
@@ -1018,8 +1014,8 @@ $untested_plugins = array();
     <table class="yatra_status_table widefat" cellspacing="0">
         <thead>
         <tr>
-            <th colspan="3" data-export-label="Status report information">
-                <h2><?php esc_html_e('Status report information', 'yatra'); ?>
+            <th colspan="3" data-export-label="Status Report Information">
+                <h2><?php esc_html_e('Status Report Information', 'yatra'); ?>
                     <?php
                     yatra_tippy_tooltip(esc_html__('This section shows information about this status report.', 'yatra')); ?>
 

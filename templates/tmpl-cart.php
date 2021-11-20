@@ -1,4 +1,9 @@
 <?php
+/**
+ * The Template for displaying cart
+ * @package     Yatra\Templates
+ * @version     2.1.2
+ */
 defined('ABSPATH') || exit;
 if (count($cart_items) < 1) {
 

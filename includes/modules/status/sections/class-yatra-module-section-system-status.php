@@ -112,9 +112,7 @@ class Yatra_Module_Section_System_Status
 
         // Return all database info. Described by JSON Schema.
         return array(
-            'wc_database_version' => get_option('yatra_db_version'),
             'database_prefix' => $wpdb->prefix,
-            'maxmind_geoip_database' => '',
             'database_tables' => $tables,
             'database_size' => $database_size,
         );
@@ -203,7 +201,6 @@ class Yatra_Module_Section_System_Status
      * @param string $plugin Plugin directory/file.
      * @param array $data Plugin data from WP.
      * @return array Formatted data.
-     * @since 3.6.0
      */
     protected function format_plugin_data($plugin, $data)
     {
@@ -241,7 +238,6 @@ class Yatra_Module_Section_System_Status
      * Get a list of Dropins and MU plugins.
      *
      * @return array
-     * @since 3.6.0
      */
     public function get_dropins_mu_plugins()
     {
@@ -269,6 +265,34 @@ class Yatra_Module_Section_System_Status
             );
         }
         return $plugins;
+    }
+
+    public static function get_file_version($file)
+    {
+
+        // Avoid notices if file does not exist.
+        if (!file_exists($file)) {
+            return '';
+        }
+
+        // We don't need to write to the file, so just open for reading.
+        $fp = fopen($file, 'r'); // @codingStandardsIgnoreLine.
+
+        // Pull only the first 8kiB of the file in.
+        $file_data = fread($fp, 8192); // @codingStandardsIgnoreLine.
+
+        // PHP will close file handle, but we are good citizens.
+        fclose($fp); // @codingStandardsIgnoreLine.
+
+        // Make sure we catch CR-only line endings.
+        $file_data = str_replace("\r", "\n", $file_data);
+        $version = '';
+
+        if (preg_match('/^[ \t\/*#@]*' . preg_quote('@version', '/') . '(.*)$/mi', $file_data, $match) && $match[1]) {
+            $version = _cleanup_header_comment($match[1]);
+        }
+
+        return $version;
     }
 
     /**
@@ -306,15 +330,13 @@ class Yatra_Module_Section_System_Status
          */
         $override_files = array();
         $outdated_templates = false;
-        $scan_files = array();// WC_Admin_Status::scan_template_files(WC()->plugin_path() . '/templates/');
-
-        // Include *-product_<cat|tag> templates for backwards compatibility.
-        $scan_files[] = 'content-product_cat.php';
-        $scan_files[] = 'taxonomy-product_cat.php';
-        $scan_files[] = 'taxonomy-product_tag.php';
-
+        $scan_files = array();
+        $scan_files[] = 'single-tour.php';
+        $scan_files[] = 'archive-tour.php';
+        $scan_files[] = 'taxonomy-activity.php';
+        $scan_files[] = 'taxonomy-destination.php';
         foreach ($scan_files as $file) {
-            $located = apply_filters('wc_get_template', $file, $file, array(), yatra()->template_path(), yatra()->plugin_path() . '/templates/');
+            $located = apply_filters('yatra_get_template', $file, $file, array(), yatra()->template_path(), yatra()->plugin_path() . '/templates/');
 
             if (file_exists($located)) {
                 $theme_file = $located;
@@ -333,13 +355,8 @@ class Yatra_Module_Section_System_Status
             if (!empty($theme_file)) {
                 $core_file = $file;
 
-                // Update *-product_<cat|tag> template name before searching in core.
-                if (false !== strpos($core_file, '-product_cat') || false !== strpos($core_file, '-product_tag')) {
-                    $core_file = str_replace('_', '-', $core_file);
-                }
-
-                $core_version = WC_Admin_Status::get_file_version(WC()->plugin_path() . '/templates/' . $core_file);
-                $theme_version = WC_Admin_Status::get_file_version($theme_file);
+                $core_version = self::get_file_version(yatra()->plugin_path() . '/templates/' . $core_file);
+                $theme_version = self::get_file_version($theme_file);
                 if ($core_version && (empty($theme_version) || version_compare($theme_version, $core_version, '<'))) {
                     if (!$outdated_templates) {
                         $outdated_templates = true;
@@ -496,36 +513,32 @@ class Yatra_Module_Section_System_Status
      */
     public function get_pages()
     {
-        // WC pages to check against.
         $check_pages = array(
-            _x('Shop base', 'Page setting', 'yatra') => array(
-                'option' => 'yatra_shop_page_id',
-                'shortcode' => '',
+
+            _x('Cart', 'Page setting', 'yatra') => array(
+                'option' => 'yatra_cart_page',
+                'shortcode' => '[' . apply_filters('yatra_cart_shortcode_tag', 'yatra_cart') . ']',
                 'block' => '',
             ),
-            _x('Cart', 'Page setting', 'yatra') => array(
-                'option' => 'yatra_cart_page_id',
-                'shortcode' => '[' . apply_filters('yatra_cart_shortcode_tag', 'yatra_cart') . ']',
-                'block' => 'yatra/cart',
-            ),
             _x('Checkout', 'Page setting', 'yatra') => array(
-                'option' => 'yatra_checkout_page_id',
+                'option' => 'yatra_checkout_page',
                 'shortcode' => '[' . apply_filters('yatra_checkout_shortcode_tag', 'yatra_checkout') . ']',
-                'block' => 'yatra/checkout',
+                'block' => '',
             ),
             _x('My account', 'Page setting', 'yatra') => array(
-                'option' => 'yatra_myaccount_page_id',
+                'option' => 'yatra_my_account_page',
                 'shortcode' => '[' . apply_filters('yatra_my_account_shortcode_tag', 'yatra_my_account') . ']',
                 'block' => '',
             ),
             _x('Terms and conditions', 'Page setting', 'yatra') => array(
-                'option' => 'yatra_terms_page_id',
+                'option' => 'yatra_termsandconditions_page',
                 'shortcode' => '',
                 'block' => '',
             ),
         );
 
         $pages_output = array();
+
         foreach ($check_pages as $page_name => $values) {
             $page_id = get_option($values['option']);
             $page_set = false;
