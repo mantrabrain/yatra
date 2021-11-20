@@ -130,7 +130,7 @@ class Yatra_Module_Section_System_Status
     {
         global $wpdb;
 
-        $post_type_counts = $wpdb->get_results("SELECT post_type AS 'type', count(1) AS 'count' FROM {$wpdb->posts} GROUP BY post_type;", 'array');
+        $post_type_counts = $wpdb->get_results("SELECT post_type AS 'type', count(1) AS 'count' FROM {$wpdb->posts} GROUP BY post_type;", ARRAY_A);
 
         return is_array($post_type_counts) ? $post_type_counts : array();
     }
@@ -708,7 +708,7 @@ class Yatra_Module_Section_System_Status
         );
     }
 
-    private static function output_plugins_info($plugins, $untested_plugins=array())
+    private static function output_plugins_info($plugins, $untested_plugins = array())
     {
         $wc_version = YATRA_VERSION;
 

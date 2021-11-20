@@ -4,6 +4,7 @@ class Yatra_Module_Status
 {
     public function __construct()
     {
+        add_action('admin_enqueue_scripts', array($this, 'load_admin_scripts'), 10);
         add_action('admin_menu', array($this, 'status_menu'));
         add_action('yatra_status_system_status', array($this, 'system_status'));
         add_action('yatra_status_logs', array($this, 'logs'));
@@ -44,6 +45,7 @@ class Yatra_Module_Status
         }
         include YATRA_ABSPATH . 'includes/modules/status/templates/html-admin-status.php';
     }
+
     public static function show_messages()
     {
 
@@ -52,12 +54,25 @@ class Yatra_Module_Status
 
     public function system_status()
     {
+        wp_enqueue_style('yatra-admin-status');
+
         include_once "sections/class-yatra-module-section-system-status.php";
     }
 
     public function logs()
     {
         echo '<h1>This is Log Page</h1>';
+    }
+
+    public function load_admin_scripts($id)
+    {
+
+        if ($id !== 'tour_page_yatra-status') {
+            return;
+        }
+
+        wp_register_style('yatra-admin-status', YATRA_PLUGIN_URI . '/includes/modules/status/assets/css/yatra-admin-status.css', array(), YATRA_VERSION);
+
     }
 }
 
