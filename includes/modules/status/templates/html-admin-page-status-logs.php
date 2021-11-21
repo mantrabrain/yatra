@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
                 <?php if (!empty($viewed_log)) : ?>
                     <a class="page-title-action"
                        href="<?php echo esc_url(wp_nonce_url(add_query_arg(array('handle' => sanitize_title($viewed_log)), admin_url('admin.php?page=yatra-status&tab=logs')), 'remove_log')); ?>"
-                       class="button"><?php esc_html_e('Delete log', 'woocommerce'); ?></a>
+                       class="button"><?php esc_html_e('Delete log', 'yatra'); ?></a>
                 <?php endif; ?>
             </h2>
         </div>
@@ -30,7 +30,7 @@ if (!defined('ABSPATH')) {
                         $timestamp = filemtime(yatra()->get_log_dir() . $log_file);
                         $date = sprintf(
                         /* translators: 1: last access date 2: last access time 3: last access timezone abbreviation */
-                            __('%1$s at %2$s %3$s', 'woocommerce'),
+                            __('%1$s at %2$s %3$s', 'yatra'),
                             wp_date(yatra_date_format(), $timestamp),
                             wp_date(yatra_time_format(), $timestamp),
                             wp_date('T', $timestamp)
@@ -42,7 +42,7 @@ if (!defined('ABSPATH')) {
                     <?php endforeach; ?>
                 </select>
                 <button type="submit" class="button"
-                        value="<?php esc_attr_e('View', 'woocommerce'); ?>"><?php esc_html_e('View', 'woocommerce'); ?></button>
+                        value="<?php esc_attr_e('View', 'yatra'); ?>"><?php esc_html_e('View', 'yatra'); ?></button>
             </form>
         </div>
         <div class="clear"></div>
@@ -52,5 +52,5 @@ if (!defined('ABSPATH')) {
     </div>
 <?php else : ?>
     <div class="updated woocommerce-message inline">
-        <p><?php esc_html_e('There are currently no logs to view.', 'woocommerce'); ?></p></div>
+        <p><?php esc_html_e('There are currently no logs to view.', 'yatra'); ?></p></div>
 <?php endif; ?>

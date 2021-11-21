@@ -130,7 +130,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
         } else {
             $settings = array(
                 array(
-                    'title' => __('CSS Classes Settings', 'yatra'),
+                    'title' => __('General Email Settings', 'yatra'),
                     'type' => 'title',
                     'desc' => '',
                     'id' => 'yatra_emails_general_options',
@@ -138,6 +138,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Disable all  emails', 'yatra'),
                     'desc' => __('This option disable all email ( admin and user email )  related to yatra plugin.', 'yatra'),
+
                     'id' => 'yatra_disable_all_email',
                     'type' => 'checkbox',
                 ),
@@ -155,6 +156,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('"From" name', 'yatra'),
                     'desc' => __('From name for outgoing email address from yatra plugin.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_email_from_name',
                     'type' => 'text',
                     'default' => get_bloginfo('name', 'display'),
@@ -165,6 +167,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('"From" email address', 'yatra'),
                     'desc' => __('From email address for outgoing email address from yatra plugin.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_email_from_address',
                     'type' => 'email',
                     'default' => get_option('admin_email'),

@@ -630,7 +630,7 @@ $untested_plugins = array();
             </td>
 
             <td class="help">
-                <?php yatra_tippy_tooltip(esc_html__('Is the connection to your store secure?', 'yatra')); ?>
+                <?php yatra_tippy_tooltip(esc_html__('Is the connection to your site secure?', 'yatra')); ?>
             </td>
             <td>
                 <?php if ($security['secure_connection']) : ?>
@@ -648,7 +648,7 @@ $untested_plugins = array();
         <tr>
             <td data-export-label="Hide errors from visitors"><?php esc_html_e('Hide errors from visitors', 'yatra'); ?></td>
             <td class="help">
-                <?php yatra_tippy_tooltip(esc_html__('Error messages can contain sensitive information about your store environment. These should be hidden from untrusted visitors.', 'yatra')); ?>
+                <?php yatra_tippy_tooltip(esc_html__('Error messages can contain sensitive information about your site environment. These should be hidden from untrusted visitors.', 'yatra')); ?>
             </td>
             <td>
                 <?php if ($security['hide_errors']) : ?>
@@ -756,16 +756,9 @@ $untested_plugins = array();
         </thead>
         <tbody>
         <tr>
-            <td data-export-label="Force SSL"><?php esc_html_e('Force SSL', 'yatra'); ?>:</td>
-            <td class="help">
-                <?php yatra_tippy_tooltip(esc_html__('Does your site force a SSL Certificate for transactions?', 'yatra')); ?>
-            </td>
-            <td><?php echo $settings['force_ssl'] ? '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>' : '<mark class="no">&ndash;</mark>'; ?></td>
-        </tr>
-        <tr>
             <td data-export-label="Currency"><?php esc_html_e('Currency', 'yatra'); ?></td>
             <td class="help">
-                <?php yatra_tippy_tooltip(esc_html__('What currency prices are listed at in the catalog and which currency gateways will take payments in.', 'yatra')); ?>
+                <?php yatra_tippy_tooltip(esc_html__('What currency prices are listed and which currency gateways will take payments in.', 'yatra')); ?>
             </td>
             <td><?php echo esc_html($settings['currency']); ?> (<?php echo esc_html($settings['currency_symbol']); ?>)
             </td>

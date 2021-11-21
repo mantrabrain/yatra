@@ -92,6 +92,7 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Tab Layout for tour page', 'yatra'),
                     'desc' => __('Tab layout for single tour page', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_setting_layouts_single_tour_tab_layout',
                     'type' => 'select',
                     'options' => array(
@@ -118,6 +119,7 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Page Container Class', 'yatra'),
                     'desc' => __('Container class for all page templates for yatra plugin.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_page_container_class',
                     'type' => 'text',
                 ),

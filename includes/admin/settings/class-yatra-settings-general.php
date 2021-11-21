@@ -93,36 +93,42 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Cart Page', 'yatra'),
                     'desc' => __('Cart page for tour booking', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_cart_page',
                     'type' => 'single_select_page',
                 ),
                 array(
                     'title' => __('Checkout Page', 'yatra'),
                     'desc' => __('Checkout page for tour booking', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_checkout_page',
                     'type' => 'single_select_page',
                 ),
                 array(
                     'title' => __('My Account Page', 'yatra'),
                     'desc' => __('My Account Page', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_my_account_page',
                     'type' => 'single_select_page',
                 ),
                 array(
                     'title' => __('Thank you page', 'yatra'),
                     'desc' => __('Thank you page after tour booking completed.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_thankyou_page',
                     'type' => 'single_select_page',
                 ),
                 array(
                     'title' => __('Transaction failed page', 'yatra'),
                     'desc' => __('This is the page buyers are sent to if their transaction is cancelled or fails', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_failed_transaction_page',
                     'type' => 'single_select_page',
                 ),
                 array(
-                    'title' => __('Terms and conditions page', 'yatra'),
+                    'title' => __('Terms and conditions', 'yatra'),
                     'desc' => __('Page for your terms and condition.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_termsandconditions_page',
                     'type' => 'single_select_page',
                 ),
@@ -145,6 +151,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Currency & symbol', 'yatra'),
                     'desc' => __('Currency for price of tour and other pricing parts.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_currency',
                     'default' => 'USD',
                     'type' => 'select',
@@ -153,6 +160,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Book Now Button Text', 'yatra'),
                     'desc' => __('Text for Book now button.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_booknow_button_text',
                     'default' => __('Book Now', 'yatra'),
                     'type' => 'text',
@@ -160,6 +168,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Book Now loading text', 'yatra'),
                     'desc' => __('Text for loading book now button.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_booknow_loading_text',
                     'default' => __('Loading....', 'yatra'),
                     'type' => 'text',
@@ -167,6 +176,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Booking Form Title', 'yatra'),
                     'desc' => __('Title for booking form', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_booking_form_title_text',
                     'default' => __('Booking Form', 'yatra'),
                     'type' => 'text',
@@ -174,6 +184,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Enquiry Form Title', 'yatra'),
                     'desc' => __('Title for enquiry form', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_enquiry_form_title_text',
                     'default' => __('Enquiry Form', 'yatra'),
                     'type' => 'text',
@@ -182,6 +193,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Enquiry Button Text', 'yatra'),
                     'desc' => __('Enquiry Button Text', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_enquiry_button_text',
                     'default' => __('Send Enquiry', 'yatra'),
                     'type' => 'text',
@@ -189,6 +201,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Select Date Title', 'yatra'),
                     'desc' => __('Select Date Title', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_select_date_title',
                     'default' => __('Please select date', 'yatra'),
                     'type' => 'text',
@@ -196,6 +209,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Attributes Title', 'yatra'),
                     'desc' => __('Title for custom attributes', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_custom_attributes_title_text',
                     'default' => __('Attributes', 'yatra'),
                     'type' => 'text',
@@ -203,6 +217,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Update cart button text', 'yatra'),
                     'desc' => __('Text for update cart button', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_update_cart_text',
                     'default' => __('Update Cart', 'yatra'),
                     'type' => 'text',
@@ -210,6 +225,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Proceed to checkout text', 'yatra'),
                     'desc' => __('Text for proceed to checkout button.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_proceed_to_checkout_text',
                     'default' => __('Proceed to checkout', 'yatra'),
                     'type' => 'text',
@@ -217,6 +233,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Order booking text', 'yatra'),
                     'desc' => __('Text for order booking text.', 'yatra'),
+                    'desc_tip' => true,
                     'id' => 'yatra_order_booking_text',
                     'default' => __('Order Booking', 'yatra'),
                     'type' => 'text',

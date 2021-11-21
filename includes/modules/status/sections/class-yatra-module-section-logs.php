@@ -28,7 +28,7 @@ class Yatra_Module_Section_Logs
     public static function remove_log()
     {
         if (empty($_REQUEST['_wpnonce']) || !wp_verify_nonce(wp_unslash($_REQUEST['_wpnonce']), 'remove_log')) { // WPCS: input var ok, sanitization ok.
-            wp_die(esc_html__('Action failed. Please refresh the page and retry.', 'woocommerce'));
+            wp_die(esc_html__('Action failed. Please refresh the page and retry.', 'yatra'));
         }
 
         if (!empty($_REQUEST['handle'])) {  // WPCS: input var ok.
@@ -62,7 +62,7 @@ class Yatra_Module_Section_Logs
     private static function flush_db_logs()
     {
         if (empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], 'yatra-status-logs')) { // WPCS: input var ok, sanitization ok.
-            wp_die(esc_html__('Action failed. Please refresh the page and retry.', 'woocommerce'));
+            wp_die(esc_html__('Action failed. Please refresh the page and retry.', 'yatra'));
         }
 
         Yatra_Log_Handler_DB::flush();

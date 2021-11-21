@@ -52,6 +52,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 				$settings[] = include 'settings/class-yatra-settings-checkout.php';
 				$settings[] = include 'settings/class-yatra-settings-payment-gateways.php';
 				$settings[] = include 'settings/class-yatra-settings-frontend-tabs.php';
+				$settings[] = include 'settings/class-yatra-settings-miscellaneous.php';
 
 
 				self::$settings = apply_filters( 'yatra_get_settings_pages', $settings );
@@ -751,9 +752,9 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 			}
 
 			if ( $tooltip_html && in_array( $value['type'], array( 'checkbox' ), true ) ) {
-				$tooltip_html = '<p class="description">' . $tooltip_html . '</p>';
-			} elseif ( $tooltip_html ) {
-				$tooltip_html = ( $tooltip_html );
+				$tooltip_html = yatra_tippy_tooltip($tooltip_html, false);
+			} elseif ( ''!==$tooltip_html ) {
+				$tooltip_html = yatra_tippy_tooltip($tooltip_html, false);
 			}
 
 			return array(
