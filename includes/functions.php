@@ -1254,10 +1254,3 @@ function yatra_print_js()
         unset($yatra_queued_js);
     }
 }
-
-add_action('plugins_loaded', function () {
-    $logger = yatra_get_logger();
-
-
-    $logger->info(sprintf('Checking Log wow '), array('source' => 'email'));
-});

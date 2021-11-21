@@ -71,6 +71,9 @@ if (!class_exists('Yatra_Email')) {
 
                     $this->send($admin_emails, $admin_subject, $admin_message, $yatra_all_smart_tags, array(), true);
 
+                    $logger = yatra_get_logger();
+
+                    $logger->info(__('Booking Email Successfully sent to admin', 'yatra'), array('source' => 'email'));
                 }
 
             }
@@ -118,6 +121,9 @@ if (!class_exists('Yatra_Email')) {
 
                     $this->send($admin_emails, $admin_subject, $admin_message, $yatra_all_smart_tags, array(), true);
 
+                    $logger = yatra_get_logger();
+
+                    $logger->info(__('Booking Status Change email Successfully sent to admin', 'yatra'), array('source' => 'email'));
                 }
 
             }
@@ -213,15 +219,14 @@ if (!class_exists('Yatra_Email')) {
         /**
          * Trigger the user email.
          *
-         * @param  array $emails List of email
-         * @param  string $subject Subject
-         * @param  string $message String.
-         * @param  array $smart_values Array
+         * @param array $emails List of email
+         * @param string $subject Subject
+         * @param string $message String.
+         * @param array $smart_values Array
          * @return void
          */
         public function send($emails, $subject, $message, $all_smart_tags = array(), $attachment = array(), $is_admin_email = false)
         {
-
 
             foreach ($all_smart_tags as $tag => $tag_value) {
 
