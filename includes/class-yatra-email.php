@@ -71,9 +71,6 @@ if (!class_exists('Yatra_Email')) {
 
                     $this->send($admin_emails, $admin_subject, $admin_message, $yatra_all_smart_tags, array(), true);
 
-                    $logger = yatra_get_logger();
-
-                    $logger->info(__('Booking Email Successfully sent to admin', 'yatra'), array('source' => 'email'));
                 }
 
             }
@@ -121,9 +118,6 @@ if (!class_exists('Yatra_Email')) {
 
                     $this->send($admin_emails, $admin_subject, $admin_message, $yatra_all_smart_tags, array(), true);
 
-                    $logger = yatra_get_logger();
-
-                    $logger->info(__('Booking Status Change email Successfully sent to admin', 'yatra'), array('source' => 'email'));
                 }
 
             }
