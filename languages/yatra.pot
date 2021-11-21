@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.3\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-11-21 06:18:18+00:00\n"
+"POT-Creation-Date: 2021-11-21 12:28:06+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,31 +35,31 @@ msgstr ""
 msgid "Select an Image"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:133
+#: includes/admin/class-yatra-admin-assets.php:135
 msgid "Are you sure want to remove this item?"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:135
+#: includes/admin/class-yatra-admin-assets.php:137
 msgid ""
 "%1sWarning%2s: If you remove this tab, all of your contents associated with "
 "this tab will be deleted"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:137
-#: includes/admin/class-yatra-admin-assets.php:143
+#: includes/admin/class-yatra-admin-assets.php:139
+#: includes/admin/class-yatra-admin-assets.php:145
 msgid "Yes, Confirm"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:139
-#: includes/admin/class-yatra-admin-assets.php:145
+#: includes/admin/class-yatra-admin-assets.php:141
+#: includes/admin/class-yatra-admin-assets.php:147
 msgid "Cancel this process"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:141
+#: includes/admin/class-yatra-admin-assets.php:143
 msgid "Are you sure want to delete attribute?"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:150
+#: includes/admin/class-yatra-admin-assets.php:152
 msgid "Font Awesome"
 msgstr ""
 
@@ -202,15 +202,15 @@ msgstr ""
 msgid "Yatra My Account Page"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-settings.php:76
+#: includes/admin/class-yatra-admin-settings.php:77
 msgid "Your settings have been saved."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-settings.php:641
+#: includes/admin/class-yatra-admin-settings.php:642
 msgid "Select a page&hellip;"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-settings.php:707
+#: includes/admin/class-yatra-admin-settings.php:708
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:17
 #: includes/template-tags.php:659
 msgid "Add New"
@@ -430,7 +430,7 @@ msgid "When you get new customer, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:123
-#: includes/modules/status/templates/html-admin-page-status-report.php:871
+#: includes/modules/status/templates/html-admin-page-status-report.php:864
 #: templates/myaccount/tmpl-dashboard.php:23
 msgid "Name"
 msgstr ""
@@ -558,26 +558,25 @@ msgstr ""
 msgid "Tab layout for single tour page"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:98
+#: includes/admin/settings/class-yatra-settings-design.php:99
 #: includes/admin/setup/class-yatra-setup-wizard.php:385
 msgid "Tab Style Layout"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:99
+#: includes/admin/settings/class-yatra-settings-design.php:100
 #: includes/admin/setup/class-yatra-setup-wizard.php:386
 msgid "Heading & Content Style Tab"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:113
-#: includes/admin/settings/class-yatra-settings-emails.php:133
+#: includes/admin/settings/class-yatra-settings-design.php:114
 msgid "CSS Classes Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:119
+#: includes/admin/settings/class-yatra-settings-design.php:120
 msgid "Page Container Class"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:120
+#: includes/admin/settings/class-yatra-settings-design.php:121
 #: includes/admin/setup/class-yatra-setup-wizard.php:369
 msgid "Container class for all page templates for yatra plugin."
 msgstr ""
@@ -632,6 +631,10 @@ msgid ""
 "customer."
 msgstr ""
 
+#: includes/admin/settings/class-yatra-settings-emails.php:133
+msgid "General Email Settings"
+msgstr ""
+
 #: includes/admin/settings/class-yatra-settings-emails.php:139
 msgid "Disable all  emails"
 msgstr ""
@@ -642,23 +645,23 @@ msgid ""
 "plugin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:150
+#: includes/admin/settings/class-yatra-settings-emails.php:151
 msgid "Email Sender Options"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:156
+#: includes/admin/settings/class-yatra-settings-emails.php:157
 msgid "\"From\" name"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:157
+#: includes/admin/settings/class-yatra-settings-emails.php:158
 msgid "From name for outgoing email address from yatra plugin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:166
+#: includes/admin/settings/class-yatra-settings-emails.php:168
 msgid "\"From\" email address"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:167
+#: includes/admin/settings/class-yatra-settings-emails.php:169
 msgid "From email address for outgoing email address from yatra plugin."
 msgstr ""
 
@@ -696,140 +699,140 @@ msgstr ""
 msgid "Cart page for tour booking"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:100
+#: includes/admin/settings/class-yatra-settings-general.php:101
 #: includes/admin/setup/class-yatra-setup-wizard.php:287
 msgid "Checkout Page"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:101
+#: includes/admin/settings/class-yatra-settings-general.php:102
 msgid "Checkout page for tour booking"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:106
-#: includes/admin/settings/class-yatra-settings-general.php:107
+#: includes/admin/settings/class-yatra-settings-general.php:108
+#: includes/admin/settings/class-yatra-settings-general.php:109
 #: includes/admin/setup/class-yatra-setup-wizard.php:299
 msgid "My Account Page"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:112
+#: includes/admin/settings/class-yatra-settings-general.php:115
 msgid "Thank you page"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:113
+#: includes/admin/settings/class-yatra-settings-general.php:116
 msgid "Thank you page after tour booking completed."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:118
+#: includes/admin/settings/class-yatra-settings-general.php:122
 msgid "Transaction failed page"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:119
+#: includes/admin/settings/class-yatra-settings-general.php:123
 msgid ""
 "This is the page buyers are sent to if their transaction is cancelled or "
 "fails"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:124
-msgid "Terms and conditions page"
+#: includes/admin/settings/class-yatra-settings-general.php:129
+msgid "Terms and conditions"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:125
+#: includes/admin/settings/class-yatra-settings-general.php:130
 msgid "Page for your terms and condition."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:140
+#: includes/admin/settings/class-yatra-settings-general.php:146
 #: includes/admin/setup/class-yatra-setup-wizard.php:222
 msgid "General Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:146
+#: includes/admin/settings/class-yatra-settings-general.php:152
 msgid "Currency & symbol"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:147
+#: includes/admin/settings/class-yatra-settings-general.php:153
 msgid "Currency for price of tour and other pricing parts."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:154
+#: includes/admin/settings/class-yatra-settings-general.php:161
 msgid "Book Now Button Text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:155
+#: includes/admin/settings/class-yatra-settings-general.php:162
 msgid "Text for Book now button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:157
+#: includes/admin/settings/class-yatra-settings-general.php:165
 msgid "Book Now"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:161
+#: includes/admin/settings/class-yatra-settings-general.php:169
 msgid "Book Now loading text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:162
+#: includes/admin/settings/class-yatra-settings-general.php:170
 msgid "Text for loading book now button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:164
+#: includes/admin/settings/class-yatra-settings-general.php:173
 #: templates/tour/book-now-button.php:5
 msgid "Loading...."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:168
+#: includes/admin/settings/class-yatra-settings-general.php:177
 msgid "Booking Form Title"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:169
+#: includes/admin/settings/class-yatra-settings-general.php:178
 msgid "Title for booking form"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:171
+#: includes/admin/settings/class-yatra-settings-general.php:181
 #: templates/tour/sidebar.php:30
 msgid "Booking Form"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:175
+#: includes/admin/settings/class-yatra-settings-general.php:185
 msgid "Enquiry Form Title"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:176
+#: includes/admin/settings/class-yatra-settings-general.php:186
 msgid "Title for enquiry form"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:178
+#: includes/admin/settings/class-yatra-settings-general.php:189
 #: templates/tour/sidebar.php:36
 msgid "Enquiry Form"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:183
-#: includes/admin/settings/class-yatra-settings-general.php:184
+#: includes/admin/settings/class-yatra-settings-general.php:194
+#: includes/admin/settings/class-yatra-settings-general.php:195
 msgid "Enquiry Button Text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:186
+#: includes/admin/settings/class-yatra-settings-general.php:198
 #: templates/tour/enquiry-button.php:2 templates/tour/enquiry-form.php:14
 msgid "Send Enquiry"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:190
-#: includes/admin/settings/class-yatra-settings-general.php:191
+#: includes/admin/settings/class-yatra-settings-general.php:202
+#: includes/admin/settings/class-yatra-settings-general.php:203
 msgid "Select Date Title"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:193
+#: includes/admin/settings/class-yatra-settings-general.php:206
 #: templates/tour/sidebar.php:8
 msgid "Please select date"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:197
+#: includes/admin/settings/class-yatra-settings-general.php:210
 msgid "Attributes Title"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:198
+#: includes/admin/settings/class-yatra-settings-general.php:211
 msgid "Title for custom attributes"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:200
+#: includes/admin/settings/class-yatra-settings-general.php:214
 #: includes/functions.php:64 includes/hooks/yatra-list-table-hooks.php:19
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:179
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:180
@@ -837,40 +840,69 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:204
+#: includes/admin/settings/class-yatra-settings-general.php:218
 msgid "Update cart button text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:205
+#: includes/admin/settings/class-yatra-settings-general.php:219
 msgid "Text for update cart button"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:207
+#: includes/admin/settings/class-yatra-settings-general.php:222
 msgid "Update Cart"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:211
+#: includes/admin/settings/class-yatra-settings-general.php:226
 msgid "Proceed to checkout text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:212
+#: includes/admin/settings/class-yatra-settings-general.php:227
 msgid "Text for proceed to checkout button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:214
+#: includes/admin/settings/class-yatra-settings-general.php:230
 msgid "Proceed to checkout"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:218
+#: includes/admin/settings/class-yatra-settings-general.php:234
 msgid "Order booking text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:219
+#: includes/admin/settings/class-yatra-settings-general.php:235
 msgid "Text for order booking text."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:221
+#: includes/admin/settings/class-yatra-settings-general.php:238
 msgid "Order Booking"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:29
+#: includes/admin/setup/class-yatra-setup-wizard.php:69
+msgid "Miscellaneous"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:42
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:87
+msgid "Miscellaneous Settings"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:92
+msgid "Log Options"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:93
+msgid ""
+"This option allows you to setup log option for yatra plugin. Log option "
+"might be on file or on db or no log."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:99
+msgid "File"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:100
+#: includes/modules/status/templates/html-admin-page-status-report.php:508
+msgid "Database"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
@@ -896,10 +928,6 @@ msgstr ""
 
 #: includes/admin/setup/class-yatra-setup-wizard.php:49
 msgid "Introduction"
-msgstr ""
-
-#: includes/admin/setup/class-yatra-setup-wizard.php:69
-msgid "Miscellaneous"
 msgstr ""
 
 #: includes/admin/setup/class-yatra-setup-wizard.php:74
@@ -953,7 +981,7 @@ msgid "Not right now"
 msgstr ""
 
 #: includes/admin/setup/class-yatra-setup-wizard.php:228
-#: includes/modules/status/templates/html-admin-page-status-report.php:766
+#: includes/modules/status/templates/html-admin-page-status-report.php:759
 msgid "Currency"
 msgstr ""
 
@@ -1371,6 +1399,14 @@ msgstr ""
 
 #: includes/class-yatra-compatibility.php:62 includes/class-yatra.php:106
 msgid "Unserializing instances of this class is forbidden."
+msgstr ""
+
+#: includes/class-yatra-email.php:76
+msgid "Booking Email Successfully sent to admin"
+msgstr ""
+
+#: includes/class-yatra-email.php:126
+msgid "Booking Status Change email Successfully sent to admin"
 msgstr ""
 
 #: includes/class-yatra-enquiry-form.php:86
@@ -2572,69 +2608,69 @@ msgstr ""
 msgid "All sources"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-logs.php:31
-#: includes/modules/status/sections/class-yatra-module-section-logs.php:65
-#: includes/modules/status/sections/class-yatra-module-section-logs.php:77
+#: includes/modules/status/sections/class-yatra-module-section-logs.php:39
+#: includes/modules/status/sections/class-yatra-module-section-logs.php:73
+#: includes/modules/status/sections/class-yatra-module-section-logs.php:85
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:616
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:582
 msgid "cURL installed but unable to retrieve version."
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:719
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:685
 #: includes/modules/status/templates/html-admin-page-status-report.php:732
 msgid "Visit plugin homepage"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:728
-#: includes/modules/status/templates/html-admin-page-status-report.php:882
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:694
+#: includes/modules/status/templates/html-admin-page-status-report.php:875
 #. translators: 1: current version. 2: latest version
 msgid "%1$s (update to version %2$s is available)"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:732
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:698
 msgid "Network enabled"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:740
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:706
 #. translators: %s: version
 msgid "Installed version not tested with active version of Yatra %s"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:751
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:717
 #: includes/modules/status/templates/html-admin-page-status-report.php:741
 #. translators: %s: plugin author
 msgid "by %s"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-logs-db.php:14
+#: includes/modules/status/templates/html-admin-page-status-logs-db.php:8
 msgid "Search logs"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-logs-db.php:20
+#: includes/modules/status/templates/html-admin-page-status-logs-db.php:14
 msgid "Flush all logs"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-logs-db.php:26
+#: includes/modules/status/templates/html-admin-page-status-logs-db.php:20
 msgid "Are you sure you want to clear all logs from the database?"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-logs.php:21
+#: includes/modules/status/templates/html-admin-page-status-logs.php:16
 msgid "Delete log"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-logs.php:33
+#: includes/modules/status/templates/html-admin-page-status-logs.php:28
 #. translators: 1: last access date 2: last access time 3: last access timezone
 #. abbreviation
 msgid "%1$s at %2$s %3$s"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-logs.php:45
+#: includes/modules/status/templates/html-admin-page-status-logs.php:40
 msgid "View"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-logs.php:55
+#: includes/modules/status/templates/html-admin-page-status-logs.php:50
 msgid "There are currently no logs to view."
 msgstr ""
 
@@ -2991,10 +3027,6 @@ msgid ""
 "updates."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:508
-msgid "Database"
-msgstr ""
-
 #: includes/modules/status/templates/html-admin-page-status-report.php:517
 msgid "Database prefix"
 msgstr ""
@@ -3055,7 +3087,7 @@ msgid "Secure connection (HTTPS)"
 msgstr ""
 
 #: includes/modules/status/templates/html-admin-page-status-report.php:633
-msgid "Is the connection to your store secure?"
+msgid "Is the connection to your site secure?"
 msgstr ""
 
 #: includes/modules/status/templates/html-admin-page-status-report.php:642
@@ -3069,7 +3101,7 @@ msgstr ""
 
 #: includes/modules/status/templates/html-admin-page-status-report.php:651
 msgid ""
-"Error messages can contain sensitive information about your store "
+"Error messages can contain sensitive information about your site "
 "environment. These should be hidden from untrusted visitors."
 msgstr ""
 
@@ -3097,121 +3129,113 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:759
-msgid "Force SSL"
-msgstr ""
-
 #: includes/modules/status/templates/html-admin-page-status-report.php:761
-msgid "Does your site force a SSL Certificate for transactions?"
-msgstr ""
-
-#: includes/modules/status/templates/html-admin-page-status-report.php:768
 msgid ""
-"What currency prices are listed at in the catalog and which currency "
-"gateways will take payments in."
+"What currency prices are listed and which currency gateways will take "
+"payments in."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:774
+#: includes/modules/status/templates/html-admin-page-status-report.php:767
 msgid "Currency position"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:776
+#: includes/modules/status/templates/html-admin-page-status-report.php:769
 msgid "The position of the currency symbol."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:781
+#: includes/modules/status/templates/html-admin-page-status-report.php:774
 msgid "Thousand separator"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:783
+#: includes/modules/status/templates/html-admin-page-status-report.php:776
 msgid "The thousand separator of displayed prices."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:788
+#: includes/modules/status/templates/html-admin-page-status-report.php:781
 msgid "Decimal separator"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:790
+#: includes/modules/status/templates/html-admin-page-status-report.php:783
 msgid "The decimal separator of displayed prices."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:795
+#: includes/modules/status/templates/html-admin-page-status-report.php:788
 msgid "Number of decimals"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:797
+#: includes/modules/status/templates/html-admin-page-status-report.php:790
 msgid "The number of decimal points shown in displayed prices."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:807
+#: includes/modules/status/templates/html-admin-page-status-report.php:800
 msgid "Yatra Pages"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:819
+#: includes/modules/status/templates/html-admin-page-status-report.php:812
 #. Translators: %s: page name.
 msgid "Edit %s page"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:829
+#: includes/modules/status/templates/html-admin-page-status-report.php:822
 #. Translators: %s: page name.
 msgid "The URL of your %s page (along with the Page ID)."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:834
+#: includes/modules/status/templates/html-admin-page-status-report.php:827
 msgid "Page not set"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:837
+#: includes/modules/status/templates/html-admin-page-status-report.php:830
 msgid "Page ID is set, but the page does not exist"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:841
+#: includes/modules/status/templates/html-admin-page-status-report.php:834
 #. Translators: %s: docs link.
 msgid "Page visibility should be <a href=\"%s\" target=\"_blank\">public</a>"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:848
+#: includes/modules/status/templates/html-admin-page-status-report.php:841
 #. Translators: %1$s: shortcode text, %2$s: block slug.
 msgid "Page does not contain the %1$s shortcode or the %2$s block."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:848
+#: includes/modules/status/templates/html-admin-page-status-report.php:841
 msgid "Page does not contain the %s shortcode."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:866
+#: includes/modules/status/templates/html-admin-page-status-report.php:859
 msgid "Theme"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:872
+#: includes/modules/status/templates/html-admin-page-status-report.php:865
 msgid "The name of the current active theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:876
+#: includes/modules/status/templates/html-admin-page-status-report.php:869
 msgid "Version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:877
+#: includes/modules/status/templates/html-admin-page-status-report.php:870
 msgid "The installed version of the current active theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:890
+#: includes/modules/status/templates/html-admin-page-status-report.php:883
 msgid "Author URL"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:891
+#: includes/modules/status/templates/html-admin-page-status-report.php:884
 msgid "The theme developers URL."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:895
+#: includes/modules/status/templates/html-admin-page-status-report.php:888
 msgid "Child theme"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:896
+#: includes/modules/status/templates/html-admin-page-status-report.php:889
 msgid "Displays whether or not the current theme is a child theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:903
+#: includes/modules/status/templates/html-admin-page-status-report.php:896
 #. Translators: %s docs link.
 msgid ""
 "If you are modifying Yatra on a parent theme that you did not build "
@@ -3219,84 +3243,84 @@ msgid ""
 "target=\"_blank\">How to create a child theme</a>"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:910
+#: includes/modules/status/templates/html-admin-page-status-report.php:903
 msgid "Parent theme name"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:911
+#: includes/modules/status/templates/html-admin-page-status-report.php:904
 msgid "The name of the parent theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:915
+#: includes/modules/status/templates/html-admin-page-status-report.php:908
 msgid "Parent theme version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:917
+#: includes/modules/status/templates/html-admin-page-status-report.php:910
 msgid "The installed version of the parent theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:923
+#: includes/modules/status/templates/html-admin-page-status-report.php:916
 #. translators: %s: parent theme latest version
 msgid "%s is available"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:929
+#: includes/modules/status/templates/html-admin-page-status-report.php:922
 msgid "Parent theme author URL"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:932
+#: includes/modules/status/templates/html-admin-page-status-report.php:925
 msgid "The parent theme developers URL."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:942
+#: includes/modules/status/templates/html-admin-page-status-report.php:935
 msgid "Templates"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:945
+#: includes/modules/status/templates/html-admin-page-status-report.php:938
 msgid ""
 "This section shows any files that are overriding the default Yatra template "
 "pages."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:953
+#: includes/modules/status/templates/html-admin-page-status-report.php:946
 msgid "Archive template"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:955
+#: includes/modules/status/templates/html-admin-page-status-report.php:948
 msgid ""
 "Your theme has a yatra.php file, you will not be able to override the "
 "yatra/archive-product.php custom template since yatra.php has priority over "
 "archive-product.php. This is intended to prevent display issues."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:960
-#: includes/modules/status/templates/html-admin-page-status-report.php:989
+#: includes/modules/status/templates/html-admin-page-status-report.php:953
+#: includes/modules/status/templates/html-admin-page-status-report.php:982
 msgid "Overrides"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:971
+#: includes/modules/status/templates/html-admin-page-status-report.php:964
 #. Translators: %1$s: Template name, %2$s: Template version, %3$s: Core
 #. version.
 msgid "%1$s version %2$s is out of date. The core version is %3$s"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:997
+#: includes/modules/status/templates/html-admin-page-status-report.php:990
 msgid "Outdated templates"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:1004
+#: includes/modules/status/templates/html-admin-page-status-report.php:997
 msgid "Learn how to update"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:1018
+#: includes/modules/status/templates/html-admin-page-status-report.php:1011
 msgid "Status Report Information"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:1020
+#: includes/modules/status/templates/html-admin-page-status-report.php:1013
 msgid "This section shows information about this status report."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:1028
+#: includes/modules/status/templates/html-admin-page-status-report.php:1021
 msgid "Generated at"
 msgstr ""
 
@@ -4046,22 +4070,22 @@ msgctxt "Booking status"
 msgid "Cancelled"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:503
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:469
 msgctxt "Page setting"
 msgid "Cart"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:508
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:474
 msgctxt "Page setting"
 msgid "Checkout"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:513
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:479
 msgctxt "Page setting"
 msgid "My account"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:518
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:484
 msgctxt "Page setting"
 msgid "Terms and conditions"
 msgstr ""
