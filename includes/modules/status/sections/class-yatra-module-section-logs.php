@@ -4,7 +4,15 @@ class Yatra_Module_Section_Logs
 {
     public function __construct()
     {
-        $log_handler = defined('YATRA_LOG_HANDLER') ? YATRA_LOG_HANDLER : '';
+        $log_options = $log_options = get_option('yatra_log_options', 'db');
+
+        if ($log_options === 'db') {
+
+            $log_handler = 'Yatra_Log_Handler_DB';
+        } else {
+            $log_handler = 'Yatra_Log_Handler_File';
+        }
+
 
         if ('Yatra_Log_Handler_DB' === $log_handler) {
 

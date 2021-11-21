@@ -98,7 +98,6 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
                 'options' => array(
                     'file' => __('File', 'yatra'),
                     'db' => __('Database', 'yatra'),
-                    'none' => __('None', 'yatra')
                 )
             ),
             array(

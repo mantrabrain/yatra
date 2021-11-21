@@ -11,7 +11,14 @@ class Yatra_Log_Handler_Hooks
 
     public function update_handler($handlers)
     {
-        $handler_class = defined('YATRA_LOG_HANDLER') ? YATRA_LOG_HANDLER : null;
+        $log_options = get_option('yatra_log_options', 'db');
+
+        if ($log_options === 'file') {
+
+            $handler_class = 'Yatra_Log_Handler_File';
+        } else {
+            $handler_class = 'Yatra_Log_Handler_DB';
+        }
 
         if (!class_exists($handler_class)) {
 
