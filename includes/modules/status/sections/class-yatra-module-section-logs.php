@@ -72,7 +72,6 @@ class Yatra_Module_Section_Logs
         if (empty($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], 'yatra-status-logs')) { // WPCS: input var ok, sanitization ok.
             wp_die(esc_html__('Action failed. Please refresh the page and retry.', 'yatra'));
         }
-
         Yatra_Log_Handler_DB::flush();
 
         wp_safe_redirect(esc_url_raw(admin_url('admin.php?page=yatra-status&tab=logs')));
@@ -96,7 +95,7 @@ class Yatra_Module_Section_Logs
 
     public static function status_logs_db()
     {
-        if (!empty($_REQUEST['flush-logs'])) { // WPCS: input var ok, CSRF ok.
+        if (!empty($_REQUEST['yatra-flush-logs'])) { // WPCS: input var ok, CSRF ok.
             self::flush_db_logs();
         }
 

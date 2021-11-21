@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  * Handles log entries by writing to database.
  *
