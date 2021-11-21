@@ -1,3 +1,8 @@
+= 2.1.2 | 2021/11/09 =
+* Fixed - My Account Page Design fixed
+* Fixed - Minor issue fixed
+* Fixed - Added filters for addons
+
 = 2.1.1 | 2021/11/02 =
 * Fixed - Frontend design update & responsive issue fixed
 * Fixed - Multisite issue fixed

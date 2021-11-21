@@ -244,6 +244,18 @@ if (!class_exists('Yatra_Email')) {
 
                 $status = wp_mail($email, $subject, $message, $this->yatra_get_header($is_admin_email));
 
+                $logger = yatra_get_logger();
+
+                $message = sprintf(__('Yatra Email successfully sent to %s', 'yatra'), $email);
+
+                if (!$status) {
+
+                    $message = sprintf(__('Yatra Email could not sent to %s via WP_Mail function', 'yatra'), $email);
+
+                }
+
+                $logger->info($message, array('source' => 'email'));
+
             }
             do_action('yatra_email_send_after');
 
