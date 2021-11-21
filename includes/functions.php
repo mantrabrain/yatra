@@ -1226,6 +1226,34 @@ function yatra_get_logger()
     return $logger;
 }
 
+function yatra_enqueue_js($code)
+{
+    global $yatra_queued_js;
+
+    if (empty($yatra_queued_js)) {
+        $yatra_queued_js = '';
+    }
+
+    $yatra_queued_js .= "\n" . $code . "\n";
+}
+
+function yatra_print_js()
+{
+    global $yatra_queued_js;
+
+    if (!empty($yatra_queued_js)) {
+        // Sanitize.
+        $yatra_queued_js = wp_check_invalid_utf8($yatra_queued_js);
+        $yatra_queued_js = preg_replace('/&#(x)?0*(?(1)27|39);?/i', "'", $yatra_queued_js);
+        $yatra_queued_js = str_replace("\r", '', $yatra_queued_js);
+
+        $js = "<!-- Yatra JavaScript -->\n<script type=\"text/javascript\">\njQuery(function($) { $yatra_queued_js });\n</script>\n";
+
+        echo apply_filters('yatra_queued_js', $js); //
+
+        unset($yatra_queued_js);
+    }
+}
 
 add_action('plugins_loaded', function () {
     $logger = yatra_get_logger();

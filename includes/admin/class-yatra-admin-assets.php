@@ -7,6 +7,8 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
             add_action('admin_enqueue_scripts', array($this, 'load_admin_scripts'), 10);
 
+            add_action('admin_footer', 'yatra_print_js', 30);
+            
         }
 
         public function load_admin_scripts($hook)

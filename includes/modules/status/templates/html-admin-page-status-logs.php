@@ -1,9 +1,4 @@
 <?php
-/**
- * Admin View: Page - Status Logs
- *
- * @package WooCommerce\Admin\Logs
- */
 
 if (!defined('ABSPATH')) {
     exit;
@@ -51,6 +46,6 @@ if (!defined('ABSPATH')) {
         <pre><?php echo esc_html(file_get_contents(yatra()->get_log_dir() . $viewed_log)); ?></pre>
     </div>
 <?php else : ?>
-    <div class="updated woocommerce-message inline">
+    <div class="updated yatra-message inline">
         <p><?php esc_html_e('There are currently no logs to view.', 'yatra'); ?></p></div>
 <?php endif; ?>
