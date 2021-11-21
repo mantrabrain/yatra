@@ -48,11 +48,14 @@ class Yatra_Module_Status
         include YATRA_ABSPATH . 'includes/modules/status/templates/html-admin-status.php';
     }
 
-    public function log_action_init()
+    public function log_action_init($id)
     {
+
         $current_tab = empty($_GET['tab']) ? '' : sanitize_title(wp_unslash($_GET['tab'])); // WPCS: input var okay, CSRF ok.
 
-        if ($current_tab === "logs") {
+        $page = empty($_GET['page']) ? '' : sanitize_title(wp_unslash($_GET['page'])); // WPCS: input var okay, CSRF ok.
+
+        if ($current_tab === "logs" && $page === 'yatra-status') {
 
             include_once "sections/class-yatra-module-section-logs.php";
 
