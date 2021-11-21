@@ -1,9 +1,4 @@
 <?php
-/**
- * Admin View: Settings
- *
- * @package AgencyEcommerceAddons
- */
 
 if (!defined('ABSPATH')) {
     exit;

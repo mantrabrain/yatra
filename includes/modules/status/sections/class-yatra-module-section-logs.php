@@ -2,27 +2,6 @@
 
 class Yatra_Module_Section_Logs
 {
-    public function __construct()
-    {
-        $log_options = $log_options = get_option('yatra_log_options', 'db');
-
-        if ($log_options === 'db') {
-
-            $log_handler = 'Yatra_Log_Handler_DB';
-        } else {
-            $log_handler = 'Yatra_Log_Handler_File';
-        }
-
-
-        if ('Yatra_Log_Handler_DB' === $log_handler) {
-
-            self::status_logs_db();
-
-        } else {
-            self::status_logs_file();
-        }
-    }
-
     public static function get_log_file_handle($filename)
     {
         return substr($filename, 0, strlen($filename) > 48 ? strlen($filename) - 48 : strlen($filename) - 4);
@@ -48,7 +27,14 @@ class Yatra_Module_Section_Logs
         exit();
     }
 
-    public static function status_logs_file()
+    public static function status_logs_file_actions()
+    {
+        if (!empty($_REQUEST['handle'])) { // WPCS: input var ok, CSRF ok.
+            self::remove_log();
+        }
+    }
+
+    public static function status_logs_file_template()
     {
         $logs = self::scan_log_files();
 
@@ -57,12 +43,7 @@ class Yatra_Module_Section_Logs
         } elseif (!empty($logs)) {
             $viewed_log = current($logs);
         }
-
         $handle = !empty($viewed_log) ? self::get_log_file_handle($viewed_log) : '';
-
-        if (!empty($_REQUEST['handle'])) { // WPCS: input var ok, CSRF ok.
-            self::remove_log();
-        }
 
         include YATRA_ABSPATH . 'includes/modules/status/templates/html-admin-page-status-logs.php';
     }
@@ -93,7 +74,7 @@ class Yatra_Module_Section_Logs
         }
     }
 
-    public static function status_logs_db()
+    public static function status_log_database_actions()
     {
         if (!empty($_REQUEST['yatra-flush-logs'])) { // WPCS: input var ok, CSRF ok.
             self::flush_db_logs();
@@ -102,6 +83,11 @@ class Yatra_Module_Section_Logs
         if (isset($_REQUEST['action']) && isset($_REQUEST['log'])) { // WPCS: input var ok, CSRF ok.
             self::log_table_bulk_actions();
         }
+
+    }
+
+    public static function status_log_database_template()
+    {
         include_once YATRA_ABSPATH . 'includes/modules/status/list-tables/class-yatra-admin-log-list-table.php';
 
         $log_table_list = new Yatra_Admin_Log_List_Table();
@@ -109,6 +95,45 @@ class Yatra_Module_Section_Logs
 
         include YATRA_ABSPATH . 'includes/modules/status/templates/html-admin-page-status-logs-db.php';
     }
-}
 
-new Yatra_Module_Section_Logs();
+    public static function log_template()
+    {
+        $log_options = $log_options = get_option('yatra_log_options', 'db');
+
+        if ($log_options === 'db') {
+
+            $log_handler = 'Yatra_Log_Handler_DB';
+        } else {
+            $log_handler = 'Yatra_Log_Handler_File';
+        }
+
+        if ('Yatra_Log_Handler_DB' === $log_handler) {
+
+            self::status_log_database_template();
+
+        } else {
+            self::status_logs_file_template();
+        }
+    }
+
+    public static function log_actions()
+    {
+        $log_options = $log_options = get_option('yatra_log_options', 'db');
+
+        if ($log_options === 'db') {
+
+            $log_handler = 'Yatra_Log_Handler_DB';
+        } else {
+            $log_handler = 'Yatra_Log_Handler_File';
+        }
+
+        if ('Yatra_Log_Handler_DB' === $log_handler) {
+
+            self::status_log_database_actions();
+
+        } else {
+            self::status_logs_file_actions();
+        }
+    }
+
+}

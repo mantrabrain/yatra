@@ -6,6 +6,7 @@ class Yatra_Module_Status
     {
         add_action('admin_enqueue_scripts', array($this, 'load_admin_scripts'), 10);
         add_action('admin_menu', array($this, 'status_menu'));
+        add_action('admin_init', array($this, 'log_action_init'), 10);
         add_action('yatra_status_system_status', array($this, 'system_status'));
         add_action('yatra_status_logs', array($this, 'logs'));
     }
@@ -43,7 +44,20 @@ class Yatra_Module_Status
             $current_tab = $tab_keys[0];
 
         }
+
         include YATRA_ABSPATH . 'includes/modules/status/templates/html-admin-status.php';
+    }
+
+    public function log_action_init()
+    {
+        $current_tab = empty($_GET['tab']) ? '' : sanitize_title(wp_unslash($_GET['tab'])); // WPCS: input var okay, CSRF ok.
+
+        if ($current_tab === "logs") {
+
+            include_once "sections/class-yatra-module-section-logs.php";
+
+            Yatra_Module_Section_Logs::log_actions();
+        }
     }
 
     public static function show_messages()
@@ -64,6 +78,8 @@ class Yatra_Module_Status
         wp_enqueue_style('yatra-admin-status');
 
         include_once "sections/class-yatra-module-section-logs.php";
+
+        Yatra_Module_Section_Logs::log_template();
     }
 
     public function load_admin_scripts($id)
