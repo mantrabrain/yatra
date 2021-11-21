@@ -90,7 +90,7 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
             ),
             array(
                 'title' => __('Log Options', 'yatra'),
-                'desc' => __('This option allows you to setup log option for yatra plugin. Log option might be on file or on db or no log.', 'yatra'),
+                'desc' => __('This option allows you to setup log option for yatra plugin. Log option might be on file or on db.', 'yatra'),
                 'desc_tip' => true,
                 'id' => 'yatra_log_options',
                 'type' => 'select',
