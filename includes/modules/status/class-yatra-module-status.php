@@ -71,14 +71,12 @@ class Yatra_Module_Status
 
     public function system_status()
     {
-        wp_enqueue_style('yatra-admin-status');
 
         include_once "sections/class-yatra-module-section-system-status.php";
     }
 
     public function logs()
     {
-        wp_enqueue_style('yatra-admin-status');
 
         include_once "sections/class-yatra-module-section-logs.php";
 
@@ -94,6 +92,7 @@ class Yatra_Module_Status
 
         wp_register_style('yatra-admin-status', YATRA_PLUGIN_URI . '/includes/modules/status/assets/css/yatra-admin-status.css', array(), YATRA_VERSION);
 
+        wp_enqueue_style('yatra-admin-status');
     }
 }
 
