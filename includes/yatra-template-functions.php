@@ -466,17 +466,37 @@ if (!function_exists('yatra_get_price')) {
 
     function yatra_get_price($currency, $price, $echo = false)
     {
-        $currency_price_separator = apply_filters('yatra_currency_price_separator', '');
+        $args = array(
 
-        $currency_position = 'before';
+            'decimals' => 0,
 
-        $price_string = ($currency . $currency_price_separator . $price);
+            'decimal_separator' => '.',
 
-        if ($currency_position === "after") {
+            'thousand_separator' => get_option('yatra_thousand_separator', ',')
 
-            $price_string = ($price . $currency_price_separator . $currency);
+        );
+
+        $price = apply_filters('formatted_yatra_price',
+            number_format($price, $args['decimals'], $args['decimal_separator'], $args['thousand_separator']), $price, $args['decimals'], $args['decimal_separator'], $args['thousand_separator'], $price);
+
+        $currency_position = get_option('yatra_currency_position');
+
+        if ($currency_position === "left_space") {
+
+            $price_string = ($currency . ' ' . $price);
+
+        } else if ($currency_position === "right_space") {
+            $price_string = ($price . ' ' . $currency);
+
+        } else if ($currency_position === "right") {
+
+            $price_string = ($price . $currency);
+
+        } else {
+            $price_string = ($currency . $price);
 
         }
+
 
         if (!$echo) {
             return $price_string;

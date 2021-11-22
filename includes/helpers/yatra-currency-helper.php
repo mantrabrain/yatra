@@ -378,3 +378,18 @@ if (!function_exists('yatra_get_currency_with_symbol')) {
         return $currency_with_symbol;
     }
 }
+if (!function_exists('yatra_get_currency_position')) {
+
+    function yatra_get_currency_position()
+    {
+
+
+        return [
+            'left' => __('Left', 'yatra'),
+            'right' => __('Right', 'yatra'),
+            'left_space' => __('Left with space', 'yatra'),
+            'right_space' => __('Right with space', 'yatra')
+
+        ];
+    }
+}

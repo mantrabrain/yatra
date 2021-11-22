@@ -158,6 +158,23 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     'options' => yatra_get_currency_with_symbol()
                 ),
                 array(
+                    'title' => __('Currency position', 'yatra'),
+                    'desc' => __('Currency symbol position.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_currency_position',
+                    'default' => 'left',
+                    'type' => 'select',
+                    'options' => yatra_get_currency_position()
+                ),
+                array(
+                    'title' => __('Thousand Separator', 'yatra'),
+                    'desc' => __('Thousand separator for pricing', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_thousand_separator',
+                    'default' => ',',
+                    'type' => 'text',
+                ),
+                array(
                     'title' => __('Book Now Button Text', 'yatra'),
                     'desc' => __('Text for Book now button.', 'yatra'),
                     'desc_tip' => true,
