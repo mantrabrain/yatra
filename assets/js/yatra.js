@@ -618,12 +618,49 @@ window.yatra_global_tour_additional_price = 0;
         },
         getPrice(currency = null, price) {
             currency = currency === null ? yatra_params.currency_symbol : currency;
-            var currency_seperator = '';
-            var currency_position = 'before';
-            if (currency_position === "before") {
-                return currency + currency_seperator + price;
+
+            price = this.numberFormat(price);
+            
+            var currency_position = yatra_params.currency_position;
+            if (currency_position === "left_space") {
+                return currency + ' ' + price;
+
+            } else if (currency_position === "right_space") {
+                return price + ' ' + currency;
+
+            } else if (currency_position === "right") {
+                return price + currency;
+
+            } else {
+                return currency + price;
+
             }
-            return price + currency_seperator + curency;
+        },
+        numberFormat: function (number) {
+            var decimals = yatra_params.decimals;
+            var dec_point = yatra_params.decimal_separator;
+            var thousands_sep = yatra_params.thousand_separator;
+            // Strip all characters but numerical ones.
+            number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+            var n = !isFinite(+number) ? 0 : +number,
+                prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+                sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                s = '',
+                toFixedFix = function (n, prec) {
+                    var k = Math.pow(10, prec);
+                    return '' + Math.round(n * k) / k;
+                };
+            // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+            s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+            if (s[0].length > 3) {
+                s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+            }
+            if ((s[1] || '').length < prec) {
+                s[1] = s[1] || '';
+                s[1] += new Array(prec - s[1].length + 1).join('0');
+            }
+            return s.join(dec);
         },
         getTotalTourPrice: function () {
 
@@ -680,6 +717,7 @@ window.yatra_global_tour_additional_price = 0;
         YatraPricingCalculator.init();
         $('#yatra-tour-tabs').YatraTabs();
         $('#yatra-tour-sidebar-tabs').YatraTabs();
+        window.YatraPricingCalculator = YatraPricingCalculator;
 
 
     });

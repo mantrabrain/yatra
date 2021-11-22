@@ -81,7 +81,17 @@ if (!class_exists('Yatra_Assets')) {
                     'availability_month_action' => 'yatra_tour_frontend_availability_month',
                     'availability_month_nonce' => wp_create_nonce('wp_yatra_tour_frontend_availability_month_nonce')
                 ),
-                'currency_symbol' => yatra_get_current_currency_symbol()
+                'currency_symbol' => yatra_get_current_currency_symbol(),
+
+                'decimals' => get_option('yatra_price_number_decimals', 2),
+
+                'decimal_separator' => get_option('yatra_decimal_separator', '.'),
+
+                'thousand_separator' => get_option('yatra_thousand_separator', ','),
+
+                'currency_position' => get_option('yatra_currency_position', 'left')
+
+
             );
 
             wp_localize_script('yatra-script', 'yatra_params', $yatra_params);
