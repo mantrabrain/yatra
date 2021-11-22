@@ -4,8 +4,8 @@
 
   ul {
     list-style: none;
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
 
     li {
       .fa, svg {
@@ -32,6 +32,29 @@
 
   label {
     display: block;
+  }
+
+  table {
+    text-align: left;
+  }
+
+  .yatra-edit-account-form.edit-account {
+    label {
+      font-weight: 500;
+      margin-top: 10px;
+    }
+
+    p {
+      padding-left: 0;
+    }
+
+    button {
+      margin-top: 10px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+    }
   }
 }
 

@@ -468,9 +468,9 @@ if (!function_exists('yatra_get_price')) {
     {
         $args = array(
 
-            'decimals' => 0,
+            'decimals' => get_option('yatra_price_number_decimals', 2),
 
-            'decimal_separator' => '.',
+            'decimal_separator' => get_option('yatra_decimals_separator', '.'),
 
             'thousand_separator' => get_option('yatra_thousand_separator', ',')
 

@@ -1068,8 +1068,8 @@ form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
   float: left; }
   .yatra-my-account-navigation ul {
     list-style: none;
-    margin: 0;
-    padding: 0; }
+    margin: 0 !important;
+    padding: 0 !important; }
     .yatra-my-account-navigation ul li .fa, .yatra-my-account-navigation ul li svg {
       margin-right: 5px; }
     .yatra-my-account-navigation ul li.active:before {
@@ -1085,6 +1085,17 @@ form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
   width: 70%; }
   .yatra-my-account-content label {
     display: block; }
+  .yatra-my-account-content table {
+    text-align: left; }
+  .yatra-my-account-content .yatra-edit-account-form.edit-account label {
+    font-weight: 500;
+    margin-top: 10px; }
+  .yatra-my-account-content .yatra-edit-account-form.edit-account p {
+    padding-left: 0; }
+  .yatra-my-account-content .yatra-edit-account-form.edit-account button {
+    margin-top: 10px; }
+  .yatra-my-account-content .yatra-edit-account-form.edit-account input, .yatra-my-account-content .yatra-edit-account-form.edit-account select, .yatra-my-account-content .yatra-edit-account-form.edit-account textarea {
+    width: 100%; }
 
 .yatra-booking-table .yatra-account-booking-item-row {
   display: -webkit-box;

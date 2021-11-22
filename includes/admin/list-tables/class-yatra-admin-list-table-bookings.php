@@ -278,16 +278,18 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
 
         $yatra_currency_symbol = isset($this->booking_meta_params['currency_symbol']) ? $this->booking_meta_params['currency_symbol'] : yatra_get_current_currency_symbol();
 
-        printf('<span>%s%s</span>', $yatra_currency_symbol, esc_html($total_booking_price));
+        $price = yatra_get_price($yatra_currency_symbol, $total_booking_price);
+
+        printf('<span>%s</span>', $price);
     }
 
 
     /**
      * Handle bulk actions.
      *
-     * @param  string $redirect_to URL to redirect to.
-     * @param  string $action Action name.
-     * @param  array $ids List of ids.
+     * @param string $redirect_to URL to redirect to.
+     * @param string $action Action name.
+     * @param array $ids List of ids.
      * @return string
      */
     public function handle_bulk_actions($redirect_to, $action, $ids)

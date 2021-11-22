@@ -261,7 +261,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                 // Total Booking Price
                 echo '<td>';
 
-                echo '<span>' . esc_html($currency_symbol) . absint($total_booking_price) . '</span>';
+                echo '<span>' . yatra_get_price($currency_symbol, absint($total_booking_price)) . '</span>';
 
                 echo '</td>';
 

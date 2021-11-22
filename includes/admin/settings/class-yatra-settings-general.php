@@ -148,32 +148,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     'desc' => '',
                     'id' => 'yatra_general_options',
                 ),
-                array(
-                    'title' => __('Currency & symbol', 'yatra'),
-                    'desc' => __('Currency for price of tour and other pricing parts.', 'yatra'),
-                    'desc_tip' => true,
-                    'id' => 'yatra_currency',
-                    'default' => 'USD',
-                    'type' => 'select',
-                    'options' => yatra_get_currency_with_symbol()
-                ),
-                array(
-                    'title' => __('Currency position', 'yatra'),
-                    'desc' => __('Currency symbol position.', 'yatra'),
-                    'desc_tip' => true,
-                    'id' => 'yatra_currency_position',
-                    'default' => 'left',
-                    'type' => 'select',
-                    'options' => yatra_get_currency_position()
-                ),
-                array(
-                    'title' => __('Thousand Separator', 'yatra'),
-                    'desc' => __('Thousand separator for pricing', 'yatra'),
-                    'desc_tip' => true,
-                    'id' => 'yatra_thousand_separator',
-                    'default' => ',',
-                    'type' => 'text',
-                ),
+
                 array(
                     'title' => __('Book Now Button Text', 'yatra'),
                     'desc' => __('Text for Book now button.', 'yatra'),
@@ -259,6 +234,60 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                 array(
                     'type' => 'sectionend',
                     'id' => 'yatra_general_options',
+                ),
+                array(
+                    'title' => __('Currency Options', 'yatra'),
+                    'type' => 'title',
+                    'desc' => '',
+                    'id' => 'yatra_general_currency_options',
+                ),
+
+
+                array(
+                    'title' => __('Currency & symbol', 'yatra'),
+                    'desc' => __('Currency for price of tour and other pricing parts.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_currency',
+                    'default' => 'USD',
+                    'type' => 'select',
+                    'options' => yatra_get_currency_with_symbol()
+                ),
+                array(
+                    'title' => __('Currency position', 'yatra'),
+                    'desc' => __('Currency symbol position.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_currency_position',
+                    'default' => 'left',
+                    'type' => 'select',
+                    'options' => yatra_get_currency_position()
+                ),
+                array(
+                    'title' => __('Thousand Separator', 'yatra'),
+                    'desc' => __('Thousand separator for price.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_thousand_separator',
+                    'default' => ',',
+                    'type' => 'text',
+                ),
+                array(
+                    'title' => __('Number of Decimals', 'yatra'),
+                    'desc' => __('Number of decimals shown in price.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_price_number_decimals',
+                    'default' => 2,
+                    'type' => 'number',
+                ),
+                array(
+                    'title' => __('Decimal Separator', 'yatra'),
+                    'desc' => __('Decimal separator for price.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_decimals_separator',
+                    'default' => '.',
+                    'type' => 'text',
+                ),
+                array(
+                    'type' => 'sectionend',
+                    'id' => 'yatra_general_currency_options',
                 ),
 
             );
