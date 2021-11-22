@@ -259,7 +259,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     'id' => 'yatra_currency_position',
                     'default' => 'left',
                     'type' => 'select',
-                    'options' => yatra_get_currency_position()
+                    'options' => yatra_get_currency_positions()
                 ),
                 array(
                     'title' => __('Thousand Separator', 'yatra'),
@@ -281,7 +281,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     'title' => __('Decimal Separator', 'yatra'),
                     'desc' => __('Decimal separator for price.', 'yatra'),
                     'desc_tip' => true,
-                    'id' => 'yatra_decimals_separator',
+                    'id' => 'yatra_decimal_separator',
                     'default' => '.',
                     'type' => 'text',
                 ),

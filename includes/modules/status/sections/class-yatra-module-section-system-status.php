@@ -428,23 +428,19 @@ class Yatra_Module_Section_System_Status
 
         return $update_theme_version;
     }
-
-    /**
-     * Get some setting values for the site that are useful for debugging
-     * purposes. For full settings access, use the settings api.
-     *
-     * @return array
-     */
+    
     public function get_settings()
     {
-        // Return array of useful settings for debugging.
+        $all_positions = yatra_get_currency_positions();
+        $currency_position = get_option('yatra_currency_position', 'left');
+        $currency_position = isset($all_positions[$currency_position]) ? $all_positions[$currency_position] : 'Left';
         return array(
             'currency' => yatra_get_current_currency(),
             'currency_symbol' => yatra_get_current_currency_symbol(),
-            'currency_position' => 'left',
-            'thousand_separator' => ',',
-            'decimal_separator' => ',',
-            'number_of_decimals' => ',',
+            'currency_position' => $currency_position,
+            'thousand_separator' => get_option('yatra_thousand_separator', ','),
+            'decimal_separator' => get_option('yatra_decimal_separator', '.'),
+            'number_of_decimals' => get_option('yatra_price_number_decimals', '2'),
         );
     }
 

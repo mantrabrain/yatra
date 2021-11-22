@@ -378,9 +378,9 @@ if (!function_exists('yatra_get_currency_with_symbol')) {
         return $currency_with_symbol;
     }
 }
-if (!function_exists('yatra_get_currency_position')) {
+if (!function_exists('yatra_get_currency_positions')) {
 
-    function yatra_get_currency_position()
+    function yatra_get_currency_positions()
     {
 
 
