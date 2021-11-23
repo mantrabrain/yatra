@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.3\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-11-23 03:11:47+00:00\n"
+"POT-Creation-Date: 2021-11-23 09:00:23+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -522,7 +522,7 @@ msgid "Checkout Settings"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-checkout.php:93
-#: includes/admin/setup/class-yatra-setup-wizard.php:427
+#: includes/admin/setup/class-yatra-setup-wizard.php:511
 msgid "Enable Guest Checkout"
 msgstr ""
 
@@ -534,7 +534,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:29
-#: includes/admin/setup/class-yatra-setup-wizard.php:64
+#: includes/admin/setup/class-yatra-setup-wizard.php:66
 msgid "Design"
 msgstr ""
 
@@ -559,12 +559,12 @@ msgid "Tab layout for single tour page"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:99
-#: includes/admin/setup/class-yatra-setup-wizard.php:385
+#: includes/admin/setup/class-yatra-setup-wizard.php:469
 msgid "Tab Style Layout"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:100
-#: includes/admin/setup/class-yatra-setup-wizard.php:386
+#: includes/admin/setup/class-yatra-setup-wizard.php:470
 msgid "Heading & Content Style Tab"
 msgstr ""
 
@@ -577,7 +577,7 @@ msgid "Page Container Class"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:121
-#: includes/admin/setup/class-yatra-setup-wizard.php:369
+#: includes/admin/setup/class-yatra-setup-wizard.php:453
 msgid "Container class for all page templates for yatra plugin."
 msgstr ""
 
@@ -589,7 +589,7 @@ msgstr ""
 #: includes/admin/settings/class-yatra-settings-general.php:29
 #: includes/admin/settings/class-yatra-settings-general.php:42
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:42
-#: includes/admin/setup/class-yatra-setup-wizard.php:54
+#: includes/admin/setup/class-yatra-setup-wizard.php:56
 msgid "General"
 msgstr ""
 
@@ -682,7 +682,7 @@ msgid "Available Tabs"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:43
-#: includes/admin/setup/class-yatra-setup-wizard.php:59
+#: includes/admin/setup/class-yatra-setup-wizard.php:61
 msgid "Pages"
 msgstr ""
 
@@ -691,7 +691,7 @@ msgid "Page Settings"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:94
-#: includes/admin/setup/class-yatra-setup-wizard.php:275
+#: includes/admin/setup/class-yatra-setup-wizard.php:359
 msgid "Cart Page"
 msgstr ""
 
@@ -700,7 +700,7 @@ msgid "Cart page for tour booking"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:101
-#: includes/admin/setup/class-yatra-setup-wizard.php:287
+#: includes/admin/setup/class-yatra-setup-wizard.php:371
 msgid "Checkout Page"
 msgstr ""
 
@@ -710,7 +710,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:108
 #: includes/admin/settings/class-yatra-settings-general.php:109
-#: includes/admin/setup/class-yatra-setup-wizard.php:299
+#: includes/admin/setup/class-yatra-setup-wizard.php:383
 msgid "My Account Page"
 msgstr ""
 
@@ -741,7 +741,7 @@ msgid "Page for your terms and condition."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:146
-#: includes/admin/setup/class-yatra-setup-wizard.php:222
+#: includes/admin/setup/class-yatra-setup-wizard.php:238
 msgid "General Settings"
 msgstr ""
 
@@ -886,14 +886,17 @@ msgid "Currency position"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:257
+#: includes/admin/setup/class-yatra-setup-wizard.php:267
 msgid "Currency symbol position."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:265
+#: includes/admin/setup/class-yatra-setup-wizard.php:273
 msgid "Thousand Separator"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:266
+#: includes/admin/setup/class-yatra-setup-wizard.php:280
 msgid "Thousand separator for price."
 msgstr ""
 
@@ -902,10 +905,12 @@ msgid "Number of Decimals"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:274
+#: includes/admin/setup/class-yatra-setup-wizard.php:294
 msgid "Number of decimals shown in price."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:281
+#: includes/admin/setup/class-yatra-setup-wizard.php:300
 msgid "Decimal Separator"
 msgstr ""
 
@@ -914,7 +919,7 @@ msgid "Decimal separator for price."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-miscellaneous.php:29
-#: includes/admin/setup/class-yatra-setup-wizard.php:69
+#: includes/admin/setup/class-yatra-setup-wizard.php:71
 msgid "Miscellaneous"
 msgstr ""
 
@@ -963,39 +968,39 @@ msgid ""
 "are testing."
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:49
+#: includes/admin/setup/class-yatra-setup-wizard.php:51
 msgid "Introduction"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:74
+#: includes/admin/setup/class-yatra-setup-wizard.php:76
 msgid "Themes"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:79
+#: includes/admin/setup/class-yatra-setup-wizard.php:81
 msgid "Final!"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:125
+#: includes/admin/setup/class-yatra-setup-wizard.php:141
 msgid "Yatra &rsaquo; Setup Wizard"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:145
+#: includes/admin/setup/class-yatra-setup-wizard.php:161
 msgid "Return to the WordPress Dashboard"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:193
+#: includes/admin/setup/class-yatra-setup-wizard.php:209
 msgid "Continue"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:195
+#: includes/admin/setup/class-yatra-setup-wizard.php:211
 msgid "Skip this step"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:207
+#: includes/admin/setup/class-yatra-setup-wizard.php:223
 msgid "Welcome to Complete Travel & Tour Booking System – Yatra!"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:208
+#: includes/admin/setup/class-yatra-setup-wizard.php:224
 msgid ""
 "Thank you for choosing Yatra plugin for your travel & tour booking site. "
 "This setup wizard will help you configure the basic settings of the plugin. "
@@ -1003,95 +1008,112 @@ msgid ""
 "minutes.</strong>"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:209
+#: includes/admin/setup/class-yatra-setup-wizard.php:225
 msgid ""
 "No time right now? If you don’t want to go through the wizard, you can skip "
 "and return to the WordPress dashboard."
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:212
+#: includes/admin/setup/class-yatra-setup-wizard.php:228
 msgid "Let's Go!"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:214
+#: includes/admin/setup/class-yatra-setup-wizard.php:230
 msgid "Not right now"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:228
+#: includes/admin/setup/class-yatra-setup-wizard.php:244
 #: includes/modules/status/templates/html-admin-page-status-report.php:759
 msgid "Currency"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:236
+#: includes/admin/setup/class-yatra-setup-wizard.php:252
 msgid "Currency symbol for yatra plugin."
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:269
+#: includes/admin/setup/class-yatra-setup-wizard.php:259
+msgid "Currency Position"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:286
+#: includes/modules/status/templates/html-admin-page-status-report.php:788
+msgid "Number of decimals"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:308
+msgid "Decimal separator for price.."
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:353
 msgid "Pages Options"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:282
+#: includes/admin/setup/class-yatra-setup-wizard.php:366
 msgid "Cart page for yatra plugin."
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:294
+#: includes/admin/setup/class-yatra-setup-wizard.php:378
 msgid "Checkout page for yatra plugin."
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:307
+#: includes/admin/setup/class-yatra-setup-wizard.php:391
 msgid "My Account page for yatra plugin."
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:356
+#: includes/admin/setup/class-yatra-setup-wizard.php:440
 msgid "Design Setup"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:362
+#: includes/admin/setup/class-yatra-setup-wizard.php:446
 msgid "Container Class"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:375
+#: includes/admin/setup/class-yatra-setup-wizard.php:459
 msgid "Tab Layout for tour page\t"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:383
+#: includes/admin/setup/class-yatra-setup-wizard.php:467
 msgid "Tab layout for single tour page."
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:417
+#: includes/admin/setup/class-yatra-setup-wizard.php:501
 msgid "Miscellaneous Setup"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:475
+#: includes/admin/setup/class-yatra-setup-wizard.php:559
 msgid "Compatible Themes for Yatra Plugin"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:483
+#: includes/admin/setup/class-yatra-setup-wizard.php:567
 msgid "Yatri"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:514
+#: includes/admin/setup/class-yatra-setup-wizard.php:598
 msgid "Details &amp; Preview"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:525
+#: includes/admin/setup/class-yatra-setup-wizard.php:609
 msgid "Download"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:527
+#: includes/admin/setup/class-yatra-setup-wizard.php:611
 msgid "Preview"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:555
+#: includes/admin/setup/class-yatra-setup-wizard.php:639
 msgid "Your Site is Ready!"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:559
+#: includes/admin/setup/class-yatra-setup-wizard.php:643
 msgid "Next Steps &rarr;"
 msgstr ""
 
-#: includes/admin/setup/class-yatra-setup-wizard.php:564
+#: includes/admin/setup/class-yatra-setup-wizard.php:648
 msgid "Go to Dashboard!"
+msgstr ""
+
+#: includes/admin/setup/class-yatra-setup-wizard.php:652
+msgid "Import Sample Data"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar-date.php:25
@@ -1311,19 +1333,19 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-yatra-ajax.php:52 includes/class-yatra-ajax.php:503
+#: includes/class-yatra-ajax.php:53 includes/class-yatra-ajax.php:528
 msgid "Something wrong, please try again."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:296
+#: includes/class-yatra-ajax.php:297
 msgid "Invalid file type. Please use vaild json file."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:302
+#: includes/class-yatra-ajax.php:303
 msgid "File upload failed. Please try again."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:505
+#: includes/class-yatra-ajax.php:530
 msgid "Thank you for your query. We will get back to you soon"
 msgstr ""
 
@@ -3206,10 +3228,6 @@ msgstr ""
 
 #: includes/modules/status/templates/html-admin-page-status-report.php:783
 msgid "The decimal separator of displayed prices."
-msgstr ""
-
-#: includes/modules/status/templates/html-admin-page-status-report.php:788
-msgid "Number of decimals"
 msgstr ""
 
 #: includes/modules/status/templates/html-admin-page-status-report.php:790
