@@ -4,7 +4,7 @@
 		<?php
 		echo __('If you have a exported tours file, you can upload it from here and import the tour Or You can upload sample tour file. (file format .json)', 'yatra')
 		?></p>
-	<form method="post" enctype="multipart/form-data" class="wp-upload-form yatra-import-course-form"
+	<form method="post" enctype="multipart/form-data" class="wp-upload-form yatra-import-tour-form"
 		  action="<?php echo esc_attr('admin-ajax.php'); ?>">
 		<label class="screen-reader-text"
 			   for="coursesfile"><?php echo esc_html__('Course exported file', 'yatra'); ?></label>

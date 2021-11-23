@@ -542,3 +542,8 @@ a:hover, a:active {
 .yatra-setup-content .theme-browser .theme:focus .theme-screenshot {
     background: rgba(5, 152, 123, 0.4);
 }
+
+.yatra-setup-next-steps-last {
+    padding: 10px 0;
+    display: block;
+}

@@ -11,6 +11,7 @@ class Yatra_Ajax
 
             'change_tour_attribute',
             'import_content',
+            'import_sample_data_on_setup',
             'tour_availability',
             'day_wise_tour_availability',
             'day_wise_tour_availability_save'
@@ -307,6 +308,30 @@ class Yatra_Ajax
         unlink($target_file);
 
         if ($status) {
+            wp_send_json_success();
+        } else {
+            wp_send_json_error();
+        }
+
+    }
+
+    public function import_sample_data_on_setup()
+    {
+        $status = $this->validate_nonce();
+
+        if (!$status) {
+            wp_send_json_error($this->ajax_error());
+        }
+
+        if (get_option('yatra_setup_wizard_importer_already_ran', '') == '1') {
+            wp_send_json_error();
+        }
+        $sample_data_file_path = YATRA_ABSPATH . 'sample-data/sample-data.json';
+
+        $status = yatra()->importer->import($sample_data_file_path);
+
+        if ($status) {
+            update_option('yatra_setup_wizard_importer_already_ran', 1);
             wp_send_json_success();
         } else {
             wp_send_json_error();

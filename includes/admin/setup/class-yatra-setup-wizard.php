@@ -20,8 +20,10 @@ class Yatra_Setup_Wizard
         update_option('yatra_setup_wizard_ran', '1');
 
         if (apply_filters('yatra_enable_setup_wizard', true) && current_user_can('manage_options')) {
+
             add_action('admin_menu', array($this, 'admin_menus'));
             add_action('admin_init', array($this, 'setup_wizard'));
+
         }
     }
 
@@ -89,7 +91,21 @@ class Yatra_Setup_Wizard
             $this->step = $all_steps_key[0];
         }
 
-        wp_enqueue_style('yatra-setup', YATRA_PLUGIN_URI . '/assets/admin/css/setup.css', array('dashicons', 'install'));
+        wp_register_style('yatra-swal-css', YATRA_PLUGIN_URI . '/assets/lib/sweetalert2/css/sweetalert2.css', array(), YATRA_VERSION);
+
+        wp_register_script('yatra-swal-js', YATRA_PLUGIN_URI . '/assets/lib/sweetalert2/js/sweetalert2.js', array(), YATRA_VERSION);
+
+        wp_enqueue_style('yatra-setup', YATRA_PLUGIN_URI . '/assets/admin/css/setup.css', array('dashicons', 'install', 'yatra-swal-css'));
+        wp_enqueue_script('yatra-setup', YATRA_PLUGIN_URI . '/assets/admin/js/setup.js', array('jquery', 'yatra-swal-js'), YATRA_VERSION);
+        wp_localize_script('yatra-setup', 'yatraSetup',
+            array(
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'import_action' => 'yatra_import_sample_data_on_setup',
+                'import_nonce' => wp_create_nonce('wp_yatra_import_sample_data_on_setup_nonce'),
+                'loading_image' => YATRA_PLUGIN_URI . '/assets/images/loading.gif',
+
+            )
+        );
 
         wp_register_script('yatra-select2', YATRA_PLUGIN_URI . '/assets/lib/select2/js/select2.min.js', false, false, true);
 
@@ -623,7 +639,7 @@ class Yatra_Setup_Wizard
             <h1><?php _e('Your Site is Ready!', 'yatra'); ?></h1>
 
             <div class="yatra-setup-next-steps">
-                <div class="yatra-setup-next-steps-first">
+                <div class="yatra-setup-next-steps-last">
                     <h2><?php _e('Next Steps &rarr;', 'yatra'); ?></h2>
 
 
@@ -631,6 +647,10 @@ class Yatra_Setup_Wizard
                        href="<?php echo esc_url(admin_url('edit.php?post_type=tour')); ?>">
                         <?php _e('Go to Dashboard!', 'yatra'); ?>
                     </a>
+                    <button class="button button-primary button-large yatra-import-dummy-data"
+                            href="<?php echo esc_url(admin_url('edit.php?post_type=tour')); ?>">
+                        <?php _e('Import Sample Data', 'yatra'); ?>
+                    </button>
                 </div>
             </div>
         </div>

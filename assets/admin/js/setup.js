@@ -1,37 +1,31 @@
 // @var
-
 jQuery(function ($) {
-    var yatraImporter = {
+    var yatraSetupImportDemoSampleData = {
         init: function () {
-
-            var form = $('form.yatra-import-tour-form');
-
             var _this = this;
-            form.on('submit', function (e) {
+            $('button.yatra-import-dummy-data').on('click', function (e) {
                 e.preventDefault();
-                var formData = new FormData(this);
-                _this.import(formData, $(this));
+                _this.import($(this));
 
             });
 
         },
-        import: function (formData, form) {
-
+        import: function ($this) {
+            console.log(yatraSetup);
             $.ajax({
-                url: yatraImporterData.ajax_url,
+                url: yatraSetup.ajax_url,
                 type: 'POST',
-                data: formData,
-                contentType: false,
-                cache: false,
-                processData: false,
+                data: {
+                    action: yatraSetup.import_action,
+                    yatra_nonce: yatraSetup.import_nonce,
+                },
                 beforeSend: function () {
-                    form.trigger("reset");
                     Swal.fire({
                         title: 'Please wait.....',
                         text: 'System is processing your request',
                         showCancelButton: false, // There won't be any cancel button
                         showConfirmButton: false, // There won't be any confirm button
-                        imageUrl: yatraImporterData.loading_image,
+                        imageUrl: yatraSetup.loading_image,
                         imageWidth: 300
                     });
                 },
@@ -42,6 +36,7 @@ jQuery(function ($) {
                         'Import process successfully completed.',
                         'success'
                     );
+                    $this.hide();
                 } else {
                     var error_message = 'Something went wrong with ajax !';
                     if (typeof response.data != "undefined") {
@@ -59,7 +54,7 @@ jQuery(function ($) {
     };
     $(document).ready(function () {
 
-        yatraImporter.init();
+        yatraSetupImportDemoSampleData.init();
     });
 
 });
