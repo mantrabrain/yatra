@@ -148,3 +148,4 @@ Shortcode for Tour Listing:
 * Fixed - Added filters for addons
 * Added - Sample Data Import Feature on setup wizard
 * Added - Currency settings
+* Fixed - PHP8 compatibility issue resolved
