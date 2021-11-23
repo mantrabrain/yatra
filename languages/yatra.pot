@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.3\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-11-21 13:20:27+00:00\n"
+"POT-Creation-Date: 2021-11-23 03:11:47+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -745,94 +745,86 @@ msgstr ""
 msgid "General Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:152
-msgid "Currency & symbol"
-msgstr ""
-
 #: includes/admin/settings/class-yatra-settings-general.php:153
-msgid "Currency for price of tour and other pricing parts."
-msgstr ""
-
-#: includes/admin/settings/class-yatra-settings-general.php:161
 msgid "Book Now Button Text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:162
+#: includes/admin/settings/class-yatra-settings-general.php:154
 msgid "Text for Book now button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:165
+#: includes/admin/settings/class-yatra-settings-general.php:157
 msgid "Book Now"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:169
+#: includes/admin/settings/class-yatra-settings-general.php:161
 msgid "Book Now loading text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:170
+#: includes/admin/settings/class-yatra-settings-general.php:162
 msgid "Text for loading book now button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:173
+#: includes/admin/settings/class-yatra-settings-general.php:165
 #: templates/tour/book-now-button.php:5
 msgid "Loading...."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:177
+#: includes/admin/settings/class-yatra-settings-general.php:169
 msgid "Booking Form Title"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:178
+#: includes/admin/settings/class-yatra-settings-general.php:170
 msgid "Title for booking form"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:181
+#: includes/admin/settings/class-yatra-settings-general.php:173
 #: templates/tour/sidebar.php:30
 msgid "Booking Form"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:185
+#: includes/admin/settings/class-yatra-settings-general.php:177
 msgid "Enquiry Form Title"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:186
+#: includes/admin/settings/class-yatra-settings-general.php:178
 msgid "Title for enquiry form"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:189
+#: includes/admin/settings/class-yatra-settings-general.php:181
 #: templates/tour/sidebar.php:36
 msgid "Enquiry Form"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:194
-#: includes/admin/settings/class-yatra-settings-general.php:195
+#: includes/admin/settings/class-yatra-settings-general.php:186
+#: includes/admin/settings/class-yatra-settings-general.php:187
 msgid "Enquiry Button Text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:198
+#: includes/admin/settings/class-yatra-settings-general.php:190
 #: templates/tour/enquiry-button.php:2 templates/tour/enquiry-form.php:14
 msgid "Send Enquiry"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:202
-#: includes/admin/settings/class-yatra-settings-general.php:203
+#: includes/admin/settings/class-yatra-settings-general.php:194
+#: includes/admin/settings/class-yatra-settings-general.php:195
 msgid "Select Date Title"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:206
+#: includes/admin/settings/class-yatra-settings-general.php:198
 #: templates/tour/sidebar.php:8
 msgid "Please select date"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:210
+#: includes/admin/settings/class-yatra-settings-general.php:202
 msgid "Attributes Title"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:211
+#: includes/admin/settings/class-yatra-settings-general.php:203
 msgid "Title for custom attributes"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:214
+#: includes/admin/settings/class-yatra-settings-general.php:206
 #: includes/functions.php:64 includes/hooks/yatra-list-table-hooks.php:19
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:179
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:180
@@ -840,40 +832,85 @@ msgstr ""
 msgid "Attributes"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:218
+#: includes/admin/settings/class-yatra-settings-general.php:210
 msgid "Update cart button text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:219
+#: includes/admin/settings/class-yatra-settings-general.php:211
 msgid "Text for update cart button"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:222
+#: includes/admin/settings/class-yatra-settings-general.php:214
 msgid "Update Cart"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:226
+#: includes/admin/settings/class-yatra-settings-general.php:218
 msgid "Proceed to checkout text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:227
+#: includes/admin/settings/class-yatra-settings-general.php:219
 msgid "Text for proceed to checkout button."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:230
+#: includes/admin/settings/class-yatra-settings-general.php:222
 msgid "Proceed to checkout"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:234
+#: includes/admin/settings/class-yatra-settings-general.php:226
 msgid "Order booking text"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:235
+#: includes/admin/settings/class-yatra-settings-general.php:227
 msgid "Text for order booking text."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:238
+#: includes/admin/settings/class-yatra-settings-general.php:230
 msgid "Order Booking"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:239
+msgid "Currency Options"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:247
+msgid "Currency & symbol"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:248
+msgid "Currency for price of tour and other pricing parts."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:256
+#: includes/modules/status/templates/html-admin-page-status-report.php:767
+msgid "Currency position"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:257
+msgid "Currency symbol position."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:265
+msgid "Thousand Separator"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:266
+msgid "Thousand separator for price."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:273
+msgid "Number of Decimals"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:274
+msgid "Number of decimals shown in price."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:281
+msgid "Decimal Separator"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:282
+msgid "Decimal separator for price."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-miscellaneous.php:29
@@ -893,7 +930,7 @@ msgstr ""
 #: includes/admin/settings/class-yatra-settings-miscellaneous.php:93
 msgid ""
 "This option allows you to setup log option for yatra plugin. Log option "
-"might be on file or on db or no log."
+"might be on file or on db."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-miscellaneous.php:99
@@ -2459,6 +2496,22 @@ msgstr ""
 msgid "Zambian kwacha"
 msgstr ""
 
+#: includes/helpers/yatra-currency-helper.php:388
+msgid "Left"
+msgstr ""
+
+#: includes/helpers/yatra-currency-helper.php:389
+msgid "Right"
+msgstr ""
+
+#: includes/helpers/yatra-currency-helper.php:390
+msgid "Left with space"
+msgstr ""
+
+#: includes/helpers/yatra-currency-helper.php:391
+msgid "Right with space"
+msgstr ""
+
 #: includes/hooks/yatra-template-hooks.php:137
 msgid "Total Price"
 msgstr ""
@@ -2614,31 +2667,31 @@ msgstr ""
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:582
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:578
 msgid "cURL installed but unable to retrieve version."
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:685
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:681
 #: includes/modules/status/templates/html-admin-page-status-report.php:732
 msgid "Visit plugin homepage"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:694
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:690
 #: includes/modules/status/templates/html-admin-page-status-report.php:875
 #. translators: 1: current version. 2: latest version
 msgid "%1$s (update to version %2$s is available)"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:698
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:694
 msgid "Network enabled"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:706
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:702
 #. translators: %s: version
 msgid "Installed version not tested with active version of Yatra %s"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:717
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:713
 #: includes/modules/status/templates/html-admin-page-status-report.php:741
 #. translators: %s: plugin author
 msgid "by %s"
@@ -3133,10 +3186,6 @@ msgstr ""
 msgid ""
 "What currency prices are listed and which currency gateways will take "
 "payments in."
-msgstr ""
-
-#: includes/modules/status/templates/html-admin-page-status-report.php:767
-msgid "Currency position"
 msgstr ""
 
 #: includes/modules/status/templates/html-admin-page-status-report.php:769
@@ -3851,15 +3900,15 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:495
+#: includes/yatra-template-functions.php:515
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:496
+#: includes/yatra-template-functions.php:516
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:497
+#: includes/yatra-template-functions.php:517
 msgid "Not Available"
 msgstr ""
 
@@ -4070,22 +4119,22 @@ msgctxt "Booking status"
 msgid "Cancelled"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:469
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:465
 msgctxt "Page setting"
 msgid "Cart"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:474
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:470
 msgctxt "Page setting"
 msgid "Checkout"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:479
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:475
 msgctxt "Page setting"
 msgid "My account"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:484
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:480
 msgctxt "Page setting"
 msgid "Terms and conditions"
 msgstr ""
