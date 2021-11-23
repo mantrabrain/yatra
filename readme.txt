@@ -3,7 +3,7 @@ Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
 Tested up to: 5.8.2
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -142,7 +142,9 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
-= 2.1.2 | 2021/11/09 =
+= 2.1.3 | 2021/11/23 =
 * Fixed - My Account Page Design fixed
 * Fixed - Minor issue fixed
 * Fixed - Added filters for addons
+* Added - Sample Data Import Feature on setup wizard
+* Added - Currency settings
