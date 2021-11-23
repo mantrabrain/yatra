@@ -237,6 +237,62 @@ class Yatra_Setup_Wizard
                         ]); ?>
                     </td>
                 </tr>
+
+                <tr>
+                    <th scope="row"><label
+                                for="yatra_currency_position"><?php _e('Currency Position', 'yatra'); ?></label></th>
+
+                    <td>
+                        <?php yatra_html_form_input([
+                            'name' => 'yatra_currency_position',
+                            'type' => 'select',
+                            'value' => get_option('yatra_currency_position', 'left'),
+                            'options' => yatra_get_currency_positions(),
+                            'help' => __('Currency symbol position.', 'yatra'),
+                        ]); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label
+                                for="yatra_thousand_separator"><?php _e('Thousand Separator', 'yatra'); ?></label></th>
+
+                    <td>
+                        <?php yatra_html_form_input([
+                            'name' => 'yatra_thousand_separator',
+                            'type' => 'text',
+                            'value' => get_option('yatra_thousand_separator', ','),
+                            'help' => __('Thousand separator for price.', 'yatra'),
+                        ]); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label
+                                for="yatra_price_number_decimals"><?php _e('Number of decimals', 'yatra'); ?></label>
+                    </th>
+
+                    <td>
+                        <?php yatra_html_form_input([
+                            'name' => 'yatra_price_number_decimals',
+                            'type' => 'number',
+                            'value' => get_option('yatra_price_number_decimals', 2),
+                            'help' => __('Number of decimals shown in price.', 'yatra'),
+                        ]); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label
+                                for="yatra_decimal_separator"><?php _e('Decimal Separator', 'yatra'); ?></label>
+                    </th>
+
+                    <td>
+                        <?php yatra_html_form_input([
+                            'name' => 'yatra_decimal_separator',
+                            'type' => 'text',
+                            'value' => get_option('yatra_decimal_separator', '.'),
+                            'help' => __('Decimal separator for price..', 'yatra'),
+                        ]); ?>
+                    </td>
+                </tr>
             </table>
 
             <?php $this->next_step_buttons(); ?>
@@ -249,6 +305,12 @@ class Yatra_Setup_Wizard
         check_admin_referer('yatra-setup');
 
         $yatra_currency = sanitize_text_field($_POST['yatra_currency']);
+        $currency_position = sanitize_text_field($_POST['yatra_currency_position']);
+        $all_currency_positions = yatra_get_currency_positions();
+        $currency_position = isset($all_currency_positions[$currency_position]) ? $currency_position : 'left';
+        $thousand_separator = sanitize_text_field($_POST['yatra_thousand_separator']);
+        $decimals = absint($_POST['yatra_price_number_decimals']);
+        $decimal_separator = sanitize_text_field($_POST['yatra_decimal_separator']);
 
         $all_currencies = array_keys(yatra_get_currencies());
 
@@ -256,6 +318,12 @@ class Yatra_Setup_Wizard
 
             update_option('yatra_currency', $yatra_currency);
         }
+        update_option('yatra_currency', $yatra_currency);
+        update_option('yatra_currency_position', $currency_position);
+        update_option('yatra_thousand_separator', $thousand_separator);
+        update_option('yatra_price_number_decimals', $decimals);
+        update_option('yatra_decimal_separator', $decimal_separator);
+
 
         wp_redirect(esc_url_raw($this->get_next_step_link()));
         exit;

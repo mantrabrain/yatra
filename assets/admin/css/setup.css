@@ -119,6 +119,8 @@ a:hover, a:active {
 .yatra-setup-content .form-table td input {
     width: 100%;
     box-sizing: border-box;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .yatra-setup-content .form-table td select {
@@ -530,11 +532,13 @@ a:hover, a:active {
     border-radius: 3px;
     transition: opacity 0.1s ease-in-out;
 }
+
 .yatra-setup-content .theme-browser.rendered .theme:hover .theme-screenshot img,
 .yatra-setup-content .theme-browser.rendered .theme:focus .theme-screenshot img {
     opacity: 0.4;
 }
+
 .yatra-setup-content .theme-browser .theme:hover .theme-screenshot,
 .yatra-setup-content .theme-browser .theme:focus .theme-screenshot {
-    background: rgba(5, 152, 123,0.4);
+    background: rgba(5, 152, 123, 0.4);
 }
