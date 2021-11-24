@@ -11,6 +11,7 @@ assets/lib/fullcalendar/examples/
 
 # Grunt
 /node_modules/
+/assets/admin/src/node_modules/
 
 # Sass
 .sass-cache/

@@ -26,16 +26,38 @@ class Yatra_Metabox
     protected static $_instance = null;
 
 
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Metabox_Tour_CPT
+     * @since 2.1.4
+     */
     public $tour_metabox;
+
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Metabox_Booking_CPT
+     * @since 2.1.4
+     */
+    public $booking_metabox;
+
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Metabox_Coupons_CPT
+     * @since 2.1.4
+     */
+    public $coupons_metabox;
 
     /**
      * Main Yatra Instance.
      *
      * Ensures only one instance of Yatra is loaded or can be loaded.
      *
+     * @return Yatra - Yatra_Metabox
      * @since 1.0.0
      * @static
-     * @return Yatra - Yatra_Metabox
      */
     public static function instance()
     {
@@ -64,11 +86,10 @@ class Yatra_Metabox
     {
 
         $this->tour_metabox = new Yatra_Metabox_Tour_CPT();
-        $this->tour_metabox = new Yatra_Metabox_Booking_CPT();
+        $this->booking_metabox = new Yatra_Metabox_Booking_CPT();
+        $this->coupons_metabox = new Yatra_Metabox_Coupons_CPT();
 
     }
-
-
 
 
 }

@@ -48,6 +48,13 @@ class Yatra_Custom_Post_Type
      * @since 1.0.0
      */
     public $customers;
+    /**
+     * The single instance of the class.
+     *
+     * @var Yatra_Custom_Post_Type_Coupons
+     * @since 1.0.0
+     */
+    public $coupons;
 
 
     /**
@@ -55,9 +62,9 @@ class Yatra_Custom_Post_Type
      *
      * Ensures only one instance of Yatra is loaded or can be loaded.
      *
+     * @return Yatra_Custom_Post_Type - Yatra_Custom_Post_Type
      * @since 1.0.0
      * @static
-     * @return Yatra_Custom_Post_Type - Yatra_Custom_Post_Type
      */
     public static function instance()
     {
@@ -87,6 +94,7 @@ class Yatra_Custom_Post_Type
         $this->tour = new Yatra_Custom_Post_Type_Tour();
         $this->booking = new Yatra_Custom_Post_Type_Booking();
         $this->customers = new Yatra_Custom_Post_Type_Customers();
+        $this->coupons = new Yatra_Custom_Post_Type_Coupons();
 
     }
 
@@ -111,6 +119,7 @@ class Yatra_Custom_Post_Type
         $this->tour->init();
         $this->booking->init();
         $this->customers->init();
+        $this->coupons->init();
 
 
     }
