@@ -3,6 +3,7 @@ import {render} from 'react-dom';
 import {TabPanel} from '@wordpress/components';
 import './style.scss';
 import Counter from "./Counter";
+import {TabContent} from "./TabContent.js";
 
 const onSelect = (tabName) => {
     console.log('Selecting tab', tabName);
@@ -33,7 +34,7 @@ const YatraCouponTabPanel = () => (
         orientation="vertical"
         tabs={tabLists()}
     >
-        {(tab) => <p>{tab.content_title}</p>}
+        {(tab) => <TabContent tab={tab}/>}
     </TabPanel>
 );
 

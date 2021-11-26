@@ -2,6 +2,30 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./coupon/TabContent.js":
+/*!******************************!*\
+  !*** ./coupon/TabContent.js ***!
+  \******************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "TabContent": function() { return /* binding */ TabContent; }
+/* harmony export */ });
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
+
+
+const TabContent = props => {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Card, {
+    size: "small"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CardBody, null, props.tab.content_title));
+};
+
+/***/ }),
+
 /***/ "./coupon/index.js":
 /*!*************************!*\
   !*** ./coupon/index.js ***!
@@ -20,6 +44,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _style_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./style.scss */ "./coupon/style.scss");
 /* harmony import */ var _Counter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Counter */ "./coupon/Counter.tsx");
 /* harmony import */ var _Counter__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_Counter__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _TabContent_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./TabContent.js */ "./coupon/TabContent.js");
+
 
 
 
@@ -59,7 +85,9 @@ const YatraCouponTabPanel = () => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE
   onSelect: onSelect,
   orientation: "vertical",
   tabs: tabLists()
-}, tab => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, tab.content_title));
+}, tab => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_TabContent_js__WEBPACK_IMPORTED_MODULE_6__.TabContent, {
+  tab: tab
+}));
 
 window.addEventListener("load", function () {
   (0,react_dom__WEBPACK_IMPORTED_MODULE_2__.render)((0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(YatraCouponTabPanel, null), document.getElementById("yatra-coupon-meta-element"));
