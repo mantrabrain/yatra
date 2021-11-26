@@ -49,6 +49,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
             $coupon_dependency['dependencies'] = isset($coupon_dependency['dependencies']) ? $coupon_dependency['dependencies'] : array();
             $coupon_dependency['version'] = isset($coupon_dependency['version']) ? sanitize_text_field($coupon_dependency['version']) : YATRA_VERSION;
             wp_register_script('yatra-coupon', YATRA_PLUGIN_URI . '/assets/admin/build/coupon.js', $coupon_dependency['dependencies'], $coupon_dependency['version']);
+            wp_register_style('yatra-coupon-css', YATRA_PLUGIN_URI . '/assets/admin/build/style-coupon.css', array('wp-components'), YATRA_VERSION);
 
             // Register Only Script
             wp_register_script('yatra-popper', YATRA_PLUGIN_URI . '/assets/lib/popperjs/popper.js', array(), YATRA_VERSION);

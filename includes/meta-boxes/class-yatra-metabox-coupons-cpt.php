@@ -24,6 +24,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                 return;
             }
             wp_enqueue_script('yatra-coupon');
+            wp_enqueue_style('yatra-coupon-css');
         }
 
         public function metabox_config($key = null, $get_merge_all_field = false)
