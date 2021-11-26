@@ -1,0 +1,30 @@
+.yatra-coupon-tabs {
+  display: grid;
+  grid-template-columns: 20% 80%;
+
+  .components-tab-panel__tabs {
+    background: #f3f4f5;
+    border: 1px solid #e0e0e0;
+    min-width: 20%;
+    display: flex;
+    flex-direction: column;
+
+    button {
+      box-shadow: unset;
+      border-radius: 0;
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 10px 5px;
+      font-weight: 400;
+      padding: 15px;
+      border-bottom: 1px solid #e2e4e7;
+    }
+  }
+
+  .components-tab-panel__tab-content {
+    flex: 1;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+  }
+}

@@ -1,19 +1,19 @@
 import * as React from 'react';
 import {render} from 'react-dom';
-import { TabPanel } from '@wordpress/components';
-import './style.css';
+import {TabPanel} from '@wordpress/components';
+import './style.scss';
 import Counter from "./Counter";
 
-const onSelect = ( tabName ) => {
-    console.log( 'Selecting tab', tabName );
+const onSelect = (tabName) => {
+    console.log('Selecting tab', tabName);
 };
 const MyTabPanel = () => (
     <TabPanel
-        className="my-tab-panel"
+        className="yatra-coupon-tabs"
         activeClass="active-tab"
-        onSelect={ onSelect }
+        onSelect={onSelect}
         orientation="vertical"
-        tabs={ [
+        tabs={[
             {
                 name: 'tab1',
                 title: 'Tab WOW',
@@ -24,9 +24,9 @@ const MyTabPanel = () => (
                 title: 'Tab 2',
                 className: 'tab-two',
             },
-        ] }
+        ]}
     >
-        { ( tab ) => <p>{ tab.title }</p> }
+        {(tab) => <p>{tab.title}</p>}
     </TabPanel>
 );
 
