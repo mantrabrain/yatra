@@ -25,6 +25,48 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
             }
             wp_enqueue_script('yatra-coupon');
             wp_enqueue_style('yatra-coupon-css');
+            wp_localize_script('yatra-coupon', 'YatraCouponSettings', array(
+                'tabs' => array(
+                    'general' =>
+                        array(
+                            'title' => __('General', 'yatra'),
+                            'content_title' => __('General Settings', 'yatra'),
+                            'settings' => array(
+                                array(
+                                    'title' => __('Tab Layout for tour page', 'yatra'),
+                                    'desc' => __('Tab layout for single tour page', 'yatra'),
+                                    'desc_tip' => true,
+                                    'id' => 'yatra_setting_layouts_single_tour_tab_layout',
+                                    'type' => 'select',
+                                    'options' => array(
+                                        '' => __('Tab Style Layout', 'yatra'),
+                                        'heading_and_content' => __('Heading & Content Style Tab', 'yatra')
+                                    ),
+                                    'default' => ''
+                                ))
+                        ),
+
+                    'restriction' =>
+                        array(
+                            'title' => __('Restrictions', 'yatra'),
+                            'content_title' => __('Restrictions Settings', 'yatra'),
+                            'settings' => array(
+                                array(
+                                    'title' => __('Tab Layout for tour page', 'yatra'),
+                                    'desc' => __('Tab layout for single tour page', 'yatra'),
+                                    'desc_tip' => true,
+                                    'id' => 'yatra_setting_layouts_single_tour_tab_layout',
+                                    'type' => 'select',
+                                    'options' => array(
+                                        '' => __('Tab Style Layout', 'yatra'),
+                                        'heading_and_content' => __('Heading & Content Style Tab', 'yatra')
+                                    ),
+                                    'default' => ''
+                                ))
+                        
+                        )
+                ),
+            ));
         }
 
         public function metabox_config($key = null, $get_merge_all_field = false)

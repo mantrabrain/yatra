@@ -31,24 +31,38 @@ const onSelect = tabName => {
   console.log('Selecting tab', tabName);
 };
 
-const MyTabPanel = () => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.TabPanel, {
+const tabLists = () => {
+  let all_tabs = YatraCouponSettings.tabs;
+  let updated_all_tabs = [];
+
+  for (const [key, options] of Object.entries(all_tabs)) {
+    let title = typeof options.title !== "undefined" ? options.title : '';
+    let content_title = typeof options.content_title !== "undefined" ? options.content_title : '';
+    console.log(options);
+
+    if (title !== '') {
+      updated_all_tabs.push({
+        name: key,
+        title: title,
+        className: key,
+        content_title: content_title
+      });
+    }
+  }
+
+  return updated_all_tabs;
+};
+
+const YatraCouponTabPanel = () => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.TabPanel, {
   className: "yatra-coupon-tabs",
   activeClass: "active-tab",
   onSelect: onSelect,
   orientation: "vertical",
-  tabs: [{
-    name: 'tab1',
-    title: 'Tab WOW',
-    className: 'tab-one'
-  }, {
-    name: 'tab2',
-    title: 'Tab 2',
-    className: 'tab-two'
-  }]
-}, tab => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, tab.title));
+  tabs: tabLists()
+}, tab => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, tab.content_title));
 
 window.addEventListener("load", function () {
-  (0,react_dom__WEBPACK_IMPORTED_MODULE_2__.render)((0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(MyTabPanel, null), document.getElementById("yatra-coupon-meta-element"));
+  (0,react_dom__WEBPACK_IMPORTED_MODULE_2__.render)((0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(YatraCouponTabPanel, null), document.getElementById("yatra-coupon-meta-element"));
 });
 
 /***/ }),
