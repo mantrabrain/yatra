@@ -16,12 +16,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./fields/NumberInput */ "./coupon/fields/NumberInput.tsx");
+/* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fields_NumberInput__WEBPACK_IMPORTED_MODULE_2__);
+
 
 
 const TabContent = props => {
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Card, {
     size: "small"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CardBody, null, props.tab.content_title));
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CardBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, props.tab.content_title)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_NumberInput__WEBPACK_IMPORTED_MODULE_2___default()), {
+    settings: props.tab.settings
+  }));
 };
 
 /***/ }),
@@ -42,10 +47,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _style_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./style.scss */ "./coupon/style.scss");
-/* harmony import */ var _Counter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Counter */ "./coupon/Counter.tsx");
-/* harmony import */ var _Counter__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_Counter__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _TabContent_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./TabContent.js */ "./coupon/TabContent.js");
-
+/* harmony import */ var _TabContent_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./TabContent.js */ "./coupon/TabContent.js");
 
 
 
@@ -64,14 +66,15 @@ const tabLists = () => {
   for (const [key, options] of Object.entries(all_tabs)) {
     let title = typeof options.title !== "undefined" ? options.title : '';
     let content_title = typeof options.content_title !== "undefined" ? options.content_title : '';
-    console.log(options);
+    let settings = typeof options.settings !== "undefined" ? options.settings : {};
 
     if (title !== '') {
       updated_all_tabs.push({
         name: key,
         title: title,
         className: key,
-        content_title: content_title
+        content_title: content_title,
+        settings: settings
       });
     }
   }
@@ -85,7 +88,7 @@ const YatraCouponTabPanel = () => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE
   onSelect: onSelect,
   orientation: "vertical",
   tabs: tabLists()
-}, tab => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_TabContent_js__WEBPACK_IMPORTED_MODULE_6__.TabContent, {
+}, tab => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_TabContent_js__WEBPACK_IMPORTED_MODULE_5__.TabContent, {
   tab: tab
 }));
 
@@ -107,10 +110,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./coupon/Counter.tsx":
-/*!****************************!*\
-  !*** ./coupon/Counter.tsx ***!
-  \****************************/
+/***/ "./coupon/components/tooltip.tsx":
+/*!***************************************!*\
+  !*** ./coupon/components/tooltip.tsx ***!
+  \***************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -131,34 +134,63 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var React = __webpack_require__(/*! react */ "react");
-var Counter = /** @class */ (function (_super) {
-    __extends(Counter, _super);
-    function Counter() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.state = {
-            count: 0
-        };
-        _this.increment = function () {
-            _this.setState({
-                count: (_this.state.count + 1)
-            });
-        };
-        _this.decrement = function () {
-            _this.setState({
-                count: (_this.state.count - 1)
-            });
-        };
-        return _this;
+var Tooltip = /** @class */ (function (_super) {
+    __extends(Tooltip, _super);
+    function Tooltip() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    Counter.prototype.render = function () {
-        return (React.createElement("div", null,
-            React.createElement("h1", null, this.state.count),
-            React.createElement("button", { type: "button", onClick: this.increment }, "Increment"),
-            React.createElement("button", { type: "button", onClick: this.decrement }, "Decrement")));
+    Tooltip.prototype.render = function () {
+        return (React.createElement("span", { className: "yatra-tippy-tooltip dashicons dashicons-editor-help", "data-tippy-content": "Total duration days for this tour" }));
     };
-    return Counter;
+    return Tooltip;
 }(React.Component));
-exports["default"] = Counter;
+exports["default"] = Tooltip;
+
+
+/***/ }),
+
+/***/ "./coupon/fields/NumberInput.tsx":
+/*!***************************************!*\
+  !*** ./coupon/fields/NumberInput.tsx ***!
+  \***************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var React = __webpack_require__(/*! react */ "react");
+var tooltip_1 = __webpack_require__(/*! ../components/tooltip */ "./coupon/components/tooltip.tsx");
+var NumberInput = /** @class */ (function (_super) {
+    __extends(NumberInput, _super);
+    function NumberInput() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    NumberInput.prototype.render = function () {
+        var settings = this.props.settings;
+        return (React.createElement("div", { className: "yatra-field-wrap" },
+            React.createElement("label", { htmlFor: settings.id },
+                settings.title,
+                " "),
+            React.createElement("input", { className: "widefat", id: settings.id, name: settings.id, type: "number", value: settings.value, placeholder: settings.placeholder }),
+            React.createElement(tooltip_1.default, null)));
+    };
+    return NumberInput;
+}(React.Component));
+exports["default"] = NumberInput;
 
 
 /***/ }),

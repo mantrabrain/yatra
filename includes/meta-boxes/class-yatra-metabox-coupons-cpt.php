@@ -12,7 +12,15 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
 
             add_action('admin_enqueue_scripts', array($this, 'coupon_script'), 11);
 
+        }
 
+        public function get_value($option_id, $post_id, $default = '')
+        {
+            $post_meta = get_post_meta($post_id, $option_id, true);
+            if (!($post_meta)) {
+                $post_meta = $default;
+            }
+            return $post_meta;
         }
 
         public function coupon_script($hook)
@@ -23,6 +31,10 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
             if ($screen_id != 'yatra-coupons') {
                 return;
             }
+            global $post;
+
+            $post_id = isset($post->ID) ? $post->ID : '';
+
             wp_enqueue_script('yatra-coupon');
             wp_enqueue_style('yatra-coupon-css');
             wp_localize_script('yatra-coupon', 'YatraCouponSettings', array(
@@ -31,19 +43,15 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                         array(
                             'title' => __('General', 'yatra'),
                             'content_title' => __('General Settings', 'yatra'),
-                            'settings' => array(
+                            'settings' =>
                                 array(
                                     'title' => __('Tab Layout for tour page', 'yatra'),
                                     'desc' => __('Tab layout for single tour page', 'yatra'),
                                     'desc_tip' => true,
                                     'id' => 'yatra_setting_layouts_single_tour_tab_layout',
-                                    'type' => 'select',
-                                    'options' => array(
-                                        '' => __('Tab Style Layout', 'yatra'),
-                                        'heading_and_content' => __('Heading & Content Style Tab', 'yatra')
-                                    ),
-                                    'default' => ''
-                                ))
+                                    'type' => 'number',
+                                    'value' => $this->get_value('yatra_setting_layouts_single_tour_tab_layout', $post_id, 2)
+                                )
                         ),
 
                     'restriction' =>
@@ -51,19 +59,14 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                             'title' => __('Restrictions', 'yatra'),
                             'content_title' => __('Restrictions Settings', 'yatra'),
                             'settings' => array(
-                                array(
-                                    'title' => __('Tab Layout for tour page', 'yatra'),
-                                    'desc' => __('Tab layout for single tour page', 'yatra'),
-                                    'desc_tip' => true,
-                                    'id' => 'yatra_setting_layouts_single_tour_tab_layout',
-                                    'type' => 'select',
-                                    'options' => array(
-                                        '' => __('Tab Style Layout', 'yatra'),
-                                        'heading_and_content' => __('Heading & Content Style Tab', 'yatra')
-                                    ),
-                                    'default' => ''
-                                ))
-                        
+                                'title' => __('Restriction', 'yatra'),
+                                'desc' => __('Tab layout for single tour page', 'yatra'),
+                                'desc_tip' => true,
+                                'id' => 'yatra_setting_layouts_single_tour_tab_layout',
+                                'type' => 'number',
+                                'default' => 2
+                            )
+
                         )
                 ),
             ));

@@ -25,6 +25,9 @@
   padding: 15px;
   border-bottom: 1px solid #e2e4e7;
 }
+.yatra-coupon-tabs .components-tab-panel__tabs-item:focus:not(:disabled) {
+  box-shadow: inset 2px 0px #007cba;
+}
 .yatra-coupon-tabs .components-tab-panel__tab-content {
   flex: 1;
   background-color: #fff;

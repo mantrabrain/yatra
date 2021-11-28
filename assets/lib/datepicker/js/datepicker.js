@@ -602,7 +602,7 @@
         /**
          * Updates datepicker options
          * @param {String|Object} param - parameter's name to update. If object then it will extend current options
-         * @param {String|Number|Object} [value] - new param value
+         * @param {String|NumberInput|Object} [value] - new param value
          */
         update: function (param, value) {
             var len = arguments.length,
@@ -2155,7 +2155,7 @@
 
         /**
          * Calculates valid hour value to display in text input and datepicker's body.
-         * @param date {Date|Number} - date or hours
+         * @param date {Date|NumberInput} - date or hours
          * @param [ampm] {Boolean} - 12 hours mode
          * @returns {{hours: *, dayPeriod: string}}
          * @private
