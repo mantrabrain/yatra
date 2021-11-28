@@ -14,6 +14,42 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
 
         }
 
+        public function getTabSettings($post_id)
+        {
+            return array(
+                'general' =>
+                    array(
+                        'title' => __('General', 'yatra'),
+                        'content_title' => __('General Settings', 'yatra'),
+                        'settings' =>
+                            array(
+                                'title' => __('Tab Layout for tour page', 'yatra'),
+                                'desc' => __('Tab layout for single tour page', 'yatra'),
+                                'desc_tip' => true,
+                                'id' => 'yatra_setting_layouts_single_tour_tab_layout',
+                                'type' => 'number',
+                                'value' => $this->get_value('yatra_setting_layouts_single_tour_tab_layout', $post_id, 2)
+                            )
+                    ),
+
+                'restriction' =>
+                    array(
+                        'title' => __('Restrictions', 'yatra'),
+                        'content_title' => __('Restrictions Settings', 'yatra'),
+                        'settings' => array(
+                            'title' => __('Restriction', 'yatra'),
+                            'desc' => __('Tab layout for single tour page', 'yatra'),
+                            'desc_tip' => true,
+                            'id' => 'yatra_setting_layouts_single_tour_tab_layout',
+                            'type' => 'number',
+                            'value' => $this->get_value('yatra_setting_layouts_single_tour_tab_layout', $post_id, 2)
+                        )
+
+                    )
+            );
+
+        }
+
         public function get_value($option_id, $post_id, $default = '')
         {
             $post_meta = get_post_meta($post_id, $option_id, true);
@@ -38,37 +74,9 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
             wp_enqueue_script('yatra-coupon');
             wp_enqueue_style('yatra-coupon-css');
             wp_localize_script('yatra-coupon', 'YatraCouponSettings', array(
-                'tabs' => array(
-                    'general' =>
-                        array(
-                            'title' => __('General', 'yatra'),
-                            'content_title' => __('General Settings', 'yatra'),
-                            'settings' =>
-                                array(
-                                    'title' => __('Tab Layout for tour page', 'yatra'),
-                                    'desc' => __('Tab layout for single tour page', 'yatra'),
-                                    'desc_tip' => true,
-                                    'id' => 'yatra_setting_layouts_single_tour_tab_layout',
-                                    'type' => 'number',
-                                    'value' => $this->get_value('yatra_setting_layouts_single_tour_tab_layout', $post_id, 2)
-                                )
-                        ),
-
-                    'restriction' =>
-                        array(
-                            'title' => __('Restrictions', 'yatra'),
-                            'content_title' => __('Restrictions Settings', 'yatra'),
-                            'settings' => array(
-                                'title' => __('Restriction', 'yatra'),
-                                'desc' => __('Tab layout for single tour page', 'yatra'),
-                                'desc_tip' => true,
-                                'id' => 'yatra_setting_layouts_single_tour_tab_layout',
-                                'type' => 'number',
-                                'default' => 2
-                            )
-
-                        )
-                ),
+                'tabs' => $this->getTabSettings($post_id),
+                'nonce' => wp_create_nonce('yatra_coupon_post_type_metabox_nonce'),
+                'active_tab' => $this->get_value('active_tab', $post_id, 'general')
             ));
         }
 
@@ -118,31 +126,36 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
          */
         public function save($post_id)
         {
-            $nonce = isset($_POST['yatra_booking_post_type_metabox_nonce']) ? ($_POST['yatra_booking_post_type_metabox_nonce']) : '';
+            $nonce = isset($_POST['yatra_coupon_post_type_metabox_nonce']) ? ($_POST['yatra_coupon_post_type_metabox_nonce']) : '';
 
-            if (isset($_POST['yatra_booking_post_type_metabox_nonce'])) {
+            if (isset($_POST['yatra_coupon_post_type_metabox_nonce'])) {
 
-                $is_valid_nonce = wp_verify_nonce($nonce, 'yatra_booking_post_type_metabox_nonce');
+                $is_valid_nonce = wp_verify_nonce($nonce, 'yatra_coupon_post_type_metabox_nonce');
 
                 if ($is_valid_nonce) {
 
-                    $post_status = isset($_POST['yatra_booking_status']) ? $_POST['yatra_booking_status'] : '';
+                    $tabs = $this->getTabSettings($post_id);
 
-                    $booking_statuses = array_keys(yatra_get_booking_statuses());
+                    foreach ($tabs as $tab_settings) {
 
-                    if (in_array($post_status, $booking_statuses)) {
+                        $field = isset($tab_settings['settings']) ? $tab_settings['settings'] : array();
 
-                        if (!wp_is_post_revision($post_id)) {
+                        $field_id = isset($field['id']) ? $field['id'] : '';
 
-                            // unhook this function so it doesn't loop infinitely
-                            remove_action('save_post', array($this, 'save'));
+                        if ('' !== $field_id) {
+                            $field_value = isset($_POST[$field_id]) ? $_POST[$field_id] : '';
 
-                            yatra_update_booking_status($post_id, $post_status);
-                            // re-hook this function
-                            add_action('save_post', array($this, 'save'));
+                            $valid_field_value = $this->sanitize($field_value, $field);
+
+                            update_post_meta($post_id, $field_id, $valid_field_value);
                         }
-
                     }
+
+                    $active_tab = isset($_POST['yatra_coupon_active_tab']) ? sanitize_text_field($_POST['yatra_coupon_active_tab']) : '';
+
+                    update_post_meta($post_id, 'active_tab', $active_tab);
+
+
                 }
             }
 

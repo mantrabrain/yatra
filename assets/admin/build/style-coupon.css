@@ -25,13 +25,38 @@
   padding: 15px;
   border-bottom: 1px solid #e2e4e7;
 }
-.yatra-coupon-tabs .components-tab-panel__tabs-item:focus:not(:disabled) {
+.yatra-coupon-tabs .components-tab-panel__tabs-item:focus:not(:disabled), .yatra-coupon-tabs .components-tab-panel__tabs-item.active-tab {
   box-shadow: inset 2px 0px #007cba;
 }
 .yatra-coupon-tabs .components-tab-panel__tab-content {
   flex: 1;
   background-color: #fff;
   border: 1px solid #e0e0e0;
+}
+.yatra-coupon-tabs .yatra-field-wrap {
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+}
+.yatra-coupon-tabs .yatra-field-wrap label:not(.yatra-switch-control) {
+  width: 100%;
+  margin-right: 20px;
+  vertical-align: baseline;
+  max-width: 200px;
+  float: left;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.yatra-coupon-tabs .yatra-field-wrap input[type=text], .yatra-coupon-tabs .yatra-field-wrap input[type=number], .yatra-coupon-tabs .yatra-field-wrap input[type=url], .yatra-coupon-tabs .yatra-field-wrap input[type=url], .yatra-coupon-tabs .yatra-field-wrap select, .yatra-coupon-tabs .yatra-field-wrap textarea, .yatra-coupon-tabs .yatra-field-wrap .select2-container {
+  max-width: 300px;
+  width: 100%;
+  box-shadow: none;
+  border: 1px solid #aaa;
+  border-radius: 0;
+  padding: 4px 12px;
+  height: 35px;
+  outline: 0;
+  border-left: 3px solid #aaa;
 }
 
 /*# sourceMappingURL=style-coupon.css.map*/

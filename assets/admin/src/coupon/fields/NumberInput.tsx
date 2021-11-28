@@ -21,7 +21,7 @@ export default class NumberInput extends React.Component<NumberProps> {
             <div className="yatra-field-wrap"><label
                 htmlFor={settings.id}>{settings.title} </label>
                 <input className="widefat" id={settings.id}
-                       name={settings.id} type="number" value={settings.value} placeholder={settings.placeholder}/>
+                       name={settings.id} type="number" defaultValue={settings.value} placeholder={settings.placeholder}/>
                 <Tooltip/>
             </div>
         );

@@ -14,18 +14,35 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
-/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./fields/NumberInput */ "./coupon/fields/NumberInput.tsx");
-/* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_fields_NumberInput__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./fields/NumberInput */ "./coupon/fields/NumberInput.tsx");
+/* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_fields_NumberInput__WEBPACK_IMPORTED_MODULE_3__);
+
 
 
 
 const TabContent = props => {
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Card, {
+  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
+    tippy('.yatra-tippy-tooltip', {
+      //content: "Hello World",
+      allowHTML: true
+    });
+  });
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Card, {
     size: "small"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CardBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, props.tab.content_title)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_NumberInput__WEBPACK_IMPORTED_MODULE_2___default()), {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.CardBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, props.tab.content_title)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_NumberInput__WEBPACK_IMPORTED_MODULE_3___default()), {
     settings: props.tab.settings
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    value: YatraCouponSettings.nonce,
+    name: "yatra_coupon_post_type_metabox_nonce"
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "hidden",
+    value: props.active,
+    name: "yatra_coupon_active_tab"
   }));
 };
 
@@ -38,6 +55,9 @@ const TabContent = props => {
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "useComponentDidUpdate": function() { return /* binding */ useComponentDidUpdate; }
+/* harmony export */ });
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
@@ -54,43 +74,64 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-const onSelect = tabName => {
-  console.log('Selecting tab', tabName);
-};
-
-const tabLists = () => {
-  let all_tabs = YatraCouponSettings.tabs;
-  let updated_all_tabs = [];
-
-  for (const [key, options] of Object.entries(all_tabs)) {
-    let title = typeof options.title !== "undefined" ? options.title : '';
-    let content_title = typeof options.content_title !== "undefined" ? options.content_title : '';
-    let settings = typeof options.settings !== "undefined" ? options.settings : {};
-
-    if (title !== '') {
-      updated_all_tabs.push({
-        name: key,
-        title: title,
-        className: key,
-        content_title: content_title,
-        settings: settings
-      });
+const useComponentDidUpdate = (effect, dependencies) => {
+  const hasMounted = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(false);
+  (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
     }
-  }
 
-  return updated_all_tabs;
+    effect();
+  }, dependencies);
 };
 
-const YatraCouponTabPanel = () => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.TabPanel, {
-  className: "yatra-coupon-tabs",
-  activeClass: "active-tab",
-  onSelect: onSelect,
-  orientation: "vertical",
-  tabs: tabLists()
-}, tab => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_TabContent_js__WEBPACK_IMPORTED_MODULE_5__.TabContent, {
-  tab: tab
-}));
+const YatraCouponTabPanel = () => {
+  const getTabLists = () => {
+    let all_tabs = YatraCouponSettings.tabs;
+    let updated_all_tabs = [];
+
+    for (const [key, options] of Object.entries(all_tabs)) {
+      let title = typeof options.title !== "undefined" ? options.title : '';
+      let content_title = typeof options.content_title !== "undefined" ? options.content_title : '';
+      let settings = typeof options.settings !== "undefined" ? options.settings : {};
+
+      if (title !== '') {
+        if (updated_all_tabs.length === 0) {//  setActiveTab(key);
+        }
+
+        updated_all_tabs.push({
+          name: key,
+          title: title,
+          className: key,
+          content_title: content_title,
+          settings: settings
+        });
+      }
+    }
+
+    return updated_all_tabs;
+  };
+
+  const [activeTab, setActiveTab] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(YatraCouponSettings.active_tab);
+  const [tabList, setTabLists] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(getTabLists());
+
+  const onSelect = tabName => {
+    setActiveTab(tabName);
+  };
+
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.TabPanel, {
+    className: "yatra-coupon-tabs",
+    activeClass: "active-tab",
+    onSelect: onSelect,
+    orientation: "vertical",
+    tabs: tabList,
+    initialTabName: activeTab
+  }, tab => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_TabContent_js__WEBPACK_IMPORTED_MODULE_5__.TabContent, {
+    tab: tab,
+    active: activeTab
+  }));
+};
 
 window.addEventListener("load", function () {
   (0,react_dom__WEBPACK_IMPORTED_MODULE_2__.render)((0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(YatraCouponTabPanel, null), document.getElementById("yatra-coupon-meta-element"));
@@ -185,7 +226,7 @@ var NumberInput = /** @class */ (function (_super) {
             React.createElement("label", { htmlFor: settings.id },
                 settings.title,
                 " "),
-            React.createElement("input", { className: "widefat", id: settings.id, name: settings.id, type: "number", value: settings.value, placeholder: settings.placeholder }),
+            React.createElement("input", { className: "widefat", id: settings.id, name: settings.id, type: "number", defaultValue: settings.value, placeholder: settings.placeholder }),
             React.createElement(tooltip_1.default, null)));
     };
     return NumberInput;
