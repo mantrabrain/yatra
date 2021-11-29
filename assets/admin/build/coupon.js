@@ -20,6 +20,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./fields/NumberInput */ "./coupon/fields/NumberInput.tsx");
 /* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_fields_NumberInput__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _fields_TextInput__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./fields/TextInput */ "./coupon/fields/TextInput.tsx");
+/* harmony import */ var _fields_TextInput__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_fields_TextInput__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _fields_Select__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./fields/Select */ "./coupon/fields/Select.tsx");
+/* harmony import */ var _fields_Select__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_fields_Select__WEBPACK_IMPORTED_MODULE_5__);
+
+
 
 
 
@@ -27,14 +33,41 @@ __webpack_require__.r(__webpack_exports__);
 const TabContent = props => {
   (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
     tippy('.yatra-tippy-tooltip', {
-      //content: "Hello World",
       allowHTML: true
     });
   });
+
+  const renderSwitch = setting => {
+    const field_type = setting.type;
+    console.log(setting);
+
+    switch (field_type) {
+      case "number":
+        return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_NumberInput__WEBPACK_IMPORTED_MODULE_3___default()), {
+          settings: setting
+        });
+
+      case "text":
+        return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_TextInput__WEBPACK_IMPORTED_MODULE_4___default()), {
+          settings: setting
+        });
+
+      case "select":
+        return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_Select__WEBPACK_IMPORTED_MODULE_5___default()), {
+          settings: setting
+        });
+
+      default:
+        return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_TextInput__WEBPACK_IMPORTED_MODULE_4___default()), {
+          settings: setting
+        });
+    }
+  };
+
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Card, {
     size: "small"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.CardBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, props.tab.content_title)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_NumberInput__WEBPACK_IMPORTED_MODULE_3___default()), {
-    settings: props.tab.settings
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.CardBody, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, props.tab.content_title)), props.tab.settings.map(function (setting, i) {
+    return renderSwitch(setting);
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
     type: "hidden",
     value: YatraCouponSettings.nonce,
@@ -232,6 +265,107 @@ var NumberInput = /** @class */ (function (_super) {
     return NumberInput;
 }(React.Component));
 exports["default"] = NumberInput;
+
+
+/***/ }),
+
+/***/ "./coupon/fields/Select.tsx":
+/*!**********************************!*\
+  !*** ./coupon/fields/Select.tsx ***!
+  \**********************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var React = __webpack_require__(/*! react */ "react");
+// @ts-ignore
+var components_1 = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+var tooltip_1 = __webpack_require__(/*! ../components/tooltip */ "./coupon/components/tooltip.tsx");
+var Select = /** @class */ (function (_super) {
+    __extends(Select, _super);
+    function Select() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Select.prototype.render = function () {
+        var getOptions = function (setting_options) {
+            console.log(typeof setting_options);
+            var options = [];
+            Object.entries(setting_options).forEach(function (_a) {
+                var option_key = _a[0], option_value = _a[1];
+                return options.push({ label: option_value, value: option_key });
+            });
+            return options;
+        };
+        var settings = this.props.settings;
+        return (React.createElement("div", { className: "yatra-field-wrap" },
+            React.createElement("label", { htmlFor: settings.id },
+                settings.title,
+                " "),
+            React.createElement(components_1.SelectControl, { defaultValue: settings.value, name: settings.id, options: getOptions(settings.options) }),
+            React.createElement(tooltip_1.default, null)));
+    };
+    return Select;
+}(React.Component));
+exports["default"] = Select;
+
+
+/***/ }),
+
+/***/ "./coupon/fields/TextInput.tsx":
+/*!*************************************!*\
+  !*** ./coupon/fields/TextInput.tsx ***!
+  \*************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var React = __webpack_require__(/*! react */ "react");
+var tooltip_1 = __webpack_require__(/*! ../components/tooltip */ "./coupon/components/tooltip.tsx");
+var TextInput = /** @class */ (function (_super) {
+    __extends(TextInput, _super);
+    function TextInput() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    TextInput.prototype.render = function () {
+        var settings = this.props.settings;
+        return (React.createElement("div", { className: "yatra-field-wrap" },
+            React.createElement("label", { htmlFor: settings.id }, settings.title),
+            React.createElement("input", { className: "widefat", id: settings.id, name: settings.id, type: "text", defaultValue: settings.value, placeholder: settings.placeholder }),
+            React.createElement(tooltip_1.default, null)));
+    };
+    return TextInput;
+}(React.Component));
+exports["default"] = TextInput;
 
 
 /***/ }),

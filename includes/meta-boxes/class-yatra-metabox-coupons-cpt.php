@@ -23,12 +23,27 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                         'content_title' => __('General Settings', 'yatra'),
                         'settings' =>
                             array(
-                                'title' => __('Tab Layout for tour page', 'yatra'),
-                                'desc' => __('Tab layout for single tour page', 'yatra'),
-                                'desc_tip' => true,
-                                'id' => 'yatra_setting_layouts_single_tour_tab_layout',
-                                'type' => 'number',
-                                'value' => $this->get_value('yatra_setting_layouts_single_tour_tab_layout', $post_id, 2)
+                                array(
+                                    'title' => __('Coupon Code', 'yatra'),
+                                    'desc' => __('Coupon Code', 'yatra'),
+                                    'desc_tip' => true,
+                                    'id' => 'yatra_coupon_code',
+                                    'type' => 'text',
+                                    'value' => $this->get_value('yatra_coupon_code', $post_id)
+                                ),
+                                array(
+                                    'title' => __('Coupon Type', 'yatra'),
+                                    'desc' => __('Coupon Type', 'yatra'),
+                                    'desc_tip' => true,
+                                    'id' => 'yatra_coupon_type',
+                                    'type' => 'select',
+                                    'value' => $this->get_value('yatra_coupon_type', $post_id),
+                                    'options' => array(
+                                        'percentage' => __('Percentage Discount', 'yatra'),
+                                        'fixed' => __('Fixed Discount', 'yatra'),
+
+                                    )
+                                )
                             )
                     ),
 
@@ -36,7 +51,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                     array(
                         'title' => __('Restrictions', 'yatra'),
                         'content_title' => __('Restrictions Settings', 'yatra'),
-                        'settings' => array(
+                        'settings' => array(array(
                             'title' => __('Restriction', 'yatra'),
                             'desc' => __('Tab layout for single tour page', 'yatra'),
                             'desc_tip' => true,
@@ -45,6 +60,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                             'value' => $this->get_value('yatra_setting_layouts_single_tour_tab_layout', $post_id, 2)
                         )
 
+                        )
                     )
             );
 
@@ -138,16 +154,19 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
 
                     foreach ($tabs as $tab_settings) {
 
-                        $field = isset($tab_settings['settings']) ? $tab_settings['settings'] : array();
+                        $fields = isset($tab_settings['settings']) ? $tab_settings['settings'] : array();
 
-                        $field_id = isset($field['id']) ? $field['id'] : '';
+                        foreach ($fields as $field) {
 
-                        if ('' !== $field_id) {
-                            $field_value = isset($_POST[$field_id]) ? $_POST[$field_id] : '';
+                            $field_id = isset($field['id']) ? $field['id'] : '';
 
-                            $valid_field_value = $this->sanitize($field_value, $field);
+                            if ('' !== $field_id) {
+                                $field_value = isset($_POST[$field_id]) ? $_POST[$field_id] : '';
 
-                            update_post_meta($post_id, $field_id, $valid_field_value);
+                                $valid_field_value = $this->sanitize($field_value, $field);
+
+                                update_post_meta($post_id, $field_id, $valid_field_value);
+                            }
                         }
                     }
 
