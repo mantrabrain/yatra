@@ -8,7 +8,7 @@ type TextProps = {
 
 type Setting = {
     title: string,
-    description: string,
+    desc: string,
     desc_tip: boolean,
     id: string,
     type: string,
@@ -25,7 +25,7 @@ export default class TextInput extends React.Component<TextProps> {
                 <input className="yatra-input" id={settings.id}
                        name={settings.id} type="text" defaultValue={settings.value}
                        placeholder={settings.placeholder}/>
-                <Tooltip/>
+                {settings.desc_tip ? <Tooltip content={settings.desc}/> : ''}
             </div>
         );
     }

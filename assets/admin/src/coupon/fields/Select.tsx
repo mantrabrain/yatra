@@ -12,7 +12,7 @@ type SelectProps = {
 
 type Setting = {
     title: string,
-    description: string,
+    desc: string,
     desc_tip: boolean,
     id: string,
     type: string,
@@ -25,7 +25,6 @@ export default class Select extends React.Component<SelectProps> {
     render() {
 
         const getOptions = (setting_options: Object) => {
-            console.log(typeof setting_options);
             let options: { label: string; value: string; }[] = [];
             Object.entries(setting_options).forEach(
                 ([option_key, option_value]) => options.push(
@@ -44,7 +43,7 @@ export default class Select extends React.Component<SelectProps> {
                     name={settings.id}
                     options={getOptions(settings.options)}
                 />
-                <Tooltip/>
+                {settings.desc_tip ? <Tooltip content={settings.desc}/> : ''}
             </div>
         );
     }

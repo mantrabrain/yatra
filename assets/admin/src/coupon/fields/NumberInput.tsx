@@ -7,7 +7,7 @@ type NumberProps = {
 
 type Setting = {
     title: string,
-    description: string,
+    desc: string,
     desc_tip: boolean,
     id: string,
     type: string,
@@ -21,7 +21,7 @@ const NumberInput = (props: NumberProps) => {
             htmlFor={settings.id}>{settings.title} </label>
             <input className="yatra-input" id={settings.id}
                    name={settings.id} type="number" defaultValue={settings.value} placeholder={settings.placeholder}/>
-            <Tooltip/>
+            {settings.desc_tip ? <Tooltip content={settings.desc}/> : ''}
         </div>
     );
 };

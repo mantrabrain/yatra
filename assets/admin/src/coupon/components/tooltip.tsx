@@ -1,10 +1,17 @@
 import * as React from 'react';
 
-export default class Tooltip extends React.Component {
-    render() {
-        return (
-            <span className="yatra-tippy-tooltip dashicons dashicons-editor-help"
-                  data-tippy-content="Total duration days for this tour"></span>
-        );
-    }
+type TooltipProps = {
+    content: TooltipContent
 }
+type TooltipContent = {
+    tooltip: string
+}
+
+const Tooltip = (props: TooltipProps) => {
+
+    return (
+        <span className="yatra-tippy-tooltip dashicons dashicons-editor-help"
+              data-tippy-content={props.content}></span>
+    );
+};
+export default Tooltip

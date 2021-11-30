@@ -196,33 +196,11 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var React = __webpack_require__(/*! react */ "react");
-var Tooltip = /** @class */ (function (_super) {
-    __extends(Tooltip, _super);
-    function Tooltip() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    Tooltip.prototype.render = function () {
-        return (React.createElement("span", { className: "yatra-tippy-tooltip dashicons dashicons-editor-help", "data-tippy-content": "Total duration days for this tour" }));
-    };
-    return Tooltip;
-}(React.Component));
+var Tooltip = function (props) {
+    return (React.createElement("span", { className: "yatra-tippy-tooltip dashicons dashicons-editor-help", "data-tippy-content": props.content }));
+};
 exports["default"] = Tooltip;
 
 
@@ -245,7 +223,7 @@ var NumberInput = function (props) {
             settings.title,
             " "),
         React.createElement("input", { className: "yatra-input", id: settings.id, name: settings.id, type: "number", defaultValue: settings.value, placeholder: settings.placeholder }),
-        React.createElement(tooltip_1.default, null)));
+        settings.desc_tip ? React.createElement(tooltip_1.default, { content: settings.desc }) : ''));
 };
 exports["default"] = NumberInput;
 
@@ -286,7 +264,6 @@ var Select = /** @class */ (function (_super) {
     }
     Select.prototype.render = function () {
         var getOptions = function (setting_options) {
-            console.log(typeof setting_options);
             var options = [];
             Object.entries(setting_options).forEach(function (_a) {
                 var option_key = _a[0], option_value = _a[1];
@@ -300,7 +277,7 @@ var Select = /** @class */ (function (_super) {
                 settings.title,
                 " "),
             React.createElement(components_1.SelectControl, { defaultValue: settings.value, name: settings.id, options: getOptions(settings.options) }),
-            React.createElement(tooltip_1.default, null)));
+            settings.desc_tip ? React.createElement(tooltip_1.default, { content: settings.desc }) : ''));
     };
     return Select;
 }(React.Component));
@@ -344,7 +321,7 @@ var TextInput = /** @class */ (function (_super) {
         return (React.createElement("div", { className: "yatra-field-wrap" },
             React.createElement("label", { htmlFor: settings.id }, settings.title),
             React.createElement("input", { className: "yatra-input", id: settings.id, name: settings.id, type: "text", defaultValue: settings.value, placeholder: settings.placeholder }),
-            React.createElement(tooltip_1.default, null)));
+            settings.desc_tip ? React.createElement(tooltip_1.default, { content: settings.desc }) : ''));
     };
     return TextInput;
 }(React.Component));
@@ -389,7 +366,7 @@ var DateTime = function (props) {
         React.createElement(components_1.Button, { isLink: true, onClick: function () { return setOpenDatePopup(!openDatePopup); } }, dateValue === '' ? "Pick Date & Time" : (0, date_1.dateI18n)('F j, Y g:i a', dateValue)),
         openDatePopup && (React.createElement(components_1.Popover, { onClose: setOpenDatePopup.bind(null, false) },
             React.createElement(components_1.DateTimePicker, { currentDate: currentDate(), initialOpen: false, onChange: setDateValue, isInvalidDate: isInvalidDate, is12Hour: true }))),
-        React.createElement(tooltip_1.default, null)));
+        settings.desc_tip ? React.createElement(tooltip_1.default, { content: settings.desc }) : ''));
 };
 exports["default"] = DateTime;
 

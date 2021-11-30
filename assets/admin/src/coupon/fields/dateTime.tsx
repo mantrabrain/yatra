@@ -12,7 +12,7 @@ type DateTimeProps = {
 }
 type Setting = {
     title: string,
-    description: string,
+    desc: string,
     desc_tip: boolean,
     id: string,
     type: string,
@@ -62,7 +62,7 @@ const DateTime = (props: DateTimeProps) => {
                 </Popover>
             )}
 
-            <Tooltip/>
+            {settings.desc_tip ? <Tooltip content={settings.desc}/> : ''}
         </div>
     );
 };
