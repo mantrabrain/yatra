@@ -968,8 +968,16 @@ body.single .yatra-single-tour:after {
   max-width: 100%; }
   .yatra-shortcode-wrapper form.yatra-cart-form {
     position: relative; }
+    .yatra-shortcode-wrapper form.yatra-cart-form tr.yatra-cart-item td {
+      padding: 5px 0; }
     .yatra-shortcode-wrapper form.yatra-cart-form .actions {
-      text-align: right; }
+      text-align: right;
+      padding: 10px 0;
+      border: 1px solid #ccc;
+      border-left: 0;
+      border-right: 0; }
+      .yatra-shortcode-wrapper form.yatra-cart-form .actions .coupon {
+        float: left; }
     .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra-proceed-to-checkout, .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra_update_cart {
       padding: 10px; }
   .yatra-shortcode-wrapper .yatra-proceed-to-checkout-wrap {

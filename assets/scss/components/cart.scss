@@ -11,9 +11,20 @@
 
       }
     }
+    tr.yatra-cart-item td {
+      padding: 5px 0;
+    }
 
     .actions {
       text-align: right;
+      padding: 10px 0;
+      border: 1px solid #ccc;
+      border-left: 0;
+      border-right: 0;
+
+      .coupon {
+        float: left;
+      }
     }
 
     .button.yatra-proceed-to-checkout, .button.yatra_update_cart {

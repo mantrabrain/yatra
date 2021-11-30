@@ -67,13 +67,17 @@ window.yatra_global_tour_additional_price = 0;
                     $this.sendEnquiry(form_data);
                 });
 
+                $('form.yatra-cart-form').on('submit', function (e) {
+                    e.preventDefault();
+                    var form = $(this);
+                    var form_data = form.serialize();
+                    $this.update_cart(form_data, $(this));
+                });
                 $('body').on('click', '.yatra_update_cart', function (e) {
 
                     e.preventDefault();
-
                     var form = $(this).closest('form');
                     var form_data = form.serialize();
-
                     $this.update_cart(form_data, $(this));
                 });
                 $('body').on('change', 'table.yatra_cart_table input.yatra-number-of-person-field', function (e) {
@@ -620,7 +624,7 @@ window.yatra_global_tour_additional_price = 0;
             currency = currency === null ? yatra_params.currency_symbol : currency;
 
             price = this.numberFormat(price);
-            
+
             var currency_position = yatra_params.currency_position;
             if (currency_position === "left_space") {
                 return currency + ' ' + price;
