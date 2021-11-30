@@ -219,10 +219,10 @@ var tooltip_1 = __webpack_require__(/*! ../components/tooltip */ "./coupon/compo
 var NumberInput = function (props) {
     var settings = props.settings;
     return (React.createElement("div", { className: "yatra-field-wrap" },
-        React.createElement("label", { htmlFor: settings.id },
+        React.createElement("label", { htmlFor: settings.name },
             settings.title,
             " "),
-        React.createElement("input", { className: "yatra-input", id: settings.id, name: settings.id, type: "number", defaultValue: settings.value, placeholder: settings.placeholder }),
+        React.createElement("input", { className: "yatra-input", id: settings.name, name: settings.name, type: "number", defaultValue: settings.value, placeholder: settings.placeholder }),
         settings.desc_tip ? React.createElement(tooltip_1.default, { content: settings.desc }) : ''));
 };
 exports["default"] = NumberInput;
@@ -273,10 +273,10 @@ var Select = /** @class */ (function (_super) {
         };
         var settings = this.props.settings;
         return (React.createElement("div", { className: "yatra-field-wrap" },
-            React.createElement("label", { htmlFor: settings.id },
+            React.createElement("label", { htmlFor: settings.name },
                 settings.title,
                 " "),
-            React.createElement(components_1.SelectControl, { defaultValue: settings.value, name: settings.id, options: getOptions(settings.options) }),
+            React.createElement(components_1.SelectControl, { defaultValue: settings.value, name: settings.name, options: getOptions(settings.options) }),
             settings.desc_tip ? React.createElement(tooltip_1.default, { content: settings.desc }) : ''));
     };
     return Select;
@@ -319,8 +319,8 @@ var TextInput = /** @class */ (function (_super) {
     TextInput.prototype.render = function () {
         var settings = this.props.settings;
         return (React.createElement("div", { className: "yatra-field-wrap" },
-            React.createElement("label", { htmlFor: settings.id }, settings.title),
-            React.createElement("input", { className: "yatra-input", id: settings.id, name: settings.id, type: "text", defaultValue: settings.value, placeholder: settings.placeholder }),
+            React.createElement("label", { htmlFor: settings.name }, settings.title),
+            React.createElement("input", { className: "yatra-input", id: settings.name, name: settings.name, type: "text", defaultValue: settings.value, placeholder: settings.placeholder }),
             settings.desc_tip ? React.createElement(tooltip_1.default, { content: settings.desc }) : ''));
     };
     return TextInput;
@@ -345,6 +345,7 @@ var element_1 = __webpack_require__(/*! @wordpress/element */ "@wordpress/elemen
 var date_1 = __webpack_require__(/*! @wordpress/date */ "@wordpress/date");
 var DateTime = function (props) {
     var settings = props.settings;
+    console.log(settings);
     var _a = (0, element_1.useState)(false), openDatePopup = _a[0], setOpenDatePopup = _a[1];
     var _b = (0, element_1.useState)(settings.value), dateValue = _b[0], setDateValue = _b[1];
     var isInvalidDate = function (to_date) {
@@ -359,10 +360,10 @@ var DateTime = function (props) {
         return new Date();
     };
     return (React.createElement("div", { className: "yatra-field-wrap" },
-        React.createElement("label", { htmlFor: settings.id },
+        React.createElement("label", { htmlFor: settings.name },
             settings.title,
             " "),
-        React.createElement("input", { className: "widefat", id: settings.id, name: settings.id, type: "hidden", defaultValue: dateValue, placeholder: settings.placeholder }),
+        React.createElement("input", { className: "widefat", id: settings.name, name: settings.name, type: "text", value: dateValue === '' ? "" : (0, date_1.dateI18n)('F j, Y g:i a', dateValue), placeholder: settings.placeholder }),
         React.createElement(components_1.Button, { isLink: true, onClick: function () { return setOpenDatePopup(!openDatePopup); } }, dateValue === '' ? "Pick Date & Time" : (0, date_1.dateI18n)('F j, Y g:i a', dateValue)),
         openDatePopup && (React.createElement(components_1.Popover, { onClose: setOpenDatePopup.bind(null, false) },
             React.createElement(components_1.DateTimePicker, { currentDate: currentDate(), initialOpen: false, onChange: setDateValue, isInvalidDate: isInvalidDate, is12Hour: true }))),

@@ -41,7 +41,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                     echo '<strong>' . esc_html($this->get_value('yatra_coupon_code', $coupon_id)) . '</strong>';
                     break;
                 case "coupon_type":
-                    echo esc_html($this->get_value('yatra_coupon_type', $coupon_id));
+                    echo esc_html(ucwords($this->get_value('yatra_coupon_type', $coupon_id)));
                     break;
                 case "discount_value":
                     echo esc_html($this->get_value('yatra_coupon_value', $coupon_id));
@@ -69,7 +69,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                                     'title' => __('Coupon Code', 'yatra'),
                                     'desc' => __('Coupon Code', 'yatra'),
                                     'desc_tip' => true,
-                                    'id' => 'yatra_coupon_code',
+                                    'name' => 'yatra_coupon_code',
                                     'type' => 'text',
                                     'value' => $this->get_value('yatra_coupon_code', $post_id)
                                 ),
@@ -77,7 +77,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                                     'title' => __('Coupon Type', 'yatra'),
                                     'desc' => __('Coupon Type', 'yatra'),
                                     'desc_tip' => true,
-                                    'id' => 'yatra_coupon_type',
+                                    'name' => 'yatra_coupon_type',
                                     'type' => 'select',
                                     'value' => $this->get_value('yatra_coupon_type', $post_id),
                                     'options' => array(
@@ -90,7 +90,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                                     'title' => __('Coupon Value', 'yatra'),
                                     'desc' => __('Coupon Value', 'yatra'),
                                     'desc_tip' => true,
-                                    'id' => 'yatra_coupon_value',
+                                    'name' => 'yatra_coupon_value',
                                     'type' => 'number',
                                     'value' => $this->get_value('yatra_coupon_value', $post_id),
                                 ),
@@ -98,7 +98,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                                     'title' => __('Coupon Expiry Date', 'yatra'),
                                     'desc' => __('Coupon Expiry Date', 'yatra'),
                                     'desc_tip' => true,
-                                    'id' => 'yatra_coupon_expiry_date',
+                                    'name' => 'yatra_coupon_expiry_date',
                                     'type' => 'datetime',
                                     'value' => $this->get_value('yatra_coupon_expiry_date', $post_id),
                                 ),
@@ -114,9 +114,9 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                             'title' => __('Coupon Using Limit', 'yatra'),
                             'desc' => __('Max number of time this coupon can be used.', 'yatra'),
                             'desc_tip' => true,
-                            'id' => 'yatra_coupon_expiry_date',
+                            'name' => 'yatra_coupon_usage_limit',
                             'type' => 'number',
-                            'value' => $this->get_value('yatra_coupon_expiry_date', $post_id)
+                            'value' => $this->get_value('yatra_coupon_usage_limit', $post_id)
                         )
 
                         )
@@ -217,9 +217,10 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
 
                         foreach ($fields as $field) {
 
-                            $field_id = isset($field['id']) ? $field['id'] : '';
+                            $field_id = isset($field['name']) ? $field['name'] : '';
 
                             if ('' !== $field_id) {
+
                                 $field_value = isset($_POST[$field_id]) ? $_POST[$field_id] : '';
 
                                 $valid_field_value = $this->sanitize($field_value, $field);
@@ -232,8 +233,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                     $active_tab = isset($_POST['yatra_coupon_active_tab']) ? sanitize_text_field($_POST['yatra_coupon_active_tab']) : '';
 
                     update_post_meta($post_id, 'active_tab', $active_tab);
-
-
+                    
                 }
             }
 

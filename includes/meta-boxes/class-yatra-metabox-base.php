@@ -101,6 +101,12 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     $updated_value = json_encode(yatra_get_unique_date_ranges($field_value_array));
 
                     break;
+                case "datetime":
+
+                    $updated_value = sanitize_text_field($field_value);
+                    $updated_value = $updated_value != '' ? date('Y-m-d H:i:s', strtotime($updated_value)) : '';
+
+                    break;
                 default:
                     $updated_value = wp_kses_post(sanitize_text_field($field_value));
                     break;

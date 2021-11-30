@@ -14,7 +14,7 @@ type Setting = {
     title: string,
     desc: string,
     desc_tip: boolean,
-    id: string,
+    name: string,
     type: string,
     value: string,
     placeholder: string,
@@ -37,10 +37,10 @@ export default class Select extends React.Component<SelectProps> {
         const {settings} = this.props;
         return (
             <div className="yatra-field-wrap"><label
-                htmlFor={settings.id}>{settings.title} </label>
+                htmlFor={settings.name}>{settings.title} </label>
                 <SelectControl
                     defaultValue={settings.value}
-                    name={settings.id}
+                    name={settings.name}
                     options={getOptions(settings.options)}
                 />
                 {settings.desc_tip ? <Tooltip content={settings.desc}/> : ''}
