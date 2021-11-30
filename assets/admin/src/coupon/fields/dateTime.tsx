@@ -39,13 +39,13 @@ const DateTime = (props: DateTimeProps) => {
     const currentDate = () => {
         return new Date();
     }
-
     return (
         <div className="yatra-field-wrap">
             <label
                 htmlFor={settings.name}>{settings.title} </label>
             <input className="widefat" id={settings.name}
-                   name={settings.name} type="text" value={dateValue === '' ? "" : dateI18n('F j, Y g:i a', dateValue)}
+                   name={settings.name} type="hidden"
+                   value={dateValue === '' ? "" : dateI18n('F j, Y g:i a', dateValue)}
                    placeholder={settings.placeholder}/>
 
             <Button isLink={true} onClick={() => setOpenDatePopup(!openDatePopup)}>

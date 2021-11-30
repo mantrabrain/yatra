@@ -47,7 +47,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                     echo esc_html($this->get_value('yatra_coupon_value', $coupon_id));
                     break;
                 case "usage_count":
-                    echo 'need to add dynamic data';
+                    echo esc_html($this->get_value('yatra_coupon_using_limit', $coupon_id));
                     break;
                 case "expire_date":
                     echo esc_html($this->get_value('yatra_coupon_expiry_date', $coupon_id));
@@ -114,9 +114,9 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                             'title' => __('Coupon Using Limit', 'yatra'),
                             'desc' => __('Max number of time this coupon can be used.', 'yatra'),
                             'desc_tip' => true,
-                            'name' => 'yatra_coupon_usage_limit',
+                            'name' => 'yatra_coupon_using_limit',
                             'type' => 'number',
-                            'value' => $this->get_value('yatra_coupon_usage_limit', $post_id)
+                            'value' => $this->get_value('yatra_coupon_using_limit', $post_id)
                         )
 
                         )
@@ -219,7 +219,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
 
                             $field_id = isset($field['name']) ? $field['name'] : '';
 
-                            if ('' !== $field_id) {
+                            if ('' !== $field_id && isset($_POST[$field_id])) {
 
                                 $field_value = isset($_POST[$field_id]) ? $_POST[$field_id] : '';
 
@@ -233,7 +233,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                     $active_tab = isset($_POST['yatra_coupon_active_tab']) ? sanitize_text_field($_POST['yatra_coupon_active_tab']) : '';
 
                     update_post_meta($post_id, 'active_tab', $active_tab);
-                    
+
                 }
             }
 

@@ -363,7 +363,7 @@ var DateTime = function (props) {
         React.createElement("label", { htmlFor: settings.name },
             settings.title,
             " "),
-        React.createElement("input", { className: "widefat", id: settings.name, name: settings.name, type: "text", value: dateValue === '' ? "" : (0, date_1.dateI18n)('F j, Y g:i a', dateValue), placeholder: settings.placeholder }),
+        React.createElement("input", { className: "widefat", id: settings.name, name: settings.name, type: "hidden", value: dateValue === '' ? "" : (0, date_1.dateI18n)('F j, Y g:i a', dateValue), placeholder: settings.placeholder }),
         React.createElement(components_1.Button, { isLink: true, onClick: function () { return setOpenDatePopup(!openDatePopup); } }, dateValue === '' ? "Pick Date & Time" : (0, date_1.dateI18n)('F j, Y g:i a', dateValue)),
         openDatePopup && (React.createElement(components_1.Popover, { onClose: setOpenDatePopup.bind(null, false) },
             React.createElement(components_1.DateTimePicker, { currentDate: currentDate(), initialOpen: false, onChange: setDateValue, isInvalidDate: isInvalidDate, is12Hour: true }))),
