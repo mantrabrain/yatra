@@ -77,6 +77,7 @@ class Yatra_Admin_Post_Types
             $screen_id = sanitize_text_field($_REQUEST['screen']);
         }
 
+
         switch ($screen_id) {
             case 'edit-yatra-booking':
                 include_once 'list-tables/class-yatra-admin-list-table-bookings.php';

@@ -12,6 +12,48 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
 
             add_action('admin_enqueue_scripts', array($this, 'coupon_script'), 11);
 
+            add_filter('manage_edit-yatra-coupons_columns', array($this, 'columns'));
+            add_action('manage_yatra-coupons_posts_custom_column', array($this, 'coupons_manage_columns'), 10, 2);
+
+
+        }
+
+        public function columns($columns)
+        {
+            $columns['title'] = __('Coupon Name', 'yatra');
+            $columns['coupon_code'] = __('Coupon Code', 'yatra');
+            $columns['coupon_type'] = __('Coupon Type', 'yatra');
+            $columns['discount_value'] = __('Discount Value', 'yatra');
+            $columns['usage_count'] = __('Usage Count', 'yatra');
+            $columns['expire_date'] = __('Expire Date', 'yatra');
+            unset($columns['date']);
+            $columns['date'] = __('Created Date', 'yatra');
+
+
+            return $columns;
+        }
+
+        public function coupons_manage_columns($column_name, $coupon_id)
+        {
+            echo '<span class="yatra-column-' . esc_attr($column_name) . '">';
+            switch ($column_name) {
+                case "coupon_code":
+                    echo '<strong>' . esc_html($this->get_value('yatra_coupon_code', $coupon_id)) . '</strong>';
+                    break;
+                case "coupon_type":
+                    echo esc_html($this->get_value('yatra_coupon_type', $coupon_id));
+                    break;
+                case "discount_value":
+                    echo esc_html($this->get_value('yatra_coupon_value', $coupon_id));
+                    break;
+                case "usage_count":
+                    echo 'need to add dynamic data';
+                    break;
+                case "expire_date":
+                    echo esc_html($this->get_value('yatra_coupon_expiry_date', $coupon_id));
+                    break;
+            }
+            echo '</span>';
         }
 
         public function getTabSettings($post_id)
@@ -69,12 +111,12 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                         'title' => __('Restrictions', 'yatra'),
                         'content_title' => __('Restrictions Settings', 'yatra'),
                         'settings' => array(array(
-                            'title' => __('Restriction', 'yatra'),
-                            'desc' => __('Tab layout for single tour page', 'yatra'),
+                            'title' => __('Coupon Using Limit', 'yatra'),
+                            'desc' => __('Max number of time this coupon can be used.', 'yatra'),
                             'desc_tip' => true,
-                            'id' => 'yatra_setting_layouts_single_tour_tab_layout',
+                            'id' => 'yatra_coupon_expiry_date',
                             'type' => 'number',
-                            'value' => $this->get_value('yatra_setting_layouts_single_tour_tab_layout', $post_id, 2)
+                            'value' => $this->get_value('yatra_coupon_expiry_date', $post_id)
                         )
 
                         )
