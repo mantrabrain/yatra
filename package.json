@@ -10,6 +10,7 @@
   "license": "GPL-3.0+",
   "main": "Gruntfile.js",
   "devDependencies": {
+    "@types/wordpress__components": "^14.0.4",
     "autoprefixer": "~7.2.3",
     "grunt": "^1.0.3",
     "grunt-checktextdomain": "^1.0.1",

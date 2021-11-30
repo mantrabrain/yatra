@@ -47,7 +47,13 @@
   font-weight: 600;
   text-transform: capitalize;
 }
-.yatra-coupon-tabs .yatra-field-wrap input[type=text], .yatra-coupon-tabs .yatra-field-wrap input[type=number], .yatra-coupon-tabs .yatra-field-wrap input[type=url], .yatra-coupon-tabs .yatra-field-wrap input[type=url], .yatra-coupon-tabs .yatra-field-wrap select, .yatra-coupon-tabs .yatra-field-wrap textarea, .yatra-coupon-tabs .yatra-field-wrap .select2-container {
+.yatra-coupon-tabs .yatra-field-wrap input[type=text].yatra-input,
+.yatra-coupon-tabs .yatra-field-wrap input[type=number].yatra-input,
+.yatra-coupon-tabs .yatra-field-wrap input[type=url].yatra-input,
+.yatra-coupon-tabs .yatra-field-wrap input[type=url].yatra-input,
+.yatra-coupon-tabs .yatra-field-wrap select.yatra-input,
+.yatra-coupon-tabs .yatra-field-wrap textarea.yatra-input,
+.yatra-coupon-tabs .yatra-field-wrap .select2-container {
   max-width: 300px;
   width: 100%;
   box-shadow: none;

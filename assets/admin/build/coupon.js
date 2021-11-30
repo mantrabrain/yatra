@@ -19,11 +19,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./fields/NumberInput */ "./coupon/fields/NumberInput.tsx");
-/* harmony import */ var _fields_NumberInput__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_fields_NumberInput__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _fields_TextInput__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./fields/TextInput */ "./coupon/fields/TextInput.tsx");
 /* harmony import */ var _fields_TextInput__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_fields_TextInput__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _fields_Select__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./fields/Select */ "./coupon/fields/Select.tsx");
 /* harmony import */ var _fields_Select__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_fields_Select__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _fields_dateTime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./fields/dateTime */ "./coupon/fields/dateTime.tsx");
+
 
 
 
@@ -39,11 +40,10 @@ const TabContent = props => {
 
   const renderSwitch = setting => {
     const field_type = setting.type;
-    console.log(setting);
 
     switch (field_type) {
       case "number":
-        return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_NumberInput__WEBPACK_IMPORTED_MODULE_3___default()), {
+        return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_fields_NumberInput__WEBPACK_IMPORTED_MODULE_3__["default"], {
           settings: setting
         });
 
@@ -54,6 +54,11 @@ const TabContent = props => {
 
       case "select":
         return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_fields_Select__WEBPACK_IMPORTED_MODULE_5___default()), {
+          settings: setting
+        });
+
+      case "datetime":
+        return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_fields_dateTime__WEBPACK_IMPORTED_MODULE_6__["default"], {
           settings: setting
         });
 
@@ -230,40 +235,18 @@ exports["default"] = Tooltip;
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var React = __webpack_require__(/*! react */ "react");
 var tooltip_1 = __webpack_require__(/*! ../components/tooltip */ "./coupon/components/tooltip.tsx");
-var NumberInput = /** @class */ (function (_super) {
-    __extends(NumberInput, _super);
-    function NumberInput() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    NumberInput.prototype.render = function () {
-        var settings = this.props.settings;
-        return (React.createElement("div", { className: "yatra-field-wrap" },
-            React.createElement("label", { htmlFor: settings.id },
-                settings.title,
-                " "),
-            React.createElement("input", { className: "widefat", id: settings.id, name: settings.id, type: "number", defaultValue: settings.value, placeholder: settings.placeholder }),
-            React.createElement(tooltip_1.default, null)));
-    };
-    return NumberInput;
-}(React.Component));
+var NumberInput = function (props) {
+    var settings = props.settings;
+    return (React.createElement("div", { className: "yatra-field-wrap" },
+        React.createElement("label", { htmlFor: settings.id },
+            settings.title,
+            " "),
+        React.createElement("input", { className: "yatra-input", id: settings.id, name: settings.id, type: "number", defaultValue: settings.value, placeholder: settings.placeholder }),
+        React.createElement(tooltip_1.default, null)));
+};
 exports["default"] = NumberInput;
 
 
@@ -360,12 +343,55 @@ var TextInput = /** @class */ (function (_super) {
         var settings = this.props.settings;
         return (React.createElement("div", { className: "yatra-field-wrap" },
             React.createElement("label", { htmlFor: settings.id }, settings.title),
-            React.createElement("input", { className: "widefat", id: settings.id, name: settings.id, type: "text", defaultValue: settings.value, placeholder: settings.placeholder }),
+            React.createElement("input", { className: "yatra-input", id: settings.id, name: settings.id, type: "text", defaultValue: settings.value, placeholder: settings.placeholder }),
             React.createElement(tooltip_1.default, null)));
     };
     return TextInput;
 }(React.Component));
 exports["default"] = TextInput;
+
+
+/***/ }),
+
+/***/ "./coupon/fields/dateTime.tsx":
+/*!************************************!*\
+  !*** ./coupon/fields/dateTime.tsx ***!
+  \************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var React = __webpack_require__(/*! react */ "react");
+var tooltip_1 = __webpack_require__(/*! ../components/tooltip */ "./coupon/components/tooltip.tsx");
+var components_1 = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+var element_1 = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+var date_1 = __webpack_require__(/*! @wordpress/date */ "@wordpress/date");
+var DateTime = function (props) {
+    var settings = props.settings;
+    var _a = (0, element_1.useState)(false), openDatePopup = _a[0], setOpenDatePopup = _a[1];
+    var _b = (0, element_1.useState)(settings.value), dateValue = _b[0], setDateValue = _b[1];
+    var isInvalidDate = function (to_date) {
+        var to = new Date(to_date);
+        var today = currentDate();
+        if (to.getTime() >= today.getTime()) {
+            return false;
+        }
+        return true;
+    };
+    var currentDate = function () {
+        return new Date();
+    };
+    return (React.createElement("div", { className: "yatra-field-wrap" },
+        React.createElement("label", { htmlFor: settings.id },
+            settings.title,
+            " "),
+        React.createElement("input", { className: "widefat", id: settings.id, name: settings.id, type: "hidden", defaultValue: dateValue, placeholder: settings.placeholder }),
+        React.createElement(components_1.Button, { isLink: true, onClick: function () { return setOpenDatePopup(!openDatePopup); } }, dateValue === '' ? "Pick Date & Time" : (0, date_1.dateI18n)('F j, Y g:i a', dateValue)),
+        openDatePopup && (React.createElement(components_1.Popover, { onClose: setOpenDatePopup.bind(null, false) },
+            React.createElement(components_1.DateTimePicker, { currentDate: currentDate(), initialOpen: false, onChange: setDateValue, isInvalidDate: isInvalidDate, is12Hour: true }))),
+        React.createElement(tooltip_1.default, null)));
+};
+exports["default"] = DateTime;
 
 
 /***/ }),
@@ -397,6 +423,16 @@ module.exports = window["ReactDOM"];
 /***/ (function(module) {
 
 module.exports = window["wp"]["components"];
+
+/***/ }),
+
+/***/ "@wordpress/date":
+/*!******************************!*\
+  !*** external ["wp","date"] ***!
+  \******************************/
+/***/ (function(module) {
+
+module.exports = window["wp"]["date"];
 
 /***/ }),
 

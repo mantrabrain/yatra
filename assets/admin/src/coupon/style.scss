@@ -37,27 +37,37 @@
     padding: 10px 15px;
     display: flex;
     align-items: center;
-  }
 
-  .yatra-field-wrap label:not(.yatra-switch-control) {
-    width: 100%;
-    margin-right: 20px;
-    vertical-align: baseline;
-    max-width: 200px;
-    float: left;
-    font-weight: 600;
-    text-transform: capitalize;
-  }
+    label {
 
-  .yatra-field-wrap input[type="text"], .yatra-field-wrap input[type="number"], .yatra-field-wrap input[type="url"], .yatra-field-wrap input[type="url"], .yatra-field-wrap select, .yatra-field-wrap textarea, .yatra-field-wrap .select2-container {
-    max-width: 300px;
-    width: 100%;
-    box-shadow: none;
-    border: 1px solid #aaa;
-    border-radius: 0;
-    padding: 4px 12px;
-    height: 35px;
-    outline: 0;
-    border-left: 3px solid #aaa;
+      &:not(.yatra-switch-control) {
+        width: 100%;
+        margin-right: 20px;
+        vertical-align: baseline;
+        max-width: 200px;
+        float: left;
+        font-weight: 600;
+        text-transform: capitalize;
+      }
+    }
+
+
+    input[type="text"].yatra-input,
+    input[type="number"].yatra-input,
+    input[type="url"].yatra-input,
+    input[type="url"].yatra-input,
+    select.yatra-input,
+    textarea.yatra-input,
+    .select2-container {
+      max-width: 300px;
+      width: 100%;
+      box-shadow: none;
+      border: 1px solid #aaa;
+      border-radius: 0;
+      padding: 4px 12px;
+      height: 35px;
+      outline: 0;
+      border-left: 3px solid #aaa;
+    }
   }
 }

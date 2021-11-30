@@ -26,7 +26,7 @@ export default class Select extends React.Component<SelectProps> {
 
         const getOptions = (setting_options: Object) => {
             console.log(typeof setting_options);
-            let options: { label: unknown; value: string; }[] = [];
+            let options: { label: string; value: string; }[] = [];
             Object.entries(setting_options).forEach(
                 ([option_key, option_value]) => options.push(
                     {label: option_value, value: option_key}

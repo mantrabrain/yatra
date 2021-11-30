@@ -3,6 +3,7 @@ import {Card, CardBody} from '@wordpress/components';
 import NumberInput from "./fields/NumberInput";
 import TextInput from "./fields/TextInput";
 import Select from "./fields/Select";
+import DateTime from "./fields/dateTime";
 
 export const TabContent = (props) => {
     useEffect(() => {
@@ -13,7 +14,6 @@ export const TabContent = (props) => {
     const renderSwitch = (setting) => {
 
         const field_type = setting.type;
-        console.log(setting);
         switch (field_type) {
             case "number":
                 return <NumberInput settings={setting}/>;
@@ -21,6 +21,8 @@ export const TabContent = (props) => {
                 return <TextInput settings={setting}/>;
             case "select":
                 return <Select settings={setting}/>;
+            case "datetime":
+                return <DateTime settings={setting}/>;
             default:
                 return <TextInput settings={setting}/>;
 

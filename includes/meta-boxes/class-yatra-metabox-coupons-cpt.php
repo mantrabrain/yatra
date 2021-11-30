@@ -43,7 +43,24 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                                         'fixed' => __('Fixed Discount', 'yatra'),
 
                                     )
-                                )
+                                ),
+                                array(
+                                    'title' => __('Coupon Value', 'yatra'),
+                                    'desc' => __('Coupon Value', 'yatra'),
+                                    'desc_tip' => true,
+                                    'id' => 'yatra_coupon_value',
+                                    'type' => 'number',
+                                    'value' => $this->get_value('yatra_coupon_value', $post_id),
+                                ),
+                                array(
+                                    'title' => __('Coupon Expiry Date', 'yatra'),
+                                    'desc' => __('Coupon Expiry Date', 'yatra'),
+                                    'desc_tip' => true,
+                                    'id' => 'yatra_coupon_expiry_date',
+                                    'type' => 'datetime',
+                                    'value' => $this->get_value('yatra_coupon_expiry_date', $post_id),
+                                ),
+
                             )
                     ),
 
