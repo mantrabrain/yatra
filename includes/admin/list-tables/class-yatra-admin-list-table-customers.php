@@ -163,7 +163,7 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
             $fullname = $user->first_name . ' ' . $user->last_name;
 
             if (trim($fullname) == '') {
-                
+
                 $fullname = $user->nickname;
             }
         }
@@ -210,7 +210,7 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
 
             $paid_currency = empty($paid_currency) ? $currency : $paid_currency;
 
-            $paid_amount = absint(get_post_meta($payment_id, 'yatra_total_paid_amount', true));
+            $paid_amount = floatval(get_post_meta($payment_id, 'yatra_total_paid_amount', true));
 
             if (!empty($paid_currency)) {
                 $amount_array[$paid_currency] = isset($amount_array[$paid_currency]) ? $amount_array[$paid_currency] + $paid_amount : $paid_amount;
@@ -222,7 +222,7 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
 
             $customer_paid_currency = yatra_get_currency_symbols($currency_key);
 
-            printf('<span>%s%s</span>', $customer_paid_currency, absint($amount_spent));
+            printf('<span>%s</span>', yatra_get_price($customer_paid_currency, ($amount_spent)));
         }
     }
 
@@ -250,12 +250,10 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
 
             $currency_symbol = isset($booking_params['currency_symbol']) ? $booking_params['currency_symbol'] : '';
 
-            $total_booking_price += isset($booking_params['total_booking_price']) ? absint($booking_params['total_booking_price']) : 0;
+            $total_booking_price += isset($booking_params['total_booking_net_price']) ? floatval($booking_params['total_booking_net_price']) : 0;
         }
 
-        $total_booking_price_string = $currency_symbol . $total_booking_price;
-
-        printf('<span>%s</span>', esc_html($total_booking_price_string));
+        printf('<span>%s</span>', esc_html(yatra_get_price($currency_symbol, $total_booking_price)));
     }
 
 }

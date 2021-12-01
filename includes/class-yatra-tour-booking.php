@@ -130,6 +130,8 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                 update_post_meta($booking_id, 'yatra_booking_meta', $booking_post_meta_value);
 
+                $coupon = yatra()->cart->get_coupon();
+
                 $yatra_booking_meta_params = array(
 
                     'total_booking_price' => yatra_get_booking_final_price($booking_parameters),
@@ -146,9 +148,27 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                     'total_booking_gross_price' => yatra_get_booking_final_price($booking_parameters),
 
-                    'total_booking_net_price' => yatra_get_booking_final_price($booking_parameters, true)
+                    'total_booking_net_price' => yatra_get_booking_final_price($booking_parameters, true),
+
+                    'coupon' => $coupon
 
                 );
+
+                $coupon_id = isset($coupon['id']) ? absint($coupon['id']) : 0;
+
+                if ($coupon_id > 0) {
+
+                    $booking_ids = get_post_meta($coupon_id, 'yatra_coupon_usages_bookings', true);
+
+                    $booking_ids = is_array($booking_ids) ? $booking_ids : array();
+
+                    array_push($booking_ids, $booking_id);
+
+                    $booking_ids = array_unique($booking_ids);
+
+                    update_post_meta($coupon_id, 'yatra_coupon_usages_bookings', $booking_ids);
+                }
+
                 update_post_meta($booking_id, 'yatra_booking_meta_params', $yatra_booking_meta_params);
 
                 $yatra_booking_meta_params['booking_id'] = $booking_id;

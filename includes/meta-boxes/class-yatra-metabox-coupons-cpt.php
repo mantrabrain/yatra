@@ -47,7 +47,15 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                     echo esc_html($this->get_value('yatra_coupon_value', $coupon_id));
                     break;
                 case "usage_count":
-                    echo esc_html($this->get_value('yatra_coupon_using_limit', $coupon_id));
+                    $usage_limit = ($this->get_value('yatra_coupon_using_limit', $coupon_id));
+                    $usage_count = absint($this->get_value('yatra_coupon_usages_bookings', $coupon_id));
+
+                    printf(
+                    /* translators: 1: count 2: limit */
+                        __('%1$s / %2$s', 'yatra'),
+                        esc_html($usage_count),
+                        $usage_limit ? esc_html($usage_limit) : '&infin;'
+                    );
                     break;
                 case "expire_date":
                     echo esc_html($this->get_value('yatra_coupon_expiry_date', $coupon_id));

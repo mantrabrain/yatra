@@ -48,8 +48,6 @@ class Yatra_Shortcode_Cart
         // Show non-cart errors.
         do_action('yatra_before_cart_template');
 
-        $cart = array();
-
         $cart = yatra()->cart->get_cart();
 
         if (!is_array($cart)) {

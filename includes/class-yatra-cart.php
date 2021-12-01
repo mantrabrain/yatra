@@ -9,6 +9,7 @@ if (!class_exists('Yatra_Cart')) {
 
             add_action('init', array($this, 'remove_cart'));
             add_action('init', array($this, 'remove_coupon'));
+            add_filter('yatra_booking_final_price', array($this, 'final_price'), 10, 3);
 
         }
 
@@ -54,6 +55,19 @@ if (!class_exists('Yatra_Cart')) {
 
         }
 
+        public function final_price($final_price, $booking_params, $net_price)
+        {
+            if ($net_price) {
+
+                $coupon = $this->get_coupon();
+
+                $coupon_value = isset($coupon['calculated_value']) ? absint($coupon['calculated_value']) : 0;
+
+                return absint($final_price) > $coupon_value ? floatval($final_price) - $coupon_value : 0;
+
+            }
+            return $final_price;
+        }
 
         public function get_cart_total($net_total = false)
         {
@@ -71,18 +85,7 @@ if (!class_exists('Yatra_Cart')) {
                 ));
             }
 
-            $total = yatra_get_booking_final_price($cart_parameters, $net_total);
-
-            if ($net_total) {
-
-                $coupon = $this->get_coupon();
-
-                $coupon_value = isset($coupon['calculated_value']) ? absint($coupon['calculated_value']) : 0;
-
-                return absint($total) > $coupon_value ? absint($total) - $coupon_value : 0;
-
-            }
-            return $total;
+            return yatra_get_booking_final_price($cart_parameters, $net_total);
         }
 
         public function get_items()
