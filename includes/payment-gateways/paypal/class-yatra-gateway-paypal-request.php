@@ -135,7 +135,7 @@ class Yatra_Gateway_Paypal_Request
 
                 $trip_code = isset($yatra_booking_meta_params['booking_code']) ? $yatra_booking_meta_params['booking_code'] : '';
 
-                $payment_amount = isset($item['total_tour_price']) ? $item['total_tour_price'] : 0;
+                $payment_amount = isset($item['total_tour_final_price']) ? $item['total_tour_final_price'] : 0;
 
                 $args['item_name_' . $agrs_index] = $item_name;
 
@@ -151,7 +151,7 @@ class Yatra_Gateway_Paypal_Request
 
                 $args['os0_' . $agrs_index] = $trip_code;
                 // $args['os1_' . $agrs_index ] = $payment_mode;
-                $args['os2_' . $agrs_index] = $item['total_tour_price'];
+                $args['os2_' . $agrs_index] = $payment_amount;
 
                 $args = apply_filters('yatra_extra_paypal_args', $args, $item, $tour_id, $agrs_index);
 
