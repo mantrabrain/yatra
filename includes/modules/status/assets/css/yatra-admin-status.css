@@ -35,7 +35,9 @@ table.yatra_status_table td mark.no, table.yatra_status_table th mark.no {
     border: 1px solid #e5e5e5;
     box-shadow: 0 1px 1px rgb(0 0 0 / 4%);
     padding: 5px 20px;
+    overflow-x: auto;
 }
+
 #yatra-log-viewer-select {
     padding: 10px 0 8px;
     line-height: 28px;
