@@ -33,7 +33,7 @@ class Yatra_Gateway_Paypal_Request
     /**
      * Get the PayPal request URL for an order.
      *
-     * @param  bool $sandbox Whether to use sandbox mode or not.
+     * @param bool $sandbox Whether to use sandbox mode or not.
      * @return string
      */
     public function get_request_url($booking_id)
@@ -69,6 +69,9 @@ class Yatra_Gateway_Paypal_Request
 
         $currency_code = isset($yatra_booking_meta_params['currency']) ? $yatra_booking_meta_params['currency'] : yatra_get_current_currency_symbol();
 
+        $coupon = isset($yatra_booking_meta_params['coupon']) ? $yatra_booking_meta_params['coupon'] : array();
+
+        $cart_discount = isset($coupon['calculated_value']) ? floatval($coupon['calculated_value']) : 0;
 
         if (count($yatra_booking_metas) > 0) {  // Normal Payment.
 
@@ -91,7 +94,7 @@ class Yatra_Gateway_Paypal_Request
             $args['business'] = sanitize_email($paypal_email);
             //$args['bn'] = '';
             $args['rm'] = '2';
-            $args['discount_amount_cart'] = 0;
+            $args['discount_amount_cart'] = $cart_discount;
             $args['tax_cart'] = 0;
             $args['charset'] = get_bloginfo('charset');
             $args['cbt'] = get_bloginfo('name');

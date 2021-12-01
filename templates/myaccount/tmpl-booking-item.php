@@ -19,6 +19,7 @@ $duration_string = '' != $yatra_tour_meta_tour_duration_days ? $yatra_tour_meta_
 $duration_string .= '' != $yatra_tour_meta_tour_duration_nights ? $yatra_tour_meta_tour_duration_nights . ' nights' : '';
 
 $duration_string = '' != $duration_string ? __('Duration: ', 'yatra') . $duration_string : '';
+
 ?>
 <div class="yatra-account-booking-item-row-wrap">
     <span class="tour-title">
@@ -110,5 +111,6 @@ $duration_string = '' != $duration_string ? __('Duration: ', 'yatra') . $duratio
         <?php
         do_action('yatra_myaccount_tour_booking_item', $id, $booking);
         ?>
+        <h2><?php echo __('Total Booking Price', 'yatra') ?></h2>
     </div>
 </div>
