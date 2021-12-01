@@ -6,6 +6,7 @@ if (count($cart_items) < 1) {
     return;
 }
 
+
 ?>
 <table class="yatra_cart_table yatra_cart_table_responsive cart yatra-cart-form__contents" cellspacing="0">
     <thead>
@@ -83,9 +84,9 @@ if (count($cart_items) < 1) {
     <tr>
         <td colspan="6" class="actions">
             <div class="coupon">
-                <input type="text" name="coupon_code" class="input-text"
-                       id="coupon_code" value="" placeholder="<?php echo esc_attr('Coupon Code', 'yatra') ?>">
-                <button type="submit" class="button" name="apply_coupon"
+                <input type="text" name="yatra_coupon_code" class="input-text"
+                       id="yatra_coupon_code" value="" placeholder="<?php echo esc_attr('Coupon Code', 'yatra') ?>"/>
+                <button type="submit" class="button yatra_apply_coupon" name="yatra_apply_coupon"
                         value="<?php echo esc_attr('Apply coupon', 'yatra') ?>"><?php echo __('Apply coupon', 'yatra') ?>
                 </button>
             </div>
@@ -101,7 +102,57 @@ if (count($cart_items) < 1) {
 
         </td>
     </tr>
+    <tr>
+        <td colspan="3">
+        </td>
+        <td colspan="2">
+            <strong><?php echo __('Sub Total', 'yatra') ?></strong>
+        </td>
+        <td>
+            <strong>
+                <?php
+                echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_cart_total()); ?>
+            </strong>
+        </td>
+    </tr>
 
+    <?php if (isset($coupon['id'])) { ?>
+        <tr>
+            <td colspan="3">
+            </td>
+            <td colspan="2">
+                <strong><?php echo __('Coupon:', 'yatra') ?></strong>
+                <strong><?php echo esc_html($coupon['code']); ?></strong>
+                <?php
+                $yatra_coupon_remove_nonce = wp_create_nonce('yatra_coupon_remove');
+
+                $remove_url = add_query_arg(array(
+                    'yatra_coupon_remove_nonce' => $yatra_coupon_remove_nonce
+
+                ), yatra_get_cart_page(true));
+                ?>
+                <a href="<?php echo esc_url($remove_url) ?>"><?php echo __('[Remove]', 'yatra') ?></a>
+            </td>
+            <td>
+                <strong>- <?php
+                    echo yatra_get_price(yatra_get_current_currency_symbol(), $coupon['calculated_value']); ?>
+                </strong>
+            </td>
+        </tr>
+    <?php } ?>
+    <tr>
+        <td colspan="3">
+        </td>
+        <td colspan="2">
+            <strong><?php echo __('Total', 'yatra') ?></strong>
+        </td>
+        <td>
+            <strong>
+                <?php
+                echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_cart_total(true)); ?>
+            </strong>
+        </td>
+    </tr>
 
     </tbody>
 </table>

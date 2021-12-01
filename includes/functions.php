@@ -518,7 +518,6 @@ if (!function_exists('yatra_get_booking_final_price')) {
             $total_booking_price = $total_booking_price + absint(yatra_get_final_tour_price($parameter['tour_id'], $parameter['number_of_person'], $parameter['selected_date']));
 
         }
-
         return apply_filters('yatra_booking_final_price', $total_booking_price, $booking_parameters, $net_pricing);
     }
 }

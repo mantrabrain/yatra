@@ -223,6 +223,7 @@ final class Yatra
 
         include_once YATRA_ABSPATH . 'includes/class-yatra-install.php';
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-db.php';
+        include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-coupon.php';
 
         include_once YATRA_ABSPATH . 'includes/class-yatra-tour-availability-validation.php';
         include_once YATRA_ABSPATH . 'includes/settings/class-yatra-tour-settings.php';

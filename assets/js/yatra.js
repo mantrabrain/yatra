@@ -71,14 +71,26 @@ window.yatra_global_tour_additional_price = 0;
                     e.preventDefault();
                     var form = $(this);
                     var form_data = form.serialize();
-                    $this.update_cart(form_data, $(this));
+                    $this.submit_cart_form(form_data, $(this));
                 });
                 $('body').on('click', '.yatra_update_cart', function (e) {
-
                     e.preventDefault();
                     var form = $(this).closest('form');
+                    var field = $('<input type="hidden" name="yatra_cart_submit_type" value="update_cart"/>');
+                    form.find('.yatra_cart_submit_type').remove();
+                    form.append(field);
                     var form_data = form.serialize();
-                    $this.update_cart(form_data, $(this));
+                    $this.submit_cart_form(form_data, $(this));
+                });
+
+                $('body').on('click', '.yatra_apply_coupon', function (e) {
+                    e.preventDefault();
+                    var form = $(this).closest('form');
+                    var field = $('<input type="hidden" name="yatra_cart_submit_type" value="apply_coupon"/>');
+                    form.find('.yatra_cart_submit_type').remove();
+                    form.append(field);
+                    var form_data = form.serialize();
+                    $this.submit_cart_form(form_data, $(this));
                 });
                 $('body').on('change', 'table.yatra_cart_table input.yatra-number-of-person-field', function (e) {
                     e.preventDefault();
@@ -201,7 +213,7 @@ window.yatra_global_tour_additional_price = 0;
                     $node.val($node.attr('data-text'));
                 }
             },
-            update_cart: function (form_data, cart_btn) {
+            submit_cart_form: function (form_data, cart_btn) {
 
                 var cart_form = cart_btn.closest('form.yatra-cart-form');
                 var $this = this;

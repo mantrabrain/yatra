@@ -47,16 +47,29 @@
             <th colspan="3"><?php echo __('Subtotal', 'yatra') ?></th>
 
             <td><span class="yatra-Price-amount amount">
-                    <?php echo yatra_get_price(yatra_get_current_currency_symbol(), $total_price) ?></span>
+                    <?php echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_cart_total()) ?></span>
             </td>
 
 
         </tr>
+        <?php if (isset($coupon['id'])) { ?>
+            <tr>
+                <th colspan="3">
+                    <strong><?php echo __('Coupon:', 'yatra') ?></strong>
+                    <em><?php echo esc_html($coupon['code']); ?></em>
+                </th>
+                <td>
+                    <strong>- <?php
+                        echo yatra_get_price(yatra_get_current_currency_symbol(), $coupon['calculated_value']); ?>
+                    </strong>
+                </td>
+            </tr>
+        <?php } ?>
         <tr class="tour-book-total">
             <th colspan="3"><?php echo __('Total', 'yatra') ?></th>
 
             <td><strong><span
-                            class="yatra-Price-amount amount"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), $total_price) ?></span>
+                            class="yatra-Price-amount amount"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_cart_total(true)) ?></span>
                 </strong>
             </td>
 

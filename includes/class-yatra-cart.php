@@ -4,11 +4,11 @@ if (!class_exists('Yatra_Cart')) {
     class Yatra_Cart
     {
 
-
         function __construct()
         {
 
             add_action('init', array($this, 'remove_cart'));
+            add_action('init', array($this, 'remove_coupon'));
 
         }
 
@@ -20,17 +20,146 @@ if (!class_exists('Yatra_Cart')) {
             }
         }
 
+        public function remove_coupon()
+        {
+            if (isset($_GET['yatra_coupon_remove_nonce']) && !empty($_GET['yatra_coupon_remove_nonce'])) {
+
+                $nonce = sanitize_text_field($_GET['yatra_coupon_remove_nonce']);
+
+                $status = wp_verify_nonce($nonce, 'yatra_coupon_remove');
+
+                if ($status) {
+
+                    $cart = $this->get_cart();
+
+                    $cart['coupon'] = array();
+
+                    $this->set_cart($cart);
+
+                    wp_redirect(yatra_get_cart_page(true));
+
+                }
+            }
+        }
+
         public function get_cart()
         {
-            $yatra_tour_cart = yatra_get_session('yatra_tour_cart');
+            return yatra_get_session('yatra_tour_cart');
+
+        }
+
+        public function set_cart($cart_details)
+        {
+            return yatra_set_session('yatra_tour_cart', $cart_details);
+
+        }
 
 
-            return $yatra_tour_cart;
+        public function get_cart_total($net_total = false)
+        {
+            $cart = $this->get_cart();
+
+            $cart_items = isset($cart['items']) ? $cart['items'] : array();
+
+            $cart_parameters = array();
+
+            foreach ($cart_items as $tour_id => $item) {
+                array_push($cart_parameters, array(
+                    'tour_id' => $tour_id,
+                    'selected_date' => $cart_items[$tour_id]['selected_date'],
+                    'number_of_person' => $cart_items[$tour_id]['number_of_person']
+                ));
+            }
+
+            $total = yatra_get_booking_final_price($cart_parameters, $net_total);
+
+            if ($net_total) {
+
+                $coupon = $this->get_coupon();
+
+                $coupon_value = isset($coupon['calculated_value']) ? absint($coupon['calculated_value']) : 0;
+
+                return absint($total) > $coupon_value ? absint($total) - $coupon_value : 0;
+
+            }
+            return $total;
+        }
+
+        public function get_items()
+        {
+            $cart = $this->get_cart();
+
+            return isset($cart['items']) ? $cart['items'] : array();
+        }
+
+        public function update_items($items = array())
+        {
+            $cart = $this->get_cart();
+
+            if (count($items) < 1) {
+
+                yatra_clear_session('yatra_tour_cart');
+
+            } else {
+                $cart['items'] = $items;
+
+                $this->set_cart($cart);
+            }
+        }
+
+        public function apply_coupon($coupon_details)
+        {
+            $yatra_tour_cart = $this->get_cart();
+
+
+            $yatra_tour_cart['coupon'] = $this->recalculate_coupon($coupon_details);
+
+
+            return $this->set_cart($yatra_tour_cart);
+
+        }
+
+        public function get_coupon()
+        {
+            $yatra_tour_cart = $this->get_cart();
+
+            return isset($yatra_tour_cart['coupon']) ? $this->recalculate_coupon($yatra_tour_cart['coupon']) : array();
+        }
+
+        private function recalculate_coupon($coupon_details)
+        {
+            $value = isset($coupon_details['value']) ? $coupon_details['value'] : '';
+
+            $type = isset($coupon_details['type']) ? $coupon_details['type'] : '';
+
+            if ($value === '' || $type === '' || $value === 0) {
+                return array();
+            }
+
+            $calculated_value = 0;
+
+            if ($type === "percentage") {
+
+                $total = $this->get_cart_total();
+
+                $calculated_value = ($total * $value) / 100;
+
+
+            } elseif ($type === "fixed") {
+
+                $calculated_value = $value;
+
+            }
+
+            $coupon_details['calculated_value'] = $calculated_value;
+
+
+            return $coupon_details;
         }
 
         public function update_cart($tour_id, $number_of_persons, $type, $selected_date)
         {
-            $yatra_tour_cart = yatra_get_session('yatra_tour_cart');
+            $yatra_tour_cart = $this->get_cart();
 
             $tour = get_post($tour_id);
 
@@ -53,7 +182,11 @@ if (!class_exists('Yatra_Cart')) {
                 'selected_date' => $selected_date,
 
             );
-            $yatra_tour_cart[$tour_id] = $single_cart_item;
+            $yatra_tour_cart['items'][$tour_id] = $single_cart_item;
+
+            $coupon = isset($yatra_tour_cart['coupon']) ? $yatra_tour_cart['coupon'] : array();
+
+            $yatra_tour_cart['coupon'] = $this->recalculate_coupon($coupon);
 
             $unset_this = false;
 
@@ -79,23 +212,23 @@ if (!class_exists('Yatra_Cart')) {
 
             if ($unset_this) {
 
-                unset($yatra_tour_cart[$tour_id]);
+                unset($yatra_tour_cart['items'][$tour_id]);
 
             }
 
             $yatra_tour_cart = apply_filters('yatra_update_tour_cart', $yatra_tour_cart, $tour_id, $number_of_persons);
 
 
-            $status = yatra_set_session('yatra_tour_cart', $yatra_tour_cart);
+            $status = $this->set_cart($yatra_tour_cart);
 
             return $status;
         }
 
         public function is_valid_tour_id_on_cart($tour_id)
         {
-            $yatra_tour_cart = yatra_get_session('yatra_tour_cart');
+            $cart_items = $this->get_items();
 
-            if (isset($yatra_tour_cart[$tour_id])) {
+            if (isset($cart_items[$tour_id])) {
 
                 return true;
             }
@@ -104,7 +237,7 @@ if (!class_exists('Yatra_Cart')) {
 
         public function is_valid_id_hash($hash)
         {
-            $yatra_tour_cart = yatra_get_session('yatra_tour_cart');
+            $yatra_tour_cart = $this->get_items();
 
             if (count($yatra_tour_cart) < 1) {
                 return false;
@@ -125,17 +258,23 @@ if (!class_exists('Yatra_Cart')) {
             return $tour_id;
         }
 
-        public function get_cart_table($return = false, $cart_items = array())
+        public function get_cart_table($return = false, $cart_data = array())
         {
 
-            if (count($cart_items) < 1) {
+            if (count($cart_data) < 1) {
 
-                $cart_items = $this->get_cart();
+                $cart_data = $this->get_cart();
             }
+            $cart_items = isset($cart_data['items']) ? $cart_data['items'] : array();
+            $coupon = isset($cart_data['coupon']) ? $cart_data['coupon'] : array();
 
             ob_start();
 
-            yatra_get_template('tmpl-cart-table.php', array('cart_items' => $cart_items));
+            yatra_get_template('tmpl-cart-table.php', array(
+                    'cart_items' => $cart_items,
+                    'coupon' => $coupon
+                )
+            );
 
             $content = ob_get_clean();
 
@@ -162,22 +301,13 @@ if (!class_exists('Yatra_Cart')) {
 
                 if ($status && absint($tour_id) > 0) {
 
+                    $cart_items = $this->get_items();
 
-                    $yatra_tour_cart = yatra_get_session('yatra_tour_cart');
+                    if (isset($cart_items[$tour_id])) {
 
-                    if (isset($yatra_tour_cart[$tour_id])) {
+                        unset($cart_items[$tour_id]);
 
-                        unset($yatra_tour_cart[$tour_id]);
-
-                        if (count($yatra_tour_cart) > 0) {
-
-                            yatra_set_session('yatra_tour_cart', $yatra_tour_cart);
-
-                        } else {
-
-
-                            yatra_clear_session('yatra_tour_cart');
-                        }
+                        $this->update_items($cart_items);
                     }
 
 
@@ -190,14 +320,22 @@ if (!class_exists('Yatra_Cart')) {
 
         }
 
-        public function get_cart_order_table($return = false, $cart_items = array())
+        public function get_cart_order_table($return = false, $cart = array())
         {
-            if (count($cart_items) < 1) {
-                $cart_items = $this->get_cart();
+            if (count($cart) < 1) {
+                $cart = $this->get_cart();
             }
+            $cart_items = isset($cart['items']) ? $cart['items'] : array();
+
+            $coupon = isset($cart['coupon']) ? $cart['coupon'] : array();
+
             ob_start();
 
-            yatra_get_template('tmpl-order-table.php', array('cart_items' => $cart_items));
+            yatra_get_template('tmpl-order-table.php', array(
+                    'cart_items' => $cart_items,
+                    'coupon' => $coupon
+                )
+            );
 
             $content = ob_get_clean();
 
