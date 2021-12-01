@@ -502,7 +502,7 @@ if (!function_exists('yatra_get_final_tour_price')) {
 
         $final_pricing = yatra_get_tour_price($tour_id, $number_of_people, $selected_date);
 
-        return apply_filters('yatra_tour_booking_final_price', absint($final_pricing), $tour_id, $number_of_people, $selected_date);
+        return apply_filters('yatra_tour_booking_final_price', floatval($final_pricing), $tour_id, $number_of_people, $selected_date);
     }
 }
 
@@ -515,7 +515,7 @@ if (!function_exists('yatra_get_booking_final_price')) {
 
         foreach ($booking_parameters as $parameter) {
 
-            $total_booking_price = $total_booking_price + absint(yatra_get_final_tour_price($parameter['tour_id'], $parameter['number_of_person'], $parameter['selected_date']));
+            $total_booking_price = $total_booking_price + floatval(yatra_get_final_tour_price($parameter['tour_id'], $parameter['number_of_person'], $parameter['selected_date']));
 
         }
         return apply_filters('yatra_booking_final_price', $total_booking_price, $booking_parameters, $net_pricing);
