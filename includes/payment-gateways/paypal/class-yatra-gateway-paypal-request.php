@@ -145,9 +145,9 @@ class Yatra_Gateway_Paypal_Request
 
                 $args['item_number_' . $agrs_index] = $tour_id;
 
-                $args['on0_' . $agrs_index] = __('Trip Code', 'yatra');
+                $args['on0_' . $agrs_index] = __('Tour Code', 'yatra');
                 // $args['on1_' . $agrs_index ] = __( 'Payment Mode', 'yatra' );
-                $args['on2_' . $agrs_index] = __('Trip Price', 'yatra');
+                $args['on2_' . $agrs_index] = __('Tour Price', 'yatra');
 
                 $args['os0_' . $agrs_index] = $trip_code;
                 // $args['os1_' . $agrs_index ] = $payment_mode;
@@ -164,6 +164,12 @@ class Yatra_Gateway_Paypal_Request
         $args['option_index_0'] = $agrs_index;
 
         $args['custom'] = $booking_id;
+
+        $logger = yatra_get_logger();
+
+        $message = json_encode($args);
+
+        $logger->info($message, array('source' => 'paypal_request'));
 
         return apply_filters('yatra_paypal_args', $args);
     }
