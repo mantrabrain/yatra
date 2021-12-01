@@ -262,7 +262,8 @@ module.exports = function (grunt) {
                     '!*.jshintrc',
                     '!.git',
                     '!requirement.txt',
-                    '!assets/admin/src/**'
+                    '!assets/admin/src/**',
+                    '!yatra.tar'
                 ],
                 dest: 'yatra',
                 expand: true

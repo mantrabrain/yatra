@@ -16,10 +16,11 @@
 /Gruntfile.js  export-ignore
 /.jshintrc  export-ignore
 /assets/package.json  export-ignore
-/assets/admin/src  export-ignore
+/assets/admin/src  export-ignoreg
 /assets/package-lock.json  export-ignore
 /assets/src  export-ignore
 /assets/node_modules  export-ignore
 /node_modules  export-ignore
 /pax_global_header  export-ignore
 /yatra.tar  export-ignore
+/yatra.zip  export-ignore
