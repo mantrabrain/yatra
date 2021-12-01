@@ -61,9 +61,9 @@ if (!class_exists('Yatra_Cart')) {
 
                 $coupon = $this->get_coupon();
 
-                $coupon_value = isset($coupon['calculated_value']) ? absint($coupon['calculated_value']) : 0;
+                $coupon_value = isset($coupon['calculated_value']) ? floatval($coupon['calculated_value']) : 0;
 
-                return absint($final_price) > $coupon_value ? floatval($final_price) - $coupon_value : 0;
+                return floatval($final_price) > $coupon_value ? floatval($final_price) - $coupon_value : 0;
 
             }
             return $final_price;

@@ -55,6 +55,21 @@ class Yatra_Gateway_Paypal_Request
         return $redirect_uri;
     }
 
+    protected function limit_length($string, $limit = 127)
+    {
+        $str_limit = $limit - 3;
+        if (function_exists('mb_strimwidth')) {
+            if (mb_strlen($string) > $limit) {
+                $string = mb_strimwidth($string, 0, $str_limit) . '...';
+            }
+        } else {
+            if (strlen($string) > $limit) {
+                $string = substr($string, 0, $str_limit) . '...';
+            }
+        }
+        return $string;
+    }
+
     private function get_paypal_args($booking_id)
     {
         $paypal_email = get_option('yatra_payment_gateway_paypal_email');
@@ -93,7 +108,7 @@ class Yatra_Gateway_Paypal_Request
 
             $args['business'] = sanitize_email($paypal_email);
             //$args['bn'] = '';
-            $args['rm'] = '2';
+            $args['rm'] = is_ssl() ? 2 : 1;
             $args['discount_amount_cart'] = $cart_discount;
             $args['tax_cart'] = 0;
             $args['charset'] = get_bloginfo('charset');
@@ -125,7 +140,7 @@ class Yatra_Gateway_Paypal_Request
             );
 
             // Cart Item.
-            $agrs_index = 1;
+            $args_index = 1;
 
             foreach ($yatra_booking_metas as $tour_id => $item) {
 
@@ -133,36 +148,24 @@ class Yatra_Gateway_Paypal_Request
 
                 $item_name = isset($item['yatra_tour_name']) ? $item['yatra_tour_name'] : '';
 
-                $trip_code = isset($yatra_booking_meta_params['booking_code']) ? $yatra_booking_meta_params['booking_code'] : '';
-
                 $payment_amount = isset($item['total_tour_final_price']) ? $item['total_tour_final_price'] : 0;
 
-                $args['item_name_' . $agrs_index] = $item_name;
+                $args['item_name_' . $args_index] = $this->limit_length($item_name, 127);
 
-                $args['quantity_' . $agrs_index] = 1;
+                $args['quantity_' . $args_index] = 1;
 
-                $args['amount_' . $agrs_index] = $payment_amount;
+                $args['amount_' . $args_index] = $payment_amount;
 
-                $args['item_number_' . $agrs_index] = $tour_id;
+                $args['item_number_' . $args_index] = $tour_id;
 
-                $args['on0_' . $agrs_index] = __('Tour Code', 'yatra');
-                // $args['on1_' . $agrs_index ] = __( 'Payment Mode', 'yatra' );
-                $args['on2_' . $agrs_index] = __('Tour Price', 'yatra');
+                $args = apply_filters('yatra_extra_paypal_args', $args, $item, $tour_id, $args_index);
 
-                $args['os0_' . $agrs_index] = $trip_code;
-                // $args['os1_' . $agrs_index ] = $payment_mode;
-                $args['os2_' . $agrs_index] = $payment_amount;
-
-                $args = apply_filters('yatra_extra_paypal_args', $args, $item, $tour_id, $agrs_index);
-
-                $agrs_index++;
+                $args_index++;
             }
         } else {
             return;
         }
-
-        $args['option_index_0'] = $agrs_index;
-
+        
         $args['custom'] = $booking_id;
 
         $logger = yatra_get_logger();
