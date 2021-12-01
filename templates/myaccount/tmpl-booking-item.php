@@ -111,6 +111,5 @@ $duration_string = '' != $duration_string ? __('Duration: ', 'yatra') . $duratio
         <?php
         do_action('yatra_myaccount_tour_booking_item', $id, $booking);
         ?>
-        <h2><?php echo __('Total Booking Price', 'yatra') ?></h2>
     </div>
 </div>
