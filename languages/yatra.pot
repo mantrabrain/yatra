@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.3\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-11-23 09:12:35+00:00\n"
+"POT-Creation-Date: 2021-12-01 13:28:42+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,48 +18,48 @@ msgid "Validation error for %s field"
 msgstr ""
 
 #: includes/abstracts/abstract-yatra-form.php:367
-#: includes/meta-boxes/class-yatra-metabox-base.php:528
+#: includes/meta-boxes/class-yatra-metabox-base.php:534
 #: includes/widgets/class-yatra-widget-base.php:266
 msgid "Choose an image"
 msgstr ""
 
 #: includes/abstracts/abstract-yatra-form.php:368
-#: includes/meta-boxes/class-yatra-metabox-base.php:529
+#: includes/meta-boxes/class-yatra-metabox-base.php:535
 #: includes/widgets/class-yatra-widget-base.php:267
 msgid "Use image"
 msgstr ""
 
 #: includes/abstracts/abstract-yatra-form.php:369
-#: includes/meta-boxes/class-yatra-metabox-base.php:530
+#: includes/meta-boxes/class-yatra-metabox-base.php:536
 #: includes/widgets/class-yatra-widget-base.php:268
 msgid "Select an Image"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:135
+#: includes/admin/class-yatra-admin-assets.php:140
 msgid "Are you sure want to remove this item?"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:137
+#: includes/admin/class-yatra-admin-assets.php:142
 msgid ""
 "%1sWarning%2s: If you remove this tab, all of your contents associated with "
 "this tab will be deleted"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:139
-#: includes/admin/class-yatra-admin-assets.php:145
+#: includes/admin/class-yatra-admin-assets.php:144
+#: includes/admin/class-yatra-admin-assets.php:150
 msgid "Yes, Confirm"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:141
-#: includes/admin/class-yatra-admin-assets.php:147
+#: includes/admin/class-yatra-admin-assets.php:146
+#: includes/admin/class-yatra-admin-assets.php:152
 msgid "Cancel this process"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:143
+#: includes/admin/class-yatra-admin-assets.php:148
 msgid "Are you sure want to delete attribute?"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:152
+#: includes/admin/class-yatra-admin-assets.php:157
 msgid "Font Awesome"
 msgstr ""
 
@@ -93,112 +93,112 @@ msgstr ""
 msgid "Attribute base"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:110
+#: includes/admin/class-yatra-admin-post-types.php:111
 msgid "updated."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:111
+#: includes/admin/class-yatra-admin-post-types.php:112
 msgid "Custom field updated."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:112
+#: includes/admin/class-yatra-admin-post-types.php:113
 msgid "Custom field deleted."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:113
-#: includes/admin/class-yatra-admin-post-types.php:115
+#: includes/admin/class-yatra-admin-post-types.php:114
+#: includes/admin/class-yatra-admin-post-types.php:116
 msgid "Order updated."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:114
+#: includes/admin/class-yatra-admin-post-types.php:115
 msgid "Revision restored."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:116
+#: includes/admin/class-yatra-admin-post-types.php:117
 msgid "Order saved."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:117
+#: includes/admin/class-yatra-admin-post-types.php:118
 msgid "Order submitted."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:120
+#: includes/admin/class-yatra-admin-post-types.php:121
 #. translators: %s: date
 msgid "Order scheduled for: %s."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:121
+#: includes/admin/class-yatra-admin-post-types.php:122
 msgid "M j, Y @ G:i"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:123
+#: includes/admin/class-yatra-admin-post-types.php:124
 msgid "Order draft updated."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:124
+#: includes/admin/class-yatra-admin-post-types.php:125
 msgid "Order updated and sent."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:142
+#: includes/admin/class-yatra-admin-post-types.php:143
 #. translators: %s: order count
 msgid "%s order updated."
 msgid_plural "%s orders updated."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:144
+#: includes/admin/class-yatra-admin-post-types.php:145
 #. translators: %s: order count
 msgid "%s order not updated, somebody is editing it."
 msgid_plural "%s orders not updated, somebody is editing them."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:146
+#: includes/admin/class-yatra-admin-post-types.php:147
 #. translators: %s: order count
 msgid "%s order permanently deleted."
 msgid_plural "%s orders permanently deleted."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:148
+#: includes/admin/class-yatra-admin-post-types.php:149
 #. translators: %s: order count
 msgid "%s order moved to the Trash."
 msgid_plural "%s orders moved to the Trash."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:150
+#: includes/admin/class-yatra-admin-post-types.php:151
 #. translators: %s: order count
 msgid "%s order restored from the Trash."
 msgid_plural "%s orders restored from the Trash."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/admin/class-yatra-admin-post-types.php:283
+#: includes/admin/class-yatra-admin-post-types.php:284
 msgid "Product name"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:286
+#: includes/admin/class-yatra-admin-post-types.php:287
 msgid "Coupon code"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:302
+#: includes/admin/class-yatra-admin-post-types.php:303
 msgid "Description (optional)"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:340
+#: includes/admin/class-yatra-admin-post-types.php:341
 msgid "Yatra Cart Page"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:344
+#: includes/admin/class-yatra-admin-post-types.php:345
 msgid "Yatra Checkout Page"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:348
+#: includes/admin/class-yatra-admin-post-types.php:349
 msgid "Yatra Thank You Page"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-post-types.php:351
+#: includes/admin/class-yatra-admin-post-types.php:352
 msgid "Yatra My Account Page"
 msgstr ""
 
@@ -360,7 +360,7 @@ msgid "When you receive a new booking, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:216
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:226
 #: templates/myaccount/tmpl-booking.php:8
 msgid "Booking Code"
 msgstr ""
@@ -368,12 +368,12 @@ msgstr ""
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:73
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:16
-#: templates/tmpl-cart-table.php:15 templates/tmpl-order-table.php:6
+#: templates/tmpl-cart-table.php:16 templates/tmpl-order-table.php:6
 msgid "Tour"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
-#: templates/myaccount/tmpl-booking.php:9 templates/tmpl-cart-table.php:16
+#: templates/myaccount/tmpl-booking.php:9 templates/tmpl-cart-table.php:17
 #: templates/tmpl-order-table.php:7
 msgid "Date"
 msgstr ""
@@ -390,7 +390,7 @@ msgstr ""
 #: includes/class-yatra-checkout-form.php:141
 #: includes/class-yatra-enquiry-form.php:51
 #: includes/class-yatra-user-form.php:71 includes/class-yatra-user-form.php:72
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:212
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:221
 #: templates/myaccount/tmpl-dashboard.php:32
 msgid "Email"
 msgstr ""
@@ -400,8 +400,9 @@ msgid "Full name"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
-#: templates/myaccount/tmpl-booking.php:11 templates/tmpl-cart-table.php:18
-#: templates/tmpl-order-table.php:9 templates/tmpl-order-table.php:56
+#: templates/myaccount/tmpl-booking.php:11 templates/tmpl-cart-table.php:19
+#: templates/tmpl-cart-table.php:147 templates/tmpl-order-table.php:9
+#: templates/tmpl-order-table.php:69
 msgid "Total"
 msgstr ""
 
@@ -447,7 +448,7 @@ msgid "Bookings"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:126
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:215
+#: templates/myaccount/tmpl-booking-item.php:114
 msgid "Total Booking Price"
 msgstr ""
 
@@ -474,7 +475,7 @@ msgstr ""
 #: includes/class-yatra-enquiry-form.php:70
 #: includes/class-yatra-user-form.php:29 includes/class-yatra-user-form.php:30
 #: includes/class-yatra-user-form.php:38 includes/class-yatra-user-form.php:44
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:213
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:222
 #: includes/template-tags.php:169 includes/template-tags.php:724
 #: includes/template-tags.php:728 includes/template-tags.php:1163
 #: templates/myaccount/tmpl-dashboard.php:47 templates/tour/additional.php:16
@@ -590,6 +591,7 @@ msgstr ""
 #: includes/admin/settings/class-yatra-settings-general.php:42
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:42
 #: includes/admin/setup/class-yatra-setup-wizard.php:56
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:72
 msgid "General"
 msgstr ""
 
@@ -742,6 +744,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:146
 #: includes/admin/setup/class-yatra-setup-wizard.php:238
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:73
 msgid "General Settings"
 msgstr ""
 
@@ -949,7 +952,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:101
-#: includes/functions.php:753
+#: includes/functions.php:752
 msgid "Payment Gateways"
 msgstr ""
 
@@ -1266,6 +1269,7 @@ msgid "License"
 msgstr ""
 
 #: includes/admin/templates/license/license.php:15
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:28
 msgid "Expire Date"
 msgstr ""
 
@@ -1333,19 +1337,31 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-yatra-ajax.php:53 includes/class-yatra-ajax.php:528
+#: includes/class-yatra-ajax.php:53 includes/class-yatra-ajax.php:554
 msgid "Something wrong, please try again."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:297
+#: includes/class-yatra-ajax.php:179
+msgid "Empty coupon code"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:191
+msgid "Coupon Successfully applied"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:264
+msgid "Cart Successfully updated"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:323
 msgid "Invalid file type. Please use vaild json file."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:303
+#: includes/class-yatra-ajax.php:329
 msgid "File upload failed. Please try again."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:530
+#: includes/class-yatra-ajax.php:556
 msgid "Thank you for your query. We will get back to you soon"
 msgstr ""
 
@@ -1606,6 +1622,26 @@ msgstr ""
 msgid "Confirm password  not matched with old password"
 msgstr ""
 
+#: includes/classes/class-yatra-core-coupon.php:41
+msgid "Invalid coupon code"
+msgstr ""
+
+#: includes/classes/class-yatra-core-coupon.php:50
+msgid "Coupon already expired"
+msgstr ""
+
+#: includes/classes/class-yatra-core-coupon.php:57
+msgid "Maximum usage limit crossed for this coupon."
+msgstr ""
+
+#: includes/classes/class-yatra-core-coupon.php:62
+msgid "Valid Coupon"
+msgstr ""
+
+#: includes/classes/class-yatra-core-coupon.php:135
+msgid "Coupon applied successfully"
+msgstr ""
+
 #: includes/classes/class-yatra-core-tour-availability.php:357
 #: includes/classes/class-yatra-core-tour-availability.php:399
 msgid "Booking Full"
@@ -1643,6 +1679,7 @@ msgid "Last page"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:22
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:22
 #. translators: %s: number of orders
 msgid "Pending booking <span class=\"count\">(%s)</span>"
 msgid_plural "Pending bookings <span class=\"count\">(%s)</span>"
@@ -1650,6 +1687,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:31
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:31
 #. translators: %s: number of orders
 msgid "Processing <span class=\"count\">(%s)</span>"
 msgid_plural "Processing <span class=\"count\">(%s)</span>"
@@ -1657,6 +1695,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:40
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:40
 #. translators: %s: number of orders
 msgid "On hold <span class=\"count\">(%s)</span>"
 msgid_plural "On hold <span class=\"count\">(%s)</span>"
@@ -1664,6 +1703,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:49
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:49
 #. translators: %s: number of orders
 msgid "Completed <span class=\"count\">(%s)</span>"
 msgid_plural "Completed <span class=\"count\">(%s)</span>"
@@ -1671,6 +1711,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:58
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:58
 #. translators: %s: number of orders
 msgid "Cancelled <span class=\"count\">(%s)</span>"
 msgid_plural "Cancelled <span class=\"count\">(%s)</span>"
@@ -1703,6 +1744,43 @@ msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:89
 msgid "No Bookings found in the Trash"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:87
+msgid "Add New Coupon"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:88
+msgid "New Coupon"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:89
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:90
+msgid "View Coupon"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:91
+msgid "Coupons"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:92
+msgid "Search Coupons"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:93
+msgid "Parent Coupons:"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:94
+msgid "No Coupons found."
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:95
+msgid "No Coupons found in Trash."
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:100
+msgid "Description."
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-customers.php:12
@@ -1861,11 +1939,11 @@ msgstr ""
 msgid "Edit <span class=\"screen-reader-text\">%s</span>"
 msgstr ""
 
-#: includes/functions.php:1092 includes/template-tags.php:862
+#: includes/functions.php:1091 includes/template-tags.php:862
 msgid "Guest"
 msgstr ""
 
-#: includes/functions.php:1215
+#: includes/functions.php:1214
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
 msgstr ""
@@ -2543,12 +2621,12 @@ msgstr ""
 msgid "This method should not be called before plugins_loaded."
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-base.php:551
+#: includes/meta-boxes/class-yatra-metabox-base.php:557
 msgid "Add image(s) to gallery"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-base.php:552
-#: includes/meta-boxes/class-yatra-metabox-base.php:553
+#: includes/meta-boxes/class-yatra-metabox-base.php:558
+#: includes/meta-boxes/class-yatra-metabox-base.php:559
 msgid "Add image(s)"
 msgstr ""
 
@@ -2574,25 +2652,112 @@ msgstr ""
 msgid "Toal Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:208
-msgid "Booking Customer Information"
-msgstr ""
-
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:211
-msgid "Fullname"
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:213
+msgid "Discount Code:"
 msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:214
+msgid "Discount Amount:"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:217
+msgid "Booking Customer Information"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:220
+msgid "Fullname"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:223
 #: templates/myaccount/tmpl-dashboard.php:52
 msgid "Phone"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:279
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:224
+msgid "Total Gross Price"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:225
+msgid "Total Net Price"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:295
 msgid "Booking Status"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:306
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:322
 msgid "Payment Log"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:23
+msgid "Coupon Name"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:24
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:77
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:78
+msgid "Coupon Code"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:25
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:85
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:86
+msgid "Coupon Type"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:26
+msgid "Discount Value"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:27
+msgid "Usage Count"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:30
+msgid "Created Date"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:55
+#. translators: 1: count 2: limit
+msgid "%1$s / %2$s"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:92
+msgid "Percentage Discount"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:93
+msgid "Fixed Discount"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:98
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:99
+msgid "Coupon Value"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:106
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:107
+msgid "Coupon Expiry Date"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:119
+msgid "Restrictions"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:120
+msgid "Restrictions Settings"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:122
+msgid "Coupon Using Limit"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:123
+msgid "Max number of time this coupon can be used."
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:189
+msgid "Coupon Settings"
 msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:51
@@ -3391,11 +3556,11 @@ msgstr ""
 msgid "Generated at"
 msgstr ""
 
-#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:145
+#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:148
 msgid "Trip Code"
 msgstr ""
 
-#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:147
+#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:150
 msgid "Trip Price"
 msgstr ""
 
@@ -3918,15 +4083,15 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:515
+#: includes/yatra-template-functions.php:516
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:516
+#: includes/yatra-template-functions.php:517
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:517
+#: includes/yatra-template-functions.php:518
 msgid "Not Available"
 msgstr ""
 
@@ -3938,15 +4103,15 @@ msgstr ""
 msgid "Duration: "
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-item.php:33
+#: templates/myaccount/tmpl-booking-item.php:34
 msgid "Date: "
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-item.php:37
+#: templates/myaccount/tmpl-booking-item.php:38
 msgid "Persons: "
 msgstr ""
 
-#: templates/myaccount/tmpl-booking-item.php:45
+#: templates/myaccount/tmpl-booking-item.php:46
 msgid "Total Price: "
 msgstr ""
 
@@ -4025,8 +4190,24 @@ msgstr ""
 msgid "Pages:"
 msgstr ""
 
-#: templates/tmpl-cart-table.php:17
+#: templates/tmpl-cart-table.php:18
 msgid "Person - Per - Pricing"
+msgstr ""
+
+#: templates/tmpl-cart-table.php:90
+msgid "Apply coupon"
+msgstr ""
+
+#: templates/tmpl-cart-table.php:109
+msgid "Sub Total"
+msgstr ""
+
+#: templates/tmpl-cart-table.php:124 templates/tmpl-order-table.php:58
+msgid "Coupon:"
+msgstr ""
+
+#: templates/tmpl-cart-table.php:134
+msgid "[Remove]"
 msgstr ""
 
 #: templates/tmpl-deals-item.php:12 templates/tmpl-tour-item.php:12
@@ -4113,28 +4294,58 @@ msgid "%1$s of %2$s"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:16
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:16
 msgctxt "Booking status"
 msgid "Pending booking"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:25
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:25
 msgctxt "Booking status"
 msgid "Processing"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:34
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:34
 msgctxt "Booking status"
 msgid "On hold"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:43
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:43
 msgctxt "Booking status"
 msgid "Completed"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:52
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:52
 msgctxt "Booking status"
 msgid "Cancelled"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:82
+msgctxt "post type general name"
+msgid "Coupons"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:83
+msgctxt "post type singular name"
+msgid "Coupon"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:84
+msgctxt "admin menu"
+msgid "Coupons"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:85
+msgctxt "add new on admin bar"
+msgid "Coupon"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:86
+msgctxt "yatra"
+msgid "Add New"
 msgstr ""
 
 #: includes/modules/status/sections/class-yatra-module-section-system-status.php:465

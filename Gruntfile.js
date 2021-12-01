@@ -98,7 +98,7 @@ module.exports = function (grunt) {
 
         // Minify all .css files.
         cssmin: {
-            options:{
+            options: {
                 sourceMap: true,
             },
             minify: {
@@ -262,6 +262,7 @@ module.exports = function (grunt) {
                     '!*.jshintrc',
                     '!.git',
                     '!requirement.txt',
+                    '!assets/admin/src/**'
                 ],
                 dest: 'yatra',
                 expand: true
