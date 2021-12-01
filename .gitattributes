@@ -16,7 +16,7 @@
 /Gruntfile.js  export-ignore
 /.jshintrc  export-ignore
 /assets/package.json  export-ignore
-/assets/admin/src
+/assets/admin/src  export-ignore
 /assets/package-lock.json  export-ignore
 /assets/src  export-ignore
 /assets/node_modules  export-ignore
