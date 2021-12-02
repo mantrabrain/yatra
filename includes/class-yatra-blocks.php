@@ -5,6 +5,7 @@ class Yatra_Blocks
     public function __construct()
     {
         add_action('init', array($this, 'register_blocks'));
+        add_filter('block_categories_all', array($this, 'block_categories'), 10, 2);
     }
 
     public function register_blocks()
@@ -20,6 +21,21 @@ class Yatra_Blocks
             'api_version' => 2,
             'editor_script' => 'yatra-blocks',
         ));
+    }
+
+    public function block_categories($categories, $context)
+    {
+        if (!empty($context->post)) {
+            array_push(
+                $categories,
+                array(
+                    'slug' => 'yatra',
+                    'title' => __('Yatra', 'yatra'),
+                    'icon' => YATRA_PLUGIN_URI . '/assets/images/menu-icon.png'
+                )
+            );
+        }
+        return $categories;
     }
 }
 
