@@ -108,7 +108,7 @@ class Yatra_Core_Coupon
     public function get_coupon_details()
     {
         $coupon_details = array(
-            
+
             'id' => $this->coupon_id,
 
             'code' => get_post_meta($this->coupon_id, 'yatra_coupon_code', true),
@@ -128,9 +128,9 @@ class Yatra_Core_Coupon
     {
         $coupon_validation = $this->is_valid_coupon();
 
-        if ($coupon_validation['status']) {
+        $status = yatra()->cart->apply_coupon($this->get_coupon_details(), $coupon_validation['status']);
 
-            yatra()->cart->apply_coupon($this->get_coupon_details());
+        if ($status) {
 
             return array('status' => true, 'message' => __('Coupon applied successfully', 'yatra'));
         }

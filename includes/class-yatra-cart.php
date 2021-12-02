@@ -10,6 +10,7 @@ if (!class_exists('Yatra_Cart')) {
             add_action('init', array($this, 'remove_cart'));
             add_action('init', array($this, 'remove_coupon'));
             add_filter('yatra_booking_final_price', array($this, 'final_price'), 10, 3);
+            add_filter('yatra_after_update_tour_cart', array($this, 'refresh_cart_coupon'));
 
         }
 
@@ -110,33 +111,23 @@ if (!class_exists('Yatra_Cart')) {
             }
         }
 
-        public function apply_coupon($coupon_details)
+        public function apply_coupon($coupon_details, $validation_status)
         {
             $yatra_tour_cart = $this->get_cart();
 
-
-            $yatra_tour_cart['coupon'] = $this->recalculate_coupon($coupon_details);
-
-
-            return $this->set_cart($yatra_tour_cart);
-
-        }
-
-        public function get_coupon()
-        {
-            $yatra_tour_cart = $this->get_cart();
-
-            return isset($yatra_tour_cart['coupon']) ? $this->recalculate_coupon($yatra_tour_cart['coupon']) : array();
-        }
-
-        private function recalculate_coupon($coupon_details)
-        {
             $value = isset($coupon_details['value']) ? $coupon_details['value'] : '';
 
             $type = isset($coupon_details['type']) ? $coupon_details['type'] : '';
 
-            if ($value === '' || $type === '' || $value === 0) {
-                return array();
+            $coupon = isset($coupon_details['code']) ? $coupon_details['code'] : '';
+
+            if ($value === '' || $type === '' || $value === 0 || $coupon === '' || !$validation_status) {
+
+                $yatra_tour_cart['coupon'] = array();
+
+                $this->set_cart($yatra_tour_cart);
+
+                return false;
             }
 
             $calculated_value = 0;
@@ -147,7 +138,6 @@ if (!class_exists('Yatra_Cart')) {
 
                 $calculated_value = ($total * $value) / 100;
 
-
             } elseif ($type === "fixed") {
 
                 $calculated_value = $value;
@@ -156,8 +146,41 @@ if (!class_exists('Yatra_Cart')) {
 
             $coupon_details['calculated_value'] = $calculated_value;
 
+            $yatra_tour_cart['coupon'] = $coupon_details;
 
-            return $coupon_details;
+            return $this->set_cart($yatra_tour_cart);
+
+        }
+
+        public function get_coupon()
+        {
+            $this->refresh_cart_coupon(true);
+
+            $yatra_tour_cart = $this->get_cart();
+
+            return isset($yatra_tour_cart['coupon']) ? $yatra_tour_cart['coupon'] : array();
+        }
+
+        public function refresh_cart_coupon($status)
+        {
+            $yatra_tour_cart = $this->get_cart();
+
+            if (isset($yatra_tour_cart['coupon'])) {
+
+                $coupon = $yatra_tour_cart['coupon'];
+
+                $coupon_code = isset($coupon['code']) ? $coupon['code'] : '';
+
+                if ('' != $coupon_code) {
+
+                    $yatra_coupon = new Yatra_Core_Coupon($coupon_code);
+
+                    $yatra_coupon->apply();
+                }
+
+            }
+
+            return $status;
         }
 
         public function update_cart($tour_id, $number_of_persons, $type, $selected_date)
@@ -186,10 +209,6 @@ if (!class_exists('Yatra_Cart')) {
 
             );
             $yatra_tour_cart['items'][$tour_id] = $single_cart_item;
-
-            $coupon = isset($yatra_tour_cart['coupon']) ? $yatra_tour_cart['coupon'] : array();
-
-            $yatra_tour_cart['coupon'] = $this->recalculate_coupon($coupon);
 
             $unset_this = false;
 
@@ -221,8 +240,10 @@ if (!class_exists('Yatra_Cart')) {
 
             $yatra_tour_cart = apply_filters('yatra_update_tour_cart', $yatra_tour_cart, $tour_id, $number_of_persons);
 
-
             $status = $this->set_cart($yatra_tour_cart);
+
+            $status = apply_filters('yatra_after_update_tour_cart', $status);
+
 
             return $status;
         }
