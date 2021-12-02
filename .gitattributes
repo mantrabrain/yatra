@@ -19,7 +19,7 @@
 /tsconfig.json  export-ignore
 /entryPoints.js  export-ignore
 /webpack.config.js  export-ignore
-/assets/admin/src  export-ignoreg
+/assets/admin/src  export-ignore
 /assets/package-lock.json  export-ignore
 /assets/src  export-ignore
 /assets/node_modules  export-ignore
