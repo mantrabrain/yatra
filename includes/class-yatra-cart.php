@@ -132,9 +132,9 @@ if (!class_exists('Yatra_Cart')) {
 
             $calculated_value = 0;
 
+            $total = $this->get_cart_total();
+            
             if ($type === "percentage") {
-
-                $total = $this->get_cart_total();
 
                 $calculated_value = floatval($total) > 0 ? ($total * $value) / 100 : 0;
 
