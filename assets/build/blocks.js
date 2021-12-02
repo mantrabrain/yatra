@@ -150,8 +150,8 @@ const Edit = _ref => {
   }));
 };
 
-(0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_1__.registerBlockType)('wordpress-plugin/block', {
-  title: 'PLUGIN_NAME',
+(0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_1__.registerBlockType)('yatra/tour', {
+  title: 'Tour',
   apiVersion: 2,
   description: 'Hi Roy',
   category: 'widgets',

@@ -1,7 +1,6 @@
-
-import { registerBlockType } from "@wordpress/blocks";
-import { InspectorControls, useBlockProps } from "@wordpress/block-editor";
-import { TextControl } from '@wordpress/components';
+import {registerBlockType} from "@wordpress/blocks";
+import {InspectorControls, useBlockProps} from "@wordpress/block-editor";
+import {TextControl} from '@wordpress/components';
 
 let attributes = {
     content: {
@@ -11,22 +10,22 @@ let attributes = {
     },
 }
 
-const Edit = ({ attributes, setAttributes }) => {
+const Edit = ({attributes, setAttributes}) => {
     return (
-        <div { ...useBlockProps() }>
+        <div {...useBlockProps()}>
             <InspectorControls>
                 Settings
             </InspectorControls>
-			<TextControl
-				value={ attributes.content }
-				onChange={ ( val ) => setAttributes( { content: val } ) }
-			/>
+            <TextControl
+                value={attributes.content}
+                onChange={(val) => setAttributes({content: val})}
+            />
         </div>
     )
 }
 
-registerBlockType( 'wordpress-plugin/block', {
-    title: 'PLUGIN_NAME',
+registerBlockType('yatra/tour', {
+    title: 'Tour',
     apiVersion: 2,
     description: 'Hi Roy',
     category: 'widgets',
@@ -39,10 +38,10 @@ registerBlockType( 'wordpress-plugin/block', {
     save: ({attributes}) => {
         return (
             <div
-                { ...useBlockProps.save() }
+                {...useBlockProps.save()}
             >
-                { attributes.content }
+                {attributes.content}
             </div>
         );
     }
-} );
+});
