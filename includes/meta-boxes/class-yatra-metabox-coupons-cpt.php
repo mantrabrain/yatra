@@ -48,7 +48,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                     break;
                 case "usage_count":
                     $usage_limit = ($this->get_value('yatra_coupon_using_limit', $coupon_id));
-                    $usage_count_array = ($this->get_value('yatra_coupon_usages_bookings', $coupon_id));;
+                    $usage_count_array = ($this->get_value('yatra_coupon_usages_bookings', $coupon_id));
                     $usage_count_array = is_array($usage_count_array) ? $usage_count_array: array();
                     $usage_count = count($usage_count_array);
                     printf(

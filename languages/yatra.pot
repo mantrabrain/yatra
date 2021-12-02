@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.4\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-02 08:33:22+00:00\n"
+"POT-Creation-Date: 2021-12-02 08:53:59+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -591,7 +591,7 @@ msgstr ""
 #: includes/admin/settings/class-yatra-settings-general.php:42
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:42
 #: includes/admin/setup/class-yatra-setup-wizard.php:56
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:72
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:73
 msgid "General"
 msgstr ""
 
@@ -744,7 +744,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:146
 #: includes/admin/setup/class-yatra-setup-wizard.php:238
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:73
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:74
 msgid "General Settings"
 msgstr ""
 
@@ -1495,35 +1495,35 @@ msgstr ""
 msgid "Number of Children"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:71
+#: includes/class-yatra-form-handler.php:73
 msgid "Please select at least one payment gateway"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:99
+#: includes/class-yatra-form-handler.php:101
 msgid "Something went wrong! Booking could not complete. Please try again later"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:162
+#: includes/class-yatra-form-handler.php:164
 msgid "User profile successfully updated."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:201
+#: includes/class-yatra-form-handler.php:203
 msgid "Old Password doesn't match"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:219
+#: includes/class-yatra-form-handler.php:221
 msgid "Password successfully changed."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:246
+#: includes/class-yatra-form-handler.php:248
 msgid "Username is required."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:310
+#: includes/class-yatra-form-handler.php:312
 msgid "Email or Usrename already exists, please try again.."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:343
+#: includes/class-yatra-form-handler.php:345
 msgid "Something wrong on registration, please check all form fields once."
 msgstr ""
 
@@ -2699,14 +2699,14 @@ msgid "Coupon Name"
 msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:24
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:77
 #: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:78
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:79
 msgid "Coupon Code"
 msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:25
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:85
 #: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:86
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:87
 msgid "Coupon Type"
 msgstr ""
 
@@ -2722,46 +2722,46 @@ msgstr ""
 msgid "Created Date"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:55
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:56
 #. translators: 1: count 2: limit
 msgid "%1$s / %2$s"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:92
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:93
 msgid "Percentage Discount"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:93
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:94
 msgid "Fixed Discount"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:98
 #: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:99
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:100
 msgid "Coupon Value"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:106
 #: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:107
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:108
 msgid "Coupon Expiry Date"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:119
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:120
 msgid "Restrictions"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:120
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:121
 msgid "Restrictions Settings"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:122
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:123
 msgid "Coupon Using Limit"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:123
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:124
 msgid "Max number of time this coupon can be used."
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:189
+#: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:190
 msgid "Coupon Settings"
 msgstr ""
 
