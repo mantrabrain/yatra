@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.3\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-02 06:14:04+00:00\n"
+"POT-Creation-Date: 2021-12-02 06:48:22+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1624,6 +1624,11 @@ msgstr ""
 msgid "Confirm password  not matched with old password"
 msgstr ""
 
+#: includes/class-yatra.php:376
+#. translators: 1: error message 2: file name and path 3: line number
+msgid "%1$s in %2$s on line %3$s"
+msgstr ""
+
 #: includes/classes/class-yatra-core-coupon.php:41
 msgid "Invalid coupon code"
 msgstr ""
@@ -2824,7 +2829,7 @@ msgid ""
 "with your tour package ( Free Services or\n"
 "                            Charged Services), this addon is useful for "
 "you. You can customize the pricing as per tour\n"
-"                            package or individual person"
+"                            package or individual person."
 msgstr ""
 
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:145
@@ -2848,11 +2853,29 @@ msgstr ""
 msgid "View All Addon/Extensions"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:160
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:158
+msgid "Feature Request"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:161
+msgid ""
+"If you would like to add a new feature on the yatra plugin or any of the "
+"addons you can send us a feature request. Our development team will check & "
+"validate your requested feature. If your requested feature passes the "
+"validation, then you will get that feature in the next upcoming versions of "
+"the plugin. You can send directly the request via email to "
+"%smantrabrain@gmail.com%s too."
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:165
+msgid "Send feature request"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:174
 msgid "Facebook Community Group"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:163
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:177
 msgid ""
 "Join our facebook community group. You can post your query or share your "
 "thought and\n"
@@ -2860,41 +2883,41 @@ msgid ""
 "the group."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:168
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:182
 msgid "Join Yatra Facebook Community Group"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:175
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:189
 msgid "Documentation"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:178
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:192
 msgid "You can read documentation about yatra WordPress plugin."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:182
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:196
 msgid "Check Documentation"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:189
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:203
 msgid "Support Forum"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:192
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:206
 msgid ""
 "Post your questions and query about yatra WordPress plugin on our support "
 "forum."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:196
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:210
 msgid "View Support Forum"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:203
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:217
 msgid "Video Introduction"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:216
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:230
 msgid "Watch on youtube"
 msgstr ""
 

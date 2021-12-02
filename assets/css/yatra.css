@@ -977,7 +977,11 @@ body.single .yatra-single-tour:after {
       border-left: 0;
       border-right: 0; }
       .yatra-shortcode-wrapper form.yatra-cart-form .actions .coupon {
-        float: left; }
+        float: left;
+        display: -webkit-box;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: flex; }
     .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra-proceed-to-checkout, .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra_update_cart {
       padding: 10px; }
   .yatra-shortcode-wrapper .yatra-proceed-to-checkout-wrap {
