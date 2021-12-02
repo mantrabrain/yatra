@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 } ?>
 <div class="wrap">
-
+    <h2></h2>
     <div class="yatra-dashboard-heading">
         <h2><?php echo __('Yatra', 'yatra'); ?></h2>
         <p class="version"><?php echo esc_html(YATRA_VERSION); ?></p>
