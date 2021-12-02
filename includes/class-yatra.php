@@ -140,10 +140,8 @@ final class Yatra
      */
     private function init_hooks()
     {
-
-
         register_activation_hook(YATRA_FILE, array('Yatra_Install', 'install'));
-
+        register_shutdown_function(array($this, 'log_errors'));
         add_action('init', array($this, 'init'), 0);
         add_action('init', array('Yatra_Shortcodes', 'init'));
 
@@ -366,6 +364,22 @@ final class Yatra
     public function ajax_url()
     {
         return admin_url('admin-ajax.php', 'relative');
+    }
+
+    public function log_errors()
+    {
+        $error = error_get_last();
+        if ($error && in_array($error['type'], array(E_ERROR, E_PARSE, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR), true)) {
+            $logger = yatra_get_logger();
+            $logger->critical(
+            /* translators: 1: error message 2: file name and path 3: line number */
+                sprintf(__('%1$s in %2$s on line %3$s', 'yatra'), $error['message'], $error['file'], $error['line']) . PHP_EOL,
+                array(
+                    'source' => 'fatal-errors',
+                )
+            );
+            do_action('yatra_shutdown_error', $error);
+        }
     }
 
     /**

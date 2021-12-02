@@ -226,7 +226,7 @@ class Yatra_Setup_Wizard
         <p class="yatra-setup-actions step">
             <a href="<?php echo esc_url($this->get_next_step_link()); ?>"
                class="button-primary button button-large button-next"><?php _e('Let\'s Go!', 'yatra'); ?></a>
-            <a href="<?php echo esc_url(admin_url('edit.php?post_type=tour')); ?>"
+            <a href="<?php echo esc_url(admin_url('edit.php?post_type=tour&page=yatra-dashboard')); ?>"
                class="button button-large"><?php _e('Not right now', 'yatra'); ?></a>
         </p>
         <?php
@@ -644,11 +644,11 @@ class Yatra_Setup_Wizard
 
 
                     <a class="button button-primary button-large"
-                       href="<?php echo esc_url(admin_url('edit.php?post_type=tour')); ?>">
+                       href="<?php echo esc_url(admin_url('edit.php?post_type=tour&page=yatra-dashboard')); ?>">
                         <?php _e('Go to Dashboard!', 'yatra'); ?>
                     </a>
                     <button class="button button-primary button-large yatra-import-dummy-data"
-                            href="<?php echo esc_url(admin_url('edit.php?post_type=tour')); ?>">
+                            href="<?php echo esc_url(admin_url('edit.php?post_type=tour&page=yatra-dashboard')); ?>">
                         <?php _e('Import Sample Data', 'yatra'); ?>
                     </button>
                 </div>
