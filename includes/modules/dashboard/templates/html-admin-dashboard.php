@@ -135,14 +135,14 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-dashboard-card yatra-card">
                     <div class="yatra-card-header"><h2>
                             <span class="dashicons dashicons-text-page"></span>
-                            <?php echo __('Yatra Documentation', 'yatra') ?></h2>
+                            <?php echo __('Documentation', 'yatra') ?></h2>
                     </div>
                     <div class="yatra-card-body"><p>
                             <?php echo __('You can read documentation about yatra WordPress plugin.', 'yatra'); ?>
                         </p></div>
                     <div class="yatra-card-footer"><a target="_blank"
                                                       href="https://docs.mantrabrain.com/yatra-wordpress-plugin/?ref=yatra-dashboard">
-                            <?php echo __('Documentation', 'yatra') ?></a></div>
+                            <?php echo __('Check Documentation', 'yatra') ?></a></div>
                 </div>
             </div>
             <div class="yatra-row">
@@ -156,7 +156,7 @@ if (!defined('ABSPATH')) {
                         </p></div>
                     <div class="yatra-card-footer"><a target="_blank"
                                                       href="https://mantrabrain.com/support-forum/forum/yatra-wordpress-plugin/?ref=yatra-dashboard">
-                            <?php echo __('Support Forum', 'yatra') ?></a></div>
+                            <?php echo __('View Support Forum', 'yatra') ?></a></div>
                 </div>
             </div>
             <div class="yatra-row">
