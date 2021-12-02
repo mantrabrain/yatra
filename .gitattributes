@@ -17,7 +17,7 @@
 /.jshintrc  export-ignore
 /assets/package.json  export-ignore
 /tsconfig.json  export-ignore
-/entryPoint.js  export-ignore
+/entryPoints.js  export-ignore
 /webpack.config.js  export-ignore
 /assets/admin/src  export-ignoreg
 /assets/package-lock.json  export-ignore
