@@ -59,7 +59,6 @@ const DateTime = (props: DateTimeProps) => {
                         is12Hour={true}/>
                 </Popover>
             )}
-
             {settings.desc_tip ? <Tooltip content={settings.desc}/> : ''}
         </div>
     );
