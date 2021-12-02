@@ -123,7 +123,7 @@ if (!defined('ABSPATH')) {
                     <div class="yatra-card-body">
                         <h2>
                             <a target="_blank"
-                               href="https://mantrabrain.com/downloads/yatra-services/?ref=yatra-dashboard"><?php echo __('Yatra Downloads', 'yatra') ?></a>
+                               href="https://mantrabrain.com/downloads/yatra-downloads/?ref=yatra-dashboard"><?php echo __('Yatra Downloads', 'yatra') ?></a>
                         </h2>
                         <p>
                             <?php echo __('Yatra Downloads is premium addon of Yatra free WordPress travel and tour plugin. This addon add features to add additional files so that anyone can download those files from frontend. It is useful for tour operator to add brochure, tour guidelines pdf file and other costing details files, and any kind of other additional files, so that anyone can easily download those files from website frontend.', 'yatra'); ?>
