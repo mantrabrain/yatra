@@ -1,11 +1,9 @@
 import * as React from 'react';
 import Tooltip from "../components/tooltip";
-import {DateTimePicker, Popover, Button, PanelRow} from '@wordpress/components';
+// @ts-ignore
+import {DateTimePicker, Popover, Button } from '@wordpress/components';
 import {useState} from '@wordpress/element';
 import {dateI18n} from '@wordpress/date';
-import NumberInput from "./NumberInput";
-import TextInput from "./TextInput";
-import Select from "./Select";
 
 type DateTimeProps = {
     settings: Setting
@@ -23,10 +21,9 @@ type Setting = {
 const DateTime = (props: DateTimeProps) => {
 
     const {settings} = props;
-    console.log(settings);
     const [openDatePopup, setOpenDatePopup] = useState(false);
     const [dateValue, setDateValue] = useState(settings.value);
-    const isInvalidDate = (to_date) => {
+    const isInvalidDate = (to_date: Date) => {
         var to = new Date(to_date);
         var today = currentDate();
 
@@ -45,11 +42,11 @@ const DateTime = (props: DateTimeProps) => {
                 htmlFor={settings.name}>{settings.title} </label>
             <input className="widefat" id={settings.name}
                    name={settings.name} type="hidden"
-                   value={dateValue === '' ? "" : dateI18n('F j, Y g:i a', dateValue)}
+                   value={dateValue === '' ? "" : dateI18n('F j, Y g:i a', dateValue, false)}
                    placeholder={settings.placeholder}/>
 
             <Button isLink={true} onClick={() => setOpenDatePopup(!openDatePopup)}>
-                {dateValue === '' ? "Pick Date & Time" : dateI18n('F j, Y g:i a', dateValue)}
+                {dateValue === '' ? "Pick Date & Time" : dateI18n('F j, Y g:i a', dateValue, false)}
 
             </Button>
             {openDatePopup && (

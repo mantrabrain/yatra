@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Tooltip from "../components/tooltip";
-import {PanelRow} from '@wordpress/components';
 
 type TextProps = {
     settings: Setting

@@ -6,7 +6,7 @@ let entryPoints = require('./entryPoints');
 let entry = {};
 entryPoints.forEach(
     (entryPoint) => {
-        entry[entryPoint] = path.resolve(process.cwd(), `${entryPoint}/index.js`);
+        entry[entryPoint] = path.resolve(process.cwd(), `assets/src/${entryPoint}/index.js`);
     }
 );
 
@@ -32,6 +32,6 @@ module.exports = {
     entry,
     output: {
         filename: "[name].js",
-        path: path.join(__dirname, "../build"),
+        path: path.join(__dirname, "assets/build"),
     },
 };

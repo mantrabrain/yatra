@@ -1,10 +1,7 @@
 import * as React from 'react';
 
 type TooltipProps = {
-    content: TooltipContent
-}
-type TooltipContent = {
-    tooltip: string
+    content: string
 }
 
 const Tooltip = (props: TooltipProps) => {
