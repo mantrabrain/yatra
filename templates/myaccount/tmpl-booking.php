@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 $my_booking_columns = apply_filters('yatra_my_account_my_booking_columns', array(
     'booking-id' => __('ID', 'yatra'),
     'booking-code' => __('Booking Code', 'yatra'),
-    'booking-date' => __('Date', 'yatra'),
+    'booking-date' => __('Booking Date Time', 'yatra'),
     'booking-status' => __('Status', 'yatra'),
     'booking-total' => __('Total', 'yatra'),
 //    'booking-actions' => '&nbsp;',
