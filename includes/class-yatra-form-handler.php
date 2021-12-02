@@ -66,7 +66,9 @@ class Yatra_Form_Handler
 
         $yatra_get_active_payment_gateways = yatra_get_active_payment_gateways();
 
-        if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && count($yatra_get_active_payment_gateways) > 0) {
+        $cart_total = floatval(yatra()->cart->get_cart_total(true));
+
+        if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && count($yatra_get_active_payment_gateways) > 0 && $cart_total > 0) {
 
             yatra()->yatra_error->add('yatra_form_validation_errors', __('Please select at least one payment gateway', 'yatra'));
 
@@ -82,7 +84,7 @@ class Yatra_Form_Handler
 
             yatra_clear_session('yatra_tour_cart');
 
-            if (in_array($payment_gateway_id, $yatra_get_active_payment_gateways)) {
+            if (in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && $cart_total > 0) {
 
                 do_action('yatra_payment_checkout_payment_gateway_' . $payment_gateway_id, $booking_id);
 
@@ -102,7 +104,7 @@ class Yatra_Form_Handler
             $error_message = yatra()->yatra_error->get_error_message();
             if (is_array($error_message)) {
                 $message = isset($error_message[0]) ? $error_message[0] : $message;
-                
+
             } else if (is_string($error_message)) {
                 $message = $error_message;
             }

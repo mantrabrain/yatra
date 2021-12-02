@@ -136,7 +136,7 @@ if (!class_exists('Yatra_Cart')) {
 
                 $total = $this->get_cart_total();
 
-                $calculated_value = ($total * $value) / 100;
+                $calculated_value = floatval($total) > 0 ? ($total * $value) / 100 : 0;
 
             } elseif ($type === "fixed") {
 
@@ -144,7 +144,7 @@ if (!class_exists('Yatra_Cart')) {
 
             }
 
-            $coupon_details['calculated_value'] = $calculated_value;
+            $coupon_details['calculated_value'] = floatval($calculated_value) <= floatval($total) ? floatval($calculated_value) : floatval($total);
 
             $yatra_tour_cart['coupon'] = $coupon_details;
 
