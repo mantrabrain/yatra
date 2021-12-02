@@ -334,6 +334,7 @@ if (!class_exists('Yatra_Cart')) {
                         $this->update_items($cart_items);
                     }
 
+                    $this->refresh_cart_coupon(true);
 
                     wp_redirect(yatra_get_cart_page(true));
                     exit;
