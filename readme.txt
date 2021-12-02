@@ -142,10 +142,6 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
-= 2.1.3 | 2021/11/23 =
-* Fixed - My Account Page Design fixed
+= 2.1.4 | 2021/12/02 =
+* Added - Discount coupon added
 * Fixed - Minor issue fixed
-* Fixed - Added filters for addons
-* Added - Sample Data Import Feature on setup wizard
-* Added - Currency settings
-* Fixed - PHP8 compatibility issue resolved
