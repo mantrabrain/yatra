@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.3\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-02 02:26:10+00:00\n"
+"POT-Creation-Date: 2021-12-02 06:14:04+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -218,6 +218,7 @@ msgstr ""
 
 #: includes/admin/class-yatra-admin-tour-enquiries.php:17
 #: includes/admin/class-yatra-admin-tour-enquiries.php:18
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:71
 msgid "Enquiries"
 msgstr ""
 
@@ -443,6 +444,7 @@ msgstr ""
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:125
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:82
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:91
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:107
 #: includes/yatra-template-functions.php:26
 msgid "Bookings"
 msgstr ""
@@ -828,6 +830,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:206
 #: includes/functions.php:64 includes/hooks/yatra-list-table-hooks.php:19
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:57
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:179
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:180
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:189
@@ -1678,7 +1681,6 @@ msgid "Last page"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:22
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:22
 #. translators: %s: number of orders
 msgid "Pending booking <span class=\"count\">(%s)</span>"
 msgid_plural "Pending bookings <span class=\"count\">(%s)</span>"
@@ -1686,7 +1688,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:31
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:31
 #. translators: %s: number of orders
 msgid "Processing <span class=\"count\">(%s)</span>"
 msgid_plural "Processing <span class=\"count\">(%s)</span>"
@@ -1694,7 +1695,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:40
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:40
 #. translators: %s: number of orders
 msgid "On hold <span class=\"count\">(%s)</span>"
 msgid_plural "On hold <span class=\"count\">(%s)</span>"
@@ -1702,7 +1702,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:49
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:49
 #. translators: %s: number of orders
 msgid "Completed <span class=\"count\">(%s)</span>"
 msgid_plural "Completed <span class=\"count\">(%s)</span>"
@@ -1710,7 +1709,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:58
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:58
 #. translators: %s: number of orders
 msgid "Cancelled <span class=\"count\">(%s)</span>"
 msgid_plural "Cancelled <span class=\"count\">(%s)</span>"
@@ -1745,45 +1743,47 @@ msgstr ""
 msgid "No Bookings found in the Trash"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:87
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:25
 msgid "Add New Coupon"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:88
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:26
 msgid "New Coupon"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:89
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:90
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:27
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:28
 msgid "View Coupon"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:91
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:29
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:95
 msgid "Coupons"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:92
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:30
 msgid "Search Coupons"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:93
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:31
 msgid "Parent Coupons:"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:94
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:32
 msgid "No Coupons found."
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:95
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:33
 msgid "No Coupons found in Trash."
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:100
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:38
 msgid "Description."
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-customers.php:12
 #: includes/custom-post-type/class-yatra-custom-post-type-customers.php:21
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:83
 msgid "Customers"
 msgstr ""
 
@@ -1816,6 +1816,7 @@ msgid "No Customers found in the Trash"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:15
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:19
 msgid "Tours"
 msgstr ""
 
@@ -1852,6 +1853,7 @@ msgid "No Tours found in the Trash"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:9
 msgid "Yatra"
 msgstr ""
 
@@ -2763,6 +2765,139 @@ msgstr ""
 msgid "Tour Additional Information"
 msgstr ""
 
+#: includes/modules/dashboard/class-yatra-module-dashboard.php:15
+#: includes/modules/dashboard/class-yatra-module-dashboard.php:16
+#: includes/yatra-template-functions.php:12
+msgid "Dashboard"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:24
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:38
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:50
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:62
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:76
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:88
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:100
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:112
+msgid "View All"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:33
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:72
+msgid "Destinations"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:45
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:71
+msgid "Activities"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:121
+msgid "Premium Addons/Extensions"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:126
+msgid "Yatra Downloads"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:129
+msgid ""
+"Yatra Downloads is premium addon of Yatra free WordPress travel and tour "
+"plugin. This addon add features to add additional files so that anyone can "
+"download those files from frontend. It is useful for tour operator to add "
+"brochure, tour guidelines pdf file and other costing details files, and any "
+"kind of other additional files, so that anyone can easily download those "
+"files from website frontend."
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:133
+msgid "Yatra Services"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:136
+msgid ""
+"Yatra Services is premium addon of Yatra free WordPress travel and tour "
+"plugin. This addon\n"
+"                            add features to add additional services for "
+"your tour packages. For example if you want to\n"
+"                            add cleaning and other extra services along "
+"with your tour package ( Free Services or\n"
+"                            Charged Services), this addon is useful for "
+"you. You can customize the pricing as per tour\n"
+"                            package or individual person"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:145
+msgid "Yatra Availability Conditions\n"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:147
+msgid ""
+"Yatra Availability Conditions is premium addon of Yatra free WordPress "
+"travel and tour plugin. This addon add features to add different types of "
+"conditional logic for your tour packages. For example if you want to make "
+"available for booking the tour package for weekend only or each sunday only "
+"or each month only, then this addon is for you. Simply you can add logic "
+"for the availability/enquiry only or for not availability. But make sure "
+"your condition will not conflict each other. If your custom condition "
+"conflict each other then the system will automatically apply the last added "
+"condition."
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:151
+msgid "View All Addon/Extensions"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:160
+msgid "Facebook Community Group"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:163
+msgid ""
+"Join our facebook community group. You can post your query or share your "
+"thought and\n"
+"                            questions about %sYatra WordPress plugin%s on "
+"the group."
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:168
+msgid "Join Yatra Facebook Community Group"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:175
+msgid "Documentation"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:178
+msgid "You can read documentation about yatra WordPress plugin."
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:182
+msgid "Check Documentation"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:189
+msgid "Support Forum"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:192
+msgid ""
+"Post your questions and query about yatra WordPress plugin on our support "
+"forum."
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:196
+msgid "View Support Forum"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:203
+msgid "Video Introduction"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:216
+msgid "Watch on youtube"
+msgstr ""
+
 #: includes/modules/status/class-yatra-module-status.php:35
 msgid "System Status"
 msgstr ""
@@ -3604,10 +3739,6 @@ msgstr ""
 msgid "Remove Image"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:71
-msgid "Activities"
-msgstr ""
-
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:72
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:81
 msgid "Activity"
@@ -3686,10 +3817,6 @@ msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:188
 msgid "New Attributes Name"
-msgstr ""
-
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:72
-msgid "Destinations"
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:73
@@ -4056,10 +4183,6 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-#: includes/yatra-template-functions.php:12
-msgid "Dashboard"
-msgstr ""
-
 #: includes/yatra-template-functions.php:16
 msgid "Edit Profile"
 msgstr ""
@@ -4285,56 +4408,51 @@ msgid "%1$s of %2$s"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:16
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:16
 msgctxt "Booking status"
 msgid "Pending booking"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:25
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:25
 msgctxt "Booking status"
 msgid "Processing"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:34
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:34
 msgctxt "Booking status"
 msgid "On hold"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:43
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:43
 msgctxt "Booking status"
 msgid "Completed"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:52
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:52
 msgctxt "Booking status"
 msgid "Cancelled"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:82
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:20
 msgctxt "post type general name"
 msgid "Coupons"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:83
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:21
 msgctxt "post type singular name"
 msgid "Coupon"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:84
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:22
 msgctxt "admin menu"
 msgid "Coupons"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:85
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:23
 msgctxt "add new on admin bar"
 msgid "Coupon"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:86
+#: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:24
 msgctxt "yatra"
 msgid "Add New"
 msgstr ""
