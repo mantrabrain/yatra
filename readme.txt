@@ -3,7 +3,7 @@ Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
 Tested up to: 5.8.2
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
