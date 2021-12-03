@@ -89,7 +89,10 @@ const Edit = props => {
   apiVersion: 2,
   title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Tour', 'yatra'),
   description: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('This block is used to show the tour packages of Yatra WordPress plugin.', 'yatra'),
-  icon: 'dashicons dashicons-palmtree',
+  icon: {
+    foreground: '#1abc9c',
+    src: "dashicons dashicons-palmtree"
+  },
   category: 'yatra',
   edit: Edit
 });

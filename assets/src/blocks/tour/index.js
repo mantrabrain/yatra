@@ -59,7 +59,10 @@ registerBlockType('yatra/tour', {
     apiVersion: 2,
     title: __('Tour', 'yatra'),
     description: __('This block is used to show the tour packages of Yatra WordPress plugin.', 'yatra'),
-    icon: 'dashicons dashicons-palmtree',
+    icon: {
+        foreground: '#1abc9c',
+        src: "dashicons dashicons-palmtree",
+    },
     category: 'yatra',
     edit: Edit,
 });
