@@ -47,7 +47,7 @@ if (!function_exists('register_yatra_session')) {
     function register_yatra_session()
     {
         if (!session_id()) {
-            session_start();
+            @session_start();
         }
     }
 

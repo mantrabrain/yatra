@@ -13,7 +13,7 @@ class Yatra_Blocks
     {
 
         wp_send_json_success(array(
-            'tour_class' => "response_from_php"
+            'tour_class' => "response_from_php-new updaed dynamic hhhhhhh sssssssssssss"
         ));
     }
 
@@ -33,8 +33,43 @@ class Yatra_Blocks
 
         register_block_type('yatra/tour', array(
             'api_version' => 2,
+
             'editor_script' => 'yatra-blocks',
+
+            'attributes' => array(
+                'order' => array(
+                    'type' => 'string',
+                    'default' => 'asc'
+                ),
+                'featured' => array(
+                    'type' => 'boolean',
+                    'default' => false
+                ),
+                'posts_per_page' => array(
+                    'type' => 'number',
+                    'default' => 9,
+                ),
+            ),
+            'render_callback' => array($this, 'callback')
+
         ));
+    }
+
+    public function callback($attributes, $content)
+    {
+        $attributes['order'] = isset($attributes['order']) ? sanitize_text_field($attributes['order']) : 'DESC';
+
+        $attributes['order'] = in_array(strtolower($attributes['order']), array('asc', 'desc')) ? $attributes['order'] : 'desc';
+
+        $attributes['featured'] = isset($attributes['featured']) ? absint($attributes['featured']) : 2;
+
+        $attributes['posts_per_page'] = isset($attributes['posts_per_page']) ? absint($attributes['posts_per_page']) : 9;
+
+        ob_start();
+
+        yatra_get_tour_lists($attributes);
+
+        return ob_get_clean();
     }
 
     public function block_categories($categories, $context)

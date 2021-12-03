@@ -2,119 +2,6 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./assets/src/blocks/tour/components/item.js":
-/*!***************************************************!*\
-  !*** ./assets/src/blocks/tour/components/item.js ***!
-  \***************************************************/
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Item": function() { return /* binding */ Item; }
-/* harmony export */ });
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-
-
-const Item = props => {
-  let itemClassName = "yatra-tour-list-item ";
-
-  if (props.options !== undefined) {
-    if (props.options.tour_class !== undefined) {
-      itemClassName = itemClassName + props.options.tour_class;
-    }
-  }
-
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    className: itemClassName
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    className: "yatra-item-inner"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h2", {
-    className: "yatra-tour-title"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
-    href: "http://localhost/WordPressPlugins/tour/pathibhara-tour/"
-  }, "Pathibhara Tour")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("figure", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("img", {
-    src: "http://localhost/WordPressPlugins/wp-content/uploads/2021/12/nepal.jpg"
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("ul", {
-    className: "yatra-tour-meta-options"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("li", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("i", {
-    className: "fa fa-users"
-  }), "\xA0", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("strong", null, "Maximum Traveller: "), "10"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("li", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("i", {
-    className: "fa fa-chair"
-  }), "\xA0", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("strong", null, "Minimum Pax: "), "1"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("li", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("i", {
-    className: "fa fa-globe"
-  }), "\xA0", (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("strong", null, "Country: "), "Nepal")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    className: "deals-footer"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
-    href: "http://localhost/WordPressPlugins/tour/pathibhara-tour/",
-    className: "button button-primary"
-  }, "Book Now "))));
-};
-
-/***/ }),
-
-/***/ "./assets/src/blocks/tour/components/template.js":
-/*!*******************************************************!*\
-  !*** ./assets/src/blocks/tour/components/template.js ***!
-  \*******************************************************/
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "TourTemplate": function() { return /* binding */ TourTemplate; }
-/* harmony export */ });
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _item_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./item.js */ "./assets/src/blocks/tour/components/item.js");
-
-// Setup the block
-//import {Item} from "./item.js";
-//import {useState, useEffect} from '@wordpress/element';
-
-
-const {
-  apiFetch
-} = wp;
-const TourTemplate = props => {
-  function getDynamicTemplate() {
-    let postData = new FormData();
-    postData.append('action', yatraBlocks.tour_action);
-    apiFetch({
-      url: yatraBlocks.ajax_url,
-      method: 'POST',
-      credentials: 'same-origin',
-      body: postData
-    }).then(response => {
-      if (response.success) {
-        return response.data;
-      }
-    }).catch(() => {
-      return {};
-    });
-  }
-
-  console.log(dynamic);
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    className: "yatra-shortcode-wrapper yatra-block-template-wrap"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-    className: "yatra-tour-list-wrap yatra-col-3"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_item_js__WEBPACK_IMPORTED_MODULE_2__.Item, {
-    options: dynamic
-  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_item_js__WEBPACK_IMPORTED_MODULE_2__.Item, {
-    options: dynamic
-  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_item_js__WEBPACK_IMPORTED_MODULE_2__.Item, {
-    options: dynamic
-  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_item_js__WEBPACK_IMPORTED_MODULE_2__.Item, {
-    options: dynamic
-  })));
-};
-
-/***/ }),
-
 /***/ "./assets/src/blocks/tour/index.js":
 /*!*****************************************!*\
   !*** ./assets/src/blocks/tour/index.js ***!
@@ -132,110 +19,58 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/i18n */ "@wordpress/i18n");
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _components_template_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/template.js */ "./assets/src/blocks/tour/components/template.js");
+/* harmony import */ var _wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/server-side-render */ "@wordpress/server-side-render");
+/* harmony import */ var _wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_5__);
 
 
 
 
 
 
-let attributes = {
-  content: {
-    type: 'string',
-    required: true,
-    default: 'Inside of block',
-    text_color: {
-      type: 'string',
-      default: '#ffffff'
-    },
-    bg_color: {
-      type: 'string',
-      default: '#000000'
-    },
-    per_page: {
-      type: 'number',
-      default: 10
-    }
-  }
-};
+const {
+  useSelect
+} = wp.data;
 
-const Edit = _ref => {
-  let {
+const Edit = props => {
+  const {
     attributes,
     setAttributes
-  } = _ref;
+  } = props;
+  const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)();
 
-  const onChangeBGColor = hexColor => {
+  const onChangePostPerPage = value => {
     setAttributes({
-      bg_color: hexColor
+      posts_per_page: value
     });
   };
 
-  const onChangeTextColor = hexColor => {
-    setAttributes({
-      text_color: hexColor
-    });
-  };
-
-  const onChangePostPerPage = perPage => {
-    setAttributes({
-      per_page: perPage
-    });
-  };
-
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)(), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", blockProps, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_5___default()), {
+    block: "yatra/tour",
+    attributes: attributes
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, {
+    key: "setting"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     id: "gutenpride-controls"
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", {
-    className: "block-base-control__label"
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Posts Per Page', 'yatra')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.RangeControl, {
-    label: "Columns",
-    value: attributes.per_page,
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Panel, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Tour Settings', 'yatra'),
+    initialOpen: true
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.RangeControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Number of posts'),
+    value: attributes.posts_per_page,
     onChange: value => onChangePostPerPage(value),
-    min: 2,
-    max: 10
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", {
-    className: "blocks-base-control__label"
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Background color', 'gutenpride')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.ColorPalette // Element Tag for Gutenberg standard colour selector
-  , {
-    onChange: onChangeBGColor // onChange event callback
-
-  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", {
-    className: "blocks-base-control__label"
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Text color', 'gutenpride')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.ColorPalette // Element Tag for Gutenberg standard colour selector
-  , {
-    onChange: onChangeTextColor // onChange event callback
-
-  })))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_template_js__WEBPACK_IMPORTED_MODULE_5__.TourTemplate, null));
+    min: 1,
+    max: 50
+  }))))));
 };
 
 (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_1__.registerBlockType)('yatra/tour', {
-  title: 'Tour',
   apiVersion: 2,
+  title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Tour', 'yatra'),
   description: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('This block is used to show the tour packages of Yatra WordPress plugin.', 'yatra'),
-  category: 'yatra',
   icon: 'dashicons dashicons-palmtree',
-  supports: {
-    html: false
-  },
-  attributes,
-  edit: Edit,
-  save: _ref2 => {
-    let {
-      attributes
-    } = _ref2;
-    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps.save(), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_template_js__WEBPACK_IMPORTED_MODULE_5__.TourTemplate, null));
-  }
+  category: 'yatra',
+  edit: Edit
 });
-
-/***/ }),
-
-/***/ "react":
-/*!************************!*\
-  !*** external "React" ***!
-  \************************/
-/***/ (function(module) {
-
-module.exports = window["React"];
 
 /***/ }),
 
@@ -286,6 +121,16 @@ module.exports = window["wp"]["element"];
 /***/ (function(module) {
 
 module.exports = window["wp"]["i18n"];
+
+/***/ }),
+
+/***/ "@wordpress/server-side-render":
+/*!******************************************!*\
+  !*** external ["wp","serverSideRender"] ***!
+  \******************************************/
+/***/ (function(module) {
+
+module.exports = window["wp"]["serverSideRender"];
 
 /***/ })
 

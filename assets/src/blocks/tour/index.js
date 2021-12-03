@@ -1,89 +1,49 @@
 import {registerBlockType} from "@wordpress/blocks";
 import {InspectorControls, useBlockProps, ColorPalette} from "@wordpress/block-editor";
-import {TextControl, RangeControl} from '@wordpress/components';
+import {Panel, PanelBody, RangeControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
-import {TourTemplate} from "./components/template.js";
+import ServerSideRender from '@wordpress/server-side-render';
+
+const {useSelect} = wp.data;
 
 
-let attributes = {
-    content: {
-        type: 'string',
-        required: true,
-        default: 'Inside of block',
-        text_color: {type: 'string', default: '#ffffff'},
-        bg_color: {type: 'string', default: '#000000'},
-        per_page: {type: 'number', default: 10}
-
-    },
-}
-
-const Edit = ({attributes, setAttributes}) => {
-
-    const onChangeBGColor = (hexColor) => {
-        setAttributes({bg_color: hexColor});
+const Edit = (props) => {
+    const {attributes, setAttributes} = props;
+    const blockProps = useBlockProps();
+    const onChangePostPerPage = (value) => {
+        setAttributes({posts_per_page: value});
     };
-
-    const onChangeTextColor = (hexColor) => {
-        setAttributes({text_color: hexColor});
-    };
-    const onChangePostPerPage = (perPage) => {
-        setAttributes({per_page: perPage});
-
-    }
     return (
-        <div {...useBlockProps()}>
-            <InspectorControls>
+        <div {...blockProps}>
+            <ServerSideRender
+                block="yatra/tour"
+                attributes={attributes}
+            />
+            <InspectorControls key="setting">
                 <div id="gutenpride-controls">
-                    <fieldset>
-                        <legend className="block-base-control__label">
-                            {__('Posts Per Page', 'yatra')}
-                        </legend>
-                        <RangeControl
-                            label="Columns"
-                            value={attributes.per_page}
-                            onChange={(value) => onChangePostPerPage(value)}
-                            min={2}
-                            max={10}/>
-                    </fieldset>
-                    <fieldset>
-                        <legend className="blocks-base-control__label">
-                            {__('Background color', 'gutenpride')}
-                        </legend>
-                        <ColorPalette // Element Tag for Gutenberg standard colour selector
-                            onChange={onChangeBGColor} // onChange event callback
-                        />
-                    </fieldset>
-                    <fieldset>
-                        <legend className="blocks-base-control__label">
-                            {__('Text color', 'gutenpride')}
-                        </legend>
-                        <ColorPalette // Element Tag for Gutenberg standard colour selector
-                            onChange={onChangeTextColor} // onChange event callback
-                        />
-                    </fieldset>
+                    <Panel>
+                        <PanelBody title={__('Tour Settings', 'yatra')} initialOpen={true}>
+
+                            <RangeControl
+                                label={__('Number of posts')}
+                                value={attributes.posts_per_page}
+                                onChange={(value) => onChangePostPerPage(value)}
+                                min={1}
+                                max={50}
+                            />
+                        </PanelBody>
+                    </Panel>
                 </div>
             </InspectorControls>
-            <TourTemplate/>
         </div>
-    )
+    );
 }
+
 registerBlockType('yatra/tour', {
-    title: 'Tour',
     apiVersion: 2,
+    title: __('Tour', 'yatra'),
     description: __('This block is used to show the tour packages of Yatra WordPress plugin.', 'yatra'),
-    category: 'yatra',
     icon: 'dashicons dashicons-palmtree',
-    supports: {
-        html: false,
-    },
-    attributes,
+    category: 'yatra',
     edit: Edit,
-    save: ({attributes}) => {
-        return (
-            <div
-                {...useBlockProps.save()}>
-                <TourTemplate/>
-            </div>
-        );
-    }
 });
