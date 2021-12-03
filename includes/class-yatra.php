@@ -218,7 +218,6 @@ final class Yatra
          * Classes.
          */
         include_once YATRA_ABSPATH . 'includes/class-yatra-modules.php';
-        include_once YATRA_ABSPATH . 'includes/class-yatra-blocks.php';
 
         include_once YATRA_ABSPATH . 'includes/class-yatra-install.php';
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-db.php';

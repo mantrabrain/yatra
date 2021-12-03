@@ -1,1 +1,1 @@
-module.exports = ["coupon", "blocks"];
+module.exports = ["coupon", "block-tour", "block-activity", "block-destination"];
