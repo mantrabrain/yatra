@@ -1,17 +1,17 @@
 import {registerBlockType} from "@wordpress/blocks";
-import {InspectorControls, useBlockProps, ColorPalette} from "@wordpress/block-editor";
-import {Panel, PanelBody, RangeControl} from '@wordpress/components';
+import {InspectorControls, useBlockProps} from "@wordpress/block-editor";
+import {Panel, PanelBody, RangeControl, ToggleControl, SelectControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
-
-const {useSelect} = wp.data;
-
 
 const Edit = (props) => {
     const {attributes, setAttributes} = props;
     const blockProps = useBlockProps();
     const onChangePostPerPage = (value) => {
         setAttributes({posts_per_page: value});
+    };
+    const onFeatureToggleChange = (value) => {
+        setAttributes({featured: value});
     };
     return (
         <div {...blockProps}>
@@ -30,6 +30,22 @@ const Edit = (props) => {
                                 onChange={(value) => onChangePostPerPage(value)}
                                 min={1}
                                 max={50}
+                            />
+                            <ToggleControl
+                                label={__('Show Feature Tour Only', 'yatra')}
+                                checked={attributes.featured}
+                                onChange={(value) => {
+                                    onFeatureToggleChange(value);
+                                }}
+                            />
+                            <SelectControl
+                                label={__('Order', 'yatra')}
+                                value={attributes.order}
+                                options={[
+                                    {label: __('Ascending', 'yatra'), value: 'asc'},
+                                    {label: __('Descending', 'yatra'), value: 'desc'},
+                                ]}
+                                onChange={(order) => setAttributes({order: order})}
                             />
                         </PanelBody>
                     </Panel>

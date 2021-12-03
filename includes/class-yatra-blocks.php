@@ -32,7 +32,7 @@ class Yatra_Blocks
             'attributes' => array(
                 'order' => array(
                     'type' => 'string',
-                    'default' => 'asc'
+                    'default' => 'desc'
                 ),
                 'featured' => array(
                     'type' => 'boolean',

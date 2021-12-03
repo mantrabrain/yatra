@@ -27,9 +27,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const {
-  useSelect
-} = wp.data;
 
 const Edit = props => {
   const {
@@ -41,6 +38,12 @@ const Edit = props => {
   const onChangePostPerPage = value => {
     setAttributes({
       posts_per_page: value
+    });
+  };
+
+  const onFeatureToggleChange = value => {
+    setAttributes({
+      featured: value
     });
   };
 
@@ -60,6 +63,25 @@ const Edit = props => {
     onChange: value => onChangePostPerPage(value),
     min: 1,
     max: 50
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.ToggleControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Show Feature Tour Only', 'yatra'),
+    checked: attributes.featured,
+    onChange: value => {
+      onFeatureToggleChange(value);
+    }
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.SelectControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Order', 'yatra'),
+    value: attributes.order,
+    options: [{
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Ascending', 'yatra'),
+      value: 'asc'
+    }, {
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Descending', 'yatra'),
+      value: 'desc'
+    }],
+    onChange: order => setAttributes({
+      order: order
+    })
   }))))));
 };
 
