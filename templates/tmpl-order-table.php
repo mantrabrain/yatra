@@ -20,7 +20,7 @@
                     <?php
                     $total_price += $item['tour_final_price'];
                     $tour = isset($item['tour']) ? $item['tour'] : array();
-                    echo '<a target="_blank" href="' . esc_url(get_post_permalink($tour->ID)) . '" class="tour-title">' . esc_html($tour->post_title) . '</a>';
+                    echo '<a target="_blank" href="' . esc_url(get_permalink($tour->ID)) . '" class="tour-title">' . esc_html($tour->post_title) . '</a>';
                     ?>
                 </td>
                 <td><span>
