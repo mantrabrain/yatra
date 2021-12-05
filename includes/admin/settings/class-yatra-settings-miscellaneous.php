@@ -103,7 +103,7 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
             ),
             array(
                 'title' => __('Show Enquiry Form', 'yatra'),
-                'desc' => __('Show/hide enquiry form. This can be overridable from availability options.', 'yatra'),
+                'desc' => __('Show/hide enquiry form. You can override this option by enabling enquiry only option from availability menu for specific date or date ranges..', 'yatra'),
                 'id' => 'yatra_enquiry_form_show',
                 'type' => 'checkbox',
                 'default' => 'yes',
