@@ -89,7 +89,9 @@ if (!class_exists('Yatra_Assets')) {
 
                 'thousand_separator' => get_option('yatra_thousand_separator', ','),
 
-                'currency_position' => get_option('yatra_currency_position', 'left')
+                'currency_position' => get_option('yatra_currency_position', 'left'),
+
+                'show_enquiry_form' => get_option('yatra_enquiry_form_show', 'yes')
 
 
             );

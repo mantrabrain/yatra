@@ -80,7 +80,8 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
      */
     public function get_settings($current_section = '')
     {
-
+        $terms_setup_link = admin_url('admin.php?page=yatra-settings&tab=general&section=pages');
+        $privacy_setup_link = admin_url('options-privacy.php');
 
         return apply_filters('yatra_get_settings_' . $this->id, array(
             array(
@@ -99,6 +100,27 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
                     'file' => __('File', 'yatra'),
                     'db' => __('Database', 'yatra'),
                 )
+            ),
+            array(
+                'title' => __('Show Enquiry Form', 'yatra'),
+                'desc' => __('Show/hide enquiry form. This can be overridable from availability options.', 'yatra'),
+                'id' => 'yatra_enquiry_form_show',
+                'type' => 'checkbox',
+                'default' => 'yes',
+            ),
+            array(
+                'title' => __('Show Terms on enquiry form', 'yatra'),
+                'desc' => sprintf(__('Show terms and condition agree checkbox on enquiry form. You can setup terms and conditions page from %s here %s', 'yatra'), "<a target='_blank' href='{$terms_setup_link}'>", '</a>'),
+                'id' => 'yatra_enquiry_form_show_agree_to_terms_policy',
+                'type' => 'checkbox',
+                'default' => 'no',
+            ),
+            array(
+                'title' => __('Show Privacy on enquiry form', 'yatra'),
+                'desc' => sprintf(__('Show privacy policy agree checkbox on enquiry form. You can setup privacy policy page from %s here %s', 'yatra'), "<a target='_blank' href='{$privacy_setup_link}'>", '</a>'),
+                'id' => 'yatra_enquiry_form_show_agree_to_privacy_policy',
+                'type' => 'checkbox',
+                'default' => 'no',
             ),
             array(
                 'type' => 'sectionend',

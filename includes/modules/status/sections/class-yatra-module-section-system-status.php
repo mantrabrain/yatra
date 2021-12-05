@@ -478,7 +478,7 @@ class Yatra_Module_Section_System_Status
                 'block' => '',
             ),
             _x('Terms and conditions', 'Page setting', 'yatra') => array(
-                'option' => 'yatra_termsandconditions_page',
+                'option' => 'yatra_terms_and_conditions_page',
                 'shortcode' => '',
                 'block' => '',
             ),

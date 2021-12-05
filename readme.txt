@@ -142,6 +142,12 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
+= 2.1.5 | 2021/12/05 =
+* Added - Tour, Destination, Activity gutenberg block
+* Added - Terms and conditions, privacy policy option on checkout
+* Added - Terms and conditions, privacy policy on enquiry form
+* Added - Show hide enquiry form
+
 = 2.1.4 | 2021/12/02 =
 * Added - Discount coupon added
 * Fixed - Minor issue fixed

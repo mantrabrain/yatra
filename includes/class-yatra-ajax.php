@@ -544,6 +544,45 @@ class Yatra_Ajax
         if (!$status) {
             wp_send_json_error($this->ajax_error());
         }
+
+        $selected_date = isset($_POST['selected_date']) ? sanitize_text_field($_POST['selected_date']) : '';
+
+        $show_enquiry_form = get_option('yatra_enquiry_form_show', 'true');
+
+        if ($selected_date === '') {
+
+            if ($show_enquiry_form != 'yes') {
+
+                wp_send_json_error(__('Enquiry form is disabled by admin.', 'yatra'));
+
+            }
+        } else {
+
+            $tour_id = $_POST['tour_id'] ? absint($_POST['tour_id']) : 0;
+
+            if ($tour_id > 0) {
+
+                $yatra_tour_options = new Yatra_Tour_Options($tour_id, $selected_date, $selected_date);
+
+                $tourData = $yatra_tour_options->getTodayData($selected_date);
+
+                if ($tourData->getAvailabilityFor($tour_id, $selected_date) !== 'enquiry') {
+
+                    wp_send_json_error(__('Error::Enquiry form is disabled by admin.', 'yatra'));
+
+                }
+            }
+
+        }
+        if (!yatra_privacy_policy_pass('yatra_enquiry_form_show_agree_to_privacy_policy')) {
+
+            wp_send_json_error(__('You must have to agree privacy policy.', 'yatra'));
+        }
+        if (!yatra_terms_and_conditions_pass('yatra_enquiry_form_show_agree_to_terms_policy')) {
+
+            wp_send_json_error(__('You must have to agree terms and conditions.', 'yatra'));
+
+        }
         $status = Yatra_Enquiry_Form::get_instance()->save_enquiry($_POST);
 
         if (yatra()->yatra_error->has_errors()) {

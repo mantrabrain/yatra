@@ -62,6 +62,19 @@ class Yatra_Form_Handler
             );
         }
 
+        if (!yatra_privacy_policy_pass('yatra_checkout_show_agree_to_privacy_policy')) {
+
+            yatra()->yatra_error->add('yatra_form_validation_errors', __('You must have to agree privacy policy', 'yatra'));
+
+            return;
+        }
+        if (!yatra_terms_and_conditions_pass('yatra_checkout_show_agree_to_terms_policy')) {
+
+            yatra()->yatra_error->add('yatra_form_validation_errors', __('You must have to agree terms and conditions.', 'yatra'));
+
+            return;
+        }
+
         $payment_gateway_id = isset($_POST['yatra-payment-gateway']) ? sanitize_text_field($_POST['yatra-payment-gateway']) : 'yatra-not-gateway';
 
         $yatra_get_active_payment_gateways = yatra_get_active_payment_gateways();

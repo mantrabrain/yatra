@@ -559,7 +559,7 @@ class Yatra_Setup_Wizard
         <h1 style="text-align: center;font-weight: bold;text-transform: uppercase;color: #18d0ab;"><?php _e('Compatible Themes for Yatra Plugin', 'yatra'); ?></h1>
         <form method="post">
             <?php
-            //$compatible_themes = apply_filters('yatra_most_compatible_themes', array());
+            //$compatible_themes = apply_filters('yatra_must_compatible_themes', array());
 
             $compatible_themes = array(
                 array(

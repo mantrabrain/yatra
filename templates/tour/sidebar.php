@@ -5,6 +5,8 @@
                 <h2>
                     <?php
 
+                    $show_hide_enquiry_form = get_option('yatra_enquiry_form_show', 'yes');
+                    $enquiry_hide_class = $show_hide_enquiry_form === "no" ? 'yatra-hide' : '';
                     echo esc_html(get_option('yatra_select_date_title', __('Please select date', 'yatra')));
 
                     ?>
@@ -30,7 +32,8 @@
                         <?php echo esc_html(get_option('yatra_booking_form_title_text', __('Booking Form', 'yatra'))); ?>
                     </a>
                 </li>
-                <li class="item" role="presentation">
+                <li class="item yatra-enquiry-form-list <?php echo esc_attr($enquiry_hide_class) ?>"
+                    role="presentation">
                     <a href="#yatra-tour-enquiry-form" role="tab" tabindex="1"
                        aria-controls="yatra-tour-enquiry-form">
                         <?php echo esc_html(get_option('yatra_enquiry_form_title_text', __('Enquiry Form', 'yatra'))); ?>
@@ -48,7 +51,8 @@
                     </div>
                 </div>
             </section>
-            <section id="yatra-tour-enquiry-form" class="yatra-tab-content" role="tabpanel">
+            <section id="yatra-tour-enquiry-form" class="yatra-tab-content <?php echo esc_attr($enquiry_hide_class) ?>"
+                     role="tabpanel">
                 <div class="tab-inner" tabindex="0">
                     <div class="yatra-tour-enquiry-form-section">
                         <div class="sec-row row">

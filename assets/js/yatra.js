@@ -63,7 +63,9 @@ window.yatra_global_tour_additional_price = 0;
 
                 this.$enquiry_form.on('submit', function (e) {
                     e.preventDefault();
-                    var form_data = $(this).serialize();
+                    var selected_date = $('input.yatra-booking-calendar-choosen-date').val();
+                    var form_data = $(this).serializeArray();
+                    form_data.push({name: "selected_date", value: selected_date});
                     $this.sendEnquiry(form_data);
                 });
 
@@ -356,6 +358,19 @@ window.yatra_global_tour_additional_price = 0;
                                     if (data.success) {
                                         $('.yatra-tour-booking-pricing-wrap').html(data.data);
 
+                                        if (yatra_params.show_enquiry_form === 'no') {
+
+                                            $('#yatra-tour-sidebar-tabs').find('li.yatra-enquiry-form-list').addClass('yatra-hide');
+                                            $('#yatra-tour-enquiry-form.yatra-tab-content ').addClass('yatra-hide');
+                                        }
+
+                                        if ($('.yatra-tour-booking-pricing-wrap').find('button.yatra-enquiry-now-btn').length === 1) {
+
+                                            $('#yatra-tour-sidebar-tabs').find('li.yatra-enquiry-form-list').removeClass('yatra-hide');
+                                            $('#yatra-tour-enquiry-form.yatra-tab-content ').removeClass('yatra-hide');
+
+                                        }
+
                                         setTimeout(function () {
                                             tippy('.yatra-tippy-tooltip', {
                                                 allowHTML: true,
@@ -451,7 +466,7 @@ window.yatra_global_tour_additional_price = 0;
 
                             this.changeTab(e);
                         }.bind(this));
-                        this.$tabLink.on('keydown', function () {
+                        this.$tabLink.on('keydown', function (e) {
                             this.changeTabKey(e);
                         }.bind(this));
                     },

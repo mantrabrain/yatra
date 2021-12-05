@@ -129,7 +129,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     'title' => __('Terms and conditions', 'yatra'),
                     'desc' => __('Page for your terms and condition.', 'yatra'),
                     'desc_tip' => true,
-                    'id' => 'yatra_termsandconditions_page',
+                    'id' => 'yatra_terms_and_conditions_page',
                     'type' => 'single_select_page',
                 ),
 
@@ -228,6 +228,22 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     'desc_tip' => true,
                     'id' => 'yatra_order_booking_text',
                     'default' => __('Order Booking', 'yatra'),
+                    'type' => 'text',
+                ),
+                array(
+                    'title' => __('Terms and condition label', 'yatra'),
+                    'desc' => __('This text will show on terms and conditions agreement label.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_terms_and_conditions_agree_label',
+                    'default' => __('Agree to Terms and conditions?', 'yatra'),
+                    'type' => 'text',
+                ),
+                array(
+                    'title' => __('Privacy policy label', 'yatra'),
+                    'desc' => __('This text will show on privacy policy agreement label.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_privacy_policy_agree_label',
+                    'default' => __('Agree to Privacy Policy?', 'yatra'),
                     'type' => 'text',
                 ),
 

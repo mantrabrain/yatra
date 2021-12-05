@@ -345,3 +345,93 @@ if (!function_exists('yatra_tippy_tooltip')) {
         return $tippy_content;
     }
 }
+
+if (!function_exists('yatra_privacy_agreement')) {
+
+    function yatra_privacy_agreement($id)
+    {
+        $id = sanitize_text_field($id);
+
+        $show_privacy_policy = get_option($id, 'no');
+
+        if ('yes' === $show_privacy_policy) {
+
+            $agree_label = get_option('yatra_privacy_policy_agree_label', __('Agree to Privacy Policy?', 'yatra'));
+
+            $privacy_page = absint(get_option('wp_page_for_privacy_policy', 0));
+
+            ob_start();
+            if ($privacy_page > 0) {
+                ?>
+
+                <fieldset id="yatra-privacy-policy-agreement">
+
+                    <div class="yatra-privacy-policy-agreement">
+                        <input name="yatra_agree_to_privacy_policy" class="required" type="checkbox"
+                               id="yatra-agree-to-privacy-policy" value="1"/>
+                        <label for="yatra-agree-to-privacy-policy"><?php echo stripslashes($agree_label); ?></label>
+                        <a href="<?php echo esc_url(get_permalink($privacy_page)) ?>"
+                           target="_blank"><?php echo __('View Privacy Policy', 'yatra') ?></a>
+                    </div>
+
+                </fieldset>
+
+                <?php
+            } else {
+
+                echo '<p class="yatra-warning">';
+                echo __('Privacy policy page is not setup properly.', 'yatra');
+                echo '</p>';
+            }
+            $html_output = ob_get_clean();
+
+            echo apply_filters('yatra_checkout_privacy_policy_agreement_html', $html_output);
+        }
+    }
+}
+
+if (!function_exists('yatra_terms_agreement')) {
+
+    function yatra_terms_agreement($id)
+    {
+        $id = sanitize_text_field($id);
+
+        $show_terms_agreement = get_option($id, 'no');
+
+        if ($show_terms_agreement === 'yes') {
+
+            $agree_label = get_option('yatra_terms_and_conditions_agree_label', __('Agree to Privacy Policy?', 'yatra'));
+
+            $terms_page = absint(get_option('yatra_terms_and_conditions_page', 0));
+
+            ob_start();
+
+            if ($terms_page > 0) {
+                ?>
+
+                <fieldset id="yatra-terms-agreement">
+
+                    <div class="yatra-terms-agreement">
+                        <input name="yatra_agree_to_terms_and_conditions" class="required" type="checkbox"
+                               id="yatra-agree-to-terms" value="1"/>
+                        <label for="yatra-agree-to-terms"><?php echo stripslashes($agree_label); ?></label>
+                        <a href="<?php echo esc_url(get_permalink($terms_page)) ?>"
+                           target="_blank"><?php echo __('View Terms & Conditions', 'yatra') ?></a>
+                    </div>
+
+                </fieldset>
+
+                <?php
+            } else {
+
+                echo '<p class="yatra-warning">';
+                echo __('Terms and conditions page is not setup properly.', 'yatra');
+                echo '</p>';
+            }
+            $html_output = ob_get_clean();
+
+            echo apply_filters('yatra_checkout_terms_and_conditions_agreement_html', $html_output);
+        }
+    }
+}
+

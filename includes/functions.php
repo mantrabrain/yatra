@@ -741,6 +741,7 @@ if (!function_exists('yatra_enable_guest_checkout')) {
 }
 
 if (!function_exists('yatra_payment_gateway_fields')) {
+
     function yatra_payment_gateway_fields()
     {
         $yatra_get_active_payment_gateways = (yatra_get_active_payment_gateways());
@@ -768,6 +769,12 @@ if (!function_exists('yatra_payment_gateway_fields')) {
                     echo '&nbsp;<span>' . $gateway['frontend_title'] . '</span>';
 
                     echo '</label>';
+
+                    echo '<div class="yatra-payment-gateway-field-wrap yatra-payment-gateway-field-' . $gateway_id . '">';
+
+                    do_action('yatra_payment_gateway_field_' . $gateway_id);
+
+                    echo '</div>';
 
                     echo '</li>';
                 }
@@ -1251,5 +1258,49 @@ function yatra_print_js()
         echo apply_filters('yatra_queued_js', $js); //
 
         unset($yatra_queued_js);
+    }
+}
+
+if (!function_exists('yatra_terms_and_conditions_pass')) {
+
+    function yatra_terms_and_conditions_pass($show_terms_option_id)
+    {
+        $show_terms_option_id = sanitize_text_field($show_terms_option_id);
+
+        $agree_terms = get_option($show_terms_option_id, 'no');
+
+        if ($agree_terms === 'yes') {
+
+            $agreed_by_user_value = isset($_POST['yatra_agree_to_terms_and_conditions']) ? absint($_POST['yatra_agree_to_terms_and_conditions']) : 0;
+
+            if ($agreed_by_user_value === 1) {
+
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+}
+
+if (!function_exists('yatra_privacy_policy_pass')) {
+
+    function yatra_privacy_policy_pass($show_privacy_policy_option_id)
+    {
+        $show_privacy_policy_option_id = sanitize_text_field($show_privacy_policy_option_id);
+
+        $agree_privacy = get_option($show_privacy_policy_option_id, 'no');
+
+        if ($agree_privacy === 'yes') {
+
+            $agreed_by_user_value = isset($_POST['yatra_agree_to_privacy_policy']) ? absint($_POST['yatra_agree_to_privacy_policy']) : 0;
+
+            if ($agreed_by_user_value === 1) {
+
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 }

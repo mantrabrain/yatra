@@ -43,8 +43,26 @@ form.yatra-checkout-form {
   .yatra-checkout-review-tour-book-table {
     text-align: center;
   }
+
+
 }
 
 .select2-container {
   max-width: 100%;
+}
+.yatra-privacy-policy-agreement, .yatra-terms-agreement {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 15px;
+
+  label {
+    cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    height: 18px;
+    width: 18px;
+  }
 }
