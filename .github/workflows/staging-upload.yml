@@ -15,7 +15,7 @@ jobs:
           username: ${{ secrets.STAGING_FTP_USERNAME }}
           password: ${{ secrets.STAGING_FTP_PASSWORD }}
           server-dir: public_html/wp-content/plugins/yatra/
-          dangerous-clean-slate: false,
+          dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.git*/**
