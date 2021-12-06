@@ -10,10 +10,13 @@ defined('ABSPATH') || exit;
 
 global $wpdb;
 
+
 $environment = $this->environment();
 $database = $this->get_database_info();
 $post_type_counts = $this->get_post_type_counts();
+
 $active_plugins = $this->get_active_plugins();
+
 $inactive_plugins = $this->get_inactive_plugins();
 $dropins_mu_plugins = $this->get_dropins_mu_plugins();
 $theme = $this->get_theme_info();
