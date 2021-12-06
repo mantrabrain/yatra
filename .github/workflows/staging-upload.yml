@@ -19,8 +19,8 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
-            **/.wordpress.org*
-            **/.wordpress.org*/**
+            **/.wordpress-org*
+            **/.wordpress-org*/**
             **/node_modules/**
             **/assets/src/**
             entryPoints.js

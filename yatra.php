@@ -14,7 +14,7 @@
 
 if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly.
-}g
+}
 // Define YATRA_PLUGIN_FILE.
 if (!defined('YATRA_FILE')) {
 	define('YATRA_FILE', __FILE__);
