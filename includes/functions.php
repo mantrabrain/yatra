@@ -1304,3 +1304,33 @@ if (!function_exists('yatra_privacy_policy_pass')) {
         return true;
     }
 }
+
+
+if (!function_exists('yatra_is_checkout')) {
+
+    function yatra_is_checkout()
+    {
+        global $wp_query;
+
+        $is_object_set = isset($wp_query->queried_object);
+        $is_object_id_set = isset($wp_query->queried_object_id);
+        $is_checkout = is_page(get_option('yatra_checkout_page'));
+
+        if (!$is_object_set) {
+            unset($wp_query->queried_object);
+        } else if (is_singular()) {
+            $content = $wp_query->queried_object->post_content;
+        }
+
+        if (!$is_object_id_set) {
+            unset($wp_query->queried_object_id);
+        }
+
+        // If we know this isn't the primary checkout page, check other methods.
+        if (!$is_checkout && isset($content) && has_shortcode($content, 'yatra_checkout')) {
+            $is_checkout = true;
+        }
+
+        return apply_filters('yatra_is_checkout', $is_checkout);
+    }
+}

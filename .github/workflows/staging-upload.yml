@@ -1,0 +1,18 @@
+on: push
+name: 🚀 Deploy Plugin to Staging Server
+jobs:
+  web-deploy:
+    name: 🎉 Deploy to Staging Server
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v2
+
+      - name: 📂 Upload Files
+        uses: mantrabrain/FTP-Deploy-Action@4.2.0
+        with:
+          server: ${{ secrets.STAGING_FTP }}
+          username: ${{ secrets.STAGING_FTP_USERNAME }}
+          password: ${{ secrets.STAGING_FTP_PASSWORD }}
+          server-dir: public_html/wp-content/plugins/yatra/
+          dangerous-clean-slate: false
