@@ -233,10 +233,10 @@ window.yatra_global_tour_additional_price = 0;
                             var table = response.data.table;
                             cart_form.find('.yatra-cart-table-wrapper').find('table.yatra_cart_table').remove();
                             cart_form.find('.yatra-cart-table-wrapper').append(table)
-                            YatraMessages.showSuccess(el, response.data.message);
+                            window.YatraMessages.showSuccess(el, response.data.message);
 
                         } else {
-                            YatraMessages.showError(el, response.data);
+                            window.YatraMessages.showError(el, response.data);
 
                         }
                         cart_form.find('.yatra-overlay').remove();
@@ -577,7 +577,7 @@ window.yatra_global_tour_additional_price = 0;
     };
 
 
-    var YatraMessages = {
+    window.YatraMessages = {
 
         getMessageHTML: function (messages) {
             var message_html = $("<ul/>");
@@ -593,7 +593,7 @@ window.yatra_global_tour_additional_price = 0;
             }
             return message_html;
         },
-        showError: function (el, messages) {
+        showError: function (el, messages, is_append = true, fade_out_delay = 5000) {
 
             var message_html = this.getMessageHTML(messages);
 
@@ -603,11 +603,18 @@ window.yatra_global_tour_additional_price = 0;
 
             $(el).find('.yatra-message').remove();
 
-            $(el).append(error_html);
+            if (is_append) {
+                $(el).append(error_html);
 
-            $(el).find('.yatra-message').delay(5000).fadeOut(800);
+            } else {
+                $(el).prepend(error_html);
+            }
+            if (fade_out_delay > 0) {
+
+                $(el).find('.yatra-message').delay(fade_out_delay).fadeOut(800);
+            }
         },
-        showSuccess: function (el, messages) {
+        showSuccess: function (el, messages, is_append = true, fade_out_delay = 5000) {
 
             var message_html = this.getMessageHTML(messages);
 
@@ -617,9 +624,16 @@ window.yatra_global_tour_additional_price = 0;
 
             $(el).find('.yatra-message').remove();
 
-            $(el).append(error_html);
+            if (is_append) {
+                $(el).append(error_html);
 
-            $(el).find('.yatra-message').delay(5000).fadeOut(800);
+            } else {
+                $(el).prepend(error_html);
+            }
+
+            if (fade_out_delay > 0) {
+                $(el).find('.yatra-message').delay(fade_out_delay).fadeOut(800);
+            }
         }
     };
 

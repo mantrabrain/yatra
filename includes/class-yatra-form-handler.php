@@ -36,7 +36,6 @@ class Yatra_Form_Handler
             return;
         }
 
-
         if (empty($_POST['action']) || 'yatra_book_selected_tour_nonce' !== $_POST['action']) {
             return;
         }
