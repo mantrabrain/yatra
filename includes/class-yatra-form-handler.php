@@ -28,7 +28,7 @@ class Yatra_Form_Handler
 
     }
 
-    public static function book_selected_tour()
+    public static function book_selected_tour($redirect = true)
     {
         $nonce_value = yatra_get_var($_REQUEST['yatra-book-selected-tour-nonce'], yatra_get_var($_REQUEST['_wpnonce'], '')); // @codingStandardsIgnoreLine.
 
@@ -43,7 +43,6 @@ class Yatra_Form_Handler
         if (yatra_enable_guest_checkout() && !is_user_logged_in()) {
 
             $valid_data = Yatra_Checkout_Form::get_instance()->valid_tour_checkout_form($_POST);
-
 
             if (yatra()->yatra_error->has_errors()) {
 
@@ -88,6 +87,15 @@ class Yatra_Form_Handler
 
         }
 
+        $process_ahead = apply_filters('yatra_process_payment_gateway_' . $payment_gateway_id, true);
+
+        if (!$process_ahead) {
+
+            yatra()->yatra_error->add('yatra_form_validation_errors', __('Can\'t Process the payment', 'yatra'));
+
+            return;
+        }
+
         $yatra_booking = new Yatra_Tour_Booking();
 
         $booking_id = (int)$yatra_booking->book($valid_data);
@@ -102,13 +110,19 @@ class Yatra_Form_Handler
 
             }
 
-            $success_redirect_page_id = get_option('yatra_thankyou_page');
+            if ($redirect) {
 
-            $page_permalink = get_permalink($success_redirect_page_id);
+                $success_redirect_page_id = get_option('yatra_thankyou_page');
 
-            wp_safe_redirect($page_permalink);
+                $page_permalink = get_permalink($success_redirect_page_id);
 
-            exit;
+                wp_safe_redirect($page_permalink);
+
+                exit;
+
+            } else {
+                return $booking_id;
+            }
         }
         $message = __('Something went wrong! Booking could not complete. Please try again later', 'yatra');
 
