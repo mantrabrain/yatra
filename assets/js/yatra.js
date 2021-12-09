@@ -597,7 +597,7 @@ window.yatra_global_tour_additional_price = 0;
 
             var message_html = this.getMessageHTML(messages);
 
-            var error_html = $('<div class="yatra-message yatra-error"/>');
+            var error_html = $('<div class="yatra-message yatra-error" id="yatra-message"/>');
 
             error_html.append(message_html);
 
@@ -609,16 +609,21 @@ window.yatra_global_tour_additional_price = 0;
             } else {
                 $(el).prepend(error_html);
             }
+            document.getElementById("yatra-message").scrollIntoView();
+
             if (fade_out_delay > 0) {
 
-                $(el).find('.yatra-message').delay(fade_out_delay).fadeOut(800);
+                $(el).find('.yatra-message').delay(fade_out_delay).fadeOut(800, function () {
+                    $(this).remove()
+                });
             }
+
         },
         showSuccess: function (el, messages, is_append = true, fade_out_delay = 5000) {
 
             var message_html = this.getMessageHTML(messages);
 
-            var error_html = $('<div class="yatra-message yatra-success"/>');
+            var error_html = $('<div class="yatra-message yatra-success" id="yatra-message"/>');
 
             error_html.append(message_html);
 
@@ -630,10 +635,15 @@ window.yatra_global_tour_additional_price = 0;
             } else {
                 $(el).prepend(error_html);
             }
+            document.getElementById("yatra-message").scrollIntoView();
 
             if (fade_out_delay > 0) {
-                $(el).find('.yatra-message').delay(fade_out_delay).fadeOut(800);
+                $(el).find('.yatra-message').delay(fade_out_delay).fadeOut(800, function () {
+                    $(this).remove()
+                });
             }
+
+
         }
     };
 
