@@ -209,7 +209,9 @@ if (!function_exists('yatra_account_bookings')) {
                 $booking_detail->booking_code = $booking_meta_params['booking_code'];
                 $booking_detail->booking_date = $booking_meta_params['booking_date'];
                 $booking_detail->booking_total = $booking_meta_params['total_booking_net_price'];
-                $booking_detail->booking_currency_symbol = $booking_meta_params['currency_symbol'];
+                $currency = $booking_meta_params['currency'] ?? '';
+                $currency = $booking_meta_params['yatra_currency'] ?? $currency;
+                $booking_detail->booking_currency_symbol = yatra_get_current_currency_symbol($currency);
                 $booking_detail->number_of_tours = count($yatra_booking_meta);
                 $booking_detail->coupon = isset($booking_meta_params['coupon']) ? $booking_meta_params['coupon'] : array();
 

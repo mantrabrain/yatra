@@ -101,11 +101,13 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
         public function tour_item($booking)
         {
             $booking['yatra_selected_date'] = isset($booking['yatra_selected_date']) ? $booking['yatra_selected_date'] : '';
+            $currency = isset($booking['yatra_currency']) ? $booking['yatra_currency'] : '';
+            $currency_symbol = yatra_get_current_currency_symbol($currency);
             $total_tour_final_price = !isset($booking['total_tour_final_price']) ? $booking['total_tour_price'] : $booking['total_tour_final_price'];
             echo '<div class="yatra-tour-booking-info-item">';
             echo '<h2 class="tour-name">Tour: ' . esc_html($booking['yatra_tour_name']) . '</h2>';
             echo '<span class="booking-date">Booking Date: ' . esc_html($booking['yatra_selected_date']) . '</span>';
-            echo '<span class="price">Booking Total: ' . esc_html(yatra_get_price($booking['yatra_currency_symbol'], $total_tour_final_price)) . '</span>';
+            echo '<span class="price">Booking Total: ' . esc_html(yatra_get_price($currency_symbol, $total_tour_final_price)) . '</span>';
             echo '</div>';
 
         }
@@ -122,7 +124,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                 <th><?php echo __('Sales Price', 'yatra'); ?></th>
                 <th><?php echo __('Price Per', 'yatra'); ?></th>
                 <th><?php echo __('Group Size', 'yatra'); ?></th>
-                <th><?php echo __('Toal Price', 'yatra'); ?></th>
+                <th><?php echo __('Total Price', 'yatra'); ?></th>
             </tr>
             </thead>
             <tbody>
@@ -140,7 +142,9 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
             $total_tour_price = isset($booking['total_tour_price']) ? $booking['total_tour_price'] : null;
 
-            $yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['yatra_currency_symbol'] : '';
+            $currency = isset($booking['yatra_currency']) ? $booking['yatra_currency'] : '';
+
+            $yatra_currency_symbol = yatra_get_current_currency_symbol($currency);
 
             $durations = isset($booking['yatra_selected_date']) ? $booking['yatra_selected_date'] : '';
 
@@ -204,10 +208,15 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
         public function customer_info($booking_id, $args, $yatra_tour_customer_info, $yatra_booking_meta_params)
         {
-            $currency_symbol = isset($yatra_booking_meta_params['currency_symbol']) ? $yatra_booking_meta_params['currency_symbol'] : '';
+
+            $currency = isset($yatra_booking_meta_params['currency']) ? $yatra_booking_meta_params['currency'] : '';
+
+            $currency = isset($yatra_booking_meta_params['yatra_currency']) ? $yatra_booking_meta_params['yatra_currency'] : $currency;
+
+            $currency_symbol = yatra_get_current_currency_symbol($currency);
 
             $coupon = isset($yatra_booking_meta_params['coupon']) ? $yatra_booking_meta_params['coupon'] : array();
-            
+
             if (isset($coupon['id'])) {
                 ?>
                 <h2><?php echo __('Discount Code:', 'yatra') . '<span style="text-transform:none;margin-left:20px">' . esc_html($coupon['code']) . '</span>'; ?></h2>

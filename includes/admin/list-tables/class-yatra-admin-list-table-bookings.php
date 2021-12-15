@@ -277,7 +277,11 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
 
         $total_booking_price = isset($this->booking_meta_params['total_booking_net_price']) ? $this->booking_meta_params['total_booking_net_price'] : '';
 
-        $yatra_currency_symbol = isset($this->booking_meta_params['currency_symbol']) ? $this->booking_meta_params['currency_symbol'] : yatra_get_current_currency_symbol();
+        $currency = $this->booking_meta_params['currency'] ?? '';
+        
+        $currency = $this->booking_meta_params['yatra_currency'] ?? $currency;
+
+        $yatra_currency_symbol = yatra_get_current_currency_symbol($currency);
 
         $price = yatra_get_price($yatra_currency_symbol, $total_booking_price);
 

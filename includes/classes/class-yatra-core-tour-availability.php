@@ -445,7 +445,7 @@ class Yatra_Core_Tour_Availability
 
         $currency = yatra_get_current_currency();
 
-        $currency_symbol = yatra_get_currency_symbols($currency);
+        $currency_symbol = yatra_get_currency_symbol($currency);
 
         $template = '';
 
