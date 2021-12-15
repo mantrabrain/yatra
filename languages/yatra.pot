@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.4\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-03 14:55:32+00:00\n"
+"POT-Creation-Date: 2021-12-15 13:58:38+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -431,7 +431,7 @@ msgid "When you get new customer, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:123
-#: includes/modules/status/templates/html-admin-page-status-report.php:864
+#: includes/modules/status/templates/html-admin-page-status-report.php:867
 #: templates/myaccount/tmpl-dashboard.php:23
 msgid "Name"
 msgstr ""
@@ -518,20 +518,40 @@ msgid "Checkout"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-checkout.php:42
-#: includes/admin/settings/class-yatra-settings-checkout.php:87
+#: includes/admin/settings/class-yatra-settings-checkout.php:89
 msgid "Checkout Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-checkout.php:93
+#: includes/admin/settings/class-yatra-settings-checkout.php:95
 #: includes/admin/setup/class-yatra-setup-wizard.php:511
 msgid "Enable Guest Checkout"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-checkout.php:94
+#: includes/admin/settings/class-yatra-settings-checkout.php:96
 #: includes/admin/settings/class-yatra-settings-frontend-tabs.php:95
 msgid ""
 "This option allows you to checkout without login. User will not created if "
 "you tick this option.."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-checkout.php:102
+msgid "Show Terms on checkout"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-checkout.php:103
+msgid ""
+"Show terms and condition agree checkbox on checkout page. You can setup "
+"terms and conditions page from %s here %s"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-checkout.php:109
+msgid "Show Privacy Policy"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-checkout.php:110
+msgid ""
+"Show privacy policy agree checkbox on checkout page. You can setup privacy "
+"policy page from %s here %s"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-design.php:29
@@ -782,7 +802,7 @@ msgid "Title for booking form"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:173
-#: templates/tour/sidebar.php:30
+#: templates/tour/sidebar.php:32
 msgid "Booking Form"
 msgstr ""
 
@@ -795,7 +815,7 @@ msgid "Title for enquiry form"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:181
-#: templates/tour/sidebar.php:36
+#: templates/tour/sidebar.php:39
 msgid "Enquiry Form"
 msgstr ""
 
@@ -805,7 +825,7 @@ msgid "Enquiry Button Text"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:190
-#: templates/tour/enquiry-button.php:2 templates/tour/enquiry-form.php:14
+#: templates/tour/enquiry-button.php:2 templates/tour/enquiry-form.php:18
 msgid "Send Enquiry"
 msgstr ""
 
@@ -815,7 +835,7 @@ msgid "Select Date Title"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:198
-#: templates/tour/sidebar.php:8
+#: templates/tour/sidebar.php:10
 msgid "Please select date"
 msgstr ""
 
@@ -872,53 +892,78 @@ msgstr ""
 msgid "Order Booking"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:239
+#: includes/admin/settings/class-yatra-settings-general.php:234
+msgid "Terms and condition label"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:235
+msgid "This text will show on terms and conditions agreement label."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:238
+msgid "Agree to Terms and conditions?"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:242
+msgid "Privacy policy label"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:243
+msgid "This text will show on privacy policy agreement label."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:246
+#: includes/yatra-html-functions.php:359 includes/yatra-html-functions.php:403
+msgid "Agree to Privacy Policy?"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-general.php:255
 msgid "Currency Options"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:247
+#: includes/admin/settings/class-yatra-settings-general.php:263
 msgid "Currency & symbol"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:248
+#: includes/admin/settings/class-yatra-settings-general.php:264
 msgid "Currency for price of tour and other pricing parts."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:256
-#: includes/modules/status/templates/html-admin-page-status-report.php:767
+#: includes/admin/settings/class-yatra-settings-general.php:272
+#: includes/modules/status/templates/html-admin-page-status-report.php:770
 msgid "Currency position"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:257
+#: includes/admin/settings/class-yatra-settings-general.php:273
 #: includes/admin/setup/class-yatra-setup-wizard.php:267
 msgid "Currency symbol position."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:265
+#: includes/admin/settings/class-yatra-settings-general.php:281
 #: includes/admin/setup/class-yatra-setup-wizard.php:273
 msgid "Thousand Separator"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:266
+#: includes/admin/settings/class-yatra-settings-general.php:282
 #: includes/admin/setup/class-yatra-setup-wizard.php:280
 msgid "Thousand separator for price."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:273
+#: includes/admin/settings/class-yatra-settings-general.php:289
 msgid "Number of Decimals"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:274
+#: includes/admin/settings/class-yatra-settings-general.php:290
 #: includes/admin/setup/class-yatra-setup-wizard.php:294
 msgid "Number of decimals shown in price."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:281
+#: includes/admin/settings/class-yatra-settings-general.php:297
 #: includes/admin/setup/class-yatra-setup-wizard.php:300
 msgid "Decimal Separator"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-general.php:282
+#: includes/admin/settings/class-yatra-settings-general.php:298
 msgid "Decimal separator for price."
 msgstr ""
 
@@ -928,32 +973,62 @@ msgid "Miscellaneous"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-miscellaneous.php:42
-#: includes/admin/settings/class-yatra-settings-miscellaneous.php:87
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:88
 msgid "Miscellaneous Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-miscellaneous.php:92
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:93
 msgid "Log Options"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-miscellaneous.php:93
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:94
 msgid ""
 "This option allows you to setup log option for yatra plugin. Log option "
 "might be on file or on db."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-miscellaneous.php:99
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:100
 msgid "File"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-miscellaneous.php:100
-#: includes/modules/status/templates/html-admin-page-status-report.php:508
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:101
+#: includes/modules/status/templates/html-admin-page-status-report.php:511
 msgid "Database"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:105
+msgid "Show Enquiry Form"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:106
+msgid ""
+"Show/hide enquiry form. You can override this option by enabling enquiry "
+"only option from availability menu for specific date or date ranges.."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:112
+msgid "Show Terms on enquiry form"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:113
+msgid ""
+"Show terms and condition agree checkbox on enquiry form. You can setup "
+"terms and conditions page from %s here %s"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:119
+msgid "Show Privacy on enquiry form"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:120
+msgid ""
+"Show privacy policy agree checkbox on enquiry form. You can setup privacy "
+"policy page from %s here %s"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:101
-#: includes/functions.php:752
+#: includes/functions.php:753
 msgid "Payment Gateways"
 msgstr ""
 
@@ -1027,7 +1102,7 @@ msgid "Not right now"
 msgstr ""
 
 #: includes/admin/setup/class-yatra-setup-wizard.php:244
-#: includes/modules/status/templates/html-admin-page-status-report.php:759
+#: includes/modules/status/templates/html-admin-page-status-report.php:762
 msgid "Currency"
 msgstr ""
 
@@ -1040,7 +1115,7 @@ msgid "Currency Position"
 msgstr ""
 
 #: includes/admin/setup/class-yatra-setup-wizard.php:286
-#: includes/modules/status/templates/html-admin-page-status-report.php:788
+#: includes/modules/status/templates/html-admin-page-status-report.php:791
 msgid "Number of decimals"
 msgstr ""
 
@@ -1338,7 +1413,7 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-yatra-ajax.php:53 includes/class-yatra-ajax.php:554
+#: includes/class-yatra-ajax.php:53 includes/class-yatra-ajax.php:593
 msgid "Something wrong, please try again."
 msgstr ""
 
@@ -1363,6 +1438,22 @@ msgid "File upload failed. Please try again."
 msgstr ""
 
 #: includes/class-yatra-ajax.php:556
+msgid "Enquiry form is disabled by admin."
+msgstr ""
+
+#: includes/class-yatra-ajax.php:570
+msgid "Error::Enquiry form is disabled by admin."
+msgstr ""
+
+#: includes/class-yatra-ajax.php:579
+msgid "You must have to agree privacy policy."
+msgstr ""
+
+#: includes/class-yatra-ajax.php:583 includes/class-yatra-form-handler.php:71
+msgid "You must have to agree terms and conditions."
+msgstr ""
+
+#: includes/class-yatra-ajax.php:595
 msgid "Thank you for your query. We will get back to you soon"
 msgstr ""
 
@@ -1495,35 +1586,43 @@ msgstr ""
 msgid "Number of Children"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:73
+#: includes/class-yatra-form-handler.php:65
+msgid "You must have to agree privacy policy"
+msgstr ""
+
+#: includes/class-yatra-form-handler.php:84
 msgid "Please select at least one payment gateway"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:101
+#: includes/class-yatra-form-handler.php:94
+msgid "Can't Process the payment"
+msgstr ""
+
+#: includes/class-yatra-form-handler.php:127
 msgid "Something went wrong! Booking could not complete. Please try again later"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:164
+#: includes/class-yatra-form-handler.php:190
 msgid "User profile successfully updated."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:203
+#: includes/class-yatra-form-handler.php:229
 msgid "Old Password doesn't match"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:221
+#: includes/class-yatra-form-handler.php:247
 msgid "Password successfully changed."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:248
+#: includes/class-yatra-form-handler.php:274
 msgid "Username is required."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:312
+#: includes/class-yatra-form-handler.php:338
 msgid "Email or Usrename already exists, please try again.."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:345
+#: includes/class-yatra-form-handler.php:371
 msgid "Something wrong on registration, please check all form fields once."
 msgstr ""
 
@@ -1945,11 +2044,11 @@ msgstr ""
 msgid "Edit <span class=\"screen-reader-text\">%s</span>"
 msgstr ""
 
-#: includes/functions.php:1091 includes/template-tags.php:862
+#: includes/functions.php:1098 includes/template-tags.php:862
 msgid "Guest"
 msgstr ""
 
-#: includes/functions.php:1214
+#: includes/functions.php:1221
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
 msgstr ""
@@ -3011,32 +3110,32 @@ msgstr ""
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:578
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:581
 msgid "cURL installed but unable to retrieve version."
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:681
-#: includes/modules/status/templates/html-admin-page-status-report.php:732
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:684
+#: includes/modules/status/templates/html-admin-page-status-report.php:735
 msgid "Visit plugin homepage"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:690
-#: includes/modules/status/templates/html-admin-page-status-report.php:875
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:693
+#: includes/modules/status/templates/html-admin-page-status-report.php:878
 #. translators: 1: current version. 2: latest version
 msgid "%1$s (update to version %2$s is available)"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:694
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:697
 msgid "Network enabled"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:702
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:705
 #. translators: %s: version
 msgid "Installed version not tested with active version of Yatra %s"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:713
-#: includes/modules/status/templates/html-admin-page-status-report.php:741
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:716
+#: includes/modules/status/templates/html-admin-page-status-report.php:744
 #. translators: %s: plugin author
 msgid "by %s"
 msgstr ""
@@ -3071,144 +3170,144 @@ msgstr ""
 msgid "There are currently no logs to view."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:32
+#: includes/modules/status/templates/html-admin-page-status-report.php:35
 msgid "WordPress Environment"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:37
+#: includes/modules/status/templates/html-admin-page-status-report.php:40
 msgid "WordPress address (URL)"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:39
+#: includes/modules/status/templates/html-admin-page-status-report.php:42
 msgid "The root URL of your site."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:45
+#: includes/modules/status/templates/html-admin-page-status-report.php:48
 msgid "Site address (URL)"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:48
+#: includes/modules/status/templates/html-admin-page-status-report.php:51
 msgid "The homepage URL of your site"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:54
+#: includes/modules/status/templates/html-admin-page-status-report.php:57
 msgid "Yatra version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:57
+#: includes/modules/status/templates/html-admin-page-status-report.php:60
 msgid "The version of Yatra installed on your site"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:64
+#: includes/modules/status/templates/html-admin-page-status-report.php:67
 msgid "Log directory writable"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:68
+#: includes/modules/status/templates/html-admin-page-status-report.php:71
 msgid ""
 "Several Yatra addons can write logs which makes debugging problems easier. "
 "The directory must be writable for this to happen"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:77
+#: includes/modules/status/templates/html-admin-page-status-report.php:80
 #. Translators: %1$s: Log directory, %2$s: Log directory constant
 msgid "To allow logging, make %1$s writable or define a custom %2$s."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:83
+#: includes/modules/status/templates/html-admin-page-status-report.php:86
 msgid "WordPress version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:86
+#: includes/modules/status/templates/html-admin-page-status-report.php:89
 msgid "The version of WordPress installed on your site."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:107
+#: includes/modules/status/templates/html-admin-page-status-report.php:110
 #. Translators: %1$s: Current version, %2$s: New version
 msgid "%1$s - There is a newer version of WordPress available (%2$s)"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:115
+#: includes/modules/status/templates/html-admin-page-status-report.php:118
 msgid "WordPress multisite"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:118
+#: includes/modules/status/templates/html-admin-page-status-report.php:121
 msgid "Whether or not you have WordPress Multisite enabled."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:124
+#: includes/modules/status/templates/html-admin-page-status-report.php:127
 msgid "WordPress memory limit"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:127
+#: includes/modules/status/templates/html-admin-page-status-report.php:130
 msgid "The maximum amount of memory (RAM) that your site can use at one time."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:134
+#: includes/modules/status/templates/html-admin-page-status-report.php:137
 #. Translators: %1$s: Memory limit, %2$s: Docs link.
 msgid "%1$s - We recommend setting memory to at least 64MB. See: %2$s"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:134
+#: includes/modules/status/templates/html-admin-page-status-report.php:137
 msgid "Increasing memory allocated to PHP"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:142
+#: includes/modules/status/templates/html-admin-page-status-report.php:145
 msgid "WordPress debug mode"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:146
+#: includes/modules/status/templates/html-admin-page-status-report.php:149
 msgid "Displays whether or not WordPress is in Debug Mode."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:158
+#: includes/modules/status/templates/html-admin-page-status-report.php:161
 msgid "WordPress cron"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:161
+#: includes/modules/status/templates/html-admin-page-status-report.php:164
 msgid "Displays whether or not WP Cron Jobs are enabled."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:173
+#: includes/modules/status/templates/html-admin-page-status-report.php:176
 msgid "Language"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:176
+#: includes/modules/status/templates/html-admin-page-status-report.php:179
 msgid "The current language used by WordPress. Default = English."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:182
+#: includes/modules/status/templates/html-admin-page-status-report.php:185
 msgid "External object cache"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:185
+#: includes/modules/status/templates/html-admin-page-status-report.php:188
 msgid "Displays whether or not WordPress is using an external object cache."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:202
+#: includes/modules/status/templates/html-admin-page-status-report.php:205
 msgid "Server Environment"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:207
+#: includes/modules/status/templates/html-admin-page-status-report.php:210
 msgid "Server info"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:210
+#: includes/modules/status/templates/html-admin-page-status-report.php:213
 msgid "Information about the web server that is currently hosting your site."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:216
+#: includes/modules/status/templates/html-admin-page-status-report.php:219
 msgid "PHP version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:219
+#: includes/modules/status/templates/html-admin-page-status-report.php:222
 msgid "The version of PHP installed on your hosting server."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:227
+#: includes/modules/status/templates/html-admin-page-status-report.php:230
 msgid "How to update your PHP version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:231
+#: includes/modules/status/templates/html-admin-page-status-report.php:234
 msgid ""
 "Yatra will run under this version of PHP, however, some features such as "
 "geolocation are not compatible. Support for this version will be dropped in "
@@ -3216,60 +3315,60 @@ msgid ""
 "greater performance and security."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:233
+#: includes/modules/status/templates/html-admin-page-status-report.php:236
 msgid ""
 "Yatra will run under this version of PHP, however, it has reached end of "
 "life. We recommend using PHP version 7.2 or above for greater performance "
 "and security."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:235
+#: includes/modules/status/templates/html-admin-page-status-report.php:238
 msgid ""
 "We recommend using PHP version 7.2 or above for greater performance and "
 "security."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:246
+#: includes/modules/status/templates/html-admin-page-status-report.php:249
 msgid "PHP post max size"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:249
+#: includes/modules/status/templates/html-admin-page-status-report.php:252
 msgid "The largest filesize that can be contained in one post."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:255
+#: includes/modules/status/templates/html-admin-page-status-report.php:258
 msgid "PHP time limit"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:258
+#: includes/modules/status/templates/html-admin-page-status-report.php:261
 msgid ""
 "The amount of time (in seconds) that your site will spend on a single "
 "operation before timing out (to avoid server lockups)."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:264
+#: includes/modules/status/templates/html-admin-page-status-report.php:267
 msgid "PHP max input vars"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:267
+#: includes/modules/status/templates/html-admin-page-status-report.php:270
 msgid ""
 "The maximum number of variables your server can use for a single function "
 "to avoid overloads."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:273
+#: includes/modules/status/templates/html-admin-page-status-report.php:276
 msgid "cURL version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:276
+#: includes/modules/status/templates/html-admin-page-status-report.php:279
 msgid "The version of cURL installed on your server."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:282
+#: includes/modules/status/templates/html-admin-page-status-report.php:285
 msgid "SUHOSIN installed"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:285
+#: includes/modules/status/templates/html-admin-page-status-report.php:288
 msgid ""
 "Suhosin is an advanced protection system for PHP installations. It was "
 "designed to protect your servers on the one hand against a number of well "
@@ -3279,191 +3378,191 @@ msgid ""
 "its data submission limits."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:297
+#: includes/modules/status/templates/html-admin-page-status-report.php:300
 msgid "MySQL version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:301
+#: includes/modules/status/templates/html-admin-page-status-report.php:304
 msgid "The version of MySQL installed on your hosting server."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:308
+#: includes/modules/status/templates/html-admin-page-status-report.php:311
 #. Translators: %1$s: MySQL version, %2$s: Recommended MySQL version.
 msgid "%1$s - We recommend a minimum MySQL version of 5.6. See: %2$s"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:308
+#: includes/modules/status/templates/html-admin-page-status-report.php:311
 msgid "WordPress requirements"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:317
+#: includes/modules/status/templates/html-admin-page-status-report.php:320
 msgid "Max upload size"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:320
+#: includes/modules/status/templates/html-admin-page-status-report.php:323
 msgid "The largest filesize that can be uploaded to your WordPress installation."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:326
+#: includes/modules/status/templates/html-admin-page-status-report.php:329
 msgid "Default timezone is UTC"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:331
+#: includes/modules/status/templates/html-admin-page-status-report.php:334
 msgid "The default timezone for your server."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:338
+#: includes/modules/status/templates/html-admin-page-status-report.php:341
 #. Translators: %s: default timezone..
 msgid "Default timezone is %s - it should be UTC"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:346
+#: includes/modules/status/templates/html-admin-page-status-report.php:349
 msgid "fsockopen/cURL"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:349
+#: includes/modules/status/templates/html-admin-page-status-report.php:352
 msgid ""
 "Payment gateways can use cURL to communicate with remote servers to "
 "authorize payments, other plugins may also use it when communicating with "
 "remote services."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:357
+#: includes/modules/status/templates/html-admin-page-status-report.php:360
 msgid ""
 "Your server does not have fsockopen or cURL enabled - PayPal IPN and other "
 "scripts which communicate with other servers will not work. Contact your "
 "hosting provider."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:363
+#: includes/modules/status/templates/html-admin-page-status-report.php:366
 msgid "SoapClient"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:367
+#: includes/modules/status/templates/html-admin-page-status-report.php:370
 msgid ""
 "Some webservices like shipping use SOAP to get information from remote "
 "servers, for example, live shipping quotes from FedEx require SOAP to be "
 "installed."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:376
+#: includes/modules/status/templates/html-admin-page-status-report.php:379
 #. Translators: %s classname and link.
 msgid "Your server does not have the %s class enabled."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:382
+#: includes/modules/status/templates/html-admin-page-status-report.php:385
 msgid "DOMDocument"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:385
+#: includes/modules/status/templates/html-admin-page-status-report.php:388
 msgid "HTML/Multipart emails use DOMDocument to generate inline CSS in templates."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:394
+#: includes/modules/status/templates/html-admin-page-status-report.php:397
 #. Translators: %s: classname and link.
 msgid ""
 "Your server does not have the %s class enabled - HTML/Multipart emails, and "
 "also some extensions, will not work without DOMDocument."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:400
+#: includes/modules/status/templates/html-admin-page-status-report.php:403
 msgid "GZip"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:403
+#: includes/modules/status/templates/html-admin-page-status-report.php:406
 msgid "GZip (gzopen) is used to open the GEOIP database from MaxMind."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:412
+#: includes/modules/status/templates/html-admin-page-status-report.php:415
 #. Translators: %s: classname and link.
 msgid ""
 "Your server does not support the %s function - this is required to use the "
 "GeoIP database from MaxMind."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:418
+#: includes/modules/status/templates/html-admin-page-status-report.php:421
 msgid "Multibyte string"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:421
+#: includes/modules/status/templates/html-admin-page-status-report.php:424
 msgid ""
 "Multibyte String (mbstring) is used to convert character encoding, like for "
 "emails or converting characters to lowercase."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:430
+#: includes/modules/status/templates/html-admin-page-status-report.php:433
 #. Translators: %s: classname and link.
 msgid ""
 "Your server does not support the %s functions - this is required for better "
 "character encoding. Some fallbacks will be used instead for it."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:436
+#: includes/modules/status/templates/html-admin-page-status-report.php:439
 msgid "Remote post"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:439
+#: includes/modules/status/templates/html-admin-page-status-report.php:442
 msgid ""
 "PayPal uses this method of communicating when sending back transaction "
 "information."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:448
-#: includes/modules/status/templates/html-admin-page-status-report.php:466
+#: includes/modules/status/templates/html-admin-page-status-report.php:451
+#: includes/modules/status/templates/html-admin-page-status-report.php:469
 #. Translators: %s: function name.
 msgid "%s failed. Contact your hosting provider."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:454
+#: includes/modules/status/templates/html-admin-page-status-report.php:457
 msgid "Remote get"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:457
+#: includes/modules/status/templates/html-admin-page-status-report.php:460
 msgid ""
 "Yatra plugins may use this method of communication when checking for plugin "
 "updates."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:517
+#: includes/modules/status/templates/html-admin-page-status-report.php:520
 msgid "Database prefix"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:523
+#: includes/modules/status/templates/html-admin-page-status-report.php:526
 #. Translators: %1$s: Database prefix, %2$s: Docs link.
 msgid "%1$s - We recommend using a prefix with less than 20 characters. See: %2$s"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:523
+#: includes/modules/status/templates/html-admin-page-status-report.php:526
 msgid "How to update your database table prefix"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:533
+#: includes/modules/status/templates/html-admin-page-status-report.php:536
 msgid "Total Database Size"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:539
+#: includes/modules/status/templates/html-admin-page-status-report.php:542
 msgid "Database Data Size"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:545
+#: includes/modules/status/templates/html-admin-page-status-report.php:548
 msgid "Database Index Size"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:559
+#: includes/modules/status/templates/html-admin-page-status-report.php:562
 msgid "Table does not exist"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:562
-#: includes/modules/status/templates/html-admin-page-status-report.php:576
+#: includes/modules/status/templates/html-admin-page-status-report.php:565
+#: includes/modules/status/templates/html-admin-page-status-report.php:579
 #. Translators: %1$f: Table size, %2$f: Index size, %3$s Engine.
 msgid "Data: %1$.2fMB + Index: %2$.2fMB + Engine %3$s"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:583
+#: includes/modules/status/templates/html-admin-page-status-report.php:586
 msgid "Database information:"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:587
+#: includes/modules/status/templates/html-admin-page-status-report.php:590
 msgid ""
 "Unable to retrieve database information. Usually, this is not a problem, "
 "and it only means that your install is using a class that replaces the "
@@ -3471,160 +3570,160 @@ msgid ""
 "database information."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:602
+#: includes/modules/status/templates/html-admin-page-status-report.php:605
 msgid "Post Type Counts"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:623
+#: includes/modules/status/templates/html-admin-page-status-report.php:626
 msgid "Security"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:628
+#: includes/modules/status/templates/html-admin-page-status-report.php:631
 msgid "Secure connection (HTTPS)"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:633
+#: includes/modules/status/templates/html-admin-page-status-report.php:636
 msgid "Is the connection to your site secure?"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:642
+#: includes/modules/status/templates/html-admin-page-status-report.php:645
 #. Translators: %s: docs link.
 msgid "Your site is not using HTTPS"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:649
+#: includes/modules/status/templates/html-admin-page-status-report.php:652
 msgid "Hide errors from visitors"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:651
+#: includes/modules/status/templates/html-admin-page-status-report.php:654
 msgid ""
 "Error messages can contain sensitive information about your site "
 "environment. These should be hidden from untrusted visitors."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:658
+#: includes/modules/status/templates/html-admin-page-status-report.php:661
 msgid "Error messages should not be shown to visitors."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:669
+#: includes/modules/status/templates/html-admin-page-status-report.php:672
 msgid "Active Plugins"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:680
+#: includes/modules/status/templates/html-admin-page-status-report.php:683
 msgid "Inactive Plugins"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:696
+#: includes/modules/status/templates/html-admin-page-status-report.php:699
 msgid "Dropin Plugins"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:723
+#: includes/modules/status/templates/html-admin-page-status-report.php:726
 msgid "Must Use Plugins"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:754
+#: includes/modules/status/templates/html-admin-page-status-report.php:757
 msgid "Settings"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:761
+#: includes/modules/status/templates/html-admin-page-status-report.php:764
 msgid ""
 "What currency prices are listed and which currency gateways will take "
 "payments in."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:769
+#: includes/modules/status/templates/html-admin-page-status-report.php:772
 msgid "The position of the currency symbol."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:774
+#: includes/modules/status/templates/html-admin-page-status-report.php:777
 msgid "Thousand separator"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:776
+#: includes/modules/status/templates/html-admin-page-status-report.php:779
 msgid "The thousand separator of displayed prices."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:781
+#: includes/modules/status/templates/html-admin-page-status-report.php:784
 msgid "Decimal separator"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:783
+#: includes/modules/status/templates/html-admin-page-status-report.php:786
 msgid "The decimal separator of displayed prices."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:790
+#: includes/modules/status/templates/html-admin-page-status-report.php:793
 msgid "The number of decimal points shown in displayed prices."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:800
+#: includes/modules/status/templates/html-admin-page-status-report.php:803
 msgid "Yatra Pages"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:812
+#: includes/modules/status/templates/html-admin-page-status-report.php:815
 #. Translators: %s: page name.
 msgid "Edit %s page"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:822
+#: includes/modules/status/templates/html-admin-page-status-report.php:825
 #. Translators: %s: page name.
 msgid "The URL of your %s page (along with the Page ID)."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:827
+#: includes/modules/status/templates/html-admin-page-status-report.php:830
 msgid "Page not set"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:830
+#: includes/modules/status/templates/html-admin-page-status-report.php:833
 msgid "Page ID is set, but the page does not exist"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:834
+#: includes/modules/status/templates/html-admin-page-status-report.php:837
 #. Translators: %s: docs link.
 msgid "Page visibility should be <a href=\"%s\" target=\"_blank\">public</a>"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:841
+#: includes/modules/status/templates/html-admin-page-status-report.php:844
 #. Translators: %1$s: shortcode text, %2$s: block slug.
 msgid "Page does not contain the %1$s shortcode or the %2$s block."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:841
+#: includes/modules/status/templates/html-admin-page-status-report.php:844
 msgid "Page does not contain the %s shortcode."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:859
+#: includes/modules/status/templates/html-admin-page-status-report.php:862
 msgid "Theme"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:865
+#: includes/modules/status/templates/html-admin-page-status-report.php:868
 msgid "The name of the current active theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:869
+#: includes/modules/status/templates/html-admin-page-status-report.php:872
 msgid "Version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:870
+#: includes/modules/status/templates/html-admin-page-status-report.php:873
 msgid "The installed version of the current active theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:883
+#: includes/modules/status/templates/html-admin-page-status-report.php:886
 msgid "Author URL"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:884
+#: includes/modules/status/templates/html-admin-page-status-report.php:887
 msgid "The theme developers URL."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:888
+#: includes/modules/status/templates/html-admin-page-status-report.php:891
 msgid "Child theme"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:889
+#: includes/modules/status/templates/html-admin-page-status-report.php:892
 msgid "Displays whether or not the current theme is a child theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:896
+#: includes/modules/status/templates/html-admin-page-status-report.php:899
 #. Translators: %s docs link.
 msgid ""
 "If you are modifying Yatra on a parent theme that you did not build "
@@ -3632,84 +3731,84 @@ msgid ""
 "target=\"_blank\">How to create a child theme</a>"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:903
+#: includes/modules/status/templates/html-admin-page-status-report.php:906
 msgid "Parent theme name"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:904
+#: includes/modules/status/templates/html-admin-page-status-report.php:907
 msgid "The name of the parent theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:908
+#: includes/modules/status/templates/html-admin-page-status-report.php:911
 msgid "Parent theme version"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:910
+#: includes/modules/status/templates/html-admin-page-status-report.php:913
 msgid "The installed version of the parent theme."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:916
+#: includes/modules/status/templates/html-admin-page-status-report.php:919
 #. translators: %s: parent theme latest version
 msgid "%s is available"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:922
+#: includes/modules/status/templates/html-admin-page-status-report.php:925
 msgid "Parent theme author URL"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:925
+#: includes/modules/status/templates/html-admin-page-status-report.php:928
 msgid "The parent theme developers URL."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:935
+#: includes/modules/status/templates/html-admin-page-status-report.php:938
 msgid "Templates"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:938
+#: includes/modules/status/templates/html-admin-page-status-report.php:941
 msgid ""
 "This section shows any files that are overriding the default Yatra template "
 "pages."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:946
+#: includes/modules/status/templates/html-admin-page-status-report.php:949
 msgid "Archive template"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:948
+#: includes/modules/status/templates/html-admin-page-status-report.php:951
 msgid ""
 "Your theme has a yatra.php file, you will not be able to override the "
 "yatra/archive-product.php custom template since yatra.php has priority over "
 "archive-product.php. This is intended to prevent display issues."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:953
-#: includes/modules/status/templates/html-admin-page-status-report.php:982
+#: includes/modules/status/templates/html-admin-page-status-report.php:956
+#: includes/modules/status/templates/html-admin-page-status-report.php:985
 msgid "Overrides"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:964
+#: includes/modules/status/templates/html-admin-page-status-report.php:967
 #. Translators: %1$s: Template name, %2$s: Template version, %3$s: Core
 #. version.
 msgid "%1$s version %2$s is out of date. The core version is %3$s"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:990
+#: includes/modules/status/templates/html-admin-page-status-report.php:993
 msgid "Outdated templates"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:997
+#: includes/modules/status/templates/html-admin-page-status-report.php:1000
 msgid "Learn how to update"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:1011
+#: includes/modules/status/templates/html-admin-page-status-report.php:1014
 msgid "Status Report Information"
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:1013
+#: includes/modules/status/templates/html-admin-page-status-report.php:1016
 msgid "This section shows information about this status report."
 msgstr ""
 
-#: includes/modules/status/templates/html-admin-page-status-report.php:1021
+#: includes/modules/status/templates/html-admin-page-status-report.php:1024
 msgid "Generated at"
 msgstr ""
 
@@ -4202,6 +4301,22 @@ msgstr ""
 msgid "Taxonomy (%s) not found"
 msgstr ""
 
+#: includes/yatra-html-functions.php:374
+msgid "View Privacy Policy"
+msgstr ""
+
+#: includes/yatra-html-functions.php:383
+msgid "Privacy policy page is not setup properly."
+msgstr ""
+
+#: includes/yatra-html-functions.php:419
+msgid "View Terms & Conditions"
+msgstr ""
+
+#: includes/yatra-html-functions.php:428
+msgid "Terms and conditions page is not setup properly."
+msgstr ""
+
 #: includes/yatra-template-functions.php:9
 msgid "Account"
 msgstr ""
@@ -4380,11 +4495,11 @@ msgstr ""
 msgid "Please pick the date"
 msgstr ""
 
-#: templates/tour/sidebar.php:14
+#: templates/tour/sidebar.php:16
 msgid " from "
 msgstr ""
 
-#: templates/tour/sidebar.php:16
+#: templates/tour/sidebar.php:18
 msgid "Free"
 msgstr ""
 
@@ -4484,22 +4599,22 @@ msgctxt "yatra"
 msgid "Add New"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:465
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:468
 msgctxt "Page setting"
 msgid "Cart"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:470
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:473
 msgctxt "Page setting"
 msgid "Checkout"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:475
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:478
 msgctxt "Page setting"
 msgid "My account"
 msgstr ""
 
-#: includes/modules/status/sections/class-yatra-module-section-system-status.php:480
+#: includes/modules/status/sections/class-yatra-module-section-system-status.php:483
 msgctxt "Page setting"
 msgid "Terms and conditions"
 msgstr ""
