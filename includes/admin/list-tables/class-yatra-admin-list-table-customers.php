@@ -242,10 +242,6 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
      */
     protected function render_total_booking_price_column()
     {
-        $currency_symbol = '';
-
-        $total_booking_price = 0;
-
         $currency_price_array = array();
 
         foreach ($this->yatra_customer_booking_meta as $meta_key => $booking_params) {
