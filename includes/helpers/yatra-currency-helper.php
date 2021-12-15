@@ -181,8 +181,8 @@ if (!function_exists('yatra_get_currencies')) {
     }
 }
 
-if (!function_exists('yatra_get_currency_symbols')) {
-    function yatra_get_currency_symbols($currency_key = '')
+if (!function_exists('yatra_get_currency_symbol')) {
+    function yatra_get_currency_symbol($currency_key = '')
     {
         $symbols = apply_filters('yatra_currency_symbols', array(
             'AED' => '&#x62f;.&#x625;',
@@ -366,7 +366,7 @@ if (!function_exists('yatra_get_currency_with_symbol')) {
 
         foreach ($currency as $currency_key => $currency_value) {
 
-            $symbol = yatra_get_currency_symbols($currency_key);
+            $symbol = yatra_get_currency_symbol($currency_key);
 
             $value = !empty($symbol) ? ' (' . $symbol . ') ' : '';
 

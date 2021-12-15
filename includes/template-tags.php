@@ -100,11 +100,19 @@ if (!function_exists('yatra_entry_footer')) {
 }
 
 if (!function_exists('yatra_get_current_currency_symbol')) {
-    function yatra_get_current_currency_symbol()
-    {
-        $currency = yatra_get_current_currency();
 
-        return yatra_get_currency_symbols($currency);
+    function yatra_get_current_currency_symbol($currency = '')
+    {
+        $currency = $currency === '' ? yatra_get_current_currency() : $currency;
+
+        $symbol_type = get_option('yatra_currency_symbol_type', 'symbol');
+
+        if ($symbol_type === 'code') {
+
+            return $currency;
+
+        }
+        return yatra_get_currency_symbol($currency);
     }
 }
 
@@ -112,9 +120,7 @@ if (!function_exists('yatra_get_current_currency')) {
 
     function yatra_get_current_currency()
     {
-        $currency = get_option('yatra_currency');
-
-        return $currency;
+        return get_option('yatra_currency', 'USD');
     }
 }
 
@@ -808,7 +814,7 @@ if (!function_exists('yatra_tour_pricing_configurations')) {
     {
         $currency = yatra_get_current_currency();
 
-        $currency_symbols = yatra_get_currency_symbols($currency);
+        $currency_symbols = yatra_get_currency_symbol($currency);
 
         $tour_options = array(
             'yatra_tour_meta_price_per' => array(
@@ -1140,7 +1146,7 @@ if (!function_exists('yatra_tour_additional_info')) {
 
         $currency = yatra_get_current_currency();
 
-        $currency_symbol = yatra_get_currency_symbols($currency);
+        $currency_symbol = yatra_get_currency_symbol($currency);
 
         if (!empty($yatra_tour_meta_tour_country)) {
 

@@ -43,8 +43,6 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
             $currency = yatra_get_current_currency();
 
-            $currency_symbol = yatra_get_currency_symbols($currency);
-
             if (!empty($yatra_tour_customer_info['email'])) {
 
                 foreach ($tour_ids as $yatra_tour_id) {
@@ -87,8 +85,6 @@ if (!class_exists('Yatra_Tour_Booking')) {
                         $booking_post_meta['yatra_tour_meta_tour_fixed_departure'] = $tour_options->isFixedDeparture();
 
                         $booking_post_meta['yatra_tour_meta_tour_country'] = get_post_meta($yatra_tour_id, 'yatra_tour_meta_tour_country', true);
-
-                        $booking_post_meta['yatra_currency_symbol'] = $currency_symbol;
 
                         $booking_post_meta['yatra_currency'] = $currency;
 
@@ -136,9 +132,7 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                     'total_booking_price' => yatra_get_booking_final_price($booking_parameters),
 
-                    'currency_symbol' => $currency_symbol,
-
-                    'currency' => $currency,
+                    'yatra_currency' => $currency,
 
                     'booking_date' => yatra_get_date(),
 

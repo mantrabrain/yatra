@@ -97,7 +97,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             }
             $currency = yatra_get_current_currency();
 
-            $currency_symbol = yatra_get_currency_symbols($currency);
+            $currency_symbol = yatra_get_currency_symbol($currency);
 
             // Load Template
             yatra_load_admin_template('metabox.tour.pricing.group-pricing-tmpl', array(

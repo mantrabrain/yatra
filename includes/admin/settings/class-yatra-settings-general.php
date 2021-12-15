@@ -260,13 +260,25 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
 
 
                 array(
-                    'title' => __('Currency & symbol', 'yatra'),
+                    'title' => __('Currency', 'yatra'),
                     'desc' => __('Currency for price of tour and other pricing parts.', 'yatra'),
                     'desc_tip' => true,
                     'id' => 'yatra_currency',
                     'default' => 'USD',
                     'type' => 'select',
                     'options' => yatra_get_currency_with_symbol()
+                ),
+                array(
+                    'title' => __('Currency Symbol Type', 'yatra'),
+                    'desc' => __('Currency Symbol type', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_currency_symbol_type',
+                    'default' => 'symbol',
+                    'type' => 'select',
+                    'options' => array(
+                        'code' => __('Currency Code', 'yatra'),
+                        'symbol' => __('Currency Symbol', 'yatra')
+                    ),
                 ),
                 array(
                     'title' => __('Currency position', 'yatra'),

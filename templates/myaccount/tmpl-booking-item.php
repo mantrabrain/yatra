@@ -12,7 +12,9 @@ $yatra_tour_meta_tour_duration_nights = isset($booking['yatra_tour_meta_tour_dur
 
 $yatra_tour_meta_tour_duration_days = isset($booking['yatra_tour_meta_tour_duration_days']) ? $booking['yatra_tour_meta_tour_duration_days'] : '';
 
-$yatra_currency_symbol = isset($booking['yatra_currency_symbol']) ? $booking['yatra_currency_symbol'] : '';
+$currency = isset($booking['yatra_currency']) ? $booking['yatra_currency'] : '';
+
+$yatra_currency_symbol = $currency != '' ? yatra_get_current_currency_symbol($currency) : '';
 
 $duration_string = '' != $yatra_tour_meta_tour_duration_days ? $yatra_tour_meta_tour_duration_days . ' days ' : '';
 
@@ -61,7 +63,7 @@ $duration_string = '' != $duration_string ? __('Duration: ', 'yatra') . $duratio
                     <th>Sales Price</th>
                     <th>Price Per</th>
                     <th>Group Size</th>
-                    <th>Toal Price</th>
+                    <th>Total Price</th>
                 </tr>
                 </thead>
                 <tbody>

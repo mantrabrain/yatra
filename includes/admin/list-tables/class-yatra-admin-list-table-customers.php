@@ -220,7 +220,7 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
 
         foreach ($amount_array as $currency_key => $amount_spent) {
 
-            $customer_paid_currency = yatra_get_currency_symbols($currency_key);
+            $customer_paid_currency = yatra_get_current_currency_symbol($currency_key);
 
             printf('<span>%s</span>', yatra_get_price($customer_paid_currency, ($amount_spent)));
         }
@@ -246,14 +246,31 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
 
         $total_booking_price = 0;
 
+        $currency_price_array = array();
+
         foreach ($this->yatra_customer_booking_meta as $meta_key => $booking_params) {
 
-            $currency_symbol = isset($booking_params['currency_symbol']) ? $booking_params['currency_symbol'] : '';
+            $currency = $booking_params['currency'] ?? '';
 
-            $total_booking_price += isset($booking_params['total_booking_net_price']) ? floatval($booking_params['total_booking_net_price']) : 0;
+            $currency = $booking_params['yatra_currency'] ?? $currency;
+
+            if ($currency != '') {
+
+                $total_booking_amount = isset($booking_params['total_booking_net_price']) ? floatval($booking_params['total_booking_net_price']) : 0;
+
+                $prev_amount = isset($currency_price_array[$currency]) ? floatval($currency_price_array[$currency]) : 0;
+
+                $currency_price_array[$currency] = $prev_amount + $total_booking_amount;
+            }
+
         }
 
-        printf('<span>%s</span>', esc_html(yatra_get_price($currency_symbol, $total_booking_price)));
+        foreach ($currency_price_array as $currency => $total) {
+
+            $currency_symbol = yatra_get_current_currency_symbol($currency);
+
+            printf('<span %s>%s</span>', 'style="display:block"', esc_html(yatra_get_price($currency_symbol, $total)));
+        }
     }
 
 }
