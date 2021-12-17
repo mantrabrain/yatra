@@ -12,9 +12,9 @@ ul.yatra-payment-gateway {
     align-items: center;
   }
 
-  input {
-    height: 25px;
-    width: 25px;
+  input[type="radio"] {
+    height: 20px;
+    width: 20px;
     margin-right: 10px;
   }
 

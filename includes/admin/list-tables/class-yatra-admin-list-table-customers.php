@@ -217,7 +217,7 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
             }
 
         }
-
+        
         foreach ($amount_array as $currency_key => $amount_spent) {
 
             $customer_paid_currency = yatra_get_current_currency_symbol($currency_key);

@@ -7,19 +7,21 @@
 .yatra-info, .yatra-success, .yatra-warning, .yatra-error, .yatra-validation {
   border: 1px solid;
   margin: 10px 0px;
-  padding: 15px 10px 15px 50px;
+  padding: 10px 15px;
   background-repeat: no-repeat;
   background-position: 10px center;
   text-align: left;
 
   ul {
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
 
     li {
       margin: 0;
       padding: 0;
-      list-style: disc !important;
+      list-style: disc inside !important;
+      font-size: 15px;
+      font-weight: normal;
     }
   }
 }

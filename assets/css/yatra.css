@@ -215,17 +215,19 @@
 .yatra-info, .yatra-success, .yatra-warning, .yatra-error, .yatra-validation {
   border: 1px solid;
   margin: 10px 0px;
-  padding: 15px 10px 15px 50px;
+  padding: 10px 15px;
   background-repeat: no-repeat;
   background-position: 10px center;
   text-align: left; }
   .yatra-info ul, .yatra-success ul, .yatra-warning ul, .yatra-error ul, .yatra-validation ul {
-    margin: 0;
-    padding: 0; }
+    margin: 0 !important;
+    padding: 0 !important; }
     .yatra-info ul li, .yatra-success ul li, .yatra-warning ul li, .yatra-error ul li, .yatra-validation ul li {
       margin: 0;
       padding: 0;
-      list-style: disc !important; }
+      list-style: disc inside !important;
+      font-size: 15px;
+      font-weight: normal; }
 
 .yatra-info {
   color: #00529B;
@@ -1199,10 +1201,14 @@ ul.yatra-payment-gateway {
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
-    display: flex; }
-  ul.yatra-payment-gateway input {
-    height: 25px;
-    width: 25px;
+    display: flex;
+    -webkit-box-align: center;
+       -moz-box-align: center;
+        -ms-flex-align: center;
+            align-items: center; }
+  ul.yatra-payment-gateway input[type="radio"] {
+    height: 20px;
+    width: 20px;
     margin-right: 10px; }
   ul.yatra-payment-gateway:after {
     clear: both;
