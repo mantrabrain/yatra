@@ -771,7 +771,7 @@ if (!function_exists('yatra_payment_gateway_fields')) {
 
                     echo '</label>';
 
-                    echo '<div class="yatra-payment-gateway-field-wrap yatra-payment-gateway-field-' . $gateway_id . '">';
+                    echo '<div class="yatra-payment-gateway-field-wrap yatra-payment-gateway-field-' . $gateway_id . ' yatra-hide">';
 
                     do_action('yatra_payment_gateway_field_' . $gateway_id);
 
