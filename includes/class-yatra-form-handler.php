@@ -28,7 +28,7 @@ class Yatra_Form_Handler
 
     }
 
-    public static function book_selected_tour($redirect = true)
+    public static function book_selected_tour($redirect = true, $clear_session = true)
     {
         $nonce_value = yatra_get_var($_REQUEST['yatra-book-selected-tour-nonce'], yatra_get_var($_REQUEST['_wpnonce'], '')); // @codingStandardsIgnoreLine.
 
@@ -102,7 +102,10 @@ class Yatra_Form_Handler
 
         if ($booking_id > 0) {
 
-            yatra_clear_session('yatra_tour_cart');
+            if ($clear_session) {
+
+                yatra_clear_session('yatra_tour_cart');
+            }
 
             if (in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && $cart_total > 0) {
 

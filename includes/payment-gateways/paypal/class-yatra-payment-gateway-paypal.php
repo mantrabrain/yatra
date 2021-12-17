@@ -15,7 +15,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
                 'title' => __('PayPal Standard', 'yatra'),
                 'default' => 'no',
                 'id' => $this->id,
-                'frontend_title' => __('PayPal Standard', 'yatra'),
+                'frontend_title' => get_option('yatra_payment_gateway_paypal_label_on_checkout', __('PayPal Standard', 'yatra')),
 
             ),
         );
@@ -47,6 +47,13 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
                     'desc' => __(' Enter your PayPal account\'s email', 'yatra'),
                     'id' => 'yatra_payment_gateway_paypal_email',
                     'type' => 'text',
+                ),
+                array(
+                    'title' => __('Label on checkout', 'yatra'),
+                    'desc' => __('Label on checkout', 'yatra'),
+                    'id' => 'yatra_payment_gateway_paypal_label_on_checkout',
+                    'type' => 'text',
+                    'default' => __('Paypal Standard', 'yatra')
                 ),
 
                 array(
@@ -238,7 +245,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
             file_put_contents('yatra-ipn_errors.log', print_r($errors, true) . PHP_EOL, LOCK_EX | FILE_APPEND);
 
             do_action('yatra_after_failed_payment', $booking_id, $message, $this->id);
-            
+
         }
         file_put_contents('yatra-ipn_message.log', print_r($message, true) . PHP_EOL, LOCK_EX | FILE_APPEND);
 

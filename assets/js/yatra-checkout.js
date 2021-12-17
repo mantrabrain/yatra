@@ -22,9 +22,14 @@
                     return false;
                 });
 
+                if ($('input[name="yatra-payment-gateway"]:checked').length < 1) {
+
+                    $('input[name="yatra-payment-gateway"]').eq(0).trigger('click');
+                }
+
             },
             load_gateway: function (payment_mode) {
-
+                
                 $('body').trigger('yatra_gateway_loaded', [payment_mode]);
             }
 
