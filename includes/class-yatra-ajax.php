@@ -547,7 +547,7 @@ class Yatra_Ajax
 
         $selected_date = isset($_POST['selected_date']) ? sanitize_text_field($_POST['selected_date']) : '';
 
-        $show_enquiry_form = get_option('yatra_enquiry_form_show', 'true');
+        $show_enquiry_form = get_option('yatra_enquiry_form_show', 'yes');
 
         if ($show_enquiry_form != 'yes') {
 
