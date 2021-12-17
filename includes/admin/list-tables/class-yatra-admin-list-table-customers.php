@@ -208,7 +208,7 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
 
             $paid_currency = get_post_meta($payment_id, 'yatra_total_paid_currency', true);
 
-            $paid_currency = empty($paid_currency) ? $currency : $paid_currency;
+            $paid_currency = empty($paid_currency) ? $currency : strtoupper($paid_currency);
 
             $paid_amount = floatval(get_post_meta($payment_id, 'yatra_total_paid_amount', true));
 
@@ -217,7 +217,7 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
             }
 
         }
-        
+
         foreach ($amount_array as $currency_key => $amount_spent) {
 
             $customer_paid_currency = yatra_get_current_currency_symbol($currency_key);
