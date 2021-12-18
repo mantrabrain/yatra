@@ -29,7 +29,9 @@
 
             },
             load_gateway: function (payment_mode) {
-                
+
+                $('ul.yatra-payment-gateway').find('.yatra-payment-gateway-field-wrap').addClass('yatra-hide');
+
                 $('body').trigger('yatra_gateway_loaded', [payment_mode]);
             }
 
