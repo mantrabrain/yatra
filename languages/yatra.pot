@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.4\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-17 10:55:18+00:00\n"
+"POT-Creation-Date: 2021-12-19 10:46:59+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1735,7 +1735,7 @@ msgstr ""
 msgid "Confirm password  not matched with old password"
 msgstr ""
 
-#: includes/class-yatra.php:376
+#: includes/class-yatra.php:377
 #. translators: 1: error message 2: file name and path 3: line number
 msgid "%1$s in %2$s on line %3$s"
 msgstr ""
