@@ -286,6 +286,18 @@ if (!class_exists('Yatra_Tour_Booking')) {
             return $booking_details;
         }
 
+        public function get_total($net_price = true)
+        {
+            $booking_meta_params = get_post_meta($this->booking_id, 'yatra_booking_meta_params', true);
+
+            $gross = isset($booking_meta_params['total_booking_gross_price']) ? floatval($booking_meta_params['total_booking_gross_price']) : 0;
+
+            $net = isset($booking_meta_params['total_booking_net_price']) ? floatval($booking_meta_params['total_booking_net_price']) : 0;
+
+            return $net_price ? $net : $gross;
+
+        }
+
 
     }
 
