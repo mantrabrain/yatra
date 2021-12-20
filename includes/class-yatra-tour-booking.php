@@ -298,6 +298,25 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
         }
 
+        public function get_id()
+        {
+            return $this->booking_id;
+        }
+
+        public function get_title()
+        {
+            return get_the_title($this->booking_id);
+        }
+
+        public function get_currency_code()
+        {
+            $booking_details = $this->get_all_booking_details();
+
+            $meta = $booking_details->yatra_booking_meta ?? array();
+
+            return $meta['yatra_currency'] ?? yatra_get_current_currency();
+        }
+
 
     }
 
