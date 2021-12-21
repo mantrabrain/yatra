@@ -2,9 +2,9 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Complete Travel & Tour Booking System 2.1.4\n"
+"Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.5\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-19 10:46:59+00:00\n"
+"POT-Creation-Date: 2021-12-21 11:56:48+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -441,8 +441,8 @@ msgid "Primary Email"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:125
-#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:82
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:91
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:100
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:107
 #: includes/yatra-template-functions.php:26
 msgid "Bookings"
@@ -1046,7 +1046,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:101
-#: includes/functions.php:754
+#: includes/functions.php:755
 msgid "Payment Gateways"
 msgstr ""
 
@@ -1462,7 +1462,7 @@ msgstr ""
 msgid "You must have to agree privacy policy."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:583 includes/class-yatra-form-handler.php:71
+#: includes/class-yatra-ajax.php:583 includes/class-yatra-form-handler.php:73
 msgid "You must have to agree terms and conditions."
 msgstr ""
 
@@ -1599,43 +1599,43 @@ msgstr ""
 msgid "Number of Children"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:65
+#: includes/class-yatra-form-handler.php:67
 msgid "You must have to agree privacy policy"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:84
+#: includes/class-yatra-form-handler.php:86
 msgid "Please select at least one payment gateway"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:94
+#: includes/class-yatra-form-handler.php:96
 msgid "Can't Process the payment"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:130
+#: includes/class-yatra-form-handler.php:132
 msgid "Something went wrong! Booking could not complete. Please try again later"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:193
+#: includes/class-yatra-form-handler.php:195
 msgid "User profile successfully updated."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:232
+#: includes/class-yatra-form-handler.php:234
 msgid "Old Password doesn't match"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:250
+#: includes/class-yatra-form-handler.php:252
 msgid "Password successfully changed."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:277
+#: includes/class-yatra-form-handler.php:279
 msgid "Username is required."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:341
+#: includes/class-yatra-form-handler.php:343
 msgid "Email or Usrename already exists, please try again.."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:374
+#: includes/class-yatra-form-handler.php:376
 msgid "Something wrong on registration, please check all form fields once."
 msgstr ""
 
@@ -1831,31 +1831,38 @@ msgid_plural "Cancelled <span class=\"count\">(%s)</span>"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:83
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:67
+#. translators: %s: number of orders
+msgid "Failed <span class=\"count\">(%s)</span>"
+msgid_plural "Failed <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:92
 msgid "Booking"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:84
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:93
 msgid "Edit Booking"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:85
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:94
 msgid "All Bookings"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:86
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:95
 msgid "View Booking"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:87
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:96
 msgid "Search Booking"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:88
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:97
 msgid "No Bookings found"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:89
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:98
 msgid "No Bookings found in the Trash"
 msgstr ""
 
@@ -2038,30 +2045,34 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: includes/functions.php:333
-msgid "Previous Post"
+#: includes/functions.php:311
+msgid "Failed"
 msgstr ""
 
 #: includes/functions.php:334
+msgid "Previous Post"
+msgstr ""
+
+#: includes/functions.php:335
 msgid "Next Post"
 msgstr ""
 
-#: includes/functions.php:365
+#: includes/functions.php:366
 #. translators: 1: SVG icon. 2: post author, only visible to screen readers. 3:
 #. author link.
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:413 templates/parts/content.php:47
+#: includes/functions.php:414 templates/parts/content.php:47
 #. translators: %s: Name of current post. Only visible to screen readers.
 msgid "Edit <span class=\"screen-reader-text\">%s</span>"
 msgstr ""
 
-#: includes/functions.php:1099 includes/template-tags.php:868
+#: includes/functions.php:1100 includes/template-tags.php:868
 msgid "Guest"
 msgstr ""
 
-#: includes/functions.php:1222
+#: includes/functions.php:1223
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
 msgstr ""
@@ -2942,10 +2953,10 @@ msgid ""
 msgstr ""
 
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:145
-msgid "Yatra Availability Conditions\n"
+msgid "Yatra Availability Conditions"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:147
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:146
 msgid ""
 "Yatra Availability Conditions is premium addon of Yatra free WordPress "
 "travel and tour plugin. This addon add features to add different types of "
@@ -2958,15 +2969,46 @@ msgid ""
 "condition."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:151
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:148
+msgid "Yatra Stripe"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:149
+msgid ""
+"Yatra Stripe is premium addon of Yatra free WordPress travel and tour "
+"plugin. This is payment gateway of stripe.com which support different types "
+"of credit/debit cards. While booking the tour package on yatra plugin the "
+"traveller no need to go any of the payment gateway pages to pay the tour "
+"price. Any one can easily book the tour package via this premium payment "
+"gateway addon. But make sure you have already installed ssl on your "
+"website. "
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:153
+msgid "Yatra Authorize.net"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:154
+msgid ""
+"Yatra Authorize.net  is premium addon of Yatra free WordPress travel and "
+"tour plugin. This is payment gateway addon for Yatra plugin. This is a "
+"gateway of authorize.net.  This gateway will support different types of "
+"credit/debit cards. Any one can book the tour package with their "
+"credit/debit card. You can check the supported currency and cards for this "
+"gateway from "
+"https://developer.authorize.net/api/reference/features/processor_support."
+"html "
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:160
 msgid "View All Addon/Extensions"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:158
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:167
 msgid "Feature Request"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:161
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:170
 msgid ""
 "If you would like to add a new feature on the yatra plugin or any of the "
 "addons you can send us a feature request. Our development team will check & "
@@ -2976,15 +3018,15 @@ msgid ""
 "%smantrabrain@gmail.com%s too."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:165
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:174
 msgid "Send feature request"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:174
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:183
 msgid "Facebook Community Group"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:177
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:186
 msgid ""
 "Join our facebook community group. You can post your query or share your "
 "thought and\n"
@@ -2992,41 +3034,41 @@ msgid ""
 "the group."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:182
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:191
 msgid "Join Yatra Facebook Community Group"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:189
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:198
 msgid "Documentation"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:192
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:201
 msgid "You can read documentation about yatra WordPress plugin."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:196
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:205
 msgid "Check Documentation"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:203
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:212
 msgid "Support Forum"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:206
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:215
 msgid ""
 "Post your questions and query about yatra WordPress plugin on our support "
 "forum."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:210
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:219
 msgid "View Support Forum"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:217
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:226
 msgid "Video Introduction"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:230
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:239
 msgid "Watch on youtube"
 msgstr ""
 
@@ -4354,15 +4396,15 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:518
+#: includes/yatra-template-functions.php:522
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:519
+#: includes/yatra-template-functions.php:523
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:520
+#: includes/yatra-template-functions.php:524
 msgid "Not Available"
 msgstr ""
 
@@ -4523,7 +4565,7 @@ msgid "Free"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
-msgid "Yatra - Complete Travel & Tour Booking System"
+msgid "Yatra - Best Travel & Tour Booking Plugin"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
@@ -4591,6 +4633,11 @@ msgstr ""
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:52
 msgctxt "Booking status"
 msgid "Cancelled"
+msgstr ""
+
+#: includes/custom-post-type/class-yatra-custom-post-type-booking.php:61
+msgctxt "Booking status"
+msgid "Failed"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:20
