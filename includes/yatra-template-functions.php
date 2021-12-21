@@ -348,7 +348,7 @@ if (!function_exists('yatra_checkout_form_error')) {
 
             if (count($error_messages) > 0) {
 
-                echo '<div class="yatra-messages yatra-error" id="yatra-message">';
+                echo '<div class="yatra-message yatra-error" id="yatra-message">';
 
                 echo '<ul>';
 
