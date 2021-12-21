@@ -237,6 +237,9 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
             case "cancelled":
                 $background = "#6b6767";
                 break;
+            case "failed":
+                $background = "#ff0000";
+                break;
         }
 
         printf('<mark 
@@ -278,7 +281,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
         $total_booking_price = isset($this->booking_meta_params['total_booking_net_price']) ? $this->booking_meta_params['total_booking_net_price'] : '';
 
         $currency = $this->booking_meta_params['currency'] ?? '';
-        
+
         $currency = $this->booking_meta_params['yatra_currency'] ?? $currency;
 
         $yatra_currency_symbol = yatra_get_current_currency_symbol($currency);

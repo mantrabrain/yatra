@@ -307,7 +307,8 @@ if (!function_exists('yatra_get_booking_statuses')) {
                 'yatra-processing' => __('Processing', 'yatra'),
                 'yatra-on-hold' => __('On Hold', 'yatra'),
                 'yatra-completed' => __('Completed', 'yatra'),
-                'yatra-cancelled' => __('Cancelled', 'yatra')
+                'yatra-cancelled' => __('Cancelled', 'yatra'),
+                'yatra-failed' => __('Failed', 'yatra')
             )
         );
 

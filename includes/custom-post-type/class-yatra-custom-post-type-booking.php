@@ -57,6 +57,15 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
                         /* translators: %s: number of orders */
                         'label_count' => _n_noop('Cancelled <span class="count">(%s)</span>', 'Cancelled <span class="count">(%s)</span>', 'yatra'),
                     ),
+                    'yatra-failed' => array(
+                        'label' => _x('Failed', 'Booking status', 'yatra'),
+                        'public' => true,
+                        'exclude_from_search' => false,
+                        'show_in_admin_all_list' => true,
+                        'show_in_admin_status_list' => true,
+                        /* translators: %s: number of orders */
+                        'label_count' => _n_noop('Failed <span class="count">(%s)</span>', 'Failed <span class="count">(%s)</span>', 'yatra'),
+                    ),
                 )
             );
 
@@ -99,8 +108,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
                 'show_in_menu' => 'edit.php?post_type=tour',
                 'publicly_queryable' => false,
                 'exclude_from_search' => true,
-                'show_in_admin_bar'   => false,
-
+                'show_in_admin_bar' => false,
 
 
             );
@@ -114,7 +122,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
             add_action('init', array($this, 'register'));
             add_action('init', array($this, 'register_post_status'));
             add_filter('post_row_actions', array($this, 'remove'));
-           // add_action('do_meta_boxes', array($this, 'hide_metabox'));
+            // add_action('do_meta_boxes', array($this, 'hide_metabox'));
         }
 
         public function hide_metabox()

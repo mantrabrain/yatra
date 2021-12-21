@@ -22,14 +22,16 @@ class Yatra_Form_Handler
         add_action('template_redirect', array(__CLASS__, 'yatra_change_user_password'));
         add_action('template_redirect', array(__CLASS__, 'process_login'));
         add_action('template_redirect', array(__CLASS__, 'register_user'));
-        add_action('template_redirect', array(__CLASS__, 'book_selected_tour'));
+        add_action('template_redirect', array(__CLASS__, 'book_selected_tour'), 10, 2);
         //add_action('wp_loaded', array(__CLASS__, 'checkout_action'), 20);
 
 
     }
 
-    public static function book_selected_tour($redirect = true, $clear_session = true)
+    public static function book_selected_tour()
     {
+        $redirect = !wp_doing_ajax();
+
         $nonce_value = yatra_get_var($_REQUEST['yatra-book-selected-tour-nonce'], yatra_get_var($_REQUEST['_wpnonce'], '')); // @codingStandardsIgnoreLine.
 
         if (!wp_verify_nonce($nonce_value, 'yatra_book_selected_tour_nonce')) {
@@ -102,16 +104,14 @@ class Yatra_Form_Handler
 
         if ($booking_id > 0) {
 
-            if ($clear_session) {
-
-                //yatra_clear_session('yatra_tour_cart');
-            }
+            //yatra_clear_session('yatra_tour_cart');
 
             if (in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && $cart_total > 0) {
 
                 do_action('yatra_payment_checkout_payment_gateway_' . $payment_gateway_id, $booking_id);
 
             }
+
 
             if ($redirect) {
 

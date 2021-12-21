@@ -1188,6 +1188,8 @@ form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
     background: #0e880e; }
   .yatra-booking-table td.booking-status span.booking-status.cancelled {
     background: #6b6767; }
+  .yatra-booking-table td.booking-status span.booking-status.failed {
+    background: #ff0000; }
 
 ul.yatra-payment-gateway {
   padding: 15px !important;
