@@ -63,11 +63,17 @@ You can Join our [Facebook Community group](https://www.facebook.com/groups/yatr
 15. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
 
-== Premium Extensions/Addons ==
+== Premium Payment Gateway Extensions/Addons ==
+
+* [Yatra Stripe](https://mantrabrain.com/downloads/yatra-stripe/)
+* [Yatra AuthorizeNet](https://mantrabrain.com/downloads/yatra-authorizenet/)
+
+== Other Premium Extensions/Addons ==
 
 * [Yatra Downloads](https://mantrabrain.com/downloads/yatra-downloads/)
 * [Yatra Services](https://mantrabrain.com/downloads/yatra-services/)
 * [Yatra Availability Conditions](https://mantrabrain.com/downloads/yatra-availability-conditions/)
+
 
 [View all Yatra Extensions/Addons](https://mantrabrain.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
 
