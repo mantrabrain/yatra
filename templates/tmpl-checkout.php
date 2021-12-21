@@ -7,11 +7,13 @@ if (count($checkout) < 1) {
     return;
 }
 
-do_action('yatra_checkout_before_form_fields');
+do_action('yatra_checkout_before_form');
 
 ?>
 
     <form method="post" class="yatra-checkout-form" id="yatra-checkout-form">
+
+        <?php do_action('yatra_checkout_before_form_fields'); ?>
 
         <div class="yatra-checkout-form-fields"><?php
 
@@ -19,6 +21,8 @@ do_action('yatra_checkout_before_form_fields');
 
             ?>
         </div>
+
+        <?php do_action('yatra_checkout_after_form_fields'); ?>
 
         <div class="yatra-checkout-order-table">
             <?php
@@ -39,4 +43,4 @@ do_action('yatra_checkout_before_form_fields');
         </div>
     </form>
 <?php
-do_action('yatra_checkout_after_form_fields');
+do_action('yatra_checkout_after_form');
