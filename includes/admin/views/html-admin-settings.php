@@ -18,7 +18,7 @@ if (!$tab_exists) {
     exit;
 }
 ?>
-<div class="wrap yatra">
+<div class="wrap yatra-admin-setting-page-wrap">
     <form method="<?php echo esc_attr(apply_filters('yatra_settings_form_method_tab_' . $current_tab, 'post')); ?>"
           id="mainform" action="" enctype="multipart/form-data">
         <nav class="nav-tab-wrapper yatra-nav-tab-wrapper">
