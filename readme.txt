@@ -1,6 +1,6 @@
 === Best Travel Booking Plugin, Tour Booking System, Trip Booking WordPress Plugin - Yatra ===
 Contributors: Mantrabrain, ughimire1
-Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
+Tags: travel-booking, tour-booking, travel-agency, package-booking, trip-booking
 Requires at least: 4.7
 Tested up to: 5.8.2
 Stable tag: 2.1.5
