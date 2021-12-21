@@ -749,7 +749,7 @@ if (!function_exists('yatra_payment_gateway_fields')) {
         $yatra_get_active_payment_gateways = (yatra_get_active_payment_gateways());
 
         $yatra_get_payment_gateways = yatra_get_payment_gateways();
-
+        
         if (count($yatra_get_active_payment_gateways) > 0) {
 
             echo '<h2 class="yatra-payment-gateway-title">' . __('Payment Gateways', 'yatra') . '</h2>';

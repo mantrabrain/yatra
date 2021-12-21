@@ -102,6 +102,8 @@ class Yatra_Form_Handler
 
         $booking_id = (int)$yatra_booking->book($valid_data);
 
+        update_post_meta($booking_id, 'yatra_selected_payment_gateway', $payment_gateway_id);
+
         if ($booking_id > 0) {
 
             //yatra_clear_session('yatra_tour_cart');
