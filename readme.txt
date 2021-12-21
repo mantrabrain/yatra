@@ -1,4 +1,4 @@
-=== Complete Travel & Tour Booking Plugin - Yatra ===
+=== Best Travel Booking Plugin, Tour Booking System, Trip Booking WordPress Plugin - Yatra ===
 Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
@@ -10,6 +10,9 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Yatra is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
 
 == Description ==
+
+**Yatra - The Best Travel Booking Plugin for WordPress**
+
 [Yatra]( https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg) is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
 
 Get [free support](https://mantrabrain.com/support-forum/)
@@ -60,7 +63,11 @@ You can Join our [Facebook Community group](https://www.facebook.com/groups/yatr
 
 14. Seperated customer section
 
-15. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
+15. Discount Coupon
+
+16. Import/Export
+
+16. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
 
 == Premium Payment Gateway Extensions/Addons ==
