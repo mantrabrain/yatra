@@ -73,7 +73,7 @@ You can Join our [Facebook Community group](https://www.facebook.com/groups/yatr
 == Premium Payment Gateway Extensions/Addons ==
 
 * [Yatra Stripe](https://mantrabrain.com/downloads/yatra-stripe/)
-* [Yatra AuthorizeNet](https://mantrabrain.com/downloads/yatra-authorizenet/)
+* [Yatra Authorize.Net](https://mantrabrain.com/downloads/yatra-authorizenet/)
 
 == Other Premium Extensions/Addons ==
 
