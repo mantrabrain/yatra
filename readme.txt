@@ -1,9 +1,9 @@
-=== Complete Travel & Tour Booking System - Yatra ===
+=== Complete Travel & Tour Booking Plugin - Yatra ===
 Contributors: Mantrabrain, ughimire1
 Tags: travel, travel-booking, tour-booking, tour-operator, travel-agency, package-booking, trip-booking, tours, packages
 Requires at least: 4.7
 Tested up to: 5.8.2
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -148,12 +148,10 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
-= 2.1.5 | 2021/12/05 =
+= 2.1.5 | 2021/12/21 =
 * Added - Tour, Destination, Activity gutenberg block
 * Added - Terms and conditions, privacy policy option on checkout
 * Added - Terms and conditions, privacy policy on enquiry form
 * Added - Show hide enquiry form
-
-= 2.1.4 | 2021/12/02 =
-* Added - Discount coupon added
-* Fixed - Minor issue fixed
+* Fixed - Other minor issue fixed
+* Fixed - Stripe/Authorize.net addon compatibility issue fixed
