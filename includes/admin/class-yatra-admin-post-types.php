@@ -3,7 +3,7 @@
  * Post Types Admin
  *
  * @package  Yatra/admin
- * @version  3.3.0
+ * @version  1.0.0
  */
 
 if (!defined('ABSPATH')) {
@@ -38,20 +38,7 @@ class Yatra_Admin_Post_Types
         add_filter('post_updated_messages', array($this, 'post_updated_messages'));
         add_filter('bulk_post_updated_messages', array($this, 'bulk_post_updated_messages'), 10, 2);
 
-
-        // Extra post data and screen elements.
-        add_action('edit_form_top', array($this, 'edit_form_top'));
-        add_filter('enter_title_here', array($this, 'enter_title_here'), 1, 2);
-        add_action('edit_form_after_title', array($this, 'edit_form_after_title'));
-        add_filter('default_hidden_meta_boxes', array($this, 'hidden_meta_boxes'), 10, 2);
-
-
-        // Bulk / quick edit.
-        add_action('bulk_edit_custom_box', array($this, 'bulk_edit'), 10, 2);
-        add_action('quick_edit_custom_box', array($this, 'quick_edit'), 10, 2);
-        add_action('save_post', array($this, 'bulk_and_quick_edit_hook'), 10, 2);
-        add_action('yatra_product_bulk_and_quick_edit', array($this, 'bulk_and_quick_edit_save_post'), 10, 2);
-
+        add_action( 'admin_print_scripts', array( $this, 'disable_autosave' ) );
 
         add_filter('display_post_states', array($this, 'add_display_post_states'), 10, 2);
 
@@ -154,99 +141,6 @@ class Yatra_Admin_Post_Types
         return $bulk_messages;
     }
 
-    /**
-     * Custom bulk edit - form.
-     *
-     * @param string $column_name Column being shown.
-     * @param string $post_type Post type being shown.
-     */
-    public function bulk_edit($column_name, $post_type)
-    {
-        if ('price' !== $column_name || 'product' !== $post_type) {
-            return;
-        }
-
-        $shipping_class = get_terms(
-            'product_shipping_class',
-            array(
-                'hide_empty' => false,
-            )
-        );
-
-    }
-
-    /**
-     * Custom quick edit - form.
-     *
-     * @param string $column_name Column being shown.
-     * @param string $post_type Post type being shown.
-     */
-    public function quick_edit($column_name, $post_type)
-    {
-        if ('price' !== $column_name || 'product' !== $post_type) {
-            return;
-        }
-
-        $shipping_class = get_terms(
-            'product_shipping_class',
-            array(
-                'hide_empty' => false,
-            )
-        );
-
-    }
-
-    /**
-     * Offers a way to hook into save post without causing an infinite loop
-     * when quick/bulk saving product info.
-     *
-     * @param int $post_id Post ID being saved.
-     * @param object $post Post object being saved.
-     * @since 3.0.0
-     */
-    public function bulk_and_quick_edit_hook($post_id, $post)
-    {
-        remove_action('save_post', array($this, 'bulk_and_quick_edit_hook'));
-        do_action('yatra_product_bulk_and_quick_edit', $post_id, $post);
-        add_action('save_post', array($this, 'bulk_and_quick_edit_hook'), 10, 2);
-    }
-
-    /**
-     * Quick and bulk edit saving.
-     *
-     * @param int $post_id Post ID being saved.
-     * @param object $post Post object being saved.
-     * @return int
-     */
-    public function bulk_and_quick_edit_save_post($post_id, $post)
-    {
-        // If this is an autosave, our form has not been submitted, so we don't want to do anything.
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-            return $post_id;
-        }
-
-        // Don't save revisions and autosaves.
-        if (wp_is_post_revision($post_id) || wp_is_post_autosave($post_id) || 'product' !== $post->post_type || !current_user_can('edit_post', $post_id)) {
-            return $post_id;
-        }
-
-        // Check nonce.
-        if (!isset($_REQUEST['yatra_quick_edit_nonce']) || !wp_verify_nonce($_REQUEST['yatra_quick_edit_nonce'], 'yatra_quick_edit_nonce')) { // WPCS: input var ok, sanitization ok.
-            return $post_id;
-        }
-
-        // Get the product and save.
-        $product = ($post);
-
-        if (!empty($_REQUEST['yatra_quick_edit'])) { // WPCS: input var ok.
-            $this->quick_edit_save($post_id, $product);
-        } else {
-            $this->bulk_edit_save($post_id, $product);
-        }
-
-        return $post_id;
-    }
-
 
     /**
      * Disable the auto-save functionality for Orders.
@@ -260,66 +154,6 @@ class Yatra_Admin_Post_Types
         }
     }
 
-    /**
-     * Output extra data on post forms.
-     *
-     * @param WP_Post $post Current post object.
-     */
-    public function edit_form_top($post)
-    {
-        echo '<input type="hidden" id="original_post_title" name="original_post_title" value="' . esc_attr($post->post_title) . '" />';
-    }
-
-    /**
-     * Change title boxes in admin.
-     *
-     * @param string $text Text to shown.
-     * @param WP_Post $post Current post object.
-     * @return string
-     */
-    public function enter_title_here($text, $post)
-    {
-        switch ($post->post_type) {
-            case 'product':
-                $text = esc_html__('Product name', 'yatra');
-                break;
-            case 'shop_coupon':
-                $text = esc_html__('Coupon code', 'yatra');
-                break;
-        }
-        return $text;
-    }
-
-    /**
-     * Print coupon description textarea field.
-     *
-     * @param WP_Post $post Current post object.
-     */
-    public function edit_form_after_title($post)
-    {
-        if ('shop_coupon' === $post->post_type) {
-            ?>
-            <textarea id="yatra-coupon-description" name="excerpt" cols="5" rows="2"
-                      placeholder="<?php esc_attr_e('Description (optional)', 'yatra'); ?>"><?php echo $post->post_excerpt; // WPCS: XSS ok. ?></textarea>
-            <?php
-        }
-    }
-
-    /**
-     * Hidden default Meta-Boxes.
-     *
-     * @param array $hidden Hidden boxes.
-     * @param object $screen Current screen.
-     * @return array
-     */
-    public function hidden_meta_boxes($hidden, $screen)
-    {
-        if ('product' === $screen->post_type && 'post' === $screen->base) {
-            $hidden = array_merge($hidden, array('postcustom'));
-        }
-
-        return $hidden;
-    }
 
     /**
      * Add a post display state for special Yatra pages in the page list table.

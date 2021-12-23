@@ -288,7 +288,9 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
         public function get_total($net_price = true)
         {
-            $booking_meta_params = get_post_meta($this->booking_id, 'yatra_booking_meta_params', true);
+            $booking_details = $this->get_all_booking_details();
+
+            $booking_meta_params = $booking_details->yatra_booking_meta_params ?? array();
 
             $gross = isset($booking_meta_params['total_booking_gross_price']) ? floatval($booking_meta_params['total_booking_gross_price']) : 0;
 
@@ -312,9 +314,18 @@ if (!class_exists('Yatra_Tour_Booking')) {
         {
             $booking_details = $this->get_all_booking_details();
 
-            $meta = $booking_details->yatra_booking_meta ?? array();
+            $meta_params = $booking_details->yatra_booking_meta_params ?? array();
 
-            return $meta['yatra_currency'] ?? yatra_get_current_currency();
+            return $meta_params['yatra_currency'] ?? yatra_get_current_currency();
+        }
+
+        public function get_coupon()
+        {
+            $booking_details = $this->get_all_booking_details();
+
+            $meta_params = $booking_details->yatra_booking_meta_params ?? array();
+
+            return $meta_params['coupon'] ?? array();
         }
 
 

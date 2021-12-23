@@ -30,7 +30,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'labels' => $labels,
                 'menu_icon' => YATRA_PLUGIN_URI . '/assets/images/menu-icon.png',// 'dashicons-palmtree',
                 'public' => true,
-                'supports' => array('title', 'editor', 'excerpt', 'thumbnail',),
+                'supports' => array('title', 'editor', 'excerpt', 'thumbnail'),
                 'has_archive' => true,
                 'rewrite' => array(
                     'slug' => trim($permalinks['yatra_tour_base']),

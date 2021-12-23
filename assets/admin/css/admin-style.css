@@ -6,6 +6,17 @@
     display: none !important;
 }
 
+.yatra-booking-status-meta-content {
+    margin: 20px 0;
+}
+
+.yatra-booking-status-meta-content p.flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
 .yatra-admin-tab--content-section .yatra-pricing-group-wrap {
     border: 1px solid #000;
     box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.02);
@@ -433,7 +444,7 @@ ul.mb-selected-gallery-list li img {
     width: 50%;
 }
 
-#booking_meta_information table {
+#yatra_booking_details_metabox table {
     width: 100%;
     margin: 0 !important;
     padding: 0;
@@ -446,8 +457,8 @@ table.yatra-booking-meta-info th,
 table.yatra-booking-meta-info td,
 table.yatra-booking-meta-customer-info th,
 table.yatra-booking-meta-customer-info td,
-#booking_meta_information table td,
-#booking_meta_information table th {
+#yatra_booking_details_metabox table td,
+#yatra_booking_details_metabox table th {
     border: 1px solid #aaa;
     padding: 10px;
 }
@@ -457,7 +468,7 @@ table.yatra-booking-meta-customer-info tr {
 }
 
 table.yatra-booking-meta-info tr,
-#booking_meta_information table tr {
+#yatra_booking_details_metabox table tr {
     text-align: center;
 }
 
@@ -781,16 +792,6 @@ body.post-type-yatra-booking #title {
     line-height: 1.75;
     font-weight: 600;
     margin-bottom: 4px;
-}
-
-.wp-admin.post-type-yatra-booking #poststuff #postbox-container-1 {
-
-    display: none;
-}
-
-.wp-admin.post-type-yatra-booking #poststuff #post-body.columns-2 {
-    margin: 0;
-
 }
 
 .yatra-setting-tab-options ul {
