@@ -157,7 +157,7 @@ final class Yatra
         $this->define('YATRA_ABSPATH', dirname(YATRA_FILE) . '/');
         $this->define('YATRA_BASENAME', plugin_basename(YATRA_FILE));
         $this->define('YATRA_ROUNDING_PRECISION', 6);
-        $this->define('YATRA_REST_WEBHOOKS_NAMESPACE', 'yatra/v1/webhooks/');
+        $this->define('YATRA_REST_WEBHOOKS_NAMESPACE', 'yatra/v1/webhooks');
     }
 
     /**

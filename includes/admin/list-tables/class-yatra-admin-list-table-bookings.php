@@ -45,7 +45,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
     {
 
         parent::__construct();
-        //add_action('admin_notices', array($this, 'bulk_admin_notices'));
+
     }
 
     /**
@@ -337,3 +337,6 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
     }
 
 }
+
+
+
