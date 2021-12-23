@@ -26,6 +26,10 @@
       .coupon {
         float: left;
         display: flex;
+
+        input, button {
+          flex: 1;
+        }
       }
     }
 
@@ -75,6 +79,7 @@
           margin: 0;
           border: none;
           padding: 0 10px;
+          background: #fff;
         }
       }
     }

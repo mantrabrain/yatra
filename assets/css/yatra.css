@@ -987,6 +987,11 @@ body.single .yatra-single-tour:after {
         display: -moz-box;
         display: -ms-flexbox;
         display: flex; }
+        .yatra-shortcode-wrapper form.yatra-cart-form .actions .coupon input, .yatra-shortcode-wrapper form.yatra-cart-form .actions .coupon button {
+          -webkit-box-flex: 1;
+             -moz-box-flex: 1;
+              -ms-flex: 1;
+                  flex: 1; }
     .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra-proceed-to-checkout, .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra_update_cart {
       padding: 10px; }
   .yatra-shortcode-wrapper .yatra-proceed-to-checkout-wrap {
@@ -1028,7 +1033,8 @@ body.single .yatra-single-tour:after {
           height: 100%;
           margin: 0;
           border: none;
-          padding: 0 10px; }
+          padding: 0 10px;
+          background: #fff; }
     #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-price {
       width: 30%; }
       #yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-price ins {

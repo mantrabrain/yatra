@@ -55,11 +55,15 @@ class Yatra_Tour_Block
 
         wp_register_script('yatra-block-tour', YATRA_PLUGIN_URI . '/assets/build/block-tour.js', $block_dependency['dependencies'], $block_dependency['version']);
 
+        wp_register_style('yatra-block-tour', YATRA_PLUGIN_URI . '/assets/build/block-tour.css', array(), $block_dependency['version']);
+
         register_block_type('yatra/tour', array(
 
             'api_version' => 2,
 
             'editor_script' => 'yatra-block-tour',
+
+            'editor_style' => 'yatra-block-tour',
 
             'attributes' => $this->attributes(),
 
