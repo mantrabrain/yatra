@@ -215,7 +215,7 @@
 .yatra-info, .yatra-success, .yatra-warning, .yatra-error, .yatra-validation {
   border: 1px solid;
   margin: 10px 0px;
-  padding: 10px 15px;
+  padding: 10px 15px 10px 25px;
   background-repeat: no-repeat;
   background-position: 10px center;
   text-align: left; }
@@ -225,7 +225,7 @@
     .yatra-info ul li, .yatra-success ul li, .yatra-warning ul li, .yatra-error ul li, .yatra-validation ul li {
       margin: 0;
       padding: 0;
-      list-style: disc inside !important;
+      list-style: disc !important;
       font-size: 15px;
       font-weight: normal; }
 
