@@ -19,7 +19,12 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
         );
         $posts = get_posts($args);
 
-        echo '<div class="yatra-discount-deals-wrap yatra-col-3">';
+
+        $grid_class = 'yatra-col-sm-6 yatra-col-md-4';
+
+        echo '<div class="yatra-discount-deals-list-container">';
+
+        echo '<div class="yatra-row yatra-discount-deals-wrap">';
 
         foreach ($posts as $item) {
 
@@ -28,7 +33,8 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
                 'title' => $item->post_title,
                 'excerpt' => $item->post_excerpt,
                 'permalink' => get_permalink($item->ID),
-                'image' => ''
+                'image' => '',
+                'class' => $grid_class
             );
 
             $attachment_id = (int)get_post_thumbnail_id($item);
@@ -43,6 +49,8 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
             yatra_get_template('tmpl-deals-item.php', $data);
 
         }
+        echo '</div>';
+        
         echo '</div>';
 
     }
@@ -102,7 +110,7 @@ if (!function_exists('yatra_get_tour_lists')) {
         );
 
         if (count($meta_query) > 0) {
-            
+
             $args['meta_query'] = $meta_query;
         }
 
