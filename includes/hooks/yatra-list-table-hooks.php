@@ -17,7 +17,7 @@ class Yatra_List_Table_Hooks
         unset($columns['date']);
 
         $columns['attributes'] = __('Attributes', 'yatra');
-        $columns['bookings'] = __('Bookings', 'yatra');
+        $columns['bookings'] = __('Total Booking', 'yatra');
         $columns['featured'] = __('Featured', 'yatra');
         $columns['date'] = __('Date', 'yatra');
 
@@ -73,6 +73,10 @@ class Yatra_List_Table_Hooks
 
     public function bookings($tour_id)
     {
+        $booking_count = Yatra_Core_DB::get_count(Yatra_Tables::TOUR_BOOKING_STATS, array(
+            'tour_id' => absint($tour_id)
+        ));
+        echo '<span>' . absint($booking_count) . '</span>';
 
     }
 
