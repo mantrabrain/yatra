@@ -3,6 +3,7 @@ import {InspectorControls, useBlockProps} from "@wordpress/block-editor";
 import {Panel, PanelBody, SelectControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
+import './editor.scss';
 
 const Edit = (props) => {
     const {attributes, setAttributes} = props;
@@ -14,7 +15,7 @@ const Edit = (props) => {
                 attributes={attributes}
             />
             <InspectorControls key="setting">
-                <div id="gutenpride-controls">
+                <div id="yatra-destination-controls">
                     <Panel>
                         <PanelBody title={__('Destination Settings', 'yatra')} initialOpen={true}>
 

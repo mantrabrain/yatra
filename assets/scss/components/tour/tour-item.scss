@@ -1,0 +1,134 @@
+.yatra-tour-list-wrap {
+
+  .yatra-item-inner {
+    position: relative;
+    height: 550px;
+    padding: 0;
+    margin: 0 0 30px;
+    display: block;
+    border: 1px solid #ddd;
+
+    img, figure {
+      vertical-align: top;
+      height: 275px;
+      width: 100%;
+      -o-object-fit: cover;
+      object-fit: cover;
+      max-width: 100%;
+    }
+
+    figure {
+      background: #ddd;
+      margin: 0;
+      padding: 0;
+    }
+
+    h2 {
+      position: absolute;
+      left: 15px;
+      bottom: 0;
+      width: calc(100% - 30px);
+      font-size: 30px;
+      line-height: 1.2em;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      margin: 0;
+      padding: 15px;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 100%);
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 100%;
+      border-left: 23px solid transparent;
+      border-right: 23px solid transparent;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+
+    h2.yatra-tour-title {
+      pointer-events: unset;
+      background: #1abc9c;
+
+      a {
+        color: #fff !important;
+        text-align: center;
+        margin: 0 auto;
+        display: block;
+        border: none;
+        font-size: 18px;
+        font-weight: 500;
+
+      }
+
+      &:hover {
+        background: #03ad8b;
+        color: initial;
+      }
+    }
+
+    a.yatra-link {
+      display: block;
+      height: 100%;
+      width: 100%;
+      background: #f9f9f9;
+    }
+
+    &:hover {
+      box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
+      border: 1px solid #aaa;
+
+    }
+
+    ul.yatra-tour-meta-options {
+      background: #f9f9f9;
+      padding: 25px 15px;
+      margin: 0;
+      list-style: none;
+      text-align: left;
+      border-bottom: 2px solid #ddd;
+
+      li {
+        line-height: 1.7;
+      }
+
+      .fa {
+        margin-right: 10px;
+        width: 10px;
+        display: inline-block;
+      }
+    }
+
+    .book-now-wrap {
+      position: absolute;
+      top: 250px;
+      left: 33%;
+
+      a {
+        border-radius: 50px;
+        padding: 10px 25px;
+        background-color: #1abc9c;
+        border: 1px solid #1abc9c;
+        color: #fff;
+      }
+    }
+
+  }
+
+  &:after {
+    clear: both;
+    content: '';
+  }
+
+  .yatra-tour-list-item {
+    padding: 0 15px;
+
+  }
+
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+    width: 100%;
+  }
+}

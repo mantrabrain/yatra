@@ -45,10 +45,10 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
                 }
             }
-            $coupon_dependency = file_exists(YATRA_ABSPATH . '/assets/build/coupon.asset.php') ? include_once(YATRA_ABSPATH . '/assets/build/coupon.asset.php') : array();
+            $coupon_dependency = file_exists(YATRA_ABSPATH . 'assets/build/js/coupon.asset.php') ? include_once(YATRA_ABSPATH . 'assets/build/js/coupon.asset.php') : array();
             $coupon_dependency['dependencies'] = isset($coupon_dependency['dependencies']) ? $coupon_dependency['dependencies'] : array();
             $coupon_dependency['version'] = isset($coupon_dependency['version']) ? sanitize_text_field($coupon_dependency['version']) : YATRA_VERSION;
-            wp_register_script('yatra-coupon', YATRA_PLUGIN_URI . '/assets/build/coupon.js', $coupon_dependency['dependencies'], $coupon_dependency['version']);
+            wp_register_script('yatra-coupon', YATRA_PLUGIN_URI . '/assets/build/js/coupon.js', $coupon_dependency['dependencies'], $coupon_dependency['version']);
             wp_register_style('yatra-coupon-css', YATRA_PLUGIN_URI . '/assets/build/style-coupon.css', array('wp-components'), YATRA_VERSION);
 
             // Register Only Script

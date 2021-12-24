@@ -3,7 +3,6 @@ import {render} from 'react-dom';
 import {TabPanel} from '@wordpress/components';
 import './style.scss';
 import {TabContent} from "./TabContent.js";
-
 export const useComponentDidUpdate = (effect, dependencies) => {
     const hasMounted = useRef(false);
     useEffect(

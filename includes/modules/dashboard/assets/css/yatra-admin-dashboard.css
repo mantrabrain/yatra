@@ -27,7 +27,7 @@
     font-size: 14px;
 }
 
-.yatra-row, .yatra-dashboard-wrap {
+.yatra-row-admin, .yatra-dashboard-wrap {
     display: flex;
 
 }

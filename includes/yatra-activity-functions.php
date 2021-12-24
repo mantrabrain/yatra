@@ -12,7 +12,12 @@ if (!function_exists('yatra_get_activity_lists')) {
             'hide_empty' => false,
             'order' => $order,
         ));
-        echo '<div class="yatra-activity-wrap yatra-col-4">';
+
+        $grid_class = 'yatra-col-sm-4 yatra-col-md-3';
+
+        echo '<div class="yatra-activity-list-container">';
+
+        echo '<div class="yatra-row yatra-activity-wrap">';
 
         foreach ($activity_terms as $term) {
 
@@ -22,7 +27,8 @@ if (!function_exists('yatra_get_activity_lists')) {
                 'slug' => $term->slug,
                 'count' => $term->count,
                 'permalink' => get_term_link($term->term_id),
-                'image' => ''
+                'image' => '',
+                'class' => $grid_class
             );
 
             $attachment_id = (int)get_term_meta($term->term_id, 'activity_image_id', true);
@@ -35,6 +41,8 @@ if (!function_exists('yatra_get_activity_lists')) {
             yatra_get_template('activity/item.php', $data);
 
         }
+        echo '</div>';
+
         echo '</div>';
 
     }

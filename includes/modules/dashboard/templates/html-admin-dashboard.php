@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
     <div class="yatra-dashboard-wrap">
 
         <div class="yatra-dashboard-content">
-            <div class="yatra-row">
+            <div class="yatra-row-admin">
                 <div class="yatra-dashboard-card yatra-card">
                     <div class="yatra-card-header"><h2>
                             <span class="dashicons dashicons-palmtree"></span>
@@ -64,7 +64,7 @@ if (!defined('ABSPATH')) {
                     </div>
                 </div>
             </div>
-            <div class="yatra-row">
+            <div class="yatra-row-admin">
                 <div class="yatra-dashboard-card yatra-card">
                     <div class="yatra-card-header"><h2>
                             <span class="dashicons dashicons-buddicons-pm"></span>
@@ -114,7 +114,7 @@ if (!defined('ABSPATH')) {
                     </div>
                 </div>
             </div>
-            <div class="yatra-row">
+            <div class="yatra-row-admin">
                 <div class="yatra-dashboard-card yatra-card">
                     <div class="yatra-card-header"><h2>
                             <span class="dashicons dashicons-external"></span>
@@ -160,7 +160,7 @@ if (!defined('ABSPATH')) {
                             <?php echo __('View All Addon/Extensions', 'yatra') ?></a></div>
                 </div>
             </div>
-            <div class="yatra-row">
+            <div class="yatra-row-admin">
                 <div class="yatra-dashboard-card yatra-card">
                     <div class="yatra-card-header"><h2>
                             <span class="dashicons dashicons-lightbulb"></span>
@@ -176,7 +176,7 @@ if (!defined('ABSPATH')) {
             </div>
         </div>
         <div class="yatra-dashboard-sidebar">
-            <div class="yatra-row">
+            <div class="yatra-row-admin">
                 <div class="yatra-dashboard-card yatra-card">
                     <div class="yatra-card-header"><h2>
                             <span class="dashicons dashicons-facebook-alt"></span>
@@ -191,7 +191,7 @@ if (!defined('ABSPATH')) {
                             <?php echo __('Join Yatra Facebook Community Group', 'yatra') ?></a></div>
                 </div>
             </div>
-            <div class="yatra-row">
+            <div class="yatra-row-admin">
                 <div class="yatra-dashboard-card yatra-card">
                     <div class="yatra-card-header"><h2>
                             <span class="dashicons dashicons-text-page"></span>
@@ -205,7 +205,7 @@ if (!defined('ABSPATH')) {
                             <?php echo __('Check Documentation', 'yatra') ?></a></div>
                 </div>
             </div>
-            <div class="yatra-row">
+            <div class="yatra-row-admin">
                 <div class="yatra-dashboard-card yatra-card">
                     <div class="yatra-card-header"><h2>
                             <span class="dashicons dashicons-buddicons-forums"></span>
@@ -219,7 +219,7 @@ if (!defined('ABSPATH')) {
                             <?php echo __('View Support Forum', 'yatra') ?></a></div>
                 </div>
             </div>
-            <div class="yatra-row">
+            <div class="yatra-row-admin">
                 <div class="yatra-dashboard-card yatra-card">
                     <div class="yatra-card-header"><h2>
                             <span class="dashicons dashicons-format-video"></span>

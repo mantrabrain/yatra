@@ -102,12 +102,17 @@ if (!function_exists('yatra_get_tour_lists')) {
         );
 
         if (count($meta_query) > 0) {
+            
             $args['meta_query'] = $meta_query;
         }
 
         $posts = get_posts($args);
 
-        echo '<div class="yatra-tour-list-wrap yatra-col-3">';
+        $grid_class = 'yatra-col-sm-6 yatra-col-md-4';
+
+        echo '<div class="yatra-tour-list-container">';
+
+        echo '<div class="yatra-row yatra-tour-list-wrap">';
 
         foreach ($posts as $item) {
 
@@ -116,7 +121,8 @@ if (!function_exists('yatra_get_tour_lists')) {
                 'title' => $item->post_title,
                 'excerpt' => $item->post_excerpt,
                 'permalink' => get_permalink($item->ID),
-                'image' => ''
+                'image' => '',
+                'class' => $grid_class,
             );
 
             $attachment_id = (int)get_post_thumbnail_id($item);
@@ -132,6 +138,9 @@ if (!function_exists('yatra_get_tour_lists')) {
 
         }
         echo '</div>';
+
+        echo '</div>';
+
 
     }
 

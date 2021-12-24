@@ -1,6 +1,5 @@
-<div id="admin-editor-yatra-tour" class="yatra-admin-editor yatra-box-data"
-     data-question-id="18">
-    <div class="yatra-box-data-head yatra-row">
+<div id="admin-editor-yatra-tour" class="yatra-admin-editor yatra-box-data">
+    <div class="yatra-box-data-head yatra-admin-row">
         <h3 class="heading"><?php echo esc_html($title); ?></h3>
     </div>
     <div class="yatra-box-data-content">

@@ -33,17 +33,21 @@ class Yatra_Block_Destination
 
     public function register()
     {
-        $block_dependency = file_exists(YATRA_ABSPATH . '/assets/build/block-destination.asset.php') ? include_once(YATRA_ABSPATH . '/assets/build/block-destination.asset.php') : array();
+        $block_dependency = file_exists(YATRA_ABSPATH . 'assets/build/js/block-destination.asset.php') ? include_once(YATRA_ABSPATH . 'assets/build/js/block-destination.asset.php') : array();
 
         $block_dependency['dependencies'] = isset($block_dependency['dependencies']) ? $block_dependency['dependencies'] : array();
 
         $block_dependency['version'] = isset($block_dependency['version']) ? sanitize_text_field($block_dependency['version']) : YATRA_VERSION;
 
-        wp_register_script('yatra-block-destination', YATRA_PLUGIN_URI . '/assets/build/block-destination.js', $block_dependency['dependencies'], $block_dependency['version']);
+        wp_register_script('yatra-block-destination', YATRA_PLUGIN_URI . '/assets/build/js/block-destination.js', $block_dependency['dependencies'], $block_dependency['version']);
+
+        wp_register_style('yatra-block-destination', YATRA_PLUGIN_URI . '/assets/build/block-destination.css', array(), $block_dependency['version']);
 
         register_block_type('yatra/destination', array(
 
             'api_version' => 2,
+
+            'editor_style' => 'yatra-block-destination',
 
             'editor_script' => 'yatra-block-destination',
 

@@ -13,7 +13,12 @@ if (!function_exists('yatra_get_destination_lists')) {
             'order' => $order,
 
         ));
-        echo '<div class="yatra-destination-wrap yatra-col-4">';
+
+        $grid_class = 'yatra-col-sm-4 yatra-col-md-3';
+
+        echo '<div class="yatra-destination-list-container">';
+
+        echo '<div class="yatra-row yatra-destination-wrap">';
 
         foreach ($destination_terms as $term) {
 
@@ -23,7 +28,8 @@ if (!function_exists('yatra_get_destination_lists')) {
                 'slug' => $term->slug,
                 'count' => $term->count,
                 'permalink' => get_term_link($term->term_id),
-                'image' => ''
+                'image' => '',
+                'class' => $grid_class
             );
 
             $attachment_id = (int)get_term_meta($term->term_id, 'destination_image_id', true);
@@ -35,7 +41,10 @@ if (!function_exists('yatra_get_destination_lists')) {
 
             yatra_get_template('destination/item.php', $data);
 
+
         }
+        echo '</div>';
+
         echo '</div>';
 
     }

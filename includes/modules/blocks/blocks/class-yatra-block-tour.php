@@ -47,13 +47,13 @@ class Yatra_Tour_Block
 
     public function register()
     {
-        $block_dependency = file_exists(YATRA_ABSPATH . '/assets/build/block-tour.asset.php') ? include_once(YATRA_ABSPATH . '/assets/build/block-tour.asset.php') : array();
+        $block_dependency = file_exists(YATRA_ABSPATH . 'assets/build/js/block-tour.asset.php') ? include_once(YATRA_ABSPATH . 'assets/build/js/block-tour.asset.php') : array();
 
         $block_dependency['dependencies'] = isset($block_dependency['dependencies']) ? $block_dependency['dependencies'] : array();
 
         $block_dependency['version'] = isset($block_dependency['version']) ? sanitize_text_field($block_dependency['version']) : YATRA_VERSION;
 
-        wp_register_script('yatra-block-tour', YATRA_PLUGIN_URI . '/assets/build/block-tour.js', $block_dependency['dependencies'], $block_dependency['version']);
+        wp_register_script('yatra-block-tour', YATRA_PLUGIN_URI . '/assets/build/js/block-tour.js', $block_dependency['dependencies'], $block_dependency['version']);
 
         wp_register_style('yatra-block-tour', YATRA_PLUGIN_URI . '/assets/build/block-tour.css', array(), $block_dependency['version']);
 

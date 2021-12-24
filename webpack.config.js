@@ -1,6 +1,4 @@
 const defaultConfig = require("@wordpress/scripts/config/webpack.config");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-
 const path = require("path");
 const isProduction = "production" === process.env.NODE_ENV;
 
@@ -11,17 +9,9 @@ entryPoints.forEach(
         entry[entryPoint] = path.resolve(process.cwd(), `assets/src/${entryPoint}/index.js`);
     }
 );
-
 module.exports = {
     mode: isProduction ? "production" : "development",
     ...defaultConfig,
-    plugins: [new MiniCssExtractPlugin({
-        filename: function (output) {
-            var filename = output.filename.replace("style", "").replace("editor", "");
-            return "[" + filename + "]/[" + filename + "].css";
-        },
-    })],
-
     module: {
         ...defaultConfig.module,
         rules: [
@@ -31,11 +21,8 @@ module.exports = {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
                 exclude: /node_modules/,
-            },
-            {
-                test: /\.css$/i,
-                use: [MiniCssExtractPlugin.loader, "css-loader"],
-            },
+            }
+
         ],
     },
     resolve: {
@@ -44,7 +31,7 @@ module.exports = {
     },
     entry,
     output: {
-        filename: "[name]/[name].js",
+        filename: "js/[name].js",
         path: path.join(__dirname, "assets/build"),
         clean: false,
     },

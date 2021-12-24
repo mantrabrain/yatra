@@ -4,7 +4,7 @@ import {Panel, PanelBody, RangeControl, ToggleControl, SelectControl} from '@wor
 import {__} from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
 import './editor.scss';
-import './style.scss';
+
 const Edit = (props) => {
     const {attributes, setAttributes} = props;
     const blockProps = useBlockProps();
@@ -21,7 +21,7 @@ const Edit = (props) => {
                 attributes={attributes}
             />
             <InspectorControls key="setting">
-                <div id="gutenpride-controls">
+                <div id="yatra-tour-controls">
                     <Panel>
                         <PanelBody title={__('Tour Settings', 'yatra')} initialOpen={true}>
 
