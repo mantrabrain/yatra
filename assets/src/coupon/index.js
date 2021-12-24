@@ -6,7 +6,6 @@ import {TabContent} from "./TabContent.js";
 
 export const useComponentDidUpdate = (effect, dependencies) => {
     const hasMounted = useRef(false);
-
     useEffect(
         () => {
             if (!hasMounted.current) {

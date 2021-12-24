@@ -15,7 +15,12 @@ entryPoints.forEach(
 module.exports = {
     mode: isProduction ? "production" : "development",
     ...defaultConfig,
-    plugins: [new MiniCssExtractPlugin()],
+    plugins: [new MiniCssExtractPlugin({
+        filename: function (output) {
+            var filename = output.filename.replace("style", "").replace("editor", "");
+            return "[" + filename + "]/[" + filename + "].css";
+        },
+    })],
 
     module: {
         ...defaultConfig.module,
