@@ -21,7 +21,7 @@ class Yatra_List_Table_Hooks
         $columns['price'] = sprintf(__('Price %s', 'yatra'), $pricing_tooltip);
         $columns['bookings'] = __('Total Booking', 'yatra');
         $columns['featured'] = __('Featured', 'yatra');
-        $columns['earning'] = __('Earning', 'yatra');
+       // $columns['earning'] = __('Earning', 'yatra');
         $columns['date'] = __('Date', 'yatra');
 
         return $columns;
