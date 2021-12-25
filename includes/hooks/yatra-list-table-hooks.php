@@ -16,9 +16,12 @@ class Yatra_List_Table_Hooks
         unset($columns['taxonomy-attributes']);
         unset($columns['date']);
 
+        $pricing_tooltip = '<span class="yatra-tippy-tooltip dashicons dashicons-editor-help" data-tippy-content="' . esc_attr__('Pricing might be different as per selected date on booking.', 'yatra') . '"></span>';
         $columns['attributes'] = __('Attributes', 'yatra');
+        $columns['price'] = sprintf(__('Price %s', 'yatra'), $pricing_tooltip);
         $columns['bookings'] = __('Total Booking', 'yatra');
         $columns['featured'] = __('Featured', 'yatra');
+        $columns['earning'] = __('Earning', 'yatra');
         $columns['date'] = __('Date', 'yatra');
 
         return $columns;
@@ -41,6 +44,11 @@ class Yatra_List_Table_Hooks
             case "featured":
                 $this->featured($post_id);
                 break;
+            case "price":
+                $this->price($post_id);
+                break;
+
+
         }
 
 
@@ -97,6 +105,48 @@ class Yatra_List_Table_Hooks
               data-is-featured="<?php echo absint($featured_status) ?>"
         ></span>
         <?php
+    }
+
+    public function price($tour_id)
+    {
+        $tour_options = new Yatra_Tour_Options($tour_id);
+
+
+        $tour_data = $tour_options->getTourData();
+
+        $pricing = $tour_data->getPricing();
+
+        if ($pricing instanceof Yatra_Tour_Pricing) {
+
+            $regular_price = $pricing->getRegularPrice();
+
+            $sales_price = $pricing->getSalesPrice();
+
+            $final_price = $sales_price === '' ? $regular_price : $sales_price;
+
+            echo '<span>';
+
+            echo esc_html(yatra_get_price(yatra_get_current_currency_symbol(), $final_price));
+
+            echo '</span>';
+
+        } else {
+
+            $min_price = yatra_get_minimum_tour_price($pricing);
+
+            $max_price = yatra_get_maximum_tour_price($pricing);
+
+            echo '<span>';
+
+            echo esc_html(yatra_get_price(yatra_get_current_currency_symbol(), $min_price));
+
+            echo ' &nbsp;– &nbsp;';
+
+            echo esc_html(yatra_get_price(yatra_get_current_currency_symbol(), $max_price));
+
+            echo '</span>';
+
+        }
     }
 }
 

@@ -3,6 +3,7 @@ defined('ABSPATH') || exit;
 
 // Load Helpers
 
+include_once YATRA_ABSPATH . 'includes/yatra-pricing-functions.php';
 include_once YATRA_ABSPATH . 'includes/yatra-deprecated-functions.php';
 include_once YATRA_ABSPATH . 'includes/yatra-html-functions.php';
 include_once YATRA_ABSPATH . 'includes/helpers/yatra-country-helper.php';
@@ -749,7 +750,7 @@ if (!function_exists('yatra_payment_gateway_fields')) {
         $yatra_get_active_payment_gateways = (yatra_get_active_payment_gateways());
 
         $yatra_get_payment_gateways = yatra_get_payment_gateways();
-        
+
         if (count($yatra_get_active_payment_gateways) > 0) {
 
             echo '<h2 class="yatra-payment-gateway-title">' . __('Payment Gateways', 'yatra') . '</h2>';
