@@ -159,6 +159,9 @@ if (!class_exists('Yatra_Admin_Assets')) {
                 ),
                 'visibility_conditions' => $visibility_conditions,
 
+                'tour_featured_status_update_action' => 'yatra_update_tour_featured_status',
+
+
             );
             wp_localize_script('yatra-admin-script', 'yatra_admin_params', $yatra_admin_params);
 

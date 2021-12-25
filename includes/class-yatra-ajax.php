@@ -14,7 +14,8 @@ class Yatra_Ajax
             'import_sample_data_on_setup',
             'tour_availability',
             'day_wise_tour_availability',
-            'day_wise_tour_availability_save'
+            'day_wise_tour_availability_save',
+            'update_tour_featured_status'
         );
 
         return $actions;
@@ -35,10 +36,13 @@ class Yatra_Ajax
 
     private function validate_nonce($nonce_action = '', $nonce_value = '')
     {
-        $debug_backtrace = debug_backtrace();
-        if (@isset($debug_backtrace[1]['function'])) {
+        if (empty($nonce_action)) {
+            $debug_backtrace = debug_backtrace();
 
-            $nonce_action = 'wp_yatra_' . $debug_backtrace[1]['function'] . '_nonce';
+            if (@isset($debug_backtrace[1]['function'])) {
+
+                $nonce_action = 'wp_yatra_' . $debug_backtrace[1]['function'] . '_nonce';
+            }
         }
         if (empty($nonce_value)) {
             $nonce_value = isset($_REQUEST['yatra_nonce']) ? $_REQUEST['yatra_nonce'] : '';
@@ -69,6 +73,30 @@ class Yatra_Ajax
         }
 
 
+    }
+
+    public function update_tour_featured_status()
+    {
+        $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
+
+        $nonce_action = 'yatra_tour_update_feature_status_' . $tour_id;
+
+        $status = $this->validate_nonce($nonce_action);
+
+        if (!$status) {
+            wp_send_json_error($this->ajax_error());
+        }
+        $status = isset($_POST['featured_status']) && (boolean)$_POST['featured_status'];
+
+        $updated_featured_status = $status ? 0 : 1;
+
+        if (FALSE === get_post_status($tour_id)) {
+            wp_send_json_error();
+        }
+
+        update_post_meta($tour_id, 'yatra_tour_meta_tour_featured', $updated_featured_status);
+
+        wp_send_json_success($updated_featured_status);
     }
 
     public function tour_add_to_cart()

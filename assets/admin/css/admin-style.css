@@ -894,3 +894,7 @@ ul.yatra-daterange-list li:hover small.dashicons {
     height: 30px;
     width: 30px;
 }
+
+.yatra-update-feature-tour-icon {
+    cursor: pointer;
+}
