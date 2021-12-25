@@ -10,7 +10,7 @@
  */
 
 ?>
-<div id="post-<?php the_ID(); ?>" <?php yatra_tour_class(); ?>>
+<div id="tour-<?php the_ID(); ?>" <?php yatra_tour_class(); ?>>
     <?php
     $template = get_option('yatra_archive_template', 'template-default');
     switch ($template) {
@@ -46,4 +46,4 @@
     //yatra_entry_footer();
 
     ?>
-</div><!-- #post-${ID} -->
+</div><!-- #tour-${ID} -->

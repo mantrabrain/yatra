@@ -13,6 +13,7 @@ class Yatra_Compatibility_Themes_Kadence
     public function before_content()
     {
         if (yatra_is_archive_page() || yatra_is_tour_page()) {
+
             ?>
             <div id="primary" class="content-area">
             <div class="content-container site-container">

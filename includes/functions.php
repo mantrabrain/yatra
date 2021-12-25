@@ -1199,6 +1199,9 @@ if (!function_exists('yatra_is_archive_page')) {
         if (is_tax('activity')) {
             return true;
         }
+        if (is_post_type_archive('tour')) {
+            return true;
+        }
         return false;
     }
 }
