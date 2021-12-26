@@ -32,9 +32,9 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
                 $discount_code = $coupon['code'] ?? '';
 
-                $total_gross_price = $booking->get_total();
+                $total_gross_price = $booking->get_total(false);
 
-                $total_net_price = $booking->get_total(true);
+                $total_net_price = $booking->get_total();
 
 
                 ?>
