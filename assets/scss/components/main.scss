@@ -42,55 +42,6 @@
 }
 
 .yatra-page-wrapper {
-  &.template-default {
-    .yatra-tour-archive {
-      position: relative;
-      margin-bottom: 60px;
-      background-color: #fff;
-      -webkit-box-shadow: 0 0 30px 0 rgba(33, 30, 25, .1);
-      -moz-box-shadow: 0 0 30px 0 rgba(33, 30, 25, .1);
-      box-shadow: 0 0 30px 0 rgba(33, 30, 25, .1);
-      display: block;
-
-      &:after {
-        content: "";
-        display: block;
-        clear: both;
-      }
-
-      .thumb-wrap {
-        width: 33.33%;
-        float: left;
-      }
-
-      .content-wrap {
-
-        width: 41.67%;
-        float: left;
-
-      }
-
-      .meta-content-wrap {
-        width: 25%;
-        float: left;
-
-        ul {
-          li {
-            list-style: none;
-            line-height: 1.5em;
-            background: #f9f9f9;
-            padding: 8px;
-            border: 1px solid #ddd;
-            margin-bottom: 1px;
-          }
-        }
-      }
-
-      .inner {
-        padding: 15px;
-      }
-    }
-  }
 
   .nav-links {
     .meta-nav {
@@ -375,6 +326,7 @@
 @import "tour/destination-item";
 @import "tour/activity-item";
 @import "tour/deals-item";
+@import "archive";
 
 .yatra-flex-row {
   display: flex;

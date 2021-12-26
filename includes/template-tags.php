@@ -2,8 +2,9 @@
 
 defined('ABSPATH') || exit;
 if (!function_exists('yatra_get_taxonomy_term_lists')) {
-    function yatra_get_taxonomy_term_lists($post_id, $taxonomy = '')
+    function yatra_get_taxonomy_term_lists($post_id, $taxonomy = '', $return = false)
     {
+        ob_start();
         /* translators: used between list items, there is a space after the comma. */
         $terms = get_the_term_list($post_id, $taxonomy, '', __(', ', 'yatra'));
 
@@ -16,18 +17,11 @@ if (!function_exists('yatra_get_taxonomy_term_lists')) {
                 $terms
             ); // WPCS: XSS OK.
         }
-
-//        /* translators: used between list items, there is a space after the comma. */
-//        $tags_list = get_the_tag_list('', __(', ', 'yatra'));
-//        if ($tags_list) {
-//            printf(
-//            /* translators: 1: SVG icon. 2: posted in label, only visible to screen readers. 3: list of tags. */
-//                '<span class="tags-links">%1$s<span class="screen-reader-text">%2$s </span>%3$s</span>',
-//                yatra_get_icon_svg('tag', 16),
-//                __('Tags:', 'yatra'),
-//                $tags_list
-//            ); // WPCS: XSS OK.
-//        }
+        $content = ob_get_clean();
+        if ($return) {
+            return $content;
+        }
+        echo $content;
     }
 }
 
@@ -143,13 +137,11 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
             array(
                 'icon' => 'fa fa-users',
                 'text' => '{{yatra_tour_maximum_number_of_traveller}}',
-                'title' => __('Maximum Traveller', 'yatra')
 
             ),
             array(
                 'icon' => 'fa fa-chair',
                 'text' => '{{yatra_tour_minimum_pax}}',
-                'title' => __('Minimum Pax', 'yatra')
 
             )
 
@@ -172,7 +164,6 @@ if (!function_exists('yatra_entry_meta_for_frontend_archive')) {
                 array(
                     'icon' => 'fa fa-globe',
                     'text' => $country_string,
-                    'title' => __('Country', 'yatra')
 
                 );
 
@@ -192,7 +183,50 @@ if (!function_exists('yatra_entry_meta_options')) {
     {
         $post_id = $post_id > 0 ? $post_id : get_the_id();
 
-        $meta_frontend = yatra_entry_meta_for_frontend_archive($post_id);
+        $yatra_tour_meta_tour_country = get_post_meta($post_id, 'yatra_tour_meta_tour_country', true);
+
+        $yatra_tour_meta_tour_days = get_post_meta($post_id, 'yatra_tour_meta_tour_duration_days', true);
+
+        $yatra_tour_meta_tour_nights = get_post_meta($post_id, 'yatra_tour_meta_tour_duration_nights', true);
+
+        $duration_string = '';
+
+        if ($yatra_tour_meta_tour_days != '') {
+
+            $duration_string .= $yatra_tour_meta_tour_days . ' ' . __("Days", 'yatra') . ' ';
+
+        }
+        if ($yatra_tour_meta_tour_nights != '') {
+
+            $duration_string .= $yatra_tour_meta_tour_nights . ' ' . __("Nights", 'yatra');
+
+        }
+        if ($yatra_tour_meta_tour_nights == '' && $yatra_tour_meta_tour_days == '') {
+            $duration_string = __('N/A', 'yatra');
+
+        }
+
+        if (!empty($yatra_tour_meta_tour_country)) {
+
+            $country_string = '';
+
+            foreach ($yatra_tour_meta_tour_country as $country_item) {
+
+                $country = yatra_get_countries($country_item);
+
+
+                $country_string .= $country . ', ';
+            }
+            $country_string = trim($country_string, ', ');
+
+        }
+        $activity = yatra_get_taxonomy_term_lists($post_id, 'activity', true);
+
+        $meta_frontend = array(
+            array('icon' => 'fa fa-globe', 'text' => $country_string),
+            array('icon' => 'fa fa-clock', 'text' => $duration_string),
+            array('icon' => 'fa fa-universal-access', 'text' => $activity),
+        );
 
         $list = '';
 
@@ -202,23 +236,11 @@ if (!function_exists('yatra_entry_meta_options')) {
 
             $text = isset($value['text']) ? $value['text'] : '';
 
-            $title = isset($value['title']) ? $value['title'] : '';
 
-            preg_match_all("~\{\{\s*(.*?)\s*\}\}~", $text, $matches);
-
-            $matches = isset($matches[1]) ? $matches[1] : array();
-
-            foreach ($matches as $match) {
-
-                $text_id = sanitize_text_field($match);
-
-                $text_option = get_post_meta($post_id, $text_id, true);
-
-                $text = str_replace('{{' . $match . '}}', $text_option, $text);
-            }
-
-            $list .= '<li><i class="' . esc_attr($icon) . '"></i>&nbsp;<strong>' . esc_html($title) . ': </strong>' . ($text) . '</li>';
+            $list .= '<li><i class="icon ' . esc_attr($icon) . '"></i><span class="icon-content">' . ($text) . '</span></li>';
         }
+
+
         echo '<ul class="yatra-tour-meta-options">';
 
         echo $list;

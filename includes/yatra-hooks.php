@@ -83,7 +83,7 @@ function yatra_before_main_content_callback()
 {
 $class = '';
 
-$class .= is_post_type_archive('tour') ? 'yatra-archive-tour' : '';
+$class .= yatra_is_archive_page() ? 'yatra-archive-tour' : '';
 
 $class .= is_singular('tour') ? 'yatra-single-tour' : '';
 
@@ -149,8 +149,9 @@ $class = 'yatra-page-wrapper';
 
 $class = $class . ' ' . get_option('yatra_page_container_class');
 
-if (!is_single()) {
-    $class = $class . ' ' . get_option('yatra_archive_template', 'template-default');
+if (yatra_is_archive_page()) {
+
+    $class = $class . ' yatra-archive-template-list ' . get_option('yatra_archive_template', 'template-default');
 }
 
 $class = apply_filters('yatra_page_wrapper_class', $class);

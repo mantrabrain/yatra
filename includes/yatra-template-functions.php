@@ -558,14 +558,7 @@ function yatra_get_tour_class($class = '', $tour_id = null)
         return $post_classes;
     }
 
-    if (is_singular()) {
-
-        $classes[] = 'yatra-tour-single';
-
-    } else if (is_archive()) {
-
-        $classes[] = 'yatra-tour-archive';
-    }
+    $classes[] = 'yatra-tour-single-item';
 
     $classes = apply_filters('yatra_post_class', $classes, $tour_id);
 

@@ -17,23 +17,34 @@
         case "template-default":
             ?>
 
-            <div class="thumb-wrap">
+            <div class="yatra-thumb-wrap">
                 <div class="inner">
                     <?php yatra_tour_thumbnail(); ?>
                 </div>
             </div>
 
-            <div class="content-wrap">
+            <div class="yatra-content-wrap">
                 <div class="inner">
-                    <?php yatra_entry_header(); ?>
-                    <?php yatra_entry_post_content(); ?>
-                </div>
-            </div>
+                    <div class="yatra-content-left">
+                        <?php yatra_entry_header(); ?>
+                        <?php yatra_entry_post_content(); ?>
 
-
-            <div class="meta-content-wrap">
-                <div class="inner">
-                    <?php yatra_entry_meta_options(); ?>
+                        <div class="yatra-meta-content-wrap">
+                            <div class="inner">
+                                <?php yatra_entry_meta_options(); ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="yatra-content-right">
+                        <div class="yatra-tour-details">
+                            <div class="yatra-tour-price">
+                                <p>From $2000</p>
+                            </div>
+                            <div class="yatra-tour-more">
+                                <a class="" href="https://themepalacedemo.com/tourable-pro/itinerary/venice-beach/">Explore</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -42,8 +53,6 @@
             break;
 
     }
-
-    //yatra_entry_footer();
 
     ?>
 </div><!-- #tour-${ID} -->
