@@ -3,6 +3,7 @@
 include_once YATRA_ABSPATH . 'includes/hooks/yatra-template-hooks.php';
 include_once YATRA_ABSPATH . 'includes/hooks/yatra-list-table-hooks.php';
 include_once YATRA_ABSPATH . 'includes/hooks/yatra-log-handler-hooks.php';
+include_once YATRA_ABSPATH . 'includes/hooks/yatra-archive-hooks.php';
 
 if (!function_exists('yatra_checkout_form_fields')) {
 
@@ -57,6 +58,16 @@ if (!function_exists('register_yatra_session')) {
 if (!function_exists('yatra_main_content_callback')) {
     function yatra_main_content_callback()
     {
+        if (yatra_is_archive_page()) {
+            ?>
+            <header class="yatra-page-header">
+                <?php
+                the_archive_title('<h1 class="page-title">', '</h1>');
+                ?>
+            </header><!-- .page-header -->
+
+            <?php
+        }
         ?>
         <main id="yatra-main" class="site-main yatra-site-main">
 

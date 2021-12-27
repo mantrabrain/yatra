@@ -55,7 +55,8 @@
                                 </p>
                             </div>
                             <div class="yatra-tour-more">
-                                <a href="<?php the_permalink() ?>"><?php echo esc_html__('View Details', 'yatra') ?></a>
+                                <a class="button"
+                                   href="<?php the_permalink() ?>"><?php echo esc_html__('View Details', 'yatra') ?></a>
                             </div>
                         </div>
                     </div>

@@ -42,6 +42,9 @@
 
         }
 
+        del {
+          color: #aaa;
+        }
 
         .yatra-content-wrap {
 
@@ -115,6 +118,32 @@
           display: inline-block;
         }
       }
+    }
+  }
+
+  .yatra-archive-tour {
+    display: inline-block;
+
+    .yatra-tour-filter-sidebar {
+      width: 250px;
+      float: left;
+      background: #fff;
+    }
+
+    .yatra-archive-main-content-area {
+      width: calc(100% - 250px
+      );
+      width: -moz-calc(100% - 266px);
+      float: left;
+      padding-left: 20px;
+      display: inline-block;
+      margin: 0;
+    }
+
+    &:after {
+      content: "";
+      display: inline-block;
+      clear: both;
     }
   }
 }
