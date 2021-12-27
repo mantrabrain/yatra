@@ -1,7 +1,8 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
+
 interface Yatra_Tour_Pricing_Interface
 {
     public function getID();
@@ -14,9 +15,11 @@ interface Yatra_Tour_Pricing_Interface
 
     public function getGroupSize();
 
-    public function getRegularPrice($calculate_total_regular_price = false);
+    public function getRegularPrice();
 
     public function getSalesPrice();
+
+    public function getFinalRegularPrice();
 
     public function getFinalPrice();
 

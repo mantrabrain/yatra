@@ -24,46 +24,16 @@ class Yatra_Template_Hooks
 
         $tourData = $yatra_tour_options->getTourData();
 
-        $pricing = $tourData->getPricing();
 
-        $min_regular_price = 0;
-
-        $min_sales_price = 0;
-
-        if ($pricing instanceof Yatra_Tour_Pricing) {
-
-            $min_regular_price = $pricing->getRegularPrice();
-
-            $min_sales_price = $pricing->getSalesPrice();
-        } else {
-
-            /* @var $single Yatra_Tour_Pricing */
-            foreach ($pricing as $single) {
-
-                $regular_price = $single->getRegularPrice();
-
-                $sales_price = $single->getSalesPrice();
-                
-                $min_pax = $single->getMinimumPax();
-
-                if (absint($min_pax) > 0) {
-
-                    $min_sales_price += absint($sales_price);
-
-                    $min_regular_price += $regular_price;
-
-
-                }
-            }
-        }
+        $minimum_pricing = yatra_get_minimum_tour_pricing(get_the_ID());
 
 
         yatra_get_template('tour/sidebar.php',
             array(
                 'data' => $tourData,
                 'currency' => yatra_get_current_currency_symbol(),
-                'min_regular' => $min_regular_price,
-                'min_sales' => $min_sales_price
+                'min_regular' => $minimum_pricing['regular_price'],
+                'min_sales' => $minimum_pricing['sales_price']
             )
         );
     }

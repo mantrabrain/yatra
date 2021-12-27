@@ -32,18 +32,20 @@ class Yatra_Tour_Pricing extends Yatra_Tour_Pricing_Abstract
         return $this->group_size;
     }
 
-    public function getRegularPrice($calculate_total_regular_price = false)
+    public function getRegularPrice()
     {
-        if (!$calculate_total_regular_price) {
-            return $this->regular_price;
-        } else {
-            return (absint($this->regular_price) * absint($this->person_count));
-        }
+        return $this->regular_price;
+
     }
 
     public function getSalesPrice()
     {
         return $this->sales_price;
+    }
+
+    public function getFinalRegularPrice()
+    {
+        return $this->final_regular_price;
     }
 
     public function getFinalPrice()

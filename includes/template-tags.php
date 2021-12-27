@@ -6,7 +6,7 @@ if (!function_exists('yatra_get_taxonomy_term_lists')) {
     {
         ob_start();
         /* translators: used between list items, there is a space after the comma. */
-        $terms = get_the_term_list($post_id, $taxonomy, '', __(', ', 'yatra'));
+        $terms = get_the_term_list($post_id, $taxonomy, '', __(',&nbsp;', 'yatra'));
 
         if ($terms) {
             printf(
@@ -41,10 +41,6 @@ if (!function_exists('yatra_entry_header')) {
                 the_title(sprintf('<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url(get_permalink())), '</a></h2>');
             endif;
             ?>
-            <div class="entry-meta">
-                <?php
-                yatra_get_taxonomy_term_lists(get_the_ID(), 'destination');
-                ?></div>
         </header><!-- .entry-header -->
         <?php
     }
@@ -183,8 +179,6 @@ if (!function_exists('yatra_entry_meta_options')) {
     {
         $post_id = $post_id > 0 ? $post_id : get_the_id();
 
-        $yatra_tour_meta_tour_country = get_post_meta($post_id, 'yatra_tour_meta_tour_country', true);
-
         $yatra_tour_meta_tour_days = get_post_meta($post_id, 'yatra_tour_meta_tour_duration_days', true);
 
         $yatra_tour_meta_tour_nights = get_post_meta($post_id, 'yatra_tour_meta_tour_duration_nights', true);
@@ -206,26 +200,18 @@ if (!function_exists('yatra_entry_meta_options')) {
 
         }
 
-        if (!empty($yatra_tour_meta_tour_country)) {
 
-            $country_string = '';
-
-            foreach ($yatra_tour_meta_tour_country as $country_item) {
-
-                $country = yatra_get_countries($country_item);
-
-
-                $country_string .= $country . ', ';
-            }
-            $country_string = trim($country_string, ', ');
-
-        }
         $activity = yatra_get_taxonomy_term_lists($post_id, 'activity', true);
 
+        $destination = yatra_get_taxonomy_term_lists(get_the_ID(), 'destination', true);
+
         $meta_frontend = array(
-            array('icon' => 'fa fa-globe', 'text' => $country_string),
-            array('icon' => 'fa fa-clock', 'text' => $duration_string),
             array('icon' => 'fa fa-universal-access', 'text' => $activity),
+
+            array('icon' => 'fa fa fa-map-marker-alt', 'text' => $destination),
+
+            array('icon' => 'fa fa-clock', 'text' => $duration_string),
+
         );
 
         $list = '';

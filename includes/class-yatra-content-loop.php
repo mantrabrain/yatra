@@ -23,6 +23,7 @@ class Yatra_Content_Loop
 
                 $template = '';
                 if (!is_single()) {
+
                     $template = 'listing';
                 }
                 yatra_get_template_part('parts/content', $template);

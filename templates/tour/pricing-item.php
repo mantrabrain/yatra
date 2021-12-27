@@ -33,7 +33,7 @@ $number_of_people = absint($yatra_booking_pricing->getMinimumPax()) === 0 ? 1 : 
             $sales_price = $sales_price === '' ? $regular_price : $sales_price;
             $final_price = $yatra_booking_pricing->getFinalPrice();
             if ($regular_price != '' && ($regular_price != $sales_price)) { ?>
-                <del class="regular"><?php echo esc_html(yatra_get_price($currency_symbol, $yatra_booking_pricing->getRegularPrice(true))) ?></del>
+                <del class="regular"><?php echo esc_html(yatra_get_price($currency_symbol, $yatra_booking_pricing->getFinalRegularPrice())) ?></del>
             <?php } ?>
             <ins class="final"><?php
 

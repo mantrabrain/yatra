@@ -22,7 +22,7 @@
         ?>
         <div class="yatra-traveller-price">
             <?php if ($regular_price != '' && ($regular_price != $sales_price)) { ?>
-                <del><?php echo esc_html(yatra_get_price($currency, $pricing->getRegularPrice(true))) ?></del>
+                <del><?php echo esc_html(yatra_get_price($currency, $pricing->getFinalRegularPrice())) ?></del>
             <?php } ?>
             <ins><?php
 

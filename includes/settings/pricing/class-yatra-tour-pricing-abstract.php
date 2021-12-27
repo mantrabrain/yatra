@@ -19,6 +19,8 @@ abstract class Yatra_Tour_Pricing_Abstract implements Yatra_Tour_Pricing_Interfa
 
     protected $sales_price;
 
+    protected $final_regular_price;
+
     protected $final_price;
 
     protected $minimum_pax;

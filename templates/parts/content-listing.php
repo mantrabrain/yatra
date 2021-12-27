@@ -38,7 +38,21 @@
                     <div class="yatra-content-right">
                         <div class="yatra-tour-details">
                             <div class="yatra-tour-price">
-                                <p>From $2000</p>
+                                <?php
+
+                                $tour_pricing = yatra_get_minimum_tour_pricing(get_the_ID());
+
+                                ?>
+                                <p><span><?php echo __('From ', 'yatra') ?></span>
+                                    <?php if (absint($tour_pricing['sales_price']) < 1) { ?>
+                                        <span class="sales-price free"><?php echo __("Free", 'yatra'); ?></span>
+                                    <?php } else { ?>
+                                        <?php if (absint($tour_pricing['sales_price'] != $tour_pricing['regular_price'])) { ?>
+                                            <del class="regular-price"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), $tour_pricing['regular_price']) ?></del>
+                                        <?php } ?>
+                                        <span class="sales-price"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), $tour_pricing['sales_price']) ?></span>
+                                    <?php } ?>
+                                </p>
                             </div>
                             <div class="yatra-tour-more">
                                 <a class="" href="https://themepalacedemo.com/tourable-pro/itinerary/venice-beach/">Explore</a>

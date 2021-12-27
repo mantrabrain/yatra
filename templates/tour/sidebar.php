@@ -17,7 +17,9 @@
                     <?php if (absint($min_sales) < 1) { ?>
                         <span class="sales-price free"><?php echo __("Free", 'yatra'); ?></span>
                     <?php } else { ?>
-                        <del class="regular-price"><?php echo yatra_get_price($currency, $min_regular) ?></del>
+                        <?php if (absint($min_regular) != absint($min_sales)) { ?>
+                            <del class="regular-price"><?php echo yatra_get_price($currency, $min_regular) ?></del>
+                        <?php } ?>
                         <span class="sales-price"><?php echo yatra_get_price($currency, $min_sales) ?></span>
                     <?php } ?>
                 </p>

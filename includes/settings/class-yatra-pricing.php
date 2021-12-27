@@ -105,6 +105,7 @@ class Yatra_Pricing
             'regular_price' => $regular_price,
             'person_count' => $person_count,
             'sales_price' => $sales_price,
+            'final_regular_price' => $regular_price * $person_count,
             'final_price' => $final_price * $person_count
         );
 
