@@ -55,7 +55,7 @@
                                 </p>
                             </div>
                             <div class="yatra-tour-more">
-                                <a class="" href="https://themepalacedemo.com/tourable-pro/itinerary/venice-beach/">Explore</a>
+                                <a href="<?php the_permalink() ?>"><?php echo esc_html__('View Details', 'yatra') ?></a>
                             </div>
                         </div>
                     </div>
