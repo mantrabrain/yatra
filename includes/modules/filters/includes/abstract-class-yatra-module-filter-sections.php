@@ -17,24 +17,32 @@ abstract class Yatra_Module_Filter_Sections
     {
 
         $parent_count = 0;
+
         $term_count = 0;
+
         if (is_array($terms) && count($terms) > 0) {
-            printf('<ul class="%1$s">', $children ? 'children' : 'yatra-search-terms-list');
+            printf('<ul class="%1$s">', $children ? 'children' : 'yatra-terms-list');
             $invisible_terms = '';
             foreach ($terms as $term) {
+
                 if ($term->parent && !$children) {
+
                     continue;
                 }
                 ob_start();
-                printf('<li class="%1$s">', $children ? 'has-children' : '');
+
+                printf('<li class="%1$s">', $children ? 'has-children' : 'item');
                 printf(
-                    '<label>'
-                    . '<input type="checkbox" %1$s value="%2$s" name="%3$s" class="%3$s yatra-filter-item"/>'
-                    . '<span>%4$s</span>'
+                    '<label for="yatra-filter-term-item-%1$d">'
+                    . '<input type="checkbox" %2$s value="%3$s" name="%4$s" class="%5$s yatra-filter-item" id="yatra-filter-term-item-%6$d"/>'
+                    . '<span class="yatra-filter-term-name">%7$s</span>'
                     . '</label>',
+                    $term->term_id,
                     checked($term->slug, yatra_array_get($_GET, $term->taxonomy, false), false), // phpcs:ignore
                     $term->slug,
                     $term->taxonomy,
+                    $term->taxonomy,
+                    $term->term_id,
                     $term->name
                 );
 
@@ -54,6 +62,7 @@ abstract class Yatra_Module_Filter_Sections
                 print('</li>');
 
                 $list = ob_get_clean();
+
                 if ((++$parent_count > 4) && !$children) {
                     $invisible_terms .= $list;
                 } else {
@@ -63,7 +72,7 @@ abstract class Yatra_Module_Filter_Sections
             }
             if ($invisible_terms != '' && !$children) {
                 printf(
-                    '<li class="yatra-terms-more"><button class="show-more">%2$s</button><ul class="yatra-terms-more-list">%1$s</ul><button class="show-less">%3$s</button></li>',
+                    '<li class="yatra-terms-more"><span class="show-more">%2$s <i class="icon fa fa-chevron-down"></i></span><ul class="yatra-terms-more-list">%1$s</ul><span class="show-less">%3$s <i class="icon fa fa-chevron-up"></i></span></li>',
                     $invisible_terms,
                     sprintf(__('Show all %s', 'wp-travel-engine'), count($terms) - $term_count),
                     __('Show less', 'wp-travel-engine')

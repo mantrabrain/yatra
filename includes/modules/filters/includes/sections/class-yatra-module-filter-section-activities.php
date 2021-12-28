@@ -1,10 +1,10 @@
 <?php
 
-class Yatra_Module_Filter_Section_Destinations extends Yatra_Module_Filter_Sections
+class Yatra_Module_Filter_Section_Activities extends Yatra_Module_Filter_Sections
 {
     function get_label()
     {
-        return __('Destinations', 'yatra');
+        return __('Activities', 'yatra');
     }
 
     function is_visible()
@@ -15,7 +15,7 @@ class Yatra_Module_Filter_Section_Destinations extends Yatra_Module_Filter_Secti
     public function render()
     {
 
-        $terms = yatra_get_terms_by_id('destination');
+        $terms = yatra_get_terms_by_id('activity');
 
         ?>
         <div class="yatra-sidebar-search-field">

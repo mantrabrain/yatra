@@ -154,6 +154,18 @@ window.yatra_global_tour_additional_price = 0;
 
                 });
 
+                $('body').on('click', '.yatra-sidebar-filter-section-content .show-more', function () {
+                    $(this).closest('li').find('ul.yatra-terms-more-list').show();
+                    $(this).closest('li').find('.show-less').show();
+                    $(this).hide();
+                });
+
+                $('body').on('click', '.yatra-sidebar-filter-section-content .show-less', function () {
+                    $(this).closest('li').find('ul.yatra-terms-more-list').hide();
+                    $(this).closest('li').find('.show-more').show();
+                    $(this).hide();
+                });
+
 
             },
             initLib: function () {

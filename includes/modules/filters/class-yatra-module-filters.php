@@ -14,6 +14,7 @@ class Yatra_Module_Filters
         include_once YATRA_ABSPATH . 'includes/modules/filters/includes/abstract-class-yatra-module-filter-sections.php';
         include_once YATRA_ABSPATH . 'includes/modules/filters/includes/class-yatra-module-filter-sidebar.php';
         include_once YATRA_ABSPATH . "includes/modules/filters/includes/sections/class-yatra-module-filter-section-destinations.php";
+        include_once YATRA_ABSPATH . "includes/modules/filters/includes/sections/class-yatra-module-filter-section-activities.php";
     }
 
     public function hooks()
@@ -35,7 +36,14 @@ class Yatra_Module_Filters
 
         echo '<div class="yatra-tour-filter-sidebar">';
 
-        echo '<h1>Hello World</h1>';
+        echo '<div class="yatra-tour-filter-sidebar-inner">';
+
+        echo '<div class="yatra-filter-sidebar-header">';
+
+        echo '<h2>' . __('Filter Criteria', 'yatra') . '</h2>';
+
+        echo '</div>';
+
         $sidebar_filter_sections = yatra_get_filters_sections();
 
         foreach ($sidebar_filter_sections as $section_id) {
@@ -50,12 +58,13 @@ class Yatra_Module_Filters
                 $section_instance = new $section_class();
 
                 if ($section_instance->is_visible()) {
-                    
+
                     $section_instance->render();
                 }
             }
         }
 
+        echo '</div>';
         echo '</div>';
 
     }
