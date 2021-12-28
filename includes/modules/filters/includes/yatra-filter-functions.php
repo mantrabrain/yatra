@@ -55,6 +55,8 @@ function yatra_get_filters_sections()
         array(
             'Yatra_Module_Filter_Section_Destinations',
             'Yatra_Module_Filter_Section_Activities',
+            'Yatra_Module_Filter_Section_Price',
+            'Yatra_Module_Filter_Section_Duration',
         )
     );
 }
