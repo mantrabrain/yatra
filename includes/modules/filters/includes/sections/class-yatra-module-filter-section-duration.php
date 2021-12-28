@@ -29,7 +29,6 @@ class Yatra_Module_Filter_Section_Duration extends Yatra_Module_Filter_Sections
     public function render()
     {
 
-
         ?>
         <div class="yatra-sidebar-search-field days">
             <h3 class="yatra-sidebar-filter-section-title"><?php echo esc_html($this->get_label()); ?></h3>
