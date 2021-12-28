@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.5\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-27 09:15:43+00:00\n"
+"POT-Creation-Date: 2021-12-28 12:08:45+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2908,11 +2908,13 @@ msgid "View All"
 msgstr ""
 
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:33
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-destinations.php:7
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:72
 msgid "Destinations"
 msgstr ""
 
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:45
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-activities.php:7
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:71
 msgid "Activities"
 msgstr ""
@@ -3070,6 +3072,33 @@ msgstr ""
 
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:239
 msgid "Watch on youtube"
+msgstr ""
+
+#: includes/modules/filters/class-yatra-module-filters.php:46
+msgid "Filter Criteria"
+msgstr ""
+
+#: includes/modules/filters/includes/abstract-class-yatra-module-filter-sections.php:77
+msgid "Show all %s"
+msgstr ""
+
+#: includes/modules/filters/includes/abstract-class-yatra-module-filter-sections.php:78
+msgid "Show less"
+msgstr ""
+
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:7
+#: templates/tour/additional.php:7
+msgid "Duration"
+msgstr ""
+
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:42
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:43
+#: includes/template-tags.php:190
+msgid "Days"
+msgstr ""
+
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-price.php:7
+msgid "Price Range"
 msgstr ""
 
 #: includes/modules/status/class-yatra-module-status.php:35
@@ -4044,10 +4073,6 @@ msgstr ""
 msgid ",&nbsp;"
 msgstr ""
 
-#: includes/template-tags.php:190
-msgid "Days"
-msgstr ""
-
 #: includes/template-tags.php:195
 msgid "Nights"
 msgstr ""
@@ -4490,7 +4515,7 @@ msgstr ""
 msgid "Free"
 msgstr ""
 
-#: templates/parts/content-listing.php:58
+#: templates/parts/content-listing.php:59
 msgid "View Details"
 msgstr ""
 
@@ -4554,10 +4579,6 @@ msgstr ""
 
 #: templates/tmpl-order-table.php:47
 msgid "Subtotal"
-msgstr ""
-
-#: templates/tour/additional.php:7
-msgid "Duration"
 msgstr ""
 
 #: templates/tour/additional.php:28

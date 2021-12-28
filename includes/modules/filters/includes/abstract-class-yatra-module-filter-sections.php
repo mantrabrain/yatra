@@ -74,8 +74,8 @@ abstract class Yatra_Module_Filter_Sections
                 printf(
                     '<li class="yatra-terms-more"><span class="show-more">%2$s <i class="icon fa fa-chevron-down"></i></span><ul class="yatra-terms-more-list">%1$s</ul><span class="show-less">%3$s <i class="icon fa fa-chevron-up"></i></span></li>',
                     $invisible_terms,
-                    sprintf(__('Show all %s', 'wp-travel-engine'), count($terms) - $term_count),
-                    __('Show less', 'wp-travel-engine')
+                    sprintf(__('Show all %s', 'yatra'), count($terms) - $term_count),
+                    __('Show less', 'yatra')
                 );
             }
             print('</ul>');
