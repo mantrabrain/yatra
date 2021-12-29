@@ -26,6 +26,11 @@ class Yatra_Module_Filters
         add_action('yatra_before_main_content_loop', array($this, 'wrapper_start'), 11);
         add_action('yatra_after_main_content_loop', array($this, 'wrapper_end'), 20);
         add_filter('yatra_script_localize_params', array($this, 'localize_params'));
+
+        // Admin Filter
+
+        add_action('yatra_after_tour_update', array($this, 'after_tour_update'));
+
     }
 
 
@@ -102,6 +107,14 @@ class Yatra_Module_Filters
             'days' => __(' Days', 'yatra')
         );
         return $params;
+    }
+
+    public function after_tour_update($tour_id)
+    {
+        yatra_update_filter_meta_minimum_tour_price($tour_id);
+        wp_cache_delete('yatra_filter_duration_ranges');
+        wp_cache_delete('yatra_filter_price_ranges');
+
     }
 
 }

@@ -291,49 +291,50 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
         public function save($post_id)
         {
 
+            if (get_post_type($post_id) !== 'tour') {
+                return;
+            }
             /*
              * We need to verify this came from our screen and with proper authorization,
              * because the save_post action can be triggered at other times.
              */
             $nonce = isset($_POST['yatra_tour_cpt_meta_nonce']) ? ($_POST['yatra_tour_cpt_meta_nonce']) : '';
 
-            if (isset($_POST['yatra_tour_cpt_meta_nonce'])) {
+            $is_valid_nonce = wp_verify_nonce($nonce, 'yatra_tour_post_type_metabox_nonce');
 
-                $is_valid_nonce = wp_verify_nonce($nonce, 'yatra_tour_post_type_metabox_nonce');
+            if (!$is_valid_nonce) {
+                return;
+            }
 
-                if ($is_valid_nonce) {
+            $metabox_tabs = yatra_tour_metabox_tabs();
 
-                    $metabox_tabs = yatra_tour_metabox_tabs();
+            foreach ($metabox_tabs as $tab_content_key => $tab_content) {
 
-                    foreach ($metabox_tabs as $tab_content_key => $tab_content) {
+                $settings = isset($tab_content['settings']) ? $tab_content['settings'] : array();
 
-                        $settings = isset($tab_content['settings']) ? $tab_content['settings'] : array();
+                switch ($tab_content_key) {
 
-                        switch ($tab_content_key) {
+                    case "general":
+                        $this->save_general_options($settings, $post_id);
 
-                            case "general":
-                                $this->save_general_options($settings, $post_id);
+                        break;
+                    case "pricing":
+                        $this->save_pricing_options($settings, $post_id);
 
-                                break;
-                            case "pricing":
-                                $this->save_pricing_options($settings, $post_id);
+                        break;
 
-                                break;
+                    case "attributes":
+                        $this->save_tour_attributes($settings, $post_id);
+                        break;
 
-                            case "attributes":
-                                $this->save_tour_attributes($settings, $post_id);
-                                break;
-
-                            case "tour_tabs":
-                                $this->save_tour_tabs($settings, $post_id);
-                                break;
-                        }
-                    }
-
+                    case "tour_tabs":
+                        $this->save_tour_tabs($settings, $post_id);
+                        break;
                 }
             }
 
-            yatra_update_filter_meta_minimum_tour_price($post_id);
+
+            do_action('yatra_after_tour_update', $post_id);
         }
 
         private function save_tour_attributes($configs, $post_id)
