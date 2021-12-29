@@ -149,7 +149,7 @@
           .ui-slider-range {
             height: 2px;
             border: none;
-            background: var(--primary-color);
+            background: #1abc9c;
           }
         }
 
@@ -159,21 +159,20 @@
             height: 16px;
             width: 16px;
             border-radius: 50%;
-            background: var(--primary-color);
+            background: #1abc9c;
             margin-top: -3px;
 
             &:focus {
               border: none;
               outline: none;
             }
-
             &:before {
               content: attr(data-value);
               font-size: 10px;
               letter-spacing: 1.5px;
               line-height: 1;
               color: #fff;
-              background-color: var(--primary-color);
+              background-color: #1abc9c;
               padding: 3px 8px;
               border-radius: 3px;
               position: absolute;
@@ -190,7 +189,7 @@
             &:after {
               content: "";
               border: 4px solid transparent;
-              border-top: 6px solid var(--primary-color);
+              border-top: 6px solid #1abc9c;
               position: absolute;
               left: 50%;
               bottom: 100%;

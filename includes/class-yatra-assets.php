@@ -34,6 +34,9 @@ if (!class_exists('Yatra_Assets')) {
             // Register Only Styles
             wp_register_style('yatra-select2css', YATRA_PLUGIN_URI . '/assets/lib/select2/css/select2.min.css', false, YATRA_VERSION);
 
+            //jQuery UI css
+            wp_register_style('yatra-jquery-ui', YATRA_PLUGIN_URI . '/assets/lib/jquery-ui/jquery-ui.css', false, '1.12.1');
+
             // Font Awesome
             wp_register_style('yatra-font-awesome', YATRA_PLUGIN_URI . '/assets/lib/font-awesome/css/fontawesome.min.css', false, '5.9.0');
 
@@ -41,7 +44,7 @@ if (!class_exists('Yatra_Assets')) {
 
             // Other Register and Enqueue
             wp_register_style('yatra-style', YATRA_PLUGIN_URI . '/assets/css/yatra.css',
-                array('yatra-font-awesome', 'lightbox', 'yatra-calendarcss'), YATRA_VERSION);
+                array('yatra-font-awesome', 'lightbox', 'yatra-calendarcss', 'yatra-jquery-ui'), YATRA_VERSION);
             wp_enqueue_style('yatra-style');
 
             wp_register_script('lightbox-script', YATRA_PLUGIN_URI . '/assets/lib/lightbox2/js/lightbox.js', false, '2.11.0');
@@ -50,7 +53,10 @@ if (!class_exists('Yatra_Assets')) {
             wp_enqueue_style('yatra-select2css');
 
             wp_register_script('yatra-script', YATRA_PLUGIN_URI . '/assets/js/yatra.js',
-                array('jquery', 'lightbox-script', 'yatra-moment', 'yatra-popper', 'yatra-tippy', 'yatra-calendarjs', 'jquery-ui-slider'), YATRA_VERSION);
+                array('jquery', 'lightbox-script', 'yatra-moment', 'yatra-popper',
+                    'yatra-tippy', 'yatra-calendarjs',
+                    'jquery-ui-slider'),
+                YATRA_VERSION);
             wp_enqueue_script('yatra-script');
 
             $enabled_date = array();

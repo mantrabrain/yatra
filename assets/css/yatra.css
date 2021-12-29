@@ -1802,13 +1802,13 @@
     .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price #yatra-price-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price #yatra-days-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days #yatra-price-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days #yatra-days-slider .ui-slider-range {
       height: 2px;
       border: none;
-      background: var(--primary-color); }
+      background: #1abc9c; }
   .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle {
     border: none;
     height: 16px;
     width: 16px;
     border-radius: 50%;
-    background: var(--primary-color);
+    background: #1abc9c;
     margin-top: -3px; }
     .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:focus, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:focus {
       border: none;
@@ -1819,7 +1819,7 @@
       letter-spacing: 1.5px;
       line-height: 1;
       color: #fff;
-      background-color: var(--primary-color);
+      background-color: #1abc9c;
       padding: 3px 8px;
       border-radius: 3px;
       position: absolute;
@@ -1841,7 +1841,7 @@
     .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:after, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:after {
       content: "";
       border: 4px solid transparent;
-      border-top: 6px solid var(--primary-color);
+      border-top: 6px solid #1abc9c;
       position: absolute;
       left: 50%;
       bottom: 100%;
