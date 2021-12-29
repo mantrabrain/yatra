@@ -103,12 +103,12 @@ if (count($cart_items) < 1) {
         </td>
     </tr>
     <tr>
-        <td colspan="3">
+        <td colspan="2">
         </td>
         <td colspan="2">
             <strong><?php echo __('Sub Total', 'yatra') ?></strong>
         </td>
-        <td>
+        <td colspan="2" style="text-align:right;">
             <strong>
                 <?php
                 echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_cart_total()); ?>
@@ -141,12 +141,12 @@ if (count($cart_items) < 1) {
         </tr>
     <?php } ?>
     <tr>
-        <td colspan="3">
+        <td colspan="2">
         </td>
         <td colspan="2">
             <strong><?php echo __('Total', 'yatra') ?></strong>
         </td>
-        <td>
+        <td colspan="2" style="text-align: right">
             <strong>
                 <?php
                 echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_cart_total(true)); ?>
