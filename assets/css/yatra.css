@@ -1867,8 +1867,7 @@
 .yatra-tour-filter-top .yatra-tour-filter-top-inner {
   padding: 20px 15px;
   border: 1px solid #eee;
-  background-color: #fff;
-  margin-bottom: -1px;
+  background-color: #f1f1f1;
   display: -webkit-box;
   display: -moz-box;
   display: -ms-flexbox;
@@ -1882,7 +1881,10 @@
       -ms-flex-align: center;
           align-items: center; }
   .yatra-tour-filter-top .yatra-tour-filter-top-inner .yatra-top-filter-section {
-    padding: 0px 20px; }
+    padding: 0px 20px;
+    border-right: 1px solid #ddd; }
+    .yatra-tour-filter-top .yatra-tour-filter-top-inner .yatra-top-filter-section:last-child {
+      border-right: 0; }
   .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list {
     margin: 0;
     padding: 0; }
@@ -1890,12 +1892,18 @@
       float: left;
       list-style: none;
       padding: 5px 10px; }
+      .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li:first-child {
+        padding-left: 0; }
       .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li .icon {
-        font-size: 25px;
+        font-size: 20px;
         cursor: pointer;
         color: #aaa; }
       .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li.selected .icon {
         color: #000; }
+  .yatra-tour-filter-top .yatra-tour-filter-top-inner .yatra-top-filter-sorting-by {
+    font-size: 15px;
+    padding: 5px 10px;
+    min-width: 150px; }
 
 .yatra-flex-row {
   display: -webkit-box;

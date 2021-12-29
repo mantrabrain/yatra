@@ -2,14 +2,18 @@
   .yatra-tour-filter-top-inner {
     padding: 20px 15px;
     border: 1px solid #eee;
-    background-color: #fff;
-    margin-bottom: -1px;
+    background-color: #f1f1f1;
     display: flex;
     justify-content: flex-end;
     align-items: center;
 
     .yatra-top-filter-section {
       padding: 0px 20px;
+      border-right: 1px solid #ddd;
+
+      &:last-child {
+        border-right: 0;
+      }
     }
 
     ul.yatra-top-filter-display-list {
@@ -21,8 +25,12 @@
         list-style: none;
         padding: 5px 10px;
 
+        &:first-child {
+          padding-left: 0;
+        }
+
         .icon {
-          font-size: 25px;
+          font-size: 20px;
           cursor: pointer;
           color: #aaa;
         }
@@ -33,6 +41,12 @@
           }
         }
       }
+    }
+
+    .yatra-top-filter-sorting-by {
+      font-size: 15px;
+      padding: 5px 10px;
+      min-width: 150px;
     }
   }
 }

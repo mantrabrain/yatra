@@ -130,7 +130,7 @@ class Yatra_Module_Filter_Top
             <?php if ($label != '') { ?>
                 <label for="yatra-top-filter-sorting-by"><?php echo esc_html($label) ?>: </label>
             <?php } ?>
-            <select name="yatra-top-filter-sorting-by" id="yatra-top-filter-sorting-by">
+            <select name="yatra-top-filter-sorting-by" class="yatra-top-filter-sorting-by" id="yatra-top-filter-sorting-by">
                 <?php foreach ($sorting_fields as $field_group_id => $field_group) {
 
                     $option_group_label = isset($field_group['label']) ? $field_group['label'] : '';
