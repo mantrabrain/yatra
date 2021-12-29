@@ -1645,6 +1645,9 @@
                 flex-direction: column; }
         .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .regular-price {
           display: block; }
+        .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .sales-price {
+          font-size: 18px;
+          font-weight: 600; }
     .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .inner {
       display: -webkit-box;
       display: -moz-box;
