@@ -68,7 +68,7 @@ if (!function_exists('yatra_main_content_callback')) {
             <?php
         }
         ?>
-        <main id="yatra-main" class="site-main yatra-site-main">
+        <main id="yatra-main" class="yatra-site-main">
 
             <?php
 
