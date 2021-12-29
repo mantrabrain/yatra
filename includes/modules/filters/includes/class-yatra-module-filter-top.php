@@ -97,18 +97,62 @@ class Yatra_Module_Filter_Top
 
     public function sorting_section($section)
     {
+        $label = isset($section['label']) ? $section['label'] : '';
+        $selected = 'price_asc';
+        $sorting_fields = array(
+            '' => array(
+                'options' => array(
+                    'latest' => __('Latest', 'yatra')
+                )
+            ),
+            'price' => array(
+                'label' => __('Price', 'yatra'),
+                'options' => array('asc' => __('Low to high', 'yatra'),
+                    'desc' => __('High to low', 'yatra')
+                )
+            ),
+            'days' => array(
+                'label' => __('Days', 'yatra'),
+                'options' =>
+                    array('asc' => __('Low to high', 'yatra'),
+                        'desc' => __('High to low', 'yatra')
+                    )
+            ),
+            'name' => array(
+                'label' => __('Name', 'yatra'),
+                'options' => array('asc' => __('a - z', 'yatra'),
+                    'desc' => __('z - a', 'yatra')
+                )
+            )
+        );
         ?>
         <div class="yatra-top-filter-sorting">
-            <label for="cars">Choose a car:</label>
-            <select name="cars" id="cars">
-                <optgroup label="Swedish Cars">
-                    <option value="volvo">Volvo</option>
-                    <option value="saab">Saab</option>
-                </optgroup>
-                <optgroup label="German Cars">
-                    <option value="mercedes">Mercedes</option>
-                    <option value="audi">Audi</option>
-                </optgroup>
+            <?php if ($label != '') { ?>
+                <label for="yatra-top-filter-sorting-by"><?php echo esc_html($label) ?>: </label>
+            <?php } ?>
+            <select name="yatra-top-filter-sorting-by" id="yatra-top-filter-sorting-by">
+                <?php foreach ($sorting_fields as $field_group_id => $field_group) {
+
+                    $option_group_label = isset($field_group['label']) ? $field_group['label'] : '';
+
+                    $options = isset($field_group['options']) ? $field_group['options'] : array();
+                    if ($option_group_label != '') {
+                        ?>
+                        <optgroup label="<?php echo esc_attr($option_group_label) ?>">
+                    <?php } ?>
+                    <?php foreach ($options as $option_id => $option_label) {
+
+                        $option_dynamic_id = $field_group_id != '' ? $field_group_id . '_' . $option_id : $option_id;
+
+                        ?>
+                        <option <?php echo $selected === $option_dynamic_id ? 'selected="selected"' : ''; ?>
+                                value="<?php echo esc_attr($option_dynamic_id) ?>"><?php echo esc_html($option_label) ?></option>
+                    <?php }
+                    if ($option_group_label != '') {
+                        ?>
+                        </optgroup>
+                    <?php }
+                } ?>
             </select>
         </div>
         <?php
@@ -117,6 +161,7 @@ class Yatra_Module_Filter_Top
     public function display_section($section)
     {
         $selected = 'list';
+
         ?>
         <ul class="yatra-top-filter-display-list">
             <li class="grid<?php echo $selected === 'grid' ? ' selected' : ''; ?>">
