@@ -44,10 +44,10 @@
 
                                 ?>
                                 <p><span><?php echo __('From ', 'yatra') ?></span>
-                                    <?php if (absint($tour_pricing['sales_price']) < 1) { ?>
+                                    <?php if (floatval($tour_pricing['sales_price']) < 1) { ?>
                                         <span class="sales-price free"><?php echo __("Free", 'yatra'); ?></span>
                                     <?php } else { ?>
-                                        <?php if (absint($tour_pricing['sales_price'] != $tour_pricing['regular_price'])) { ?>
+                                        <?php if (floatval($tour_pricing['sales_price']) != floatval($tour_pricing['regular_price'])) { ?>
                                             <del class="regular-price"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), $tour_pricing['regular_price']) ?></del>
                                         <?php } ?>
                                         <span class="sales-price"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), $tour_pricing['sales_price']) ?></span>

@@ -332,6 +332,8 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
                 }
             }
+
+            yatra_update_filter_meta_minimum_tour_price($post_id);
         }
 
         private function save_tour_attributes($configs, $post_id)

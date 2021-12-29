@@ -83,28 +83,4 @@ abstract class Yatra_Module_Filter_Sections
 
     }
 
-    public function get_duration_ranges()
-    {
-        global $wpdb;
-
-        $range = wp_cache_get('yatra_duration_ranges', 'options');
-
-        if (!$range) {
-            $where = $wpdb->prepare('meta_key = %s', 'yatra_tour_meta_tour_duration_days');
-            $query = "SELECT MIN(meta_value * 1) as `min_days`, MAX(meta_value * 1) as `max_days` FROM {$wpdb->postmeta} WHERE {$where}";
-            $results = $wpdb->get_row($query); // phpcs:ignore
-            $range = array(
-                'max_days' => 0,
-                'min_days' => 0,
-            );
-            if (!empty($results)) {
-                $range = $results;
-            }
-
-            wp_cache_add('yatra_duration_ranges', $range, 'options');
-        }
-
-        return (object)$range;
-    }
-
 }

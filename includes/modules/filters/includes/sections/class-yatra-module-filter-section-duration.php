@@ -14,14 +14,14 @@ class Yatra_Module_Filter_Section_Duration extends Yatra_Module_Filter_Sections
 
     private function get_minimum_days()
     {
-        $duration = $this->get_duration_ranges();
+        $duration = yatra_get_duration_ranges_for_filter();
 
         return $duration->min_days ?? 0;
     }
 
     private function get_maximum_days()
     {
-        $duration = $this->get_duration_ranges();
+        $duration = yatra_get_duration_ranges_for_filter();
 
         return $duration->max_days ?? 0;
     }

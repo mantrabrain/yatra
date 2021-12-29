@@ -144,3 +144,29 @@ if (!function_exists('yatra_get_maximum_tour_price')) {
         return $max_price;
     }
 }
+
+if (!function_exists('yatra_update_filter_meta_minimum_tour_price')) {
+
+    function yatra_update_filter_meta_minimum_tour_price($tour_id)
+    {
+        $tour_id = absint($tour_id);
+
+        if ($tour_id < 1) {
+            return;
+        }
+        $tour_pricing = yatra_get_minimum_tour_pricing($tour_id);
+
+        $minimum_price = 0;
+
+        if (floatval($tour_pricing['sales_price']) < 1) {
+
+            $minimum_price = 0;
+
+        } else {
+
+            $minimum_price = $tour_pricing['sales_price'];
+        }
+
+        update_post_meta($tour_id, 'yatra_filter_meta_minimum_tour_price', $minimum_price);
+    }
+}

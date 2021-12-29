@@ -483,6 +483,10 @@ if (!function_exists('yatra_get_price')) {
 
         );
 
+        if (floatval($price) < 1) {
+            $price = 0;
+        }
+
         $price = apply_filters('formatted_yatra_price',
             number_format($price, $args['decimals'], $args['decimal_separator'], $args['thousand_separator']), $price, $args['decimals'], $args['decimal_separator'], $args['thousand_separator'], $price);
 

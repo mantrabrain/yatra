@@ -91,9 +91,15 @@ class Yatra_Module_Filters
 
     public function localize_params($params)
     {
+        $duration = yatra_get_duration_ranges_for_filter();
+        $price = yatra_get_price_ranges_for_filter();
+
         $params['filter_options'] = array(
-            'price_range_min' => 10,
-            'price_range_max' => 9999
+            'price_range_min' => isset($price->min_price) ? absint($price->min_price) : 0,
+            'price_range_max' => isset($price->max_price) ? absint($price->max_price) : 0,
+            'days_range_min' => isset($duration->min_days) ? absint($duration->min_days) : 0,
+            'days_range_max' => isset($duration->max_days) ? absint($duration->max_days) : 0,
+            'days' => __(' Days', 'yatra')
         );
         return $params;
     }

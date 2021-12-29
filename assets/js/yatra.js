@@ -211,24 +211,24 @@ window.yatra_global_tour_additional_price = 0;
 
                 $("#yatra-days-slider").slider({
                     range: true,
-                    min: yatra_params.filter_options.price_range_min,
-                    max: yatra_params.filter_options.price_range_max,
-                    values: [yatra_params.filter_options.price_range_min, yatra_params.filter_options.price_range_max],
+                    min: yatra_params.filter_options.days_range_min,
+                    max: yatra_params.filter_options.days_range_max,
+                    values: [yatra_params.filter_options.days_range_min, yatra_params.filter_options.days_range_max],
                     slide: function (event, ui) {
                         var min = ui.values[0]
                         var max = ui.values[1];
                         $('#yatra-days-slider-min').val(min);
                         $('#yatra-days-slider-max').val(max);
-                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', min).addClass('visible');
-                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', max).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', min + yatra_params.filter_options.days).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', max + yatra_params.filter_options.days).addClass('visible');
                     },
                     create: function (event, ui) {
-                        var min = yatra_params.filter_options.price_range_min;
-                        var max = yatra_params.filter_options.price_range_max;
+                        var min = yatra_params.filter_options.days_range_min;
+                        var max = yatra_params.filter_options.days_range_max;
                         $('#yatra-days-slider-min').val(min);
                         $('#yatra-days-slider-max').val(max);
-                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', min).addClass('visible');
-                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', max).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', (min + yatra_params.filter_options.days)).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', (max + yatra_params.filter_options.days)).addClass('visible');
                     }
 
                 });

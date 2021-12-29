@@ -14,12 +14,17 @@ class Yatra_Module_Filter_Section_Price extends Yatra_Module_Filter_Sections
 
     private function get_minimum_price()
     {
-        return 10;
+        $price = yatra_get_price_ranges_for_filter();
+
+        return $price->min_price ?? 0;
+
     }
 
     private function get_maximum_price()
     {
-        return 100;
+        $price = yatra_get_price_ranges_for_filter();
+
+        return $price->max_price ?? 0;
     }
 
     public function render()

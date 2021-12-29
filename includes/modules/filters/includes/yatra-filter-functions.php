@@ -60,3 +60,57 @@ function yatra_get_filters_sections()
         )
     );
 }
+
+if (!function_exists('yatra_get_duration_ranges_for_filter')) {
+
+    function yatra_get_duration_ranges_for_filter()
+    {
+        global $wpdb;
+
+        $range = wp_cache_get('yatra_filter_duration_ranges', 'options');
+
+        if (!$range) {
+            $where = $wpdb->prepare('meta_key = %s', 'yatra_tour_meta_tour_duration_days');
+            $query = "SELECT MIN(meta_value * 1) as `min_days`, MAX(meta_value * 1) as `max_days` FROM {$wpdb->postmeta} WHERE {$where}";
+            $results = $wpdb->get_row($query); // phpcs:ignore
+            $range = array(
+                'max_days' => 0,
+                'min_days' => 0,
+            );
+            if (!empty($results)) {
+                $range = $results;
+            }
+
+            wp_cache_add('yatra_filter_duration_ranges', $range, 'options');
+        }
+
+        return (object)$range;
+    }
+}
+
+if (!function_exists('yatra_get_price_ranges_for_filter')) {
+
+    function yatra_get_price_ranges_for_filter()
+    {
+        global $wpdb;
+
+        $range = wp_cache_get('yatra_filter_price_ranges', 'options');
+
+        if (!$range) {
+            $where = $wpdb->prepare('meta_key = %s', 'yatra_filter_meta_minimum_tour_price');
+            $query = "SELECT MIN(meta_value * 1) as `min_price`, MAX(meta_value * 1) as `max_price` FROM {$wpdb->postmeta} WHERE {$where}";
+            $results = $wpdb->get_row($query); // phpcs:ignore
+            $range = array(
+                'min_price' => 0,
+                'max_price' => 0,
+            );
+            if (!empty($results)) {
+                $range = $results;
+            }
+
+            wp_cache_add('yatra_filter_price_ranges', $range, 'options');
+        }
+
+        return (object)$range;
+    }
+}
