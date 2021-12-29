@@ -189,16 +189,16 @@ window.yatra_global_tour_additional_price = 0;
                         var max = ui.values[1];
                         $('#yatra-price-slider-min').val(min);
                         $('#yatra-price-slider-max').val(max);
-                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', min).addClass('visible');
-                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', max).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', YatraPricingCalculator.getPrice(null, min)).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', YatraPricingCalculator.getPrice(null, max)).addClass('visible');
                     },
                     create: function (event, ui) {
                         var min = yatra_params.filter_options.price_range_min;
                         var max = yatra_params.filter_options.price_range_max;
                         $('#yatra-price-slider-min').val(min);
                         $('#yatra-price-slider-max').val(max);
-                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', min).addClass('visible');
-                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', max).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', YatraPricingCalculator.getPrice(null, min)).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', YatraPricingCalculator.getPrice(null, max)).addClass('visible');
                     }
 
                 });
