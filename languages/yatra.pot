@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.5\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-28 12:08:45+00:00\n"
+"POT-Creation-Date: 2021-12-29 17:19:57+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -420,6 +420,7 @@ msgid "When you get new customer, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:123
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:122
 #: includes/modules/status/templates/html-admin-page-status-report.php:867
 #: templates/myaccount/tmpl-dashboard.php:23
 msgid "Name"
@@ -3074,8 +3075,8 @@ msgstr ""
 msgid "Watch on youtube"
 msgstr ""
 
-#: includes/modules/filters/class-yatra-module-filters.php:46
-msgid "Filter Criteria"
+#: includes/modules/filters/class-yatra-module-filters.php:65
+msgid " Days"
 msgstr ""
 
 #: includes/modules/filters/includes/abstract-class-yatra-module-filter-sections.php:77
@@ -3086,15 +3087,50 @@ msgstr ""
 msgid "Show less"
 msgstr ""
 
-#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:7
-#: templates/tour/additional.php:7
-msgid "Duration"
+#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:42
+msgid "Filter Criteria"
 msgstr ""
 
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:60
+msgid "Sort By"
+msgstr ""
+
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:105
+msgid "Latest"
+msgstr ""
+
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:109
+msgid "Price"
+msgstr ""
+
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:110
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:117
+msgid "Low to high"
+msgstr ""
+
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:111
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:118
+msgid "High to low"
+msgstr ""
+
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:115
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:42
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:43
 #: includes/template-tags.php:190
 msgid "Days"
+msgstr ""
+
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:123
+msgid "a - z"
+msgstr ""
+
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:124
+msgid "z - a"
+msgstr ""
+
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:7
+#: templates/tour/additional.php:7
+msgid "Duration"
 msgstr ""
 
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-price.php:7
@@ -4425,15 +4461,15 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:522
+#: includes/yatra-template-functions.php:526
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:523
+#: includes/yatra-template-functions.php:527
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:524
+#: includes/yatra-template-functions.php:528
 msgid "Not Available"
 msgstr ""
 
