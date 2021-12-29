@@ -1,6 +1,6 @@
 .yatra-tour-filter-sidebar {
   .yatra-tour-filter-sidebar-inner {
-    padding: 24px 16px;
+    padding: 20px 15px;
     border: 1px solid #eee;
     background-color: #fff;
 
@@ -136,14 +136,14 @@
           display: flex;
           justify-content: space-between;
           font-size: 13px;
+          font-weight: 600;
         }
 
         #yatra-price-slider, #yatra-days-slider {
           border-radius: 0;
           height: 2px;
           border: none;
-
-          background: rgba(var(--primary-color-rgb), 0.2);
+          background: rgba(26, 188, 156, 0.3);
           margin: 45px 10px 0;
 
           .ui-slider-range {
@@ -166,6 +166,7 @@
               border: none;
               outline: none;
             }
+
             &:before {
               content: attr(data-value);
               font-size: 10px;
@@ -205,6 +206,7 @@
                 visibility: visible;
               }
             }
+
           }
         }
       }
