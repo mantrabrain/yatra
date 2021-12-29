@@ -11,7 +11,7 @@ if (!function_exists('yatra_get_taxonomy_term_lists')) {
         if ($terms) {
             printf(
             /* translators: 1: Taxonomy name 2: SVG icon. 3: posted in label, only visible to screen readers.*/
-                '<span class="cat-links %1$s-links"><span class="screen-reader-text">%2$s</span>%3$s</span>',
+                '<span class="yatra-cat-links %1$s-links"><span class="screen-reader-text">%2$s</span>%3$s</span>',
                 ($taxonomy),
                 ucwords($taxonomy),
                 $terms
