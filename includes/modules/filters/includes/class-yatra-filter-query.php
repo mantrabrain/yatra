@@ -46,41 +46,38 @@ class Yatra_Filter_Query
                 'relation' => 'OR'
             );
 
-            if (isset($filter_params->destination)) {
+            if (isset($filter_params->filter_destination)) {
+                
+                foreach ($filter_params->filter_destination as $destination_slug) {
 
-                if (count($filter_params->destination) > 0) {
-
-                    foreach ($filter_params->destination as $destination_slug) {
-
-                        $destination_tax_query[] = array(
-                            'taxonomy' => 'destination',
-                            'field' => 'slug',
-                            'terms' => sanitize_text_field($destination_slug)
-                        );
-                    }
+                    $destination_tax_query[] = array(
+                        'taxonomy' => 'destination',
+                        'field' => 'slug',
+                        'terms' => sanitize_text_field($destination_slug)
+                    );
                 }
+
             }
+
             if (count($destination_tax_query) > 1) {
                 $tax_query[] = $destination_tax_query;
             }
 
-            $activity_tax_query = array(
-                'relation' => 'OR'
+            $activity_tax_query = array('relation' => 'OR'
             );
-            if (isset($filter_params->activity)) {
+            if (isset($filter_params->filter_activity)) {
 
-                if (count($filter_params->activity) > 0) {
+                foreach ($filter_params->filter_activity as $activity_slug) {
 
-                    foreach ($filter_params->activity as $activity_slug) {
-
-                        $tax_query[] = array(
-                            'taxonomy' => 'activity',
-                            'field' => 'slug',
-                            'terms' => sanitize_text_field($activity_slug)
-                        );
-                    }
+                    $activity_tax_query[] = array(
+                        'taxonomy' => 'activity',
+                        'field' => 'slug',
+                        'terms' => sanitize_text_field($activity_slug)
+                    );
                 }
+
             }
+
             if (count($activity_tax_query) > 1) {
                 $tax_query[] = $activity_tax_query;
             }

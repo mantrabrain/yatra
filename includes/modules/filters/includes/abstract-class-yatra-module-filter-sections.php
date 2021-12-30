@@ -96,13 +96,13 @@ abstract class Yatra_Module_Filter_Sections
 
         $params = yatra_get_filter_params();
 
-        if (isset($params->activity)) {
+        if (isset($params->filter_activity)) {
 
-            $current_term_slugs = array_merge($current_term_slugs, $params->activity);
+            $current_term_slugs = array_merge($current_term_slugs, $params->filter_activity);
         }
-        if (isset($params->destination)) {
+        if (isset($params->filter_destination)) {
 
-            $current_term_slugs = array_merge($current_term_slugs, $params->destination);
+            $current_term_slugs = array_merge($current_term_slugs, $params->filter_destination);
         }
 
         return array_unique($current_term_slugs);

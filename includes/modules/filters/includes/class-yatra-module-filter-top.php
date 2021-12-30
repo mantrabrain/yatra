@@ -117,8 +117,9 @@ class Yatra_Module_Filter_Top
                     if ($param_id !== 'orderby') {
 
                         $value = is_array($param_value) ? implode(',', $param_value) : $param_value;
+
                         $value = trim($value);
-                        $param_id = is_array($param_value) ? 'filter_' . $param_id : $param_id;
+
                         ?>
                         <input type="hidden" value="<?php echo esc_attr($value) ?>"
                                name="<?php echo esc_attr($param_id) ?>"/>
@@ -144,15 +145,37 @@ class Yatra_Module_Filter_Top
 
     public function display_section($section)
     {
-        $selected = 'list';
+        global $wp;
 
+        $selected = isset($_GET['display_mode']) ? sanitize_text_field($_GET['display_mode']) : 'list';
+
+        $selected = $selected === 'list' || $selected === 'grid' ? $selected : 'list';
+
+        $current_url = home_url($wp->request);
+
+        $extra_prams = (array)yatra_get_filter_params();
+
+        foreach ($extra_prams as $filter_id => $filter) {
+            $filter = is_array($filter) ? implode(',', $filter) : $filter;
+            $extra_prams[$filter_id] = $filter;
+        }
+
+
+        if (isset($extra_prams['display_mode'])) {
+            unset($extra_prams['display_mode']);
+        }
+        $current_url = add_query_arg($extra_prams, $current_url);
+
+        $grid_mode_link = add_query_arg(array('display_mode' => 'grid'), $current_url);
+
+        $list_mode_link = add_query_arg(array('display_mode' => 'list'), $current_url);
         ?>
         <ul class="yatra-top-filter-display-list">
             <li class="yatra-display-type-grid<?php echo $selected === 'grid' ? ' selected' : ''; ?>">
-                <span class="icon fa fa-th"></span>
+                <a href="<?php echo esc_attr($grid_mode_link) ?>" class="icon fa fa-th"></a>
             </li>
             <li class="yatra-display-type-list<?php echo $selected === 'list' ? ' selected' : ''; ?>">
-                <span class="icon fa fa-list"></span>
+                <a href="<?php echo esc_attr($list_mode_link) ?>" class="icon fa fa-list"></a>
             </li>
         </ul>
         <?php

@@ -208,11 +208,11 @@ if (!function_exists('yatra_get_filter_params')) {
             $response_array['max_price'] = absint($price->max_price) < $max_price ? absint($price->max_price) : $max_price;
         }
         if (count($activity) > 0 && count($activity) < 100) {
-            $response_array['activity'] = array_unique($activity);
+            $response_array['filter_activity'] = array_unique($activity);
         }
         if (count($destination) > 0 && count($destination) < 100) {
 
-            $response_array['destination'] = array_unique($destination);
+            $response_array['filter_destination'] = array_unique($destination);
         }
         if ($orderby !== '') {
             $response_array['orderby'] = $orderby;

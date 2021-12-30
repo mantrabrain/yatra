@@ -9,6 +9,8 @@ class Yatra_Template_Hooks
         add_action('yatra_single_tour_booking_form', array($this, 'single_tour_booking_form'), 10, 1);
         add_action('yatra_tour_booking_pricing_content', array(__class__, 'tour_booking_pricing_content'), 10, 3);
         add_action('yatra_single_tour_enquiry_form', array($this, 'single_tour_enquiry_form'), 10, 1);
+        add_filter('excerpt_more', array($this, 'post_link'), 1);
+
     }
 
     public function single_tour_info()
@@ -115,6 +117,17 @@ class Yatra_Template_Hooks
     {
         yatra_get_template('tour/enquiry-form.php');
     }
+
+    function post_link($output_filter = '')
+    {
+        if ((is_admin() && !wp_doing_ajax()) || !yatra_is_archive_page()) {
+            return $output_filter;
+        }
+        $output = '...';
+
+        return apply_filters('yatra_post_link', $output, $output_filter);
+    }
+
 
 }
 
