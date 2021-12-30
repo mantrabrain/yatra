@@ -30,18 +30,18 @@ if (!function_exists('yatra_entry_header')) {
     function yatra_entry_header()
     {
         ?>
-        <header class="entry-header">
+        <header class="yatra-tour-header">
             <?php
             if (is_sticky() && is_home() && !is_paged()) {
                 printf('<span class="sticky-post">%s</span>', _x('Featured', 'post', 'yatra'));
             }
             if (is_singular()) :
-                the_title('<h1 class="entry-title">', '</h1>');
+                the_title('<h1 class="yatra-tour-title">', '</h1>');
             else :
-                the_title(sprintf('<h2 class="entry-title"><a href="%s" rel="bookmark">', esc_url(get_permalink())), '</a></h2>');
+                the_title(sprintf('<h2 class="yatra-tour-title"><a href="%s" rel="bookmark">', esc_url(get_permalink())), '</a></h2>');
             endif;
             ?>
-        </header><!-- .entry-header -->
+        </header><!-- .yatra-tour-header -->
         <?php
     }
 }
@@ -65,11 +65,11 @@ if (!function_exists('yatra_entry_post_content')) {
     function yatra_entry_post_content()
     {
         ?>
-        <div class="entry-content">
+        <div class="yatra-tour-content">
             <?php
             the_excerpt();
             ?>
-        </div><!-- .entry-content -->
+        </div><!-- .yatra-tour-content -->
         <?php
     }
 }

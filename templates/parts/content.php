@@ -17,12 +17,12 @@
     } ?>
     <div class="yatra-single-meta-content">
 
-        <header class="entry-header">
+        <header class="yatra-tour-header">
 
-            <?php the_title('<h1 class="entry-title">', '</h1>'); ?>
+            <?php the_title('<h1 class="yatra-tour-title">', '</h1>'); ?>
 
 
-            <div class="entry-meta">
+            <div class="yatra-tour-meta">
                 <?php yatra_posted_by(); ?>
                 <?php yatra_posted_on();
                 echo "&nbsp;";
@@ -35,7 +35,7 @@
         </header>
 
 
-        <div class="entry-content">
+        <div class="yatra-tour-content">
 
             <?php
             the_content();
@@ -58,12 +58,12 @@
             );
 
             ?>
-        </div><!-- .entry-content -->
+        </div><!-- .yatra-tour-content -->
         <div class="entry-footer">
             <?php yatra_get_taxonomy_term_lists(get_the_ID(), 'activity'); ?>
         </div>
     </div>
-    <div class="entry-content entry-tabs">
+    <div class="yatra-tour-content entry-tabs">
         <?php
         yatra_frontend_tabs(); ?>
     </div>

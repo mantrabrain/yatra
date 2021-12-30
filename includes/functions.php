@@ -403,7 +403,7 @@ if (!function_exists('yatra_entry_meta')) {
     function yatra_entry_meta()
     {
         ?>
-        <div class="entry-meta">
+        <div class="yatra-tour-meta">
             <?php yatra_posted_by(); ?>
             <?php yatra_posted_on(); ?>
             <?php

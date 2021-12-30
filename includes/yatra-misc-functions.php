@@ -50,7 +50,7 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
 
         }
         echo '</div>';
-        
+
         echo '</div>';
 
     }
@@ -108,6 +108,7 @@ if (!function_exists('yatra_get_tour_lists')) {
             'order' => $order,
             'posts_per_page' => $posts_per_page
         );
+
 
         if (count($meta_query) > 0) {
 

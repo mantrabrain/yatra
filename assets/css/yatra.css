@@ -262,7 +262,7 @@
 .yatra-content-area header {
   margin-bottom: 30px; }
 
-.yatra-content-area .page-title, .yatra-content-area .entry-title {
+.yatra-content-area .page-title, .yatra-content-area .yatra-tour-title {
   line-height: 1.2;
   font-weight: bold;
   padding: 0;
@@ -461,7 +461,7 @@
   max-width: 50%;
   padding: 10px; }
 
-.entry-content.entry-tabs:before {
+.yatra-tour-content.entry-tabs:before {
   content: '';
   display: block;
   clear: both;
@@ -1603,11 +1603,11 @@
       padding-right: 0; }
       .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .yatra-thumb-wrap .inner figure {
         margin: 0; }
-  .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .entry-content {
+  .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .yatra-tour-content {
     padding: 10px 0; }
-    .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .entry-content p {
+    .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .yatra-tour-content p {
       margin: 0; }
-  .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .entry-meta, .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .entry-header {
+  .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .yatra-tour-meta, .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item .yatra-tour-header {
     margin: 0; }
   .yatra-page-wrapper.template-default .yatra-archive-tour .yatra-tour-single-item del {
     color: #aaa; }
