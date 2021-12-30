@@ -48,7 +48,7 @@ class Yatra_Module_Filter_Sidebar
 
         $clear_class = count((array)$filter) < 1 ? 'yatra-hide' : '';
 
-        echo '<a href="' . esc_attr($action) . '"  class="yatra-clear-filter ' . esc_attr($clear_class) . '">' . __('Clear', 'yatra') . '</a>';
+        echo '<a href="' . esc_attr($action) . '"  class="yatra-clear-filter ' . esc_attr($clear_class) . '">' . __('Clear filter', 'yatra') . '</a>';
 
         echo '</div>';
 
