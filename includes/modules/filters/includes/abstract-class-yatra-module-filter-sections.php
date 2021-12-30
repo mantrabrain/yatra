@@ -94,39 +94,15 @@ abstract class Yatra_Module_Filter_Sections
     {
         $current_term_slugs = array();
 
-        $category = get_queried_object();
-
-        $current_term_id = isset($category->term_id) ? absint($category->term_id) : 0;
-
-        $current_taxonomy_slug = '';
-
-        if (is_tax('activity')) {
-
-            $current_taxonomy_slug = 'activity';
-
-        } else if (is_tax('destination')) {
-
-            $current_taxonomy_slug = 'destination';
-        }
-
-        if ($current_taxonomy_slug != '' && absint($current_term_id) > 0) {
-
-            $current_term = get_term_by('id', $current_term_id, $current_taxonomy_slug);
-
-            $slug = isset($current_term->slug) ? $current_term->slug : '';
-
-            if ($slug != '') {
-                array_push($current_term_slugs, $slug);
-            }
-
-        }
         $params = yatra_get_filter_params();
 
         if (isset($params->activity)) {
-            $current_term_slugs = array_merge($current_term_slugs, $params->activity);
+
+            $current_term_slugs = $params->activity;
         }
         if (isset($params->destination)) {
-            $current_term_slugs = array_merge($current_term_slugs, $params->destination);
+
+            $current_term_slugs = $params->destination;
         }
 
         return $current_term_slugs;
