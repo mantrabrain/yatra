@@ -30,12 +30,12 @@ class Yatra_Module_Filter_Section_Duration extends Yatra_Module_Filter_Sections
     {
 
         ?>
-        <div class="yatra-sidebar-search-field days">
+        <div class="yatra-sidebar-filter-field days">
             <h3 class="yatra-sidebar-filter-section-title"><?php echo esc_html($this->get_label()); ?></h3>
             <div class="yatra-sidebar-filter-section-content">
                 <div class="yatra-slider-wrap">
-                    <input type="hidden" id="yatra-days-slider-min" name="yatra_min_days"/>
-                    <input type="hidden" id="yatra-days-slider-max" name="yatra_max_days"/>
+                    <input type="hidden" id="yatra-days-slider-min" name="min_days"/>
+                    <input type="hidden" id="yatra-days-slider-max" name="max_days"/>
                     <div id="yatra-days-slider"></div>
                 </div>
                 <div class="slider-content">

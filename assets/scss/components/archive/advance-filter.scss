@@ -4,6 +4,11 @@
     border: 1px solid #eee;
     background-color: #fff;
 
+    .yatra-clear-filter {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
     .yatra-filter-sidebar-header {
       margin-bottom: 24px;
       padding-bottom: 24px;
@@ -18,7 +23,7 @@
       }
     }
 
-    .yatra-sidebar-search-field {
+    .yatra-sidebar-filter-field {
       .yatra-sidebar-filter-section-title {
         font-weight: 500;
         display: block;
@@ -123,7 +128,7 @@
       }
     }
 
-    .yatra-sidebar-search-field {
+    .yatra-sidebar-filter-field {
       &:not(:last-child) {
         padding-bottom: 24px;
         margin-bottom: 24px;

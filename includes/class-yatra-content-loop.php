@@ -11,6 +11,7 @@ class Yatra_Content_Loop
                 the_post();
 
                 $template = '';
+
                 if (!is_single()) {
 
                     $template = 'listing';

@@ -4,17 +4,14 @@ if (!class_exists('Yatra_Assets')) {
     {
         function __construct()
         {
+            add_action('wp_enqueue_scripts', array($this, 'register_scripts'));
+
             add_action('wp_enqueue_scripts', array($this, 'scripts'));
 
         }
 
-        public function scripts($hook)
+        public function register_scripts($hooks)
         {
-
-            wp_enqueue_script('jquery-ui-datepicker');
-
-            wp_enqueue_style('jquery-ui-datepicker');
-
             wp_register_script('yatra-popper', YATRA_PLUGIN_URI . '/assets/lib/popperjs/popper.js', array(), YATRA_VERSION);
 
             wp_register_script('yatra-tippy', YATRA_PLUGIN_URI . '/assets/lib/tippyjs/tippy.js', array(), YATRA_VERSION);
@@ -42,22 +39,40 @@ if (!class_exists('Yatra_Assets')) {
 
             wp_register_style('lightbox', YATRA_PLUGIN_URI . '/assets/lib/lightbox2/css/lightbox.css', false, '2.11.0');
 
+            wp_register_script('lightbox-script', YATRA_PLUGIN_URI . '/assets/lib/lightbox2/js/lightbox.js', false, '2.11.0');
+
+            wp_register_script('yatra-filter', YATRA_PLUGIN_URI . '/assets/js/yatra-filter.js', array('jquery', 'jquery-ui-slider'), YATRA_VERSION);
+
             // Other Register and Enqueue
             wp_register_style('yatra-style', YATRA_PLUGIN_URI . '/assets/css/yatra.css',
                 array('yatra-font-awesome', 'lightbox', 'yatra-calendarcss', 'yatra-jquery-ui'), YATRA_VERSION);
-            wp_enqueue_style('yatra-style');
-
-            wp_register_script('lightbox-script', YATRA_PLUGIN_URI . '/assets/lib/lightbox2/js/lightbox.js', false, '2.11.0');
-
-            wp_enqueue_script('yatra-select2js');
-            wp_enqueue_style('yatra-select2css');
 
             wp_register_script('yatra-script', YATRA_PLUGIN_URI . '/assets/js/yatra.js',
                 array('jquery', 'lightbox-script', 'yatra-moment', 'yatra-popper',
                     'yatra-tippy', 'yatra-calendarjs',
-                    'jquery-ui-slider'),
+                ),
                 YATRA_VERSION);
+        }
+
+        public function scripts($hook)
+        {
+
+            wp_enqueue_script('jquery-ui-datepicker');
+
+            wp_enqueue_style('jquery-ui-datepicker');
+
+            wp_enqueue_style('yatra-style');
+
+            wp_enqueue_script('yatra-select2js');
+
+            wp_enqueue_style('yatra-select2css');
+
             wp_enqueue_script('yatra-script');
+
+            if (yatra_is_archive_page()) {
+
+                wp_enqueue_script('yatra-filter');
+            }
 
             $enabled_date = array();
 

@@ -32,14 +32,23 @@ class Yatra_Module_Filter_Sidebar
             return;
         }
 
+        $action = get_post_type_archive_link('tour');
+
+        $filter = yatra_get_filter_params();
 
         echo '<div class="yatra-tour-filter-sidebar">';
 
         echo '<div class="yatra-tour-filter-sidebar-inner">';
 
+        echo '<form class="yatra-tour-filter-sidebar-form" method="get" action="' . esc_attr($action) . '">';
+
         echo '<div class="yatra-filter-sidebar-header">';
 
         echo '<h2>' . __('Filter Criteria', 'yatra') . '</h2>';
+
+        $clear_class = count((array)$filter) < 1 ? 'yatra-hide' : '';
+
+        echo '<a href="' . esc_attr($action) . '"  class="yatra-clear-filter ' . esc_attr($clear_class) . '">' . __('Clear', 'yatra') . '</a>';
 
         echo '</div>';
 
@@ -63,6 +72,8 @@ class Yatra_Module_Filter_Sidebar
             }
         }
 
+        echo '<button type="submit" value="Filter">Filter</button>';
+        echo '</form>';
         echo '</div>';
         echo '</div>';
 

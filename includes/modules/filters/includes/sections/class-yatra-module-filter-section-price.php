@@ -29,15 +29,13 @@ class Yatra_Module_Filter_Section_Price extends Yatra_Module_Filter_Sections
 
     public function render()
     {
-
-
         ?>
-        <div class="yatra-sidebar-search-field price">
+        <div class="yatra-sidebar-filter-field price">
             <h3 class="yatra-sidebar-filter-section-title"><?php echo esc_html($this->get_label()); ?></h3>
             <div class="yatra-sidebar-filter-section-content">
                 <div class="yatra-slider-wrap">
-                    <input type="hidden" id="yatra-price-slider-min" name="yatra_min_price"/>
-                    <input type="hidden" id="yatra-price-slider-max" name="yatra_max_price"/>
+                    <input type="hidden" id="yatra-price-slider-min" name="min_price"/>
+                    <input type="hidden" id="yatra-price-slider-max" name="max_price"/>
                     <div id="yatra-price-slider"></div>
                 </div>
                 <div class="slider-content">

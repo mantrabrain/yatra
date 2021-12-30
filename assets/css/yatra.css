@@ -1700,6 +1700,9 @@
   padding: 20px 15px;
   border: 1px solid #eee;
   background-color: #fff; }
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-clear-filter {
+    cursor: pointer;
+    text-decoration: underline; }
   .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-filter-sidebar-header {
     margin-bottom: 24px;
     padding-bottom: 24px;
@@ -1717,32 +1720,32 @@
     .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-filter-sidebar-header h2 {
       margin: 0;
       font-size: 20px; }
-  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field .yatra-sidebar-filter-section-title {
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field .yatra-sidebar-filter-section-title {
     font-weight: 500;
     display: block;
     margin-bottom: 15px;
     position: relative;
     font-size: 17px; }
-  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul li ul {
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul li ul {
     margin: 15px 0px 15px 20px;
     padding: 0; }
-  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-more-list {
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-more-list {
     margin: 0;
     padding: 0; }
-  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list {
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list {
     margin: 0;
     padding: 0; }
-    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li {
+    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li {
       list-style: none;
       margin-bottom: 15px; }
-      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li label {
+      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li label {
         padding-right: 30px;
         font-size: 14px;
         font-weight: normal;
         cursor: pointer; }
-      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li input.yatra-filter-item {
+      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li input.yatra-filter-item {
         display: none; }
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li input.yatra-filter-item:checked + .yatra-filter-term-name:before {
+        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li input.yatra-filter-item:checked + .yatra-filter-term-name:before {
           border: 1px solid;
           font-family: "Font Awesome 5 Free" !important;
           font-weight: 900;
@@ -1750,10 +1753,10 @@
           line-height: 100%;
           text-align: center;
           font-size: 13px; }
-      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li .yatra-filter-term-name {
+      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li .yatra-filter-term-name {
         padding-left: 25px;
         position: relative; }
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li .yatra-filter-term-name:before {
+        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li .yatra-filter-term-name:before {
           content: "";
           height: 18px;
           width: 18px;
@@ -1767,25 +1770,25 @@
           -moz-transition: all ease .2s;
           transition: all ease .2s;
           padding: 2px; }
-      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li span.count {
+      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.count {
         float: right; }
-      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li span.show-more, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li span.show-less {
+      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-more, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-less {
         text-decoration: none;
         color: #1abc9c; }
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li span.show-more .icon, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li span.show-less .icon {
+        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-more .icon, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-less .icon {
           margin-left: 10px; }
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li span.show-more:hover, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li span.show-less:hover {
+        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-more:hover, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-less:hover {
           text-decoration: underline;
           cursor: pointer; }
-      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li.yatra-terms-more ul {
+      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li.yatra-terms-more ul {
         display: none; }
-      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field ul.yatra-terms-list li.yatra-terms-more .show-less {
+      .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li.yatra-terms-more .show-less {
         display: none; }
-  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field:not(:last-child) {
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field:not(:last-child) {
     padding-bottom: 24px;
     margin-bottom: 24px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.07); }
-  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .slider-content, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .slider-content {
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .slider-content, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .slider-content {
     padding: 10px 0;
     display: -webkit-box;
     display: -moz-box;
@@ -1797,27 +1800,27 @@
             justify-content: space-between;
     font-size: 13px;
     font-weight: 600; }
-  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price #yatra-price-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price #yatra-days-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days #yatra-price-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days #yatra-days-slider {
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-price-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-days-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-price-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-days-slider {
     border-radius: 0;
     height: 2px;
     border: none;
     background: rgba(26, 188, 156, 0.3);
     margin: 45px 10px 0; }
-    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price #yatra-price-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price #yatra-days-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days #yatra-price-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days #yatra-days-slider .ui-slider-range {
+    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-price-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-days-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-price-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-days-slider .ui-slider-range {
       height: 2px;
       border: none;
       background: #1abc9c; }
-  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle {
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle {
     border: none;
     height: 16px;
     width: 16px;
     border-radius: 50%;
     background: #1abc9c;
     margin-top: -3px; }
-    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:focus, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:focus {
+    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:focus, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:focus {
       border: none;
       outline: none; }
-    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:before, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:before {
+    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:before, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:before {
       content: attr(data-value);
       font-size: 10px;
       letter-spacing: 1.5px;
@@ -1842,7 +1845,7 @@
       -moz-transition: all .2s ease;
       transition: all .2s ease;
       white-space: nowrap; }
-    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:after, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:after {
+    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:after, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:after {
       content: "";
       border: 4px solid transparent;
       border-top: 6px solid #1abc9c;
@@ -1860,7 +1863,7 @@
       -o-transition: all .2s ease;
       -moz-transition: all .2s ease;
       transition: all .2s ease; }
-    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:before, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:after, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:before, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-search-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:after {
+    .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:before, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:after, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:before, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:after {
       opacity: 1;
       visibility: visible; }
 

@@ -16,13 +16,18 @@ abstract class Yatra_Module_Filter_Sections
     public function taxonomy_filter_html($terms, $children = false)
     {
 
+        $current_term_slugs = $this->get_selected_terms();
+
         $parent_count = 0;
 
         $term_count = 0;
 
         if (is_array($terms) && count($terms) > 0) {
+
             printf('<ul class="%1$s">', $children ? 'children' : 'yatra-terms-list');
+
             $invisible_terms = '';
+
             foreach ($terms as $term) {
 
                 if ($term->parent && !$children) {
@@ -31,14 +36,16 @@ abstract class Yatra_Module_Filter_Sections
                 }
                 ob_start();
 
+                $current_term_slug_string = in_array($term->slug, $current_term_slugs) ? $term->slug : '';
+
                 printf('<li class="%1$s">', $children ? 'has-children' : 'item');
                 printf(
                     '<label for="yatra-filter-term-item-%1$d">'
-                    . '<input type="checkbox" %2$s value="%3$s" name="%4$s" class="%5$s yatra-filter-item" id="yatra-filter-term-item-%6$d"/>'
+                    . '<input type="checkbox" %2$s value="%3$s" name="filter_%4$s" class="%5$s yatra-filter-item" id="yatra-filter-term-item-%6$d"/>'
                     . '<span class="yatra-filter-term-name">%7$s</span>'
                     . '</label>',
                     $term->term_id,
-                    checked($term->slug, yatra_array_get($_GET, $term->taxonomy, false), false), // phpcs:ignore
+                    checked($term->slug, $current_term_slug_string, false), // phpcs:ignore
                     $term->slug,
                     $term->taxonomy,
                     $term->taxonomy,
@@ -81,6 +88,48 @@ abstract class Yatra_Module_Filter_Sections
             print('</ul>');
         }
 
+    }
+
+    public function get_selected_terms()
+    {
+        $current_term_slugs = array();
+
+        $category = get_queried_object();
+
+        $current_term_id = isset($category->term_id) ? absint($category->term_id) : 0;
+
+        $current_taxonomy_slug = '';
+
+        if (is_tax('activity')) {
+
+            $current_taxonomy_slug = 'activity';
+
+        } else if (is_tax('destination')) {
+
+            $current_taxonomy_slug = 'destination';
+        }
+
+        if ($current_taxonomy_slug != '' && absint($current_term_id) > 0) {
+
+            $current_term = get_term_by('id', $current_term_id, $current_taxonomy_slug);
+
+            $slug = isset($current_term->slug) ? $current_term->slug : '';
+
+            if ($slug != '') {
+                array_push($current_term_slugs, $slug);
+            }
+
+        }
+        $params = yatra_get_filter_params();
+
+        if (isset($params->activity)) {
+            $current_term_slugs = array_merge($current_term_slugs, $params->activity);
+        }
+        if (isset($params->destination)) {
+            $current_term_slugs = array_merge($current_term_slugs, $params->destination);
+        }
+
+        return $current_term_slugs;
     }
 
 }

@@ -13,6 +13,7 @@ class Yatra_Module_Filters
         include_once YATRA_ABSPATH . 'includes/modules/filters/includes/yatra-filter-functions.php';
         include_once YATRA_ABSPATH . 'includes/modules/filters/includes/class-yatra-module-filter-top.php';
         include_once YATRA_ABSPATH . 'includes/modules/filters/includes/class-yatra-module-filter-sidebar.php';
+        include_once YATRA_ABSPATH . 'includes/modules/filters/includes/class-yatra-filter-query.php';
     }
 
     public function hooks()
@@ -55,13 +56,28 @@ class Yatra_Module_Filters
     public function localize_params($params)
     {
         $duration = yatra_get_duration_ranges_for_filter();
+
         $price = yatra_get_price_ranges_for_filter();
 
+        $filter_params = yatra_get_filter_params();
+
+        $days_range_min = isset($duration->min_days) ? absint($duration->min_days) : 0;
+
+        $days_range_max = isset($duration->max_days) ? absint($duration->max_days) : 0;
+
+        $price_range_min = isset($price->min_price) ? absint($price->min_price) : 0;
+
+        $price_range_max = isset($price->max_price) ? absint($price->max_price) : 0;
+
         $params['filter_options'] = array(
-            'price_range_min' => isset($price->min_price) ? absint($price->min_price) : 0,
-            'price_range_max' => isset($price->max_price) ? absint($price->max_price) : 0,
-            'days_range_min' => isset($duration->min_days) ? absint($duration->min_days) : 0,
-            'days_range_max' => isset($duration->max_days) ? absint($duration->max_days) : 0,
+            'price_range_min' => $price_range_min,
+            'price_range_max' => $price_range_max,
+            'price_range_min_value' => isset($filter_params->min_price) ? absint($filter_params->min_price) : $price_range_min,
+            'price_range_max_value' => isset($filter_params->max_price) ? absint($filter_params->max_price) : $price_range_max,
+            'days_range_min' => $days_range_min,
+            'days_range_max' => $days_range_max,
+            'days_range_min_value' => isset($filter_params->min_days) ? absint($filter_params->min_days) : $days_range_min,
+            'days_range_max_value' => isset($filter_params->max_days) ? absint($filter_params->max_days) : $days_range_max,
             'days' => __(' Days', 'yatra')
         );
         return $params;

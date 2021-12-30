@@ -118,3 +118,55 @@ if (!function_exists('yatra_get_price_ranges_for_filter')) {
         return (object)$range;
     }
 }
+
+if (!function_exists('yatra_get_filter_params')) {
+
+    function yatra_get_filter_params()
+    {
+        $min_days = isset($_GET['min_days']) ? absint($_GET['min_days']) : '';
+
+        $max_days = isset($_GET['max_days']) ? absint($_GET['max_days']) : '';
+
+        $min_price = isset($_GET['min_price']) ? absint($_GET['min_price']) : '';
+
+        $max_price = isset($_GET['max_price']) ? absint($_GET['max_price']) : '';
+
+        $filter_activity = isset($_GET['filter_activity']) ? sanitize_text_field($_GET['filter_activity']) : '';
+
+        $filter_destination = isset($_GET['filter_destination']) ? sanitize_text_field($_GET['filter_destination']) : '';
+
+        $activity = explode(',', $filter_activity);
+
+        $destination = explode(',', $filter_destination);
+
+        $response_array = array();
+
+        $duration = yatra_get_duration_ranges_for_filter();
+
+        $price = yatra_get_price_ranges_for_filter();
+
+        if ($min_days !== '') {
+            $response_array['min_days'] = absint($duration->min_days) > $min_days ? absint($duration->min_days) : $min_days;
+        }
+        if ($max_days !== '') {
+            $response_array['max_days'] = absint($duration->max_days) < $max_days ? absint($duration->max_days) : $max_days;
+        }
+        if ($min_price !== '') {
+            $response_array['min_price'] = absint($price->min_price) > $min_price ? absint($price->min_price) : $min_price;
+        }
+        if ($max_price !== '') {
+            $response_array['max_price'] = absint($price->max_price) < $max_price ? absint($price->max_price) : $max_price;
+        }
+        if (count($activity) > 0 && $filter_activity != '') {
+            $response_array['activity'] = $activity;
+        }
+        if (count($destination) > 0 && $filter_destination != '') {
+            $response_array['destination'] = $destination;
+        }
+
+
+        return (object)$response_array;
+
+
+    }
+}
