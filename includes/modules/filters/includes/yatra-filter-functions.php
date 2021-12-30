@@ -141,6 +141,10 @@ if (!function_exists('yatra_get_filter_params')) {
     {
         $orderby = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : '';
 
+        $display_mode = isset($_GET['display_mode']) ? sanitize_text_field($_GET['display_mode']) : '';
+
+        $display_mode = $display_mode === 'list' || $display_mode === 'grid' ? $display_mode : '';
+
         $order_by_options = array_keys(yatra_filter_get_sort_by());
 
         $orderby = in_array($orderby, $order_by_options) ? $orderby : '';
@@ -167,7 +171,7 @@ if (!function_exists('yatra_get_filter_params')) {
 
         $price = yatra_get_price_ranges_for_filter();
 
-        
+
         if ($min_days !== '') {
             $response_array['min_days'] = absint($duration->min_days) > $min_days ? absint($duration->min_days) : $min_days;
         }
@@ -189,6 +193,9 @@ if (!function_exists('yatra_get_filter_params')) {
         }
         if ($orderby !== '') {
             $response_array['orderby'] = $orderby;
+        }
+        if ($display_mode !== '') {
+            $response_array['display_mode'] = $display_mode;
         }
 
         return (object)$response_array;

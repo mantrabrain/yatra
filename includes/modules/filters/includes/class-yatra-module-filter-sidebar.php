@@ -71,10 +71,12 @@ class Yatra_Module_Filter_Sidebar
                 }
             }
         }
-        $order_by = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : '';
 
-        if ($order_by != '') {
-            echo '<input type="hidden" name="orderby" value="' . esc_attr($order_by) . '"/>';
+        if (isset($filter->orderby)) {
+            echo '<input type="hidden" name="orderby" value="' . esc_attr($filter->orderby) . '"/>';
+        }
+        if (isset($filter->display_mode)) {
+            echo '<input type="hidden" name="display_mode" value="' . esc_attr($filter->display_mode) . '"/>';
         }
 
         echo '<button type="submit" class="yatra-filter-sidebar-submit">' . __('Filter', 'yatra') . '</button>';
