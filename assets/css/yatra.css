@@ -1703,6 +1703,13 @@
   .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-clear-filter {
     cursor: pointer;
     text-decoration: underline; }
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-filter-sidebar-submit {
+    float: right; }
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-tour-filter-sidebar-form:after {
+    content: "";
+    display: inline-block;
+    width: 100%;
+    clear: both; }
   .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-filter-sidebar-header {
     margin-bottom: 24px;
     padding-bottom: 24px;

@@ -9,6 +9,19 @@
       text-decoration: underline;
     }
 
+    .yatra-filter-sidebar-submit {
+      float: right;
+    }
+
+    .yatra-tour-filter-sidebar-form {
+      &:after {
+        content: "";
+        display: inline-block;
+        width: 100%;
+        clear: both;
+      }
+    }
+
     .yatra-filter-sidebar-header {
       margin-bottom: 24px;
       padding-bottom: 24px;

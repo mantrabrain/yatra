@@ -22,6 +22,8 @@ class Yatra_Filter_Query
 
             $meta_query = (array)$query->get('meta_query');
 
+            $tax_query = (array)$query->get('tax_query');
+
             if (isset($filter_params->min_days) && isset($filter_params->max_days)) {
 
                 $meta_query[] = array(
@@ -40,9 +42,38 @@ class Yatra_Filter_Query
                     'compare' => 'BETWEEN',
                 );
             }
+            if (isset($filter_params->destination)) {
+
+                if (count($filter_params->destination) > 0) {
+
+                    foreach ($filter_params->destination as $destination_slug) {
+
+                        $tax_query[] = array(
+                            'taxonomy' => 'destination',
+                            'field' => 'slug',
+                            'terms' => sanitize_text_field($destination_slug)
+                        );
+                    }
+                }
+            }
+
+            if (isset($filter_params->activity)) {
+
+                if (count($filter_params->activity) > 0) {
+
+                    foreach ($filter_params->activity as $activity_slug) {
+
+                        $tax_query[] = array(
+                            'taxonomy' => 'activity',
+                            'field' => 'slug',
+                            'terms' => sanitize_text_field($activity_slug)
+                        );
+                    }
+                }
+            }
 
             $query->set('meta_query', $meta_query);
-            //$query->set('posts_per_page', 1);
+            $query->set('tax_query', $tax_query);
 
 
         }

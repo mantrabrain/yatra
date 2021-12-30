@@ -72,7 +72,7 @@ class Yatra_Module_Filter_Sidebar
             }
         }
 
-        echo '<button type="submit" value="Filter">Filter</button>';
+        echo '<button type="submit" class="yatra-filter-sidebar-submit">' . __('Filter', 'yatra') . '</button>';
         echo '</form>';
         echo '</div>';
         echo '</div>';
