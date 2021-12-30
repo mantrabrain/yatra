@@ -94,16 +94,46 @@ abstract class Yatra_Module_Filter_Sections
     {
         $current_term_slugs = array();
 
-        $params = yatra_get_filter_params();
+        $category = get_queried_object();
 
-        if (isset($params->filter_activity)) {
+        $current_term_id = isset($category->term_id) ? absint($category->term_id) : 0;
 
-            $current_term_slugs = array_merge($current_term_slugs, $params->filter_activity);
+        if (is_tax('activity')) {
+
+            $current_term = get_term_by('id', $current_term_id, 'activity');
+
+            $slug = $current_term->slug ?? '';
+
+            if ($slug != '') {
+
+                array_push($current_term_slugs, $slug);
+            }
+
+        } else if (is_tax('destination')) {
+
+            $current_term = get_term_by('id', $current_term_id, 'destination');
+
+            $slug = $current_term->slug ?? '';
+
+            if ($slug != '') {
+
+                array_push($current_term_slugs, $slug);
+            }
+        } else {
+
+            $params = yatra_get_filter_params();
+
+            if (isset($params->filter_activity)) {
+
+                $current_term_slugs = array_merge($current_term_slugs, $params->filter_activity);
+            }
+            if (isset($params->filter_destination)) {
+
+                $current_term_slugs = array_merge($current_term_slugs, $params->filter_destination);
+            }
+
         }
-        if (isset($params->filter_destination)) {
 
-            $current_term_slugs = array_merge($current_term_slugs, $params->filter_destination);
-        }
 
         return array_unique($current_term_slugs);
     }

@@ -167,34 +167,7 @@ if (!function_exists('yatra_get_filter_params')) {
 
         $price = yatra_get_price_ranges_for_filter();
 
-        $category = get_queried_object();
-
-        $current_term_id = isset($category->term_id) ? absint($category->term_id) : 0;
-
-        if (is_tax('activity')) {
-
-            $current_term = get_term_by('id', $current_term_id, 'activity');
-
-            $slug = $current_term->slug ?? '';
-
-            if ($slug != '') {
-
-                array_push($activity, $slug);
-            }
-
-        } else if (is_tax('destination')) {
-
-            $current_term = get_term_by('id', $current_term_id, 'destination');
-
-            $slug = $current_term->slug ?? '';
-
-            if ($slug != '') {
-
-                array_push($destination, $slug);
-            }
-        }
-
-
+        
         if ($min_days !== '') {
             $response_array['min_days'] = absint($duration->min_days) > $min_days ? absint($duration->min_days) : $min_days;
         }
