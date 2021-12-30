@@ -46,6 +46,13 @@
     .yatra-top-filter-sorting-by {
       font-size: 15px;
       padding: 5px 30px 5px 10px;
-     }
+      background: #fff;
+    }
+
+    form.yatra-topbar-filter-order-form {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   }
 }

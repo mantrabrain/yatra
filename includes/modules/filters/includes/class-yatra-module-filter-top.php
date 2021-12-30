@@ -148,10 +148,10 @@ class Yatra_Module_Filter_Top
 
         ?>
         <ul class="yatra-top-filter-display-list">
-            <li class="grid<?php echo $selected === 'grid' ? ' selected' : ''; ?>">
+            <li class="yatra-display-type-grid<?php echo $selected === 'grid' ? ' selected' : ''; ?>">
                 <span class="icon fa fa-th"></span>
             </li>
-            <li class="list<?php echo $selected === 'list' ? ' selected' : ''; ?>">
+            <li class="yatra-display-type-list<?php echo $selected === 'list' ? ' selected' : ''; ?>">
                 <span class="icon fa fa-list"></span>
             </li>
         </ul>

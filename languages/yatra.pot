@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.5\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-29 17:19:57+00:00\n"
+"POT-Creation-Date: 2021-12-30 11:27:55+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -420,7 +420,6 @@ msgid "When you get new customer, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:123
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:122
 #: includes/modules/status/templates/html-admin-page-status-report.php:867
 #: templates/myaccount/tmpl-dashboard.php:23
 msgid "Name"
@@ -3075,57 +3074,33 @@ msgstr ""
 msgid "Watch on youtube"
 msgstr ""
 
-#: includes/modules/filters/class-yatra-module-filters.php:65
+#: includes/modules/filters/class-yatra-module-filters.php:85
 msgid " Days"
 msgstr ""
 
-#: includes/modules/filters/includes/abstract-class-yatra-module-filter-sections.php:77
+#: includes/modules/filters/includes/abstract-class-yatra-module-filter-sections.php:84
 msgid "Show all %s"
 msgstr ""
 
-#: includes/modules/filters/includes/abstract-class-yatra-module-filter-sections.php:78
+#: includes/modules/filters/includes/abstract-class-yatra-module-filter-sections.php:85
 msgid "Show less"
 msgstr ""
 
-#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:42
+#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:47
 msgid "Filter Criteria"
 msgstr ""
 
+#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:51
+msgid "Clear"
+msgstr ""
+
+#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:80
+#: includes/modules/status/list-tables/class-yatra-admin-log-list-table.php:215
+msgid "Filter"
+msgstr ""
+
 #: includes/modules/filters/includes/class-yatra-module-filter-top.php:60
-msgid "Sort By"
-msgstr ""
-
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:105
-msgid "Latest"
-msgstr ""
-
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:109
-msgid "Price"
-msgstr ""
-
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:110
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:117
-msgid "Low to high"
-msgstr ""
-
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:111
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:118
-msgid "High to low"
-msgstr ""
-
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:115
-#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:42
-#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:43
-#: includes/template-tags.php:190
-msgid "Days"
-msgstr ""
-
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:123
-msgid "a - z"
-msgstr ""
-
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:124
-msgid "z - a"
+msgid "Sort"
 msgstr ""
 
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:7
@@ -3133,8 +3108,42 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:42
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:43
+#: includes/template-tags.php:190
+msgid "Days"
+msgstr ""
+
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-price.php:7
 msgid "Price Range"
+msgstr ""
+
+#: includes/modules/filters/includes/yatra-filter-functions.php:125
+msgid "Default Sorting"
+msgstr ""
+
+#: includes/modules/filters/includes/yatra-filter-functions.php:126
+msgid "Sort by price: low to high"
+msgstr ""
+
+#: includes/modules/filters/includes/yatra-filter-functions.php:127
+msgid "Sort by price: high to low"
+msgstr ""
+
+#: includes/modules/filters/includes/yatra-filter-functions.php:128
+msgid "Sort by days: low to high"
+msgstr ""
+
+#: includes/modules/filters/includes/yatra-filter-functions.php:129
+msgid "Sort by days: high to low"
+msgstr ""
+
+#: includes/modules/filters/includes/yatra-filter-functions.php:130
+msgid "Sort by name: a - z"
+msgstr ""
+
+#: includes/modules/filters/includes/yatra-filter-functions.php:131
+msgid "Sort by name: z - a"
 msgstr ""
 
 #: includes/modules/status/class-yatra-module-status.php:35
@@ -3207,10 +3216,6 @@ msgstr ""
 
 #: includes/modules/status/list-tables/class-yatra-admin-log-list-table.php:200
 msgid "Delete"
-msgstr ""
-
-#: includes/modules/status/list-tables/class-yatra-admin-log-list-table.php:215
-msgid "Filter"
 msgstr ""
 
 #: includes/modules/status/list-tables/class-yatra-admin-log-list-table.php:254
