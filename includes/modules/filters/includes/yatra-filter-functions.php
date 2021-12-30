@@ -139,11 +139,11 @@ if (!function_exists('yatra_get_filter_params')) {
 
     function yatra_get_filter_params()
     {
-        $orderby = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : 'default';
+        $orderby = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : '';
 
         $order_by_options = array_keys(yatra_filter_get_sort_by());
 
-        $orderby = in_array($orderby, $order_by_options) ? $orderby : 'default';
+        $orderby = in_array($orderby, $order_by_options) ? $orderby : '';
 
         $min_days = isset($_GET['min_days']) ? absint($_GET['min_days']) : '';
 
@@ -185,8 +185,9 @@ if (!function_exists('yatra_get_filter_params')) {
         if (count($destination) > 0 && count($destination) < 100 && $filter_destination != '') {
             $response_array['destination'] = $destination;
         }
-        $response_array['orderby'] = $orderby;
-
+        if ($orderby !== '') {
+            $response_array['orderby'] = $orderby;
+        }
 
         return (object)$response_array;
 

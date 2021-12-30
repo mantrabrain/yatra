@@ -75,7 +75,9 @@ class Yatra_Filter_Query
             $query->set('meta_query', $meta_query);
             $query->set('tax_query', $tax_query);
 
-            switch ($filter_params->orderby) {
+            $order_by = isset($filter_params->orderby) ? $filter_params->orderby : 'default';
+
+            switch ($order_by) {
                 case "name":
                     $query->set('orderby', 'title');
                     $query->set('order', 'ASC');
