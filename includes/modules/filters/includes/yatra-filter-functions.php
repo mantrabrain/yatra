@@ -217,6 +217,7 @@ if (!function_exists('yatra_get_filter_params')) {
         if ($orderby !== '') {
             $response_array['orderby'] = $orderby;
         }
+
         return (object)$response_array;
 
 

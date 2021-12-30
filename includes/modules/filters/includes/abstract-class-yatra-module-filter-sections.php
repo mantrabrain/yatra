@@ -98,14 +98,14 @@ abstract class Yatra_Module_Filter_Sections
 
         if (isset($params->activity)) {
 
-            $current_term_slugs = $params->activity;
+            $current_term_slugs = array_merge($current_term_slugs, $params->activity);
         }
         if (isset($params->destination)) {
 
-            $current_term_slugs = $params->destination;
+            $current_term_slugs = array_merge($current_term_slugs, $params->destination);
         }
 
-        return $current_term_slugs;
+        return array_unique($current_term_slugs);
     }
 
 }

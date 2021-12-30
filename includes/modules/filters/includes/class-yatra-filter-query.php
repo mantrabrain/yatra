@@ -42,13 +42,17 @@ class Yatra_Filter_Query
                     'compare' => 'BETWEEN',
                 );
             }
+            $destination_tax_query = array(
+                'relation' => 'OR'
+            );
+
             if (isset($filter_params->destination)) {
 
                 if (count($filter_params->destination) > 0) {
 
                     foreach ($filter_params->destination as $destination_slug) {
 
-                        $tax_query[] = array(
+                        $destination_tax_query[] = array(
                             'taxonomy' => 'destination',
                             'field' => 'slug',
                             'terms' => sanitize_text_field($destination_slug)
@@ -56,7 +60,13 @@ class Yatra_Filter_Query
                     }
                 }
             }
+            if (count($destination_tax_query) > 1) {
+                $tax_query[] = $destination_tax_query;
+            }
 
+            $activity_tax_query = array(
+                'relation' => 'OR'
+            );
             if (isset($filter_params->activity)) {
 
                 if (count($filter_params->activity) > 0) {
@@ -70,6 +80,9 @@ class Yatra_Filter_Query
                         );
                     }
                 }
+            }
+            if (count($activity_tax_query) > 1) {
+                $tax_query[] = $activity_tax_query;
             }
 
             $query->set('meta_query', $meta_query);
