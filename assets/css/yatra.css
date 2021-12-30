@@ -1912,8 +1912,7 @@
         color: #000; }
   .yatra-tour-filter-top .yatra-tour-filter-top-inner .yatra-top-filter-sorting-by {
     font-size: 15px;
-    padding: 5px 10px;
-    min-width: 150px; }
+    padding: 5px 30px 5px 10px; }
 
 .yatra-flex-row {
   display: -webkit-box;

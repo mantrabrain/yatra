@@ -57,7 +57,7 @@ class Yatra_Module_Filter_Top
             'yatra_topbar_filter_sections',
             array(
                 'sorting' => array(
-                    'label' => __('Sort By', 'yatra'),
+                    'label' => __('Sort', 'yatra'),
                     'callback' => array($this, 'sorting_section')
                 ),
                 'display' => array(
@@ -98,62 +98,46 @@ class Yatra_Module_Filter_Top
     public function sorting_section($section)
     {
         $label = isset($section['label']) ? $section['label'] : '';
-        $selected = 'price_asc';
-        $sorting_fields = array(
-            '' => array(
-                'options' => array(
-                    'latest' => __('Latest', 'yatra')
-                )
-            ),
-            'price' => array(
-                'label' => __('Price', 'yatra'),
-                'options' => array('asc' => __('Low to high', 'yatra'),
-                    'desc' => __('High to low', 'yatra')
-                )
-            ),
-            'days' => array(
-                'label' => __('Days', 'yatra'),
-                'options' =>
-                    array('asc' => __('Low to high', 'yatra'),
-                        'desc' => __('High to low', 'yatra')
-                    )
-            ),
-            'name' => array(
-                'label' => __('Name', 'yatra'),
-                'options' => array('asc' => __('a - z', 'yatra'),
-                    'desc' => __('z - a', 'yatra')
-                )
-            )
-        );
+
+        $selected = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : 'default';
+
+        $sorting_fields = yatra_filter_get_sort_by();
+
+        $action = get_post_type_archive_link('tour');
+
+        $filter_params = yatra_get_filter_params();
+
         ?>
         <div class="yatra-top-filter-sorting">
-            <?php if ($label != '') { ?>
-                <label for="yatra-top-filter-sorting-by"><?php echo esc_html($label) ?>: </label>
-            <?php } ?>
-            <select name="yatra-top-filter-sorting-by" class="yatra-top-filter-sorting-by" id="yatra-top-filter-sorting-by">
-                <?php foreach ($sorting_fields as $field_group_id => $field_group) {
+            <form method="get" action="<?php echo esc_attr($action) ?>" class="yatra-topbar-filter-order-form">
+                <?php
 
-                    $option_group_label = isset($field_group['label']) ? $field_group['label'] : '';
+                foreach ($filter_params as $param_id => $param_value) {
 
-                    $options = isset($field_group['options']) ? $field_group['options'] : array();
-                    if ($option_group_label != '') {
+                    if ($param_id !== 'orderby') {
+
+                        $value = is_array($param_value) ? implode(',', $param_value) : $param_value;
+                        $value = trim($value);
+                        $param_id = is_array($param_value) ? 'filter_' . $param_id : $param_id;
                         ?>
-                        <optgroup label="<?php echo esc_attr($option_group_label) ?>">
+                        <input type="hidden" value="<?php echo esc_attr($value) ?>"
+                               name="<?php echo esc_attr($param_id) ?>"/>
+                        <?php
+                    }
+                }
+                ?>
+                <?php if ($label != '') { ?>
+                    <label for="yatra-top-filter-sorting-by"><?php echo esc_html($label) ?>: </label>
+                <?php } ?>
+                <select name="orderby" class="yatra-top-filter-sorting-by"
+                        id="yatra-top-filter-sorting-by">
+                    <?php foreach ($sorting_fields as $option_id => $option_label) { ?>
+                        <option <?php echo $selected === $option_id ? 'selected="selected"' : ''; ?>
+                                value="<?php echo esc_attr($option_id) ?>"><?php echo esc_html($option_label) ?></option>
                     <?php } ?>
-                    <?php foreach ($options as $option_id => $option_label) {
+                </select>
 
-                        $option_dynamic_id = $field_group_id != '' ? $field_group_id . '_' . $option_id : $option_id;
-
-                        ?>
-                        <option <?php echo $selected === $option_dynamic_id ? 'selected="selected"' : ''; ?>
-                                value="<?php echo esc_attr($option_dynamic_id) ?>"><?php echo esc_html($option_label) ?></option>
-                    <?php }
-                    if ($option_group_label != '') {
-                        ?>
-                        </optgroup>
-                    <?php }
-                } ?>
-            </select>
+            </form>
         </div>
         <?php
     }

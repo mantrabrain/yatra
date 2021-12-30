@@ -69,6 +69,10 @@ class Yatra_Module_Filters
 
         $price_range_max = isset($price->max_price) ? absint($price->max_price) : 0;
 
+        global $wp;
+
+        $current_url = add_query_arg($wp->query_vars, get_post_type_archive_link('tour'));
+
         $params['filter_options'] = array(
             'price_range_min' => $price_range_min,
             'price_range_max' => $price_range_max,
@@ -78,7 +82,8 @@ class Yatra_Module_Filters
             'days_range_max' => $days_range_max,
             'days_range_min_value' => isset($filter_params->min_days) ? absint($filter_params->min_days) : $days_range_min,
             'days_range_max_value' => isset($filter_params->max_days) ? absint($filter_params->max_days) : $days_range_max,
-            'days' => __(' Days', 'yatra')
+            'days' => __(' Days', 'yatra'),
+            'current_url' => $current_url
         );
         return $params;
     }

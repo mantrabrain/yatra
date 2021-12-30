@@ -34,6 +34,11 @@
                     event.preventDefault();
                     that.processFilter($(this));
 
+                });
+
+                $('body').on('change', 'select#yatra-top-filter-sorting-by', function (event) {
+                    $(this).closest('form.yatra-topbar-filter-order-form').submit();
+
                 })
 
             },

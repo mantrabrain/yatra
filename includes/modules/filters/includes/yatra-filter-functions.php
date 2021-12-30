@@ -118,11 +118,33 @@ if (!function_exists('yatra_get_price_ranges_for_filter')) {
         return (object)$range;
     }
 }
+if (!function_exists('yatra_filter_get_sort_by')) {
+    function yatra_filter_get_sort_by()
+    {
+        return array(
+            'default' => __('Default Sorting', 'yatra'),
+            'price' => __('Sort by price: low to high', 'yatra'),
+            'price-desc' => __('Sort by price: high to low', 'yatra'),
+            'days' => __('Sort by days: low to high', 'yatra'),
+            'days-desc' => __('Sort by days: high to low', 'yatra'),
+            'name' => __('Sort by name: a - z', 'yatra'),
+            'name-desc' => __('Sort by name: z - a', 'yatra'),
+
+
+        );
+    }
+}
 
 if (!function_exists('yatra_get_filter_params')) {
 
     function yatra_get_filter_params()
     {
+        $orderby = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : 'default';
+
+        $order_by_options = array_keys(yatra_filter_get_sort_by());
+
+        $orderby = in_array($orderby, $order_by_options) ? $orderby : 'default';
+
         $min_days = isset($_GET['min_days']) ? absint($_GET['min_days']) : '';
 
         $max_days = isset($_GET['max_days']) ? absint($_GET['max_days']) : '';
@@ -163,6 +185,7 @@ if (!function_exists('yatra_get_filter_params')) {
         if (count($destination) > 0 && count($destination) < 100 && $filter_destination != '') {
             $response_array['destination'] = $destination;
         }
+        $response_array['orderby'] = $orderby;
 
 
         return (object)$response_array;

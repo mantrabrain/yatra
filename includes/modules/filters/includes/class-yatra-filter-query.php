@@ -75,6 +75,37 @@ class Yatra_Filter_Query
             $query->set('meta_query', $meta_query);
             $query->set('tax_query', $tax_query);
 
+            switch ($filter_params->orderby) {
+                case "name":
+                    $query->set('orderby', 'title');
+                    $query->set('order', 'ASC');
+                    break;
+                case "name-desc":
+                    $query->set('orderby', 'title');
+                    $query->set('order', 'DESC');
+                    break;
+                case "price":
+                    $query->set('meta_key', 'yatra_filter_meta_minimum_tour_price');
+                    $query->set('orderby', 'meta_value_num');
+                    $query->set('order', 'ASC');
+                    break;
+                case "price-desc":
+                    $query->set('meta_key', 'yatra_filter_meta_minimum_tour_price');
+                    $query->set('orderby', 'meta_value_num');
+                    $query->set('order', 'DESC');
+                    break;
+                case "days":
+                    $query->set('meta_key', 'yatra_tour_meta_tour_duration_days');
+                    $query->set('orderby', 'meta_value_num');
+                    $query->set('order', 'ASC');
+                    break;
+                case "days-desc":
+                    $query->set('meta_key', 'yatra_tour_meta_tour_duration_days');
+                    $query->set('orderby', 'meta_value_num');
+                    $query->set('order', 'DESC');
+                    break;
+            }
+
 
         }
 
