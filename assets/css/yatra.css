@@ -1314,7 +1314,8 @@
     background: #f9f9f9;
     width: 100%; }
     .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-meta .icon {
-      margin-right: 10px; }
+      margin-right: 10px;
+      font-style: normal; }
     .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-meta .yatra-cat-links, .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-meta .yatra-tour-duration {
       line-height: 1.5em;
       padding: 5px 8px;
