@@ -2,18 +2,21 @@
 
 defined('ABSPATH') || exit;
 if (!function_exists('yatra_get_taxonomy_term_lists')) {
-    function yatra_get_taxonomy_term_lists($post_id, $taxonomy = '', $return = false)
+    function yatra_get_taxonomy_term_lists($post_id, $taxonomy = '', $return = false, $icon = '')
     {
         ob_start();
         /* translators: used between list items, there is a space after the comma. */
         $terms = get_the_term_list($post_id, $taxonomy, '', __(',&nbsp;', 'yatra'));
 
+        $icon_html = $icon !== '' ? '<i class="icon ' . esc_attr($icon) . '"></i> ' : '';
+
         if ($terms) {
             printf(
             /* translators: 1: Taxonomy name 2: SVG icon. 3: posted in label, only visible to screen readers.*/
-                '<span class="yatra-cat-links %1$s-links"><span class="screen-reader-text">%2$s</span>%3$s</span>',
+                '<span class="yatra-cat-links %1$s-links"><span class="screen-reader-text">%2$s</span>%3$s%4$s</span>',
                 ($taxonomy),
                 ucwords($taxonomy),
+                $icon_html,
                 $terms
             ); // WPCS: XSS OK.
         }
@@ -74,20 +77,6 @@ if (!function_exists('yatra_entry_post_content')) {
     }
 }
 
-if (!function_exists('yatra_entry_footer')) {
-
-    function yatra_entry_footer()
-    {
-        ?>
-        <div class="entry-footer">
-            <?php
-            yatra_posted_by();
-            yatra_posted_on();
-            yatra_get_taxonomy_term_lists(get_the_ID(), 'destination'); ?>
-        </div>
-        <?php
-    }
-}
 
 if (!function_exists('yatra_get_current_currency_symbol')) {
 
@@ -196,42 +185,20 @@ if (!function_exists('yatra_entry_meta_options')) {
 
         }
         if ($yatra_tour_meta_tour_nights == '' && $yatra_tour_meta_tour_days == '') {
+
             $duration_string = __('N/A', 'yatra');
 
         }
 
+        echo '<div class="yatra-tour-meta">';
 
-        $activity = yatra_get_taxonomy_term_lists($post_id, 'activity', true);
+        yatra_get_taxonomy_term_lists($post_id, 'activity', false, 'fa fa-universal-access');
 
-        $destination = yatra_get_taxonomy_term_lists(get_the_ID(), 'destination', true);
+        yatra_get_taxonomy_term_lists($post_id, 'destination', false, 'fa fa-map-marker-alt');
 
-        $meta_frontend = array(
-            array('icon' => 'fa fa-universal-access', 'text' => $activity),
+        echo '<span class="yatra-tour-duration"><i class="icon fa fa-clock"></i>' . esc_html($duration_string) . '</span>';
 
-            array('icon' => 'fa fa fa-map-marker-alt', 'text' => $destination),
-
-            array('icon' => 'fa fa-clock', 'text' => $duration_string),
-
-        );
-
-        $list = '';
-
-        foreach ($meta_frontend as $value) {
-
-            $icon = isset($value['icon']) ? $value['icon'] : '';
-
-            $text = isset($value['text']) ? $value['text'] : '';
-
-
-            $list .= '<li><i class="icon ' . esc_attr($icon) . '"></i><span class="icon-content">' . ($text) . '</span></li>';
-        }
-
-
-        echo '<ul class="yatra-tour-meta-options">';
-
-        echo $list;
-
-        echo '</ul>';
+        echo '</div>';
 
     }
 }

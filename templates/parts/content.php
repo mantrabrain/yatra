@@ -23,12 +23,9 @@
 
 
             <div class="yatra-tour-meta">
-                <?php yatra_posted_by(); ?>
-                <?php yatra_posted_on();
-                echo "&nbsp;";
-                yatra_get_taxonomy_term_lists(get_the_ID(), 'destination');
-
-
+                <?php
+                yatra_get_taxonomy_term_lists(get_the_ID(), 'destination', false, 'fa fa-map-marker-alt');
+                yatra_get_taxonomy_term_lists(get_the_ID(), 'activity', false, 'fa fa-universal-access');
                 ?>
             </div><!-- .meta-info -->
 
@@ -39,36 +36,37 @@
 
             <?php
             the_content();
-            // Edit post link.
-            edit_post_link(
-                sprintf(
-                    wp_kses(
-                    /* translators: %s: Name of current post. Only visible to screen readers. */
-                        __('Edit <span class="screen-reader-text">%s</span>', 'yatra'),
-                        array(
-                            'span' => array(
-                                'class' => array(),
-                            ),
-                        )
-                    ),
-                    get_the_title()
-                ),
-                '<span class="edit-link">',
-                '</span>'
-            );
+            // Edit post link
 
             ?>
         </div><!-- .yatra-tour-content -->
         <div class="entry-footer">
-            <?php yatra_get_taxonomy_term_lists(get_the_ID(), 'activity'); ?>
+            <?php  ?>
         </div>
     </div>
     <div class="yatra-tour-content entry-tabs">
         <?php
         yatra_frontend_tabs(); ?>
     </div>
+    <?php
+    edit_post_link(
+        sprintf(
+            wp_kses(
+            /* translators: %s: Name of current post. Only visible to screen readers. */
+                __('Edit <span class="screen-reader-text">%s</span>', 'yatra'),
+                array(
+                    'span' => array(
+                        'class' => array(),
+                    ),
+                )
+            ),
+            get_the_title()
+        ),
+        '<span class="edit-link">',
+        '</span>'
+    );
 
-    <?php wp_link_pages(
+    wp_link_pages(
         array(
             'before' => '<div class="page-links">' . __('Pages:', 'yatra'),
             'after' => '</div>',

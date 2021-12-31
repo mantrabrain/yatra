@@ -259,9 +259,6 @@
   clear: both;
   display: block; }
 
-.yatra-content-area header {
-  margin-bottom: 30px; }
-
 .yatra-content-area .page-title, .yatra-content-area .yatra-tour-title {
   line-height: 1.2;
   font-weight: bold;
@@ -1937,19 +1934,17 @@
           -ms-flex-pack: justify;
               justify-content: space-between;
       height: 100%; }
-  .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-meta-content-wrap ul {
-    display: inline-block;
-    margin: 0;
-    padding: 0; }
-    .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-meta-content-wrap ul li {
-      list-style: none;
+  .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-meta-content-wrap .yatra-tour-meta {
+    line-height: 1.5em;
+    display: inline-block; }
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-meta-content-wrap .yatra-tour-meta .icon {
+      margin-right: 10px; }
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-meta-content-wrap .yatra-tour-meta .yatra-cat-links, .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-meta-content-wrap .yatra-tour-meta .yatra-tour-duration {
       line-height: 1.5em;
       padding: 5px 8px;
       margin-bottom: 1px;
       float: left;
       font-size: 14px; }
-      .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-meta-content-wrap ul li .icon {
-        margin-right: 10px; }
   .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-meta-content-wrap .inner {
     padding: 0; }
   .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .inner {
@@ -2037,19 +2032,17 @@
           font-weight: 600; }
     .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .inner {
       padding: 0 20px; }
-    .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap ul {
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap .yatra-tour-meta {
       display: inline-block;
-      margin: 0;
-      padding: 0; }
-      .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap ul li {
-        list-style: none;
+      line-height: 1.5em; }
+      .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap .yatra-tour-meta .icon {
+        margin-right: 10px; }
+      .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap .yatra-tour-meta .yatra-cat-links, .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap .yatra-tour-meta .yatra-tour-duration {
         line-height: 1.5em;
         padding: 5px 8px;
         margin-bottom: 1px;
         float: left;
         font-size: 14px; }
-        .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap ul li .icon {
-          margin-right: 10px; }
     .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap .inner {
       padding: 0; }
 
@@ -2070,6 +2063,15 @@ body.single .yatra-single-tour .yatra-site-main {
   width: 65%;
   float: left;
   padding: 10px; }
+  body.single .yatra-single-tour .yatra-site-main .yatra-tour-meta {
+    display: inline-block;
+    padding: 15px 0; }
+    body.single .yatra-single-tour .yatra-site-main .yatra-tour-meta .icon {
+      margin-right: 10px; }
+    body.single .yatra-single-tour .yatra-site-main .yatra-tour-meta .yatra-cat-links {
+      padding: 0px 8px;
+      margin-bottom: 1px;
+      float: left; }
 
 body.single .yatra-single-tour .yatra-tour-info {
   float: right;

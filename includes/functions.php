@@ -398,40 +398,6 @@ if (!function_exists('yatra_posted_on')) :
     }
 endif;
 
-if (!function_exists('yatra_entry_meta')) {
-
-    function yatra_entry_meta()
-    {
-        ?>
-        <div class="yatra-tour-meta">
-            <?php yatra_posted_by(); ?>
-            <?php yatra_posted_on(); ?>
-            <?php
-            // Edit post link.
-            edit_post_link(
-                sprintf(
-                    wp_kses(
-                    /* translators: %s: Name of current post. Only visible to screen readers. */
-                        __('Edit <span class="screen-reader-text">%s</span>', 'yatra'),
-                        array(
-                            'span' => array(
-                                'class' => array(),
-                            ),
-                        )
-                    ),
-                    get_the_title()
-                ),
-                '<span class="edit-link">',
-                '</span>'
-            );
-            ?>
-        </div><!-- .meta-info -->
-        <?php
-    }
-
-}
-
-
 /**
  * Get permalink settings
  *

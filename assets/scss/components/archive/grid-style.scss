@@ -116,26 +116,20 @@
         .yatra-meta-content-wrap {
 
 
-          ul {
+          .yatra-tour-meta {
             display: inline-block;
-            margin: 0;
-            padding: 0;
+            line-height: 1.5em;
 
-            li {
-              list-style: none;
+            .icon {
+              margin-right: 10px;
+            }
+
+            .yatra-cat-links, .yatra-tour-duration {
               line-height: 1.5em;
               padding: 5px 8px;
               margin-bottom: 1px;
               float: left;
               font-size: 14px;
-
-              &:first-child {
-
-              }
-
-              .icon {
-                margin-right: 10px;
-              }
             }
           }
 

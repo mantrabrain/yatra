@@ -1,5 +1,5 @@
 .yatra-hide {
-  display: none!important;
+  display: none !important;
 }
 
 body.single {
@@ -8,6 +8,21 @@ body.single {
       width: 65%;
       float: left;
       padding: 10px;
+
+      .yatra-tour-meta {
+        display: inline-block;
+        padding: 15px 0;
+
+        .icon {
+          margin-right: 10px;
+        }
+
+        .yatra-cat-links {
+          padding: 0px 8px;
+          margin-bottom: 1px;
+          float: left;
+        }
+      }
     }
 
     .yatra-tour-info {
