@@ -9,7 +9,9 @@ class Yatra_Template_Hooks
         add_action('yatra_single_tour_booking_form', array($this, 'single_tour_booking_form'), 10, 1);
         add_action('yatra_tour_booking_pricing_content', array(__class__, 'tour_booking_pricing_content'), 10, 3);
         add_action('yatra_single_tour_enquiry_form', array($this, 'single_tour_enquiry_form'), 10, 1);
-        add_filter('excerpt_more', array($this, 'post_link'), 1);
+        add_filter('excerpt_more', array($this, 'post_link'), 10);
+        add_filter('yatra_page_wrapper_class', array($this, 'wrapper_class'), 11);
+        add_filter('yatra_tour_class', array($this, 'tour_class'), 10);
 
     }
 
@@ -126,6 +128,28 @@ class Yatra_Template_Hooks
         $output = '...';
 
         return apply_filters('yatra_post_link', $output, $output_filter);
+    }
+
+    public function wrapper_class($class)
+    {
+
+        $display_mode = yatra_get_archive_display_mode();
+
+        $class .= ' yatra-tour-archive-display-mode-' . esc_attr($display_mode);
+
+        return $class;
+    }
+
+    public function tour_class($class)
+    {
+        if (yatra_is_archive_page()) {
+
+            $display_mode = yatra_get_archive_display_mode();
+
+            $class[] = $display_mode === 'grid' ? 'yatra-col-md-6 yatra-col-sm-12' : '';
+
+        }
+        return $class;
     }
 
 

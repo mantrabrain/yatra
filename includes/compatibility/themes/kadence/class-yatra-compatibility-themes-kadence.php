@@ -36,9 +36,6 @@ class Yatra_Compatibility_Themes_Kadence
     {
         $class = "yatra-page-wrapper ";
 
-        if (yatra_is_archive_page()) {
-            $class .= 'template-default ';
-        }
         return $class . 'kadence-theme';
     }
 }

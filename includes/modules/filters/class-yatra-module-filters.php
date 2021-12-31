@@ -35,11 +35,18 @@ class Yatra_Module_Filters
         if (!yatra_is_archive_page()) {
             return;
         }
+
+        $display_mode = yatra_get_archive_display_mode();
+
+        $display_class = 'yatra-archive-main-content-area-inner';
+
+        $display_class .= $display_mode === 'grid' ? ' yatra-row' : '';
+
         echo '<div class="yatra-archive-main-content-area">';
 
         do_action('yatra_before_main_content_area_inner');
 
-        echo '<div class="yatra-archive-main-content-area-inner">';
+        echo '<div class="' . esc_attr($display_class) . '">';
 
     }
 

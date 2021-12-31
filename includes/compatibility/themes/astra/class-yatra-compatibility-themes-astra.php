@@ -11,9 +11,6 @@ class Yatra_Compatibility_Themes_Astra
     {
         $class = "yatra-page-wrapper ";
 
-        if (yatra_is_archive_page()) {
-            $class .= 'template-default ';
-        }
         return $class . 'astra-theme';
     }
 }

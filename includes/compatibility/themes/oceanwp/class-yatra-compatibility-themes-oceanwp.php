@@ -12,10 +12,6 @@ class Yatra_Compatibility_Themes_OceanWP
     {
         $class = "yatra-page-wrapper container ";
 
-        if (yatra_is_archive_page()) {
-
-            $class .= 'template-default ';
-        }
         return $class . 'oceanwp-theme';
     }
 }

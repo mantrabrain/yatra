@@ -564,7 +564,33 @@ function yatra_get_tour_class($class = '', $tour_id = null)
 
     $classes[] = 'yatra-tour-single-item';
 
-    $classes = apply_filters('yatra_post_class', $classes, $tour_id);
+    $classes = apply_filters('yatra_tour_class', $classes, $tour_id);
 
     return array_map('esc_attr', array_unique(array_filter($classes)));
+}
+
+if (!function_exists('yatra_get_page_wrapper_class')) {
+
+    function yatra_get_page_wrapper_class()
+    {
+        $class = 'yatra-page-wrapper';
+
+        $class = $class . ' ' . get_option('yatra_page_container_class');
+
+        return apply_filters('yatra_page_wrapper_class', $class);
+
+    }
+}
+if (!function_exists('yatra_get_archive_display_mode')) {
+
+    function yatra_get_archive_display_mode()
+    {
+        $filter_params = yatra_get_filter_params();
+
+        $display_mode = $filter_params->display_mode ?? 'list';
+
+        $display_mode = $display_mode === 'grid' || $display_mode === 'list' ? $display_mode : 'list';
+
+        return $display_mode;
+    }
 }
