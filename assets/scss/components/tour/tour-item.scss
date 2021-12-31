@@ -80,25 +80,27 @@
 
     }
 
-    ul.yatra-tour-meta-options {
-      background: #f9f9f9;
+    .yatra-tour-meta {
+      line-height: 1.7;
+      display: inline-block;
       padding: 25px 15px;
-      margin: 0;
-      list-style: none;
-      text-align: left;
       border-bottom: 2px solid #ddd;
+      background: #f9f9f9;
+      width: 100%;
 
-      li {
-        line-height: 1.7;
+
+      .icon {
+        margin-right: 10px;
       }
 
-      .fa {
-        margin-right: 10px;
-        width: 10px;
-        display: inline-block;
+      .yatra-cat-links, .yatra-tour-duration {
+        line-height: 1.5em;
+        padding: 5px 8px;
+        margin-bottom: 1px;
+        display: block;
+        font-size: 14px;
       }
     }
-
     .book-now-wrap {
       position: absolute;
       top: 250px;
