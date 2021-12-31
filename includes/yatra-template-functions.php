@@ -594,3 +594,14 @@ if (!function_exists('yatra_get_archive_display_mode')) {
         return $display_mode;
     }
 }
+if (!function_exists('yatra_is_featured_tour')) {
+
+    function yatra_is_featured_tour($tour_id = null)
+    {
+        $tour_id = is_null($tour_id) ? get_the_ID() : $tour_id;
+
+        return (boolean)get_post_meta($tour_id, 'yatra_tour_meta_tour_featured', true);
+
+
+    }
+}

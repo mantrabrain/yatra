@@ -14,10 +14,13 @@
     <div class="yatra-tour-single-item-inner">
         <div class="yatra-thumb-wrap">
             <div class="inner">
-                <?php yatra_tour_thumbnail(); ?>
+                <?php
+                if (yatra_is_featured_tour()) {
+                    echo '<span class="yatra-featured-tour"><i class="icon fa fa-bullhorn"></i><small class="text">' . __('Featured', 'yatra') . '</small></span>';
+                }
+                yatra_tour_thumbnail(); ?>
             </div>
         </div>
-
         <div class="yatra-content-wrap">
             <div class="inner">
                 <div class="yatra-content-left">

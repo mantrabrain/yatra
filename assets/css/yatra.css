@@ -1843,6 +1843,22 @@
           justify-content: space-between;
   border: 1px solid #eee;
   margin-bottom: 30px; }
+  .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item span.yatra-featured-tour {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    padding: 0 5px;
+    background: #1abc9c;
+    color: #fff;
+    font-weight: 500;
+    -webkit-box-shadow: 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+            box-shadow: 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+    border-radius: 0; }
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item span.yatra-featured-tour .icon {
+      margin-right: 5px; }
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item span.yatra-featured-tour .text {
+      font-size: 12px;
+      font-weight: 600; }
   .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item:after {
     content: "";
     display: block;
@@ -1946,6 +1962,22 @@
         -ms-flex-direction: column;
             flex-direction: column;
     padding-bottom: 20px; }
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner span.yatra-featured-tour {
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      padding: 0 5px;
+      background: #1abc9c;
+      color: #fff;
+      font-weight: 500;
+      -webkit-box-shadow: 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+              box-shadow: 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+      border-radius: 0; }
+      .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner span.yatra-featured-tour .icon {
+        margin-right: 5px; }
+      .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner span.yatra-featured-tour .text {
+        font-size: 12px;
+        font-weight: 600; }
     .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner:after {
       content: "";
       display: block;

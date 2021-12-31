@@ -9,6 +9,30 @@
         border: 1px solid #eee;
         margin-bottom: 30px;
 
+        span.yatra-featured-tour {
+          position: absolute;
+          top: -1px;
+          left: -1px;
+          padding: 0 5px;
+          background: #1abc9c;
+          color: #fff;
+
+          font-weight: 500;
+
+
+          box-shadow: 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+          border-radius: 0;
+
+          .icon {
+            margin-right: 5px;
+          }
+
+          .text {
+            font-size: 12px;
+            font-weight:600;
+          }
+        }
+
         &:after {
           content: "";
           display: block;
