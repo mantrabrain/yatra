@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.5\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2021-12-30 12:33:17+00:00\n"
+"POT-Creation-Date: 2021-12-31 12:26:45+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2744,10 +2744,11 @@ msgid "Total Booking"
 msgstr ""
 
 #: includes/hooks/yatra-list-table-hooks.php:23
+#: templates/parts/content-listing.php:19
 msgid "Featured"
 msgstr ""
 
-#: includes/hooks/yatra-template-hooks.php:107
+#: includes/hooks/yatra-template-hooks.php:111
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:201
 msgid "Total Price"
 msgstr ""
@@ -3074,7 +3075,7 @@ msgstr ""
 msgid "Watch on youtube"
 msgstr ""
 
-#: includes/modules/filters/class-yatra-module-filters.php:85
+#: includes/modules/filters/class-yatra-module-filters.php:92
 msgid " Days"
 msgstr ""
 
@@ -3091,10 +3092,10 @@ msgid "Filter Criteria"
 msgstr ""
 
 #: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:51
-msgid "Clear"
+msgid "Clear filter"
 msgstr ""
 
-#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:80
+#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:82
 #: includes/modules/status/list-tables/class-yatra-admin-log-list-table.php:215
 msgid "Filter"
 msgstr ""
@@ -4548,15 +4549,15 @@ msgstr ""
 msgid "Signout"
 msgstr ""
 
-#: templates/parts/content-listing.php:46
+#: templates/parts/content-listing.php:44
 msgid "From "
 msgstr ""
 
-#: templates/parts/content-listing.php:48 templates/tour/sidebar.php:18
+#: templates/parts/content-listing.php:46 templates/tour/sidebar.php:18
 msgid "Free"
 msgstr ""
 
-#: templates/parts/content-listing.php:59
+#: templates/parts/content-listing.php:57
 msgid "View Details"
 msgstr ""
 
