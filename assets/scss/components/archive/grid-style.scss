@@ -11,29 +11,32 @@
         display: flex;
         flex-direction: column;
         padding-bottom: 20px;
+
         span.yatra-featured-tour {
           position: absolute;
-          top: -1px;
-          left: -1px;
-          padding: 0 5px;
+          top: 0px;
+          left: 0px;
+          padding: 3px 6px;
           background: #1abc9c;
           color: #fff;
-
-          font-weight: 500;
-
-
-          box-shadow: 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+          -webkit-box-shadow: inset 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+          box-shadow: inset 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
           border-radius: 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
 
           .icon {
             margin-right: 5px;
+            font-size: 13px;
           }
 
           .text {
             font-size: 12px;
-            font-weight:600;
+            font-weight: 600;
           }
         }
+
         &:after {
           content: "";
           display: block;
