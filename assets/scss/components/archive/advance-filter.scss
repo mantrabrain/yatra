@@ -79,7 +79,7 @@
             }
 
             input.yatra-filter-item {
-              display: none;
+              display: none!important;
 
               &:checked + .yatra-filter-term-name {
                 &:before {

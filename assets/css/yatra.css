@@ -1246,8 +1246,8 @@
   position: relative;
   padding: 0;
   display: block;
-  -webkit-box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
-          box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(218, 218, 218, 0.5);
+          box-shadow: 0px 0px 0px 1px rgba(218, 218, 218, 0.5);
   padding-bottom: 20px; }
   .yatra-tour-list-wrap .yatra-item-inner span.yatra-featured-tour {
     position: absolute;
@@ -1296,6 +1296,8 @@
       color: #aaa; }
     .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-price .sales-price {
       font-size: 22px; }
+    .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-price p {
+      margin: 0; }
   .yatra-tour-list-wrap .yatra-item-inner img, .yatra-tour-list-wrap .yatra-item-inner figure {
     vertical-align: top;
     height: 250px;
@@ -1342,8 +1344,8 @@
       display: block;
       font-size: 14px; }
   .yatra-tour-list-wrap .yatra-item-inner:hover {
-    -webkit-box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
-            box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5); }
+    -webkit-box-shadow: 0 20px 38px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 38px rgba(0, 0, 0, 0.15); }
   .yatra-tour-list-wrap .yatra-item-inner .book-now-wrap {
     width: 90%;
     margin-left: 5%; }
@@ -1358,7 +1360,8 @@
       line-height: 1;
       -webkit-box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
               box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
-      font-weight: 500; }
+      font-weight: 500;
+      border: none; }
       .yatra-tour-list-wrap .yatra-item-inner .book-now-wrap a:hover {
         text-decoration: underline;
         background: #03ad8b; }
@@ -1511,8 +1514,8 @@
   position: relative;
   padding: 0;
   display: block;
-  -webkit-box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
-          box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(218, 218, 218, 0.5);
+          box-shadow: 0px 0px 0px 1px rgba(218, 218, 218, 0.5);
   padding-bottom: 20px; }
   .yatra-discount-deals-wrap .yatra-item-inner span.yatra-featured-tour {
     position: absolute;
@@ -1561,6 +1564,8 @@
       color: #aaa; }
     .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-price .sales-price {
       font-size: 22px; }
+    .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-price p {
+      margin: 0; }
   .yatra-discount-deals-wrap .yatra-item-inner .yatra-figure-wrap {
     position: relative; }
   .yatra-discount-deals-wrap .yatra-item-inner img, .yatra-discount-deals-wrap .yatra-item-inner figure {
@@ -1601,8 +1606,8 @@
       display: block;
       font-size: 14px; }
   .yatra-discount-deals-wrap .yatra-item-inner:hover {
-    -webkit-box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
-            box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5); }
+    -webkit-box-shadow: 0 20px 38px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 38px rgba(0, 0, 0, 0.15); }
   .yatra-discount-deals-wrap .yatra-item-inner .book-now-wrap {
     width: 90%;
     margin-left: 5%; }
@@ -1617,7 +1622,8 @@
       line-height: 1;
       -webkit-box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
               box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
-      font-weight: 500; }
+      font-weight: 500;
+      border: none; }
       .yatra-discount-deals-wrap .yatra-item-inner .book-now-wrap a:hover {
         text-decoration: underline;
         background: #03ad8b; }
@@ -1709,7 +1715,7 @@
           cursor: pointer;
           margin: 0; }
         .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li .yatra-filter-term-content input.yatra-filter-item {
-          display: none; }
+          display: none !important; }
           .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li .yatra-filter-term-content input.yatra-filter-item:checked + .yatra-filter-term-name:before {
             border: 1px solid;
             font-family: "Font Awesome 5 Free" !important;
