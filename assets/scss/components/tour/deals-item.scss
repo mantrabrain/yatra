@@ -77,26 +77,19 @@
       }
     }
 
+    @import "../parts/tour-meta";
+
     .yatra-tour-meta {
       line-height: 1.7;
-      display: inline-block;
       padding: 25px 15px;
       border-bottom: 1px solid #ddd;
       background: #f9f9f9;
-      width: 100%;
       min-height: 150px;
 
-      .icon {
-        margin-right: 10px;
-        font-style: normal;
-      }
 
       .yatra-cat-links, .yatra-tour-duration {
-        line-height: 1.5em;
-        padding: 5px 8px;
-        margin-bottom: 1px;
-        display: block;
-        font-size: 14px;
+        display: inline-block;
+        width: 100%;
       }
     }
 

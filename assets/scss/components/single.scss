@@ -5,21 +5,7 @@
 body.single {
   .yatra-single-tour {
     .yatra-site-main {
-      .yatra-tour-meta {
-        display: inline-block;
-        padding: 15px 0;
-        width: 100%;
-
-        .icon {
-          margin-right: 10px;
-        }
-
-        .yatra-cat-links {
-          padding: 0px 8px;
-          margin-bottom: 1px;
-          float: left;
-        }
-      }
+      @import "parts/tour-meta";
     }
 
     .yatra-tour-info {

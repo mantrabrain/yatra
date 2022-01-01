@@ -39,7 +39,7 @@
           }
         }
 
-        .yatra-tour-meta, .yatra-tour-header {
+        .yatra-tour-header {
           margin: 0;
 
         }
@@ -85,25 +85,7 @@
         }
 
         .yatra-meta-content-wrap {
-
-
-          .yatra-tour-meta {
-            line-height: 1.5em;
-            display: inline-block;
-            width: 100%;
-
-            .icon {
-              margin-right: 10px;
-            }
-
-            .yatra-cat-links, .yatra-tour-duration {
-              line-height: 1.5em;
-              padding: 5px 8px;
-              margin-bottom: 1px;
-              float: left;
-              font-size: 14px;
-            }
-          }
+          @import "../parts/tour-meta";
 
           .inner {
             padding: 0;
