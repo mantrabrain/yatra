@@ -1246,6 +1246,41 @@
   margin: 0 0 30px;
   display: block;
   border: 1px solid #ddd; }
+  .yatra-tour-list-wrap .yatra-item-inner span.yatra-featured-tour {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 3px 6px;
+    background: #1abc9c;
+    color: #fff;
+    -webkit-box-shadow: inset 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+    border-radius: 0;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+       -moz-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    -webkit-box-align: center;
+       -moz-box-align: center;
+        -ms-flex-align: center;
+            align-items: center; }
+    .yatra-tour-list-wrap .yatra-item-inner span.yatra-featured-tour .icon {
+      margin-right: 5px;
+      font-size: 13px; }
+    .yatra-tour-list-wrap .yatra-item-inner span.yatra-featured-tour .text {
+      font-size: 12px;
+      font-weight: 600; }
+  .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-price {
+    text-align: center; }
+    .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-price .regular-price {
+      display: block; }
+    .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-price .sales-price {
+      font-size: 18px;
+      font-weight: 600; }
   .yatra-tour-list-wrap .yatra-item-inner img, .yatra-tour-list-wrap .yatra-item-inner figure {
     vertical-align: top;
     height: 275px;
@@ -1305,8 +1340,7 @@
     background: #f9f9f9; }
   .yatra-tour-list-wrap .yatra-item-inner:hover {
     -webkit-box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
-            box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
-    border: 1px solid #aaa; }
+            box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5); }
   .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-meta {
     line-height: 1.7;
     display: inline-block;
@@ -1482,6 +1516,41 @@
   margin: 0 0 30px;
   display: block;
   border: 1px solid #ddd; }
+  .yatra-discount-deals-wrap .yatra-item-inner span.yatra-featured-tour {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 3px 6px;
+    background: #1abc9c;
+    color: #fff;
+    -webkit-box-shadow: inset 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
+    border-radius: 0;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+       -moz-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    -webkit-box-align: center;
+       -moz-box-align: center;
+        -ms-flex-align: center;
+            align-items: center; }
+    .yatra-discount-deals-wrap .yatra-item-inner span.yatra-featured-tour .icon {
+      margin-right: 5px;
+      font-size: 13px; }
+    .yatra-discount-deals-wrap .yatra-item-inner span.yatra-featured-tour .text {
+      font-size: 12px;
+      font-weight: 600; }
+  .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-price {
+    text-align: center; }
+    .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-price .regular-price {
+      display: block; }
+    .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-price .sales-price {
+      font-size: 18px;
+      font-weight: 600; }
   .yatra-discount-deals-wrap .yatra-item-inner img, .yatra-discount-deals-wrap .yatra-item-inner figure {
     vertical-align: top;
     height: 275px;
@@ -1534,6 +1603,22 @@
     .yatra-discount-deals-wrap .yatra-item-inner h2.yatra-deals-title:hover {
       background: #03ad8b;
       color: initial; }
+  .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-meta {
+    line-height: 1.7;
+    display: inline-block;
+    padding: 25px 15px;
+    border-bottom: 2px solid #ddd;
+    background: #f9f9f9;
+    width: 100%; }
+    .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-meta .icon {
+      margin-right: 10px;
+      font-style: normal; }
+    .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-meta .yatra-cat-links, .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-meta .yatra-tour-duration {
+      line-height: 1.5em;
+      padding: 5px 8px;
+      margin-bottom: 1px;
+      display: block;
+      font-size: 14px; }
   .yatra-discount-deals-wrap .yatra-item-inner a.yatra-link {
     display: block;
     height: 100%;
@@ -1541,8 +1626,7 @@
     background: #f9f9f9; }
   .yatra-discount-deals-wrap .yatra-item-inner:hover {
     -webkit-box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
-            box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5);
-    border: 1px solid #aaa; }
+            box-shadow: 1px 1px 9px 3px rgba(218, 218, 218, 0.5); }
   .yatra-discount-deals-wrap .yatra-item-inner .book-now-wrap {
     position: absolute;
     top: 250px;
@@ -1910,11 +1994,13 @@
            -moz-box-direction: normal;
             -ms-flex-direction: column;
                 flex-direction: column; }
-        .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .regular-price {
-          display: block; }
-        .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .sales-price {
-          font-size: 18px;
-          font-weight: 600; }
+        .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price {
+          text-align: center; }
+          .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .regular-price {
+            display: block; }
+          .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .sales-price {
+            font-size: 18px;
+            font-weight: 600; }
     .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .inner {
       display: -webkit-box;
       display: -moz-box;
@@ -2017,11 +2103,13 @@
       margin-top: 15px; }
       .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details {
         text-align: center; }
-        .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .regular-price {
-          display: block; }
-        .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .sales-price {
-          font-size: 18px;
-          font-weight: 600; }
+        .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price {
+          text-align: center; }
+          .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .regular-price {
+            display: block; }
+          .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .sales-price {
+            font-size: 18px;
+            font-weight: 600; }
     .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .inner {
       padding: 0 20px; }
     .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap .yatra-tour-meta {

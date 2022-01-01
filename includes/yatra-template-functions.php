@@ -605,3 +605,14 @@ if (!function_exists('yatra_is_featured_tour')) {
 
     }
 }
+if (!function_exists('yatra_get_price_html')) {
+    function yatra_get_price_html($tour_id = null)
+    {
+        $tour_id = is_null($tour_id) ? get_the_ID() : $tour_id;
+
+        yatra_get_template('parts/price.php',
+            array('yatra_tour_id' => $tour_id)
+        );
+
+    }
+}

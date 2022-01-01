@@ -9,30 +9,7 @@
         border: 1px solid #eee;
         margin-bottom: 30px;
 
-        span.yatra-featured-tour {
-          position: absolute;
-          top: 0px;
-          left: 0px;
-          padding: 3px 6px;
-          background: #1abc9c;
-          color: #fff;
-          -webkit-box-shadow: inset 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
-          box-shadow: inset 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
-          border-radius: 0;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-
-          .icon {
-            margin-right: 5px;
-            font-size: 13px;
-          }
-
-          .text {
-            font-size: 12px;
-            font-weight: 600;
-          }
-        }
+        @import "../parts/featured-ribon";
 
         &:after {
           content: "";
@@ -95,16 +72,7 @@
               justify-content: center;
               flex-direction: column;
 
-              .yatra-tour-price {
-                .regular-price {
-                  display: block;
-                }
-
-                .sales-price {
-                  font-size: 18px;
-                  font-weight: 600;
-                }
-              }
+              @import "../parts/price";
             }
           }
 
