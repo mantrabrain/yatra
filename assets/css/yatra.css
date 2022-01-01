@@ -1569,8 +1569,6 @@
 
 .yatra-page-wrapper .yatra-archive-tour {
   display: inline-block; }
-  .yatra-page-wrapper .yatra-archive-tour .yatra-tour-filter-sidebar {
-    background: #fff; }
   .yatra-page-wrapper .yatra-archive-tour:after {
     content: "";
     display: inline-block;

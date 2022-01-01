@@ -118,17 +118,6 @@ $class .= is_singular('tour') ? 'yatra-single-tour' : '';
 add_action('yatra_after_main_content', 'yatra_after_main_content_callback');
 }
 
-if (!function_exists('yatra_after_main_content_loop_callback')) {
-    function yatra_after_main_content_loop_callback()
-    {
-        if (!is_single()) {
-            return;
-        }
-
-    }
-
-    add_action('yatra_after_main_content_loop', 'yatra_after_main_content_loop_callback');
-}
 
 if (!function_exists('yatra_enquiry_form_fields')) {
 

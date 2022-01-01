@@ -182,6 +182,7 @@ class Yatra_Template_Hooks
         }
         echo '</div><!-- end of .yatra-single-main-content-area-inner-->';
 
+
         echo '</div><!-- end of .yatra-single-main-content-area -->';
     }
 
