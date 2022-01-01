@@ -42,7 +42,7 @@ class Yatra_Module_Filters
 
         $display_class .= $display_mode === 'grid' ? ' yatra-row' : '';
 
-        echo '<div class="yatra-archive-main-content-area">';
+        echo '<div class="yatra-archive-main-content-area yatra-col-sm-9 yatra-col-xs-12">';
 
         do_action('yatra_before_main_content_area_inner');
 

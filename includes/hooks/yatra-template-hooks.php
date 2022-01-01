@@ -4,7 +4,7 @@ class Yatra_Template_Hooks
 {
     public function __construct()
     {
-        add_action('yatra_main_content', array($this, 'single_tour_info'), 15);
+
         add_action('single_tour_info', array($this, 'tour_info'), 10);
         add_action('yatra_single_tour_booking_form', array($this, 'single_tour_booking_form'), 10, 1);
         add_action('yatra_tour_booking_pricing_content', array(__class__, 'tour_booking_pricing_content'), 10, 3);
@@ -12,12 +12,16 @@ class Yatra_Template_Hooks
         add_filter('excerpt_more', array($this, 'post_link'), 10);
         add_filter('yatra_page_wrapper_class', array($this, 'wrapper_class'), 11);
         add_filter('yatra_tour_class', array($this, 'tour_class'), 10);
+        add_action('yatra_before_main_content_loop', array($this, 'wrapper_start'), 11);
+        add_action('yatra_after_main_content_loop', array($this, 'wrapper_end'), 20);
+
+        add_action('yatra_after_main_content_loop', array($this, 'single_tour_info'), 21);
 
     }
 
     public function single_tour_info()
     {
-        if (is_single()) {
+        if (is_singular('tour')) {
             do_action('single_tour_info');
         }
     }
@@ -32,6 +36,8 @@ class Yatra_Template_Hooks
         $minimum_pricing = yatra_get_minimum_tour_pricing(get_the_ID());
 
 
+        echo '<div class="yatra-single-tour-sidebar yatra-col-md-4 yatra-col-xs-12">';
+
         yatra_get_template('tour/sidebar.php',
             array(
                 'data' => $tourData,
@@ -40,6 +46,7 @@ class Yatra_Template_Hooks
                 'min_sales' => $minimum_pricing['sales_price']
             )
         );
+        echo '</div>';
     }
 
     public function single_tour_booking_form($tourData)
@@ -150,6 +157,32 @@ class Yatra_Template_Hooks
 
         }
         return $class;
+    }
+
+    public function wrapper_start()
+    {
+        if (!is_singular('tour')) {
+            return;
+        }
+
+        $display_class = 'yatra-single-main-content-area-inner';
+
+        echo '<div class="yatra-single-main-content-area yatra-col-md-8 yatra-col-xs-12">';
+
+        do_action('yatra_before_main_content_area_inner');
+
+        echo '<div class="' . esc_attr($display_class) . '">';
+
+    }
+
+    public function wrapper_end()
+    {
+        if (!is_singular('tour')) {
+            return;
+        }
+        echo '</div><!-- end of .yatra-single-main-content-area-inner-->';
+
+        echo '</div><!-- end of .yatra-single-main-content-area -->';
     }
 
 

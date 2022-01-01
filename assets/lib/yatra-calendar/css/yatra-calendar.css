@@ -6,6 +6,7 @@
     font-size: 15px;
     color: #545a5c;
     margin-bottom: 15px;
+
 }
 
 .yatra-calendar a {
@@ -80,6 +81,7 @@
     border-spacing: 0px;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+    table-layout: fixed;
 }
 
 .yatra-calendar thead td, .yatra-calendar thead th {
@@ -87,6 +89,10 @@
     font-weight: 600;
     border-bottom: 1px solid #ddd;
     background: #eafffb;
+}
+
+.yatra-calendar td, .yatra-calendar th {
+    width: 14.28%;
 }
 
 .yatra-calendar td {
@@ -103,7 +109,8 @@
     position: relative;
     display: inline-block;
     width: 2.5em;
-    height: 2.5em;
+    max-width: 100%;
+    height: auto;
     line-height: 2.5em;
     border-radius: 0;
     border: 2px solid transparent;

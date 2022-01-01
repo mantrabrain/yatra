@@ -38,7 +38,8 @@ abstract class Yatra_Module_Filter_Sections
 
                 $current_term_slug_string = in_array($term->slug, $current_term_slugs) ? $term->slug : '';
 
-                printf('<li class="%1$s">', $children ? 'has-children' : 'item');
+                printf('<li class="%1$s">', (count($term->children) > 0 ? 'item has-children' : 'item'));
+                echo '<div class="yatra-filter-term-content">';
                 printf(
                     '<label for="yatra-filter-term-item-%1$d">'
                     . '<input type="checkbox" %2$s value="%3$s" name="filter_%4$s" class="%5$s yatra-filter-item" id="yatra-filter-term-item-%6$d"/>'
@@ -56,6 +57,7 @@ abstract class Yatra_Module_Filter_Sections
                 if (apply_filters('yatra_advanced_search_filters_show_tax_count', true)) {
                     printf('<span class="count">%1$s</span>', $term->count);
                 }
+                echo '</div>';
                 if (is_array($term->children) && count($term->children) > 0) {
                     $_children = array();
                     foreach ($term->children as $term_child) {

@@ -36,7 +36,7 @@ class Yatra_Module_Filter_Sidebar
 
         $filter = yatra_get_filter_params();
 
-        echo '<div class="yatra-tour-filter-sidebar">';
+        echo '<div class="yatra-tour-filter-sidebar yatra-col-sm-3 yatra-col-xs-12">';
 
         echo '<div class="yatra-tour-filter-sidebar-inner">';
 
@@ -79,7 +79,7 @@ class Yatra_Module_Filter_Sidebar
             echo '<input type="hidden" name="display_mode" value="' . esc_attr($filter->display_mode) . '"/>';
         }
 
-        echo '<button type="submit" class="yatra-filter-sidebar-submit">' . __('Filter', 'yatra') . '</button>';
+        echo '<button type="submit" class="button yatra-filter-sidebar-submit">' . __('Filter', 'yatra') . '</button>';
         echo '</form>';
         echo '</div>';
         echo '</div>';

@@ -57,6 +57,8 @@ if (!function_exists('register_yatra_session')) {
 if (!function_exists('yatra_main_content_callback')) {
     function yatra_main_content_callback()
     {
+        $main_class = 'yatra-site-main yatra-row';
+
         if (yatra_is_archive_page()) {
             ?>
             <header class="yatra-page-header">
@@ -66,9 +68,10 @@ if (!function_exists('yatra_main_content_callback')) {
             </header><!-- .page-header -->
 
             <?php
+
         }
         ?>
-        <main id="yatra-main" class="yatra-site-main">
+        <main id="yatra-main" class="<?php echo esc_attr($main_class); ?>">
 
             <?php
 
