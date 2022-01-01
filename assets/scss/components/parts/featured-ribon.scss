@@ -2,7 +2,7 @@ span.yatra-featured-tour {
   position: absolute;
   top: 0px;
   left: 0px;
-  padding: 3px 6px;
+  padding: 2px 6px;
   background: #1abc9c;
   color: #fff;
   -webkit-box-shadow: inset 19px 5px 20px 1px rgba(0, 0, 0, 0.3);
@@ -11,6 +11,7 @@ span.yatra-featured-tour {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 99;
 
   .icon {
     margin-right: 5px;
@@ -18,7 +19,6 @@ span.yatra-featured-tour {
   }
 
   .text {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13px;
   }
 }
