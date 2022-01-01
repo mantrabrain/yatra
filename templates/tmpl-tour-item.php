@@ -4,14 +4,14 @@
         if (yatra_is_featured_tour($data['id'])) {
             echo '<span class="yatra-featured-tour"><i class="icon fa fa-bullhorn"></i><small class="text">' . __('Featured', 'yatra') . '</small></span>';
         } ?>
-        <h2 class="yatra-tour-title"><a
-                    href="<?php echo esc_url($data['permalink']) ?>"><?php echo esc_html($data['title']); ?></a></h2>
         <figure><?php if (!empty($data['image'])) { ?>
                 <img src="<?php echo $data['image'] ?>"/>
             <?php } ?>
         </figure>
-        <?php yatra_entry_meta_options($data['id']); ?>
         <?php yatra_get_price_html($data['id']); ?>
+        <?php yatra_entry_meta_options($data['id']); ?>
+        <h2 class="yatra-tour-title"><a
+                    href="<?php echo esc_url($data['permalink']) ?>"><?php echo esc_html($data['title']); ?></a></h2>
         <div class="book-now-wrap">
             <a href="<?php echo esc_url($data['permalink']) ?>" class="button button-primary">
                 <?php
