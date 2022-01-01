@@ -1320,7 +1320,8 @@
     padding: 20px; }
   .yatra-tour-list-wrap .yatra-item-inner h2.yatra-tour-title a {
     font-size: inherit;
-    font-weight: 500; }
+    font-weight: 500;
+    text-decoration: none; }
   .yatra-tour-list-wrap .yatra-item-inner h2.yatra-tour-title:hover {
     color: initial; }
   .yatra-tour-list-wrap .yatra-item-inner:hover {
@@ -1587,7 +1588,8 @@
     padding: 20px; }
   .yatra-discount-deals-wrap .yatra-item-inner h2.yatra-deals-title a {
     font-size: inherit;
-    font-weight: 500; }
+    font-weight: 500;
+    text-decoration: none; }
   .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-meta {
     line-height: 1.7;
     display: inline-block;
