@@ -22,6 +22,9 @@ final class Yatra_Install
         ),
         '2.1.3' => array(
             'yatra_update_2130_logs_update',
+        ),
+        '2.1.6' => array(
+            'yatra_update_2160_tour_minimum_price',
         )
     );
 

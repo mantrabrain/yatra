@@ -3,7 +3,7 @@ Contributors: Mantrabrain, ughimire1
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
 Tested up to: 5.8.2
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -154,6 +154,13 @@ Shortcode for Tour Listing:
 17. Yatra Checkout Page
 
 == Changelog ==
+
+= 2.1.6 |
+* Added - Sidebar Filter & Top Bar Sorting With grid and list layout for tour archive
+* Added - Container class added if user doesn't set anything from backend
+* Fixed - Widget/Shortcodes & Gutenberg blocks design optimized
+* Fixed - Archive page design optimized
+* Fixed - Other Design related fixes & minor bug fixes
 
 = 2.1.5 | 2021/12/21 =
 * Added - Tour, Destination, Activity gutenberg block

@@ -1,7 +1,8 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
+
 abstract class Yatra_Attribute_Abstract implements Yatra_Attribute_Interface
 {
     protected $id;
@@ -28,6 +29,10 @@ abstract class Yatra_Attribute_Abstract implements Yatra_Attribute_Interface
             return;
         }
         $attribute_item = get_term($attributeID);
+
+        if (is_wp_error($attribute_item)) {
+            return;
+        }
 
         $this->id = $attribute_item->term_id;
 
