@@ -56,7 +56,10 @@
           color: #fff
         }
       }
-
+      a:hover {
+        color: #fff;
+        opacity: 1;
+      }
     }
 
     &:after {
