@@ -128,7 +128,8 @@
                     }
 
                 }
-                window.location = (action + "?" + $.param(query_params));
+                var param_concat = action.includes("?") ? "&" : "?";
+                window.location = (action + param_concat + $.param(query_params));
 
             }
 

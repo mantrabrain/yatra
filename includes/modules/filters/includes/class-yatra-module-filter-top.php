@@ -126,6 +126,9 @@ class Yatra_Module_Filter_Top
                         <?php
                     }
                 }
+                if (strpos($action, "post_type=tour") !== false) {
+                    echo '<input type="hidden" name="post_type" value="tour"/>';
+                }
                 ?>
                 <?php if ($label != '') { ?>
                     <label for="yatra-top-filter-sorting-by"><?php echo esc_html($label) ?>: </label>
@@ -151,7 +154,14 @@ class Yatra_Module_Filter_Top
 
         $selected = $selected === 'list' || $selected === 'grid' ? $selected : 'list';
 
-        $current_url = home_url($wp->request);
+        if (is_tax('destination') || is_tax('activity')) {
+            $term_id = get_queried_object()->term_id;
+            $current_url = get_term_link($term_id);
+        } else if (is_post_type_archive('tour')) {
+            $current_url = get_post_type_archive_link('tour');
+        } else {
+            $current_url = home_url($wp->request);
+        }
 
         $extra_prams = (array)yatra_get_filter_params();
 
