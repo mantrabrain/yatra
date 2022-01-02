@@ -26,7 +26,7 @@ if (!class_exists('Yatra_Discount_Deals_Widget')) :
                 'classname' => 'yatra_discount_deals_widget',
                 'description' => esc_html__('Displays tour discount & deals list from Yatra tour.', 'yatra'),
             );
-            parent::__construct('yatra-discount-deals-widget', esc_html__('YT - Discount & Deals', 'yatra'), $opts);
+            parent::__construct('yatra-discount-deals-widget', esc_html__('Yatra - Discount & Deals', 'yatra'), $opts);
         }
 
 

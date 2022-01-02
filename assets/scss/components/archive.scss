@@ -2,9 +2,8 @@
 
   .yatra-archive-tour {
     display: inline-block;
-
-    .yatra-archive-main-content-area {
-     }
+    width: 100%;
+    max-width: 100%;
 
     &:after {
       content: "";
@@ -13,6 +12,7 @@
     }
   }
 }
+
 @import "archive/advance-filter";
 @import "archive/top-filter";
 @import "archive/list-style";

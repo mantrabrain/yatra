@@ -11,16 +11,14 @@ class Yatra_Blocks
 
     public function register_category($categories, $context)
     {
-        if (!empty($context->post)) {
-            array_push(
-                $categories,
-                array(
-                    'slug' => 'yatra',
-                    'title' => __('Yatra', 'yatra'),
-                    'icon' => YATRA_PLUGIN_URI . '/assets/images/menu-icon.png'
-                )
-            );
-        }
+        array_push(
+            $categories,
+            array(
+                'slug' => 'yatra',
+                'title' => __('Yatra', 'yatra'),
+                'icon' => YATRA_PLUGIN_URI . '/assets/images/menu-icon.png'
+            )
+        );
         return $categories;
     }
 

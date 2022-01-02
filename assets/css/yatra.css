@@ -1658,7 +1658,9 @@
   width: 100%; }
 
 .yatra-page-wrapper .yatra-archive-tour {
-  display: inline-block; }
+  display: inline-block;
+  width: 100%;
+  max-width: 100%; }
   .yatra-page-wrapper .yatra-archive-tour:after {
     content: "";
     display: inline-block;
@@ -1908,6 +1910,26 @@
         -ms-flex-align: center;
             align-items: center; }
 
+@media (max-width: 490px) {
+  .yatra-tour-filter-top .yatra-tour-filter-top-inner {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+       -moz-box-orient: vertical;
+       -moz-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column; }
+    .yatra-tour-filter-top .yatra-tour-filter-top-inner .yatra-top-filter-section {
+      border: none; }
+      .yatra-tour-filter-top .yatra-tour-filter-top-inner .yatra-top-filter-section.display {
+        margin-top: 20px;
+        border-top: 1px solid #ddd;
+        padding: 10px 0; }
+      .yatra-tour-filter-top .yatra-tour-filter-top-inner .yatra-top-filter-section.sorting label {
+        display: none; }
+    .yatra-tour-filter-top .yatra-tour-filter-top-inner .yatra-top-filter-sorting-by {
+      max-width: 100%;
+      width: 100%; } }
+
 .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item {
   position: relative;
   background-color: #fff;
@@ -2036,6 +2058,24 @@
   .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .inner {
     padding: 15px;
     display: inline-block; }
+
+@media (max-width: 767px) {
+  .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-thumb-wrap {
+    width: 100%;
+    float: none; }
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-thumb-wrap .inner {
+      padding: 0; }
+  .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap {
+    width: 100%;
+    float: none; }
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .inner {
+      display: block; }
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-left, .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right {
+      float: none;
+      width: 100%;
+      border: none; }
+    .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-left {
+      border-bottom: 1px solid #ddd; } }
 
 .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item {
   margin-bottom: 10px; }

@@ -26,7 +26,7 @@ if (!class_exists('Yatra_Activity_Widget')) :
                 'classname' => 'yatra_activity_widget',
                 'description' => esc_html__('Displays tour activity list from Yatra tour.', 'yatra'),
             );
-            parent::__construct('yatra-activity-widget', esc_html__('YT - Activity', 'yatra'), $opts);
+            parent::__construct('yatra-activity-widget', esc_html__('Yatra - Activity', 'yatra'), $opts);
         }
 
 

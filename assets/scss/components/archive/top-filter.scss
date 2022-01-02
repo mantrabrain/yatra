@@ -56,3 +56,32 @@
     }
   }
 }
+
+@media (max-width: 490px) {
+  .yatra-tour-filter-top {
+    .yatra-tour-filter-top-inner {
+      flex-direction: column;
+
+      .yatra-top-filter-section {
+        border: none;
+
+        &.display {
+          margin-top: 20px;
+          border-top: 1px solid #ddd;
+          padding: 10px 0;
+        }
+
+        &.sorting {
+          label {
+            display: none;
+          }
+        }
+      }
+
+      .yatra-top-filter-sorting-by {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  }
+}

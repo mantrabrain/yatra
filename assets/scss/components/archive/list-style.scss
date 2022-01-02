@@ -100,3 +100,41 @@
     }
   }
 }
+
+@media (max-width: 767px) {
+  .yatra-page-wrapper {
+    &.yatra-tour-archive-display-mode-list {
+      .yatra-archive-tour {
+        .yatra-tour-single-item {
+          .yatra-thumb-wrap {
+            width: 100%;
+            float: none;
+
+            .inner {
+              padding: 0;
+            }
+          }
+
+          .yatra-content-wrap {
+            width: 100%;
+            float: none;
+
+            .inner {
+              display: block;
+            }
+
+            .yatra-content-left, .yatra-content-right {
+              float: none;
+              width: 100%;
+              border: none;
+            }
+
+            .yatra-content-left {
+              border-bottom: 1px solid #ddd;
+            }
+          }
+        }
+      }
+    }
+  }
+}
