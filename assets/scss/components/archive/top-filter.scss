@@ -29,7 +29,17 @@
           padding-left: 0;
         }
 
-        .icon {
+        a {
+          border: none;
+          &:focus, &:active {
+            outline: none !important;
+            text-decoration: none !important;
+            border: none;
+          }
+        }
+
+        a, .icon {
+          outline: none;
           font-size: 20px;
           cursor: pointer;
           color: #aaa;

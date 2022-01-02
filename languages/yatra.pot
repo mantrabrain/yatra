@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.5\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-01-01 08:51:48+00:00\n"
+"POT-Creation-Date: 2022-01-02 10:02:10+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1966,7 +1966,7 @@ msgid "No Tours found in the Trash"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
-#: includes/modules/blocks/class-yatra-blocks.php:19
+#: includes/modules/blocks/class-yatra-blocks.php:18
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:9
 msgid "Yatra"
 msgstr ""
@@ -2739,7 +2739,8 @@ msgid "Total Booking"
 msgstr ""
 
 #: includes/hooks/yatra-list-table-hooks.php:23
-#: templates/parts/content-listing.php:19
+#: templates/parts/content-listing.php:19 templates/tmpl-deals-item.php:5
+#: templates/tmpl-tour-item.php:5
 msgid "Featured"
 msgstr ""
 
@@ -4338,7 +4339,7 @@ msgid "Displays tour activity list from Yatra tour."
 msgstr ""
 
 #: includes/widgets/class-yatra-activity-widget.php:29
-msgid "YT - Activity"
+msgid "Yatra - Activity"
 msgstr ""
 
 #: includes/widgets/class-yatra-activity-widget.php:39
@@ -4371,7 +4372,7 @@ msgid "Displays tour destination list from Yatra tour."
 msgstr ""
 
 #: includes/widgets/class-yatra-destination-widget.php:29
-msgid "YT - Destination"
+msgid "Yatra - Destination"
 msgstr ""
 
 #: includes/widgets/class-yatra-destination-widget.php:49
@@ -4383,7 +4384,7 @@ msgid "Displays tour discount & deals list from Yatra tour."
 msgstr ""
 
 #: includes/widgets/class-yatra-discount-deals-widget.php:29
-msgid "YT - Discount & Deals"
+msgid "Yatra - Discount & Deals"
 msgstr ""
 
 #: includes/widgets/class-yatra-discount-deals-widget.php:49
@@ -4396,7 +4397,7 @@ msgid "Displays tour (with filter) list from Yatra tour."
 msgstr ""
 
 #: includes/widgets/class-yatra-tour-widget.php:29
-msgid "YT - Tour List"
+msgid "Yatra - Tour List"
 msgstr ""
 
 #: includes/widgets/class-yatra-tour-widget.php:50
@@ -4544,15 +4545,7 @@ msgstr ""
 msgid "Signout"
 msgstr ""
 
-#: templates/parts/content-listing.php:44
-msgid "From "
-msgstr ""
-
-#: templates/parts/content-listing.php:46 templates/tour/sidebar.php:18
-msgid "Free"
-msgstr ""
-
-#: templates/parts/content-listing.php:57
+#: templates/parts/content-listing.php:41
 msgid "View Details"
 msgstr ""
 
@@ -4586,6 +4579,14 @@ msgstr ""
 msgid "Pages:"
 msgstr ""
 
+#: templates/parts/price.php:5
+msgid "From "
+msgstr ""
+
+#: templates/parts/price.php:7 templates/tour/sidebar.php:18
+msgid "Free"
+msgstr ""
+
 #: templates/tmpl-cart-table.php:18
 msgid "Person - Per - Pricing"
 msgstr ""
@@ -4606,7 +4607,7 @@ msgstr ""
 msgid "[Remove]"
 msgstr ""
 
-#: templates/tmpl-deals-item.php:13 templates/tmpl-tour-item.php:13
+#: templates/tmpl-deals-item.php:20 templates/tmpl-tour-item.php:22
 #: templates/tour/book-now-button.php:2
 msgid "Book now"
 msgstr ""

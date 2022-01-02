@@ -1886,7 +1886,14 @@
       padding: 5px 10px; }
       .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li:first-child {
         padding-left: 0; }
-      .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li .icon {
+      .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li a {
+        border: none; }
+        .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li a:focus, .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li a:active {
+          outline: none !important;
+          text-decoration: none !important;
+          border: none; }
+      .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li a, .yatra-tour-filter-top .yatra-tour-filter-top-inner ul.yatra-top-filter-display-list li .icon {
+        outline: none;
         font-size: 20px;
         cursor: pointer;
         color: #aaa; }
