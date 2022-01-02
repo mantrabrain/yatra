@@ -49,7 +49,7 @@
                     <div class="yatra-tour-booking-form-section">
                         <div class="yatra-tab-section-inner">
                             <?php do_action('yatra_single_tour_booking_form', $data) ?>
-                        </div><!-- .sec-row -->
+                        </div><!-- .yatra-tab-section-inner -->
                     </div>
                 </div>
             </section>
@@ -59,7 +59,7 @@
                     <div class="yatra-tour-enquiry-form-section">
                         <div class="yatra-tab-section-inner">
                             <?php do_action('yatra_single_tour_enquiry_form', $data) ?>
-                        </div><!-- .sec-row -->
+                        </div><!-- .yatra-tab-section-inner -->
                     </div>
                 </div>
             </section>

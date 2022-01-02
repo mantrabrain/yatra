@@ -4,5 +4,5 @@
 <div class="overview-section">
 	<div class="yatra-tab-section-inner">
 		<?php echo $content; ?>
-	</div><!-- .sec-row -->
+	</div><!-- .yatra-tab-section-inner -->
 </div>
