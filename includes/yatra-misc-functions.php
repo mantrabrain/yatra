@@ -195,3 +195,10 @@ function yatra_export($args = array())
     exit;
 
 }
+
+if (!function_exists('yatra_get_tour_view_details_button_text')) {
+    function yatra_get_tour_view_details_button_text()
+    {
+        return get_option('yatra_tour_view_details_button_text', __('View Details', 'yatra'));
+    }
+}

@@ -19,8 +19,7 @@
         <div class="book-now-wrap">
             <a href="<?php echo esc_url($data['permalink']) ?>" class="button button-primary">
                 <?php
-                $book_now_text = get_option('yatra_booknow_button_text', __('Book now', 'yatra'));
-                echo esc_html($book_now_text);
+                echo esc_html(yatra_get_tour_view_details_button_text());
                 ?>
             </a>
         </div>
