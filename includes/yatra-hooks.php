@@ -63,7 +63,7 @@ if (!function_exists('yatra_main_content_callback')) {
             ?>
             <header class="yatra-page-header">
                 <?php
-                the_archive_title('<h1 class="page-title">', '</h1>');
+                the_archive_title('<h1 class="yatra-page-title">', '</h1>');
                 ?>
             </header><!-- .page-header -->
 

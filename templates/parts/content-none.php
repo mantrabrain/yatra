@@ -13,7 +13,7 @@
 
 <section class="no-results not-found">
     <header class="yatra-page-header">
-        <h1 class="page-title"><?php _e('Nothing Found', 'yatra'); ?></h1>
+        <h1 class="yatra-page-title"><?php _e('Nothing Found', 'yatra'); ?></h1>
     </header><!-- .page-header -->
 
     <div class="page-content">

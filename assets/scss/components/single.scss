@@ -24,6 +24,13 @@ body.single {
       display: block;
     }
   }
+
+  .tour-thumbnail-inner {
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  }
 }
 
 .yatra-tour-additional-info {

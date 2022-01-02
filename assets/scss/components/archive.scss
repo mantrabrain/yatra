@@ -11,6 +11,12 @@
       clear: both;
     }
   }
+  .tour-thumbnail-inner {
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  }
 }
 
 @import "archive/advance-filter";

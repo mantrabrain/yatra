@@ -575,7 +575,11 @@ if (!function_exists('yatra_get_page_wrapper_class')) {
     {
         $class = 'yatra-page-wrapper';
 
-        $class = $class . ' ' . get_option('yatra_page_container_class');
+        $container_class = get_option('yatra_page_container_class');
+
+        $container_class = $container_class == '' || !$container_class ? 'yatra-container' : $container_class;
+
+        $class = $class . ' ' . $container_class;
 
         return apply_filters('yatra_page_wrapper_class', $class);
 

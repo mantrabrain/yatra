@@ -9,7 +9,7 @@ class Yatra_Template_Hooks
         add_action('yatra_single_tour_booking_form', array($this, 'single_tour_booking_form'), 10, 1);
         add_action('yatra_tour_booking_pricing_content', array(__class__, 'tour_booking_pricing_content'), 10, 3);
         add_action('yatra_single_tour_enquiry_form', array($this, 'single_tour_enquiry_form'), 10, 1);
-        add_filter('excerpt_more', array($this, 'post_link'), 10);
+        add_filter('excerpt_more', array($this, 'post_link'), 11);
         add_filter('yatra_page_wrapper_class', array($this, 'wrapper_class'), 11);
         add_filter('yatra_tour_class', array($this, 'tour_class'), 10);
         add_action('yatra_before_main_content_loop', array($this, 'wrapper_start'), 11);
