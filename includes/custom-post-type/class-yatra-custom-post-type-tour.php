@@ -26,6 +26,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'parent_item_colon' => '',
                 'menu_name' => __('Yatra', 'yatra'),
             );
+
             $args = array(
                 'labels' => $labels,
                 'menu_icon' => YATRA_PLUGIN_URI . '/assets/images/menu-icon.png',// 'dashicons-palmtree',

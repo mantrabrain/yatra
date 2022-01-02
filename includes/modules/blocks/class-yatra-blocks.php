@@ -16,7 +16,6 @@ class Yatra_Blocks
             array(
                 'slug' => 'yatra',
                 'title' => __('Yatra', 'yatra'),
-                'icon' => YATRA_PLUGIN_URI . '/assets/images/menu-icon.png'
             )
         );
         return $categories;
