@@ -55,9 +55,14 @@ if (!function_exists('yatra_tour_thumbnail')) {
     {
         ?>
         <figure class="tour-thumbnail">
+            <?php if (!is_singular('tour')){ ?>
             <a class="tour-thumbnail-inner" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
-                <?php the_post_thumbnail($size); ?>
+                <?php }
+                the_post_thumbnail($size);
+                if (!is_singular('tour')){
+                ?>
             </a>
+        <?php } ?>
         </figure>
         <?php
     }

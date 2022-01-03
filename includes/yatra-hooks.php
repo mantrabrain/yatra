@@ -59,11 +59,12 @@ if (!function_exists('yatra_main_content_callback')) {
     {
         $main_class = 'yatra-site-main yatra-row';
 
-        if (yatra_is_archive_page()) {
+        if (yatra_is_archive_page() && apply_filters('yatra_tour_archive_page_header', true)) {
             ?>
             <header class="yatra-page-header">
                 <?php
                 the_archive_title('<h1 class="yatra-page-title">', '</h1>');
+                the_archive_description();
                 ?>
             </header><!-- .page-header -->
 

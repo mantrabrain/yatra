@@ -1652,6 +1652,8 @@
     content: "";
     display: inline-block;
     clear: both; }
+  .yatra-page-wrapper .yatra-archive-tour .yatra-page-header {
+    padding: 15px 0; }
 
 .yatra-page-wrapper .tour-thumbnail-inner img {
   max-width: 100%;
