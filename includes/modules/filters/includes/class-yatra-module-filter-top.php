@@ -129,6 +129,16 @@ class Yatra_Module_Filter_Top
                 if (strpos($action, "post_type=tour") !== false) {
                     echo '<input type="hidden" name="post_type" value="tour"/>';
                 }
+                $search_text = get_query_var('s');
+
+                if ('' != $search_text) {
+                    ?>
+
+                    <input type="hidden" name="s" value="<?php echo esc_attr($search_text) ?>"
+                           placeholder="<?php echo esc_attr__('Search …', 'yatra') ?>"/>
+
+                    <?php
+                }
                 ?>
                 <?php if ($label != '') { ?>
                     <label for="yatra-top-filter-sorting-by"><?php echo esc_html($label) ?>: </label>
@@ -165,6 +175,10 @@ class Yatra_Module_Filter_Top
 
         $extra_prams = (array)yatra_get_filter_params();
 
+        $search = get_query_var('s');
+        if ($search != '') {
+            $extra_prams['s'] = $search;
+        }
         foreach ($extra_prams as $filter_id => $filter) {
             $filter = is_array($filter) ? implode(',', $filter) : $filter;
             $extra_prams[$filter_id] = $filter;

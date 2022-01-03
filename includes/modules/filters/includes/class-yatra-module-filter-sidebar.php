@@ -46,12 +46,25 @@ class Yatra_Module_Filter_Sidebar
 
         echo '<h2>' . __('Filter Criteria', 'yatra') . '</h2>';
 
+
         $clear_class = count((array)$filter) < 1 ? 'yatra-hide' : '';
 
         echo '<a href="' . esc_attr($action) . '"  class="yatra-clear-filter ' . esc_attr($clear_class) . '">' . __('Clear filter', 'yatra') . '</a>';
 
         echo '</div>';
 
+        $search_text = get_query_var('s');
+        if ('' != $search_text) {
+            ?>
+            <div class="yatra-sidebar-filter-field">
+                <h3 class="yatra-sidebar-filter-section-title"><?php echo __('Search', 'yatra') ?></h3>
+                <div class="yatra-sidebar-filter-section-content">
+                    <input type="text" name="s" value="<?php echo esc_attr($search_text) ?>"
+                           placeholder="<?php echo esc_attr__('Search …', 'yatra') ?>"/>
+                </div>
+            </div>
+            <?php
+        }
         $sidebar_filter_sections = yatra_get_sidebar_filter_sections();
 
         foreach ($sidebar_filter_sections as $section_id) {
@@ -75,6 +88,7 @@ class Yatra_Module_Filter_Sidebar
         if (isset($filter->orderby)) {
             echo '<input type="hidden" name="orderby" value="' . esc_attr($filter->orderby) . '"/>';
         }
+
         if (isset($filter->display_mode)) {
             echo '<input type="hidden" name="display_mode" value="' . esc_attr($filter->display_mode) . '"/>';
         }
