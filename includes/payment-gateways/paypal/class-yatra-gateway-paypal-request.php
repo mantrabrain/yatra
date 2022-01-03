@@ -14,28 +14,7 @@ if (!defined('ABSPATH')) {
  */
 class Yatra_Gateway_Paypal_Request
 {
-
-
-    /**
-     * Endpoint for requests to PayPal.
-     *
-     * @var string
-     */
-    protected $endpoint;
-
-
-    public function __construct()
-    {
-
-    }
-
-
-    /**
-     * Get the PayPal request URL for an order.
-     *
-     * @param bool $sandbox Whether to use sandbox mode or not.
-     * @return string
-     */
+    
     public function get_request_url($booking_id)
     {
 
@@ -74,6 +53,15 @@ class Yatra_Gateway_Paypal_Request
     {
         $paypal_email = get_option('yatra_payment_gateway_paypal_email');
 
+        if ('' == $paypal_email || empty($paypal_email)) {
+            wp_die(
+                new WP_Error(
+                    'yatra_payment_gateway_error',
+                    __('Empty paypal email address.', 'yatra')
+                )
+            );
+        }
+
         $booking = new Yatra_Tour_Booking($booking_id);
 
         $booking_details = $booking->get_all_booking_details($booking_id);
@@ -82,33 +70,31 @@ class Yatra_Gateway_Paypal_Request
 
         $yatra_booking_metas = isset($booking_details->yatra_booking_meta) ? $booking_details->yatra_booking_meta : array();
 
-        $currency_code = isset($yatra_booking_meta_params['currency']) ? $yatra_booking_meta_params['currency'] : yatra_get_current_currency_symbol();
-
         $coupon = isset($yatra_booking_meta_params['coupon']) ? $yatra_booking_meta_params['coupon'] : array();
 
         $cart_discount = isset($coupon['calculated_value']) ? floatval($coupon['calculated_value']) : 0;
 
+        $currency_code = $booking->get_currency_code();
+
+        $amount = $booking->get_total();
+
+        $thank_you_page_id = get_option('yatra_thankyou_page');
+
+        $cancel_page_id = get_option('yatra_failed_transaction_page');
+
+        $thank_you_page = 'publish' == get_post_status($thank_you_page_id) ? get_permalink($thank_you_page_id) : home_url();
+
+        $cancel_page_url = 'publish' == get_post_status($cancel_page_id) ? get_permalink($cancel_page_id) : home_url();
+
         if (count($yatra_booking_metas) > 0) {  // Normal Payment.
 
-
-            $thank_you_page_id = get_option('yatra_thankyou_page');
-
-
-            $cancel_page_id = get_option('yatra_failed_transaction_page');
-
-            $thank_you_page = 'publish' == get_post_status($thank_you_page_id) ? get_permalink($thank_you_page_id) : home_url();
-
-            $cancel_page_url = 'publish' == get_post_status($cancel_page_id) ? get_permalink($cancel_page_id) : home_url();
-
+            $args['amount'] = $amount;
             $args['cmd'] = '_cart';
-
             $args['upload'] = '1';
-
-            $args['currency_code'] = sanitize_text_field($currency_code);
-
-            $args['business'] = sanitize_email($paypal_email);
-            //$args['bn'] = '';
-            $args['rm'] = is_ssl() ? 2 : 1;
+            $args['currency_code'] = $currency_code;
+            $args['business'] = $paypal_email;
+            $args['bn'] = '';
+            $args['rm'] = '2';
             $args['discount_amount_cart'] = $cart_discount;
             $args['tax_cart'] = 0;
             $args['charset'] = get_bloginfo('charset');
@@ -139,9 +125,8 @@ class Yatra_Gateway_Paypal_Request
                 )
             );
 
-            // Cart Item.
             $args_index = 1;
-
+            // Add cart items to paypal args.
             foreach ($yatra_booking_metas as $tour_id => $item) {
 
                 $tour_id = $item['yatra_tour_id'];
@@ -158,14 +143,25 @@ class Yatra_Gateway_Paypal_Request
 
                 $args['item_number_' . $args_index] = $tour_id;
 
-                $args = apply_filters('yatra_extra_paypal_args', $args, $item, $tour_id, $args_index);
+                $args['on2_' . $args_index] = __('Total Price', 'yatra');
+
+                $args['os2_' . $args_index] = $amount;
 
                 $args_index++;
             }
         } else {
-            return;
+            wp_die(
+                new WP_Error(
+                    'yatra_payment_gateway_error',
+                    __('Cart is empty.', 'yatra')
+                )
+            );
         }
-        
+
+        $args['option_index_0'] = $args_index;
+
+        $args['custom'] = $booking_id;
+
         $args['custom'] = $booking_id;
 
         $logger = yatra_get_logger();
@@ -176,5 +172,4 @@ class Yatra_Gateway_Paypal_Request
 
         return apply_filters('yatra_paypal_args', $args);
     }
-
 }

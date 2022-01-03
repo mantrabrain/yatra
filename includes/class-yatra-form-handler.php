@@ -114,7 +114,6 @@ class Yatra_Form_Handler
 
             }
 
-
             if ($redirect) {
 
                 $success_redirect_page_id = get_option('yatra_thankyou_page');
