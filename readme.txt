@@ -154,6 +154,7 @@ Shortcode for Tour Listing:
 17. Yatra Checkout Page
 
 == Changelog ==
+
 = 2.1.6 | 2022/01/03 =
 * Added - Sidebar Filter & Top Bar Sorting With grid and list layout for tour archive
 * Added - Container class added if user doesn't set anything from backend
