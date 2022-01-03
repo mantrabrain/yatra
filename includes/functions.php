@@ -1171,6 +1171,20 @@ if (!function_exists('yatra_is_archive_page')) {
         return false;
     }
 }
+
+if (!function_exists('yatra_is_search_page')) {
+
+    function yatra_is_search_page()
+    {
+        global $wp_query;
+
+        if (is_post_type_archive('tour') && $wp_query->is_search) {
+
+            return true;
+        }
+        return false;
+    }
+}
 function yatra_get_logger()
 {
     static $logger = null;

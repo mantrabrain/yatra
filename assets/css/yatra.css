@@ -1958,6 +1958,8 @@
           justify-content: space-between;
   border: 1px solid #eee;
   margin-bottom: 30px; }
+  .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-tour-single-item-inner {
+    width: 100%; }
   .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item span.yatra-featured-tour {
     position: absolute;
     top: 0px;

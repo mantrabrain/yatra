@@ -17,6 +17,7 @@ class Yatra_Template_Hooks
 
         add_action('yatra_after_main_content_loop', array($this, 'single_tour_info'), 21);
 
+
     }
 
     public function single_tour_info()

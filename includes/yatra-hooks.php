@@ -72,15 +72,8 @@ if (!function_exists('yatra_main_content_callback')) {
         }
         ?>
         <main id="yatra-main" class="<?php echo esc_attr($main_class); ?>">
-
             <?php
-
-            do_action('yatra_before_main_content_loop');
-
             Yatra_Content_Loop::loop();
-
-            do_action('yatra_after_main_content_loop');
-
             ?>
         </main><!-- #main -->
         <?php

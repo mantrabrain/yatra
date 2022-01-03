@@ -4,7 +4,10 @@ class Yatra_Content_Loop
 {
     public static function loop()
     {
+        
         if (have_posts()) {
+
+            do_action('yatra_before_main_content_loop');
 
             // Start the Loop.
             while (have_posts()) :
@@ -20,10 +23,13 @@ class Yatra_Content_Loop
 
             endwhile;
 
+            do_action('yatra_after_main_content_loop');
+
         } else {
             yatra_get_template_part('parts/content', 'none');
 
         }
+
 
     }
 

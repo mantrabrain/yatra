@@ -31,43 +31,46 @@ if (!class_exists('Yatra_Page_Templater')) {
 
         function page_template($template_path)
         {
-
             $yatra_template_path = yatra()->template_path();
 
             $yatra_plugin_template_path = yatra()->plugin_template_path();
 
+            $yatra_template_file = '';
 
-            if (get_post_type() == 'tour') {
-                if (is_single()) {
-                    if ($theme_file = locate_template(array("{$yatra_template_path}single-tour.php"))) {
-                        $template_path = $theme_file;
-                    } else {
-                        $template_path = "{$yatra_plugin_template_path}/single-tour.php";
-                    }
-                }
-                if (is_archive()) {
+            if (is_post_type_archive('tour')) {
 
-                    if ($theme_file = locate_template(array("{$yatra_template_path}archive-tour.php"))) {
-                        $template_path = $theme_file;
-                    } else {
-                        $template_path = "{$yatra_plugin_template_path}archive-tour.php";
-                    }
-                 }
-                if (is_tax('destination')) {
-                    if ($theme_file = locate_template(array("{$yatra_template_path}taxonomy-destination.php"))) {
-                        $template_path = $theme_file;
-                    } else {
-                        $template_path = "{$yatra_plugin_template_path}taxonomy-destination.php";
-                    }
-                }
-                if (is_tax('activity')) {
-                    if ($theme_file = locate_template(array("{$yatra_template_path}taxonomy-activity.php"))) {
-                        $template_path = $theme_file;
-                    } else {
-                        $template_path = "{$yatra_plugin_template_path}taxonomy-activity.php";
-                    }
+                $yatra_template_file = 'archive-tour.php';
+
+            }
+            if (yatra_is_search_page()) {
+
+                $yatra_template_file = 'search-tour.php';
+            }
+            if (is_singular('tour')) {
+
+                $yatra_template_file = 'single-tour.php';
+
+            }
+            if (is_tax('destination')) {
+
+                $yatra_template_file = 'taxonomy-destination.php';
+
+            }
+            if (is_tax('activity')) {
+
+                $yatra_template_file = 'taxonomy-activity.php';
+
+            }
+
+            if ('' != $yatra_template_file && !is_null($yatra_template_file)) {
+
+                if ($theme_file = locate_template(array("{$yatra_template_path}{$yatra_template_file}"))) {
+                    $template_path = $theme_file;
+                } else {
+                    $template_path = "{$yatra_plugin_template_path}{$yatra_template_file}";
                 }
             }
+
 
             return $template_path;
         }
