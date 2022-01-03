@@ -147,4 +147,5 @@ class Yatra_Shortcodes
         return self::shortcode_wrapper(array('Yatra_Shortcode_Tour', 'output'), $atts);
     }
 
+
 }
