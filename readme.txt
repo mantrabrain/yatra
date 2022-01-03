@@ -11,7 +11,7 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 == Description ==
 
-**Yatra - The Best Travel Booking Plugin for WordPress**
+**#Best Travel Booking Plugin for WordPress - Yatra**
 
 [Yatra]( https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg) is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
 
@@ -155,17 +155,10 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
-= 2.1.6 |
+= 2.1.6 | 2022/01/03 =
 * Added - Sidebar Filter & Top Bar Sorting With grid and list layout for tour archive
 * Added - Container class added if user doesn't set anything from backend
+* Fixed - Container added
 * Fixed - Widget/Shortcodes & Gutenberg blocks design optimized
 * Fixed - Archive page design optimized
 * Fixed - Other Design related fixes & minor bug fixes
-
-= 2.1.5 | 2021/12/21 =
-* Added - Tour, Destination, Activity gutenberg block
-* Added - Terms and conditions, privacy policy option on checkout
-* Added - Terms and conditions, privacy policy on enquiry form
-* Added - Show hide enquiry form
-* Fixed - Other minor issue fixed
-* Fixed - Stripe/Authorize.net addon compatibility issue fixed

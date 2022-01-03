@@ -1,3 +1,11 @@
+= 2.1.5 | 2021/12/21 =
+* Added - Tour, Destination, Activity gutenberg block
+* Added - Terms and conditions, privacy policy option on checkout
+* Added - Terms and conditions, privacy policy on enquiry form
+* Added - Show hide enquiry form
+* Fixed - Other minor issue fixed
+* Fixed - Stripe/Authorize.net addon compatibility issue fixed
+
 = 2.1.4 | 2021/12/02 =
 * Added - Discount coupon added
 * Fixed - Minor issue fixed
