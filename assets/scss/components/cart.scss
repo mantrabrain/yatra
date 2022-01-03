@@ -1,7 +1,8 @@
 .yatra-shortcode-wrapper {
-  display: inline-block;
+  display: block;
   width: 100%;
   max-width: 100%;
+  margin: 0 auto;
 
   form.yatra-cart-form {
     position: relative;
@@ -109,4 +110,9 @@
       margin-bottom: 0;
     }
   }
+}
+
+.yatra-checkout-button-wrap {
+  text-align: right;
+  padding: 15px 0;
 }

@@ -32,7 +32,7 @@ do_action('yatra_checkout_before_form');
             yatra_privacy_agreement('yatra_checkout_show_agree_to_privacy_policy');
             yatra_terms_agreement('yatra_checkout_show_agree_to_terms_policy');
             ?>
-            <p>
+            <p class="yatra-checkout-button-wrap">
                 <?php wp_nonce_field('yatra_book_selected_tour_nonce', 'yatra-book-selected-tour-nonce'); ?>
                 <input type="submit" class="yatra-button button yatra_order_submit_button" name="yatra_order_submit_button"
                        id="yatra_order_submit_button"

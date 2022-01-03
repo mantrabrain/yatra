@@ -17,6 +17,10 @@
     margin: 0;
     padding: 0!important;
     line-height: 35px;
+    text-align:center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &:focus, &:hover {
       outline: none!important;

@@ -163,7 +163,20 @@
     font-weight: 900;
     margin: 0;
     padding: 0 !important;
-    line-height: 35px; }
+    line-height: 35px;
+    text-align: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+       -moz-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+       -moz-box-align: center;
+        -ms-flex-align: center;
+            align-items: center; }
     .yatra-nice-input-number .nice-button:focus, .yatra-nice-input-number .nice-button:hover {
       outline: none !important; }
     .yatra-nice-input-number .nice-button:before {
@@ -249,9 +262,12 @@
   color: #D63301;
   background-color: #FFCCBA; }
 
-#yatra-page-wrapper {
+.yatra-page-wrapper {
   padding-top: 20px;
-  padding-bottom: 20px; }
+  padding-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block; }
 
 .yatra-book-btn-wrapper, .yatra-enquiry-btn-wrapper, .yatra-enquiry-submit-btn-wrapper {
   text-align: right; }
@@ -2498,9 +2514,10 @@ body.single .tour-thumbnail-inner img {
   margin-bottom: 10px; }
 
 .yatra-shortcode-wrapper {
-  display: inline-block;
+  display: block;
   width: 100%;
-  max-width: 100%; }
+  max-width: 100%;
+  margin: 0 auto; }
   .yatra-shortcode-wrapper form.yatra-cart-form {
     position: relative; }
     .yatra-shortcode-wrapper form.yatra-cart-form tr.yatra-cart-item td {
@@ -2576,6 +2593,10 @@ body.single .tour-thumbnail-inner img {
   #yatra-tour-cart-edit-form-fields .yatra-form-fields:last-child .yatra-traveller-info-wrap {
     border-bottom: none;
     margin-bottom: 0; }
+
+.yatra-checkout-button-wrap {
+  text-align: right;
+  padding: 15px 0; }
 
 form.yatra-checkout-form label {
   display: block;

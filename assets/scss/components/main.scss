@@ -1,6 +1,9 @@
-#yatra-page-wrapper {
+.yatra-page-wrapper {
   padding-top: 20px;
   padding-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 .yatra-book-btn-wrapper, .yatra-enquiry-btn-wrapper, .yatra-enquiry-submit-btn-wrapper {
