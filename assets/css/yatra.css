@@ -488,6 +488,15 @@
   padding-right: 2rem;
   padding-left: 2rem; }
 
+.yatra-container {
+  width: 100%;
+  max-width: 1300px; }
+
+@media (max-width: 1330px) {
+  .yatra-container {
+    padding-left: 15px;
+    padding-right: 15px; } }
+
 .yatra-row {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
@@ -730,7 +739,7 @@
        order: 1; }
 
 @media only screen and (min-width: 48em) {
-  .yatra-container {
+  .yatra-container1 {
     width: 49rem; }
   .yatra-col-sm,
   .yatra-col-sm-1,
@@ -900,7 +909,7 @@
          order: 1; } }
 
 @media only screen and (min-width: 64em) {
-  .yatra-container {
+  .yatra-container1 {
     width: 65rem; }
   .yatra-col-md,
   .yatra-col-md-1,
@@ -1070,7 +1079,7 @@
          order: 1; } }
 
 @media only screen and (min-width: 75em) {
-  .yatra-container {
+  .yatra-container1 {
     width: 76rem; }
   .yatra-col-lg,
   .yatra-col-lg-1,
@@ -1354,26 +1363,11 @@
   .yatra-tour-list-wrap .yatra-item-inner:hover {
     -webkit-box-shadow: 0 20px 38px rgba(0, 0, 0, 0.15);
             box-shadow: 0 20px 38px rgba(0, 0, 0, 0.15); }
-  .yatra-tour-list-wrap .yatra-item-inner .book-now-wrap {
+  .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-more {
     width: 90%;
     margin-left: 5%; }
-    .yatra-tour-list-wrap .yatra-item-inner .book-now-wrap a {
-      border-radius: 5px;
-      padding: 15px;
-      background-color: #1abc9c;
-      color: #fff;
-      display: block;
-      text-align: center;
-      font-size: 16px;
-      line-height: 1;
-      -webkit-box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
-              box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
-      font-weight: 500;
-      border: none;
-      text-decoration: none; }
-      .yatra-tour-list-wrap .yatra-item-inner .book-now-wrap a:hover {
-        text-decoration: underline;
-        background: #03ad8b; }
+    .yatra-tour-list-wrap .yatra-item-inner .yatra-tour-more .yatra-button {
+      display: block; }
 
 .yatra-tour-list-wrap:after {
   clear: both;
@@ -1631,26 +1625,11 @@
   .yatra-discount-deals-wrap .yatra-item-inner:hover {
     -webkit-box-shadow: 0 20px 38px rgba(0, 0, 0, 0.15);
             box-shadow: 0 20px 38px rgba(0, 0, 0, 0.15); }
-  .yatra-discount-deals-wrap .yatra-item-inner .book-now-wrap {
+  .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-more {
     width: 90%;
     margin-left: 5%; }
-    .yatra-discount-deals-wrap .yatra-item-inner .book-now-wrap a {
-      border-radius: 5px;
-      padding: 15px;
-      background-color: #1abc9c;
-      color: #fff;
-      display: block;
-      text-align: center;
-      font-size: 16px;
-      line-height: 1;
-      -webkit-box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
-              box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
-      font-weight: 500;
-      border: none;
-      text-decoration: none; }
-      .yatra-discount-deals-wrap .yatra-item-inner .book-now-wrap a:hover {
-        text-decoration: underline;
-        background: #03ad8b; }
+    .yatra-discount-deals-wrap .yatra-item-inner .yatra-tour-more .yatra-button {
+      display: block; }
 
 .yatra-discount-deals-wrap:after {
   clear: both;
@@ -2196,6 +2175,17 @@
     .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-meta-content-wrap .inner {
       padding: 0; }
 
+.yatra-button {
+  padding: 10px 20px;
+  border: 2px solid;
+  -webkit-box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
+          box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.09);
+  text-decoration: none;
+  cursor: pointer;
+  text-align: center; }
+  .yatra-button:hover {
+    text-decoration: none; }
+
 .yatra-flex-row {
   display: -webkit-box;
   display: -moz-box;
@@ -2530,8 +2520,6 @@ body.single .tour-thumbnail-inner img {
              -moz-box-flex: 1;
               -ms-flex: 1;
                   flex: 1; }
-    .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra-proceed-to-checkout, .yatra-shortcode-wrapper form.yatra-cart-form .button.yatra_update_cart {
-      padding: 10px; }
   .yatra-shortcode-wrapper .yatra-proceed-to-checkout-wrap {
     text-align: right;
     margin-top: 15px; }

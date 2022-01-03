@@ -93,7 +93,7 @@ class Yatra_Module_Filter_Sidebar
             echo '<input type="hidden" name="display_mode" value="' . esc_attr($filter->display_mode) . '"/>';
         }
 
-        echo '<button type="submit" class="button yatra-filter-sidebar-submit">' . __('Filter', 'yatra') . '</button>';
+        echo '<button type="submit" class="yatra-button button yatra-filter-sidebar-submit">' . __('Filter', 'yatra') . '</button>';
         echo '</form>';
         echo '</div>';
         echo '</div>';

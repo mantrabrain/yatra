@@ -16,8 +16,8 @@
         <?php yatra_entry_meta_options($data['id']); ?>
         <h2 class="yatra-tour-title"><a
                     href="<?php echo esc_url($data['permalink']) ?>"><?php echo esc_html($data['title']); ?></a></h2>
-        <div class="book-now-wrap">
-            <a href="<?php echo esc_url($data['permalink']) ?>" class="button button-primary">
+        <div class="yatra-tour-more">
+            <a href="<?php echo esc_url($data['permalink']) ?>" class="yatra-button button yatra-tour-details-button">
                 <?php
                 echo esc_html(yatra_get_tour_view_details_button_text());
                 ?>

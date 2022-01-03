@@ -37,7 +37,7 @@
                     <div class="yatra-tour-details">
                         <?php yatra_get_price_html(get_the_ID()); ?>
                         <div class="yatra-tour-more">
-                            <a class="button"
+                            <a class="yatra-button button yatra-tour-details-button"
                                href="<?php the_permalink() ?>"><?php echo esc_html(yatra_get_tour_view_details_button_text()) ?></a>
                         </div>
                     </div>

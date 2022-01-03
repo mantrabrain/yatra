@@ -9,6 +9,19 @@
   padding-left: 2rem;
 }
 
+.yatra-container {
+  width: 100%;
+  max-width: 1300px;
+  
+}
+
+@media(max-width: 1330px) {
+  .yatra-container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
+
 .yatra-row {
   box-sizing: border-box;
   display: -webkit-box;
@@ -267,7 +280,7 @@
 }
 
 @media only screen and (min-width: 48em) {
-  .yatra-container {
+  .yatra-container1 {
     width: 49rem;
   }
 
@@ -498,7 +511,7 @@
 }
 
 @media only screen and (min-width: 64em) {
-  .yatra-container {
+  .yatra-container1 {
     width: 65rem;
   }
 
@@ -729,7 +742,7 @@
 }
 
 @media only screen and (min-width: 75em) {
-  .yatra-container {
+  .yatra-container1 {
     width: 76rem;
   }
 
