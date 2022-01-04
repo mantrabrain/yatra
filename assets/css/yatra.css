@@ -2760,14 +2760,14 @@ body.single .tour-thumbnail-inner img {
   .yatra-booking-table td.booking-status span.booking-status.failed {
     background: #ff0000; }
 
-ul.yatra-payment-gateway {
+.yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway {
   padding: 15px !important;
   list-style: none;
   background: #f9f9f9;
   margin-left: 0;
   font-size: 18px;
   border: 1px solid #ddd; }
-  ul.yatra-payment-gateway label {
+  .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway label {
     cursor: pointer;
     display: -webkit-box;
     display: -moz-box;
@@ -2777,16 +2777,16 @@ ul.yatra-payment-gateway {
        -moz-box-align: center;
         -ms-flex-align: center;
             align-items: center; }
-  ul.yatra-payment-gateway input[type="radio"] {
+  .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway input[type="radio"] {
     height: 20px;
     width: 20px;
     margin-right: 10px; }
-  ul.yatra-payment-gateway:after {
+  .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway:after {
     clear: both;
     content: '';
     display: block; }
 
-h2.yatra-payment-gateway-title:before {
+.yatra-checkout-page-wrap form.yatra-checkout-form h2.yatra-payment-gateway-title:before {
   clear: both;
   content: '';
   display: block; }
