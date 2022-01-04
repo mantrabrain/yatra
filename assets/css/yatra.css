@@ -2034,7 +2034,10 @@
            -moz-box-orient: vertical;
            -moz-box-direction: normal;
             -ms-flex-direction: column;
-                flex-direction: column; }
+                flex-direction: column;
+        gap: 25px; }
+        .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details p {
+          margin: 0; }
         .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price {
           text-align: center; }
           .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .regular-price {
@@ -2164,7 +2167,29 @@
       display: block;
       margin-top: 15px; }
       .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details {
-        text-align: center; }
+        text-align: center;
+        height: 100%;
+        display: -webkit-box;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+           -moz-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+        -webkit-box-pack: center;
+           -moz-box-pack: center;
+            -ms-flex-pack: center;
+                justify-content: center;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+           -moz-box-orient: vertical;
+           -moz-box-direction: normal;
+            -ms-flex-direction: column;
+                flex-direction: column;
+        gap: 25px; }
+        .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details p {
+          margin: 0; }
         .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price {
           text-align: center; }
           .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner .yatra-content-wrap .yatra-content-right .yatra-tour-details .yatra-tour-price .regular-price {

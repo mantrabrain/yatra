@@ -10,6 +10,7 @@
         justify-content: space-between;
         border: 1px solid #eee;
         margin-bottom: 30px;
+
         .yatra-tour-single-item-inner {
           width: 100%;
         }
@@ -76,6 +77,11 @@
               align-items: center;
               justify-content: center;
               flex-direction: column;
+              gap: 25px;
+
+              p {
+                margin: 0;
+              }
 
               @import "../parts/price";
             }
