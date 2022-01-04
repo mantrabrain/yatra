@@ -35,7 +35,6 @@ class Yatra_Checkout_Form extends Yatra_Form
                     'title' => __('Your full name', 'yatra'),
                     'type' => 'text',
                     'value' => '',
-                    'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
                         'placeholder' => __('Your full name', 'yatra'),
                         'required' => 'required'
@@ -55,7 +54,6 @@ class Yatra_Checkout_Form extends Yatra_Form
                     'type' => 'email',
                     'value' => '',
                     'group_id' => 'yatra_tour_customer_info',
-                    'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
                         'placeholder' => __('Email address', 'yatra'),
                         'required' => 'required'
@@ -77,7 +75,6 @@ class Yatra_Checkout_Form extends Yatra_Form
                     'type' => 'select',
                     'group_id' => 'yatra_tour_customer_info',
                     'options' => $countries,
-                    'wrap_class' => 'yatra-left',
                     'row_start' => true,
                     'select2' => true
                 ),
@@ -87,7 +84,6 @@ class Yatra_Checkout_Form extends Yatra_Form
                     'type' => 'text',
                     'group_id' => 'yatra_tour_customer_info',
                     'value' => '',
-                    'wrap_class' => 'yatra-left',
                     'extra_attributes' => array(
                         'placeholder' => __('Your contact number', 'yatra'),
                     ),

@@ -2599,16 +2599,16 @@ body.single .tour-thumbnail-inner img {
   text-align: right;
   padding: 15px 0; }
 
-form.yatra-checkout-form label {
+.yatra-checkout-page-wrap form.yatra-checkout-form label {
   display: block;
   padding: 5px 0; }
 
-form.yatra-checkout-form .yatra-field-wrap p {
+.yatra-checkout-page-wrap form.yatra-checkout-form .yatra-field-wrap p {
   margin: 0 !important;
   padding-left: 0 !important;
   padding-right: 10px !important; }
 
-form.yatra-checkout-form .yatra-field-wrap input, form.yatra-checkout-form .yatra-field-wrap select {
+.yatra-checkout-page-wrap form.yatra-checkout-form .yatra-field-wrap input, .yatra-checkout-page-wrap form.yatra-checkout-form .yatra-field-wrap select {
   width: 100%;
   -webkit-appearance: none;
   color: #4a5568;
@@ -2617,27 +2617,26 @@ form.yatra-checkout-form .yatra-field-wrap input, form.yatra-checkout-form .yatr
   padding: 0.4em 0.5em;
   max-width: 100%; }
 
-form.yatra-checkout-form .yatra-field-wrap .select2-container--default .select2-selection--single .select2-selection__rendered {
+.yatra-checkout-page-wrap form.yatra-checkout-form .yatra-field-wrap .select2-container--default .select2-selection--single .select2-selection__rendered {
   padding: 0.4em 0.5em;
   color: #4a5568; }
 
-form.yatra-checkout-form .yatra-field-wrap .select2-container--default .select2-selection--single {
+.yatra-checkout-page-wrap form.yatra-checkout-form .yatra-field-wrap .select2-container--default .select2-selection--single {
   height: auto;
   border: 1px solid #cbd5e0;
   border-radius: 3px;
   color: #4a5568; }
 
-form.yatra-checkout-form .yatra-checkout-form-fields, form.yatra-checkout-form .yatra-checkout-order-table {
+.yatra-checkout-page-wrap form.yatra-checkout-form .yatra-checkout-form-fields, .yatra-checkout-page-wrap form.yatra-checkout-form .yatra-checkout-order-table {
   padding: 10px 0; }
 
-form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
-  text-align: center;
-  background: red; }
+.yatra-checkout-page-wrap form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
+  text-align: center; }
 
-.select2-container {
+.yatra-checkout-page-wrap .select2-container {
   max-width: 100%; }
 
-.yatra-privacy-policy-agreement, .yatra-terms-agreement {
+.yatra-checkout-page-wrap .yatra-privacy-policy-agreement, .yatra-checkout-page-wrap .yatra-terms-agreement {
   -webkit-box-align: center;
      -moz-box-align: center;
       -ms-flex-align: center;
@@ -2650,11 +2649,24 @@ form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
       flex-wrap: wrap;
   gap: 12px;
   font-size: 15px; }
-  .yatra-privacy-policy-agreement label, .yatra-terms-agreement label {
+  .yatra-checkout-page-wrap .yatra-privacy-policy-agreement label, .yatra-checkout-page-wrap .yatra-terms-agreement label {
     cursor: pointer; }
-  .yatra-privacy-policy-agreement input[type="checkbox"], .yatra-terms-agreement input[type="checkbox"] {
+  .yatra-checkout-page-wrap .yatra-privacy-policy-agreement input[type="checkbox"], .yatra-checkout-page-wrap .yatra-terms-agreement input[type="checkbox"] {
     height: 18px;
     width: 18px; }
+
+.yatra-checkout-page-wrap .yatra-form {
+  padding: 15px 0; }
+  .yatra-checkout-page-wrap .yatra-form .yatra-field-wrap {
+    margin-bottom: 10px; }
+    .yatra-checkout-page-wrap .yatra-form .yatra-field-wrap p {
+      padding: 0; }
+    .yatra-checkout-page-wrap .yatra-form .yatra-field-wrap label {
+      display: block;
+      font-weight: 600;
+      margin-top: 10px; }
+    .yatra-checkout-page-wrap .yatra-form .yatra-field-wrap input[type="text"], .yatra-checkout-page-wrap .yatra-form .yatra-field-wrap input[type="password"], .yatra-checkout-page-wrap .yatra-form .yatra-field-wrap input[type="email"] {
+      width: 100%; }
 
 .yatra-my-account-navigation {
   width: 30%;

@@ -52,8 +52,11 @@ class Yatra_Shortcode_Checkout
 
         $checkout = yatra_get_session('yatra_tour_cart');
 
+        echo '<div class="yatra-checkout-page-wrap">';
+
         yatra_get_template('tmpl-checkout.php', array('checkout' => $checkout));
 
+        echo '</div>';
 
     }
 }

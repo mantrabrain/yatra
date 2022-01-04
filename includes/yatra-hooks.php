@@ -4,9 +4,9 @@ include_once YATRA_ABSPATH . 'includes/hooks/yatra-template-hooks.php';
 include_once YATRA_ABSPATH . 'includes/hooks/yatra-list-table-hooks.php';
 include_once YATRA_ABSPATH . 'includes/hooks/yatra-log-handler-hooks.php';
 
-if (!function_exists('yatra_checkout_form_fields')) {
+if (!function_exists('yatra_checkout_login_register_fields')) {
 
-    function yatra_checkout_form_fields()
+    function yatra_checkout_login_register_fields()
     {
 
         if (is_user_logged_in()) {
@@ -23,14 +23,25 @@ if (!function_exists('yatra_checkout_form_fields')) {
 
                 yatra_get_template('myaccount/tmpl-form-registration.php', array());
 
-            } else {
-
-                Yatra_Checkout_Form::get_instance()->tour_checkout_form();
             }
         }
     }
 
-    add_action('yatra_checkout_before_form', 'yatra_checkout_form_fields', 17);
+    add_action('yatra_checkout_before_form', 'yatra_checkout_login_register_fields', 17);
+}
+
+if (!function_exists('yatra_checkout_form_fields')) {
+
+    function yatra_checkout_form_fields()
+    {
+        if (!is_user_logged_in() && yatra_enable_guest_checkout()) {
+
+            Yatra_Checkout_Form::get_instance()->tour_checkout_form();
+
+        }
+    }
+
+    add_action('yatra_checkout_form_fields', 'yatra_checkout_form_fields', 10);
 }
 
 if (!function_exists('yatra_registration_form_fields')) {

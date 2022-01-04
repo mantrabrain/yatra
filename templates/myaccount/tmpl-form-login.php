@@ -14,19 +14,23 @@ do_action('yatra_before_customer_login_form'); ?>
 
     <?php do_action('yatra_login_form_start'); ?>
 
-    <p class="yatra-form-row yatra-form-row--wide form-row form-row-wide">
-        <label for="username"><?php esc_html_e('Username or email address', 'yatra'); ?>&nbsp;<span
-                    class="required">*</span></label>
-        <input type="text" class="yatra-input yatra-input--text input-text" name="username" id="username"
-               autocomplete="username"
-               value="<?php echo (!empty($_POST['username'])) ? esc_attr(wp_unslash($_POST['username'])) : ''; ?>"/><?php // @codingStandardsIgnoreLine ?>
-    </p>
-    <p class="yatra-form-row yatra-form-row--wide form-row form-row-wide">
-        <label for="password"><?php esc_html_e('Password', 'yatra'); ?>&nbsp;<span
-                    class="required">*</span></label>
-        <input class="yatra-input yatra-input--text input-text" type="password" name="password"
-               id="password" autocomplete="current-password"/>
-    </p>
+    <div class="yatra-field-wrap">
+        <p>
+            <label for="username"><?php esc_html_e('Username or email address', 'yatra'); ?>&nbsp;<span
+                        class="required">*</span></label>
+            <input type="text" class="yatra-input yatra-input--text input-text" name="username" id="username"
+                   autocomplete="username"
+                   value="<?php echo (!empty($_POST['username'])) ? esc_attr(wp_unslash($_POST['username'])) : ''; ?>"/><?php // @codingStandardsIgnoreLine ?>
+        </p>
+    </div>
+    <div class="yatra-field-wrap">
+        <p>
+            <label for="password"><?php esc_html_e('Password', 'yatra'); ?>&nbsp;<span
+                        class="required">*</span></label>
+            <input class="yatra-input yatra-input--text input-text" type="password" name="password"
+                   id="password" autocomplete="current-password"/>
+        </p>
+    </div>
 
     <?php do_action('yatra_login_form'); ?>
 
