@@ -17,7 +17,7 @@ do_action('yatra_before_customer_registration_form'); ?>
     <p class="form-row">
         <?php wp_nonce_field('yatra-registration', 'yatra-registration-nonce'); ?>
         <button type="submit" class="yatra-button button yatra-form-registration__submit" name="registration"
-                value="<?php esc_attr_e('Log in', 'yatra'); ?>"><?php esc_html_e('Register', 'yatra'); ?></button>
+                value="<?php esc_attr_e('Register', 'yatra'); ?>"><?php esc_html_e('Register', 'yatra'); ?></button>
     </p>
 
 

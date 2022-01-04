@@ -11,6 +11,7 @@ add_action('yatra_my_account_edit_profile_form_fields', 'yatra_my_account_edit_p
 add_action('yatra_my_account_change_password_form_fields', 'yatra_my_account_change_password_form_fields');
 add_action('yatra_before_account_content', 'yatra_account_notices');
 add_action('yatra_before_customer_login_form', 'yatra_login_notices');
+add_action('yatra_before_customer_registration_form', 'yatra_registration_notices');
 add_action('yatra_registration_form_start', 'yatra_registration_form_fields');
 add_action('yatra_checkout_before_form_fields', 'yatra_checkout_form_error', 10);
 add_action('yatra_checkout_form_fields', 'yatra_payment_gateway_fields', 15);

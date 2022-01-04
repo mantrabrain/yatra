@@ -169,7 +169,7 @@ class Yatra_User_Form extends Yatra_Form
 
     public function valid_profile_form_data($data = array())
     {
-        return $this->valid_data($data, $this->get_user_profile_form_fields());
+        return $this->valid_data($data, $this->get_user_profile_form_fields(), 'yatra_user_profile_update_message');
 
     }
 
@@ -249,7 +249,7 @@ class Yatra_User_Form extends Yatra_Form
 
     public function valid_change_password_form_data($data = array())
     {
-        return $this->valid_data($data, $this->change_password_fields());
+        return $this->valid_data($data, $this->change_password_fields(), 'yatra_user_profile_update_message');
 
     }
 

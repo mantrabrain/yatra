@@ -1,6 +1,6 @@
 <h3><?php echo __('Your booking', 'yatra') ?></h3>
 <div id="tour-book_review" class="yatra-checkout-review-tour-book">
-    <table class="shop_table yatra-checkout-review-tour-book-table">
+    <table class="yatra-checkout-review-tour-book-table">
         <thead>
         <tr>
             <th class="tour-name"><?php echo __('Tour', 'yatra') ?></th>

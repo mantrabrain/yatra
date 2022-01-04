@@ -112,7 +112,7 @@ class Yatra_Checkout_Form extends Yatra_Form
 
     public function valid_tour_checkout_form($data = array())
     {
-        return $this->valid_data($data, $this->checkout_form_fields());
+        return $this->valid_data($data, $this->checkout_form_fields(), 'yatra_checkout_error_message');
 
     }
 
@@ -205,7 +205,6 @@ class Yatra_Checkout_Form extends Yatra_Form
     {
         $all_form_fields = $this->create_account_checkout_fields();
 
-
         foreach ($all_form_fields as $field) {
 
             $this->form_html($field);
@@ -216,7 +215,7 @@ class Yatra_Checkout_Form extends Yatra_Form
 
     public function create_account_valid_form_data($data = array())
     {
-        return $this->valid_data($data, $this->create_account_checkout_fields());
+        return $this->valid_data($data, $this->create_account_checkout_fields(), 'yatra_registration_error_message');
 
     }
 

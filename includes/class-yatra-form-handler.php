@@ -42,15 +42,9 @@ class Yatra_Form_Handler
             return;
         }
 
-        if (yatra_enable_guest_checkout() && !is_user_logged_in()) {
+        $valid_data = array();
 
-            $valid_data = Yatra_Checkout_Form::get_instance()->valid_tour_checkout_form($_POST);
-
-            if (yatra()->yatra_error->has_errors()) {
-
-                return;
-            }
-        } else {
+        if (is_user_logged_in()) {
 
             $current_user_id = get_current_user_id();
 
@@ -60,17 +54,44 @@ class Yatra_Form_Handler
 
                 'email' => $user_data->user_email
             );
+        } else {
+
+            if (yatra_enable_guest_checkout()) {
+
+                $valid_data = Yatra_Checkout_Form::get_instance()->valid_tour_checkout_form($_POST);
+
+                if (yatra()->yatra_error->has_errors()) {
+
+                    return;
+                }
+            } else {
+
+                yatra()->yatra_error->add('yatra_booking_errors', __('You must have to login to proceed booking.', 'yatra'));
+
+                return;
+            }
         }
+
+        $yatra_tour_customer_info = $valid_data['yatra_tour_customer_info'] ?? array();
+
+        $valid_email = $yatra_tour_customer_info['email'] ?? '';
+
+        if ($valid_email == '' || empty($valid_email)) {
+
+            yatra()->yatra_error->add('yatra_booking_errors', __('Empty or invalid email.', 'yatra'));
+
+        }
+
 
         if (!yatra_privacy_policy_pass('yatra_checkout_show_agree_to_privacy_policy')) {
 
-            yatra()->yatra_error->add('yatra_form_validation_errors', __('You must have to agree privacy policy', 'yatra'));
+            yatra()->yatra_error->add('yatra_booking_errors', __('You must have to agree privacy policy', 'yatra'));
 
             return;
         }
         if (!yatra_terms_and_conditions_pass('yatra_checkout_show_agree_to_terms_policy')) {
 
-            yatra()->yatra_error->add('yatra_form_validation_errors', __('You must have to agree terms and conditions.', 'yatra'));
+            yatra()->yatra_error->add('yatra_booking_errors', __('You must have to agree terms and conditions.', 'yatra'));
 
             return;
         }
@@ -83,7 +104,7 @@ class Yatra_Form_Handler
 
         if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && count($yatra_get_active_payment_gateways) > 0 && $cart_total > 0) {
 
-            yatra()->yatra_error->add('yatra_form_validation_errors', __('Please select at least one payment gateway', 'yatra'));
+            yatra()->yatra_error->add('yatra_booking_errors', __('Please select at least one payment gateway', 'yatra'));
 
             return;
 
@@ -93,7 +114,7 @@ class Yatra_Form_Handler
 
         if (!$process_ahead) {
 
-            yatra()->yatra_error->add('yatra_form_validation_errors', __('Can\'t Process the payment', 'yatra'));
+            yatra()->yatra_error->add('yatra_booking_errors', __('Can\'t Process the payment', 'yatra'));
 
             return;
         }
@@ -139,7 +160,7 @@ class Yatra_Form_Handler
                 $message = $error_message;
             }
         }
-        yatra()->yatra_error->add('yatra_checkout_error', $message);
+        yatra()->yatra_error->add('yatra_booking_errors', $message);
 
     }
 
@@ -191,7 +212,7 @@ class Yatra_Form_Handler
 
         wp_update_user($user);
 
-        yatra()->yatra_messages->add('yatra_my_account_messages', __('User profile successfully updated.', 'yatra'), 'success');
+        yatra()->yatra_messages->add('yatra_user_profile_update_message', __('User profile successfully updated.', 'yatra'), 'success');
 
     }
 
@@ -230,7 +251,7 @@ class Yatra_Form_Handler
 
         if (!wp_check_password($old_password, $current_user->user_pass, $current_user->ID) || empty($yatra_new_password)) {
 
-            yatra()->yatra_error->add('yatra_form_validation_errors', __('Old Password doesn\'t match', 'yatra'));
+            yatra()->yatra_error->add('yatra_user_profile_update_message', __('Old Password doesn\'t match', 'yatra'));
 
             return;
         }
@@ -248,7 +269,7 @@ class Yatra_Form_Handler
 
         wp_update_user($user);
 
-        yatra()->yatra_messages->add('yatra_my_account_messages', __('Password successfully changed.', 'yatra'), 'success');
+        yatra()->yatra_messages->add('yatra_user_profile_update_message', __('Password successfully changed.', 'yatra'), 'success');
 
 
     }
@@ -326,7 +347,6 @@ class Yatra_Form_Handler
             }
             $email = isset($valid_data['yatra_email']) ? $valid_data['yatra_email'] : '';
 
-
             $password = isset($valid_data['yatra_password']) ? $valid_data['yatra_password'] : '';
 
             $confirm_password = isset($valid_data['yatra_confirm_password']) ? $valid_data['yatra_confirm_password'] : '';
@@ -339,7 +359,7 @@ class Yatra_Form_Handler
 
             if ($is_email_already_exists || $username_exists) {
 
-                yatra()->yatra_error->add('yatra_form_validation_errors', __('Email or Usrename already exists, please try again..', 'yatra'));
+                yatra()->yatra_error->add('yatra_registration_error_message', __('Email or Usrename already exists, please try again..', 'yatra'));
 
                 return;
             }
@@ -372,7 +392,7 @@ class Yatra_Form_Handler
 
             } else {
 
-                yatra()->yatra_error->add('yatra_form_validation_errors', __('Something wrong on registration, please check all form fields once.', 'yatra'));
+                yatra()->yatra_error->add('yatra_registration_error_message', __('Something wrong on registration, please check all form fields once.', 'yatra'));
 
                 return;
             }

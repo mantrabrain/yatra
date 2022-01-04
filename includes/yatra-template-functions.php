@@ -266,44 +266,8 @@ if (!function_exists('yatra_account_notices')) {
 
     function yatra_account_notices()
     {
-        if (is_yatra_error(yatra()->yatra_error)) {
-
-            $error_messages = yatra()->yatra_error->get_error_messages('yatra_form_validation_errors');
-
-            if (count($error_messages) > 0) {
-
-                echo '<ul class="yatra-account-messages yatra-error">';
-
-                foreach ($error_messages as $message) {
-
-                    echo '<li>' . esc_html($message) . '</li>';
-                }
-
-                echo '</ul>';
-            }
-
-        }
-
-        if (yatra()->yatra_messages->has_messages('yatra_my_account_messages')) {
-
-            $messages = yatra()->yatra_messages->get_messages('yatra_my_account_messages');
-
-            if (count($messages) > 0) {
-
-                foreach ($messages as $message_type => $message_list) {
-
-                    echo '<ul class="yatra-account-messages yatra-' . esc_attr($message_type) . '">';
-
-                    foreach ($message_list as $message_text) {
-
-                        echo '<li>' . esc_html($message_text) . '</li>';
-                    }
-
-                    echo '</ul>';
-                }
-            }
-
-        }
+        yatra_get_validation_messages('yatra_user_profile_update_message', 'error', 'yatra-user-profile-update');
+        yatra_get_validation_messages('yatra_user_profile_update_message', 'success', 'yatra-user-profile-update');
     }
 }
 
@@ -312,24 +276,17 @@ if (!function_exists('yatra_login_notices')) {
 
     function yatra_login_notices()
     {
+        yatra_get_validation_messages('yatra_login_error_message', 'error', 'yatra-login-notice');
 
-        if (is_yatra_error(yatra()->yatra_error)) {
+    }
+}
 
-            $error_messages = yatra()->yatra_error->get_error_messages('yatra_login_error_message');
+if (!function_exists('yatra_registration_notices')) {
 
-            if (count($error_messages) > 0) {
+    function yatra_registration_notices()
+    {
+        yatra_get_validation_messages('yatra_registration_error_message', 'error', 'yatra-registration-notice');
 
-                echo '<ul class="yatra-account-messages yatra-error">';
-
-                foreach ($error_messages as $message) {
-
-                    echo '<li>' . wp_kses($message, array('span', 'strong', 'a' => array('href', ''))) . '</li>';
-                }
-
-                echo '</ul>';
-            }
-
-        }
     }
 }
 
@@ -337,31 +294,80 @@ if (!function_exists('yatra_checkout_form_error')) {
 
     function yatra_checkout_form_error()
     {
-        if (is_yatra_error(yatra()->yatra_error)) {
+        yatra_get_validation_messages(array('yatra_booking_errors', 'yatra_form_validation_errors', 'yatra_checkout_error_message'), 'error', 'yatra-on-checkout');
+    }
+}
+
+if (!function_exists('yatra_get_validation_messages')) {
+
+    function yatra_get_validation_messages($message_id_value, $type = 'messages', $context = '')
+    {
+        $all_messages = array(
+            'error' => array(),
+            'warning' => array(),
+            'success' => array()
+        );
+
+        $message_ids = is_array($message_id_value) ? $message_id_value : array($message_id_value);
+
+        foreach ($message_ids as $message_id) {
+
+            if ($type === 'error') {
+
+                if (is_yatra_error(yatra()->yatra_error)) {
+
+                    $error_messages = yatra()->yatra_error->get_error_messages($message_id);
+
+                    if (is_array($error_messages)) {
+
+                        $all_messages['error'] = array_merge($all_messages['error'], $error_messages);
+
+                    } else if ($error_messages != '') {
+
+                        array_push($all_messages['error'], $error_messages);
+                    }
 
 
-            $form_validation_error = yatra()->yatra_error->get_error_messages('yatra_form_validation_errors');
-
-            $checkout_error = yatra()->yatra_error->get_error_messages('yatra_checkout_error');
-
-            $error_messages = array_merge($form_validation_error, $checkout_error);
-
-            if (count($error_messages) > 0) {
-
-                echo '<div class="yatra-message yatra-error" id="yatra-message">';
-
-                echo '<ul>';
-
-                foreach ($error_messages as $message) {
-
-                    echo '<li>' . wp_kses($message, array('span', 'strong', 'a' => array('href', ''))) . '</li>';
                 }
+            } else {
+                if (yatra()->yatra_messages->has_messages($message_id)) {
 
-                echo '</ul>';
+                    $messages = yatra()->yatra_messages->get_messages($message_id);
 
-                echo '</div>';
+                    if (count($messages) > 0) {
+                        if (isset($messages['error'])) {
+                            $all_messages['error'] = array_merge($all_messages['error'], $messages['error']);
+                        }
+                        if (isset($messages['warning'])) {
+                            $all_messages['warning'] = array_merge($all_messages['warning'], $messages['warning']);
+                        }
+                        if (isset($messages['success'])) {
+                            $all_messages['success'] = array_merge($all_messages['success'], $messages['success']);
+                        }
+
+                    }
+                }
             }
+        }
+        $context = $context == '' ? 'yatra-general-message' : $context;
 
+        if (count($all_messages) > 0) {
+
+            foreach ($all_messages as $message_type => $message_list) {
+
+                if (count($message_list) > 0) {
+
+                    echo '<ul class="yatra-messages yatra-' . esc_attr($message_type) . ' ' . esc_attr($context) . '">';
+
+                    foreach ($message_list as $message_text) {
+
+                        echo '<li>' . wp_kses($message_text, array('span', 'strong', 'a' => array('href' => array()))) . '</li>';
+
+                    }
+
+                    echo '</ul>';
+                }
+            }
         }
     }
 }

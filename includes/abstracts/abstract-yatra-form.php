@@ -17,12 +17,11 @@ if (!defined('ABSPATH')) {
 abstract class Yatra_Form
 {
 
-    protected function valid_data($data = array(), $form_fields_all = array())
+    protected function valid_data($data = array(), $form_fields_all = array(), $error_code = 'yatra_form_validation_errors')
     {
         $valid_data = array();
 
         foreach ($form_fields_all as $field_option) {
-
 
             $field = isset($field_option['name']) ? $field_option['name'] : '';
 
@@ -30,7 +29,7 @@ abstract class Yatra_Form
 
                 if (isset($data[$form_fields_all[$field]['group_id']][$field])) {
 
-                    $this->form_validation($data[$form_fields_all[$field]['group_id']], $field_option, $form_fields_all);
+                    $this->form_validation($data[$form_fields_all[$field]['group_id']], $field_option, $error_code);
 
                     $valid_data[$form_fields_all[$field]['group_id']][$field] = $this->sanitization($data[$form_fields_all[$field]['group_id']][$field], $field_option);
                 }
@@ -39,7 +38,7 @@ abstract class Yatra_Form
 
                 if (isset($data[$field])) {
 
-                    $this->form_validation($data, $field_option, $form_fields_all);
+                    $this->form_validation($data, $field_option, $error_code);
 
                     $valid_data[$field] = $this->sanitization($data[$field], $field_option);
                 }
@@ -49,7 +48,7 @@ abstract class Yatra_Form
         return $valid_data;
     }
 
-    private function form_validation($data, $single_field, $all_fields)
+    private function form_validation($data, $single_field, $error_code)
     {
         $field_key = isset($single_field['name']) ? $single_field['name'] : '';
 
@@ -67,12 +66,12 @@ abstract class Yatra_Form
                 case "required":
 
                     if (empty($value) || $value == '' || is_null($value)) {
-                        yatra()->yatra_error->add('yatra_form_validation_errors', $error_message);
+                        yatra()->yatra_error->add($error_code, $error_message);
                     }
                     break;
                 case "email":
                     if (!is_email($value)) {
-                        yatra()->yatra_error->add('yatra_form_validation_errors', $error_message);
+                        yatra()->yatra_error->add($error_code, $error_message);
                     }
 
                 case "equal_compare":
@@ -84,7 +83,7 @@ abstract class Yatra_Form
 
                         if ($data[$rule_fields[0]] != $data[$rule_fields[1]]) {
 
-                            yatra()->yatra_error->add('yatra_form_validation_errors', $error_message);
+                            yatra()->yatra_error->add($error_code, $error_message);
 
                         }
                     }

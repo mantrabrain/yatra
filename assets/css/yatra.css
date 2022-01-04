@@ -2631,7 +2631,8 @@ form.yatra-checkout-form .yatra-checkout-form-fields, form.yatra-checkout-form .
   padding: 10px 0; }
 
 form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
-  text-align: center; }
+  text-align: center;
+  background: red; }
 
 .select2-container {
   max-width: 100%; }

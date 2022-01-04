@@ -30,7 +30,7 @@ if (!function_exists('yatra_checkout_form_fields')) {
         }
     }
 
-    add_action('yatra_checkout_form_fields', 'yatra_checkout_form_fields', 17);
+    add_action('yatra_checkout_before_form', 'yatra_checkout_form_fields', 17);
 }
 
 if (!function_exists('yatra_registration_form_fields')) {
