@@ -5,6 +5,7 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
     {
         $order = isset($atts['order']) ? sanitize_text_field($atts['order']) : 'DESC';
         $order = in_array(strtolower($order), array('asc', 'desc')) ? $order : 'desc';
+        $columns = isset($atts['columns']) ? absint($atts['columns']) : 3;
         $args = array(
             'meta_query' => array(
                 array(
@@ -19,8 +20,22 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
         );
         $posts = get_posts($args);
 
+        
+        $grid_class = 'yatra-col-sm-6 ';
 
-        $grid_class = 'yatra-col-sm-6 yatra-col-md-4';
+        switch ($columns) {
+            case 2:
+                $grid_class .= 'yatra-col-md-6';
+                break;
+            case 3:
+                $grid_class .= 'yatra-col-md-4';
+                break;
+            case 4:
+                $grid_class .= 'yatra-col-md-3';
+                break;
+            default:
+                $grid_class .= 'yatra-col-md-4';
+        }
 
         echo '<div class="yatra-discount-deals-list-container">';
 
@@ -72,7 +87,6 @@ if (!function_exists('yatra_get_tour_lists')) {
         $columns = isset($atts['columns']) ? absint($atts['columns']) : 3;
 
         $meta_query = array();
-
 
         switch ($featured) {
 
