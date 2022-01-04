@@ -28,6 +28,16 @@ const Edit = (props) => {
                                 ]}
                                 onChange={(order) => setAttributes({order: order})}
                             />
+                            <SelectControl
+                                label={__('Columns', 'yatra')}
+                                value={attributes.columns}
+                                options={[
+                                    {label: __('Two (2)', 'yatra'), value: 2},
+                                    {label: __('Three (3)', 'yatra'), value: 3},
+                                    {label: __('Four (4)', 'yatra'), value: 4},
+                                ]}
+                                onChange={(columns) => setAttributes({columns: columns})}
+                            />
                         </PanelBody>
                     </Panel>
                 </div>

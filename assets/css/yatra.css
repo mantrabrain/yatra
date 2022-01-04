@@ -1421,7 +1421,6 @@
     font-size: 30px;
     line-height: 1.2em;
     color: #fff;
-    font-family: 'Montserrat', sans-serif;
     font-weight: 600;
     margin: 0;
     padding: 15px;
@@ -1488,7 +1487,6 @@
     font-size: 30px;
     line-height: 1.2em;
     color: #fff;
-    font-family: 'Montserrat', sans-serif;
     font-weight: 600;
     margin: 0;
     padding: 15px;
@@ -2246,6 +2244,9 @@ body.single .tour-thumbnail-inner img {
   max-width: 100%;
   height: auto;
   width: 100%; }
+
+body.single figure {
+  margin: 0; }
 
 .yatra-tour-additional-info {
   padding: 0;

@@ -24,7 +24,7 @@
 
             <div class="yatra-tour-meta">
                 <?php
-                yatra_get_taxonomy_term_lists(get_the_ID(), 'destination', false, 'fa fa-map-marker-alt');
+                yatra_get_taxonomy_term_lists(get_the_ID(), 'destination', false, 'fas fa-map-marker-alt');
                 yatra_get_taxonomy_term_lists(get_the_ID(), 'activity', false, 'fa fa-universal-access');
                 ?>
             </div><!-- .meta-info -->

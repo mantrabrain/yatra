@@ -5,6 +5,8 @@ if (!function_exists('yatra_get_activity_lists')) {
     {
         $order = isset($atts['order']) ? sanitize_text_field($atts['order']) : 'ASC';
 
+        $columns = isset($atts['columns']) ? absint($atts['columns']) : 4;
+
         $order = in_array(strtolower($order), array('asc', 'desc')) ? $order : 'asc';
 
         $activity_terms = get_terms(array(
@@ -13,7 +15,18 @@ if (!function_exists('yatra_get_activity_lists')) {
             'order' => $order,
         ));
 
-        $grid_class = 'yatra-col-sm-4 yatra-col-md-3';
+        $grid_class = 'yatra-col-sm-6 ';
+
+        switch ($columns) {
+            case 2:
+                $grid_class .= 'yatra-col-md-6';
+                break;
+            case 3:
+                $grid_class .= 'yatra-col-md-4';
+                break;
+            default:
+                $grid_class .= 'yatra-col-md-3';
+        }
 
         echo '<div class="yatra-activity-list-container">';
 

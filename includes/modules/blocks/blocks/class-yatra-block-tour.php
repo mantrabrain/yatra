@@ -23,6 +23,10 @@ class Yatra_Tour_Block
                 'type' => 'number',
                 'default' => 9,
             ),
+            'columns' => array(
+                'type' => 'number',
+                'default' => 3
+            ),
         );
 
     }
@@ -36,6 +40,8 @@ class Yatra_Tour_Block
         $attributes['featured'] = isset($attributes['featured']) ? absint($attributes['featured']) : 2;
 
         $attributes['posts_per_page'] = isset($attributes['posts_per_page']) ? absint($attributes['posts_per_page']) : 9;
+
+        $attributes['columns'] = isset($attributes['columns']) ? absint($attributes['columns']) : 3;
 
         ob_start();
 

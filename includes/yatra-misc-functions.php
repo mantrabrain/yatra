@@ -69,6 +69,8 @@ if (!function_exists('yatra_get_tour_lists')) {
 
         $posts_per_page = isset($atts['posts_per_page']) ? absint($atts['posts_per_page']) : 9;
 
+        $columns = isset($atts['columns']) ? absint($atts['columns']) : 3;
+
         $meta_query = array();
 
 
@@ -117,7 +119,21 @@ if (!function_exists('yatra_get_tour_lists')) {
 
         $posts = get_posts($args);
 
-        $grid_class = 'yatra-col-sm-6 yatra-col-md-4';
+        $grid_class = 'yatra-col-sm-6 ';
+
+        switch ($columns) {
+            case 2:
+                $grid_class .= 'yatra-col-md-6';
+                break;
+            case 3:
+                $grid_class .= 'yatra-col-md-4';
+                break;
+            case 4:
+                $grid_class .= 'yatra-col-md-3';
+                break;
+            default:
+                $grid_class .= 'yatra-col-md-4';
+        }
 
         echo '<div class="yatra-tour-list-container">';
 

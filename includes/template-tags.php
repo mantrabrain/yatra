@@ -199,7 +199,7 @@ if (!function_exists('yatra_entry_meta_options')) {
 
         yatra_get_taxonomy_term_lists($post_id, 'activity', false, 'fa fa-universal-access');
 
-        yatra_get_taxonomy_term_lists($post_id, 'destination', false, 'fa fa-map-marker-alt');
+        yatra_get_taxonomy_term_lists($post_id, 'destination', false, 'fas fa-map-marker-alt');
 
         echo '<span class="yatra-tour-duration"><i class="icon fa fa-clock"></i>' . esc_html($duration_string) . '</span>';
 

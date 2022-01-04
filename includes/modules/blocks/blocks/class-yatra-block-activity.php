@@ -15,6 +15,10 @@ class Yatra_Block_Activity
                 'type' => 'string',
                 'default' => 'asc'
             ),
+            'columns' => array(
+                'type' => 'number',
+                'default' => 4
+            ),
         );
 
     }
@@ -22,6 +26,8 @@ class Yatra_Block_Activity
     public function callback($attributes, $content)
     {
         $attributes['order'] = isset($attributes['order']) ? sanitize_text_field($attributes['order']) : 'asc';
+
+        $attributes['columns'] = isset($attributes['columns']) ? absint($attributes['columns']) : 4;
 
         ob_start();
 

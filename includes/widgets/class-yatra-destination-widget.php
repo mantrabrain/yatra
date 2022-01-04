@@ -53,6 +53,17 @@ if (!class_exists('Yatra_Destination_Widget')) :
                         'desc' => esc_html__('DESC', 'yatra')
                     ),
                     'default' => 'asc'
+                ),
+                'columns' => array(
+                    'name' => 'order',
+                    'title' => esc_html__('Columns', 'yatra'),
+                    'type' => 'select',
+                    'options' => array(
+                        '2' => esc_html__('Two (2)', 'yatra'),
+                        '3' => esc_html__('Three (3)', 'yatra'),
+                        '4' => esc_html__('Four (4)', 'yatra'),
+                    ),
+                    'default' => '4'
                 )
 
 
@@ -81,6 +92,8 @@ if (!class_exists('Yatra_Destination_Widget')) :
             $widget_arguments = array();
 
             $widget_arguments['order'] = $valid_widget_instance['order'];
+            $widget_arguments['columns'] = $valid_widget_instance['columns'];
+
             ?>
             <div class="yatra-destination-widget-wrap">
 
