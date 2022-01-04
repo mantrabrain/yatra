@@ -2244,7 +2244,8 @@ body.single .yatra-single-tour:after {
 
 body.single .tour-thumbnail-inner img {
   max-width: 100%;
-  height: auto; }
+  height: auto;
+  width: 100%; }
 
 .yatra-tour-additional-info {
   padding: 0;
