@@ -296,7 +296,7 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
         $tab_config = array(
             'overview' => array(
                 'label' => __('Overview', 'yatra'),
-                'icon' => 'fa fa-atom',
+                'icon' => 'fas fa-atom',
                 'options' =>
                     array(
                         'overview_visibility' => array(
@@ -322,7 +322,7 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
             ),
             'itinerary' => array(
                 'label' => __('Itinerary', 'yatra'),
-                'icon' => 'fa fa-gopuram',
+                'icon' => 'fas fa-gopuram',
                 'options' =>
                     array(
                         'itinerary_visibility' => array(
@@ -414,7 +414,7 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
             ),
             'faq' => array(
                 'label' => __('FAQ', 'yatra'),
-                'icon' => 'fa fa-comment-dots',
+                'icon' => 'fas fa-comment-dots',
                 'options' =>
                     array(
                         'faq_visibility' => array(
@@ -457,7 +457,7 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
             ),
             'map' => array(
                 'label' => __('Map', 'yatra'),
-                'icon' => 'fa fa-directions',
+                'icon' => 'fas fa-directions',
                 'options' =>
                     array(
                         'map_visibility' => array(
@@ -484,7 +484,7 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
             ),
             'gallery' => array(
                 'label' => __('Gallery', 'yatra'),
-                'icon' => 'fa fa-images',
+                'icon' => 'fas fa-images',
                 'options' =>
                     array(
                         'gallery_visibility' => array(
