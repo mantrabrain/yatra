@@ -119,7 +119,7 @@ if (count($cart_items) < 1) {
 
     <?php if (isset($coupon['id'])) { ?>
         <tr>
-            <th colspan="3">
+            <th colspan="2">
             </th>
             <td colspan="2" class="coupon"
                 data-title="<?php echo esc_attr(yatra_get_price(yatra_get_current_currency_symbol(), $coupon['calculated_value'])) ?>">
@@ -135,7 +135,7 @@ if (count($cart_items) < 1) {
                 ?>
                 <a href="<?php echo esc_url($remove_url) ?>"><?php echo __('[Remove]', 'yatra') ?></a>
             </td>
-            <td class="coupon-content">
+            <td class="coupon-content" colspan="2" style="text-align:right;">
                 <strong>- <?php
                     echo yatra_get_price(yatra_get_current_currency_symbol(), $coupon['calculated_value']); ?>
                 </strong>
