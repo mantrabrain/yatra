@@ -14,7 +14,9 @@
   clear: both;
   display: block;
 }
-
+del {
+  color: #aaa;
+}
 .yatra-content-area {
   .yatra-page-title, .yatra-tour-title {
     line-height: 1.2;

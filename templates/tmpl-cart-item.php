@@ -12,7 +12,7 @@
                 ?>
 
             </div>
-            <span><?php echo esc_html($pricing->getLabel()) ?></span>
+            <span class="pricing-label"><?php echo esc_html($pricing->getLabel()) ?></span>
         </div>
         <?php
         $regular_price = $pricing->getRegularPrice();
@@ -40,7 +40,7 @@
             }
 
             ?>
-            <span class=""><?php echo esc_html($pricing_per_string); ?></span>
+            <span class="pricing-per"><?php echo esc_html($pricing_per_string); ?></span>
         </div>
     </div>
 </div>

@@ -1,0 +1,177 @@
+@media (max-width: 768px) {
+  table.yatra_cart_table_responsive {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse;
+    border: none;
+
+    thead {
+      display: none;
+    }
+
+    tbody {
+
+      th, td.coupon-content {
+        display: none;
+      }
+    }
+
+    tr {
+      display: block;
+      background: #fff;
+      margin: 0;
+
+      td {
+
+      }
+
+      &.yatra-cart-item {
+        border: 1px solid #ddd;
+        margin-bottom: 5px;
+
+        td {
+          border: none;
+          border-bottom: 1px solid #ddd;
+          padding: 10px !important;
+        }
+
+
+      }
+
+      &:nth-child(even) {
+        &.yatra-cart-item {
+          background: #f9f9f9;
+        }
+      }
+
+      td {
+        display: block;
+
+
+        &[data-title] {
+          text-align: left !important; // Important to overwrite order status inline styling
+          &:before {
+            content: attr(data-title) ': ';
+            font-weight: 700;
+            display: block;
+          }
+
+          &.coupon {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            &:before {
+              content: none;
+            }
+
+            &:after {
+              content: attr(data-title);
+              font-weight: 700;
+              display: block;
+            }
+          }
+        }
+
+        &.cart-total-price, &.cart-subtotal-price {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        &.tour-person {
+          .yatra-traveller-info-wrap {
+            margin: 0;
+            margin-top: 10px;
+            padding: 0;
+          }
+
+          .yatra-traveller-price {
+            /*width: 100%;
+            display: block;
+            margin-top: 20px;*/
+          }
+
+
+        }
+
+        &.actions {
+          display: block;
+
+          .coupon, .yatra-coupon-code {
+            margin-bottom: 10px;
+          }
+
+          .coupon, .yatra-coupon-code {
+            display: block !important;
+            width: 100%;
+            flex: none !important;
+          }
+
+          .yatra-button {
+            display: block;
+            width: 100%;
+            flex: unset !important;
+          }
+        }
+
+        &.tour-remove,
+        &.tour-thumbnail,
+        &.actions {
+          &::before {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 460px) {
+  table.yatra_cart_table_responsive {
+
+    tr {
+
+
+      td {
+
+
+        &.tour-person {
+          .yatra-traveller-info-wrap {
+
+            display: inline-block;
+            width: 100%;
+
+          }
+
+          .yatra-traveller-price {
+            width: 100%;
+            display: block;
+            margin-top: 20px;
+          }
+
+        }
+      }
+    }
+  }
+
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  table.yatra_cart_table_responsive {
+
+    tr {
+      td {
+
+        &.tour-person {
+          .yatra-traveller-info-wrap {
+            justify-content: space-between;
+          }
+
+
+        }
+      }
+    }
+  }
+
+}

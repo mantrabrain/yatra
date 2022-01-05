@@ -1,4 +1,4 @@
-<div id="yatra-tour-cart-edit-form-fields">
+<div id="yatra-tour-cart-edit-form-fields" class="yatra-tour-cart-edit-form-fields">
 
     <?php
 

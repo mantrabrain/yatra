@@ -53,19 +53,19 @@ if (count($cart_items) < 1) {
                 </a>
             </td>
 
-            <td class="tour-name" data-title="Product">
+            <td class="tour-name" data-title="<?php echo esc_attr__('Tour', 'yatra') ?>">
                 <a href="<?php echo get_permalink($tour_cart->ID); ?>"><?php echo esc_html($tour_cart->post_title) ?></a>
             </td>
 
-            <td class="tour-selected-date" data-title="Date">
-                <span><?php
+            <td class="tour-selected-date" data-title="<?php echo esc_attr__('Date', 'yatra') ?>">
+                <span class="selected-date"><?php
                     echo esc_html($cart_item['selected_date']);
                     ?>
                 </span>
             </td>
 
 
-            <td class="tour-person" data-title="Quantity">
+            <td class="tour-person" data-title="<?php echo esc_attr__('Person - Per - Pricing', 'yatra') ?>">
                 <div class="person">
                     <?php
                     yatra_cart_edit_person_pricing_details($cart_id, $cart_item, $tour_cart->ID);
@@ -73,7 +73,7 @@ if (count($cart_items) < 1) {
                 </div>
             </td>
 
-            <td class="tour-subtotal" data-title="Total">
+            <td class="tour-subtotal" data-title="<?php echo esc_attr__('Total', 'yatra') ?>">
                 <span class="yatra-Price-amount amount"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), yatra_get_final_tour_price($tour_cart->ID, $number_of_person, $cart_item['selected_date'])); ?></span>
                 <input type="hidden" name="yatra_tour_start_date[<?php echo esc_attr($tour_cart->ID) ?>]"
                        value="<?php echo esc_attr($cart_item['selected_date']) ?>"/>
@@ -84,7 +84,7 @@ if (count($cart_items) < 1) {
     <tr>
         <td colspan="6" class="actions">
             <div class="coupon">
-                <input type="text" name="yatra_coupon_code" class="input-text"
+                <input type="text" name="yatra_coupon_code" class="yatra-coupon-code"
                        id="yatra_coupon_code" value="" placeholder="<?php echo esc_attr('Coupon Code', 'yatra') ?>"/>
                 <button type="submit" class="yatra-button button yatra_apply_coupon" name="yatra_apply_coupon"
                         value="<?php echo esc_attr('Apply coupon', 'yatra') ?>"><?php echo __('Apply coupon', 'yatra') ?>
@@ -103,12 +103,13 @@ if (count($cart_items) < 1) {
         </td>
     </tr>
     <tr>
-        <td colspan="2">
-        </td>
-        <td colspan="2">
+        <th colspan="2">
+        </th>
+        <th colspan="2">
             <strong><?php echo __('Sub Total', 'yatra') ?></strong>
-        </td>
-        <td colspan="2" style="text-align:right;">
+        </th>
+        <td colspan="2" style="text-align:right;" class="cart-subtotal-price"
+            data-title="<?php echo esc_attr__('Sub Total', 'yatra') ?>">
             <strong>
                 <?php
                 echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_cart_total()); ?>
@@ -118,9 +119,10 @@ if (count($cart_items) < 1) {
 
     <?php if (isset($coupon['id'])) { ?>
         <tr>
-            <td colspan="3">
-            </td>
-            <td colspan="2">
+            <th colspan="3">
+            </th>
+            <td colspan="2" class="coupon"
+                data-title="<?php echo esc_attr(yatra_get_price(yatra_get_current_currency_symbol(), $coupon['calculated_value'])) ?>">
                 <strong><?php echo __('Coupon:', 'yatra') ?></strong>
                 <strong><?php echo esc_html($coupon['code']); ?></strong>
                 <?php
@@ -133,7 +135,7 @@ if (count($cart_items) < 1) {
                 ?>
                 <a href="<?php echo esc_url($remove_url) ?>"><?php echo __('[Remove]', 'yatra') ?></a>
             </td>
-            <td>
+            <td class="coupon-content">
                 <strong>- <?php
                     echo yatra_get_price(yatra_get_current_currency_symbol(), $coupon['calculated_value']); ?>
                 </strong>
@@ -141,12 +143,13 @@ if (count($cart_items) < 1) {
         </tr>
     <?php } ?>
     <tr>
-        <td colspan="2">
-        </td>
-        <td colspan="2">
+        <th colspan="2">
+        </th>
+        <th colspan="2">
             <strong><?php echo __('Total', 'yatra') ?></strong>
-        </td>
-        <td colspan="2" style="text-align: right">
+        </th>
+        <td colspan="2" class="cart-total-price" data-title="<?php echo esc_attr__('Total', 'yatra') ?>"
+            style="text-align: right">
             <strong>
                 <?php
                 echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_cart_total(true)); ?>

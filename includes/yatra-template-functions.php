@@ -456,7 +456,6 @@ if (!function_exists('yatra_cart_edit_item')) {
     {
         $person = $number_of_person;
 
-
         if ($pricing_item instanceof Yatra_Tour_Pricing) {
 
             $person = is_array($number_of_person) ? 0 : absint($number_of_person);
