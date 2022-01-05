@@ -122,7 +122,7 @@ if (count($cart_items) < 1) {
             <th colspan="2">
             </th>
             <td colspan="2" class="coupon"
-                data-title="<?php echo esc_attr(yatra_get_price(yatra_get_current_currency_symbol(), $coupon['calculated_value'])) ?>">
+                data-title="- <?php echo esc_attr(yatra_get_price(yatra_get_current_currency_symbol(), $coupon['calculated_value'])) ?>">
                 <strong><?php echo __('Coupon:', 'yatra') ?></strong>
                 <strong><?php echo esc_html($coupon['code']); ?></strong>
                 <?php
