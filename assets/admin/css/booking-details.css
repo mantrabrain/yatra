@@ -1,0 +1,66 @@
+.yatra-admin-booking-details {
+    padding: 15px;
+}
+
+.yatra-booking-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.yatra-booking-item h2.title {
+    font-size: 20px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.yatra-booking-details-item-heading {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+
+    padding: 15px 10px;
+    background: #f1f1f1;
+}
+
+.yatra-booking-item-table {
+
+    position: relative;
+    border: 2px solid #2271b1;
+    border-left: 40px solid #2271b1;
+}
+
+.yatra-booking-details-item-label {
+
+    position: absolute;
+    bottom: 0;
+    left: -40px;
+    height: 100%;
+
+}
+
+.yatra-booking-details-item-label .transformed-item {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) rotate(
+            270deg
+    );
+    left: -17px;
+    font-size: 13px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+
+}
+
+.yatra-booking-details-item-content-innner {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+    border-top: 1px solid #ddd;
+}
+
+.item-content {
+    padding: 5px;
+}
