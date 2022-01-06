@@ -127,7 +127,7 @@ class Yatra_Form_Handler
 
         if ($booking_id > 0) {
 
-            yatra_clear_session('yatra_tour_cart');
+            //yatra_clear_session('yatra_tour_cart');
 
             if (in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && $cart_total > 0) {
 

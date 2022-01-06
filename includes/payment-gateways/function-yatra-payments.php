@@ -2,16 +2,7 @@
 if (!function_exists('yatra_get_payment_gateways')) {
     function yatra_get_payment_gateways()
     {
-        $gateways = array(/* array(
-                'title' => __('Another Gateway', 'yatra'),
-                'default' => 'no',
-                'id' => 'manual'
-            ),*/
-
-
-        );
-
-        return apply_filters('yatra_payment_gateways', $gateways);
+        return apply_filters('yatra_payment_gateways', array());
     }
 }
 

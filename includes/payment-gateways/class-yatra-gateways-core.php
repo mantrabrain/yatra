@@ -27,6 +27,7 @@ if (!class_exists('Yatra_Payment_Gateways_Core')) {
 
             // Include PayPal Payment gateways
             include_once YATRA_ABSPATH . 'includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php';
+            include_once YATRA_ABSPATH . 'includes/payment-gateways/booking-only/class-yatra-payment-gateway-booking-only.php';
 
         }
 
@@ -34,7 +35,8 @@ if (!class_exists('Yatra_Payment_Gateways_Core')) {
         {
             $payment_gateways = apply_filters('yatra_registered_payment_gateways', array(
 
-                 'Yatra_Payment_Gateway_PayPal'
+                'Yatra_Payment_Gateway_Booking_Only',
+                'Yatra_Payment_Gateway_PayPal'
             ));
 
             foreach ($payment_gateways as $gateway) {
