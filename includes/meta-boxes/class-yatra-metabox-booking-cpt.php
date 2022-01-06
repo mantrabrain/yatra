@@ -194,7 +194,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
             <thead>
             <tr>
                 <th><?php echo __('Pricing Label', 'yatra'); ?></th>
-                <th><?php echo __('Number of person', 'yatra'); ?></th>
+                <th><?php echo __('Number Of Person', 'yatra'); ?></th>
                 <th><?php echo __('Regular Price', 'yatra'); ?></th>
                 <th><?php echo __('Sales Price', 'yatra'); ?></th>
                 <th><?php echo __('Price Per', 'yatra'); ?></th>
