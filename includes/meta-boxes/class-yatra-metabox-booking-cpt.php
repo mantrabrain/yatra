@@ -193,8 +193,8 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
             <table class="yatra-booking-meta-info">
             <thead>
             <tr>
-                <th><?php echo __('Number of person', 'yatra'); ?></th>
                 <th><?php echo __('Pricing Label', 'yatra'); ?></th>
+                <th><?php echo __('Number of person', 'yatra'); ?></th>
                 <th><?php echo __('Regular Price', 'yatra'); ?></th>
                 <th><?php echo __('Sales Price', 'yatra'); ?></th>
                 <th><?php echo __('Price Per', 'yatra'); ?></th>
@@ -412,8 +412,8 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
             $row_class = $index == 0 || $index == '' ? 'new-item' : '';
             ?>
             <tr class="<?php echo esc_attr($row_class); ?>">
-                <td><span><?php echo esc_html($number_of_person) ?></span></td>
                 <td><span><?php echo esc_html($pricing_label) ?></span></td>
+                <td><span><?php echo esc_html($number_of_person) ?></span></td>
                 <td><span><?php echo esc_html($regular_price) ?></span></td>
                 <td><span><?php echo esc_html($sales_price) ?></span></td>
                 <td><span><?php echo esc_html($price_per) ?></span></td>
