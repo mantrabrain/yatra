@@ -122,10 +122,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
         // Tab for notice listing and settings
         public function booking_details($args)
         {
-            wp_enqueue_style('yatra-booking-css', YATRA_PLUGIN_URI . '/assets/admin/css/booking-details.css', array(), YATRA_VERSION);
 
-            yatra_load_admin_template('metabox.booking.details');
-            // return;
             $booking_id = $args->ID;
 
             $yatra_booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
