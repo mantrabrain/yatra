@@ -3,7 +3,7 @@
 
     $payment = new Yatra_Payment();
 
-    $all_payment_info = $payment->get_booking_id(get_the_ID());
+    $all_payment_info = $payment->get_all_info(get_the_ID());
 
     echo '<pre>';
     print_r($all_payment_info);
