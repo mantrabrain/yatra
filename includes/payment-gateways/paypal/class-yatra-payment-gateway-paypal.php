@@ -132,7 +132,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
         $listener = new IPNListener();
 
-        $custom = isset($_POST['custom']) ? absint($_POST['custom']) : "";
+        $custom = isset($_POST['custom']) ? ($_POST['custom']) : "";
 
         $custom_array = json_decode($custom);
 
