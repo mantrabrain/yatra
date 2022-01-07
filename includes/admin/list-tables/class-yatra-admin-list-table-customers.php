@@ -202,7 +202,7 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
 
             $booking_id = $booking_meta['booking_id'] ?? '';
 
-            $currency = $booking_meta['currency'] ?? '';
+            $currency = $booking_meta['yatra_currency'] ?? '';
 
             $payment = new Yatra_Payment();
 
