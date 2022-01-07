@@ -14,12 +14,11 @@ if (!defined('ABSPATH')) {
  */
 class Yatra_Gateway_Paypal_Request
 {
-    
-    public function get_request_url($booking_id)
+
+    public function get_request_url($booking_id, $payment_id)
     {
 
-        $args = $this->get_paypal_args($booking_id);
-
+        $args = $this->get_paypal_args($booking_id, $payment_id);
 
         $redirect_uri = esc_url(home_url('/'));
 
@@ -49,7 +48,7 @@ class Yatra_Gateway_Paypal_Request
         return $string;
     }
 
-    private function get_paypal_args($booking_id)
+    private function get_paypal_args($booking_id, $payment_id)
     {
         $paypal_email = get_option('yatra_payment_gateway_paypal_email');
 
@@ -64,19 +63,15 @@ class Yatra_Gateway_Paypal_Request
 
         $booking = new Yatra_Tour_Booking($booking_id);
 
-        $booking_details = $booking->get_all_booking_details($booking_id);
+        $payment = new Yatra_Payment();
 
-        $yatra_booking_meta_params = isset($booking_details->yatra_booking_meta_params) ? $booking_details->yatra_booking_meta_params : array();
+        $booking_details = $booking->get_all_booking_details($booking_id);
 
         $yatra_booking_metas = isset($booking_details->yatra_booking_meta) ? $booking_details->yatra_booking_meta : array();
 
-        $coupon = isset($yatra_booking_meta_params['coupon']) ? $yatra_booking_meta_params['coupon'] : array();
-
-        $cart_discount = isset($coupon['calculated_value']) ? floatval($coupon['calculated_value']) : 0;
-
         $currency_code = $booking->get_currency_code();
 
-        $amount = $booking->get_total();
+        $amount = $payment->get_payable_amount($payment_id);
 
         $thank_you_page_id = get_option('yatra_thankyou_page');
 
@@ -95,13 +90,14 @@ class Yatra_Gateway_Paypal_Request
             $args['business'] = $paypal_email;
             $args['bn'] = '';
             $args['rm'] = '2';
-            $args['discount_amount_cart'] = $cart_discount;
+            $args['discount_amount_cart'] = 0;
             $args['tax_cart'] = 0;
             $args['charset'] = get_bloginfo('charset');
             $args['cbt'] = get_bloginfo('name');
             $args['return'] = add_query_arg(
                 array(
                     'booking_id' => $booking_id,
+                    'payment_id' => $payment_id,
                     'booked' => true,
                     'status' => 'success',
                 ),
@@ -110,6 +106,7 @@ class Yatra_Gateway_Paypal_Request
             $args['cancel'] = add_query_arg(
                 array(
                     'booking_id' => $booking_id,
+                    'payment_id' => $payment_id,
                     'booked' => true,
                     'status' => 'cancel',
                 ),
@@ -160,9 +157,7 @@ class Yatra_Gateway_Paypal_Request
 
         $args['option_index_0'] = $args_index;
 
-        $args['custom'] = $booking_id;
-
-        $args['custom'] = $booking_id;
+        $args['custom'] = json_encode(array('booking_id' => $booking_id, 'payment_id' => $payment_id));
 
         $logger = yatra_get_logger();
 

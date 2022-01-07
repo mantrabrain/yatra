@@ -56,7 +56,7 @@ class Yatra_Payment_Gateway_Booking_Only extends Yatra_Payment_Gateways
         return $settings;
     }
 
-    public function process_payment($booking_id)
+    public function process_payment($booking_id, $payment_id)
     {
 
         $payment_id = get_post_meta($booking_id, 'yatra_payment_id', true);

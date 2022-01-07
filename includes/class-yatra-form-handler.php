@@ -119,19 +119,39 @@ class Yatra_Form_Handler
             return;
         }
 
+
+        if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways)) {
+
+            yatra()->yatra_error->add('yatra_booking_errors', __('Invalid payment gateway, please select at least one payment gateway', 'yatra'));
+
+            return;
+        }
+
         $yatra_booking = new Yatra_Tour_Booking();
 
         $booking_id = (int)$yatra_booking->book($valid_data);
 
         update_post_meta($booking_id, 'yatra_selected_payment_gateway', $payment_gateway_id);
 
+        $yatra_new_booking = new Yatra_Tour_Booking($booking_id);
+
+        if (!($yatra_new_booking->get_total(true) > 0)) {
+
+            yatra_update_booking_status($booking_id, 'yatra-completed');
+        }
+
         if ($booking_id > 0) {
 
-            //yatra_clear_session('yatra_tour_cart');
+            if ($yatra_new_booking->get_total(true) > 0) {
 
-            if (in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && $cart_total > 0) {
+                $yatra_payment = new Yatra_Payment();
 
-                do_action('yatra_payment_checkout_payment_gateway_' . $payment_gateway_id, $booking_id);
+                $payment_id = $yatra_payment->create($booking_id, $payment_gateway_id);
+
+               
+                //yatra_clear_session('yatra_tour_cart');
+
+                do_action('yatra_payment_checkout_payment_gateway_' . $payment_gateway_id, $booking_id, $payment_id);
 
             }
 
@@ -149,6 +169,7 @@ class Yatra_Form_Handler
                 return $booking_id;
             }
         }
+
         $message = __('Something went wrong! Booking could not complete. Please try again later', 'yatra');
 
         if (yatra()->yatra_error->has_errors()) {

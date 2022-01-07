@@ -27,35 +27,34 @@ function yatra_payment_gateway_test_mode()
     return false;
 }
 
-function yatra_update_payment_status($booking_id)
+function yatra_update_payment_status($payment_id, $status, $paid_amount)
 {
-    if (!$booking_id || $booking_id < 1) {
+    if (!$payment_id || $payment_id < 1) {
         return;
     }
-    $payment_id = get_post_meta($booking_id, 'yatra_payment_id', true);
 
-    if (!$payment_id) {
+    do_action('yatra_before_update_payment_status', $payment_id, $status, $paid_amount);
 
-        $title = 'Payment - #' . $booking_id;
+    $payment = new Yatra_Payment();
 
-        $post_array = array(
-            'post_title' => $title,
-            'post_content' => '',
-            'post_status' => 'publish',
-            'post_slug' => uniqid(),
-            'post_type' => 'yatra-payment',
-        );
-        $payment_id = wp_insert_post($post_array);
+    $payment->update_paid_amount($payment_id, $paid_amount);
 
-        update_post_meta($booking_id, 'yatra_payment_id', $payment_id);
+    $payment->update_status($payment_id, $status);
 
-        $booking_details = new Yatra_Tour_Booking($booking_id);
+    $net_due_amount = $payment->get_net_due_amount($payment_id);
 
-        $booking_details->get_all_booking_details();
+    $booking_id = $payment->get_booking_id($payment_id);
 
-        update_post_meta($payment_id, 'booking_details', $booking_details);
+    if ($net_due_amount > 0) {
 
+        yatra_update_booking_status($booking_id, 'yatra-processing');
+
+    } else {
+
+        yatra_update_booking_status($booking_id, 'yatra-completed');
     }
+
+    do_action('yatra_after_update_payment_status', $payment_id, $status, $paid_amount);
 
 }
 

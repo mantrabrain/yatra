@@ -67,24 +67,16 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
         return $settings;
     }
 
-    public function process_payment($booking_id)
+    public function process_payment($booking_id, $payment_id)
     {
 
-        /*if (!isset($_GET['do_payment'])) {
-            return;
-        }
-
-        $booking_id = 70;*/
-
-        $txn_id = get_post_meta($booking_id, 'txn_id', true);
-
-        $payment_id = get_post_meta($booking_id, 'yatra_payment_id', true);
+        $txn_id = get_post_meta($payment_id, 'txn_id', true);
 
         $booking = get_post($booking_id);
 
-        $booking_status = isset($booking->post_status) ? $booking->post_status : '';
+        $booking_status = $booking->post_status ?? '';
 
-        if ($booking_status == 'yatra-completed' || empty($booking_status) || !empty($txn_id) || !empty($payment_id)) {
+        if (($booking_status !== 'yatra-pending' && $booking_status !== 'yatra-processing') || $txn_id) {
 
             return;
         }
@@ -96,7 +88,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
         $paypal_request = new Yatra_Gateway_Paypal_Request();
 
-        $redirect_url = $paypal_request->get_request_url($booking_id);
+        $redirect_url = $paypal_request->get_request_url($booking_id, $payment_id);
 
         wp_redirect($redirect_url);
 
@@ -140,16 +132,20 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
         $listener = new IPNListener();
 
-        $booking_id = isset($_POST['custom']) ? absint($_POST['custom']) : 0;
+        $custom = isset($_POST['custom']) ? absint($_POST['custom']) : "";
 
+        $custom_array = json_decode($custom);
 
-        if ($booking_id < 1) {
+        $booking_id = isset($custom_array['booking_id']) ? absint($custom_array['booking_id']) : 0;
+
+        $payment_id = isset($custom_array['payment_id']) ? absint($custom_array['payment_id']) : 0;
+
+        if ($booking_id < 1 || $payment_id < 1) {
 
             return;
         }
 
         $message = '';
-
 
         /**
          * Set to PayPal sandbox or live mode
@@ -161,13 +157,11 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
          */
         if ($verified = $listener->processIpn()) {
 
-
             /**
              * Log successful purchases
              */
             $transactionData = $listener->getPostData(); // POST data array
 
-            file_put_contents('yatra-ipn_success.log', print_r($transactionData, true) . PHP_EOL, LOCK_EX | FILE_APPEND);
 
             $message = json_encode($transactionData);
             /**
@@ -196,9 +190,9 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
              * PayPal transaction id (txn_id) is stored in the database, we check
              * that against the txn_id returned.
              */
-            $txn_id = get_post_meta($booking_id, 'txn_id', true);
+            $txn_id = get_post_meta($payment_id, 'txn_id', true);
             if (empty($txn_id)) {
-                update_post_meta($booking_id, 'txn_id', $_POST['txn_id']);
+                update_post_meta($payment_id, 'txn_id', $_POST['txn_id']);
             } else {
                 $message .= "\nThis payment was already processed\n";
             }
@@ -214,17 +208,9 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
                 yatra_update_booking_status($booking_id, 'yatra-completed');
 
-                yatra_update_payment_status($booking_id);
-
-                $payment_id = get_post_meta($booking_id, 'yatra_payment_id', true);
+                yatra_update_payment_status($payment_id, 'publish', $_POST['mc_gross']);
 
                 update_post_meta($payment_id, '_paypal_args', $_POST);
-
-                update_post_meta($payment_id, 'yatra_total_paid_amount', $_POST['mc_gross']);
-
-                update_post_meta($payment_id, 'yatra_total_paid_currency', $_POST['mc_currency']);
-
-                update_post_meta($payment_id, 'yatra_payment_gateway', $this->id);
 
                 do_action('yatra_after_successful_payment', $booking_id, $message, $payment_id, $this->id);
 
@@ -237,20 +223,14 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
         } else {
 
-            /**
-             * Log errors
-             */
-            $errors = $listener->getErrors();
+            $message = $listener->getErrors();
 
-            file_put_contents('yatra-ipn_errors.log', print_r($errors, true) . PHP_EOL, LOCK_EX | FILE_APPEND);
-
-            do_action('yatra_after_failed_payment', $booking_id, $message, $this->id);
+            do_action('yatra_after_failed_payment', $booking_id, $message, $payment_id, $this->id);
 
         }
-        file_put_contents('yatra-ipn_message.log', print_r($message, true) . PHP_EOL, LOCK_EX | FILE_APPEND);
 
 
-        update_post_meta($booking_id, 'yatra_payment_message', $message);
+        update_post_meta($payment_id, 'yatra_payment_message', $message);
     }
 
 }

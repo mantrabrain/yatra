@@ -29,7 +29,7 @@ abstract class Yatra_Payment_Gateways
         add_filter('yatra_payment_gateways', array($this, 'register_setting'), 10, 1);
         add_filter('yatra_get_sections_payment-gateways', array($this, 'subtab'), 10, 1);
         add_filter('yatra_get_settings_payment-gateways', array($this, 'payment_settings'), 10, 2);
-        add_action('yatra_payment_checkout_payment_gateway_' . $this->id, array($this, 'process_payment'), 10, 1);
+        add_action('yatra_payment_checkout_payment_gateway_' . $this->id, array($this, 'process_payment'), 10, 2);
     }
 
     function register_setting($gateways)
@@ -67,6 +67,6 @@ abstract class Yatra_Payment_Gateways
         return $settings;
     }
 
-    abstract function process_payment($booking_id);
+    abstract function process_payment($booking_id, $payment_id);
 
 }
