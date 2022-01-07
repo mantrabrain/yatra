@@ -140,6 +140,8 @@ class Yatra_Form_Handler
             yatra_update_booking_status($booking_id, 'yatra-completed');
         }
 
+        $payment_id = 0;
+        
         if ($booking_id > 0) {
 
             if ($yatra_new_booking->get_total(true) > 0) {
@@ -148,7 +150,6 @@ class Yatra_Form_Handler
 
                 $payment_id = $yatra_payment->create($booking_id, $payment_gateway_id);
 
-               
                 //yatra_clear_session('yatra_tour_cart');
 
                 do_action('yatra_payment_checkout_payment_gateway_' . $payment_gateway_id, $booking_id, $payment_id);
@@ -166,7 +167,7 @@ class Yatra_Form_Handler
                 exit;
 
             } else {
-                return $booking_id;
+                return ['booking_id' => $booking_id, 'payment_id' => $payment_id];
             }
         }
 
