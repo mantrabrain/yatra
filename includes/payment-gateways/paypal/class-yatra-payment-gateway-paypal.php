@@ -132,7 +132,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
         $listener = new IPNListener();
 
-        $custom = isset($_POST['custom']) ? ($_POST['custom']) : "";
+        $custom = isset($_POST['custom']) ? stripslashes($_POST['custom']) : "{}";
 
         $custom_array = json_decode($custom, true);
 
@@ -205,8 +205,6 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
             if (!empty($_POST['payment_status']) && $_POST['payment_status'] == 'Completed') {
                 // Update booking status and Payment args.
-
-                yatra_update_booking_status($booking_id, 'yatra-completed');
 
                 yatra_update_payment_status($payment_id, 'publish', $_POST['mc_gross']);
 
