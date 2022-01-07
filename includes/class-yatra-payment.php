@@ -65,6 +65,34 @@ class Yatra_Payment
 
     }
 
+    public function get_all_info($booking_id)
+    {
+        $posts = get_posts(array(
+            'post_type' => 'yatra-payment',
+            'meta_key' => 'booking_id',
+            'meta_value' => $booking_id
+        ));
+        $payment_info = array();
+        foreach ($posts as $post) {
+
+            $payment_id = $post->ID;
+            
+            $payment_info[$payment_id] = [
+                'booking_details' => get_post_meta($payment_id, 'booking_details', true),
+                'payment_gateway' => get_post_meta($payment_id, 'payment_gateway', true),
+                'total_amount' => get_post_meta($payment_id, 'total_amount', true),
+                'currency_code' => get_post_meta($payment_id, 'currency_code', true),
+                'paid_amount' => get_post_meta($payment_id, 'paid_amount', true),
+                'payable_amount' => get_post_meta($payment_id, 'payable_amount', true),
+                'due_amount' => get_post_meta($payment_id, 'due_amount', true),
+                'payment_type' => get_post_meta($payment_id, 'payment_type', true),
+                'booking_id' => get_post_meta($payment_id, 'booking_id', true),
+                'installment' => get_post_meta($payment_id, 'installment', true),
+            ];
+        }
+        return $payment_info;
+    }
+
     public function get_total_paid_amount($booking_id)
     {
         $total_paid_amount = 0;
