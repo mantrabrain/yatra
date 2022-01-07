@@ -17,11 +17,17 @@
     align-items: center;
 }
 
-.yatra-booking-status-meta-content .yatra-payment-item {
+.yatra-payment-status-meta-content .yatra-payment-item {
     background: #f9f9f9;
     padding: 10px;
     border: 1px solid #ddd;
     margin-bottom: 10px;
+}
+
+.yatra-payment-status-meta-content .yatra-payment-item h2 {
+    margin: 0;
+    padding: 0;
+    font-weight: 600;
 }
 
 
