@@ -200,17 +200,15 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
 
         foreach ($this->yatra_customer_booking_meta as $booking_meta) {
 
-            $booking_id = isset($booking_meta['booking_id']) ? $booking_meta['booking_id'] : '';
+            $booking_id = $booking_meta['booking_id'] ?? '';
 
-            $currency = isset($booking_meta['currency']) ? $booking_meta['currency'] : '';
+            $currency = $booking_meta['currency'] ?? '';
 
-            $payment_id = get_post_meta($booking_id, 'yatra_payment_id', true);
+            $payment = new Yatra_Payment();
 
-            $paid_currency = get_post_meta($payment_id, 'yatra_total_paid_currency', true);
+            $paid_amount = floatval($payment->get_total_paid_amount($booking_id));
 
-            $paid_currency = empty($paid_currency) ? $currency : strtoupper($paid_currency);
-
-            $paid_amount = floatval(get_post_meta($payment_id, 'yatra_total_paid_amount', true));
+            $paid_currency = $currency;
 
             if (!empty($paid_currency)) {
                 $amount_array[$paid_currency] = isset($amount_array[$paid_currency]) ? $amount_array[$paid_currency] + $paid_amount : $paid_amount;
