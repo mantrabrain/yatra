@@ -5,7 +5,7 @@ class Yatra_Payment
     public function payment_statuses()
     {
         return array(
-            'processing' => __('Processing', 'yatra'),
+            'processing' => __('Pending', 'yatra'),
             'publish' => __('Completed', 'yatra'),
             'hold' => __('On Hold', 'yatra'),
             'refunded' => __('Refunded', 'yatra'),
@@ -76,10 +76,12 @@ class Yatra_Payment
 
         ));
         $payment_info = array();
+        $all_status = $this->payment_statuses();
         foreach ($posts as $post) {
 
             $payment_id = $post->ID;
-
+            $status = $post->post_status;
+            $status = $all_status[$status] ?? __('Pending', 'yatra');
             $payment_info[$payment_id] = [
                 'title' => $post->post_title . '[' . $payment_id . ']',
                 'booking_details' => get_post_meta($payment_id, 'booking_details', true),
@@ -92,6 +94,7 @@ class Yatra_Payment
                 'payment_type' => get_post_meta($payment_id, 'payment_type', true),
                 'booking_id' => get_post_meta($payment_id, 'booking_id', true),
                 'installment' => get_post_meta($payment_id, 'installment', true),
+                'status' => $status
             ];
         }
         return $payment_info;

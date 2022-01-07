@@ -5,7 +5,6 @@
 
     $all_payment_info = $payment->get_all_info(get_the_ID());
 
-
     foreach ($all_payment_info as $payment_id => $info) {
 
         $currency = $info['currency_code'];
