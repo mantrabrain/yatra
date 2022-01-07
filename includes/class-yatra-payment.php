@@ -70,13 +70,15 @@ class Yatra_Payment
         $posts = get_posts(array(
             'post_type' => 'yatra-payment',
             'meta_key' => 'booking_id',
-            'meta_value' => $booking_id
+            'meta_value' => $booking_id,
+            'post_status' => 'any',
+
         ));
         $payment_info = array();
         foreach ($posts as $post) {
 
             $payment_id = $post->ID;
-            
+
             $payment_info[$payment_id] = [
                 'booking_details' => get_post_meta($payment_id, 'booking_details', true),
                 'payment_gateway' => get_post_meta($payment_id, 'payment_gateway', true),
