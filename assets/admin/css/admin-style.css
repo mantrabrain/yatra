@@ -10,10 +10,18 @@
     margin: 20px 0;
 }
 
-.yatra-booking-status-meta-content p.flex {
+.yatra-booking-status-meta-content p.flex,
+.yatra-payment-status-meta-content p.flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.yatra-booking-status-meta-content .yatra-payment-item {
+    background: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
 }
 
 
