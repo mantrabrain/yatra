@@ -134,7 +134,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
         $custom = isset($_POST['custom']) ? ($_POST['custom']) : "";
 
-        $custom_array = json_decode($custom);
+        $custom_array = json_decode($custom, true);
 
         $booking_id = isset($custom_array['booking_id']) ? absint($custom_array['booking_id']) : 0;
 
