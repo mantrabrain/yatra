@@ -39,6 +39,8 @@ function yatra_update_payment_status($payment_id, $status, $paid_amount)
 
     $payment->update_paid_amount($payment_id, $paid_amount);
 
+    $payment->update_due_amount($payment_id, 0);
+
     $payment->update_status($payment_id, $status);
 
     $net_due_amount = $payment->get_net_due_amount($payment_id);

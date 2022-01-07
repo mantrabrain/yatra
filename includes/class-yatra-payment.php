@@ -209,6 +209,10 @@ class Yatra_Payment
     {
         return update_post_meta($payment_id, 'paid_amount', floatval($paid_amount));
     }
+    public function update_due_amount($payment_id, $due_amount)
+    {
+        return update_post_meta($payment_id, 'due_amount', floatval($due_amount));
+    }
 
 
 }

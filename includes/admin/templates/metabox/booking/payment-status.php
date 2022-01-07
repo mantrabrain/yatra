@@ -1,17 +1,42 @@
-<div class="yatra-booking-status-meta-content">
+<div class="yatra-payment-status-meta-content">
     <?php
 
     $payment = new Yatra_Payment();
 
     $all_payment_info = $payment->get_all_info(get_the_ID());
 
-    echo '<pre>';
-    print_r($all_payment_info);
-    echo '</pre>';
 
+    foreach ($all_payment_info as $info) {
 
-    // $payment->create(get_the_ID(), 'paypal', 'full');
+        $currency = $info['currency_code'];
 
+        $currency_symbol = yatra_get_current_currency_symbol($currency);
+        ?>
+        <div class="yatra-payment-item">
+            <p class="flex">
+                <label for="yatra_payment_gateway"><strong>Payment Gateway: </strong></label>
+                <span><?php echo esc_html($info['payment_gateway']) ?></span>
+            </p>
+            <p class="flex">
+                <label for="yatra_payment_gateway"><strong>Paid Amount: </strong></label>
+                <span><?php echo esc_html(yatra_get_price($currency_symbol, $info['paid_amount'])) ?></span>
+            </p>
+            <p class="flex">
+                <label for="yatra_payment_gateway"><strong>Due Amount: </strong></label>
+                <span><?php echo esc_html(yatra_get_price($currency_symbol, $info['due_amount'])) ?></span>
+            </p>
+            <p class="flex">
+                <label for="yatra_payment_gateway"><strong>Payment Gateway: </strong></label>
+                <span><?php echo esc_html($info['payment_gateway']) ?></span>
+            </p>
+            <p class="flex">
+                <label for="yatra_payment_gateway"><strong>Payment Gateway: </strong></label>
+                <span><?php echo esc_html($info['payment_gateway']) ?></span>
+            </p>
+        </div>
+        <?php
+
+    }
     ?>
 
 
