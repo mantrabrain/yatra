@@ -155,10 +155,13 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
-= 2.1.6 | 2022/01/03 =
-* Added - Sidebar Filter & Top Bar Sorting With grid and list layout for tour archive
-* Added - Container class added if user doesn't set anything from backend
-* Fixed - Container added
-* Fixed - Widget/Shortcodes & Gutenberg blocks design optimized
-* Fixed - Archive page design optimized
-* Fixed - Other Design related fixes & minor bug fixes
+= 2.1.7 | 2022/01/09 =
+* Added - Number of columns on activity/destination/tour widgets/shortcodes and gutenberg blocks too
+* Added - Enable/Disable payment log for admin
+* Added - Discount & deals widgets number of column feature
+* Fixed - Font awesome icon conflict on different themes
+* Fixed - Minor design issue on archive page
+* Fixed - Issue of cart table on responsive design
+* Update - Error notice structure modify
+* Update - Other some code structural level enhancement
+* Update - Payment option show on booking details ( eg, gateway, due amount etc )

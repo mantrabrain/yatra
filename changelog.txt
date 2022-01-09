@@ -1,3 +1,11 @@
+= 2.1.6 | 2022/01/03 =
+* Added - Sidebar Filter & Top Bar Sorting With grid and list layout for tour archive
+* Added - Container class added if user doesn't set anything from backend
+* Fixed - Container added
+* Fixed - Widget/Shortcodes & Gutenberg blocks design optimized
+* Fixed - Archive page design optimized
+* Fixed - Other Design related fixes & minor bug fixes
+
 = 2.1.5 | 2021/12/21 =
 * Added - Tour, Destination, Activity gutenberg block
 * Added - Terms and conditions, privacy policy option on checkout
