@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.6\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-01-04 12:23:48+00:00\n"
+"POT-Creation-Date: 2022-01-09 07:39:10+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -349,7 +349,7 @@ msgid "When you receive a new booking, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:303
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:283
 #: templates/myaccount/tmpl-booking.php:8
 msgid "Booking Code"
 msgstr ""
@@ -357,13 +357,15 @@ msgstr ""
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:73
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:16
-#: templates/tmpl-cart-table.php:16 templates/tmpl-order-table.php:6
+#: templates/tmpl-cart-table.php:16 templates/tmpl-cart-table.php:56
+#: templates/tmpl-order-table.php:6
 msgid "Tour"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
 #: includes/hooks/yatra-list-table-hooks.php:25
-#: templates/tmpl-cart-table.php:17 templates/tmpl-order-table.php:7
+#: templates/tmpl-cart-table.php:17 templates/tmpl-cart-table.php:60
+#: templates/tmpl-order-table.php:7
 msgid "Date"
 msgstr ""
 
@@ -379,7 +381,7 @@ msgstr ""
 #: includes/class-yatra-checkout-form.php:137
 #: includes/class-yatra-enquiry-form.php:51
 #: includes/class-yatra-user-form.php:71 includes/class-yatra-user-form.php:72
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:298
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:278
 #: templates/myaccount/tmpl-dashboard.php:32
 msgid "Email"
 msgstr ""
@@ -390,7 +392,8 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
 #: templates/myaccount/tmpl-booking.php:11 templates/tmpl-cart-table.php:19
-#: templates/tmpl-cart-table.php:147 templates/tmpl-order-table.php:9
+#: templates/tmpl-cart-table.php:76 templates/tmpl-cart-table.php:149
+#: templates/tmpl-cart-table.php:151 templates/tmpl-order-table.php:9
 #: templates/tmpl-order-table.php:69
 msgid "Total"
 msgstr ""
@@ -464,7 +467,7 @@ msgstr ""
 #: includes/class-yatra-enquiry-form.php:70
 #: includes/class-yatra-user-form.php:29 includes/class-yatra-user-form.php:30
 #: includes/class-yatra-user-form.php:38 includes/class-yatra-user-form.php:44
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:299
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:279
 #: includes/template-tags.php:710 includes/template-tags.php:714
 #: includes/template-tags.php:1149 templates/myaccount/tmpl-dashboard.php:47
 #: templates/tour/additional.php:16
@@ -1034,20 +1037,32 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
-#: includes/admin/settings/class-yatra-settings-payment-gateways.php:101
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:109
 #: includes/functions.php:722
 msgid "Payment Gateways"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-payment-gateways.php:89
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:90
 msgid "Payment Gateways General Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-payment-gateways.php:95
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:96
+msgid "Log payment gateway information"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:97
+msgid ""
+"When you enable this option all payment gateway response and other payment "
+"information will be stored into <a href=\"%s\" target=\"_blank\">Yatra "
+"logging system.</a> <strong style=\"color:red;\">Please enable this option "
+"only for debugging purpose.</strong>"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:103
 msgid "Test Mode"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-payment-gateways.php:96
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:104
 msgid ""
 " While in test mode no live transactions are processed. To fully use test "
 "mode, you must have a sandbox (test) account for the payment gateway you "
@@ -1226,7 +1241,7 @@ msgstr ""
 #: includes/admin/templates/availability/availability-calendar.php:22
 #: includes/admin/templates/availability/availability-calendar.php:24
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:52
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:199
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:179
 #: includes/template-tags.php:802 templates/myaccount/tmpl-pricing-header.php:7
 msgid "Price Per"
 msgstr ""
@@ -1245,7 +1260,7 @@ msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:45
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:74
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:200
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:180
 #: includes/template-tags.php:813 includes/template-tags.php:817
 #: templates/myaccount/tmpl-pricing-header.php:8
 msgid "Group Size"
@@ -1281,7 +1296,7 @@ msgstr ""
 #: includes/admin/templates/availability/availability-calendar.php:78
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:6
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:13
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:196
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:175
 #: includes/template-tags.php:846 includes/template-tags.php:850
 msgid "Pricing Label"
 msgstr ""
@@ -1364,8 +1379,20 @@ msgid "Modify License"
 msgstr ""
 
 #: includes/admin/templates/license/license.php:89
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:77
 msgid "Update"
+msgstr ""
+
+#: includes/admin/templates/metabox/booking/payment-status.php:15
+msgid "Payment - #"
+msgstr ""
+
+#: includes/admin/templates/metabox/booking/status.php:7
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:93
+msgid "Booking Status"
+msgstr ""
+
+#: includes/admin/templates/metabox/booking/status.php:37
+msgid "Update Booking Status"
 msgstr ""
 
 #: includes/admin/templates/metabox/tour/pricing/add-new.php:4
@@ -1609,31 +1636,35 @@ msgstr ""
 msgid "Can't Process the payment"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:152
+#: includes/class-yatra-form-handler.php:125
+msgid "Invalid payment gateway, please select at least one payment gateway"
+msgstr ""
+
+#: includes/class-yatra-form-handler.php:174
 msgid "Something went wrong! Booking could not complete. Please try again later"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:215
+#: includes/class-yatra-form-handler.php:237
 msgid "User profile successfully updated."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:254
+#: includes/class-yatra-form-handler.php:276
 msgid "Old Password doesn't match"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:272
+#: includes/class-yatra-form-handler.php:294
 msgid "Password successfully changed."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:299
+#: includes/class-yatra-form-handler.php:321
 msgid "Username is required."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:362
+#: includes/class-yatra-form-handler.php:384
 msgid "Email or Usrename already exists, please try again.."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:395
+#: includes/class-yatra-form-handler.php:417
 msgid "Something wrong on registration, please check all form fields once."
 msgstr ""
 
@@ -1645,6 +1676,27 @@ msgstr ""
 #: includes/class-yatra-logger.php:134
 #. translators: 1: Yatra_Logger::log 2: level
 msgid "%1$s was called with an invalid level \"%2$s\"."
+msgstr ""
+
+#: includes/class-yatra-payment.php:8 includes/class-yatra-payment.php:84
+#: includes/functions.php:307
+msgid "Pending"
+msgstr ""
+
+#: includes/class-yatra-payment.php:9 includes/functions.php:310
+msgid "Completed"
+msgstr ""
+
+#: includes/class-yatra-payment.php:10 includes/functions.php:309
+msgid "On Hold"
+msgstr ""
+
+#: includes/class-yatra-payment.php:11
+msgid "Refunded"
+msgstr ""
+
+#: includes/class-yatra-payment.php:12 includes/functions.php:312
+msgid "Failed"
 msgstr ""
 
 #: includes/class-yatra-tour-availability-validation.php:32
@@ -2024,28 +2076,12 @@ msgstr ""
 msgid "action_args should not be overwritten when calling yatra_get_template."
 msgstr ""
 
-#: includes/functions.php:307
-msgid "Pending"
-msgstr ""
-
 #: includes/functions.php:308
 msgid "Processing"
 msgstr ""
 
-#: includes/functions.php:309
-msgid "On Hold"
-msgstr ""
-
-#: includes/functions.php:310
-msgid "Completed"
-msgstr ""
-
 #: includes/functions.php:311
 msgid "Cancelled"
-msgstr ""
-
-#: includes/functions.php:312
-msgid "Failed"
 msgstr ""
 
 #: includes/functions.php:335
@@ -2754,8 +2790,8 @@ msgid "Featured"
 msgstr ""
 
 #: includes/hooks/yatra-template-hooks.php:119
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:201
-#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:146
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:181
+#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:143
 msgid "Total Price"
 msgstr ""
 
@@ -2773,52 +2809,51 @@ msgstr ""
 msgid "Add image(s)"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:47
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:116
-msgid "Booking Status"
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:95
+msgid "Payment Information"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:118
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:97
 #: templates/myaccount/tmpl-booking-details.php:10
 msgid "Booking Details"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:195
-msgid "Number of person"
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:176
+msgid "Number Of Person"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:197
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:177
 #: templates/myaccount/tmpl-pricing-header.php:4
 msgid "Regular Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:198
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:178
 #: templates/myaccount/tmpl-pricing-header.php:5
 msgid "Sales Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:294
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:274
 msgid "Customer Information"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:297
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:277
 msgid "Fullname"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:300
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:280
 #: templates/myaccount/tmpl-dashboard.php:52
 msgid "Phone"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:301
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:281
 msgid "Total Gross Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:302
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:282
 msgid "Total Net Price"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:383
+#: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:363
 msgid "Payment Log"
 msgstr ""
 
@@ -3946,11 +3981,28 @@ msgstr ""
 msgid "Generated at"
 msgstr ""
 
-#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:60
+#: includes/payment-gateways/booking-only/class-yatra-payment-gateway-booking-only.php:13
+#: includes/payment-gateways/booking-only/class-yatra-payment-gateway-booking-only.php:16
+#: includes/payment-gateways/booking-only/class-yatra-payment-gateway-booking-only.php:46
+msgid "Book Now Pay Later"
+msgstr ""
+
+#: includes/payment-gateways/booking-only/class-yatra-payment-gateway-booking-only.php:36
+msgid "Book Now Pay Later Settings"
+msgstr ""
+
+#: includes/payment-gateways/booking-only/class-yatra-payment-gateway-booking-only.php:42
+#: includes/payment-gateways/booking-only/class-yatra-payment-gateway-booking-only.php:43
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:52
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:53
+msgid "Label on checkout"
+msgstr ""
+
+#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:59
 msgid "Empty paypal email address."
 msgstr ""
 
-#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:156
+#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:153
 msgid "Cart is empty."
 msgstr ""
 
@@ -3969,11 +4021,6 @@ msgstr ""
 
 #: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:47
 msgid " Enter your PayPal account's email"
-msgstr ""
-
-#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:52
-#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:53
-msgid "Label on checkout"
 msgstr ""
 
 #: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:56
@@ -4518,15 +4565,15 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:532
+#: includes/yatra-template-functions.php:531
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:533
+#: includes/yatra-template-functions.php:532
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:534
+#: includes/yatra-template-functions.php:533
 msgid "Not Available"
 msgstr ""
 
@@ -4637,7 +4684,7 @@ msgstr ""
 msgid "Free"
 msgstr ""
 
-#: templates/tmpl-cart-table.php:18
+#: templates/tmpl-cart-table.php:18 templates/tmpl-cart-table.php:68
 msgid "Person - Per - Pricing"
 msgstr ""
 
@@ -4645,15 +4692,15 @@ msgstr ""
 msgid "Apply coupon"
 msgstr ""
 
-#: templates/tmpl-cart-table.php:109
+#: templates/tmpl-cart-table.php:109 templates/tmpl-cart-table.php:112
 msgid "Sub Total"
 msgstr ""
 
-#: templates/tmpl-cart-table.php:124 templates/tmpl-order-table.php:58
+#: templates/tmpl-cart-table.php:126 templates/tmpl-order-table.php:58
 msgid "Coupon:"
 msgstr ""
 
-#: templates/tmpl-cart-table.php:134
+#: templates/tmpl-cart-table.php:136
 msgid "[Remove]"
 msgstr ""
 
