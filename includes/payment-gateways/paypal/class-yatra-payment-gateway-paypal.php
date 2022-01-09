@@ -210,7 +210,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
                 update_post_meta($payment_id, '_paypal_args', $_POST);
 
-                do_action('yatra_after_successful_payment', $booking_id, $message, $payment_id, $this->id);
+                do_action('yatra_after_successful_payment', $booking_id, $payment_id, $_POST['mc_gross'], $_POST['mc_currency'], $this->id, $message);
 
 
             } else {
@@ -222,8 +222,9 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
         } else {
 
             $message = $listener->getErrors();
+            
+            do_action('yatra_after_failed_payment', $booking_id, $payment_id, $this->id, $message);
 
-            do_action('yatra_after_failed_payment', $booking_id, $message, $payment_id, $this->id);
 
         }
 
