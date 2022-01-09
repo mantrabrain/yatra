@@ -1,6 +1,6 @@
 <div class="notice notice-success is-dismissible" id="yatra-admin-promo-notice">
     <div class="logo">
-        <img src="https://ps.w.org/yatra/assets/icon-128x128.png?rev=2592582" alt="ERP">
+        <img src="<?php echo esc_attr(YATRA_PLUGIN_URI . '/assets/images/promo-icon.png') ?>" alt="Yatra">
     </div>
     <div class="content">
         <p>Happy New Year 2022!</p>
