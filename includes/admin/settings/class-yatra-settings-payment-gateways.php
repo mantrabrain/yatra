@@ -82,6 +82,7 @@ class Yatra_Settings_Payment_Gateways extends Yatra_Admin_Settings_Base
     {
         $settings = array();
 
+        $status_page_url = admin_url('admin.php?page=yatra-status&tab=logs');
 
         if ('' === $current_section) {
             $settings = array(
@@ -90,6 +91,13 @@ class Yatra_Settings_Payment_Gateways extends Yatra_Admin_Settings_Base
                     'type' => 'title',
                     'desc' => '',
                     'id' => 'yatra_payment_gateways_general_options',
+                ),
+                array(
+                    'title' => __('Log payment gateway information', 'yatra'),
+                    'desc' => sprintf(__('When you enable this option all payment gateway response and other payment information will be stored into <a href="%s" target="_blank">Yatra logging system.</a> <strong style="color:red;">Please enable this option only for debugging purpose.</strong>', 'yatra'), $status_page_url),
+                    'id' => 'yatra_payment_gateway_enable_logging',
+                    'type' => 'checkbox',
+                    'default' => 'no',
                 ),
                 array(
                     'title' => __('Test Mode', 'yatra'),

@@ -60,4 +60,23 @@ function yatra_update_payment_status($payment_id, $status, $paid_amount)
 
 }
 
+function yatra_payment_gateway_logging_enabled()
+{
+    if ('yes' === get_option('yatra_payment_gateway_enable_logging', 'no')) {
+        return true;
+    }
+    return false;
+}
+
+function yatra_save_payment_gateway_log($source, $log_message)
+{
+    if (yatra_payment_gateway_logging_enabled()) {
+
+        $logger = yatra_get_logger();
+
+        $logger->info($log_message, array('source' => $source));
+    }
+
+}
+
 

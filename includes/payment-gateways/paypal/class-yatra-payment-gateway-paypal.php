@@ -227,6 +227,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
 
         }
 
+        yatra_save_payment_gateway_log('paypal_response', $message);
 
         update_post_meta($payment_id, 'yatra_payment_message', $message);
     }

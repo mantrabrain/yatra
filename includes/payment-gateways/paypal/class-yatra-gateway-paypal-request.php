@@ -159,12 +159,10 @@ class Yatra_Gateway_Paypal_Request
 
         $args['custom'] = json_encode(array('booking_id' => $booking_id, 'payment_id' => $payment_id));
 
-        $logger = yatra_get_logger();
-
         $message = json_encode($args);
 
-        $logger->info($message, array('source' => 'paypal_request'));
-
+        yatra_save_payment_gateway_log('paypal_request', $message);
+       
         return apply_filters('yatra_paypal_args', $args);
     }
 }
