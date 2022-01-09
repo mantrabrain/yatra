@@ -60,9 +60,38 @@ final class Yatra_Admin
     private function init_hooks()
     {
 
-        add_action('admin_menu', array($this, 'admin_menu'));
+
         add_action('init', array($this, 'setup_wizard'));
         add_action('admin_init', array($this, 'admin_redirects'));
+        add_action('admin_menu', array($this, 'admin_menu'));
+        add_action('admin_notices', array($this, 'promotional_offer'));
+
+
+    }
+
+    public function promotional_offer()
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $offer_key = 'yatra_promo_notice_key';
+        
+        $offer_start_date = strtotime('2022-01-09 00:00:01');
+
+        $offer_end_date = strtotime('2022-01-23 23:59:00');
+
+        $hide_notice = get_option($offer_key, 'show');
+
+        if ('hide' == $hide_notice) {
+            return;
+        }
+
+        if ($offer_start_date < current_time('timestamp') && current_time('timestamp') < $offer_end_date) {
+
+            yatra_load_admin_template('notices.promo');
+
+        }
 
     }
 

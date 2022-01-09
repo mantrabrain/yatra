@@ -1,4 +1,5 @@
 <?php
+
 if (!function_exists('yatra_get_payment_gateways')) {
     function yatra_get_payment_gateways()
     {

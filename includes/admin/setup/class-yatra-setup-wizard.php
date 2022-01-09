@@ -141,7 +141,7 @@ class Yatra_Setup_Wizard
             <title><?php _e('Yatra &rsaquo; Setup Wizard', 'yatra'); ?></title>
             <?php wp_print_scripts('yatra-setup'); ?>
             <?php do_action('admin_print_styles'); ?>
-            <?php do_action('admin_head'); ?>
+            <?php //do_action('admin_head'); ?>
         </head>
         <body class="yatra-setup wp-core-ui">
         <h1 class="yatra-logo"><a
