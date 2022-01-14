@@ -36,7 +36,7 @@ if (!function_exists('yatra_checkout_form_fields')) {
     {
         if (!is_user_logged_in() && yatra_enable_guest_checkout()) {
 
-            Yatra_Checkout_Form::get_instance()->tour_checkout_form();
+            Yatra_Checkout_Form::get_instance()->render();
 
         }
     }
@@ -48,7 +48,7 @@ if (!function_exists('yatra_registration_form_fields')) {
 
     function yatra_registration_form_fields()
     {
-        Yatra_Checkout_Form::get_instance()->create_account_checkout_form_fields();
+        Yatra_Create_Account_Form::get_instance()->render();
 
     }
 }
@@ -129,7 +129,7 @@ if (!function_exists('yatra_enquiry_form_fields')) {
     function yatra_enquiry_form_fields()
     {
 
-        Yatra_Enquiry_Form::get_instance()->get_form();
+        Yatra_Enquiry_Form::get_instance()->render();
     }
 
 }

@@ -89,6 +89,9 @@ abstract class Yatra_Form
                     }
 
                     break;
+                default:
+                    do_action('yatra_form_field_validation_' . $validation_type, $validation_config, $data, $single_field);
+                    break;
 
             }
 
@@ -167,7 +170,7 @@ abstract class Yatra_Form
                 }
                 break;
             default:
-                $updated_value = wp_kses_post(sanitize_text_field($field_value));
+                $updated_value = apply_filters('yatra_form_field_sanitization_', $type, $field_value);
                 break;
 
         }
@@ -372,6 +375,10 @@ abstract class Yatra_Form
                 </p>
                 <?php
                 break;
+            default:
+                echo '<h1>Helllo World</h1>';
+                do_action('yatra_form_field_html_' . $field['type'], $field);
+                break;
 
         }
         echo "</div>";
@@ -386,5 +393,12 @@ abstract class Yatra_Form
 
     }
 
+    public abstract function default_fields();
+
+    public abstract function render();
+
+    public abstract function fields();
+
+    public abstract function get_data($data = array());
 
 }

@@ -257,9 +257,7 @@ if (!function_exists('yatra_my_account_edit_profile_form_fields')) {
     function yatra_my_account_edit_profile_form_fields()
     {
 
-        $yatra_user = new Yatra_User_Form();
-
-        $yatra_user->edit_profile_form_fields();
+        Yatra_User_Form::get_instance()->render();
     }
 }
 if (!function_exists('yatra_account_notices')) {
@@ -388,9 +386,8 @@ if (!function_exists('yatra_my_account_change_password_form_fields')) {
     function yatra_my_account_change_password_form_fields()
     {
 
-        $yatra_user = new Yatra_User_Form();
+        Yatra_Change_Password_Form::get_instance()->render();
 
-        $yatra_user->change_password_form_fields();
     }
 }
 

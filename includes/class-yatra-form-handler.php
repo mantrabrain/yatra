@@ -58,7 +58,7 @@ class Yatra_Form_Handler
 
             if (yatra_enable_guest_checkout()) {
 
-                $valid_data = Yatra_Checkout_Form::get_instance()->valid_tour_checkout_form($_POST);
+                $valid_data = Yatra_Checkout_Form::get_instance()->get_data($_POST);
 
                 if (yatra()->yatra_error->has_errors()) {
 
@@ -209,11 +209,10 @@ class Yatra_Form_Handler
             return;
         }
 
-        $yatra_user = new Yatra_User_Form();
+        $valid_form_data = Yatra_User_Form::get_instance()->get_data($_POST);
 
-        $valid_form_data = $yatra_user->valid_profile_form_data($_POST);
-
-        $user_custom_meta_keys = $yatra_user->user_custom_meta_keys();
+        $user_custom_meta_keys = Yatra_User_Form::get_instance()->default_field_keys();
+        
         // New user data.
         $user = new stdClass();
         $user->ID = $user_id;
@@ -256,9 +255,7 @@ class Yatra_Form_Handler
             return;
         }
 
-        $yatra_user = new Yatra_User_Form();
-
-        $valid_form_data = $yatra_user->valid_change_password_form_data($_POST);
+        $valid_form_data = Yatra_Change_Password_Form::get_instance()->get_data();
 
         if (yatra()->yatra_error->has_errors()) {
 
@@ -361,7 +358,7 @@ class Yatra_Form_Handler
 
         if (isset($_POST['registration'], $_POST['yatra_username'], $_POST['yatra_email'], $_POST['yatra_password'], $_POST['yatra_confirm_password']) && wp_verify_nonce($nonce_value, 'yatra-registration')) {
 
-            $valid_data = Yatra_Checkout_Form::get_instance()->create_account_valid_form_data($_POST);
+            $valid_data = Yatra_Create_Account_Form::get_instance()->get_data($_POST);
 
             if (yatra()->yatra_error->has_errors()) {
 
