@@ -1,4 +1,6 @@
 /* jshint node:true */
+const sass = require('node-sass');
+
 module.exports = function (grunt) {
     'use strict';
     grunt.initConfig({
@@ -65,6 +67,8 @@ module.exports = function (grunt) {
         // Compile all .scss files.
         sass: {
             options: {
+                implementation: sass,
+
                 sourceMap: true,
                 // check:false,
                 // unix_newlines: true,
