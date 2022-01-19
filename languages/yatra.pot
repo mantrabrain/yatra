@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.7\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-01-09 10:58:06+00:00\n"
+"POT-Creation-Date: 2022-01-19 12:26:12+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -17,19 +17,19 @@ msgstr ""
 msgid "Validation error for %s field"
 msgstr ""
 
-#: includes/abstracts/abstract-yatra-form.php:366
+#: includes/abstracts/abstract-yatra-form.php:369
 #: includes/meta-boxes/class-yatra-metabox-base.php:534
 #: includes/widgets/class-yatra-widget-base.php:266
 msgid "Choose an image"
 msgstr ""
 
-#: includes/abstracts/abstract-yatra-form.php:367
+#: includes/abstracts/abstract-yatra-form.php:370
 #: includes/meta-boxes/class-yatra-metabox-base.php:535
 #: includes/widgets/class-yatra-widget-base.php:267
 msgid "Use image"
 msgstr ""
 
-#: includes/abstracts/abstract-yatra-form.php:368
+#: includes/abstracts/abstract-yatra-form.php:371
 #: includes/meta-boxes/class-yatra-metabox-base.php:536
 #: includes/widgets/class-yatra-widget-base.php:268
 msgid "Select an Image"
@@ -377,10 +377,10 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:129
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:75
-#: includes/class-yatra-checkout-form.php:53
-#: includes/class-yatra-checkout-form.php:137
-#: includes/class-yatra-enquiry-form.php:51
-#: includes/class-yatra-user-form.php:71 includes/class-yatra-user-form.php:72
+#: includes/class-yatra-checkout-form.php:52
+#: includes/class-yatra-create-account-form.php:40
+#: includes/class-yatra-enquiry-form.php:78
+#: includes/class-yatra-user-form.php:41 includes/class-yatra-user-form.php:42
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:278
 #: templates/myaccount/tmpl-dashboard.php:32
 msgid "Email"
@@ -458,15 +458,15 @@ msgid "ID"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:74
-#: includes/class-yatra-enquiry-form.php:35
+#: includes/class-yatra-enquiry-form.php:62
 msgid "Full Name"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:76
-#: includes/class-yatra-checkout-form.php:74
-#: includes/class-yatra-enquiry-form.php:70
-#: includes/class-yatra-user-form.php:29 includes/class-yatra-user-form.php:30
-#: includes/class-yatra-user-form.php:38 includes/class-yatra-user-form.php:44
+#: includes/class-yatra-checkout-form.php:72
+#: includes/class-yatra-enquiry-form.php:97
+#: includes/class-yatra-user-form.php:85 includes/class-yatra-user-form.php:86
+#: includes/class-yatra-user-form.php:94 includes/class-yatra-user-form.php:100
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:279
 #: includes/template-tags.php:710 includes/template-tags.php:714
 #: includes/template-tags.php:1149 templates/myaccount/tmpl-dashboard.php:47
@@ -475,9 +475,9 @@ msgid "Country"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:77
-#: includes/class-yatra-checkout-form.php:83
-#: includes/class-yatra-enquiry-form.php:77
-#: includes/class-yatra-user-form.php:37
+#: includes/class-yatra-checkout-form.php:80
+#: includes/class-yatra-enquiry-form.php:104
+#: includes/class-yatra-user-form.php:93
 msgid "Phone Number"
 msgstr ""
 
@@ -495,8 +495,8 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:81
 #: includes/admin/templates/license/license.php:17
-#: includes/class-yatra-enquiry-form.php:104
-#: includes/class-yatra-enquiry-form.php:108
+#: includes/class-yatra-enquiry-form.php:131
+#: includes/class-yatra-enquiry-form.php:135
 #: includes/modules/status/list-tables/class-yatra-admin-log-list-table.php:109
 msgid "Message"
 msgstr ""
@@ -1487,107 +1487,79 @@ msgstr ""
 msgid "Thank you for your query. We will get back to you soon"
 msgstr ""
 
-#: includes/class-yatra-checkout-form.php:25
-#: includes/class-yatra-enquiry-form.php:25
+#: includes/class-yatra-change-password-form.php:24
+msgid "Old Password"
+msgstr ""
+
+#: includes/class-yatra-change-password-form.php:25
+#: includes/class-yatra-change-password-form.php:39
+#: includes/class-yatra-change-password-form.php:53
+#: includes/class-yatra-create-account-form.php:79
+#: includes/class-yatra-user-form.php:66
+msgid "Date of birth."
+msgstr ""
+
+#: includes/class-yatra-change-password-form.php:30
+msgid "Old password field is required."
+msgstr ""
+
+#: includes/class-yatra-change-password-form.php:38
+msgid "New Password"
+msgstr ""
+
+#: includes/class-yatra-change-password-form.php:44
+msgid "New Password field is required."
+msgstr ""
+
+#: includes/class-yatra-change-password-form.php:52
+#: includes/class-yatra-create-account-form.php:78
+msgid "Confirm Password"
+msgstr ""
+
+#: includes/class-yatra-change-password-form.php:58
+#: includes/class-yatra-create-account-form.php:87
+msgid "Confirm Password field is required."
+msgstr ""
+
+#: includes/class-yatra-change-password-form.php:61
+msgid "Confirm password  not matched with old password"
+msgstr ""
+
+#: includes/class-yatra-checkout-form.php:26
+#: includes/class-yatra-enquiry-form.php:53
 msgid "Select Country"
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:35
 #: includes/class-yatra-checkout-form.php:39
-#: includes/class-yatra-enquiry-form.php:39
+#: includes/class-yatra-enquiry-form.php:66
 msgid "Your full name"
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:44
-#: includes/class-yatra-enquiry-form.php:44
+#: includes/class-yatra-enquiry-form.php:71
 msgid "Fullname field is required."
 msgstr ""
 
-#: includes/class-yatra-checkout-form.php:58
-#: includes/class-yatra-enquiry-form.php:55
+#: includes/class-yatra-checkout-form.php:57
+#: includes/class-yatra-enquiry-form.php:82
 msgid "Email address"
 msgstr ""
 
-#: includes/class-yatra-checkout-form.php:65
-#: includes/class-yatra-enquiry-form.php:61
-#: includes/class-yatra-user-form.php:78
+#: includes/class-yatra-checkout-form.php:63
+#: includes/class-yatra-enquiry-form.php:88
+#: includes/class-yatra-user-form.php:48
 msgid "Email field is required."
 msgstr ""
 
-#: includes/class-yatra-checkout-form.php:67
-#: includes/class-yatra-enquiry-form.php:63
+#: includes/class-yatra-checkout-form.php:65
+#: includes/class-yatra-enquiry-form.php:90
 msgid "Invalid email address."
 msgstr ""
 
-#: includes/class-yatra-checkout-form.php:88
-#: includes/class-yatra-enquiry-form.php:81
+#: includes/class-yatra-checkout-form.php:85
+#: includes/class-yatra-enquiry-form.php:108
 msgid "Your contact number"
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:120
-msgid "Username"
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:121
-msgid "This is used to login your account."
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:125
-msgid "Username - This is can be used to login your account"
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:130
-msgid "Usename is required"
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:138
-msgid "Email address."
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:142
-msgid "Your email address"
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:147
-msgid "Email is required"
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:150
-msgid "Invalid email address"
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:158
-#: templates/myaccount/tmpl-form-login.php:28
-msgid "Password"
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:159
-msgid "Password."
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:167
-msgid "Password field is required."
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:175
-#: includes/class-yatra-user-form.php:214
-msgid "Confirm Password"
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:176
-#: includes/class-yatra-user-form.php:10 includes/class-yatra-user-form.php:187
-#: includes/class-yatra-user-form.php:201
-#: includes/class-yatra-user-form.php:215
-msgid "Date of birth."
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:184
-#: includes/class-yatra-user-form.php:220
-msgid "Confirm Password field is required."
-msgstr ""
-
-#: includes/class-yatra-checkout-form.php:187
-msgid "Confirm password  doesn't matched with password"
 msgstr ""
 
 #: includes/class-yatra-compatibility.php:52 includes/class-yatra.php:96
@@ -1598,6 +1570,55 @@ msgstr ""
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
+#: includes/class-yatra-create-account-form.php:23
+msgid "Username"
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:24
+msgid "This is used to login your account."
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:28
+msgid "Username - This is can be used to login your account"
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:33
+msgid "Usename is required"
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:41
+msgid "Email address."
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:45
+msgid "Your email address"
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:50
+msgid "Email is required"
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:53
+msgid "Invalid email address"
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:61
+#: templates/myaccount/tmpl-form-login.php:28
+msgid "Password"
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:62
+msgid "Password."
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:70
+msgid "Password field is required."
+msgstr ""
+
+#: includes/class-yatra-create-account-form.php:90
+msgid "Confirm password  doesn't matched with password"
+msgstr ""
+
 #: includes/class-yatra-email.php:243
 msgid "Yatra Email successfully sent to %s"
 msgstr ""
@@ -1606,13 +1627,13 @@ msgstr ""
 msgid "Yatra Email could not sent to %s via WP_Mail function"
 msgstr ""
 
-#: includes/class-yatra-enquiry-form.php:86
-#: includes/class-yatra-enquiry-form.php:90
+#: includes/class-yatra-enquiry-form.php:113
+#: includes/class-yatra-enquiry-form.php:117
 msgid "Number of Adults"
 msgstr ""
 
-#: includes/class-yatra-enquiry-form.php:95
-#: includes/class-yatra-enquiry-form.php:99
+#: includes/class-yatra-enquiry-form.php:122
+#: includes/class-yatra-enquiry-form.php:126
 msgid "Number of Children"
 msgstr ""
 
@@ -1644,27 +1665,27 @@ msgstr ""
 msgid "Something went wrong! Booking could not complete. Please try again later"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:237
+#: includes/class-yatra-form-handler.php:236
 msgid "User profile successfully updated."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:276
+#: includes/class-yatra-form-handler.php:273
 msgid "Old Password doesn't match"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:294
+#: includes/class-yatra-form-handler.php:291
 msgid "Password successfully changed."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:321
+#: includes/class-yatra-form-handler.php:318
 msgid "Username is required."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:384
+#: includes/class-yatra-form-handler.php:381
 msgid "Email or Usrename already exists, please try again.."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:417
+#: includes/class-yatra-form-handler.php:414
 msgid "Something wrong on registration, please check all form fields once."
 msgstr ""
 
@@ -1719,70 +1740,50 @@ msgstr ""
 msgid "You cant book on this date"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:9
+#: includes/class-yatra-user-form.php:27
+msgid "First Name"
+msgstr ""
+
+#: includes/class-yatra-user-form.php:28
+msgid "First name ."
+msgstr ""
+
+#: includes/class-yatra-user-form.php:34 includes/class-yatra-user-form.php:35
+msgid "Last Name"
+msgstr ""
+
+#: includes/class-yatra-user-form.php:51
+msgid "Invalid email field"
+msgstr ""
+
+#: includes/class-yatra-user-form.php:65
 msgid "Date of birth"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:17
+#: includes/class-yatra-user-form.php:73
 #: templates/myaccount/tmpl-dashboard.php:42
 msgid "Gender"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:18
+#: includes/class-yatra-user-form.php:74
 msgid "Your gender"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:23
+#: includes/class-yatra-user-form.php:79
 msgid "Select Gender"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:24
+#: includes/class-yatra-user-form.php:80
 msgid "Male"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:25
+#: includes/class-yatra-user-form.php:81
 msgid "Female"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:43
+#: includes/class-yatra-user-form.php:99
 #: templates/myaccount/tmpl-dashboard.php:37
 msgid "Contact Address"
-msgstr ""
-
-#: includes/class-yatra-user-form.php:57
-msgid "First Name"
-msgstr ""
-
-#: includes/class-yatra-user-form.php:58
-msgid "First name ."
-msgstr ""
-
-#: includes/class-yatra-user-form.php:64 includes/class-yatra-user-form.php:65
-msgid "Last Name"
-msgstr ""
-
-#: includes/class-yatra-user-form.php:81
-msgid "Invalid email field"
-msgstr ""
-
-#: includes/class-yatra-user-form.php:186
-msgid "Old Password"
-msgstr ""
-
-#: includes/class-yatra-user-form.php:192
-msgid "Old password field is required."
-msgstr ""
-
-#: includes/class-yatra-user-form.php:200
-msgid "New Password"
-msgstr ""
-
-#: includes/class-yatra-user-form.php:206
-msgid "New Password field is required."
-msgstr ""
-
-#: includes/class-yatra-user-form.php:223
-msgid "Confirm password  not matched with old password"
 msgstr ""
 
 #: includes/class-yatra.php:377
@@ -4565,15 +4566,15 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:531
+#: includes/yatra-template-functions.php:528
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:532
+#: includes/yatra-template-functions.php:529
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:533
+#: includes/yatra-template-functions.php:530
 msgid "Not Available"
 msgstr ""
 
