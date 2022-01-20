@@ -263,6 +263,7 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
         public function customer_info($booking_id, $args, $yatra_tour_customer_info, $yatra_booking_meta_params)
         {
 
+
             $currency = isset($yatra_booking_meta_params['currency']) ? $yatra_booking_meta_params['currency'] : '';
 
             $currency = isset($yatra_booking_meta_params['yatra_currency']) ? $yatra_booking_meta_params['yatra_currency'] : $currency;

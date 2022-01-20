@@ -376,7 +376,7 @@ abstract class Yatra_Form
                 <?php
                 break;
             default:
-                echo '<h1>Helllo World</h1>';
+
                 do_action('yatra_form_field_html_' . $field['type'], $field);
                 break;
 
