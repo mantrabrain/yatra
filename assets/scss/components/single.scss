@@ -35,6 +35,10 @@ body.single {
 
   figure {
     margin: 0;
+
+    img {
+      max-width: 100%;
+    }
   }
 }
 
@@ -227,7 +231,7 @@ body.single {
     right: 0;
     background: rgba(0, 0, 0, 0.2);
     z-index: 9;
-    padding: 20px;
+    padding: 0px;
   }
 }
 
