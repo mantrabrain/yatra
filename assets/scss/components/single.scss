@@ -238,8 +238,7 @@ body.single {
 .yatra-tour-enquiry-form-wrap {
   label {
     display: block;
-
-    margin1: 0;
+    margin: 0;
   }
 
   p {
@@ -250,6 +249,7 @@ body.single {
   .yatra-field-wrap {
     width: 100%;
     display: inline-block;
+    position: relative;
   }
 
   input[type="text"], input[type="number"], input[type="email"], select {
@@ -273,6 +273,23 @@ body.single {
   .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 40px;
     right: 6px;
+  }
+
+  .yatra-privacy-policy-agreement, .yatra-terms-agreement {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+
+    a {
+      font-size: 13px;
+    }
+
+    label {
+      cursor: pointer;
+      font-size: 15px;
+    }
   }
 }
 
