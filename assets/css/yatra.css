@@ -2520,6 +2520,9 @@ body.single figure {
           align-items: center;
   gap: 10px;
   margin-bottom: 15px; }
+  .yatra-tour-enquiry-form-wrap .yatra-privacy-policy-agreement input[type="checkbox"], .yatra-tour-enquiry-form-wrap .yatra-terms-agreement input[type="checkbox"] {
+    height: 18px;
+    width: 18px; }
   .yatra-tour-enquiry-form-wrap .yatra-privacy-policy-agreement a, .yatra-tour-enquiry-form-wrap .yatra-terms-agreement a {
     font-size: 13px; }
   .yatra-tour-enquiry-form-wrap .yatra-privacy-policy-agreement label, .yatra-tour-enquiry-form-wrap .yatra-terms-agreement label {

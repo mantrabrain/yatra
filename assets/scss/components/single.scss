@@ -282,6 +282,11 @@ body.single {
     gap: 10px;
     margin-bottom: 15px;
 
+    input[type="checkbox"] {
+      height: 18px;
+      width: 18px;
+    }
+
     a {
       font-size: 13px;
     }
