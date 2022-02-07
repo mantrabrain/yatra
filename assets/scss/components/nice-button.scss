@@ -9,21 +9,22 @@
     color: #000 !important;
     height: 35px;
     width: 30px;
-    border: 1px solid #aaa!important;
+    border: 1px solid #aaa !important;
     border-radius: 0;
     position: relative;
     font-size: 17px;
     font-weight: 900;
     margin: 0;
-    padding: 0!important;
+    padding: 0 !important;
     line-height: 35px;
-    text-align:center;
+    text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 
     &:focus, &:hover {
-      outline: none!important;
+      outline: none !important;
     }
 
     &:before {
@@ -39,7 +40,7 @@
     }
 
     &:hover {
-      border-color: #000!important;
+      border-color: #000 !important;
     }
 
     .icon {
