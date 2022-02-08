@@ -177,7 +177,8 @@
        -moz-box-align: center;
         -ms-flex-align: center;
             align-items: center;
-    cursor: pointer; }
+    cursor: pointer;
+    min-height: 35px; }
     .yatra-nice-input-number .nice-button:focus, .yatra-nice-input-number .nice-button:hover {
       outline: none !important; }
     .yatra-nice-input-number .nice-button:before {
@@ -2476,7 +2477,8 @@ body.single figure {
 
 .yatra-tour-enquiry-form-wrap label {
   display: block;
-  margin: 0; }
+  margin: 0;
+  text-align: left; }
 
 .yatra-tour-enquiry-form-wrap p {
   margin: 0;
