@@ -25,8 +25,8 @@
 }
 
 .yatra-payment-status-meta-content .yatra-payment-item h2 {
-    margin: 0!important;
-    padding: 0!important;
+    margin: 0 !important;
+    padding: 0 !important;
     font-weight: 600;
 }
 
@@ -911,3 +911,4 @@ ul.yatra-daterange-list li:hover small.dashicons {
 .yatra-update-feature-tour-icon {
     cursor: pointer;
 }
+

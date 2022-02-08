@@ -50,6 +50,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
             $coupon_dependency['version'] = isset($coupon_dependency['version']) ? sanitize_text_field($coupon_dependency['version']) : YATRA_VERSION;
             wp_register_script('yatra-coupon', YATRA_PLUGIN_URI . '/assets/build/js/coupon.js', $coupon_dependency['dependencies'], $coupon_dependency['version']);
             wp_register_style('yatra-coupon-css', YATRA_PLUGIN_URI . '/assets/build/style-coupon.css', array('wp-components'), YATRA_VERSION);
+            wp_register_style('yatra-booking-meta-css', YATRA_PLUGIN_URI . '/assets/admin/css/booking-meta.css', array(), YATRA_VERSION);
 
             // Register Only Script
             wp_register_script('yatra-popper', YATRA_PLUGIN_URI . '/assets/lib/popperjs/popper.js', array(), YATRA_VERSION);
@@ -114,10 +115,12 @@ if (!class_exists('Yatra_Admin_Assets')) {
                 case "edit-destination":
                     wp_enqueue_script('yatra-taxonomy-destinationjs');
                     break;
+                case "yatra-booking":
+                    wp_enqueue_style('yatra-booking-meta-css');
+                    break;
 
             }
-
-
+          
             wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array(
                 'yatra-select2js', 'jquery', 'yatra-datepicker', 'yatra-swal-js', 'yatra-icopick-js', 'yatra-popper', 'yatra-tippy', 'yatra-daterangepicker'
             ), YATRA_VERSION);

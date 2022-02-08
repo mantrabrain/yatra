@@ -1128,15 +1128,13 @@ if (!function_exists('yatra_tour_additional_info')) {
 
         $currency_symbol = yatra_get_currency_symbol($currency);
 
+        $country_string = '';
+
         if (!empty($yatra_tour_meta_tour_country)) {
-
-            $country_string = '';
-
 
             foreach ($yatra_tour_meta_tour_country as $country_item) {
 
                 $country = yatra_get_countries($country_item);
-
 
                 $country_string .= $country . ', ';
             }

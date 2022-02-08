@@ -96,6 +96,34 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
             add_meta_box('yatra_booking_details_metabox', __('Booking Details', 'yatra'), array($this, 'booking_details'), $this->screen_id, 'normal', 'high');
 
+            add_action('edit_form_after_editor', array($this, 'booking_tour_item'));
+        }
+
+        public function booking_tour_item($post)
+        {
+
+            global $post;
+
+            if (get_post_type($post) !== $this->screen_id) {
+                return;
+            }
+
+            $booking_id = $post->ID;
+
+            $yatra_booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
+
+
+            $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
+
+            $yatra_booking_meta = !is_array($yatra_booking_meta) ? array() : $yatra_booking_meta;
+
+
+            foreach ($yatra_booking_meta as $id => $booking) {
+
+                yatra_load_admin_template('metabox.booking.tour', $booking);
+                
+            }
+
         }
 
         // Tab for notice listing and settings
@@ -105,6 +133,10 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
             $booking_id = $args->ID;
 
             $yatra_booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
+
+            echo '<pre>';
+            print_r($yatra_booking_meta_params);
+            echo '</pre>';
 
             $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
 
