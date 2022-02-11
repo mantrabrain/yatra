@@ -112,9 +112,6 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
             $yatra_booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
 
-            echo '<pre>';
-            print_r($yatra_booking_meta_params);
-            echo '</pre>';
             $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
 
             $yatra_booking_meta = !is_array($yatra_booking_meta) ? array() : $yatra_booking_meta;

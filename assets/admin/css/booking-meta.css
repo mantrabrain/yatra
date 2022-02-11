@@ -15,13 +15,14 @@
 #poststuff .yatra-booking-item-summary h2 {
     font-size: 15px;
     text-transform: uppercase;
-    padding-top: 20px;
-    padding-bottom: 16px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     border-bottom-width: 1px;
     border-bottom-style: solid;
     border-bottom-color: #ccc;
     font-weight: 600;
-    margin: 1em 0;
+    margin-bottom: 15px;
+    padding-left: 0;
 }
 
 #poststuff .yatra-admin-booking-metabox-wrap .yatra-booking-single-field {

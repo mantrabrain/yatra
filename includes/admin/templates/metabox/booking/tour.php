@@ -27,9 +27,7 @@
                 <span class="yatra-admin-tail"><?php echo esc_html(yatra_get_price($currency_symbol, $meta['total_booking_price'])) ?></span>
             </div>
             <?php
-            echo '<pre>';
-             print_r($booking);
-            echo '</pre>';
+
             ?>
         </div>
     </div>
