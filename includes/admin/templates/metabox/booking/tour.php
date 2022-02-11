@@ -21,10 +21,23 @@
                 <span class="yatra-admin-head">Travel Date :</span>
                 <span class="yatra-admin-tail"><?php echo esc_html($booking['yatra_selected_date']) ?></span>
             </div>
+            <?php
 
-            <div class="yatra-booking-single-field clearfix">
-                <span class="yatra-admin-head">Price :</span>
-                <span class="yatra-admin-tail"><?php echo esc_html(yatra_get_price($currency_symbol, $meta['total_booking_price'])) ?></span>
+            ?>
+        </div>
+        <?php
+
+        /*echo '<pre>';
+        print_r($booking);
+        echo '<hr/>';
+        print_r($meta);
+        echo '</pre>';*/
+        ?>
+        <div class="yatra-booking-item-price-breakdown">
+            <h2>Price Breakdown</h2>
+            <div class="yatra-price-breakdown-base-price"><span class="yatra-admin-head">Traveller Base Price</span><span
+                        class="yatra-admin-tail"><span class="yatra-price-detail">1 x $0</span><span
+                            class="yatra-price">$0.00</span></span>
             </div>
             <?php
 
