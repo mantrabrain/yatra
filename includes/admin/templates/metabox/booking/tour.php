@@ -10,12 +10,7 @@
             echo '<div class="yatra-booking-detail-item">';
             ?>
             <div class="yatra-booking-item-summary">
-
-                <div class="yatra-booking-single-field clearfix">
-                    <span class="yatra-admin-head">Booking Date :</span>
-                    <span class="yatra-admin-tail"><?php echo esc_html($meta['booking_date']) ?></span>
-                </div>
-
+                
                 <div class="yatra-booking-single-field clearfix">
                     <span class="yatra-admin-head">Tour :</span>
                     <span class="yatra-admin-tail"><a

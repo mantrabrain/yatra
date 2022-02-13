@@ -607,12 +607,14 @@ if (!function_exists('yatra_customer_smart_tags')) {
 }
 if (!function_exists('yatra_get_date')) {
 
-    function yatra_get_date($date_only = false)
+    function yatra_get_date($date_only = false, $datetime = '')
     {
+
+
         if ($date_only) {
-            return date('Y-m-d');
+            return $datetime == '' ? date('Y-m-d') : date('Y-m-d', strtotime($datetime));
         }
-        return date('Y-m-d H:i:s');
+        return $datetime == '' ? date('Y-m-d H:i:s') : date('Y-m-d H:i:s', strtotime($datetime));
     }
 }
 

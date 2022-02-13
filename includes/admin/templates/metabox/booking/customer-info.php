@@ -23,6 +23,10 @@
                 <span class="yatra-admin-tail"><?php echo isset($customer['country']) ? esc_html(yatra_get_countries($customer['country'])) : 'N/A'; ?></span>
             </div>
             <div class="yatra-booking-single-field clearfix">
+                <span class="yatra-admin-head">Booking Date :</span>
+                <span class="yatra-admin-tail"><?php echo isset($info['booking_date']) ? esc_html(yatra_get_date(false, $info['booking_date'])) : 'N/A'; ?></span>
+            </div>
+            <div class="yatra-booking-single-field clearfix">
                 <span class="yatra-admin-head">Gross Booking Price :</span>
                 <span class="yatra-admin-tail"><?php echo isset($info['total_booking_gross_price']) ? yatra_get_price($currency_symbol, $info['total_booking_gross_price']) : 'N/A'; ?></span>
             </div>
