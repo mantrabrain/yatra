@@ -1,15 +1,15 @@
 #poststuff .yatra-admin-booking-wrap {
     display: flex;
     justify-content: space-between;
-    padding-top:20px;
+    padding-top: 20px;
 
- }
+}
 
 #poststuff .yatra-admin-booking-wrap .yatra-admin-booking-information {
 
     width: 70%;
     float: left;
-    min-height:100px;
+    min-height: 100px;
 
 }
 
@@ -21,14 +21,34 @@
 
 }
 
+#poststuff .yatra-admin-booking-metabox-wrap .yatra-booking-detail-item {
+    padding: 20px 12px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    margin-bottom: 0px;
+    margin-top: -1px;
+}
+
+#poststuff .yatra-admin-booking-wrap .yatra-admin-booking-information .yatra-admin-booking-metabox-wrap {
+    border: none;
+    background: none;
+}
+
+#poststuff .yatra-admin-booking-wrap .yatra-admin-booking-information .yatra-admin-booking-metabox-wrap .yatra-box-data-content {
+    margin: 0;
+    padding: 0;
+}
+
+#poststuff .yatra-admin-booking-wrap .yatra-admin-booking-information .yatra-admin-booking-metabox-wrap .yatra-box-data-head {
+    border: 1px solid #c3c4c7;
+}
+
 #poststuff .yatra-admin-booking-metabox-wrap .heading {
-    font-size: 16px;
-    font-weight: 600;
-    text-transform: uppercase;
+    font-size: 15px;
     background: #f9f9f9;
     width: 100%;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
 
 #poststuff .yatra-booking-item-summary h2,
@@ -77,7 +97,7 @@
 
 #poststuff .yatra-admin-booking-metabox-wrap table th,
 #poststuff .yatra-admin-booking-metabox-wrap table td {
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     padding: 10px;
 }
 

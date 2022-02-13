@@ -120,16 +120,13 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
             echo '<div class="yatra-admin-booking-information">';
 
-            foreach ($yatra_booking_meta as $id => $booking) {
+            yatra_load_admin_template('metabox.booking.tour', array(
+                    'booking_meta' => $yatra_booking_meta,
+                    'meta' => $yatra_booking_meta_params,
+                    'instance' => $this
+                )
+            );
 
-                yatra_load_admin_template('metabox.booking.tour', array(
-                        'booking' => $booking,
-                        'meta' => $yatra_booking_meta_params,
-                        'instance' => $this
-                    )
-                );
-
-            }
             echo '</div>';
             echo '<div class="yatra-admin-customer-information">';
             yatra_load_admin_template('metabox.booking.customer-info', array(

@@ -1,6 +1,6 @@
 <div class="yatra-admin-booking-metabox-wrap postbox">
     <div class="yatra-box-data-head postbox-header">
-        <h2 class="heading"><?php echo __('Customer Info', 'yatra') ?></h2>
+        <h2 class="heading"><?php echo __('Customer Information', 'yatra') ?></h2>
     </div>
     <?php
 
