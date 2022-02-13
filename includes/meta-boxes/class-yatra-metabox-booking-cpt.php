@@ -116,15 +116,31 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
             $yatra_booking_meta = !is_array($yatra_booking_meta) ? array() : $yatra_booking_meta;
 
+            echo '<div class="yatra-admin-booking-wrap">';
+
+            echo '<div class="yatra-admin-booking-information">';
+
             foreach ($yatra_booking_meta as $id => $booking) {
 
                 yatra_load_admin_template('metabox.booking.tour', array(
                         'booking' => $booking,
-                        'meta' => $yatra_booking_meta_params
+                        'meta' => $yatra_booking_meta_params,
+                        'instance' => $this
                     )
                 );
 
             }
+            echo '</div>';
+            echo '<div class="yatra-admin-customer-information">';
+            yatra_load_admin_template('metabox.booking.customer-info', array(
+
+                    'info' => $yatra_booking_meta_params,
+                    'customer' => $yatra_booking_meta_params['yatra_tour_customer_info'] ?? array()
+
+                )
+            );
+            echo '</div>';
+            echo '</div>';
 
         }
 
@@ -247,12 +263,15 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
                     $person = isset($number_of_person[$pricing->getID()]) ? $number_of_person[$pricing->getID()] : '';
 
+                    $regular_price = $pricing->getRegularPrice() == '' ? 'N/A' : yatra_get_price($yatra_currency_symbol, $pricing->getRegularPrice());
+                    $sales_price = $pricing->getSalesPrice() == '' ? 'N/A' : yatra_get_price($yatra_currency_symbol, $pricing->getSalesPrice());
+
                     $this->generate_table_row(
                         $yatra_tour_name,
                         $person,
                         $pricing->getLabel(),
-                        yatra_get_price($yatra_currency_symbol, $pricing->getRegularPrice()),
-                        yatra_get_price($yatra_currency_symbol, $pricing->getSalesPrice()),
+                        $regular_price,
+                        $sales_price,
                         $variable_pricing_per,
                         $variable_group_size,
                         yatra_get_price($yatra_currency_symbol, $total_tour_price),
@@ -266,12 +285,15 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
                 /* @var $yatra_pricing Yatra_Tour_Pricing */
 
+                $regular_price = $yatra_pricing->getRegularPrice() == '' ? 'N/A' : yatra_get_price($yatra_currency_symbol, $yatra_pricing->getRegularPrice());
+                $sales_price = $yatra_pricing->getSalesPrice() == '' ? 'N/A' : yatra_get_price($yatra_currency_symbol, $yatra_pricing->getSalesPrice());
+
                 $this->generate_table_row(
                     $yatra_tour_name,
                     $number_of_person,
                     $yatra_pricing->getLabel(),
-                    yatra_get_price($yatra_currency_symbol, $yatra_pricing->getRegularPrice()),
-                    yatra_get_price($yatra_currency_symbol, $yatra_pricing->getSalesPrice()),
+                    $regular_price,
+                    $sales_price,
                     $yatra_pricing->getPricingPer(),
                     $yatra_pricing->getGroupSize(),
                     yatra_get_price($yatra_currency_symbol, $total_tour_price),

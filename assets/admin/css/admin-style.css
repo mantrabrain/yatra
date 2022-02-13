@@ -458,69 +458,7 @@ ul.mb-selected-gallery-list li img {
     width: 50%;
 }
 
-#yatra_booking_details_metabox table {
-    width: 100%;
-    margin: 0 !important;
-    padding: 0;
-    margin-bottom: 20px;
-    border-collapse: collapse;
 
-}
-
-table.yatra-booking-meta-info th,
-table.yatra-booking-meta-info td,
-table.yatra-booking-meta-customer-info th,
-table.yatra-booking-meta-customer-info td,
-#yatra_booking_details_metabox table td,
-#yatra_booking_details_metabox table th {
-    border: 1px solid #aaa;
-    padding: 10px;
-}
-
-table.yatra-booking-meta-customer-info tr {
-    text-align: center;
-}
-
-table.yatra-booking-meta-info tr,
-#yatra_booking_details_metabox table tr {
-    text-align: center;
-}
-
-
-.yatra-tour-booking-info-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: bold;
-    font-size: 14px;
-    text-transform: uppercase;
-    padding: 10px;
-    background: #606060;
-    color: #fff;
-}
-
-.yatra-tour-booking-info-item h2.tour-name {
-    margin: 0 !important;
-    padding: 0 !important;
-    color: #fff;
-}
-
-.yatra-booking-meta-information h2 {
-    padding-left: 0;
-    font-weight: bold !important;
-    text-transform: uppercase;
-}
-
-.yatra-booking-meta-information th {
-    background: #ddd;
-}
-
-.yatra-booking-meta-information h2 {
-
-    padding-left: 0 !important;
-    margin-top: 20px !important;
-
-}
 
 .yatra-booking-meta-information .yatra-booking-payment-information {
     padding: 5px;

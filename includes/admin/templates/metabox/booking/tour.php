@@ -5,7 +5,7 @@
     <?php $currency_symbol = yatra_get_current_currency_symbol($meta['yatra_currency']); ?>
     <div class="yatra-box-data-content inside">
         <div class="yatra-booking-item-summary">
-            <h2>Summary</h2>
+
             <div class="yatra-booking-single-field clearfix">
                 <span class="yatra-admin-head">Booking Date :</span>
                 <span class="yatra-admin-tail"><?php echo esc_html($meta['booking_date']) ?></span>
@@ -27,22 +27,12 @@
         </div>
         <?php
 
-        /*echo '<pre>';
-        print_r($booking);
-        echo '<hr/>';
-        print_r($meta);
-        echo '</pre>';*/
-        ?>
-        <div class="yatra-booking-item-price-breakdown">
-            <h2>Price Breakdown</h2>
-            <div class="yatra-price-breakdown-base-price"><span class="yatra-admin-head">Traveller Base Price</span><span
-                        class="yatra-admin-tail"><span class="yatra-price-detail">1 x $0</span><span
-                            class="yatra-price">$0.00</span></span>
-            </div>
-            <?php
+        $instance->pricing_header();
 
-            ?>
-        </div>
+        $instance->pricing_item($booking, $booking['yatra_tour_id']);
+
+        $instance->pricing_footer();
+        ?>
     </div>
 </div>
 
