@@ -30,9 +30,9 @@ final class Yatra_Frontend
      *
      * Ensures only one instance of Yatra_Frontend is loaded or can be loaded.
      *
+     * @return Yatra_Frontend - Main instance.
      * @since 1.0.0
      * @static
-     * @return Yatra_Frontend - Main instance.
      */
     public static function instance()
     {
@@ -72,6 +72,7 @@ final class Yatra_Frontend
         include_once YATRA_ABSPATH . 'includes/class-yatra-form-handler.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-assets.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-frontend-tour-tabs.php';
+        include_once YATRA_ABSPATH . 'includes/hooks/yatra-design-hooks.php';
 
 
     }

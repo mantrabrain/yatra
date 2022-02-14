@@ -41,6 +41,7 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
         $sections = array(
             '' => __('CSS Classes', 'yatra'),
             'layouts' => __('Layouts', 'yatra'),
+            'colors' => __('Colors', 'yatra'),
         );
 
         return apply_filters('yatra_get_sections_' . $this->id, $sections);
@@ -104,6 +105,29 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
                 array(
                     'type' => 'sectionend',
                     'id' => 'yatra_templates_options',
+                ),
+
+            );
+
+        } else if ('colors' === $current_section) {
+            $settings = array(
+                array(
+                    'title' => __('Color Settings', 'yatra'),
+                    'type' => 'title',
+                    'desc' => '',
+                    'id' => 'yatra_design_color_options',
+                ),
+                array(
+                    'title' => __('Primary Color', 'yatra'),
+                    'desc' => __('Primary Color of Yatra Plugin', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_design_primary_color',
+                    'type' => 'color',
+                    'default' => ''
+                ),
+                array(
+                    'type' => 'sectionend',
+                    'id' => 'yatra_design_color_options',
                 ),
 
             );
