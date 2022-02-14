@@ -143,6 +143,10 @@ class Yatra_Design_Hooks
             border-bottom-color:<?php echo $primary_color; ?>;
 
         }
+        .yatra-destination-wrap .yatra-destination-item .yatra-item-inner:hover h2.destination-title,
+        .yatra-activity-wrap .yatra-activity-item .yatra-item-inner:hover h2.activity-title{
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, <?php echo $primary_color; ?> 100%)
+        }
         <?php
         return ob_get_clean();
     }
