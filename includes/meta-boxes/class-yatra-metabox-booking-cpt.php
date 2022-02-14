@@ -11,6 +11,16 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
             add_action('save_post', array($this, 'save'));
 
+            add_action('do_meta_boxes', array($this, 'remove_metabox'), 1, 3);
+
+
+        }
+
+        public function remove_metabox($post_type, $context, $post)
+        {
+            if ($this->screen_id === $post_type) {
+                remove_meta_box('postcustom', $post_type, $context);
+            }
         }
 
         function booking_status()
