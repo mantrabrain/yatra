@@ -609,12 +609,14 @@ if (!function_exists('yatra_get_date')) {
 
     function yatra_get_date($date_only = false, $datetime = '')
     {
+        $date_format = 'Y-m-d';
 
+        $time_format = 'Y-m-d H:i:s';
 
         if ($date_only) {
-            return $datetime == '' ? date('Y-m-d') : date('Y-m-d', strtotime($datetime));
+            return $datetime == '' ? date($date_format) : date($date_format, strtotime($datetime));
         }
-        return $datetime == '' ? date('Y-m-d H:i:s') : date('Y-m-d H:i:s', strtotime($datetime));
+        return $datetime == '' ? date($time_format) : date($time_format, strtotime($datetime));
     }
 }
 
