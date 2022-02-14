@@ -99,18 +99,38 @@
 #poststuff .yatra-admin-booking-metabox-wrap table td {
     border: 1px solid #ddd;
     padding: 10px;
+    text-align: center !important;
+}
+
+#poststuff .yatra-admin-booking-metabox-wrap h3 {
+    margin: 0;
+    font-weight: 500;
+}
+
+#poststuff .yatra-admin-booking-metabox-wrap h3 a {
+    font-size: 13px;
+    font-weight: normal;
 }
 
 #poststuff .yatra-admin-booking-metabox-wrap table th {
     background: #f9f9f9;
 }
 
-table.yatra-booking-meta-customer-info tr {
-    text-align: center;
+#poststuff .yatra-admin-booking-metabox-wrap .yatra-booking-meta-item-row {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -moz-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background: #ddd;
+    padding: 10px;
+    border: 1px solid #aaa;
+    font-weight: bold;
 }
-
-table.yatra-booking-meta-info tr,
-#yatra_booking_details_metabox table tr {
-    text-align: center;
-}
-

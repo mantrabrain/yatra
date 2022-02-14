@@ -94,12 +94,10 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
             add_meta_box('yatra_payment_information_metabox', __('Payment Information', 'yatra'), array($this, 'payment_information'), $this->screen_id, 'side');
 
-            add_meta_box('yatra_booking_details_metabox', __('Booking Details', 'yatra'), array($this, 'booking_details'), $this->screen_id, 'normal', 'high');
-
-            add_action('edit_form_after_editor', array($this, 'booking_tour_item'));
+            add_action('edit_form_after_editor', array($this, 'booking_details'));
         }
 
-        public function booking_tour_item($post)
+        public function booking_details($post)
         {
 
             global $post;
@@ -141,74 +139,6 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
 
         }
 
-        // Tab for notice listing and settings
-        public function booking_details($args)
-        {
-
-            $booking_id = $args->ID;
-
-            $yatra_booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
-
-
-            $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
-
-            $yatra_tour_customer_info = isset($yatra_booking_meta_params['yatra_tour_customer_info']) ? $yatra_booking_meta_params['yatra_tour_customer_info'] : array();
-
-            ?>
-            <div class="yatra-booking-meta-information">
-
-                <?php
-
-                $this->tour_info($yatra_booking_meta);
-
-                $this->customer_info($booking_id, $args, $yatra_tour_customer_info, $yatra_booking_meta_params);
-
-                $this->payment_history($booking_id);
-
-
-                ?>
-
-
-            </div>
-            <?php
-
-        }
-
-        public function tour_info($yatra_booking_meta)
-        {
-            $yatra_booking_meta = !is_array($yatra_booking_meta) ? array() : $yatra_booking_meta;
-
-            foreach ($yatra_booking_meta as $id => $booking) {
-
-                echo '<div class="yatra-booking-tour-information">';
-
-                $this->tour_item($booking);
-
-                $this->pricing_header();
-
-                $this->pricing_item($booking, $id);
-
-                $this->pricing_footer();
-
-                do_action('yatra_tour_booking_info_loop', $id, $booking);
-
-                echo '</div>';
-            }
-        }
-
-        public function tour_item($booking)
-        {
-            $booking['yatra_selected_date'] = isset($booking['yatra_selected_date']) ? $booking['yatra_selected_date'] : '';
-            $currency = isset($booking['yatra_currency']) ? $booking['yatra_currency'] : '';
-            $currency_symbol = yatra_get_current_currency_symbol($currency);
-            $total_tour_final_price = !isset($booking['total_tour_final_price']) ? $booking['total_tour_price'] : $booking['total_tour_final_price'];
-            echo '<div class="yatra-tour-booking-info-item">';
-            echo '<h2 class="tour-name">Tour: ' . esc_html($booking['yatra_tour_name']) . '</h2>';
-            echo '<span class="booking-date">Booking Date: ' . esc_html($booking['yatra_selected_date']) . '</span>';
-            echo '<span class="price">Booking Total: ' . esc_html(yatra_get_price($currency_symbol, $total_tour_final_price)) . '</span>';
-            echo '</div>';
-
-        }
 
         public function pricing_header()
         {
@@ -308,118 +238,6 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
             </table>
             <?php
 
-        }
-
-        public function customer_info($booking_id, $args, $yatra_tour_customer_info, $yatra_booking_meta_params)
-        {
-
-
-            $currency = isset($yatra_booking_meta_params['currency']) ? $yatra_booking_meta_params['currency'] : '';
-
-            $currency = isset($yatra_booking_meta_params['yatra_currency']) ? $yatra_booking_meta_params['yatra_currency'] : $currency;
-
-            $currency_symbol = yatra_get_current_currency_symbol($currency);
-
-
-            ?>
-            <h2><?php echo __('Customer Information', 'yatra'); ?></h2>
-            <table class="yatra-booking-meta-customer-info" cellpadding="0" cellspacing="0">
-                <tr>
-                    <th><?php echo __('Fullname', 'yatra'); ?></th>
-                    <th><?php echo __('Email', 'yatra'); ?></th>
-                    <th><?php echo __('Country', 'yatra'); ?></th>
-                    <th><?php echo __('Phone', 'yatra'); ?></th>
-                    <th><?php echo __('Total Gross Price', 'yatra'); ?></th>
-                    <th><?php echo __('Total Net Price', 'yatra'); ?></th>
-                    <th><?php echo __('Booking Code', 'yatra'); ?></th>
-
-                </tr>
-                <?php
-                echo '<tr>';
-
-                $fullname = isset($yatra_tour_customer_info['fullname']) ? $yatra_tour_customer_info['fullname'] : '';
-                $email = isset($yatra_tour_customer_info['email']) ? $yatra_tour_customer_info['email'] : '';
-                $country = isset($yatra_tour_customer_info['country']) ? $yatra_tour_customer_info['country'] : '';
-                $phone_number = isset($yatra_tour_customer_info['phone_number']) ? $yatra_tour_customer_info['phone_number'] : '';
-                $total_gross_booking_price = isset($yatra_booking_meta_params['total_booking_gross_price']) ? $yatra_booking_meta_params['total_booking_gross_price'] : '';
-                $total_net_booking_price = isset($yatra_booking_meta_params['total_booking_net_price']) ? $yatra_booking_meta_params['total_booking_net_price'] : '';
-                $booking_code = isset($yatra_booking_meta_params['booking_code']) ? $yatra_booking_meta_params['booking_code'] : '';
-
-
-                // Fullname
-                echo '<td>';
-
-                echo '<span>' . esc_html($fullname) . '</span>';
-
-                echo '</td>';
-
-                // Email
-                echo '<td>';
-
-                echo '<span>' . esc_html($email) . '</span>';
-
-                echo '</td>';
-
-                // Country
-                echo '<td>';
-
-                if (!empty($country)) {
-                    echo '<span>' . esc_html(yatra_get_countries($country)) . '</span>';
-                }
-
-                echo '</td>';
-
-                // Phone
-                echo '<td>';
-
-                echo '<span>' . esc_html($phone_number) . '</span>';
-
-                echo '</td>';
-
-                // Total Gross Price
-                echo '<td>';
-
-                echo '<span>' . yatra_get_price($currency_symbol, ($total_gross_booking_price)) . '</span>';
-
-                echo '</td>';
-                // Total Net Booking Price
-                echo '<td>';
-
-                echo '<span>' . yatra_get_price($currency_symbol, ($total_net_booking_price)) . '</span>';
-
-                echo '</td>';
-
-                // Booking Code
-                echo '<td>';
-
-                echo '<span>' . esc_html($booking_code) . '</span>';
-
-                echo '</td>';
-
-                echo '<tr>';
-                ?>
-            </table>
-            <div style="clear:both; margin-top:20px;"></div>
-            <?php
-
-
-        }
-
-
-        public function payment_history($booking_id)
-        {
-            $payment_log = get_post_meta($booking_id, 'yatra_payment_message', true);
-            if ($payment_log != '' && !empty($payment_log)) {
-                ?>
-                <h2><?php echo __('Payment Log', 'yatra') ?></h2>
-                <div class="yatra-booking-payment-information">
-                    <p><?php
-                        echo esc_html($payment_log);
-                        ?></p>
-                </div>
-            <?php }
-            ?>
-            <?php
         }
 
         public function generate_table_row(

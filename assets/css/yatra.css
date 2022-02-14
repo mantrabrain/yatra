@@ -2590,10 +2590,11 @@ body.single figure {
   margin-bottom: 10px; }
 
 .yatra-shortcode-wrapper {
-  display: block;
-  width: 100%;
   max-width: 100%;
-  margin: 0 auto; }
+  margin: 0 auto;
+  display: inline-block;
+  width: 100%;
+  min-height: 1px; }
   .yatra-shortcode-wrapper form.yatra-cart-form {
     position: relative; }
     .yatra-shortcode-wrapper form.yatra-cart-form tr.yatra-cart-item td {
@@ -2809,11 +2810,18 @@ body.single figure {
   color: #3e3e3e; }
 
 .yatra-booking-table .yatra-account-booking-item-row-wrap {
-  margin-bottom: 20px; }
+  margin-bottom: 30px; }
 
-.yatra-booking-table .yatra-account-booking-item-row-wrap .tour-title {
+.yatra-booking-table .yatra-account-booking-item-row-wrap .tour-title,
+.yatra-booking-table .yatra-account-booking-item-row-wrap h3 {
   font-weight: bold;
-  font-size: 20px; }
+  font-size: 20px;
+  margin: 0;
+  padding: 0; }
+  .yatra-booking-table .yatra-account-booking-item-row-wrap .tour-title a,
+  .yatra-booking-table .yatra-account-booking-item-row-wrap h3 a {
+    font-size: 16px;
+    font-weight: normal; }
 
 .yatra-booking-table td.booking-status span.booking-status {
   padding: 2px 10px 2px 10px;
@@ -2834,6 +2842,27 @@ body.single figure {
     background: #6b6767; }
   .yatra-booking-table td.booking-status span.booking-status.failed {
     background: #ff0000; }
+
+.yatra-account-booking-details-header {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+     -moz-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: start;
+  -webkit-box-align: center;
+     -moz-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 15px;
+  margin-bottom: 20px; }
+  .yatra-account-booking-details-header h2 {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 25px;
+    font-weight: 600; }
 
 .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway {
   padding: 15px !important;

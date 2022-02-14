@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 $my_booking_columns = apply_filters('yatra_my_account_my_booking_columns', array(
     'booking-id' => __('ID', 'yatra'),
     'booking-code' => __('Booking Code', 'yatra'),
-    'booking-date' => __('Booking Date Time', 'yatra'),
+    'booking-date' => __('Booking Date', 'yatra'),
     'booking-status' => __('Status', 'yatra'),
     'booking-total' => __('Total', 'yatra'),
 //    'booking-actions' => '&nbsp;',
@@ -61,7 +61,7 @@ if ($booking_details) : ?>
                             </a>
 
                         <?php elseif ('booking-date' === $column_id) : ?>
-                            <time datetime="<?php echo esc_attr('date'); ?>"><?php echo esc_html($booking->booking_date); ?></time>
+                            <time title="<?php echo esc_attr(yatra_get_date(false, $booking->booking_date)) ?>" datetime="<?php echo esc_attr('date'); ?>"><?php echo esc_html(yatra_get_date(true, $booking->booking_date)); ?></time>
 
                         <?php elseif ('booking-status' === $column_id) : ?>
                             <?php echo '<span class="booking-status ' . esc_attr(strtolower($booking->booking_status_key)) . '">' . esc_html($booking->booking_status) . '</span>'; ?>

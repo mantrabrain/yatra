@@ -24,11 +24,12 @@ $duration_string = '' != $duration_string ? __('Duration: ', 'yatra') . $duratio
 
 ?>
 <div class="yatra-account-booking-item-row-wrap">
-    <span class="tour-title">
+    <h3 class="tour-title">
         <?php
-        echo '<a target="_blank" href="' . esc_url(get_permalink(absint($id))) . '">' . esc_html($booking['yatra_tour_name']) . '</a>';
+        echo esc_html__('Tour Price', 'yatra');
+        echo ' [ <a target="_blank" href="' . esc_url(get_permalink(absint($id))) . '">' . esc_html($booking['yatra_tour_name']) . '</a> ]';
         ?>
-    </span>
+    </h3>
     <div class="yatra-account-booking-item-row">
 
         <span class="tour-date">
@@ -57,13 +58,13 @@ $duration_string = '' != $duration_string ? __('Duration: ', 'yatra') . $duratio
             <table class="yatra-booking-pricing-table">
                 <thead>
                 <tr>
-                    <th>Number of person</th>
-                    <th>Pricing Label</th>
-                    <th>Regular Price</th>
-                    <th>Sales Price</th>
-                    <th>Price Per</th>
-                    <th>Group Size</th>
-                    <th>Total Price</th>
+                    <th><?php echo esc_html__('Number of person', 'yatra') ?></th>
+                    <th><?php echo esc_html__('Pricing Label', 'yatra') ?></th>
+                    <th><?php echo esc_html__('Regular Price', 'yatra') ?></th>
+                    <th><?php echo esc_html__('Sales Price', 'yatra') ?></th>
+                    <th><?php echo esc_html__('Price Per', 'yatra') ?></th>
+                    <th><?php echo esc_html__('Group Size', 'yatra') ?></th>
+                    <th><?php echo esc_html__('Total Price', 'yatra') ?></th>
                 </tr>
                 </thead>
                 <tbody>

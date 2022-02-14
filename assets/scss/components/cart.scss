@@ -1,8 +1,9 @@
 .yatra-shortcode-wrapper {
-  display: block;
-  width: 100%;
   max-width: 100%;
   margin: 0 auto;
+  display: inline-block;
+  width: 100%;
+  min-height: 1px;
 
   form.yatra-cart-form {
     position: relative;

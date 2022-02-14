@@ -85,13 +85,21 @@
 }
 
 .yatra-booking-table .yatra-account-booking-item-row-wrap {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 
 }
 
-.yatra-booking-table .yatra-account-booking-item-row-wrap .tour-title {
+.yatra-booking-table .yatra-account-booking-item-row-wrap .tour-title,
+.yatra-booking-table .yatra-account-booking-item-row-wrap h3 {
   font-weight: bold;
   font-size: 20px;
+  margin: 0;
+  padding: 0;
+
+  a {
+    font-size: 16px;
+    font-weight: normal;
+  }
 
 }
 
@@ -125,9 +133,28 @@
       background: #6b6767;
 
     }
+
     &.failed {
       background: #ff0000;
 
     }
   }
+}
+
+.yatra-account-booking-details-header {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 25px;
+    font-weight: 600;
+
+
+  }
+
 }
