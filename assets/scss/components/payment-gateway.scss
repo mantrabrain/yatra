@@ -24,6 +24,10 @@
       content: '';
       display: block;
     }
+
+    li {
+      list-style: none;
+    }
   }
 
   h2.yatra-payment-gateway-title:before {

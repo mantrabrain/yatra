@@ -229,8 +229,8 @@
 
 .yatra-info, .yatra-success, .yatra-warning, .yatra-error, .yatra-validation {
   border: 1px solid;
-  margin: 10px 0px;
-  padding: 10px 15px 10px 25px;
+  margin: 10px 0px !important;
+  padding: 10px 15px 10px 25px !important;
   background-repeat: no-repeat;
   background-position: 10px center;
   text-align: left; }
@@ -2489,7 +2489,7 @@ body.single figure {
   display: inline-block;
   position: relative; }
 
-.yatra-tour-enquiry-form-wrap input[type="text"], .yatra-tour-enquiry-form-wrap input[type="number"], .yatra-tour-enquiry-form-wrap input[type="email"], .yatra-tour-enquiry-form-wrap select {
+.yatra-tour-enquiry-form-wrap input[type="text"], .yatra-tour-enquiry-form-wrap input[type="number"], .yatra-tour-enquiry-form-wrap input[type="email"], .yatra-tour-enquiry-form-wrap select, .yatra-tour-enquiry-form-wrap textarea {
   width: 100% !important;
   max-width: 100% !important;
   padding: 10px !important;
@@ -2889,6 +2889,8 @@ body.single figure {
     clear: both;
     content: '';
     display: block; }
+  .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway li {
+    list-style: none; }
 
 .yatra-checkout-page-wrap form.yatra-checkout-form h2.yatra-payment-gateway-title:before {
   clear: both;
