@@ -118,9 +118,13 @@ if (!class_exists('Yatra_Admin_Assets')) {
                 case "yatra-booking":
                     wp_enqueue_style('yatra-booking-meta-css');
                     break;
+                case "tour_page_yatra-settings":
+                    wp_enqueue_script( 'wp-color-picker' );
+                    wp_enqueue_style( 'wp-color-picker' );
+                    break;
 
             }
-          
+
             wp_register_script('yatra-admin-script', YATRA_PLUGIN_URI . '/assets/admin/js/admin-script.js', array(
                 'yatra-select2js', 'jquery', 'yatra-datepicker', 'yatra-swal-js', 'yatra-icopick-js', 'yatra-popper', 'yatra-tippy', 'yatra-daterangepicker'
             ), YATRA_VERSION);

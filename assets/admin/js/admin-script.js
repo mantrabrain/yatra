@@ -231,6 +231,9 @@
                 allowHTML: true,
             });
 
+            $('.yatra-color-picker-container').remove();
+            $('.yatra-colorpicker').wpColorPicker().removeClass('yatra-hide');
+
 
         },
         conditionalVisibility: function () {
