@@ -338,6 +338,9 @@ class Yatra_Core_Tour_Availability
 
         $is_full = ((absint($max_travellers) <= absint($booked_travellers) && $booked_travellers != '' & $max_travellers != '') || ($max_travellers != '' && $max_travellers == 0));
 
+        if ($is_full) {
+            $availability_label = __('Booking Full', 'yatra');
+        }
         $remaining_travellers = $max_travellers == '' && absint($max_travellers) == 0 ? '' : $max_travellers - absint($booked_travellers);
 
         $is_expired = (strtotime($start_date) < strtotime($current_date));
