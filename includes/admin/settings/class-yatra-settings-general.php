@@ -199,6 +199,14 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     'type' => 'text',
                 ),
                 array(
+                    'title' => __('Available Travellers Text', 'yatra'),
+                    'desc' => __('Available Travellers Text on calendar', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_available_travellers_text',
+                    'default' => __('Available Travellers :', 'yatra'),
+                    'type' => 'text',
+                ),
+                array(
                     'title' => __('Attributes Title', 'yatra'),
                     'desc' => __('Title for custom attributes', 'yatra'),
                     'desc_tip' => true,

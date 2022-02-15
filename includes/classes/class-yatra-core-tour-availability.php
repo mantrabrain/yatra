@@ -62,8 +62,7 @@ class Yatra_Core_Tour_Availability
         $this->calendar();
     }
 
-    private
-    function calendar()
+    private function calendar()
     {
         echo '<div  id="yatra-availability-calendar-container">';
         echo '<div class="yatra-availability-calendar-header">';
@@ -330,7 +329,11 @@ class Yatra_Core_Tour_Availability
 
         $is_expired = (strtotime($start_date) < strtotime($current_date));
 
-        $available_seat_string = $remaining_travellers === '' ? '' : "<hr/>Available Travellers: " . $remaining_travellers;
+        $available_traveller_text = get_option('yatra_available_travellers_text', __('Available Travellers :', 'yatra'));
+
+        $available_traveller_text = $available_traveller_text == '' ? __('Available Travellers :', 'yatra') : $available_traveller_text;
+
+        $available_seat_string = $remaining_travellers === '' ? '' : "<hr style='margin:5px 0;padding:0;'/>" . $available_traveller_text . ' ' . $remaining_travellers;
 
         $currency_symbol = yatra_get_current_currency_symbol();
 
@@ -361,7 +364,7 @@ class Yatra_Core_Tour_Availability
                 $response = array(
                     "title" => $title,
                     "start" => $start_date,
-                    "description" => "<strong>{$availability_label}</strong><hr/>{$pricing_label}: {$pricing_string}{$available_seat_string}",
+                    "description" => "<strong>{$availability_label}</strong><hr style='margin:5px 0;padding:0;'/>{$pricing_label}: {$pricing_string}{$available_seat_string}",
                     "is_active" => $is_active,
                     "availability" => $availability,
                     'is_full' => $is_full,
@@ -374,7 +377,7 @@ class Yatra_Core_Tour_Availability
 
                 $title = '';
 
-                $description = "<strong>{$availability_label}</strong><hr/>";
+                $description = "<strong>{$availability_label}</strong><hr style='margin:5px 0;padding:0;'/>";
 
                 /* @var $single_pricing Yatra_Tour_Pricing */
                 foreach ($pricing as $single_pricing) {
