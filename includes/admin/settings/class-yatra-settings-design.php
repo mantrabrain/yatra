@@ -126,6 +126,30 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
                     'default' => ''
                 ),
                 array(
+                    'title' => __('Available For Booking Color', 'yatra'),
+                    'desc' => __('Background Color for Available for Booking', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_available_for_booking_color',
+                    'type' => 'color',
+                    'default' => '#2f582b'
+                ),
+                array(
+                    'title' => __('Available For Enquiry Color', 'yatra'),
+                    'desc' => __('Background Color for Available for Enquiry Only', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_available_for_enquiry_only_color',
+                    'type' => 'color',
+                    'default' => '#008bb5'
+                ),
+                array(
+                    'title' => __('Not Available Color', 'yatra'),
+                    'desc' => __('Background Color for Not available for booking & enquiry', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_not_available_for_booking_enquiry_color',
+                    'type' => 'color',
+                    'default' => '#aaa'
+                ),
+                array(
                     'type' => 'sectionend',
                     'id' => 'yatra_design_color_options',
                 ),
