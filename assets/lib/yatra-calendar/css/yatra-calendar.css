@@ -78,11 +78,12 @@
 
 .yatra-calendar table {
     width: 100% !important;
-    margin: 0!important;
+    margin: 0 !important;
     border-spacing: 0px;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
     table-layout: fixed;
+    border-collapse: separate;
 }
 
 .yatra-calendar thead td, .yatra-calendar thead th {
