@@ -23,6 +23,7 @@
     align-items: center;
     cursor: pointer;
     min-height: 35px;
+    background:#fff!important;
 
     &:focus, &:hover {
       outline: none !important;
@@ -70,7 +71,8 @@
     border-top: 1px solid #aaa !important;
     border-bottom: 1px solid #aaa !important;
     border-radius: 0;
-
+    background: #fff !important;
+    color: #000 !important;
 
     &:focus, &:hover {
       border: none;

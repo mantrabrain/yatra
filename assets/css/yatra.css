@@ -1,21 +1,22 @@
-.yatra-tabs section.yatra-tab-content {
-  background: #f5f5f5; }
-  .yatra-tabs section.yatra-tab-content .tab-inner {
-    background: #fff;
-    padding: 10px 15px;
-    border: 1px solid #ddd; }
-    .yatra-tabs section.yatra-tab-content .tab-inner:focus {
-      outline: none; }
-
-.yatra-tabs > ul {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.yatra-tabs section.yatra-tab-content .tab-inner {
+  background: #fff;
+  padding: 10px 15px;
   border: 1px solid #ddd;
-  font-size: 0;
-  background: #eafffb;
-  border-bottom: none; }
+  color: #000; }
+  .yatra-tabs section.yatra-tab-content .tab-inner:focus {
+    outline: none; }
+
+.yatra-tabs {
+  background: #fff; }
+  .yatra-tabs > ul {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #ddd;
+    font-size: 0;
+    background: #eafffb;
+    border-bottom: none; }
 
 .yatra-tabs > ul .indicator {
   display: block;
@@ -36,7 +37,8 @@
 .yatra-tabs > ul li {
   display: inline-block;
   font-size: 14px;
-  margin-bottom: 0; }
+  margin: 0;
+  padding: 0; }
 
 .yatra-tabs > ul li a {
   display: block;
@@ -178,7 +180,8 @@
         -ms-flex-align: center;
             align-items: center;
     cursor: pointer;
-    min-height: 35px; }
+    min-height: 35px;
+    background: #fff !important; }
     .yatra-nice-input-number .nice-button:focus, .yatra-nice-input-number .nice-button:hover {
       outline: none !important; }
     .yatra-nice-input-number .nice-button:before {
@@ -212,7 +215,9 @@
     font-size: 18px;
     border-top: 1px solid #aaa !important;
     border-bottom: 1px solid #aaa !important;
-    border-radius: 0; }
+    border-radius: 0;
+    background: #fff !important;
+    color: #000 !important; }
     .yatra-nice-input-number input[type="number"]:focus, .yatra-nice-input-number input[type="number"]:hover {
       border: none;
       -webkit-appearance: none;
@@ -468,11 +473,14 @@ del {
   border: 1px solid #ddd;
   padding: 10px;
   margin: 0;
-  font-weight: 400; }
+  margin-top: -1px; }
 
-.yatra-itinerary-list .itinerary-heading .fa, .yatra-itinerary-list .itinerary-heading svg, .yatra-itinerary-list .faq-heading .fa, .yatra-itinerary-list .faq-heading svg, .yatra-faq-list-item .itinerary-heading .fa, .yatra-faq-list-item .itinerary-heading svg, .yatra-faq-list-item .faq-heading .fa, .yatra-faq-list-item .faq-heading svg {
-  float: right;
-  cursor: pointer; }
+.yatra-itinerary-list .itinerary-heading, .yatra-itinerary-list .faq-heading, .yatra-faq-list-item .itinerary-heading, .yatra-faq-list-item .faq-heading {
+  font-size: 20px;
+  font-weight: 500; }
+  .yatra-itinerary-list .itinerary-heading .fa, .yatra-itinerary-list .itinerary-heading svg, .yatra-itinerary-list .faq-heading .fa, .yatra-itinerary-list .faq-heading svg, .yatra-faq-list-item .itinerary-heading .fa, .yatra-faq-list-item .itinerary-heading svg, .yatra-faq-list-item .faq-heading .fa, .yatra-faq-list-item .faq-heading svg {
+    float: right;
+    cursor: pointer; }
 
 .yatra-single-meta-options {
   float: right;

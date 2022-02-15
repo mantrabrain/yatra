@@ -3,6 +3,6 @@
     )) ?><?php echo esc_html($title); ?></h3>
 <div class="overview-section">
     <div class="yatra-tab-section-inner">
-        <?php echo $overview; ?>
+        <?php echo wpautop($overview); ?>
     </div><!-- .yatra-tab-section-inner -->
 </div>

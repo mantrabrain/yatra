@@ -3,12 +3,11 @@
 }
 
 .yatra-tabs section.yatra-tab-content {
-  background: #f5f5f5;
-
   .tab-inner {
     background: #fff;
     padding: 10px 15px;
     border: 1px solid #ddd;
+    color: #000;
 
     &:focus {
       outline: none;
@@ -16,15 +15,20 @@
   }
 }
 
-.yatra-tabs > ul {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border: 1px solid #ddd;
-  font-size: 0;
-  background: #eafffb;
-  border-bottom: none;
+.yatra-tabs {
+  background: #fff;
+
+  & > ul {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #ddd;
+    font-size: 0;
+    background: #eafffb;
+    border-bottom: none;
+  }
+
 }
 
 .yatra-tabs > ul .indicator {
@@ -43,7 +47,8 @@
 .yatra-tabs > ul li {
   display: inline-block;
   font-size: 14px;
-  margin-bottom: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .yatra-tabs > ul li a {

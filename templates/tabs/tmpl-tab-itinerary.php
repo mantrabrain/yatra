@@ -1,4 +1,4 @@
-<h3 class="tab-title"><?php echo  wp_kses($icon, array(
+<h3 class="tab-title"><?php echo wp_kses($icon, array(
         'span' => array('class' => array())
     )) ?><?php echo esc_html($title); ?><span class="icon fa fa-plus"></span></h3>
 <ul class="yatra-list yatra-itinerary-list">
@@ -13,9 +13,11 @@
 
         echo '<div class="yatra-content itinerary-content" style="display: none">';
 
-        echo '<h4 class="itinerary-title">'.esc_html($itinerary_item['itinerary_title']).'</h4>';
+        if ($itinerary_item['itinerary_title'] !== '') {
+            echo '<h4 class="itinerary-title">' . esc_html($itinerary_item['itinerary_title']) . '</h4>';
+        }
 
-        echo '<div class="itinerary-details">'.($itinerary_item['itinerary_details']).'</div>';
+        echo '<div class="itinerary-details">' . wpautop($itinerary_item['itinerary_details']) . '</div>';
 
         echo '</div>';
 
