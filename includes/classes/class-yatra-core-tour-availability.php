@@ -67,11 +67,7 @@ class Yatra_Core_Tour_Availability
         echo '<div  id="yatra-availability-calendar-container">';
         echo '<div class="yatra-availability-calendar-header">';
         echo '<input type="hidden" value="" id="yatra-availability-calendar-tour-id"/>';
-        echo '<ul class="symbol">';
-        echo '<li class="yatra-tippy-tooltip booking" data-tippy-content="Available for booking">For Booking</li>';
-        echo '<li class="yatra-tippy-tooltip enquery" data-tippy-content="Available for enquiry only">For Enquiry Only</li>';
-        echo '<li class="yatra-tippy-tooltip not-available" data-tippy-content="Booking & enquiry not available">Not Available for Booking & Enquiry</li>';
-        echo '</ul>';
+        echo yatra_calendar_booking_indicators();
         echo '</div>';
 
         echo '<div class="yatra-availability-calendar-content-body">';
@@ -319,7 +315,24 @@ class Yatra_Core_Tour_Availability
 
         $booked_travellers = $todayData->getBookedTravellers($start_date);
 
-        $availability_label = yatra_tour_availability_status($availability);
+        $availability_label = '';
+
+        switch ($availability) {
+            case "booking":
+                $availability_label = get_option('yatra_available_for_booking_text', __('Available For Booking', 'yatra'));
+                break;
+            case "enquiry":
+                $availability_label = get_option('yatra_available_for_enquiry_text', __('Available For Enquiry Only', 'yatra'));
+                break;
+            case "none":
+                $availability_label = get_option('yatra_not_available_for_booking_enquiry_text', __('Not Available For Booking & Enquiry', 'yatra'));
+                break;
+            default:
+                break;
+
+        }
+
+        $availability_label = $availability_label == '' ? esc_html(yatra_tour_availability_status($availability)) : esc_html($availability_label);
 
         $pricing = $todayData->getPricing();
 
@@ -333,7 +346,7 @@ class Yatra_Core_Tour_Availability
 
         $available_traveller_text = $available_traveller_text == '' ? __('Available Travellers :', 'yatra') : $available_traveller_text;
 
-        $available_seat_string = $remaining_travellers === '' ? '' : "<hr style='margin:5px 0;padding:0;'/>" . $available_traveller_text . ' ' . $remaining_travellers;
+        $available_seat_string = $remaining_travellers === '' ? '' : "<hr style='border-color:#fff;margin:5px 0;padding:0;'/>" . $available_traveller_text . ' ' . $remaining_travellers;
 
         $currency_symbol = yatra_get_current_currency_symbol();
 
@@ -364,7 +377,7 @@ class Yatra_Core_Tour_Availability
                 $response = array(
                     "title" => $title,
                     "start" => $start_date,
-                    "description" => "<strong>{$availability_label}</strong><hr style='margin:5px 0;padding:0;'/>{$pricing_label}: {$pricing_string}{$available_seat_string}",
+                    "description" => "<strong>{$availability_label}</strong><hr style='border-color:#fff;margin:5px 0;padding:0;'/>{$pricing_label}: {$pricing_string}{$available_seat_string}",
                     "is_active" => $is_active,
                     "availability" => $availability,
                     'is_full' => $is_full,
@@ -377,7 +390,7 @@ class Yatra_Core_Tour_Availability
 
                 $title = '';
 
-                $description = "<strong>{$availability_label}</strong><hr style='margin:5px 0;padding:0;'/>";
+                $description = "<strong>{$availability_label}</strong><hr style='border-color:#fff;margin:5px 0;padding:0;'/>";
 
                 /* @var $single_pricing Yatra_Tour_Pricing */
                 foreach ($pricing as $single_pricing) {

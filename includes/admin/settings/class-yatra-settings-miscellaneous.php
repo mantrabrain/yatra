@@ -123,6 +123,13 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
                 'default' => 'no',
             ),
             array(
+                'title' => __('Show Availability Indicator', 'yatra'),
+                'desc' => __('Show Availability indicator on tour single page', 'yatra'),
+                'id' => 'yatra_show_booking_availability_indicator',
+                'type' => 'checkbox',
+                'default' => 'yes',
+            ),
+            array(
                 'type' => 'sectionend',
                 'id' => 'yatra_miscellaneous_options',
             ),

@@ -435,3 +435,24 @@ if (!function_exists('yatra_terms_agreement')) {
     }
 }
 
+if (!function_exists('yatra_calendar_booking_indicators')) {
+    function yatra_calendar_booking_indicators()
+    {
+        $booking_text = get_option('yatra_available_for_booking_text', __('Available For Booking', 'yatra'));
+        $enquiry_text = get_option('yatra_available_for_enquiry_text', __('Available For Enquiry Only', 'yatra'));
+        $not_available_text = get_option('yatra_not_available_for_booking_enquiry_text', __('Not Available For Booking & Enquiry', 'yatra'));
+        if ($booking_text != '' || $enquiry_text != '' || $not_available_text != '') {
+            echo '<ul class="symbol yatra-calendar-booking-indicator-lists">';
+            if ($booking_text != '') {
+                echo '<li class="yatra-tippy-tooltip booking" data-tippy-content="' . esc_attr($booking_text) . '"><span>' . esc_html($booking_text) . '</span></li>';
+            }
+            if ($enquiry_text != '') {
+                echo '<li class="yatra-tippy-tooltip enquery" data-tippy-content="' . esc_attr($enquiry_text) . '"><span>' . esc_html($enquiry_text) . '</span></li>';
+            }
+            if ($not_available_text != '') {
+                echo '<li class="yatra-tippy-tooltip not-available" data-tippy-content="' . esc_attr($not_available_text) . '"><span>' . esc_html($not_available_text) . '</span></li>';
+            }
+            echo '</ul>';
+        }
+    }
+}

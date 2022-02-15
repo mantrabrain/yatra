@@ -10,8 +10,12 @@
         <input type="hidden" name="yatra_tour_start_date" class="yatra-booking-calendar-choosen-date" readonly
                placeholder="<?php echo __('Please pick the date', 'yatra') ?>"/>
     </div>
-    <div class="yatra-calendar-wrap">
-
+    <div class="yatra-calendar-wrap-container">
+        <div class="yatra-calendar-wrap">
+        </div>
+        <?php if (get_option('yatra_show_booking_availability_indicator', 'yes') === 'yes') { ?>
+            <div class="yatra-booking-calendar-indicator"><?php yatra_calendar_booking_indicators(); ?></div>
+        <?php } ?>
     </div>
     <div class="yatra-tour-booking-pricing-wrap">
         <?php

@@ -69,7 +69,7 @@
     display: flex;
 }
 
-#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li {
+#yatra-availability-calendar-container .yatra-availability-calendar-header .yatra-calendar-booking-indicator-lists li {
     position: relative;
     display: flex;
     justify-content: space-between;
@@ -78,24 +78,24 @@
     text-transform: uppercase;
 }
 
-#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li.active:before {
+#yatra-availability-calendar-container .yatra-availability-calendar-header .yatra-calendar-booking-indicator-lists li.active:before {
 
     background-color: #4cb111;
 }
 
-#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li.booking:before {
+#yatra-availability-calendar-container .yatra-availability-calendar-header .yatra-calendar-booking-indicator-lists li.booking:before {
     background-color: #2f582b;
 }
 
-#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li.enquery:before {
+#yatra-availability-calendar-container .yatra-availability-calendar-header .yatra-calendar-booking-indicator-lists li.enquery:before {
     background-color: #008bb5;
 }
 
-#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li.not-available:before {
+#yatra-availability-calendar-container .yatra-availability-calendar-header .yatra-calendar-booking-indicator-lists li.not-available:before {
     background-color: #aaa;
 }
 
-#yatra-availability-calendar-container .yatra-availability-calendar-header ul.symbol li:before {
+#yatra-availability-calendar-container .yatra-availability-calendar-header .yatra-calendar-booking-indicator-lists li:before {
     content: "";
     display: block;
     width: 50px;
@@ -103,7 +103,6 @@
     background: #ddd;
     margin: 0 10px;
 }
-
 
 
 #yatra-availability-calendar .fc-event .fc-event-title.yatra-availability-enquiry {

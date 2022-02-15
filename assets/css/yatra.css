@@ -2532,7 +2532,9 @@ body.single figure {
       -ms-flex-align: center;
           align-items: center;
   gap: 10px;
-  margin-bottom: 15px; }
+  margin-bottom: 15px;
+  padding-left: 10px;
+  padding-right: 10px; }
   .yatra-tour-enquiry-form-wrap .yatra-privacy-policy-agreement input[type="checkbox"], .yatra-tour-enquiry-form-wrap .yatra-terms-agreement input[type="checkbox"] {
     height: 18px;
     width: 18px; }
@@ -2599,6 +2601,44 @@ body.single figure {
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
   margin-bottom: 10px; }
+
+.yatra-tour-booking-form-section ul.yatra-calendar-booking-indicator-lists {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex; }
+
+.yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li {
+  position: relative;
+  font-weight: normal;
+  font-size: 12px;
+  cursor: pointer;
+  width: 33.33%; }
+  .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li span {
+    display: none; }
+
+.yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.active:before {
+  background-color: #4cb111; }
+
+.yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.booking:before {
+  background-color: #2f582b; }
+
+.yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.enquery:before {
+  background-color: #008bb5; }
+
+.yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.not-available:before {
+  background-color: #aaa; }
+
+.yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li:before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 8px;
+  background: #ddd;
+  margin: 0px; }
+
+.yatra-tour-booking-pricing-wrap {
+  margin-top: 10px; }
 
 .yatra-shortcode-wrapper {
   max-width: 100%;
