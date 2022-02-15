@@ -2400,6 +2400,8 @@ body.single figure {
           -ms-flex: 1;
               flex: 1; }
       #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-price ins {
+        background: none;
+        color: #000;
         font-weight: 500; }
       #yatra-tour-booking-form-fields .yatra-traveller-info-wrap .yatra-traveller-price span {
         display: block;
@@ -2571,7 +2573,8 @@ body.single figure {
       font-weight: 500;
       font-size: 25px;
       text-align: center;
-      margin: 0; }
+      margin: 0;
+      color: #000; }
   .yatra-tour-info-pricing-wrap .tour-info-pricing-content {
     border-top: 1px solid #ddd;
     padding: 20px;

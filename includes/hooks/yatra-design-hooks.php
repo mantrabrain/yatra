@@ -107,7 +107,7 @@ class Yatra_Design_Hooks
 
         $primary_color = esc_attr(get_option('yatra_design_primary_color', '#1abc9c'));
 
-        if ($primary_color == '#1abc9c') {
+        if ($primary_color == '#1abc9c' || is_null($primary_color) || ''===$primary_color) {
 
             return '';
         }
@@ -134,6 +134,9 @@ class Yatra_Design_Hooks
         .yatra-calendar td.active
         {
             background:<?php echo $this->hex2rgba($primary_color, 0.06) ?>;
+        }
+        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-price-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-days-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-price-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-days-slider{
+            background:<?php echo $this->hex2rgba($primary_color, 0.2) ?>;
         }
         .yatra-tour-info-pricing-wrap,
         .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:after, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:after{

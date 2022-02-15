@@ -124,6 +124,8 @@ body.single {
       flex: 1;
 
       ins {
+        background: none;
+        color: #000;
         font-weight: 500;
       }
 
@@ -337,6 +339,7 @@ body.single {
       font-size: 25px;
       text-align: center;
       margin: 0;
+      color: #000;
     }
   }
 
