@@ -167,10 +167,12 @@ class Yatra_Design_Hooks
         if ($booking != '#2f582b' && !is_null($booking) && '' !== $booking) {
 
             ?>
-            .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.booking:before{
+            .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.booking:before,
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-booking:after{
             background-color: <?php echo $booking; ?>;
             }
-            .day.yatra-availability-booking{
+            .day.yatra-availability-booking,
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li{
             border-color: <?php echo $booking; ?>!important;
             }
             <?php
