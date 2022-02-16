@@ -24,7 +24,7 @@
             }, // Callback on month change,
             onBeforeMonthChange: function (month, year) {
             }, // Callback on month change
-            onDateSelect: function (date) {
+            onDateSelect: function (date, el) {
             }, // Callback on date selection
             onEventSelect: function () {
             },              // Callback fired when an event is selected     - see $(this).data('event')
@@ -187,7 +187,7 @@
                 var date = new Date($(this).data('date'));
                 $(this).closest('table').find('td').removeClass('active');
                 $(this).closest('td').addClass('active');
-                plugin.settings.onDateSelect(plugin.formatDate(date));
+                plugin.settings.onDateSelect(plugin.formatDate(date), $(this));
             });
 
 

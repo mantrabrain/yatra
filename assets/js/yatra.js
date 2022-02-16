@@ -155,12 +155,14 @@ window.yatra_global_tour_additional_price = 0;
                 });
 
                 $('body').on('click', '.yatra-calendar-date-listing-item', function () {
+                    if ($(this).hasClass('yatra-availability-none')) {
+                        return;
+                    }
                     var date = $(this).attr('data-date');
                     $(this).closest('ul').find('li').removeClass('active');
                     $(this).addClass('active');
                     $this.onDateSelect(date);
                 })
-                //
 
 
             },
@@ -340,7 +342,13 @@ window.yatra_global_tour_additional_price = 0;
                             allowHTML: true,
                         });
                     },
-                    onDateSelect: function (date) {
+                    onDateSelect: function (date, el) {
+
+                        if ($(el).hasClass('yatra-availability-none')) {
+                            $(el).closest('td').removeClass('active');
+                            return;
+                        }
+
                         _that.onDateSelect(date);
                     },
 

@@ -172,7 +172,7 @@ class Yatra_Design_Hooks
             background-color: <?php echo $booking; ?>;
             }
             .day.yatra-availability-booking,
-            .yatra-calendar-date-listing ul.yatra-calendar-listing li{
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-booking{
             border-color: <?php echo $booking; ?>!important;
             }
             <?php
@@ -180,10 +180,12 @@ class Yatra_Design_Hooks
         if ($enquiry != '#2f582b' && !is_null($enquiry) && '' !== $enquiry) {
 
             ?>
-            .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.enquery:before{
+            .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.enquery:before,
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-enquiry:after{
             background-color: <?php echo $enquiry; ?>;
             }
-            .day.yatra-availability-enquiry{
+            .day.yatra-availability-enquiry,
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-enquiry{
             border-color: <?php echo $enquiry; ?>!important;
             }
             <?php
@@ -191,10 +193,12 @@ class Yatra_Design_Hooks
         if ($not_available != '#aaa' && !is_null($not_available) && '' !== $not_available) {
 
             ?>
-            .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.not-available:before{
+            .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.not-available:before,
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none:after{
             background-color: <?php echo $not_available; ?>;
             }
-            .day.yatra-availability-none{
+            .day.yatra-availability-none,
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none{
             border-color: <?php echo $not_available; ?>!important;
             }
             <?php

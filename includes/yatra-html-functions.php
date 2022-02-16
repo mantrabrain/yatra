@@ -471,7 +471,11 @@ if (!function_exists('yatra_get_calendar_date_listing')) {
 
         foreach ($yatra_available_date_data as $single_date => $date_params) {
 
-            echo '<li data-tippy-content="' . esc_attr($date_params['description']) . '" class="yatra-calendar-date-listing-item yatra-tippy-tooltip yatra-availability-' . esc_attr($date_params['availability']) . '" data-date="' . esc_attr($single_date) . '">';
+            $class = 'yatra-calendar-date-listing-item yatra-tippy-tooltip yatra-availability-' . esc_attr($date_params['availability']);
+
+            $tippy_content = 'data-tippy-content="' . esc_attr($date_params['description']) . '"';
+            
+            echo '<li ' . $tippy_content . ' class="' . esc_attr($class) . '" data-date="' . esc_attr($single_date) . '">';
 
             echo '<span>' . $single_date . '</span>';
 

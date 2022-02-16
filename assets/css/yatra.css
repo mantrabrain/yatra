@@ -2469,7 +2469,8 @@ body.single figure {
 
 .day.yatra-availability-none {
   border: 2px solid #aaa !important;
-  border-bottom: 5px solid #aaa !important; }
+  border-bottom: 5px solid #aaa !important;
+  cursor: not-allowed; }
 
 .yatra-loading {
   position: relative; }
@@ -2666,8 +2667,10 @@ body.single figure {
       background: #2f582b; }
     .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-enquiry:after {
       background: #008bb5; }
-    .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none:after {
-      background: #aaa; }
+    .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none {
+      cursor: not-allowed; }
+      .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none:after {
+        background: #aaa; }
     .yatra-calendar-date-listing ul.yatra-calendar-listing li.active {
       background: #eafffb; }
   .yatra-calendar-date-listing ul.yatra-calendar-listing:after {

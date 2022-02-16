@@ -380,7 +380,7 @@ class Yatra_Core_Tour_Availability
                 $response = array(
                     "title" => $title,
                     "start" => $start_date,
-                    "description" => "<strong>{$availability_label}</strong><hr style='border-color:#fff;margin:5px 0;padding:0;'/>{$pricing_label}: {$pricing_string}{$available_seat_string}",
+                    "description" => $availability === 'none' ? $availability_label : "<strong>{$availability_label}</strong><hr style='border-color:#fff;margin:5px 0;padding:0;'/>{$pricing_label}: {$pricing_string}{$available_seat_string}",
                     "is_active" => $is_active,
                     "availability" => $availability,
                     'is_full' => $is_full,
@@ -421,7 +421,7 @@ class Yatra_Core_Tour_Availability
                     "title" => $title,
                     //"event" => $title,
                     "start" => $start_date,
-                    "description" => $description . $available_seat_string,
+                    "description" => $availability === 'none' ? $availability_label : ($description . $available_seat_string),
                     "is_active" => $is_active,
                     "availability" => $availability,
                     'is_full' => $is_full,

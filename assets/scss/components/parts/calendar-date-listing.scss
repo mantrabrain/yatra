@@ -42,13 +42,13 @@
       }
 
       &.yatra-availability-none {
+        cursor: not-allowed;
 
         &:after {
           background: #aaa;
         }
 
       }
-
       &.active {
         background: #eafffb;
       }
