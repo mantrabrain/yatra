@@ -16,11 +16,12 @@
       float: left;
       padding: 5px 5px;
       background: #fff;
-      margin: 5px;
+      margin: 5px 0;
       cursor: pointer;
       font-size: 14px;
       border: 1px solid #ddd;
       position: relative;
+      width: 25%;
 
       &:after {
         content: "";

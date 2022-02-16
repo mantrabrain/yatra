@@ -2655,11 +2655,12 @@ body.single figure {
     float: left;
     padding: 5px 5px;
     background: #fff;
-    margin: 5px;
+    margin: 5px 0;
     cursor: pointer;
     font-size: 14px;
     border: 1px solid #ddd;
-    position: relative; }
+    position: relative;
+    width: 25%; }
     .yatra-calendar-date-listing ul.yatra-calendar-listing li:after {
       content: "";
       width: 100%;
