@@ -164,6 +164,11 @@ window.yatra_global_tour_additional_price = 0;
                     $this.onDateSelect(date);
                 })
 
+                $('body').on('change', '.yatra-availability-select-year-month', function () {
+                    var value = $(this).val();
+                    $this.calendarMonthChange(value);
+                });
+
 
             },
             initLib: function () {
@@ -443,6 +448,36 @@ window.yatra_global_tour_additional_price = 0;
                         $("#yatra-tour-booking-form").removeClass('yatra-loading');
 
 
+                    }
+                });
+            },
+            calendarMonthChange: function (selected_date) {
+                $.ajax({
+                    type: "POST",
+                    url: yatra_params.ajax_url,
+                    async: false,
+                    data: {
+                        tour_id: $('form#yatra-tour-booking-form-fields').find('input[name="tour_id"]').val(),
+                        selected_date: selected_date,
+                        action: yatra_params.single_tour.availability_month_action,
+                        yatra_nonce: yatra_params.single_tour.availability_month_nonce,
+                        type: 'date_listing'
+                    },
+                    beforeSend: function () {
+                        $("#yatra-tour-booking-form").addClass('yatra-loading');
+                    },
+                    success: function (data) {
+                        if (typeof data.success) {
+                            var content = data.data.content;
+                            $('.yatra-calendar-listing-wrap').html(content);
+
+                        } else {
+                            $('.yatra-calendar-listing-wrap').html('<h2>Somethign went wrong, please try again');
+                        }
+
+                    },
+                    complete: function () {
+                        $("#yatra-tour-booking-form").removeClass('yatra-loading');
                     }
                 });
             }

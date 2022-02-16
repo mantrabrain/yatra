@@ -20,7 +20,7 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
         );
         $posts = get_posts($args);
 
-        
+
         $grid_class = 'yatra-col-sm-6 ';
 
         switch ($columns) {
@@ -232,3 +232,20 @@ if (!function_exists('yatra_get_tour_view_details_button_text')) {
         return get_option('yatra_tour_view_details_button_text', __('View Details', 'yatra'));
     }
 }
+
+if (!function_exists('yatra_is_tour_fixed_departure')) {
+    function yatra_is_tour_fixed_departure($tour_id)
+    {
+        $fixed_departure = (boolean)get_post_meta($tour_id, 'yatra_tour_meta_tour_fixed_departure', true);
+
+        $yatra_tour_availability = yatra_tour_meta_availability_date_ranges($tour_id);
+
+        if (!$fixed_departure || (count($yatra_tour_availability) < 1)) {
+
+            return false;
+
+        }
+        return true;
+    }
+}
+

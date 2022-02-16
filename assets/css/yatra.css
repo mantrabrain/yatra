@@ -2641,6 +2641,10 @@ body.single figure {
 .yatra-tour-booking-pricing-wrap {
   margin-top: 10px; }
 
+.yatra-calendar-date-listing select.yatra-availability-select-year-month {
+  padding: 10px;
+  margin-bottom: 10px; }
+
 .yatra-calendar-date-listing ul.yatra-calendar-listing {
   margin: 0;
   padding: 0;

@@ -37,9 +37,9 @@ abstract class Yatra_Tour_Settings implements Yatra_Tour_Interface
     {
         $ID = $ID == null ? get_the_ID() : $ID;
 
-        $this->isFixedDeparture = (boolean)get_post_meta($ID, 'yatra_tour_meta_tour_fixed_departure', true);
+        $this->isFixedDeparture = yatra_is_tour_fixed_departure($ID);
 
-        $availabilityDateRanges = yatra_maybe_json_decode(get_post_meta($ID, 'yatra_tour_meta_availability_date_ranges', true));
+        $availabilityDateRanges = yatra_tour_meta_availability_date_ranges($ID);
 
         $this->availabilityDateRanges = $availabilityDateRanges;
 

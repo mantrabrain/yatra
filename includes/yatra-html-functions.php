@@ -457,31 +457,106 @@ if (!function_exists('yatra_calendar_booking_indicators')) {
     }
 }
 if (!function_exists('yatra_get_calendar_date_listing')) {
-    function yatra_get_calendar_date_listing()
-    {
-        $date_range = yatra_get_current_month_start_and_end_date();
 
-        $yatra_available_date_data = Yatra_Core_Tour_Availability::get_availability(get_the_ID(), $date_range['start'], $date_range['end'], array(
+    function yatra_get_calendar_date_listing($selected_date = '', $tour_id = null)
+    {
+        $tour_id = $tour_id === null ? get_the_ID() : $tour_id;
+
+        $selected_date_index = $selected_date == '' ? date('Y-n') : date('Y-n', strtotime($selected_date));
+
+        $selected_date_year = date('Y', strtotime($selected_date));
+
+        $selected_date_month = date('n', strtotime($selected_date));
+
+        if ($selected_date === '') {
+
+            $date_range = yatra_get_current_month_start_and_end_date();
+
+            $date_range['end']=date('Y-m-d', strtotime('+1 year'));
+
+        } else {
+            $date_range = array();
+            $month_last_cal_day = date('t', mktime(0, 0, 0, $selected_date_month, 1, $selected_date_year));
+            $date_range['start'] = date('Y-m-d', strtotime($selected_date_year . '-' . $selected_date_month . '-1'));
+            $date_range['end'] = date('Y-m-d', strtotime($selected_date_year . '-' . $selected_date_month . '-' . $month_last_cal_day));
+        }
+
+        $yatra_available_date_data = Yatra_Core_Tour_Availability::get_availability($tour_id, $date_range['start'], $date_range['end'], array(
             'is_expired' => false,
             'is_full' => false
         ), true);
 
 
-        echo '<ul class="yatra-calendar-listing">';
+        $group_by_year_month = array();
 
-        foreach ($yatra_available_date_data as $single_date => $date_params) {
+        $available_data = array();
 
-            $class = 'yatra-calendar-date-listing-item yatra-tippy-tooltip yatra-availability-' . esc_attr($date_params['availability']);
+        foreach ($yatra_available_date_data as $single_date_item => $single_date_params) {
 
-            $tippy_content = 'data-tippy-content="' . esc_attr($date_params['description']) . '"';
-            
-            echo '<li ' . $tippy_content . ' class="' . esc_attr($class) . '" data-date="' . esc_attr($single_date) . '">';
+            $single_date_item_index = date('Y-n', strtotime($single_date_item));
 
-            echo '<span>' . $single_date . '</span>';
-
-            echo '</li>';
+            $group_by_year_month[$single_date_item_index][$single_date_item] = $single_date_params;
         }
-        echo '</ul>';
+
+        $group_by_month_key = array_keys($group_by_year_month);
+
+        if (isset($group_by_year_month[$selected_date_index])) {
+
+            $available_data = $group_by_year_month[$selected_date_index];
+
+        } else if (count($group_by_year_month) > 0 && $selected_date == '') {
+
+            $selected_date_index = $group_by_month_key[0];
+
+            $available_data = $group_by_year_month[$selected_date_index];
+        }
+
+        if (count($available_data) > 0) {
+
+            if ($selected_date === '') {
+
+                echo '<select class="yatra-availability-select-year-month">';
+
+                foreach ($group_by_month_key as $month_year) {
+
+                    echo '<option value="' . esc_attr($month_year) . '">';
+
+                    echo date("F - Y ", strtotime($month_year));
+
+                    echo '</option>';
+
+                }
+
+                echo '</select>';
+            }
+
+        }
+        echo '<div class="yatra-calendar-listing-wrap">';
+
+        if (count($available_data) > 0) {
+
+            echo '<ul class="yatra-calendar-listing" id="yatra-calendar-listing">';
+
+            foreach ($available_data as $single_date => $date_params) {
+
+                $class = 'yatra-calendar-date-listing-item yatra-tippy-tooltip yatra-availability-' . esc_attr($date_params['availability']);
+
+                $tippy_content = 'data-tippy-content="' . esc_attr($date_params['description']) . '"';
+
+                echo '<li ' . $tippy_content . ' class="' . esc_attr($class) . '" data-date="' . esc_attr($single_date) . '">';
+
+                echo '<span>' . $single_date . '</span>';
+
+                echo '</li>';
+            }
+            echo '</ul>';
+
+        } else {
+
+            echo '<h2>' . __('Not available any dates on ', 'yatra') . date('F - Y', strtotime($selected_date_index)) . '</h2>';
+        }
+        echo '</div>';
+
 
     }
 }

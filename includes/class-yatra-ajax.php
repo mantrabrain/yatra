@@ -563,6 +563,23 @@ class Yatra_Ajax
 
         $selected_date = isset($_POST['selected_date']) ? sanitize_text_field($_POST['selected_date']) : '';
 
+        $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : 'calendar';
+
+        $listing_type = get_option('yatra_date_selection_type', 'calendar');
+
+        if ($type === 'date_listing' && $listing_type === $type) {
+
+            ob_start();
+
+            yatra_get_calendar_date_listing($selected_date, $tour_id);
+
+            $content = ob_get_clean();
+
+            wp_send_json_success(array('content' => $content));
+
+            exit;
+        }
+
         $selected_date = new DateTime($selected_date);
 
         $month = $selected_date->format('m');

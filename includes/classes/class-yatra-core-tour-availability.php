@@ -217,11 +217,9 @@ class Yatra_Core_Tour_Availability
     public static function get_availability($tour_id, $start_date, $end_date, $filter_condition = array(), $date_index = false)
     {
 
-        $fixed_departure = (boolean)get_post_meta($tour_id, 'yatra_tour_meta_tour_fixed_departure', true);
-
         $yatra_tour_availability = yatra_tour_meta_availability_date_ranges($tour_id);
 
-        if (!$fixed_departure || (count($yatra_tour_availability) < 1)) {
+        if (!yatra_is_tour_fixed_departure($tour_id)) {
             $start_date = new DateTime($start_date);
             $end_date = new DateTime($end_date);
             $end_date->modify('-1 day');
@@ -234,7 +232,6 @@ class Yatra_Core_Tour_Availability
         }
 
         $all_responses = array();
-
 
         foreach ($yatra_tour_availability as $availability) {
 

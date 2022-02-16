@@ -78,7 +78,7 @@ if (!class_exists('Yatra_Assets')) {
 
             $yatra_available_date_data = array();
 
-            if (is_singular('tour')) {
+            if (is_singular('tour') && get_option('yatra_date_selection_type', 'calendar') === 'calendar') {
                 $date_range = yatra_get_current_month_start_and_end_date();
 
                 $yatra_available_date_data = Yatra_Core_Tour_Availability::get_availability(get_the_ID(), $date_range['start'], $date_range['end'], array(

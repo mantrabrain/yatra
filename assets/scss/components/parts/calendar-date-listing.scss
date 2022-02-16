@@ -1,4 +1,10 @@
 .yatra-calendar-date-listing {
+
+  select.yatra-availability-select-year-month {
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
   ul.yatra-calendar-listing {
     margin: 0;
     padding: 0;
@@ -49,6 +55,7 @@
         }
 
       }
+
       &.active {
         background: #eafffb;
       }
