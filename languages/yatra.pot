@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.7\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-02-15 17:12:22+00:00\n"
+"POT-Creation-Date: 2022-02-16 06:36:15+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1135,6 +1135,24 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-miscellaneous.php:127
 msgid "Show Availability indicator on tour single page"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:133
+msgid "Date Selection Type"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:134
+msgid ""
+"This option allows you to choose date selection type. You can choose either "
+"calendar type or date listing type."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:140
+msgid "Calendar"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-miscellaneous.php:141
+msgid "Date Listing"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
