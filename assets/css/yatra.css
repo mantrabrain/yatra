@@ -2643,7 +2643,8 @@ body.single figure {
 
 .yatra-calendar-date-listing select.yatra-availability-select-year-month {
   padding: 10px;
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+  width: 100%; }
 
 .yatra-calendar-date-listing ul.yatra-calendar-listing {
   margin: 0;
@@ -2666,7 +2667,7 @@ body.single figure {
       height: 4px;
       background: transparent;
       left: 0;
-      bottom: 0; }
+      bottom: -1px; }
     .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-booking:after {
       background: #2f582b; }
     .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-enquiry:after {

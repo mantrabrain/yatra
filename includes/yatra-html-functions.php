@@ -489,7 +489,7 @@ if (!function_exists('yatra_get_calendar_date_listing')) {
             'is_full' => false
         ), true);
 
-     
+
         $group_by_year_month = array();
 
         $available_data = array();
@@ -518,7 +518,7 @@ if (!function_exists('yatra_get_calendar_date_listing')) {
 
             if ($selected_date === '') {
 
-                echo '<select class="yatra-availability-select-year-month">';
+                echo '<select data-tippy-content="' . __('Please select any of the month', 'yatra') . '" class="yatra-availability-select-year-month yatra-tippy-tooltip">';
 
                 foreach ($group_by_month_key as $month_year) {
 
@@ -548,7 +548,7 @@ if (!function_exists('yatra_get_calendar_date_listing')) {
 
                 echo '<li ' . $tippy_content . ' class="' . esc_attr($class) . '" data-date="' . esc_attr($single_date) . '">';
 
-                echo '<span>' . $single_date . '</span>';
+                echo '<span>' . date('Y-m-d', strtotime($single_date)) . '</span>';
 
                 echo '</li>';
             }

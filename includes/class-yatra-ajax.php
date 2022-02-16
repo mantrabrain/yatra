@@ -574,7 +574,7 @@ class Yatra_Ajax
             yatra_get_calendar_date_listing($selected_date, $tour_id);
 
             $content = ob_get_clean();
-
+            
             wp_send_json_success(array('content' => $content));
 
             exit;
