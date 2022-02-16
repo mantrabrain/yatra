@@ -130,6 +130,18 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
                 'default' => 'yes',
             ),
             array(
+                'title' => __('Date Selection Type', 'yatra'),
+                'desc' => __('This option allows you to choose date selection type. You can choose either calendar type or date listing type.', 'yatra'),
+                'desc_tip' => true,
+                'id' => 'yatra_date_selection_type',
+                'type' => 'select',
+                'default' => 'calendar',
+                'options' => array(
+                    'calendar' => __('Calendar', 'yatra'),
+                    'date_listing' => __('Date Listing', 'yatra'),
+                )
+            ),
+            array(
                 'type' => 'sectionend',
                 'id' => 'yatra_miscellaneous_options',
             ),

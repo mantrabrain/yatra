@@ -456,3 +456,28 @@ if (!function_exists('yatra_calendar_booking_indicators')) {
         }
     }
 }
+if (!function_exists('yatra_get_calendar_date_listing')) {
+    function yatra_get_calendar_date_listing()
+    {
+        $date_range = yatra_get_current_month_start_and_end_date();
+
+        $yatra_available_date_data = Yatra_Core_Tour_Availability::get_availability(get_the_ID(), $date_range['start'], $date_range['end'], array(
+            'is_expired' => false,
+            'is_full' => false
+        ), true);
+
+
+        echo '<ul class="yatra-calendar-listing">';
+
+        foreach ($yatra_available_date_data as $single_date => $date_params) {
+
+            echo '<li data-tippy-content="' . esc_attr($date_params['description']) . '" class="yatra-calendar-date-listing-item yatra-tippy-tooltip yatra-availability-' . esc_attr($date_params['availability']) . '" data-date="' . esc_attr($single_date) . '">';
+
+            echo '<span>' . $single_date . '</span>';
+
+            echo '</li>';
+        }
+        echo '</ul>';
+
+    }
+}

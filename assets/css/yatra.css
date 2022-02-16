@@ -2640,6 +2640,40 @@ body.single figure {
 .yatra-tour-booking-pricing-wrap {
   margin-top: 10px; }
 
+.yatra-calendar-date-listing ul.yatra-calendar-listing {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: inline-block; }
+  .yatra-calendar-date-listing ul.yatra-calendar-listing li {
+    float: left;
+    padding: 5px 5px;
+    background: #fff;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    position: relative; }
+    .yatra-calendar-date-listing ul.yatra-calendar-listing li:after {
+      content: "";
+      width: 100%;
+      position: absolute;
+      height: 4px;
+      background: transparent;
+      left: 0;
+      bottom: 0; }
+    .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-booking:after {
+      background: #2f582b; }
+    .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-enquiry:after {
+      background: #008bb5; }
+    .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none:after {
+      background: #aaa; }
+    .yatra-calendar-date-listing ul.yatra-calendar-listing li.active {
+      background: #eafffb; }
+  .yatra-calendar-date-listing ul.yatra-calendar-listing:after {
+    content: "";
+    clear: both; }
+
 .yatra-shortcode-wrapper {
   max-width: 100%;
   margin: 0 auto;

@@ -11,8 +11,18 @@
                placeholder="<?php echo __('Please pick the date', 'yatra') ?>"/>
     </div>
     <div class="yatra-calendar-wrap-container">
-        <div class="yatra-calendar-wrap">
-        </div>
+        <?php if (get_option('yatra_date_selection_type', 'calendar') === 'calendar') { ?>
+            <div class="yatra-calendar-wrap">
+            </div>
+        <?php } else {
+            ?>
+            <div class="yatra-calendar-date-listing">
+                <?php
+                yatra_get_calendar_date_listing();
+                ?>
+            </div>
+            <?php
+        } ?>
         <?php if (get_option('yatra_show_booking_availability_indicator', 'yes') === 'yes') { ?>
             <div class="yatra-booking-calendar-indicator"><?php yatra_calendar_booking_indicators(); ?></div>
         <?php } ?>

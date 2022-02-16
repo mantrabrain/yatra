@@ -153,7 +153,15 @@ window.yatra_global_tour_additional_price = 0;
                     event.preventDefault();
 
                 });
-                
+
+                $('body').on('click', '.yatra-calendar-date-listing-item', function () {
+                    var date = $(this).attr('data-date');
+                    $(this).closest('ul').find('li').removeClass('active');
+                    $(this).addClass('active');
+                    $this.onDateSelect(date);
+                })
+                //
+
 
             },
             initLib: function () {
@@ -333,63 +341,7 @@ window.yatra_global_tour_additional_price = 0;
                         });
                     },
                     onDateSelect: function (date) {
-                        $(".yatra_tour_start_date").find('input').attr('data-selected-date', date).val(date);
-
-                        const date_full = new Date(date);  // 2009-11-10
-                        const month = date_full.toLocaleString('default', {month: 'long'});
-
-                        var date_string = month + ' ' + date_full.getDate() + ', ' + date_full.getFullYear();
-
-                        $('.tour-info-pricing-header').find('h2').html(date_string);
-                        $.ajax({
-                            type: "POST",
-                            url: yatra_params.ajax_url,
-                            data: {
-                                tour_id: $('form#yatra-tour-booking-form-fields').find('input[name="tour_id"]').val(),
-                                selected_date: date,
-                                action: yatra_params.single_tour.availability_action,
-                                yatra_nonce: yatra_params.single_tour.availability_nonce
-                            },
-                            beforeSend: function () {
-                                $("#yatra-tour-booking-form").addClass('yatra-loading');
-                            },
-                            success: function (data) {
-
-                                if (typeof data.success !== undefined) {
-                                    if (data.success) {
-                                        $('.yatra-tour-booking-pricing-wrap').html(data.data);
-
-                                        if (yatra_params.show_enquiry_form === 'no') {
-
-                                            $('#yatra-tour-sidebar-tabs').find('li.yatra-enquiry-form-list').addClass('yatra-hide');
-                                            $('#yatra-tour-enquiry-form.yatra-tab-content ').addClass('yatra-hide');
-                                        }
-
-                                        if ($('.yatra-tour-booking-pricing-wrap').find('button.yatra-enquiry-now-btn').length === 1) {
-
-                                            $('#yatra-tour-sidebar-tabs').find('li.yatra-enquiry-form-list').removeClass('yatra-hide');
-                                            $('#yatra-tour-enquiry-form.yatra-tab-content ').removeClass('yatra-hide');
-
-                                        }
-
-                                        setTimeout(function () {
-                                            tippy('.yatra-tippy-tooltip', {
-                                                allowHTML: true,
-                                            });
-                                        }, 500);
-
-                                    }
-                                }
-
-                            },
-                            complete: function () {
-
-
-                                $("#yatra-tour-booking-form").removeClass('yatra-loading');
-
-
-                            }
-                        });
+                        _that.onDateSelect(date);
                     },
 
                     onBeforeMonthChange: function (month, year) {
@@ -428,6 +380,64 @@ window.yatra_global_tour_additional_price = 0;
                     allowHTML: true,
                 });
             },
+            onDateSelect: function (date) {
+                $(".yatra_tour_start_date").find('input').attr('data-selected-date', date).val(date);
+                const date_full = new Date(date);  // 2009-11-10
+                const month = date_full.toLocaleString('default', {month: 'long'});
+
+                var date_string = month + ' ' + date_full.getDate() + ', ' + date_full.getFullYear();
+
+                $('.tour-info-pricing-header').find('h2').html(date_string);
+                $.ajax({
+                    type: "POST",
+                    url: yatra_params.ajax_url,
+                    data: {
+                        tour_id: $('form#yatra-tour-booking-form-fields').find('input[name="tour_id"]').val(),
+                        selected_date: date,
+                        action: yatra_params.single_tour.availability_action,
+                        yatra_nonce: yatra_params.single_tour.availability_nonce
+                    },
+                    beforeSend: function () {
+                        $("#yatra-tour-booking-form").addClass('yatra-loading');
+                    },
+                    success: function (data) {
+
+                        if (typeof data.success !== undefined) {
+                            if (data.success) {
+                                $('.yatra-tour-booking-pricing-wrap').html(data.data);
+
+                                if (yatra_params.show_enquiry_form === 'no') {
+
+                                    $('#yatra-tour-sidebar-tabs').find('li.yatra-enquiry-form-list').addClass('yatra-hide');
+                                    $('#yatra-tour-enquiry-form.yatra-tab-content ').addClass('yatra-hide');
+                                }
+
+                                if ($('.yatra-tour-booking-pricing-wrap').find('button.yatra-enquiry-now-btn').length === 1) {
+
+                                    $('#yatra-tour-sidebar-tabs').find('li.yatra-enquiry-form-list').removeClass('yatra-hide');
+                                    $('#yatra-tour-enquiry-form.yatra-tab-content ').removeClass('yatra-hide');
+
+                                }
+
+                                setTimeout(function () {
+                                    tippy('.yatra-tippy-tooltip', {
+                                        allowHTML: true,
+                                    });
+                                }, 500);
+
+                            }
+                        }
+
+                    },
+                    complete: function () {
+
+
+                        $("#yatra-tour-booking-form").removeClass('yatra-loading');
+
+
+                    }
+                });
+            }
 
 
         };
