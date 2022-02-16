@@ -472,21 +472,24 @@ if (!function_exists('yatra_get_calendar_date_listing')) {
 
             $date_range = yatra_get_current_month_start_and_end_date();
 
-            $date_range['end']=date('Y-m-d', strtotime('+1 year'));
+            $date_range['end'] = date('Y-m-d', strtotime('+1 year'));
 
         } else {
             $date_range = array();
-            $month_last_cal_day = date('t', mktime(0, 0, 0, $selected_date_month, 1, $selected_date_year));
             $date_range['start'] = date('Y-m-d', strtotime($selected_date_year . '-' . $selected_date_month . '-1'));
-            $date_range['end'] = date('Y-m-d', strtotime($selected_date_year . '-' . $selected_date_month . '-' . $month_last_cal_day));
+            $date_range['end'] = date('Y-m-t', strtotime($selected_date_year . '-' . $selected_date_month));
+            $end_date = new DateTime($date_range['end']);
+            $end_date->modify('+1 day');
+            $date_range['end'] = $end_date->format("Y-m-d");
         }
+
 
         $yatra_available_date_data = Yatra_Core_Tour_Availability::get_availability($tour_id, $date_range['start'], $date_range['end'], array(
             'is_expired' => false,
             'is_full' => false
         ), true);
 
-
+     
         $group_by_year_month = array();
 
         $available_data = array();
