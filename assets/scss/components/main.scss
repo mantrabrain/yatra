@@ -258,6 +258,7 @@ del {
   float: left;
   position: relative;
   padding-top: 25%;
+  margin: 0;
 
   a {
     display: block;
@@ -271,6 +272,7 @@ del {
       height: 100%;
       width: 100%;
       object-fit: cover;
+      border-radius: 4px;
     }
   }
 }

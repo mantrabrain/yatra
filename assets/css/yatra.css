@@ -455,7 +455,8 @@ del {
   width: 25%;
   float: left;
   position: relative;
-  padding-top: 25%; }
+  padding-top: 25%;
+  margin: 0; }
   .yatra-tour-gallery li.yatra-gallery-item a {
     display: block;
     padding: 5px;
@@ -467,7 +468,8 @@ del {
       height: 100%;
       width: 100%;
       -o-object-fit: cover;
-         object-fit: cover; }
+         object-fit: cover;
+      border-radius: 4px; }
 
 .yatra-itinerary-list .itinerary-content, .yatra-itinerary-list .itinerary-heading, .yatra-itinerary-list .faq-content, .yatra-itinerary-list .faq-heading, .yatra-faq-list-item .itinerary-content, .yatra-faq-list-item .itinerary-heading, .yatra-faq-list-item .faq-content, .yatra-faq-list-item .faq-heading {
   border: 1px solid #ddd;
