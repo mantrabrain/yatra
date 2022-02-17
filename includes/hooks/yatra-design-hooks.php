@@ -168,11 +168,11 @@ class Yatra_Design_Hooks
 
             ?>
             .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.booking:before,
-            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-booking:after{
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-booking:after{
             background-color: <?php echo $booking; ?>;
             }
             .day.yatra-availability-booking,
-            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-booking{
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-booking{
             border-color: <?php echo $booking; ?>!important;
             }
             <?php
@@ -181,11 +181,11 @@ class Yatra_Design_Hooks
 
             ?>
             .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.enquery:before,
-            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-enquiry:after{
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-enquiry:after{
             background-color: <?php echo $enquiry; ?>;
             }
             .day.yatra-availability-enquiry,
-            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-enquiry{
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-enquiry{
             border-color: <?php echo $enquiry; ?>!important;
             }
             <?php
@@ -194,11 +194,11 @@ class Yatra_Design_Hooks
 
             ?>
             .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li.not-available:before,
-            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none:after{
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-none:after{
             background-color: <?php echo $not_available; ?>;
             }
             .day.yatra-availability-none,
-            .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none{
+            .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-none{
             border-color: <?php echo $not_available; ?>!important;
             }
             <?php

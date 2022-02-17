@@ -546,9 +546,9 @@ if (!function_exists('yatra_get_calendar_date_listing')) {
 
                 $tippy_content = 'data-tippy-content="' . esc_attr($date_params['description']) . '"';
 
-                echo '<li ' . $tippy_content . ' class="' . esc_attr($class) . '" data-date="' . esc_attr($single_date) . '">';
+                echo '<li>';
 
-                echo '<span>' . date('M d', strtotime($single_date)) . '</span>';
+                echo '<span data-date="' . esc_attr($single_date) . '" ' . $tippy_content . ' class="' . esc_attr($class) . '">' . date('M d', strtotime($single_date)) . '</span>';
 
                 echo '</li>';
             }

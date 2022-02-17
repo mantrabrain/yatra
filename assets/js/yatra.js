@@ -159,7 +159,7 @@ window.yatra_global_tour_additional_price = 0;
                         return;
                     }
                     var date = $(this).attr('data-date');
-                    $(this).closest('ul').find('li').removeClass('active');
+                    $(this).closest('ul').find('li span').removeClass('active');
                     $(this).addClass('active');
                     $this.onDateSelect(date);
                 })

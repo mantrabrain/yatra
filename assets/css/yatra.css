@@ -2644,41 +2644,52 @@ body.single figure {
 .yatra-calendar-date-listing select.yatra-availability-select-year-month {
   padding: 10px;
   margin-bottom: 10px;
-  width: 100%; }
+  width: 100%;
+  font-weight: bold; }
 
 .yatra-calendar-date-listing ul.yatra-calendar-listing {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
   display: inline-block; }
   .yatra-calendar-date-listing ul.yatra-calendar-listing li {
     float: left;
     padding: 5px 5px;
-    background: #fff;
-    margin: 5px 0;
-    cursor: pointer;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    position: relative;
-    width: 25%; }
-    .yatra-calendar-date-listing ul.yatra-calendar-listing li:after {
-      content: "";
+    width: 25%;
+    margin: 0; }
+    .yatra-calendar-date-listing ul.yatra-calendar-listing li span {
+      background: #fff;
+      margin: 0;
+      cursor: pointer;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      position: relative;
+      display: block;
       width: 100%;
-      position: absolute;
-      height: 4px;
-      background: transparent;
-      left: 0;
-      bottom: -1px; }
-    .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-booking:after {
-      background: #2f582b; }
-    .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-enquiry:after {
-      background: #008bb5; }
-    .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none {
-      cursor: not-allowed; }
-      .yatra-calendar-date-listing ul.yatra-calendar-listing li.yatra-availability-none:after {
-        background: #aaa; }
-    .yatra-calendar-date-listing ul.yatra-calendar-listing li.active {
-      background: #eafffb; }
+      text-align: center;
+      padding: 5px 0; }
+      .yatra-calendar-date-listing ul.yatra-calendar-listing li span:after {
+        content: "";
+        width: 100%;
+        position: absolute;
+        height: 4px;
+        background: transparent;
+        left: 0;
+        bottom: -1px; }
+      .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-booking:after {
+        background: #2f582b; }
+      .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-enquiry:after {
+        background: #008bb5; }
+      .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-none {
+        cursor: not-allowed; }
+        .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-none:after {
+          background: #aaa; }
+      .yatra-calendar-date-listing ul.yatra-calendar-listing li span.active {
+        background: #eafffb; }
+    .yatra-calendar-date-listing ul.yatra-calendar-listing li:nth-of-type(4n) {
+      padding-right: 0; }
+    .yatra-calendar-date-listing ul.yatra-calendar-listing li:nth-of-type(4n+1), .yatra-calendar-date-listing ul.yatra-calendar-listing li:first-child {
+      padding-left: 0; }
   .yatra-calendar-date-listing ul.yatra-calendar-listing:after {
     content: "";
     clear: both; }
