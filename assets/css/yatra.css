@@ -2442,6 +2442,7 @@ body.single figure {
          -moz-box-direction: normal;
           -ms-flex-direction: column;
               flex-direction: column;
+      margin-left: -1px;
       padding: 10px; }
       .yatra-tour-attribute-info .yatra-tour-additional-text-number .yatra-attribute-item .attribute-icon {
         font-size: 30px;
@@ -2651,7 +2652,8 @@ body.single figure {
   margin: 0 !important;
   padding: 0 !important;
   list-style: none !important;
-  display: inline-block; }
+  display: inline-block;
+  width: 100%; }
   .yatra-calendar-date-listing ul.yatra-calendar-listing li {
     float: left;
     padding: 5px 5px;
