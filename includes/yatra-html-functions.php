@@ -548,7 +548,7 @@ if (!function_exists('yatra_get_calendar_date_listing')) {
 
                 echo '<li ' . $tippy_content . ' class="' . esc_attr($class) . '" data-date="' . esc_attr($single_date) . '">';
 
-                echo '<span>' . date('Y-m-d', strtotime($single_date)) . '</span>';
+                echo '<span>' . date('M d', strtotime($single_date)) . '</span>';
 
                 echo '</li>';
             }
