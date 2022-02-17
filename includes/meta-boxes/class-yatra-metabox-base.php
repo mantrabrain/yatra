@@ -553,31 +553,44 @@ if (!class_exists('Yatra_Metabox_Base')) {
                                    name="<?php echo esc_attr(($field_key)); ?>"
                                    type="hidden"
                                    value="<?php echo esc_attr($value); ?>" <?php echo $extra_attribute_text; ?>/>
+                        <div class="mb-gallery-add-wrap">
                             <a class="mb-gallery-add" href="#"
                                data-uploader-title="<?php esc_attr_e('Add image(s) to gallery', 'yatra'); ?>"
                                data-uploader-button-text="<?php esc_attr_e('Add image(s)', 'yatra'); ?>"
-                            ><span><?php esc_html_e('Add image(s)', 'yatra'); ?></span></a>
-                            <?php
-                            $gallery_item_array = explode(',', $value);
-                            echo '<ul class="mb-selected-gallery-list">';
-                            if (count($gallery_item_array) > 0) {
-                                //wp_attachment_is_image
+                            >
+                                <img src="<?php echo YATRA_PLUGIN_URI; ?>/assets/images/upload-image.png"/>
+                                <h3><?php echo esc_html__('Drop your file here, or', 'yatra'); ?> <span><?php echo esc_html__('browse', 'yatra'); ?></span></h3>
+                                <p><?php echo esc_html__('Supports: JPG, JPEG, PNG', 'yatra'); ?></p>
+                            </a>
+                        </div>
+                        <?php
+                        $gallery_item_array = explode(',', $value);
+                        echo '<ul class="mb-selected-gallery-list">';
+                        if (count($gallery_item_array) > 0) {
+                            //wp_attachment_is_image
 
-                                for ($i = 0; $i < count($gallery_item_array); $i++) {
-                                    $src = wp_get_attachment_url($gallery_item_array[$i]);
-                                    if (wp_attachment_is_image($gallery_item_array[$i]) && $src) {
+                            for ($i = 0; $i < count($gallery_item_array); $i++) {
+                                $src = wp_get_attachment_url($gallery_item_array[$i]);
+                                if (wp_attachment_is_image($gallery_item_array[$i]) && $src) {
 
-                                        echo '<li data-id="' . absint($gallery_item_array[$i]) . '">';
-                                        echo '<a class="remove dashicons dashicons-trash"></a>';
-                                        echo '<img src="' . esc_url_raw($src) . '"/>';
-                                        echo '</li>';
-                                    }
+                                    echo '<li data-id="' . absint($gallery_item_array[$i]) . '">';
+                                    echo '<div class="image-wrapper">';
+                                    echo '<div class="image-content">';
+                                    echo '<img src="' . esc_url_raw($src) . '" alt="">';
+                                    echo '<div class="image-overlay">';
+                                    echo '<a class="remove dashicons dashicons-trash"></a>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    //echo '<a class="remove dashicons dashicons-trash"></a>';
+                                    echo '</li>';
                                 }
-
-
                             }
-                            echo '</ul>';
-                            ?>
+
+
+                        }
+                        echo '</ul>';
+                        ?>
                         </p>
                     </div>
                     <?php

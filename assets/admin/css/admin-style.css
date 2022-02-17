@@ -358,21 +358,52 @@
     font-weight: 500;
 }
 
+.mb-gallery-add-wrap {
+    width: 100%;
+    display: inline-block;
+}
+
 .mb-gallery-add {
-    width: 225px;
-    height: 160px;
-    border: 4px dotted #074771;
-    padding: 0;
-    /* border-radius: 4px; */
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
-    font-size: 14px;
-    line-height: 30px;
-    color: #1A84EE;
-    background: #fbfbfb;
-    position: relative;
-    margin: 10px auto;
+    text-decoration: none;
+    padding: 10px 0px 20px 0px;
+    background: #FFFFFF;
+    border: 1px dashed #074771;
+    border-radius: 4px;
+}
+
+.mb-gallery-add h3 {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 24px;
+    color: #00073F;
+    margin-bottom: 2px;
+    margin-top: 0;
+}
+
+.mb-gallery-add h3 span {
+    color: #008AFF;
+}
+
+.mb-gallery-add img {
+    width: 76px;
+    height: 76px;
+}
+
+.mb-gallery-add p {
+    margin: 2px 0px 0px 0px;
 }
 
 ul.mb-selected-gallery-list {
@@ -381,30 +412,84 @@ ul.mb-selected-gallery-list {
 }
 
 ul.mb-selected-gallery-list li {
-    width: 160px;
-    display: block;
-    margin: 5px;
-    padding: 5px;
     float: left;
     position: relative;
+    cursor: pointer;
+    width: calc(25% - 15px);
+    margin-bottom: 15px;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+ul.mb-selected-gallery-list li:before {
+    content: "";
+    display: block;
+    padding-top: 100%;
 }
 
 ul.mb-selected-gallery-list li a.remove {
-    position: absolute;
-
-    height: 25px;
-    width: 25px;
-    text-align: center;
-    background: #ffff;
-    border: 1px solid;
+    color: #fff;
     cursor: pointer;
+    width: 13%;
+    height: 13%;
+    min-width: 16px;
+    min-height: 16px;
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+ul.mb-selected-gallery-list li .image-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+ul.mb-selected-gallery-list li .image-content {
+    width: 100%;
+    height: 100%;
+    position: relative;
 }
 
 ul.mb-selected-gallery-list li img {
+    display: block;
     width: 100%;
-    height: 125px;
+    height: 100%;
+    -o-object-fit: cover;
     object-fit: cover;
-    border: 4px solid #bbbbbb;
+    border-radius: 4px;
+}
+
+ul.mb-selected-gallery-list li .image-overlay {
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+    display: none;
+    position: absolute;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    top: 0;
+    left: 0;
+    border-radius: 4px;
+    background: -webkit-gradient(linear, left bottom, left top, from(rgba(0, 7, 63, 0.7)), to(rgba(0, 7, 63, 0.7)));
+    background: -o-linear-gradient(bottom, rgba(0, 7, 63, 0.7), rgba(0, 7, 63, 0.7));
+    background: linear-gradient(
+            0deg, rgba(0, 7, 63, 0.7), rgba(0, 7, 63, 0.7));
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+
+ul.mb-selected-gallery-list li:hover .image-overlay {
+    display: flex;
 }
 
 .mb-tour-attributes-fields {
@@ -457,7 +542,6 @@ ul.mb-selected-gallery-list li img {
 .yatra-tabs > section#tour-attributes {
     width: 50%;
 }
-
 
 
 .yatra-booking-meta-information .yatra-booking-payment-information {

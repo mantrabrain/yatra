@@ -328,7 +328,8 @@
                     var attachment_url = attachment.sizes.full.url;
                     if ($.inArray(attachment_id, previous_selection_array) !== "-1") {
                         previous_selection_array.push(attachment_id);
-                        selected_list_html += ('<li data-id="' + attachment_id + '"><a class="remove dashicons dashicons-trash"></a><img src="' + attachment_url + '"/></li>');
+                        var template = '<div class="image-wrapper"><div class="image-content"><img src="' + attachment_url + '"/><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div>';
+                        selected_list_html += ('<li data-id="' + attachment_id + '">'+template+'</li>');
                     }
 
 
