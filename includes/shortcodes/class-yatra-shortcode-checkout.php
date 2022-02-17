@@ -48,8 +48,6 @@ class Yatra_Shortcode_Checkout
         // Show non-cart errors.
         do_action('yatra_before_checkout_template');
 
-        $checkout = array();
-
         $checkout = yatra_get_session('yatra_tour_cart');
 
         echo '<div class="yatra-checkout-page-wrap">';

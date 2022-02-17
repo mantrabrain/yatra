@@ -28,9 +28,9 @@ function yatra_payment_gateway_test_mode()
     return false;
 }
 
-function yatra_update_payment_status($payment_id, $status, $paid_amount)
+function yatra_update_payment_status($payment_id, $status, $paid_amount, $transaction_id = '')
 {
-    if (!$payment_id || $payment_id < 1) {
+    if (!$payment_id || absint($payment_id) < 1) {
         return;
     }
 
@@ -43,6 +43,10 @@ function yatra_update_payment_status($payment_id, $status, $paid_amount)
     $payment->update_due_amount($payment_id, 0);
 
     $payment->update_status($payment_id, $status);
+
+    if ($status === 'publish') {
+        $payment->update_transaction_id($payment_id, $transaction_id);
+    }
 
     $net_due_amount = $payment->get_net_due_amount($payment_id);
 

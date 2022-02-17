@@ -20,14 +20,12 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
             ),
         );
 
-
         add_action('init', array($this, 'yatra_listen_paypal_ipn'));
         add_action('yatra_payment_checkout_payment_gateway_paypal', array($this, 'process_payment'));
         add_action('yatra_verify_paypal_ipn', array($this, 'yatra_paypal_ipn_process'));
 
 
         parent::__construct($configuration);
-
 
     }
 
@@ -206,7 +204,7 @@ class Yatra_Payment_Gateway_PayPal extends Yatra_Payment_Gateways
             if (!empty($_POST['payment_status']) && $_POST['payment_status'] == 'Completed') {
                 // Update booking status and Payment args.
 
-                yatra_update_payment_status($payment_id, 'publish', $_POST['mc_gross']);
+                yatra_update_payment_status($payment_id, 'publish', $_POST['mc_gross'], $txn_id);
 
                 update_post_meta($payment_id, '_paypal_args', $_POST);
 

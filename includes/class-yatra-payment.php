@@ -40,6 +40,10 @@ class Yatra_Payment
 
         $due_amount = ($total_amount - $paid_amount) > 0 ? ($total_amount - $paid_amount) : 0;
 
+        $all_payment_info = $this->get_all_info($booking_id);
+
+        $installment = is_array($all_payment_info) ? (count($all_payment_info) + 1) : 1;
+
         $post_array = apply_filters('yatra_before_payment_created', array(
             'post_title' => $title,
             'post_content' => '',
@@ -56,7 +60,8 @@ class Yatra_Payment
                 'due_amount' => $due_amount,
                 'payment_type' => 'full',
                 'booking_id' => $booking_id,
-                'installment' => 1
+                'installment' => $installment,
+                'transaction_id' => '',
             )
         ));
 
@@ -94,6 +99,7 @@ class Yatra_Payment
                 'payment_type' => get_post_meta($payment_id, 'payment_type', true),
                 'booking_id' => get_post_meta($payment_id, 'booking_id', true),
                 'installment' => get_post_meta($payment_id, 'installment', true),
+                'transaction_id' => get_post_meta($payment_id, 'transaction_id', true),
                 'status' => $status
             ];
         }
@@ -194,6 +200,11 @@ class Yatra_Payment
         return get_post_status($payment_id);
     }
 
+    public function transaction_id($payment_id)
+    {
+        return get_post_meta($payment_id, 'transaction_id', true);
+    }
+
     public function update_status($payment_id, $status)
     {
         $all_status = $this->payment_statuses();
@@ -205,6 +216,15 @@ class Yatra_Payment
             $arg['post_status'] = $status;
 
             wp_update_post($arg);
+        }
+
+    }
+
+    public function update_transaction_id($payment_id, $transaction_id = '')
+    {
+        if ($transaction_id != '') {
+
+            update_post_meta($payment_id, 'transaction_id', sanitize_text_field($transaction_id));
         }
 
     }
