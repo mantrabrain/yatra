@@ -472,14 +472,13 @@
             var end_date = el.closest('li').attr('data-end-date');
             var selectedDateRanges = this.getSelectedDateRanges(el.closest('.yatra-field-wrap').find('input'));
             var updatedRanges = [];
-            selectedDateRanges.every(function (arr_obj, number) {
+            for (const arr_obj of selectedDateRanges) {
                 var arrStartDate = arr_obj.start;
                 var arrEndDate = arr_obj.end;
                 if (start_date !== arrStartDate && end_date !== arrEndDate) {
                     updatedRanges.push(arr_obj);
                 }
-
-            });
+            }
             var rangesString = JSON.stringify(updatedRanges);
             el.closest('.yatra-field-wrap').find('input').val(rangesString);
         },
