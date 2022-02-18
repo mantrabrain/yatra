@@ -2890,6 +2890,34 @@ body.single figure {
     margin-top: 10px; }
   .yatra-my-account-content .yatra-edit-account-form.edit-account input, .yatra-my-account-content .yatra-edit-account-form.edit-account select, .yatra-my-account-content .yatra-edit-account-form.edit-account textarea {
     width: 100%; }
+  .yatra-my-account-content .yatra-account-payment-status {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+       -moz-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+       -moz-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    gap: 10px; }
+    .yatra-my-account-content .yatra-account-payment-status p {
+      margin: 0;
+      padding: 0; }
+    .yatra-my-account-content .yatra-account-payment-status .yatra-booking-payment-action {
+      line-height: 27px;
+      margin-top: -5px;
+      margin-bottom: -5px;
+      text-align: center;
+      display: inline-block;
+      width: 27px;
+      cursor: pointer;
+      margin-right: 4px;
+      background: #485da1;
+      color: #fff; }
 
 .yatra-booking-table .yatra-account-booking-item-row {
   display: -webkit-box;
@@ -2912,7 +2940,8 @@ body.single figure {
 .yatra-booking-table table, .yatra-booking-table.my_account_booking {
   border-collapse: collapse;
   width: 100%;
-  margin: 0 !important; }
+  margin: 0 !important;
+  text-align: center; }
 
 .yatra-booking-table table th,
 .yatra-booking-table table td {

@@ -7,6 +7,8 @@
 
     foreach ($all_payment_info as $payment_id => $info) {
 
+        $due_amount = $payment->get_net_due_amount($payment_id);
+
         $currency = $info['currency_code'];
 
         $currency_symbol = yatra_get_current_currency_symbol($currency);
@@ -27,7 +29,7 @@
             </p>
             <p class="flex">
                 <label for="yatra_payment_gateway"><strong>Due Amount: </strong></label>
-                <span><?php echo esc_html(yatra_get_price($currency_symbol, $info['due_amount'])) ?></span>
+                <span><?php echo esc_html(yatra_get_price($currency_symbol, $due_amount)) ?></span>
             </p>
             <p class="flex">
                 <label for="yatra_payment_gateway"><strong>Payment Status: </strong></label>

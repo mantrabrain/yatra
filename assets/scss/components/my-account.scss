@@ -3,7 +3,7 @@
   float: left;
 
   ul {
-    list-style: none!important;
+    list-style: none !important;
     margin: 0 !important;
     padding: 0 !important;
 
@@ -56,6 +56,31 @@
       width: 100%;
     }
   }
+
+  .yatra-account-payment-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    p {
+      margin: 0;
+      padding: 0;
+    }
+
+    .yatra-booking-payment-action {
+      line-height: 27px;
+      margin-top: -5px;
+      margin-bottom: -5px;
+      text-align: center;
+      display: inline-block;
+      width: 27px;
+      cursor: pointer;
+      margin-right: 4px;
+      background: #485da1;
+      color: #fff;
+    }
+  }
 }
 
 
@@ -73,6 +98,7 @@
   border-collapse: collapse;
   width: 100%;
   margin: 0 !important;
+  text-align:center;
 }
 
 .yatra-booking-table table th,
