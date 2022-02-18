@@ -29,6 +29,11 @@ if (!function_exists('yatra_get_account_menu_items')) {
                         'label' => __('My Bookings', 'yatra'),
                         'icon' => 'fa fa-file-alt',
 
+                    ),
+                    'payment' => array(
+                        'label' => __('Payment History', 'yatra'),
+                        'icon' => 'fas fa-dollar-sign',
+
                     ))
             ),
         );
@@ -169,27 +174,26 @@ if (!function_exists('yatra_account_bookings')) {
         $booking_id = yatra_get_var($_GET['booking_id'], 0);
 
         $booking_id = absint($booking_id);
-        
+
+        $booking = new Yatra_Tour_Booking();
+
         if (yatra_user_can_modify_booking($booking_id)) {
 
-            $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
+            $yatra_booking_meta = $booking->get_all_booking_details($booking_id);
+
+            $yatra_booking_meta = isset($yatra_booking_meta->yatra_booking_meta) ? $yatra_booking_meta->yatra_booking_meta : array();
 
             yatra_get_template('myaccount/tmpl-booking-details.php',
                 array('yatra_booking_meta' => $yatra_booking_meta)
             );
 
         } else {
-            $booking_array = get_posts(apply_filters('yatra_my_account_my_booking_query', array(
-                'numberposts' => 10,
-                'meta_key' => 'yatra_user_id', // need to replace with customer_id_meta_key
-                'meta_value' => get_current_user_id(), /// need to replace with current user id
-                'post_type' => 'yatra-booking',
-                'post_status' => 'any'
-            )));
+
+            $all_booking_data = $booking->get_all_booking_by_user_id();
 
             $booking_details = array();
 
-            foreach ($booking_array as $booking) {
+            foreach ($all_booking_data as $booking) {
 
                 $yatra_booking = new Yatra_Tour_Booking($booking->ID);
 
@@ -230,6 +234,41 @@ if (!function_exists('yatra_account_bookings')) {
             yatra_get_template('myaccount/tmpl-booking.php', array('booking_details' => $booking_details));
         }
     }
+}
+
+if (!function_exists('yatra_account_payment_history')) {
+
+    /**
+     * My Account navigation template.
+     */
+    function yatra_account_payment_history()
+    {
+
+
+        $booking = new Yatra_Tour_Booking();
+
+        $all_bookings = $booking->get_all_booking_by_user_id();
+
+        $payment_details = array();
+
+        foreach ($all_bookings as $booking) {
+
+            $booking_id = $booking->ID;
+
+            $payment = new Yatra_Payment();
+
+            $all_info = $payment->get_all_info($booking_id, 'any', false);
+
+            foreach ($all_info as $payment_id => $info) {
+                $payment_details[$payment_id] = $info;
+            }
+
+        }
+
+
+        yatra_get_template('myaccount/tmpl-payment-history.php', array('payment_details' => $payment_details));
+    }
+
 }
 
 if (!function_exists('yatra_account_bookings_item')) {

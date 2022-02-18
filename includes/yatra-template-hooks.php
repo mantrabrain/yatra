@@ -4,6 +4,7 @@ add_action('yatra_account_navigation', 'yatra_account_navigation');
 add_action('yatra_account_content', 'yatra_account_content');
 add_action('yatra_account_dashboard_endpoint', 'yatra_account_dashboard');
 add_action('yatra_account_bookings_endpoint', 'yatra_account_bookings');
+add_action('yatra_account_payment_endpoint', 'yatra_account_payment_history');
 add_action('yatra_account_bookings_item_endpoint', 'yatra_account_bookings_item');
 add_action('yatra_account_edit-profile_endpoint', 'yatra_account_edit_profile');
 add_action('yatra_account_change-password_endpoint', 'yatra_account_change_password');

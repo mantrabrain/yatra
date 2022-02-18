@@ -2704,6 +2704,9 @@ body.single figure {
   display: inline-block;
   width: 100%;
   min-height: 1px; }
+  .yatra-shortcode-wrapper:after {
+    content: "";
+    clear: both; }
   .yatra-shortcode-wrapper .yatra_cart_table {
     text-align: center; }
     .yatra-shortcode-wrapper .yatra_cart_table td, .yatra-shortcode-wrapper .yatra_cart_table th {
@@ -2789,10 +2792,6 @@ body.single figure {
 .yatra-checkout-button-wrap {
   text-align: right;
   padding: 15px 0; }
-
-.yatra-shortcode-wrapper {
-  display: block;
-  width: 100%; }
 
 .yatra-checkout-page-wrap form.yatra-checkout-form label {
   display: block;

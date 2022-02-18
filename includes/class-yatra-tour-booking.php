@@ -328,7 +328,25 @@ if (!class_exists('Yatra_Tour_Booking')) {
             return $meta_params['coupon'] ?? array();
         }
 
+        public function get_all_booking_by_user_id($user_id = null)
+        {
+            $user_id = is_null($user_id) ? get_current_user_id() : absint($user_id);
 
+            $updated_bookings = array();
+
+            $all_bookings = get_posts(array(
+                'numberposts' => 10,
+                'meta_key' => 'yatra_user_id', // need to replace with customer_id_meta_key
+                'meta_value' => $user_id, /// need to replace with current user id
+                'post_type' => 'yatra-booking',
+                'post_status' => 'any'
+            ));
+            if (is_wp_error($all_bookings)) {
+
+                return $updated_bookings;
+            }
+            return $all_bookings;
+        }
     }
 
 }

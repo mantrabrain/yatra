@@ -70,7 +70,7 @@ class Yatra_Payment
 
     }
 
-    public function get_all_info($booking_id, $payment_type = 'any')
+    public function get_all_info($booking_id, $payment_type = 'any', $include_booking_details = true)
     {
         $posts = get_posts(array(
             'numberposts' => -1,
@@ -84,13 +84,12 @@ class Yatra_Payment
         $payment_info = array();
         $all_status = $this->payment_statuses();
         foreach ($posts as $post) {
-
+            
             $payment_id = $post->ID;
             $status = $post->post_status;
             $status = $all_status[$status] ?? __('Pending', 'yatra');
             $payment_info[$payment_id] = [
                 'title' => $post->post_title . '[' . $payment_id . ']',
-                'booking_details' => get_post_meta($payment_id, 'booking_details', true),
                 'payment_gateway' => get_post_meta($payment_id, 'payment_gateway', true),
                 'total_amount' => get_post_meta($payment_id, 'total_amount', true),
                 'currency_code' => get_post_meta($payment_id, 'currency_code', true),
@@ -101,8 +100,13 @@ class Yatra_Payment
                 'booking_id' => get_post_meta($payment_id, 'booking_id', true),
                 'installment' => get_post_meta($payment_id, 'installment', true),
                 'transaction_id' => get_post_meta($payment_id, 'transaction_id', true),
-                'status' => $status
+                'status' => $status,
+                'payment_date' => $post->post_date
             ];
+
+            if ($include_booking_details) {
+                $payment_info[$payment_id]['booking_details'] = get_post_meta($payment_id, 'booking_details', true);
+            }
         }
         return $payment_info;
     }
