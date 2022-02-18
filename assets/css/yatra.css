@@ -2816,9 +2816,6 @@ body.single figure {
   border-radius: 3px;
   color: #4a5568; }
 
-.yatra-checkout-page-wrap form.yatra-checkout-form .yatra-checkout-form-fields, .yatra-checkout-page-wrap form.yatra-checkout-form .yatra-checkout-order-table {
-  padding: 10px 0; }
-
 .yatra-checkout-page-wrap form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
   text-align: center; }
 
@@ -2856,6 +2853,17 @@ body.single figure {
       margin-top: 10px; }
     .yatra-checkout-page-wrap .yatra-form .yatra-field-wrap input[type="text"], .yatra-checkout-page-wrap .yatra-form .yatra-field-wrap input[type="password"], .yatra-checkout-page-wrap .yatra-form .yatra-field-wrap input[type="email"] {
       width: 100%; }
+  .yatra-checkout-page-wrap .yatra-form .yatra-checkout-review-tour-book {
+    border: 1px solid #ddd;
+    background: #fff; }
+
+.yatra-checkout-page-wrap .yatra-checkout-login-registration-wrap, .yatra-checkout-page-wrap .yatra-checkout-form-inner {
+  width: 100%;
+  background: #f7fafc;
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-left: 0;
+  margin-right: 0; }
 
 .yatra-my-account-navigation {
   width: 30%;
@@ -3009,7 +3017,7 @@ body.single figure {
 .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway {
   padding: 15px !important;
   list-style: none;
-  background: #f9f9f9;
+  background: #fff;
   margin-left: 0;
   font-size: 18px;
   border: 1px solid #ddd; }

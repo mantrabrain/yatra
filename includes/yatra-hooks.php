@@ -10,21 +10,29 @@ if (!function_exists('yatra_checkout_login_register_fields')) {
     {
 
         if (is_user_logged_in()) {
-
-            echo '<h2>You are already logged in, please proceed to checkout.</h2>';
-
-        } else {
-
-            if (!yatra_enable_guest_checkout()) {
-
-                yatra_get_template('myaccount/tmpl-form-login.php', array());
-
-                echo '<h2>OR</h2>';
-
-                yatra_get_template('myaccount/tmpl-form-registration.php', array());
-
-            }
+            return;
         }
+
+        if (!yatra_enable_guest_checkout()) {
+
+            echo '<div class="yatra-checkout-login-registration-wrap yatra-row">';
+
+            echo '<div class="yatra-col-md-6 yatra-col-xs-12 yatra-checkout-login-wrap">';
+
+            yatra_get_template('myaccount/tmpl-form-login.php', array());
+
+            echo '</div>';
+
+            echo '<div class="yatra-col-md-6 yatra-col-xs-12 yatra-checkout-registration-wrap">';
+
+            yatra_get_template('myaccount/tmpl-form-registration.php', array());
+
+            echo '</div>';
+
+            echo '</div>';
+        }
+
+
     }
 
     add_action('yatra_checkout_before_form', 'yatra_checkout_login_register_fields', 17);

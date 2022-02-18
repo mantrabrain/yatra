@@ -1,4 +1,4 @@
-<h3><?php echo __('Your booking', 'yatra') ?></h3>
+<h3><?php echo __('Booking Summary', 'yatra') ?></h3>
 <div id="tour-book_review" class="yatra-checkout-review-tour-book">
     <table class="yatra-checkout-review-tour-book-table">
         <thead>

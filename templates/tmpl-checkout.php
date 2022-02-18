@@ -10,38 +10,48 @@ if (count($checkout) < 1) {
 do_action('yatra_checkout_before_form');
 
 ?>
-
     <form method="post" class="yatra-form yatra-checkout-form" id="yatra-checkout-form">
 
-        <?php do_action('yatra_checkout_before_form_fields'); ?>
+        <div class="yatra-checkout-form-inner yatra-row">
 
-        <div class="yatra-checkout-form-fields"><?php
+            <?php do_action('yatra_checkout_before_form_fields'); ?>
 
-            do_action('yatra_checkout_form_fields');
+            <div class="yatra-col-md-6 yatra-col-xs-12 yatra-checkout-form-fields"><?php
 
-            ?>
+                do_action('yatra_checkout_form_fields');
+
+                yatra_privacy_agreement('yatra_checkout_show_agree_to_privacy_policy');
+
+                yatra_terms_agreement('yatra_checkout_show_agree_to_terms_policy');
+                ?>
+            </div>
+
+            <?php do_action('yatra_checkout_after_form_fields'); ?>
+
+            <div class="yatra-col-md-6 yatra-col-xs-12 yatra-checkout-order-table">
+                <?php
+
+                yatra()->cart->get_cart_order_table();
+
+                ?>
+
+
+            </div>
         </div>
-
-        <?php do_action('yatra_checkout_after_form_fields'); ?>
-
-        <div class="yatra-checkout-order-table">
+        <p class="yatra-checkout-button-wrap">
             <?php
+            $currency_symbol = yatra_get_current_currency_symbol();
 
-            yatra()->cart->get_cart_order_table();
+            $order_booking_text = get_option('yatra_order_booking_text', 'Order Booking');
 
-            yatra_privacy_agreement('yatra_checkout_show_agree_to_privacy_policy');
-            yatra_terms_agreement('yatra_checkout_show_agree_to_terms_policy');
-            ?>
-            <p class="yatra-checkout-button-wrap">
-                <?php wp_nonce_field('yatra_book_selected_tour_nonce', 'yatra-book-selected-tour-nonce'); ?>
-                <input type="submit" class="yatra-button button yatra_order_submit_button"
-                       name="yatra_order_submit_button"
-                       id="yatra_order_submit_button"
-                       value="<?php echo esc_attr(get_option('yatra_order_booking_text', 'Order Booking')); ?>"/>
-                <input type="hidden" name="action" value="yatra_book_selected_tour_nonce"/>
-            </p>
-
-        </div>
+            wp_nonce_field('yatra_book_selected_tour_nonce', 'yatra-book-selected-tour-nonce'); ?>
+            <input type="submit" class="yatra-button button yatra_order_submit_button"
+                   name="yatra_order_submit_button"
+                   id="yatra_order_submit_button"
+                   data-value="<?php echo esc_attr($order_booking_text); ?>"
+                   value="<?php echo esc_attr($order_booking_text); ?>"/>
+            <input type="hidden" name="action" value="yatra_book_selected_tour_nonce"/>
+        </p>
     </form>
 <?php
 do_action('yatra_checkout_after_form');

@@ -37,9 +37,6 @@
       }
     }
 
-    .yatra-checkout-form-fields, .yatra-checkout-order-table {
-      padding: 10px 0;
-    }
 
     .yatra-checkout-review-tour-book-table {
       text-align: center;
@@ -90,5 +87,19 @@
         width: 100%;
       }
     }
+
+    .yatra-checkout-review-tour-book {
+      border: 1px solid #ddd;
+      background: #fff;
+    }
+  }
+
+  .yatra-checkout-login-registration-wrap, .yatra-checkout-form-inner {
+    width: 100%;
+    background: #f7fafc;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
