@@ -110,16 +110,12 @@ if (!function_exists('yatra_account_navigation')) {
         }
         if ($current_endpoint === "bookings" && isset($_GET['booking_id'])) {
 
-            $current_user_id = get_current_user_id();
             $booking_id = absint($_GET['booking_id']);
 
-            $user_id = get_post_meta($booking_id, 'yatra_user_id', true);
-
-
-            if (absint($user_id) === absint($current_user_id)) {
-
+            if (yatra_user_can_modify_booking($booking_id)) {
                 return;
             }
+
         }
 
 
@@ -173,12 +169,8 @@ if (!function_exists('yatra_account_bookings')) {
         $booking_id = yatra_get_var($_GET['booking_id'], 0);
 
         $booking_id = absint($booking_id);
-
-        $current_user_id = get_current_user_id();
-
-        $user_id = get_post_meta($booking_id, 'yatra_user_id', true);
-
-        if ($booking_id > 0 && $user_id == $current_user_id) {
+        
+        if (yatra_user_can_modify_booking($booking_id)) {
 
             $yatra_booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
 
@@ -212,7 +204,7 @@ if (!function_exists('yatra_account_bookings')) {
                 $total_paid_amount = $payment->get_total_paid_amount($booking->ID);
 
                 $net_total_booking_price = $yatra_booking->get_total(true);
-                $reamining_payment = absint($net_total_booking_price) > absint($total_paid_amount) ? $net_total_booking_price - $total_paid_amount : 0;
+                $remaining_payment = absint($net_total_booking_price) > absint($total_paid_amount) ? $net_total_booking_price - $total_paid_amount : 0;
                 $payment_status_key = $total_paid_amount === $net_total_booking_price ? 'paid' : 'pending';
                 $payment_status = $total_paid_amount === $net_total_booking_price ? __('Paid', 'yatra') : __('Pending', 'yatra');
                 $booking_detail = new stdClass();
@@ -229,8 +221,8 @@ if (!function_exists('yatra_account_bookings')) {
                 $booking_detail->coupon = $booking_meta_params['coupon'] ?? array();
                 $booking_detail->payment_status = $payment_status;
                 $booking_detail->payment_status_key = $payment_status_key;
-                $booking_detail->reamining_payment = $reamining_payment;
-                $booking_detail->make_payment_text = $reamining_payment > 0 ? __('Make payment of ') . yatra_get_price($booking_detail->booking_currency_symbol, $reamining_payment) : '';
+                $booking_detail->remaining_payment = $remaining_payment;
+                $booking_detail->make_payment_text = $remaining_payment > 0 ? __('Make payment of ') . yatra_get_price($booking_detail->booking_currency_symbol, $remaining_payment) : '';
 
                 array_push($booking_details, $booking_detail);
             }

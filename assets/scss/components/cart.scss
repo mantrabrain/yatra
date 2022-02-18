@@ -7,8 +7,13 @@
 
   .yatra_cart_table {
     text-align: center;
-    td.tour-person{
-      text-align:left;
+
+    td, th {
+      text-align: center;
+    }
+
+    td.tour-person {
+      text-align: left;
     }
   }
 

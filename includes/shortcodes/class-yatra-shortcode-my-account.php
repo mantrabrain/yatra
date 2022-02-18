@@ -64,12 +64,8 @@ class Yatra_Shortcode_My_Account
         $current_end_point = isset($_GET['page_type']) ? sanitize_text_field($_GET['page_type']) : '';
 
         $booking_id = isset($_GET['booking_id']) ? absint($_GET['booking_id']) : 0;
-
-        $current_user_id = get_current_user_id();
-
-        $user_id = get_post_meta($booking_id, 'yatra_user_id', true);
-
-        $class = $booking_id > 0 && $current_end_point === 'bookings' && absint($user_id)===absint($current_user_id) ? 'yatra-full-width' : '';
+        
+        $class = $current_end_point === 'bookings' && yatra_user_can_modify_booking($booking_id) ? 'yatra-full-width' : '';
 
         yatra_get_template('myaccount/tmpl-my-account.php',
 

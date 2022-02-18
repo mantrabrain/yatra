@@ -34,12 +34,11 @@ do_action('yatra_checkout_before_form');
                 yatra()->cart->get_cart_order_table();
 
                 ?>
-
-
             </div>
         </div>
         <p class="yatra-checkout-button-wrap">
             <?php
+
             $currency_symbol = yatra_get_current_currency_symbol();
 
             $order_booking_text = get_option('yatra_order_booking_text', 'Order Booking');

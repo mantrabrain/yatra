@@ -48,13 +48,56 @@ class Yatra_Shortcode_Checkout
         // Show non-cart errors.
         do_action('yatra_before_checkout_template');
 
-        $checkout = yatra_get_session('yatra_tour_cart');
+        $booking_id = yatra_get_var($_GET['booking_id'], 0);
 
-        echo '<div class="yatra-checkout-page-wrap">';
+        $booking_id = absint($booking_id);
 
-        yatra_get_template('tmpl-checkout.php', array('checkout' => $checkout));
+        if (yatra_user_can_modify_booking($booking_id)) {
 
-        echo '</div>';
+            $booking = new Yatra_Tour_Booking($booking_id);
+
+            $all_booking_details = $booking->get_all_booking_details($booking_id);
+
+            $net_booking_price = (absint($booking->get_total(true)));
+
+            $payment = new Yatra_Payment();
+
+            $paid = absint($payment->get_total_paid_amount($booking_id));
+
+            if ($net_booking_price <= $paid) {
+
+                echo '<p>Your tour cart is empty. Please select any of the booking first.</p>';
+                return;
+            }
+
+            $remaining_amount = $net_booking_price - $paid;
+
+            echo '<div class="yatra-checkout-page-wrap">';
+
+            yatra_get_template('myaccount/tmpl-user-checkout.php', array(
+
+                    'remaining_amount' => $remaining_amount,
+                    'currency' => $booking->get_currency_code(),
+                    'booking_details' => $all_booking_details->yatra_booking_meta,
+                    'booking_params' => $all_booking_details->yatra_booking_meta_params,
+                    'payment' => $payment->get_all_info($booking_id, 'publish'),
+                    'booking_id' => $booking_id
+
+                )
+            );
+
+            echo '</div>';
+
+        } else {
+
+            $checkout = yatra_get_session('yatra_tour_cart');
+
+            echo '<div class="yatra-checkout-page-wrap">';
+
+            yatra_get_template('tmpl-checkout.php', array('checkout' => $checkout));
+
+            echo '</div>';
+        }
 
     }
 }

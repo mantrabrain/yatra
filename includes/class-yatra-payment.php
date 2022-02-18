@@ -70,14 +70,14 @@ class Yatra_Payment
 
     }
 
-    public function get_all_info($booking_id)
+    public function get_all_info($booking_id, $payment_type = 'any')
     {
         $posts = get_posts(array(
             'numberposts' => -1,
             'meta_key' => 'booking_id',
             'meta_value' => $booking_id,
             'post_type' => 'yatra-payment',
-            'post_status' => 'any'
+            'post_status' => sanitize_text_field($payment_type)
 
         ));
         $payment_info = array();
