@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.7\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-02-16 06:36:15+00:00\n"
+"POT-Creation-Date: 2022-02-18 12:26:04+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -349,7 +349,7 @@ msgid "When you receive a new booking, it will appear here."
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
-#: templates/myaccount/tmpl-booking.php:8
+#: templates/myaccount/tmpl-booking.php:7
 msgid "Booking Code"
 msgstr ""
 
@@ -370,7 +370,7 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:128
 #: includes/admin/templates/license/license.php:16
-#: templates/myaccount/tmpl-booking.php:10
+#: templates/myaccount/tmpl-booking.php:9
 msgid "Status"
 msgstr ""
 
@@ -389,7 +389,7 @@ msgid "Full name"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
-#: templates/myaccount/tmpl-booking.php:11 templates/tmpl-cart-table.php:19
+#: templates/myaccount/tmpl-booking.php:10 templates/tmpl-cart-table.php:19
 #: templates/tmpl-cart-table.php:76 templates/tmpl-cart-table.php:149
 #: templates/tmpl-cart-table.php:151 templates/tmpl-order-table.php:9
 #: templates/tmpl-order-table.php:69
@@ -451,7 +451,6 @@ msgid "Date Created"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:72
-#: templates/myaccount/tmpl-booking.php:7
 msgid "ID"
 msgstr ""
 
@@ -877,8 +876,8 @@ msgid "Available Travellers Text on calendar"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:206
-#: includes/classes/class-yatra-core-tour-availability.php:348
-#: includes/classes/class-yatra-core-tour-availability.php:350
+#: includes/classes/class-yatra-core-tour-availability.php:345
+#: includes/classes/class-yatra-core-tour-availability.php:347
 msgid "Available Travellers :"
 msgstr ""
 
@@ -891,7 +890,7 @@ msgid "Available for Booking Text"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:214
-#: includes/classes/class-yatra-core-tour-availability.php:322
+#: includes/classes/class-yatra-core-tour-availability.php:319
 #: includes/yatra-html-functions.php:441
 msgid "Available For Booking"
 msgstr ""
@@ -905,7 +904,7 @@ msgid "Available for Enquiry Text"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:222
-#: includes/classes/class-yatra-core-tour-availability.php:325
+#: includes/classes/class-yatra-core-tour-availability.php:322
 #: includes/yatra-html-functions.php:442
 msgid "Available For Enquiry Only"
 msgstr ""
@@ -919,7 +918,7 @@ msgid "Not Available for booking & enquiry text"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:230
-#: includes/classes/class-yatra-core-tour-availability.php:328
+#: includes/classes/class-yatra-core-tour-availability.php:325
 #: includes/yatra-html-functions.php:443
 msgid "Not Available For Booking & Enquiry"
 msgstr ""
@@ -1536,7 +1535,7 @@ msgstr ""
 msgid "Net Booking Price :"
 msgstr ""
 
-#: includes/admin/templates/metabox/booking/payment-status.php:15
+#: includes/admin/templates/metabox/booking/payment-status.php:17
 msgid "Payment - #"
 msgstr ""
 
@@ -1624,7 +1623,7 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: includes/class-yatra-ajax.php:58 includes/class-yatra-ajax.php:642
+#: includes/class-yatra-ajax.php:58 includes/class-yatra-ajax.php:659
 msgid "Something wrong, please try again."
 msgstr ""
 
@@ -1648,23 +1647,23 @@ msgstr ""
 msgid "File upload failed. Please try again."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:605
+#: includes/class-yatra-ajax.php:622
 msgid "Enquiry form is disabled by admin."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:619
+#: includes/class-yatra-ajax.php:636
 msgid "Error::Enquiry form is disabled by admin."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:628
+#: includes/class-yatra-ajax.php:645
 msgid "You must have to agree privacy policy."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:632 includes/class-yatra-form-handler.php:94
+#: includes/class-yatra-ajax.php:649 includes/class-yatra-form-handler.php:103
 msgid "You must have to agree terms and conditions."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:644
+#: includes/class-yatra-ajax.php:661
 msgid "Thank you for your query. We will get back to you soon"
 msgstr ""
 
@@ -1818,55 +1817,59 @@ msgstr ""
 msgid "Number of Children"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:69
+#: includes/class-yatra-form-handler.php:50
+msgid "You do not have that much access to make payment."
+msgstr ""
+
+#: includes/class-yatra-form-handler.php:78
 msgid "You must have to login to proceed booking."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:81
+#: includes/class-yatra-form-handler.php:90
 msgid "Empty or invalid email."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:88
+#: includes/class-yatra-form-handler.php:97
 msgid "You must have to agree privacy policy"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:107
+#: includes/class-yatra-form-handler.php:116
 msgid "Please select at least one payment gateway"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:117
+#: includes/class-yatra-form-handler.php:126
 msgid "Can't Process the payment"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:125
+#: includes/class-yatra-form-handler.php:134
 msgid "Invalid payment gateway, please select at least one payment gateway"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:174
+#: includes/class-yatra-form-handler.php:181
 msgid "Something went wrong! Booking could not complete. Please try again later"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:236
+#: includes/class-yatra-form-handler.php:243
 msgid "User profile successfully updated."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:273
+#: includes/class-yatra-form-handler.php:280
 msgid "Old Password doesn't match"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:291
+#: includes/class-yatra-form-handler.php:298
 msgid "Password successfully changed."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:318
+#: includes/class-yatra-form-handler.php:325
 msgid "Username is required."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:381
+#: includes/class-yatra-form-handler.php:388
 msgid "Email or Usrename already exists, please try again.."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:414
+#: includes/class-yatra-form-handler.php:421
 msgid "Something wrong on registration, please check all form fields once."
 msgstr ""
 
@@ -1880,8 +1883,8 @@ msgstr ""
 msgid "%1$s was called with an invalid level \"%2$s\"."
 msgstr ""
 
-#: includes/class-yatra-payment.php:8 includes/class-yatra-payment.php:84
-#: includes/functions.php:307
+#: includes/class-yatra-payment.php:8 includes/class-yatra-payment.php:90
+#: includes/functions.php:307 includes/yatra-template-functions.php:209
 msgid "Pending"
 msgstr ""
 
@@ -1992,41 +1995,41 @@ msgstr ""
 msgid "Coupon applied successfully"
 msgstr ""
 
-#: includes/classes/class-yatra-core-tour-availability.php:342
-#: includes/classes/class-yatra-core-tour-availability.php:376
-#: includes/classes/class-yatra-core-tour-availability.php:418
+#: includes/classes/class-yatra-core-tour-availability.php:339
+#: includes/classes/class-yatra-core-tour-availability.php:373
+#: includes/classes/class-yatra-core-tour-availability.php:415
 msgid "Booking Full"
 msgstr ""
 
-#: includes/classes/class-yatra-core-tour-availability.php:587
+#: includes/classes/class-yatra-core-tour-availability.php:584
 #: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:60
 msgid "Search"
 msgstr ""
 
-#: includes/classes/class-yatra-core-tour-availability.php:647
+#: includes/classes/class-yatra-core-tour-availability.php:644
 #. translators: %s: Number of items.
 msgid "%s item"
 msgid_plural "%s items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/classes/class-yatra-core-tour-availability.php:688
+#: includes/classes/class-yatra-core-tour-availability.php:685
 msgid "First page"
 msgstr ""
 
-#: includes/classes/class-yatra-core-tour-availability.php:699
+#: includes/classes/class-yatra-core-tour-availability.php:696
 msgid "Previous page"
 msgstr ""
 
-#: includes/classes/class-yatra-core-tour-availability.php:706
+#: includes/classes/class-yatra-core-tour-availability.php:703
 msgid "Current Page"
 msgstr ""
 
-#: includes/classes/class-yatra-core-tour-availability.php:722
+#: includes/classes/class-yatra-core-tour-availability.php:719
 msgid "Next page"
 msgstr ""
 
-#: includes/classes/class-yatra-core-tour-availability.php:733
+#: includes/classes/class-yatra-core-tour-availability.php:730
 msgid "Last page"
 msgstr ""
 
@@ -2984,13 +2987,24 @@ msgstr ""
 msgid "This method should not be called before plugins_loaded."
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-base.php:557
+#: includes/meta-boxes/class-yatra-metabox-base.php:558
 msgid "Add image(s) to gallery"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-base.php:558
 #: includes/meta-boxes/class-yatra-metabox-base.php:559
 msgid "Add image(s)"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-base.php:562
+msgid "Drop your file here, or"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-base.php:562
+msgid "browse"
+msgstr ""
+
+#: includes/meta-boxes/class-yatra-metabox-base.php:563
+msgid "Supports: JPG, JPEG, PNG"
 msgstr ""
 
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:105
@@ -4149,8 +4163,8 @@ msgstr ""
 
 #: includes/payment-gateways/booking-only/class-yatra-payment-gateway-booking-only.php:42
 #: includes/payment-gateways/booking-only/class-yatra-payment-gateway-booking-only.php:43
-#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:52
-#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:53
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:50
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:51
 msgid "Label on checkout"
 msgstr ""
 
@@ -4167,19 +4181,19 @@ msgstr ""
 msgid "PayPal Standard"
 msgstr ""
 
-#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:40
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:38
 msgid "PayPal Settings"
 msgstr ""
 
-#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:46
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:44
 msgid "PayPal Email Address"
 msgstr ""
 
-#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:47
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:45
 msgid " Enter your PayPal account's email"
 msgstr ""
 
-#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:56
+#: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:54
 msgid "Paypal Standard"
 msgstr ""
 
@@ -4699,6 +4713,14 @@ msgstr ""
 msgid "Terms and conditions page is not setup properly."
 msgstr ""
 
+#: includes/yatra-html-functions.php:521
+msgid "Please select any of the month"
+msgstr ""
+
+#: includes/yatra-html-functions.php:559
+msgid "Not available any dates on "
+msgstr ""
+
 #: includes/yatra-misc-functions.php:232
 msgid "View Details"
 msgstr ""
@@ -4721,15 +4743,23 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:528
+#: includes/yatra-template-functions.php:209
+msgid "Paid"
+msgstr ""
+
+#: includes/yatra-template-functions.php:225
+msgid "Make payment of "
+msgstr ""
+
+#: includes/yatra-template-functions.php:538
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:529
+#: includes/yatra-template-functions.php:539
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:530
+#: includes/yatra-template-functions.php:540
 msgid "Not Available"
 msgstr ""
 
@@ -4749,15 +4779,19 @@ msgstr ""
 msgid "Number of person"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:9
+#: templates/myaccount/tmpl-booking.php:8
 msgid "Booking Date"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:18
+#: templates/myaccount/tmpl-booking.php:11
+msgid "Payment Status"
+msgstr ""
+
+#: templates/myaccount/tmpl-booking.php:17
 msgid "Recent Bookings"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:72
+#: templates/myaccount/tmpl-booking.php:76
 #. translators: 1: formatted booking total 2: total booking items
 msgid "%1$s for %2$s tour"
 msgid_plural "%1$s for %2$s tours"
@@ -4804,6 +4838,10 @@ msgstr ""
 #: templates/myaccount/tmpl-navigation.php:50
 #: templates/myaccount/tmpl-navigation.php:54
 msgid "Signout"
+msgstr ""
+
+#: templates/myaccount/tmpl-user-checkout.php:114
+msgid "Make Payment "
 msgstr ""
 
 #: templates/parts/content-none.php:16
@@ -4865,7 +4903,7 @@ msgid "[Remove]"
 msgstr ""
 
 #: templates/tmpl-order-table.php:1
-msgid "Your booking"
+msgid "Booking Summary"
 msgstr ""
 
 #: templates/tmpl-order-table.php:8
@@ -4936,7 +4974,7 @@ msgctxt "slug"
 msgid "attributes"
 msgstr ""
 
-#: includes/classes/class-yatra-core-tour-availability.php:711
+#: includes/classes/class-yatra-core-tour-availability.php:708
 #. translators: 1: Current page, 2: Total pages.
 msgctxt "paging"
 msgid "%1$s of %2$s"
@@ -5024,7 +5062,7 @@ msgctxt "post"
 msgid "Featured"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:49
+#: templates/myaccount/tmpl-booking.php:52
 msgctxt "hash before booking number"
 msgid "#"
 msgstr ""
