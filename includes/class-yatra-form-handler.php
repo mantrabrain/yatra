@@ -42,6 +42,15 @@ class Yatra_Form_Handler
             return;
         }
 
+        // Booking ID // If this is remaining payment from user ( that is already logegd in )
+        $user_booking_id = isset($_POST['booking_id']) ? absint($_POST['booking_id']) : 0;
+
+        if ($user_booking_id > 0 && !yatra_user_can_modify_booking($user_booking_id)) {
+
+            yatra()->yatra_error->add('yatra_booking_errors', __('You do not have that much access to make payment.', 'yatra'));
+
+            return;
+        }
         $valid_data = array();
 
         if (is_user_logged_in()) {
@@ -102,7 +111,7 @@ class Yatra_Form_Handler
 
         $cart_total = floatval(yatra()->cart->get_cart_total(true));
 
-        if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && count($yatra_get_active_payment_gateways) > 0 && $cart_total > 0) {
+        if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && count($yatra_get_active_payment_gateways) > 0 && ($cart_total > 0 || $user_booking_id > 0)) {
 
             yatra()->yatra_error->add('yatra_booking_errors', __('Please select at least one payment gateway', 'yatra'));
 
@@ -129,9 +138,7 @@ class Yatra_Form_Handler
 
         $yatra_booking = new Yatra_Tour_Booking();
 
-        $booking_id = (int)$yatra_booking->book($valid_data);
-
-        update_post_meta($booking_id, 'yatra_selected_payment_gateway', $payment_gateway_id);
+        $booking_id = $user_booking_id > 0 ? $user_booking_id : (int)$yatra_booking->book($valid_data);
 
         $yatra_new_booking = new Yatra_Tour_Booking($booking_id);
 
@@ -212,7 +219,7 @@ class Yatra_Form_Handler
         $valid_form_data = Yatra_User_Form::get_instance()->get_data($_POST);
 
         $user_custom_meta_keys = Yatra_User_Form::get_instance()->default_field_keys();
-        
+
         // New user data.
         $user = new stdClass();
         $user->ID = $user_id;

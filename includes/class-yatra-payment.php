@@ -56,7 +56,7 @@ class Yatra_Payment
                 'total_amount' => $total_amount,
                 'currency_code' => $booking_details->get_currency_code(),
                 'paid_amount' => $paid_amount,
-                'payable_amount' => $total_amount,
+                'payable_amount' => $due_amount,
                 'due_amount' => $due_amount,
                 'payment_type' => 'full',
                 'booking_id' => $booking_id,
@@ -77,7 +77,8 @@ class Yatra_Payment
             'meta_key' => 'booking_id',
             'meta_value' => $booking_id,
             'post_type' => 'yatra-payment',
-            'post_status' => sanitize_text_field($payment_type)
+            'post_status' => sanitize_text_field($payment_type),
+            'order' => 'ASC',
 
         ));
         $payment_info = array();

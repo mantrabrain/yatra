@@ -38,7 +38,9 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
                         </tr>
                         </thead>
                         <tbody>
-                        <?php foreach ($booking_details as $booking) { ?>
+                        <?php foreach ($booking_details as $booking) {
+                        $number_of_person = is_array($booking['number_of_person']) ? count($booking['number_of_person']): absint($booking['number_of_person']);
+                            ?>
                             <tr class="cart_item">
                                 <td class="tour-name">
                                     <a target="_blank" href="<?php echo get_permalink($booking['yatra_tour_id']) ?>"
@@ -46,7 +48,7 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
                                 </td>
                                 <td><span><?php echo esc_html($booking['yatra_selected_date']); ?></span></td>
 
-                                <td><span><?php echo count($booking['number_of_person']) ?></span>
+                                <td><span><?php echo $number_of_person ?></span>
                                 </td>
                                 <td class="tour-total">
                                     <span class="yatra-Price-amount amount"><?php echo yatra_get_price($currency_symbol, $booking['total_tour_final_price']) ?></span>
