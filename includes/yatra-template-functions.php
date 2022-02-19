@@ -297,9 +297,7 @@ if (!function_exists('yatra_account_booking_payment_history')) {
         $booking_id = yatra_get_var($_GET['booking_id'], 0);
 
         $booking_id = absint($booking_id);
-
-        $booking = new Yatra_Tour_Booking();
-
+        
         if (!yatra_user_can_modify_booking($booking_id)) {
 
             return;
@@ -309,7 +307,7 @@ if (!function_exists('yatra_account_booking_payment_history')) {
 
         $all_info = $payment->get_all_info($booking_id, 'any', false);
 
- 
+
         yatra_get_template('myaccount/tmpl-payment-history.php', array('payment_details' => $all_info));
 
 
