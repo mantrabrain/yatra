@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$my_booking_columns = apply_filters('yatra_my_account_payment_history_columns', array(
+$payment_history_columns = apply_filters('yatra_my_account_payment_history_columns', array(
     'payment_id' => __('Payment ID', 'yatra'),
     'payment_gateway' => __('Gateway', 'yatra'),
     'date' => __('Date', 'yatra'),
