@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$my_booking_columns = apply_filters('yatra_my_account_payment_history_columns', array(
+$payment_history_columns = apply_filters('yatra_my_account_payment_history_columns', array(
     'payment_id' => __('ID', 'yatra'),
     'payment_gateway' => __('Gateway', 'yatra'),
     'date' => __('Date', 'yatra'),
@@ -12,16 +12,20 @@ $my_booking_columns = apply_filters('yatra_my_account_payment_history_columns', 
     'status' => __('Payment Status', 'yatra')
 ));
 
+if (count($payment_details) < 1) {
+    echo '<h2>You haven\'t made any payment yet.</h2>';
+    return;
+}
 
 if ($payment_details) : ?>
 
     <h2><?php echo apply_filters('yatra_my_account_my_payment_history_title', __('Payment History', 'yatra')); ?></h2>
 
-    <table class="yatra-booking-table my_account_booking">
+    <table class="yatra-booking-table payment-history-table">
 
         <thead>
         <tr>
-            <?php foreach ($my_booking_columns as $column_id => $column_name) : ?>
+            <?php foreach ($payment_history_columns as $column_id => $column_name) : ?>
                 <th class="<?php echo esc_attr($column_id); ?>"><span
                             class="nobr"><?php echo esc_html($column_name); ?></span></th>
             <?php endforeach; ?>
@@ -39,7 +43,7 @@ if ($payment_details) : ?>
             ), yatra_get_checkout_page(true));
             ?>
             <tr class="booking">
-                <?php foreach ($my_booking_columns as $column_id => $column_name) : ?>
+                <?php foreach ($payment_history_columns as $column_id => $column_name) : ?>
                     <td class="<?php echo esc_attr($column_id); ?>" data-title="<?php echo esc_attr($column_name); ?>">
                         <?php if (has_action('yatra_my_account_payment_history_column_' . $column_id)) : ?>
                             <?php do_action('yatra_my_account_payment_history_column_' . $column_id, $booking); ?>

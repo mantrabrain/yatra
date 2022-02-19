@@ -11,7 +11,10 @@ $my_booking_columns = apply_filters('yatra_my_account_my_booking_columns', array
     'payment-status' => __('Payment Status', 'yatra')
 ));
 
-
+if (count($booking_details) < 1) {
+    echo '<h2>You haven\'t made any booking yet.</h2>';
+    return;
+}
 if ($booking_details) : ?>
 
     <h2><?php echo apply_filters('yatra_my_account_my_booking_title', __('Recent Bookings', 'yatra')); ?></h2>
