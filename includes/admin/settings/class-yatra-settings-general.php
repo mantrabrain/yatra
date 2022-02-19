@@ -313,7 +313,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     ),
                 ),
                 array(
-                    'title' => __('Currency position', 'yatra'),
+                    'title' => __('Currency symbol/code position', 'yatra'),
                     'desc' => __('Currency symbol position.', 'yatra'),
                     'desc_tip' => true,
                     'id' => 'yatra_currency_position',
