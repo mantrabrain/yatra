@@ -286,6 +286,34 @@ if (!function_exists('yatra_account_bookings_item')) {
     }
 }
 
+if (!function_exists('yatra_account_booking_payment_history')) {
+
+    /**
+     * My Account navigation template.
+     */
+    function yatra_account_booking_payment_history($bookings)
+    {
+
+        $booking_id = yatra_get_var($_GET['booking_id'], 0);
+
+        $booking_id = absint($booking_id);
+        
+        if (!yatra_user_can_modify_booking($booking_id)) {
+
+            return;
+        }
+
+        $payment = new Yatra_Payment();
+
+        $all_info = $payment->get_all_info($booking_id, 'any', false);
+
+
+        yatra_get_template('myaccount/tmpl-payment-history.php', array('payment_details' => $all_info));
+
+
+    }
+}
+
 
 if (!function_exists('yatra_account_edit_profile')) {
 
