@@ -66,9 +66,14 @@ class Yatra_Shortcode_Checkout
 
             if ($net_booking_price <= $paid) {
 
-                echo '<p>Your tour cart is empty. Please select any of the booking first.</p>';
+                echo '<p>' . esc_html__('Your cart is empty. Please add any of the tour on the cart first.', 'yatra') . '</p>';
+
                 return;
             }
+
+            $yatra_booking_meta_params = $all_booking_details->yatra_booking_meta_params ?? array();
+
+            $coupon = $yatra_booking_meta_params['coupon'] ?? array();
 
             $remaining_amount = $net_booking_price - $paid;
 
@@ -81,7 +86,8 @@ class Yatra_Shortcode_Checkout
                     'booking_details' => $all_booking_details->yatra_booking_meta,
                     'booking_params' => $all_booking_details->yatra_booking_meta_params,
                     'payment' => $payment->get_all_info($booking_id, 'publish'),
-                    'booking_id' => $booking_id
+                    'booking_id' => $booking_id,
+                    'coupon' => $coupon
 
                 )
             );

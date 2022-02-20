@@ -3,7 +3,8 @@ defined('ABSPATH') || exit;
 
 if (count($checkout) < 1) {
 
-    echo '<p>Your tour cart is empty. Please select any of the booking first.</p>';
+    echo '<p>' . esc_html__('Your cart is empty. Please add any of the tour on the cart first.', 'yatra') . '</p>';
+
     return;
 }
 
@@ -48,6 +49,7 @@ do_action('yatra_checkout_before_form');
                    name="yatra_order_submit_button"
                    id="yatra_order_submit_button"
                    data-value="<?php echo esc_attr($order_booking_text); ?>"
+                   data-order-amount="<?php echo floatval(yatra()->cart->get_cart_total(true)) ?>"
                    value="<?php echo esc_attr($order_booking_text); ?>"/>
             <input type="hidden" name="action" value="yatra_book_selected_tour_nonce"/>
         </p>

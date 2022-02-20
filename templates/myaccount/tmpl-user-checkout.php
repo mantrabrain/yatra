@@ -3,6 +3,7 @@ defined('ABSPATH') || exit;
 
 
 do_action('yatra_checkout_before_form');
+
 $currency_symbol = yatra_get_current_currency_symbol($currency);
 ?>
     <form method="post" class="yatra-form yatra-checkout-form yatra-user-remaining-chekcout-form"
@@ -25,21 +26,21 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
             <?php do_action('yatra_checkout_after_form_fields'); ?>
 
             <div class="yatra-col-md-6 yatra-col-xs-12 yatra-checkout-order-table">
-                <h2>Booking Summary</h2>
+                <h2><?php esc_html_e('Booking Summary', 'yatra'); ?></h2>
 
                 <div id="tour-book_review" class="yatra-checkout-review-tour-book">
                     <table class="yatra-checkout-review-tour-book-table">
                         <thead>
                         <tr>
-                            <th class="tour-name">Tour</th>
-                            <th class="tour-name">Date</th>
-                            <th class="tour-name">Number of people</th>
-                            <th class="tour-total">Total</th>
+                            <th class="tour-name"><?php esc_html_e('Tour', 'yatra'); ?></th>
+                            <th class="tour-name"><?php esc_html_e('Date', 'yatra'); ?></th>
+                            <th class="tour-name"><?php esc_html_e('Number of people', 'yatra'); ?></th>
+                            <th class="tour-total"><?php esc_html_e('Total', 'yatra'); ?></th>
                         </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($booking_details as $booking) {
-                        $number_of_person = is_array($booking['number_of_person']) ? count($booking['number_of_person']): absint($booking['number_of_person']);
+                            $number_of_person = is_array($booking['number_of_person']) ? count($booking['number_of_person']) : absint($booking['number_of_person']);
                             ?>
                             <tr class="cart_item">
                                 <td class="tour-name">
@@ -59,7 +60,7 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
                         <tfoot>
 
                         <tr class="cart-subtotal">
-                            <th colspan="3">Subtotal</th>
+                            <th colspan="3"><?php esc_html_e('Subtotal', 'yatra'); ?></th>
 
                             <td>
                                 <span class="yatra-Price-amount amount"><?php echo yatra_get_price($currency_symbol, $booking_params['total_booking_gross_price']) ?></span>
@@ -68,8 +69,22 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
 
                         </tr>
 
+                        <?php if (isset($coupon['id'])) { ?>
+                            <tr>
+                                <th colspan="3">
+                                    <strong><?php esc_html_e('Coupon:', 'yatra') ?></strong>
+                                    <em><?php echo esc_html($coupon['code']); ?></em>
+                                </th>
+                                <td>
+                                    <strong>- <?php
+                                        echo yatra_get_price(yatra_get_current_currency_symbol(), $coupon['calculated_value']); ?>
+                                    </strong>
+                                </td>
+                            </tr>
+                        <?php } ?>
+
                         <tr class="tour-book-total">
-                            <th colspan="3">Total</th>
+                            <th colspan="3"><?php esc_html_e('Total', 'yatra'); ?></th>
 
                             <td><strong><span
                                             class="yatra-Price-amount amount"><?php echo yatra_get_price($currency_symbol, $booking_params['total_booking_net_price']) ?></span>
@@ -81,10 +96,10 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
                         foreach ($payment as $payment_id => $payment_item) {
                             ?>
                             <tr class="tour-book-total">
-                                <th colspan="3">- Payment #<?php echo esc_html($payment_id) ?> </th>
+                                <th colspan="3"><?php esc_html_e('Payment #', 'yatra'); ?><?php echo esc_html($payment_id) ?> </th>
 
                                 <td><strong><span
-                                                class="yatra-Price-amount amount"><?php echo yatra_get_price($currency_symbol, $payment_item['paid_amount']) ?></span>
+                                                class="yatra-Price-amount amount">- <?php echo yatra_get_price($currency_symbol, $payment_item['paid_amount']) ?></span>
                                     </strong>
                                 </td>
 
@@ -92,7 +107,7 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
                         <?php } ?>
 
                         <tr class="tour-book-total">
-                            <th colspan="3">Remaining Amount[Net Payable]</th>
+                            <th colspan="3"><?php esc_html_e('Remaining Amount[Net Payable]', 'yatra');?></th>
 
                             <td><strong><span
                                             class="yatra-Price-amount amount"><?php echo yatra_get_price($currency_symbol, $remaining_amount) ?></span>
