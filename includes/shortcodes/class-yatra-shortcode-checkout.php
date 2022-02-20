@@ -58,11 +58,11 @@ class Yatra_Shortcode_Checkout
 
             $all_booking_details = $booking->get_all_booking_details($booking_id);
 
-            $net_booking_price = (absint($booking->get_total(true)));
+            $net_booking_price = (floatval($booking->get_total(true)));
 
             $payment = new Yatra_Payment();
 
-            $paid = absint($payment->get_total_paid_amount($booking_id));
+            $paid = floatval($payment->get_total_paid_amount($booking_id));
 
             if ($net_booking_price <= $paid) {
 
