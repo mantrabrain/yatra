@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.7\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-02-18 12:26:04+00:00\n"
+"POT-Creation-Date: 2022-02-20 09:29:59+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -356,6 +356,7 @@ msgstr ""
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:73
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:16
+#: templates/myaccount/tmpl-user-checkout.php:35
 #: templates/tmpl-cart-table.php:16 templates/tmpl-cart-table.php:56
 #: templates/tmpl-order-table.php:6
 msgid "Tour"
@@ -363,6 +364,8 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
 #: includes/hooks/yatra-list-table-hooks.php:25
+#: templates/myaccount/tmpl-payment-history.php:9
+#: templates/myaccount/tmpl-user-checkout.php:36
 #: templates/tmpl-cart-table.php:17 templates/tmpl-cart-table.php:60
 #: templates/tmpl-order-table.php:7
 msgid "Date"
@@ -389,10 +392,12 @@ msgid "Full name"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
-#: templates/myaccount/tmpl-booking.php:10 templates/tmpl-cart-table.php:19
-#: templates/tmpl-cart-table.php:76 templates/tmpl-cart-table.php:149
-#: templates/tmpl-cart-table.php:151 templates/tmpl-order-table.php:9
-#: templates/tmpl-order-table.php:69
+#: templates/myaccount/tmpl-booking.php:10
+#: templates/myaccount/tmpl-user-checkout.php:38
+#: templates/myaccount/tmpl-user-checkout.php:87
+#: templates/tmpl-cart-table.php:19 templates/tmpl-cart-table.php:76
+#: templates/tmpl-cart-table.php:149 templates/tmpl-cart-table.php:151
+#: templates/tmpl-order-table.php:9 templates/tmpl-order-table.php:69
 msgid "Total"
 msgstr ""
 
@@ -1032,8 +1037,7 @@ msgid "Currency Symbol"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:316
-#: includes/modules/status/templates/html-admin-page-status-report.php:770
-msgid "Currency position"
+msgid "Currency symbol/code position"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:317
@@ -1884,7 +1888,7 @@ msgid "%1$s was called with an invalid level \"%2$s\"."
 msgstr ""
 
 #: includes/class-yatra-payment.php:8 includes/class-yatra-payment.php:90
-#: includes/functions.php:307 includes/yatra-template-functions.php:209
+#: includes/functions.php:307 includes/yatra-template-functions.php:213
 msgid "Pending"
 msgstr ""
 
@@ -3170,7 +3174,7 @@ msgstr ""
 msgid "Yatra Availability Conditions"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:146
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:147
 msgid ""
 "Yatra Availability Conditions is premium addon of Yatra free WordPress "
 "travel and tour plugin. This addon add features to add different types of "
@@ -3183,11 +3187,25 @@ msgid ""
 "condition."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:148
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:151
+msgid "Yatra Partial Payment"
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:153
+msgid ""
+"Yatra Partial Payment  is premium addon of Yatra free WordPress travel and "
+"tour plugin. This addon can be useful if you want to get amount partially "
+"from traveler. You can set how much money do you want to as deposit on "
+"percentage and you can simply use any of the payment gateway. Right now you "
+"can add first payment as deposit and remaining user can pay by themselves  "
+"via any of the payment gateway."
+msgstr ""
+
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:157
 msgid "Yatra Stripe"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:149
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:159
 msgid ""
 "Yatra Stripe is premium addon of Yatra free WordPress travel and tour "
 "plugin. This is payment gateway of stripe.com which support different types "
@@ -3198,11 +3216,11 @@ msgid ""
 "website. "
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:153
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:163
 msgid "Yatra Authorize.net"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:154
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:165
 msgid ""
 "Yatra Authorize.net  is premium addon of Yatra free WordPress travel and "
 "tour plugin. This is payment gateway addon for Yatra plugin. This is a "
@@ -3214,15 +3232,15 @@ msgid ""
 "html "
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:160
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:171
 msgid "View All Addon/Extensions"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:167
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:178
 msgid "Feature Request"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:170
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:181
 msgid ""
 "If you would like to add a new feature on the yatra plugin or any of the "
 "addons you can send us a feature request. Our development team will check & "
@@ -3232,15 +3250,15 @@ msgid ""
 "%smantrabrain@gmail.com%s too."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:174
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:185
 msgid "Send feature request"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:183
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:194
 msgid "Facebook Community Group"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:186
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:197
 msgid ""
 "Join our facebook community group. You can post your query or share your "
 "thought and\n"
@@ -3248,41 +3266,41 @@ msgid ""
 "the group."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:191
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:202
 msgid "Join Yatra Facebook Community Group"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:198
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:209
 msgid "Documentation"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:201
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:212
 msgid "You can read documentation about yatra WordPress plugin."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:205
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:216
 msgid "Check Documentation"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:212
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:223
 msgid "Support Forum"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:215
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:226
 msgid ""
 "Post your questions and query about yatra WordPress plugin on our support "
 "forum."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:219
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:230
 msgid "View Support Forum"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:226
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:237
 msgid "Video Introduction"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:239
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:250
 msgid "Watch on youtube"
 msgstr ""
 
@@ -3970,6 +3988,10 @@ msgid ""
 "payments in."
 msgstr ""
 
+#: includes/modules/status/templates/html-admin-page-status-report.php:770
+msgid "Currency position"
+msgstr ""
+
 #: includes/modules/status/templates/html-admin-page-status-report.php:772
 msgid "The position of the currency symbol."
 msgstr ""
@@ -4195,6 +4217,11 @@ msgstr ""
 
 #: includes/payment-gateways/paypal/class-yatra-payment-gateway-paypal.php:54
 msgid "Paypal Standard"
+msgstr ""
+
+#: includes/shortcodes/class-yatra-shortcode-checkout.php:69
+#: templates/tmpl-checkout.php:6
+msgid "Your cart is empty. Please add any of the tour on the cart first."
 msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:38
@@ -4743,23 +4770,28 @@ msgstr ""
 msgid "My Bookings"
 msgstr ""
 
-#: includes/yatra-template-functions.php:209
+#: includes/yatra-template-functions.php:34
+#: templates/myaccount/tmpl-payment-history.php:22
+msgid "Payment History"
+msgstr ""
+
+#: includes/yatra-template-functions.php:213
 msgid "Paid"
 msgstr ""
 
-#: includes/yatra-template-functions.php:225
+#: includes/yatra-template-functions.php:229
 msgid "Make payment of "
 msgstr ""
 
-#: includes/yatra-template-functions.php:538
+#: includes/yatra-template-functions.php:605
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:539
+#: includes/yatra-template-functions.php:606
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:540
+#: includes/yatra-template-functions.php:607
 msgid "Not Available"
 msgstr ""
 
@@ -4784,14 +4816,15 @@ msgid "Booking Date"
 msgstr ""
 
 #: templates/myaccount/tmpl-booking.php:11
+#: templates/myaccount/tmpl-payment-history.php:12
 msgid "Payment Status"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:17
+#: templates/myaccount/tmpl-booking.php:20
 msgid "Recent Bookings"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:76
+#: templates/myaccount/tmpl-booking.php:79
 #. translators: 1: formatted booking total 2: total booking items
 msgid "%1$s for %2$s tour"
 msgid_plural "%1$s for %2$s tours"
@@ -4840,7 +4873,51 @@ msgstr ""
 msgid "Signout"
 msgstr ""
 
-#: templates/myaccount/tmpl-user-checkout.php:114
+#: templates/myaccount/tmpl-payment-history.php:7
+msgid "Payment ID"
+msgstr ""
+
+#: templates/myaccount/tmpl-payment-history.php:8
+msgid "Gateway"
+msgstr ""
+
+#: templates/myaccount/tmpl-payment-history.php:10
+msgid "Booking ID"
+msgstr ""
+
+#: templates/myaccount/tmpl-payment-history.php:11
+msgid "Amount"
+msgstr ""
+
+#: templates/myaccount/tmpl-user-checkout.php:29
+#: templates/tmpl-order-table.php:1
+msgid "Booking Summary"
+msgstr ""
+
+#: templates/myaccount/tmpl-user-checkout.php:37
+#: templates/tmpl-order-table.php:8
+msgid "Number of people"
+msgstr ""
+
+#: templates/myaccount/tmpl-user-checkout.php:63
+#: templates/tmpl-order-table.php:47
+msgid "Subtotal"
+msgstr ""
+
+#: templates/myaccount/tmpl-user-checkout.php:75
+#: templates/tmpl-cart-table.php:126 templates/tmpl-order-table.php:58
+msgid "Coupon:"
+msgstr ""
+
+#: templates/myaccount/tmpl-user-checkout.php:99
+msgid "Payment #"
+msgstr ""
+
+#: templates/myaccount/tmpl-user-checkout.php:110
+msgid "Remaining Amount[Net Payable]"
+msgstr ""
+
+#: templates/myaccount/tmpl-user-checkout.php:129
 msgid "Make Payment "
 msgstr ""
 
@@ -4894,24 +4971,8 @@ msgstr ""
 msgid "Sub Total"
 msgstr ""
 
-#: templates/tmpl-cart-table.php:126 templates/tmpl-order-table.php:58
-msgid "Coupon:"
-msgstr ""
-
 #: templates/tmpl-cart-table.php:136
 msgid "[Remove]"
-msgstr ""
-
-#: templates/tmpl-order-table.php:1
-msgid "Booking Summary"
-msgstr ""
-
-#: templates/tmpl-order-table.php:8
-msgid "Number of people"
-msgstr ""
-
-#: templates/tmpl-order-table.php:47
-msgid "Subtotal"
 msgstr ""
 
 #: templates/tour/additional.php:28
@@ -5062,7 +5123,8 @@ msgctxt "post"
 msgid "Featured"
 msgstr ""
 
-#: templates/myaccount/tmpl-booking.php:52
+#: templates/myaccount/tmpl-booking.php:55
+#: templates/myaccount/tmpl-payment-history.php:66
 msgctxt "hash before booking number"
 msgid "#"
 msgstr ""
