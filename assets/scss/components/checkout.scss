@@ -5,6 +5,7 @@
       padding: 5px 0;
       margin: 0;
     }
+
     .yatra-field-wrap {
       p {
         margin: 0 !important;
@@ -40,6 +41,7 @@
 
     .yatra-checkout-review-tour-book-table {
       text-align: center;
+      padding: 10px;
     }
 
 
@@ -63,6 +65,8 @@
     input[type="checkbox"] {
       height: 18px;
       width: 18px;
+      margin: 0;
+      padding: 0;
     }
   }
 
@@ -98,7 +102,7 @@
     width: 100%;
     background: #f7fafc;
     border: 1px solid #ddd;
-    padding: 20px;
+    padding: 15px;
     margin-left: 0;
     margin-right: 0;
   }

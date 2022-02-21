@@ -2541,7 +2541,9 @@ body.single figure {
   padding-right: 10px; }
   .yatra-tour-enquiry-form-wrap .yatra-privacy-policy-agreement input[type="checkbox"], .yatra-tour-enquiry-form-wrap .yatra-terms-agreement input[type="checkbox"] {
     height: 18px;
-    width: 18px; }
+    width: 18px;
+    margin: 0;
+    padding: 0; }
   .yatra-tour-enquiry-form-wrap .yatra-privacy-policy-agreement a, .yatra-tour-enquiry-form-wrap .yatra-terms-agreement a {
     font-size: 13px; }
   .yatra-tour-enquiry-form-wrap .yatra-privacy-policy-agreement label, .yatra-tour-enquiry-form-wrap .yatra-terms-agreement label {
@@ -2823,7 +2825,8 @@ body.single figure {
   color: #4a5568; }
 
 .yatra-checkout-page-wrap form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
-  text-align: center; }
+  text-align: center;
+  padding: 10px; }
 
 .yatra-checkout-page-wrap .select2-container {
   max-width: 100%; }
@@ -2845,7 +2848,9 @@ body.single figure {
     cursor: pointer; }
   .yatra-checkout-page-wrap .yatra-privacy-policy-agreement input[type="checkbox"], .yatra-checkout-page-wrap .yatra-terms-agreement input[type="checkbox"] {
     height: 18px;
-    width: 18px; }
+    width: 18px;
+    margin: 0;
+    padding: 0; }
 
 .yatra-checkout-page-wrap .yatra-form {
   padding: 15px 0; }
@@ -2867,7 +2872,7 @@ body.single figure {
   width: 100%;
   background: #f7fafc;
   border: 1px solid #ddd;
-  padding: 20px;
+  padding: 15px;
   margin-left: 0;
   margin-right: 0; }
 
@@ -3024,7 +3029,7 @@ body.single figure {
   padding: 15px !important;
   list-style: none;
   background: #fff;
-  margin-left: 0;
+  margin: 0;
   font-size: 18px;
   border: 1px solid #ddd; }
   .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway label {
@@ -3040,13 +3045,15 @@ body.single figure {
   .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway input[type="radio"] {
     height: 20px;
     width: 20px;
-    margin-right: 10px; }
+    margin: 0 10px 0 0; }
   .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway:after {
     clear: both;
     content: '';
     display: block; }
   .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway li {
-    list-style: none; }
+    list-style: none;
+    margin: 0;
+    padding: 5px 0; }
 
 .yatra-checkout-page-wrap form.yatra-checkout-form h2.yatra-payment-gateway-title:before {
   clear: both;

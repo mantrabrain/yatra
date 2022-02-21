@@ -165,7 +165,7 @@ body.single {
       border: 1px solid #ddd;
       display: flex;
       flex-direction: column;
-      margin-left:-1px;
+      margin-left: -1px;
       padding: 10px;
 
       .attribute-icon {
@@ -291,6 +291,8 @@ body.single {
     input[type="checkbox"] {
       height: 18px;
       width: 18px;
+      margin: 0;
+      padding: 0;
     }
 
     a {
@@ -417,4 +419,5 @@ body.single {
 .yatra-tour-booking-pricing-wrap {
   margin-top: 10px;
 }
+
 @import "parts/calendar-date-listing";

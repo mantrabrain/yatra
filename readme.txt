@@ -24,14 +24,11 @@ Feature [request](https://mantrabrain.com/request-new-feature/)
 1. Install the plugin either via the WordPress.org plugin directory, or by uploading the files to your server (in the /wp-content/plugins/ directory).
 2. Activate the Yatra plugin through the 'Plugins' menu in WordPress.
 
+You can Join our [Facebook Community group](https://www.facebook.com/groups/yatrawordpressplugin)
 
 == Video Tour ==
 
 [youtube https://www.youtube.com/watch?v=URdGixOz760]
-
-
-You can Join our [Facebook Community group](https://www.facebook.com/groups/yatrawordpressplugin)
-
 
 == Yatra - Features ==
 
@@ -77,9 +74,10 @@ You can Join our [Facebook Community group](https://www.facebook.com/groups/yatr
 
 == Other Premium Extensions/Addons ==
 
-* [Yatra Downloads](https://mantrabrain.com/downloads/yatra-downloads/)
-* [Yatra Services](https://mantrabrain.com/downloads/yatra-services/)
-* [Yatra Availability Conditions](https://mantrabrain.com/downloads/yatra-availability-conditions/)
+* [Yatra Downloads](https://mantrabrain.com/downloads/yatra-downloads?ref=wordpress.org)
+* [Yatra Services](https://mantrabrain.com/downloads/yatra-services?ref=wordpress.org)
+* [Yatra Availability Conditions](https://mantrabrain.com/downloads/yatra-availability-conditions?ref=wordpress.org)
+* [Yatra Partial Payment](https://mantrabrain.com/downloads/yatra-partial-payment?ref=wordpress.org)
 
 
 [View all Yatra Extensions/Addons](https://mantrabrain.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
