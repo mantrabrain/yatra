@@ -2736,7 +2736,9 @@ body.single figure {
           -webkit-box-flex: 1;
              -moz-box-flex: 1;
               -ms-flex: 1;
-                  flex: 1; }
+                  flex: 1;
+          margin: 0;
+          border-radius: 0; }
   .yatra-shortcode-wrapper .yatra-proceed-to-checkout-wrap {
     text-align: right;
     margin-top: 15px; }
