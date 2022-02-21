@@ -158,6 +158,7 @@ Shortcode for Tour Listing:
 * Added - Border radius on gallery
 * Added - Admin Gallery Design Updated
 * Added - Date listing feature added
+* Added - Primary color for yatra plugin
 * Added - Indicator option added
 * Fixed - Date range issue fixed on admin
 * Fixed - Single Tour Page Header Icon issue fixed
