@@ -1,13 +1,14 @@
 .yatra-shortcode-wrapper {
   max-width: 100%;
-  margin: 0 auto;
-  display: inline-block;
+  margin: 0 auto !important;
+  display: block;
   width: 100%;
   min-height: 1px;
 
   &:after {
     content: "";
     clear: both;
+    display: block;
   }
 
   .yatra_cart_table {

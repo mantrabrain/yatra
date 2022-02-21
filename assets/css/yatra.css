@@ -2702,13 +2702,14 @@ body.single figure {
 
 .yatra-shortcode-wrapper {
   max-width: 100%;
-  margin: 0 auto;
-  display: inline-block;
+  margin: 0 auto !important;
+  display: block;
   width: 100%;
   min-height: 1px; }
   .yatra-shortcode-wrapper:after {
     content: "";
-    clear: both; }
+    clear: both;
+    display: block; }
   .yatra-shortcode-wrapper .yatra_cart_table {
     text-align: center; }
     .yatra-shortcode-wrapper .yatra_cart_table td, .yatra-shortcode-wrapper .yatra_cart_table th {
@@ -3031,7 +3032,8 @@ body.single figure {
   background: #fff;
   margin: 0;
   font-size: 18px;
-  border: 1px solid #ddd; }
+  border: 1px solid #ddd;
+  margin-bottom: 15px; }
   .yatra-checkout-page-wrap form.yatra-checkout-form ul.yatra-payment-gateway label {
     cursor: pointer;
     display: -webkit-box;
