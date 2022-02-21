@@ -2998,6 +2998,8 @@ body.single figure {
   font-size: 13px; }
   .yatra-booking-table td.booking-status span.booking-status.processing {
     background: #033503; }
+    .yatra-booking-table td.booking-status span.booking-status.processing:before, .yatra-booking-table td.booking-status span.booking-status.processing:after {
+      content: none !important; }
   .yatra-booking-table td.booking-status span.booking-status.on-hold {
     background: #7d1010; }
   .yatra-booking-table td.booking-status span.booking-status.completed {
