@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.8\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-02-21 11:02:33+00:00\n"
+"POT-Creation-Date: 2022-02-22 09:24:09+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1887,7 +1887,7 @@ msgstr ""
 msgid "%1$s was called with an invalid level \"%2$s\"."
 msgstr ""
 
-#: includes/class-yatra-payment.php:8 includes/class-yatra-payment.php:90
+#: includes/class-yatra-payment.php:8 includes/class-yatra-payment.php:92
 #: includes/functions.php:307 includes/yatra-template-functions.php:213
 msgid "Pending"
 msgstr ""
@@ -2981,7 +2981,7 @@ msgstr ""
 
 #: includes/hooks/yatra-template-hooks.php:119
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:165
-#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:143
+#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:167
 #: templates/myaccount/tmpl-booking-item.php:67
 msgid "Total Price"
 msgstr ""
@@ -4194,7 +4194,7 @@ msgstr ""
 msgid "Empty paypal email address."
 msgstr ""
 
-#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:153
+#: includes/payment-gateways/paypal/class-yatra-gateway-paypal-request.php:178
 msgid "Cart is empty."
 msgstr ""
 
@@ -4783,15 +4783,15 @@ msgstr ""
 msgid "Make payment of "
 msgstr ""
 
-#: includes/yatra-template-functions.php:605
+#: includes/yatra-template-functions.php:604
 msgid "For Booking"
 msgstr ""
 
-#: includes/yatra-template-functions.php:606
+#: includes/yatra-template-functions.php:605
 msgid "For Enquiry Only"
 msgstr ""
 
-#: includes/yatra-template-functions.php:607
+#: includes/yatra-template-functions.php:606
 msgid "Not Available"
 msgstr ""
 

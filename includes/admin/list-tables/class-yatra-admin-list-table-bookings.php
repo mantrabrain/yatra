@@ -129,6 +129,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
         $show_columns['email_address'] = __('Email', 'yatra');
         $show_columns['full_name'] = __('Full name', 'yatra');
         $show_columns['booking_total'] = __('Total', 'yatra');
+        $show_columns['paid_amount'] = __('Paid Amount', 'yatra');
 
 
         return $show_columns;
@@ -287,6 +288,27 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
         $yatra_currency_symbol = yatra_get_current_currency_symbol($currency);
 
         $price = yatra_get_price($yatra_currency_symbol, $total_booking_price);
+
+        printf('<span>%s</span>', $price);
+    }
+
+    /**
+     * Render columm: paid_amount.
+     */
+    protected function render_paid_amount_column()
+    {
+
+        $payment = new Yatra_Payment();
+
+        $total_paid_amount = floatval($payment->get_total_paid_amount($this->object->ID));
+
+        $currency = $this->booking_meta_params['currency'] ?? '';
+
+        $currency = $this->booking_meta_params['yatra_currency'] ?? $currency;
+
+        $yatra_currency_symbol = yatra_get_current_currency_symbol($currency);
+
+        $price = yatra_get_price($yatra_currency_symbol, $total_paid_amount);
 
         printf('<span>%s</span>', $price);
     }

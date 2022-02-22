@@ -244,7 +244,6 @@ if (!function_exists('yatra_account_payment_history')) {
     function yatra_account_payment_history()
     {
 
-
         $booking = new Yatra_Tour_Booking();
 
         $all_bookings = $booking->get_all_booking_by_user_id();
