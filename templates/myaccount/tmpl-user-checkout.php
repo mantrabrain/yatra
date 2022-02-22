@@ -126,7 +126,7 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
             <?php
 
 
-            $order_booking_text = __('Make Payment ') . yatra_get_price($currency_symbol, $remaining_amount);
+            $order_booking_text = __('Make Payment ', 'yatra') . yatra_get_price($currency_symbol, $remaining_amount);
 
             wp_nonce_field('yatra_book_selected_tour_nonce', 'yatra-book-selected-tour-nonce'); ?>
             <input type="submit" class="yatra-button button yatra_order_submit_button"

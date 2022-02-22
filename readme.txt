@@ -164,6 +164,7 @@ Shortcode for Tour Listing:
 * Fixed - Single Tour Page Header Icon issue fixed
 * Fixed - P tag added on overview and other descriptive sections
 * Fixed - Nice button design fixed
+* Fixed - PayPal issue with coupon code
 * Update - Removed unused  metabox on booking page
 * Update - Enquiry form design fixed and minor updates
 * Update - Terms and condition alignment issue fixed on checkout and enquiry form

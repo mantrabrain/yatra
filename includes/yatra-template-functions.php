@@ -226,7 +226,7 @@ if (!function_exists('yatra_account_bookings')) {
                 $booking_detail->payment_status = $payment_status;
                 $booking_detail->payment_status_key = $payment_status_key;
                 $booking_detail->remaining_payment = $remaining_payment;
-                $booking_detail->make_payment_text = $remaining_payment > 0 ? __('Make payment of ') . yatra_get_price($booking_detail->booking_currency_symbol, $remaining_payment) : '';
+                $booking_detail->make_payment_text = $remaining_payment > 0 ? __('Make payment of ', 'yatra') . yatra_get_price($booking_detail->booking_currency_symbol, $remaining_payment) : '';
 
                 array_push($booking_details, $booking_detail);
             }
