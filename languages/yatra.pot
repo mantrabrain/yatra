@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.8\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-02-22 09:24:09+00:00\n"
+"POT-Creation-Date: 2022-02-22 09:31:12+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -401,23 +401,27 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:148
-msgid "Change status to Pending"
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:132
+msgid "Paid Amount"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:149
-msgid "Change status to Processing"
+msgid "Change status to Pending"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:150
-msgid "Change status to On-hold"
+msgid "Change status to Processing"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:151
-msgid "Change status to Completed"
+msgid "Change status to On-hold"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:152
+msgid "Change status to Completed"
+msgstr ""
+
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:153
 msgid "Change status to Cancelled"
 msgstr ""
 
