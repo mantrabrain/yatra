@@ -19,12 +19,12 @@ Get [free support](https://mantrabrain.com/support-forum/)
 
 Feature [request](https://mantrabrain.com/request-new-feature/)
 
+You can Join our [Facebook Community group](https://www.facebook.com/groups/yatrawordpressplugin)
+
 == Installation ==
 
 1. Install the plugin either via the WordPress.org plugin directory, or by uploading the files to your server (in the /wp-content/plugins/ directory).
 2. Activate the Yatra plugin through the 'Plugins' menu in WordPress.
-
-You can Join our [Facebook Community group](https://www.facebook.com/groups/yatrawordpressplugin)
 
 == Video Tour ==
 
