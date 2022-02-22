@@ -44,6 +44,8 @@ class Yatra_Payment
 
         $installment = is_array($all_payment_info) ? (count($all_payment_info) + 1) : 1;
 
+        $payment_type = floatval($paid_amount) > 0 ? 'partial' : 'full';
+
         $post_array = apply_filters('yatra_before_payment_created', array(
             'post_title' => $title,
             'post_content' => '',
@@ -58,7 +60,7 @@ class Yatra_Payment
                 'paid_amount' => $paid_amount,
                 'payable_amount' => $due_amount,
                 'due_amount' => $due_amount,
-                'payment_type' => 'full',
+                'payment_type' => $payment_type,
                 'booking_id' => $booking_id,
                 'installment' => $installment,
                 'transaction_id' => '',
@@ -84,7 +86,7 @@ class Yatra_Payment
         $payment_info = array();
         $all_status = $this->payment_statuses();
         foreach ($posts as $post) {
-            
+
             $payment_id = $post->ID;
             $status = $post->post_status;
             $status = $all_status[$status] ?? __('Pending', 'yatra');
