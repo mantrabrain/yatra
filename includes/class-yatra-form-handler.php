@@ -157,7 +157,7 @@ class Yatra_Form_Handler
 
                 $payment_id = $yatra_payment->create($booking_id, $payment_gateway_id);
 
-               yatra_clear_session('yatra_tour_cart');
+                yatra_clear_session('yatra_tour_cart');
 
                 do_action('yatra_payment_checkout_payment_gateway_' . $payment_gateway_id, $booking_id, $payment_id);
 

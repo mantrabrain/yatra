@@ -256,17 +256,20 @@ if (!function_exists('yatra_user_can_modify_booking')) {
     {
         $booking_id = absint($booking_id);
 
-        $user_id = $user_id === null ? get_current_user_id() : $user_id;
+        $user_id = $user_id === null ? get_current_user_id() : ($user_id);
 
-        $user_id = absint($user_id);
+        $user_id = (int)($user_id);
 
         if ($booking_id < 1 || $user_id < 1) {
 
             return false;
         }
 
-        $meta_user_id = absint(get_post_meta($booking_id, 'yatra_user_id', true));
+        $meta_user_id = (int)(get_post_meta($booking_id, 'yatra_user_id', true));
 
+        if ($meta_user_id < 1) {
+            return false;
+        }
         if ($user_id === $meta_user_id) {
 
             return true;
