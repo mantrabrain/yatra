@@ -158,7 +158,7 @@ final class Yatra_Admin
             'manage_options',
             'yatra-availability',
             array($this, 'availability'),
-            2
+            3
         );
         add_action('load-' . $settings_page, array($this, 'availability_page_init'));
     }
