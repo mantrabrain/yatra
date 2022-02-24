@@ -15,7 +15,7 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 [Yatra]( https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg) is a free, SEO friendly & scalable travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
 
-It's really simple & easy to create trip, itinerary & trekking packages with yatra plugin and support different types of payment gateways so that its easy to accept payments. You can even modify your pricing as per trip date from availability calendar.
+It's really simple & easy to create trip, itinerary & trekking packages with yatra WordPress travel management plugin and support different types of payment gateways so that its easy to accept payments. You can even modify your pricing as per trip date from availability calendar.
 
 Get [free support](https://mantrabrain.com/support-forum/)
 
