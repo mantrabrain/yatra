@@ -66,7 +66,7 @@ You can Join our [Facebook Community group](https://www.facebook.com/groups/yatr
 
 16. Import/Export
 
-17. Unlimited itinerary
+17. Unlimited itineraries
 
 18. We are going to make Yatra as a complete package for Travel & Tour related any kind of WordPress site. So if you have any suggestion or feature request please send us at mantrabrain@gmail.com or directly via this [link](https://mantrabrain.com/request-new-feature/).
 
