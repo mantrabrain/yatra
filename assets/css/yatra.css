@@ -2711,7 +2711,8 @@ body.single figure {
     clear: both;
     display: block; }
   .yatra-shortcode-wrapper .yatra_cart_table {
-    text-align: center; }
+    text-align: center;
+    width: 100%; }
     .yatra-shortcode-wrapper .yatra_cart_table td, .yatra-shortcode-wrapper .yatra_cart_table th {
       text-align: center; }
     .yatra-shortcode-wrapper .yatra_cart_table td.tour-person {
