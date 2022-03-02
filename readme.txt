@@ -1,4 +1,4 @@
-=== Best Travel Booking Plugin, Tour Booking System, Trip Booking WordPress Plugin - Yatra ===
+=== Best WordPress Travel Booking Plugin, Tour Booking System, Trip Booking WordPress Plugin - Yatra ===
 Contributors: Mantrabrain, ughimire1
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
