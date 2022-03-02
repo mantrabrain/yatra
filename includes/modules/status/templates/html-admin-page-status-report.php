@@ -996,7 +996,7 @@ $untested_plugins = array();
                     <mark class="error">
                         <span class="dashicons dashicons-warning"></span>
                     </mark>
-                    <a href="https://docs.mantrabrain.com/yatra-wordpress-plugin/" target="_blank">
+                    <a href="https://wpyatra.com/docs/yatra/" target="_blank">
                         <?php esc_html_e('Learn how to update', 'yatra'); ?>
                     </a>
                 </td>

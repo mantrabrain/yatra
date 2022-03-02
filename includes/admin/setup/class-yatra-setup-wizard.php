@@ -521,7 +521,7 @@ class Yatra_Setup_Wizard
                         </label>
                         <span class="description">
                             This option allows you to checkout without login. User will not created if you tick this option. <a
-                                    href="https://docs.mantrabrain.com/yatra-wordpress-plugin/yatra-settings/"
+                                    href="https://wpyatra.com/docs/yatra/yatra-settings/checkout/"
                                     target="_blank">Read Documentation</a>
                         </span>
 

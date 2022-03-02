@@ -212,7 +212,7 @@ if (!defined('ABSPATH')) {
                             <?php echo __('You can read documentation about yatra WordPress plugin.', 'yatra'); ?>
                         </p></div>
                     <div class="yatra-card-footer"><a target="_blank"
-                                                      href="https://docs.mantrabrain.com/yatra-wordpress-plugin/?ref=yatra-dashboard">
+                                                      href="https://wpyatra.com/docs/yatra/?ref=yatra-dashboard">
                             <?php echo __('Check Documentation', 'yatra') ?></a></div>
                 </div>
             </div>
