@@ -142,7 +142,7 @@ if (!defined('ABSPATH')) {
                         </p>
                         <h2>
                             <a target="_blank"
-                               href="https://wpyatra.com/yatra-premium-extensions/yatra-downloads/?ref=yatra-dashboard"><?php echo __('Yatra Availability Conditions', 'yatra'); ?></a>
+                               href="https://wpyatra.com/yatra-premium-extensions/yatra-availability-conditions/?ref=yatra-dashboard"><?php echo __('Yatra Availability Conditions', 'yatra'); ?></a>
                         </h2>
                         <p><?php echo __('Yatra Availability Conditions is premium addon of Yatra free WordPress travel and tour plugin. This addon add features to add different types of conditional logic for your tour packages. For example if you want to make available for booking the tour package for weekend only or each sunday only or each month only, then this addon is for you. Simply you can add logic for the availability/enquiry only or for not availability. But make sure your condition will not conflict each other. If your custom condition conflict each other then the system will automatically apply the last added condition.', 'yatra'); ?></p>
 
