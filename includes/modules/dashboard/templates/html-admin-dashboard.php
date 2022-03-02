@@ -123,14 +123,14 @@ if (!defined('ABSPATH')) {
                     <div class="yatra-card-body">
                         <h2>
                             <a target="_blank"
-                               href="https://mantrabrain.com/downloads/yatra-downloads/?ref=yatra-dashboard"><?php echo __('Yatra Downloads', 'yatra') ?></a>
+                               href="https://wpyatra.com/yatra-premium-extensions/yatra-downloads/?ref=yatra-dashboard"><?php echo __('Yatra Downloads', 'yatra') ?></a>
                         </h2>
                         <p>
                             <?php echo __('Yatra Downloads is premium addon of Yatra free WordPress travel and tour plugin. This addon add features to add additional files so that anyone can download those files from frontend. It is useful for tour operator to add brochure, tour guidelines pdf file and other costing details files, and any kind of other additional files, so that anyone can easily download those files from website frontend.', 'yatra'); ?>
                         </p>
                         <h2>
                             <a target="_blank"
-                               href="https://mantrabrain.com/downloads/yatra-services/?ref=yatra-dashboard"><?php echo __('Yatra Services', 'yatra') ?></a>
+                               href="https://wpyatra.com/yatra-premium-extensions/yatra-services/?ref=yatra-dashboard"><?php echo __('Yatra Services', 'yatra') ?></a>
                         </h2>
                         <p>
                             <?php echo __('Yatra Services is premium addon of Yatra free WordPress travel and tour plugin. This addon
@@ -142,32 +142,32 @@ if (!defined('ABSPATH')) {
                         </p>
                         <h2>
                             <a target="_blank"
-                               href="https://mantrabrain.com/downloads/yatra-availability-conditions/?ref=yatra-dashboard"><?php echo __('Yatra Availability Conditions', 'yatra'); ?></a>
+                               href="https://wpyatra.com/yatra-premium-extensions/yatra-downloads/?ref=yatra-dashboard"><?php echo __('Yatra Availability Conditions', 'yatra'); ?></a>
                         </h2>
                         <p><?php echo __('Yatra Availability Conditions is premium addon of Yatra free WordPress travel and tour plugin. This addon add features to add different types of conditional logic for your tour packages. For example if you want to make available for booking the tour package for weekend only or each sunday only or each month only, then this addon is for you. Simply you can add logic for the availability/enquiry only or for not availability. But make sure your condition will not conflict each other. If your custom condition conflict each other then the system will automatically apply the last added condition.', 'yatra'); ?></p>
 
                         <h2>
                             <a target="_blank"
-                               href="https://mantrabrain.com/downloads/yatra-partial-payment/?ref=yatra-dashboard"><?php echo __('Yatra Partial Payment', 'yatra'); ?></a>
+                               href="https://wpyatra.com/yatra-premium-extensions/yatra-partial-payment/?ref=yatra-dashboard"><?php echo __('Yatra Partial Payment', 'yatra'); ?></a>
                         </h2>
                         <p><?php echo __('Yatra Partial Payment  is premium addon of Yatra free WordPress travel and tour plugin. This addon can be useful if you want to get amount partially from traveler. You can set how much money do you want to as deposit on percentage and you can simply use any of the payment gateway. Right now you can add first payment as deposit and remaining user can pay by themselves  via any of the payment gateway.', 'yatra'); ?></p>
 
 
                         <h2><a target="_blank"
-                               href="https://mantrabrain.com/downloads/yatra-stripe/?ref=yatra-dashboard"><?php echo __('Yatra Stripe', 'yatra'); ?></a>
+                               href="https://wpyatra.com/yatra-premium-extensions/yatra-stripe/?ref=yatra-dashboard"><?php echo __('Yatra Stripe', 'yatra'); ?></a>
                         </h2>
                         <p><?php echo __('Yatra Stripe is premium addon of Yatra free WordPress travel and tour plugin. This is payment gateway of stripe.com which support different types of credit/debit cards. While booking the tour package on yatra plugin the traveller no need to go any of the payment gateway pages to pay the tour price. Any one can easily book the tour package via this premium payment gateway addon. But make sure you have already installed ssl on your website. ', 'yatra'); ?></p>
 
                         <h2>
                             <a target="_blank"
-                               href="https://mantrabrain.com/downloads/yatra-authorizenet/?ref=yatra-dashboard"><?php echo __('Yatra Authorize.net', 'yatra'); ?></a>
+                               href="https://wpyatra.com/yatra-premium-extensions/yatra-authorize-net/?ref=yatra-dashboard"><?php echo __('Yatra Authorize.net', 'yatra'); ?></a>
                         </h2>
                         <p><?php echo __('Yatra Authorize.net  is premium addon of Yatra free WordPress travel and tour plugin. This is payment gateway addon for Yatra plugin. This is a gateway of authorize.net.  This gateway will support different types of credit/debit cards. Any one can book the tour package with their credit/debit card. You can check the supported currency and cards for this gateway from https://developer.authorize.net/api/reference/features/processor_support.html ', 'yatra'); ?></p>
 
 
                     </div>
                     <div class="yatra-card-footer"><a target="_blank"
-                                                      href="https://mantrabrain.com/yatra-premium-extensions/?ref=yatra-dashboard">
+                                                      href="https://wpyatra.com/yatra-premium-extensions/?ref=yatra-dashboard">
                             <?php echo __('View All Addon/Extensions', 'yatra') ?></a></div>
                 </div>
             </div>
