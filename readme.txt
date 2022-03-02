@@ -13,7 +13,7 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 **#Best WordPress Travel Booking Plugin**
 
-[Yatra]( https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg) is a free, SEO friendly & scalable WordPress travel booking plugin to create travel and tour packages for tour operators and travel agencies.
+[Yatra]( https://wpyatra.com/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg) is a free, SEO friendly & scalable WordPress travel booking plugin to create travel and tour packages for tour operators and travel agencies.
 
 It's really simple & easy to create trip, itinerary & trekking packages with yatra WordPress travel management plugin and support different types of payment gateways so that its easy to accept payments. You can even modify your pricing as per trip date from availability calendar.
 
@@ -72,18 +72,18 @@ You can Join our [Facebook Community group](https://www.facebook.com/groups/yatr
 
 == Premium Payment Gateway Extensions/Addons ==
 
-* [Yatra Stripe](https://mantrabrain.com/downloads/yatra-stripe/)
-* [Yatra Authorize.Net](https://mantrabrain.com/downloads/yatra-authorizenet/)
+* [Yatra Stripe](https://wpyatra.com/yatra-premium-extensions/yatra-stripe/?ref=wordpress.org)
+* [Yatra Authorize.Net](https://wpyatra.com/yatra-premium-extensions/yatra-authorize-net/?ref=wordpress.org)
 
 == Other Premium Extensions/Addons ==
 
-* [Yatra Downloads](https://mantrabrain.com/downloads/yatra-downloads?ref=wordpress.org)
-* [Yatra Services](https://mantrabrain.com/downloads/yatra-services?ref=wordpress.org)
-* [Yatra Availability Conditions](https://mantrabrain.com/downloads/yatra-availability-conditions?ref=wordpress.org)
-* [Yatra Partial Payment](https://mantrabrain.com/downloads/yatra-partial-payment?ref=wordpress.org)
+* [Yatra Downloads](https://wpyatra.com/yatra-premium-extensions/yatra-downloads/?ref=wordpress.org)
+* [Yatra Services](https://wpyatra.com/yatra-premium-extensions/yatra-services/?ref=wordpress.org)
+* [Yatra Availability Conditions](https://wpyatra.com/yatra-premium-extensions/yatra-availability-conditions/?ref=wordpress.org)
+* [Yatra Partial Payment](https://wpyatra.com/yatra-premium-extensions/yatra-partial-payment/?ref=wordpress.org)
 
 
-[View all Yatra Extensions/Addons](https://mantrabrain.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
+[View all Yatra Extensions/Addons](https://wpyatra.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
 
 
 == Shortcodes ==
@@ -120,6 +120,7 @@ Shortcode for Tour Listing:
 
 
 == COMPATIBLE THEMES ==
+* [Blocksy](https://wordpress.org/themes/blocksy/?ref=yatrapluginorg) by creativethemeshq
 * [Yatri](https://wpyatri.com/?ref=yatrapluginorg) by MantraBrain
 * [MagazineNP](https://wordpress.org/themes/magazinenp/) by MantraBrain
 * [Zakra](https://wordpress.org/themes/zakra/) by ThemeGrill
@@ -130,7 +131,7 @@ Shortcode for Tour Listing:
 
 == IMPORTANT LINKS ==
 
-* Plugin page: [Click here](https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg)
+* Plugin page: [Click here](https://wpyatra.com/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg)
 * Plugin review/feedback: [Click here](https://wordpress.org/support/plugin/yatra/reviews/)
 * Plugin support/bug report: [Click here](https://mantrabrain.com/support-forum/)
 
