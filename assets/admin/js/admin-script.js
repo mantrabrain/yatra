@@ -222,7 +222,18 @@
         }, initLib: function () {
 
             if (typeof "select2" !== 'undefined') {
-                $('.yatra-select2').select2();
+
+                var select2 = $('.yatra-select2');
+
+                if (select2.length > 0) {
+                    $.each(select2, function () {
+                        var select2Args = {};
+                        select2Args.placeholder = typeof $(this).data('placeholder') !== undefined ? $(this).data('placeholder') : ''
+                        $(this).select2(select2Args);
+                    });
+
+
+                }
             }
 
             tippy('.yatra-tippy-tooltip', {
@@ -329,7 +340,7 @@
                     if ($.inArray(attachment_id, previous_selection_array) !== "-1") {
                         previous_selection_array.push(attachment_id);
                         var template = '<div class="image-wrapper"><div class="image-content"><img src="' + attachment_url + '"/><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div>';
-                        selected_list_html += ('<li data-id="' + attachment_id + '">'+template+'</li>');
+                        selected_list_html += ('<li data-id="' + attachment_id + '">' + template + '</li>');
                     }
 
 

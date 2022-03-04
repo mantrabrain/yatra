@@ -839,6 +839,9 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 						$default = ( empty( $option['default'] ) ? $allowed_values[0] : $option['default'] );
 						$value   = in_array( $raw_value, $allowed_values, true ) ? $raw_value : $default;
 						break;
+					case 'multiselect':
+						$value = array_filter( array_map( 'yatra_clean', (array) $raw_value ) );
+						break;
 					case 'tab_repeator':
 
 						$value = array();
