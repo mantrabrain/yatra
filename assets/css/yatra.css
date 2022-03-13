@@ -139,6 +139,9 @@
     .yatra-tabs.heading-and-content .yatra-tab-item .yatra-tab-content .cost-info-half li {
       line-height: unset; }
 
+.single .yatra-tour-single-item .yatra-tabs.heading-and-content {
+  background: none; }
+
 .yatra-nice-input-number {
   display: -webkit-box;
   display: -moz-box;
@@ -475,7 +478,8 @@ del {
   border: 1px solid #ddd;
   padding: 10px;
   margin: 0;
-  margin-top: -1px; }
+  margin-top: -1px;
+  cursor: pointer; }
 
 .yatra-itinerary-list .itinerary-heading, .yatra-itinerary-list .faq-heading, .yatra-faq-list-item .itinerary-heading, .yatra-faq-list-item .faq-heading {
   font-size: 20px;
@@ -2619,7 +2623,8 @@ body.single figure {
   font-weight: normal;
   font-size: 12px;
   cursor: pointer;
-  width: 33.33%; }
+  width: 33.33%;
+  margin: 0; }
   .yatra-tour-booking-form-section .yatra-calendar-booking-indicator-lists li span {
     display: none; }
 

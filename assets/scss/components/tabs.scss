@@ -1,7 +1,3 @@
-.yatra-tabs {
-
-}
-
 .yatra-tabs section.yatra-tab-content {
   .tab-inner {
     background: #fff;
@@ -192,6 +188,16 @@
         .cost-info-half li {
           line-height: unset;
         }
+      }
+    }
+  }
+}
+
+.single {
+  .yatra-tour-single-item {
+    .yatra-tabs {
+      &.heading-and-content {
+        background: none;
       }
     }
   }
