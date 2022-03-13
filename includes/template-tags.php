@@ -929,7 +929,7 @@ if (!function_exists('yatra_frontend_tabs')) {
 
         $layout_class = 'yatra-tabs';
 
-        $layout_class .= $yatra_setting_layouts_single_tour_tab_layout === 'heading_and_content' ? ' heading-and-content' : '';
+        $layout_class .= $yatra_setting_layouts_single_tour_tab_layout === 'heading_and_content' ? ' heading-and-content' : ' yatra-single-tour-tabs ';
 
         echo '<div class="' . esc_attr($layout_class) . '" id="yatra-tour-tabs">';
 
