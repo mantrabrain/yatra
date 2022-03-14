@@ -195,7 +195,7 @@ if (!defined('ABSPATH')) {
                     </div>
                     <div class="yatra-card-body"><p>
                             <?php echo sprintf(__('Join our facebook community group. You can post your query or share your thought and
-                            questions about %sYatra WordPress plugin%s on the group.', 'yatra'), '<a target="_blank" href="https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?ref=yatra-dashboard">', '</a>'); ?>
+                            questions about %sYatra WordPress plugin%s on the group.', 'yatra'), '<a target="_blank" href="https://wpyatra.com/?ref=yatra-dashboard">', '</a>'); ?>
                         </p></div>
                     <div class="yatra-card-footer"><a target="_blank"
                                                       href="https://www.facebook.com/groups/yatrawordpressplugin/">
