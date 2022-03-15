@@ -170,13 +170,13 @@ abstract class Yatra_Form
                 }
                 break;
             default:
-                $updated_value = apply_filters('yatra_form_field_sanitization_', $type, $field_value);
+                $updated_value = apply_filters('yatra_form_field_sanitization_' . $type, $field_value);
                 break;
 
         }
 
 
-        return $updated_value;
+        return apply_filters('yatra_form_field_resanitization_' . $type, $updated_value, $field_value, $field_option);
     }
 
     protected function form_html($field = array())
