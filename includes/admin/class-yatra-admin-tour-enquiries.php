@@ -20,8 +20,6 @@ class Yatra_Admin_Tour_Enquiries
             'enquiries', array($this, 'settings_page'), 6);
 
 
-
-
         add_action("load-" . $hook, array($this, 'mp_custom_page_screen_options'));
 
     }
@@ -48,7 +46,7 @@ class Yatra_Admin_Tour_Enquiries
 
         $enquiriesTable->prepare_items();
 
-        echo '<h2>All Enquiries</h2>';
+        echo '<h2>' . esc_html__('All Enquiries', 'yatra') . '</h2>';
 
         $enquiriesTable->display();
 
