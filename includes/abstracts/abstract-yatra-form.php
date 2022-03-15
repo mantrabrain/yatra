@@ -287,12 +287,12 @@ abstract class Yatra_Form
                 <?php
                 if ($editor) {
                     echo '</p>';
-                    wp_editor($value, $field_key, $editor_settings);
+                    wp_editor($value, $name, $editor_settings);
                 } else {
                     ?>
                     <textarea class="<?php echo esc_attr($class); ?>"
                               id="<?php echo esc_attr(($field_key)); ?>"
-                              name="<?php echo esc_attr(($field_key)); ?>"
+                              name="<?php echo esc_attr(($name)); ?>"
                         <?php echo $extra_attribute_text; ?>
 
                     ><?php echo esc_html($value); ?></textarea>
