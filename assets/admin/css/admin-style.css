@@ -296,7 +296,6 @@
 .mb-meta-vertical-tab li:hover, .mb-meta-vertical-tab li.active {
     background: #bce5ff;
     color: #101010;
-    border-right: 2px solid;
 }
 
 .mb-repeator {
