@@ -203,6 +203,8 @@ if (!function_exists('yatra_entry_meta_options')) {
 
         echo '<span class="yatra-tour-duration"><i class="icon fa fa-clock"></i>' . esc_html($duration_string) . '</span>';
 
+        do_action('yatra_after_tour_meta', $post_id);
+
         echo '</div>';
 
     }

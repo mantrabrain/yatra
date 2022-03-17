@@ -26,6 +26,7 @@
                 <?php
                 yatra_get_taxonomy_term_lists(get_the_ID(), 'destination', false, 'fas fa-map-marker-alt');
                 yatra_get_taxonomy_term_lists(get_the_ID(), 'activity', false, 'fa fa-universal-access');
+                do_action('yatra_after_tour_meta', get_the_ID());
                 ?>
             </div><!-- .meta-info -->
 
@@ -41,7 +42,7 @@
             ?>
         </div><!-- .yatra-tour-content -->
         <div class="entry-footer">
-            <?php  ?>
+            <?php ?>
         </div>
     </div>
     <div class="yatra-tour-content entry-tabs">
