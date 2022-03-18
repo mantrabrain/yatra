@@ -23,6 +23,12 @@ class Yatra_Blocks
 
     public function includes()
     {
+        include_once "includes/class-yatra-block-template-utils.php";
+        include_once "includes/class-yatra-block-template-controller.php";
+
+
+        new Yatra_Block_Template_Controller();
+
         include_once "blocks/class-yatra-block-tour.php";
         include_once "blocks/class-yatra-block-activity.php";
         include_once "blocks/class-yatra-block-destination.php";
