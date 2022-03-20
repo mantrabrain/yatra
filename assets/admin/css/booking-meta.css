@@ -134,3 +134,27 @@
     border: 1px solid #aaa;
     font-weight: bold;
 }
+
+.yatra-booking-status-meta-content {
+    margin: 20px 0;
+}
+
+.yatra-booking-status-meta-content p.flex,
+.yatra-payment-status-meta-content p.flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.yatra-payment-status-meta-content .yatra-payment-item {
+    background: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.yatra-payment-status-meta-content .yatra-payment-item h2 {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-weight: 600;
+}

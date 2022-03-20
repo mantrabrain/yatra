@@ -365,7 +365,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
                                     'textarea_name' => $value['id'],
                                     'tinymce' => array(
                                         'init_instance_callback ' => 'function(inst) {
-                                                   $("#" + inst.id + "_ifr").css({minHeight: "' . $editor_height . 'px"});
+                                                   jQuery("#" + inst.id + "_ifr").css({minHeight: "' . $editor_height . 'px"});
                                             }'
                                     ),
                                     'wpautop' => true

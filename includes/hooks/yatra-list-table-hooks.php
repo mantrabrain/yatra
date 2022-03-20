@@ -99,7 +99,7 @@ class Yatra_List_Table_Hooks
         $featured_status = $is_featured ? 1 : 0;
 
         ?>
-        <span class="yatra-featured-tour yatra-update-feature-tour-icon dashicons dashicons-<?php echo esc_attr($star_class) ?>"
+        <span class="yatra-featured-tour yatra-pointer yatra-update-feature-tour-icon dashicons dashicons-<?php echo esc_attr($star_class) ?>"
               data-tour-id="<?php echo absint($tour_id); ?>"
               data-tour-nonce="<?php echo esc_attr($nonce); ?>"
               data-is-featured="<?php echo absint($featured_status) ?>"

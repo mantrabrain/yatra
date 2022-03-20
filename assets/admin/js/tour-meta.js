@@ -1,213 +1,12 @@
 // @var yatra_admin_params
 
 (function ($) {
-    var YatraTabs = {
-
-        init: function () {
-            this.initNewYatraTabs();
-            this.cacheDom();
-            this.setupAria();
-            this.bindEvents();
-            this.removeStyle();
-        },
-        initNewYatraTabs: function () {
-            var parent = $('.yatra-admin--tabs');
-            parent.find('li').on('click', function () {
-                $(this).closest('ul').find('li').removeClass('active');
-                $(this).addClass('active');
-                var tab_key = $(this).attr('data-tab');
-                $('input#yatra_tour_meta_tour_admin_active_tab').val(tab_key);
-                var content = parent.next('.yatra-admin--tab-content');
-                content.find('.yatra-admin-tab--content-section').removeClass('active');
-                content.find('#' + tab_key).addClass('active');
-            });
-        },
-
-
-        cacheDom: function () {
-            this.$el = $('.yatra-tabs');
-            this.$tabList = this.$el.find('ul.mb-tab-list');
-            this.$tab = this.$tabList.find('li');
-            this.$tabFirst = this.$tabList.find('li:first-child a');
-            this.$tabLink = this.$tabList.find('li>a');
-
-            this.$tabPanel = this.$el.find('section');
-            this.$tabPanelFirstContent = this.$el.find('section > *:first-child');
-            this.$tabPanelFirst = this.$el.find('section:first-child');
-            this.$tabPanelNotFirst = this.$el.find('section:not(:first-of-type)');
-        },
-
-        bindEvents: function () {
-            var _that = this;
-            this.$tabLink.on('click', function (event) {
-
-                this.changeTab(event);
-            }.bind(this));
-            this.$tabLink.on('keydown', function () {
-                this.changeTabKey();
-            }.bind(this));
-
-            $('body').on("click", '.yatra-update-feature-tour-icon', function () {
-                _that.updateTourFeaturedStatus($(this));
-            });
-        },
-
-        updateTourFeaturedStatus: function (el) {
-            if ($(el).hasClass('processing')) {
-                return;
-            }
-            var tour_id = $(el).attr('data-tour-id');
-            var nonce = $(el).attr('data-tour-nonce');
-            var status = $(el).attr('data-is-featured');
-
-            var status_update_data = {
-                action: yatra_admin_params.tour_featured_status_update_action,
-                yatra_nonce: nonce,
-                tour_id: tour_id,
-                featured_status: status
-            };
-            $.ajax({
-                type: "POST",
-                url: yatra_admin_params.ajax_url,
-                data: status_update_data,
-                beforeSend: function () {
-                    $(el).addClass('processing');
-                },
-                success: function (response) {
-
-                    if (response.success === true) {
-
-                        var response_status = response.data;
-
-                        $(el).removeClass('dashicons-star-empty');
-
-                        $(el).removeClass('dashicons-star-filled');
-
-                        if (response_status === 1) {
-
-                            $(el).addClass('dashicons-star-filled');
-
-                        } else {
-
-                            $(el).addClass('dashicons-star-empty');
-                        }
-                        $(el).attr('data-is-featured', response_status);
-                    }
-
-
-                },
-                complete: function () {
-                    $(el).removeClass('processing');
-                }
-            });
-        },
-
-        changeTab: function (event) {
-            var self = $(event.target);
-            event.preventDefault();
-            this.removeTabFocus();
-            this.setSelectedTab(self);
-            this.hideAllTabPanels();
-            this.setSelectedTabPanel(self);
-        },
-
-        changeTabKey: function () {
-            var self = $(event.target),
-                $target = this.setKeyboardDirection(self, event.keyCode);
-
-            if ($target.length) {
-                this.removeTabFocus(self);
-                this.setSelectedTab($target);
-            }
-            this.hideAllTabPanels();
-            this.setSelectedTabPanel($(document.activeElement));
-        },
-
-        hideAllTabPanels: function () {
-            this.$tabPanel.attr('aria-hidden', 'true');
-        },
-
-        removeTabFocus: function (self) {
-            var $this = self || $('[role="tab"]');
-
-            $this.attr({
-                'tabindex': '-1',
-                'aria-selected': null
-            });
-        },
-
-        selectFirstTab: function () {
-            this.$tabFirst.attr({
-                'aria-selected': 'true',
-                'tabindex': '0'
-            });
-        },
-
-        setupAria: function () {
-            this.$tabList.attr('role', 'tablist');
-            this.$tab.attr('role', 'presentation');
-            this.$tabLink.attr({
-                'role': 'tab',
-                'tabindex': '-1'
-            });
-            this.$tabLink.each(function () {
-                var $this = $(this);
-
-                $this.attr('aria-controls', $this.attr('href').substring(1));
-            });
-            this.$tabPanel.attr({
-                'role': 'tabpanel'
-            });
-            this.$tabPanelFirstContent.attr({
-                'tabindex': '0'
-            });
-            this.$tabPanelNotFirst.attr({
-                'aria-hidden': 'true'
-            });
-            this.selectFirstTab();
-        },
-
-        setKeyboardDirection: function (self, keycode) {
-            var $prev = self.parents('li').prev().children('[role="tab"]'),
-                $next = self.parents('li').next().children('[role="tab"]');
-
-            switch (keycode) {
-                case 37:
-                    return $prev;
-                    break;
-                case 39:
-                    return $next;
-                    break;
-                default:
-                    return false;
-                    break;
-            }
-        },
-
-        setSelectedTab: function (self) {
-            self.attr({
-                'aria-selected': true,
-                'tabindex': '0'
-            }).focus();
-        },
-
-        setSelectedTabPanel: function (self) {
-            this.$el.find('#' + self.attr('aria-controls')).attr('aria-hidden', null);
-        },
-        removeStyle: function () {
-            this.$el.find('.yatra-tab-section').removeAttr('style');
-        }
-
-    };
-
-
-    var YatraAdmin = {
+    var YatraTourMeta = {
 
 
         init: function () {
 
             this.initElement();
-            this.initLib();
             this.initGalleryBuilder();
             this.groupPricing();
             this.conditionalVisibility();
@@ -218,34 +17,6 @@
         },
         initElement: function () {
             this.gallery_upload_frame = '';
-
-        }, initLib: function () {
-
-            if (typeof "select2" !== 'undefined') {
-
-                var select2 = $('.yatra-select2');
-
-                if (select2.length > 0) {
-                    $.each(select2, function () {
-                        var select2Args = {};
-                        select2Args.placeholder = typeof $(this).data('placeholder') !== undefined ? $(this).data('placeholder') : ''
-                        $(this).select2(select2Args);
-                    });
-
-
-                }
-            }
-
-            tippy('.yatra-tippy-tooltip', {
-                //content: "Hello World",
-
-                allowHTML: true,
-            });
-
-            if ($.isFunction($.fn.wpColorPicker)) {
-                $('.yatra-color-picker-container').remove();
-                $('.yatra-colorpicker').wpColorPicker().removeClass('yatra-hide');
-            }
 
         },
         conditionalVisibility: function () {
@@ -479,7 +250,6 @@
 
         },
         deleteSelectedDateRanges: function (el) {
-
             var start_date = el.closest('li').attr('data-start-date');
             var end_date = el.closest('li').attr('data-end-date');
             var selectedDateRanges = this.getSelectedDateRanges(el.closest('.yatra-field-wrap').find('input'));
@@ -542,8 +312,151 @@
         }
 
     };
+    var YatraTabs = {
+
+        init: function () {
+            this.initNewYatraTabs();
+            this.cacheDom();
+            this.setupAria();
+            this.bindEvents();
+            this.removeStyle();
+        },
+        initNewYatraTabs: function () {
+            var parent = $('.yatra-admin--tabs');
+            parent.find('li').on('click', function () {
+                $(this).closest('ul').find('li').removeClass('active');
+                $(this).addClass('active');
+                var tab_key = $(this).attr('data-tab');
+                $('input#yatra_tour_meta_tour_admin_active_tab').val(tab_key);
+                var content = parent.next('.yatra-admin--tab-content');
+                content.find('.yatra-admin-tab--content-section').removeClass('active');
+                content.find('#' + tab_key).addClass('active');
+            });
+        },
 
 
+        cacheDom: function () {
+            this.$el = $('.yatra-tabs');
+            this.$tabList = this.$el.find('ul.mb-tab-list');
+            this.$tab = this.$tabList.find('li');
+            this.$tabFirst = this.$tabList.find('li:first-child a');
+            this.$tabLink = this.$tabList.find('li>a');
+
+            this.$tabPanel = this.$el.find('section');
+            this.$tabPanelFirstContent = this.$el.find('section > *:first-child');
+            this.$tabPanelFirst = this.$el.find('section:first-child');
+            this.$tabPanelNotFirst = this.$el.find('section:not(:first-of-type)');
+        },
+
+        bindEvents: function () {
+            var _that = this;
+            this.$tabLink.on('click', function (event) {
+
+                this.changeTab(event);
+            }.bind(this));
+            this.$tabLink.on('keydown', function () {
+                this.changeTabKey();
+            }.bind(this));
+
+
+        },
+        changeTab: function (event) {
+            var self = $(event.target);
+            event.preventDefault();
+            this.removeTabFocus();
+            this.setSelectedTab(self);
+            this.hideAllTabPanels();
+            this.setSelectedTabPanel(self);
+        },
+
+        changeTabKey: function () {
+            var self = $(event.target),
+                $target = this.setKeyboardDirection(self, event.keyCode);
+
+            if ($target.length) {
+                this.removeTabFocus(self);
+                this.setSelectedTab($target);
+            }
+            this.hideAllTabPanels();
+            this.setSelectedTabPanel($(document.activeElement));
+        },
+
+        hideAllTabPanels: function () {
+            this.$tabPanel.attr('aria-hidden', 'true');
+        },
+
+        removeTabFocus: function (self) {
+            var $this = self || $('[role="tab"]');
+
+            $this.attr({
+                'tabindex': '-1',
+                'aria-selected': null
+            });
+        },
+
+        selectFirstTab: function () {
+            this.$tabFirst.attr({
+                'aria-selected': 'true',
+                'tabindex': '0'
+            });
+        },
+
+        setupAria: function () {
+            this.$tabList.attr('role', 'tablist');
+            this.$tab.attr('role', 'presentation');
+            this.$tabLink.attr({
+                'role': 'tab',
+                'tabindex': '-1'
+            });
+            this.$tabLink.each(function () {
+                var $this = $(this);
+
+                $this.attr('aria-controls', $this.attr('href').substring(1));
+            });
+            this.$tabPanel.attr({
+                'role': 'tabpanel'
+            });
+            this.$tabPanelFirstContent.attr({
+                'tabindex': '0'
+            });
+            this.$tabPanelNotFirst.attr({
+                'aria-hidden': 'true'
+            });
+            this.selectFirstTab();
+        },
+
+        setKeyboardDirection: function (self, keycode) {
+            var $prev = self.parents('li').prev().children('[role="tab"]'),
+                $next = self.parents('li').next().children('[role="tab"]');
+
+            switch (keycode) {
+                case 37:
+                    return $prev;
+                    break;
+                case 39:
+                    return $next;
+                    break;
+                default:
+                    return false;
+                    break;
+            }
+        },
+
+        setSelectedTab: function (self) {
+            self.attr({
+                'aria-selected': true,
+                'tabindex': '0'
+            }).focus();
+        },
+
+        setSelectedTabPanel: function (self) {
+            this.$el.find('#' + self.attr('aria-controls')).attr('aria-hidden', null);
+        },
+        removeStyle: function () {
+            this.$el.find('.yatra-tab-section').removeAttr('style');
+        }
+
+    };
     var YatraSubTabs = {
 
         init: function () {
@@ -601,7 +514,7 @@
             $('body').on('click', '.mb-repeator-heading span.remove', function () {
 
                 if ($(this).closest('.mb-meta-vertical-tab-content-item').find('.mb-repeator').length > 1) {
-                    $(this).closest('.mb-repeator').remove();
+                    $(this).closest('.mb-repeator').parent().remove();
                 }
                 $('.mb-repeator-heading-input').trigger('keyup');
             });
@@ -730,81 +643,7 @@
         }
 
     };
-
-
-    var YatraTaxonomy = {
-
-        init: function () {
-
-            this.cacheDom();
-            this.bindEvents();
-        },
-
-        cacheDom: function () {
-
-            this.$attribute_field_type = $('select[name="attribute_field_type"]');
-            this.$taxonomy_form_field = $('<div class="form-field term-group"/>');
-        },
-
-        bindEvents: function () {
-
-            var $this = this;
-            $this.$attribute_field_type.on('change', function () {
-                $this.onChangeAttributeType($(this));
-            });
-
-        },
-        onChangeAttributeType: function ($attribute_node) {
-
-            var spinner = $('<div class="spinner is-active" style="float:none;"></div>');
-
-            var attribute_params = yatra_admin_params.attribute_params;
-
-            if ($attribute_node.val() == '') {
-                $attribute_node.closest('form').find('.yatra-taxonomy-group').remove();
-                return;
-            }
-
-            var attribute_data = {
-                action: attribute_params.attribute_action,
-                yatra_nonce: attribute_params.attribute_nonce,
-                attribute_type: $attribute_node.val(),
-                is_edit: attribute_params.is_edit
-            };
-            $attribute_node.after(spinner);
-            $.ajax({
-                type: "POST",
-                url: yatra_admin_params.ajax_url,
-                data: attribute_data,
-                beforeSend: function () {
-
-                },
-                success: function (response) {
-
-                    if (response.success === true) {
-
-                        $attribute_node.closest('form').find('.yatra-taxonomy-group').remove();
-
-                        if (attribute_params.is_edit) {
-                            $attribute_node.closest('tr').after(response.data);
-                        } else {
-                            $attribute_node.closest('.form-field').after(response.data);
-                        }
-
-                    }
-                    $attribute_node.closest('.form-field').find('.spinner').remove()
-
-                },
-                complete: function () {
-                    $attribute_node.closest('.form-field').find('.spinner').remove()
-                }
-            });
-        }
-
-    };
-
-
-    var YatraTourAttributes = {
+    var YatraTourCustomAttribute = {
 
         init: function () {
 
@@ -910,128 +749,10 @@
 
 
     };
-
-
-    var YatraSettingFrontTabs = {
-        init: function () {
-            this.cacheDom();
-            this.bindEvents();
-            this.sortableSetting();
-        },
-        bindEvents: function () {
-            var _that = this;
-            this.button.on('click', function () {
-                _that.addNewTab($(this));
-            });
-            $('body').on('change', 'input.yatra_frontend_tabs_available_options_icon', function () {
-                var className = 'label';
-                className += ' ' + $(this).val();
-                $(this).closest('li').find('span.label').attr('class', className);
-            });
-            $('body').on('keyup', 'input.yatra_frontend_tabs_available_options_label', function () {
-
-                $(this).closest('li').find('span.label').text($(this).val());
-            });
-
-            $('body').on('click', 'button.available-tab-remove-item', function (e) {
-                e.preventDefault();
-                var that = $(this);
-
-                Swal.fire({
-                    title: yatra_admin_params.tab_settings_remove_tab_item_confirm_title,
-                    icon: 'warning',
-                    html: yatra_admin_params.tab_settings_remove_tab_item_confirm_message,
-                    showCancelButton: true,
-                    focusConfirm: false,
-                    focusCancel: true,
-                    confirmButtonText: yatra_admin_params.tab_settings_remove_tab_item_yes_button_text,
-                    cancelButtonText: yatra_admin_params.tab_settings_remove_tab_item_no_button_text,
-                    confirmButtonColor: '#dd3036',
-                    width: 650
-                }).then((result) => {
-                    if (result.value === true) {
-                        that.closest('li').remove();
-                        _that.updateTabOrdering();
-                    }
-                });
-
-            });
-
-        },
-        cacheDom: function () {
-            this.button = $('#yatra-setting-tab-option-add-new-tab');
-
-        },
-        addNewTab: function ($button) {
-            var wrap = $button.closest('.yatra-setting-tab-options');
-            var icon_name = wrap.find('ul').attr('data-icon-name');
-            var type_name = wrap.find('ul').attr('data-type-name');
-            var label_name = wrap.find('ul').attr('data-label-name');
-            var visibility_name = wrap.find('ul').attr('data-visibility-name');
-            var uuid = this.getUniqueID('text_');
-            var li = $('<li data-tab-type="' + uuid + '"/>');
-            //name
-            li.append('<span class="label">Tab Label Goes Here</span><input class="yatra_frontend_tabs_available_options_label" name="' + this.replaceAll(label_name, uuid) + '" type="text" value="Tab Label"/>');
-            //label
-            li.append('<input class="yatra_frontend_tabs_available_options_icon icopick" name="' + this.replaceAll(icon_name, uuid) + '" type="text" value=""/>');
-            //visbility
-
-            li.append('<label class="yatra-switch-control">\n' +
-                '<input class="widefat" id="' + this.replaceAll(icon_name, uuid) + '" name="' + this.replaceAll(visibility_name, uuid) + '" type="checkbox" value="1">\n' +
-                '<span class="slider round" data-on="show" data-off="hide"></span>\n' +
-                '</label>')
-
-            //icon
-
-            li.append('<input name="' + this.replaceAll(type_name, uuid) + '" type="hidden" value="text"/>');
-
-            li.append('<span><button type="button" class="available-tab-remove-item">x</button></span>');
-
-            wrap.find('ul').append(li);
-
-            this.updateTabOrdering();
-
-        },
-        replaceAll(text, uuid) {
-            return text.replace('TAB_INDEX', uuid);
-        },
-        getUniqueID: function (prefix = null, suffix = null) {
-            var uuid = Math.random().toString(36).substring(2) + (new Date()).getTime().toString(36);
-            uuid = prefix !== null ? (prefix + uuid) : uuid;
-            uuid = suffix !== null ? (uuid + suffix) : uuid;
-            return uuid;
-        },
-        updateTabOrdering: function () {
-
-            var sortableItemArray = [];
-
-            var $tab_ul = $('.yatra-setting-tab-options').find('ul');
-
-            $.each($tab_ul.find('li'), function () {
-
-                sortableItemArray.push($(this).attr('data-tab-type'));
-
-            });
-            if (sortableItemArray.length > 0) {
-                $('input#yatra_frontend_tabs_ordering_global').val(sortableItemArray.join());
-            }
-        },
-        sortableSetting: function () {
-            $('.yatra-setting-tab-options ul').sortable({
-                update: function (event, ui) {
-                },
-            });
-        }
-
-    };
-
-
     $(document).ready(function () {
-        YatraAdmin.init();
+        YatraTourMeta.init();
         YatraTabs.init();
         YatraSubTabs.init();
-        YatraTaxonomy.init();
-        YatraTourAttributes.init();
-        YatraSettingFrontTabs.init();
+        YatraTourCustomAttribute.init();
     });
 }(jQuery));

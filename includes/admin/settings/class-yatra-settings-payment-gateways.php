@@ -26,7 +26,7 @@ class Yatra_Settings_Payment_Gateways extends Yatra_Admin_Settings_Base
     public function __construct()
     {
         $this->id = 'payment-gateways';
-        $this->label = __('Payment Gateways', 'yatra');
+        $this->label = __('Payment', 'yatra');
 
         parent::__construct();
     }
@@ -113,6 +113,32 @@ class Yatra_Settings_Payment_Gateways extends Yatra_Admin_Settings_Base
 
                 ),
 
+                array(
+                    'title' => __('Enable/Disable Tax', 'yatra'),
+                    'desc' => __('This option enable/disable tax option for the tour', 'yatra'),
+                    'id' => 'yatra_payment_enable_tax',
+                    'type' => 'checkbox',
+                    'default' => 'no'
+                ),
+                array(
+                    'title' => __('Tax Option', 'yatra'),
+                    'desc' => __('This option let you choose tax option', 'yatra'),
+                    'id' => 'yatra_payment_tax_option',
+                    'type' => 'select',
+                    'options' => array(
+                        'included' => __('Tax will be included on tour price', 'yatra'),
+                        'excluded' => __('Custom tax percentage', 'yatra'),
+                    ),
+                    'default' => 'excluded'
+                ),
+
+                array(
+                    'title' => __('Tax percentage', 'yatra'),
+                    'desc' => __('Tax percentage', 'yatra'),
+                    'id' => 'yatra_payment_tax_percentage',
+                    'type' => 'number',
+                    'default' => '13'
+                ),
                 array(
                     'type' => 'sectionend',
                     'id' => 'yatra_payment_gateways_general_options',
