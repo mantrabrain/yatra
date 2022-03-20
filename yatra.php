@@ -19,6 +19,7 @@ if (!defined('ABSPATH')) {
 if (!defined('YATRA_FILE')) {
     define('YATRA_FILE', __FILE__);
 }
+
 // Define YATRA_VERSION.
 if (!defined('YATRA_VERSION')) {
     define('YATRA_VERSION', '2.1.8');
