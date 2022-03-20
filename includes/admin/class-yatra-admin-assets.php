@@ -212,10 +212,6 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
         }
 
-        public function get_admin_screens()
-        {
-            
-        }
     }
 
 

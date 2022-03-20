@@ -176,7 +176,6 @@
 
             if ($.fn.yatra_datepicker) {
 
-
                 $('.yatra-datepicker').yatra_datepicker({
                     language: 'en',
                     minDate: new Date(),
