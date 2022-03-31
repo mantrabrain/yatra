@@ -116,9 +116,10 @@ if (!defined('ABSPATH')) {
             </div>
             <div class="yatra-row-admin">
                 <div class="yatra-dashboard-card yatra-card">
-                    <div class="yatra-card-header"><h2>
-                            <span class="dashicons dashicons-external"></span>
-                            <?php echo __('Premium Addons/Extensions', 'yatra') ?></h2>
+                    <div class="yatra-card-header"><a
+                                href="https://wpyatra.com/yatra-premium-extensions/?ref=yatra-dashboard" target="_blank"><h2>
+                                <span class="dashicons dashicons-external"></span>
+                                <?php echo __('Premium Addons/Extensions', 'yatra') ?></h2></a>
                     </div>
                     <div class="yatra-card-body">
                         <h2>
