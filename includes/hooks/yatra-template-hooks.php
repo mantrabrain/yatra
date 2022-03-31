@@ -140,10 +140,12 @@ class Yatra_Template_Hooks
 
     public function wrapper_class($class)
     {
+        if (yatra_is_archive_page()) {
 
-        $display_mode = yatra_get_archive_display_mode();
+            $display_mode = yatra_get_archive_display_mode();
 
-        $class .= ' yatra-tour-archive-display-mode-' . esc_attr($display_mode);
+            $class .= ' yatra-tour-archive-display-mode-' . esc_attr($display_mode);
+        }
 
         return $class;
     }
