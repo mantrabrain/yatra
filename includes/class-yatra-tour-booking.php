@@ -144,7 +144,11 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                     'total_booking_net_price' => yatra_get_booking_final_price($booking_parameters, true),
 
-                    'coupon' => $coupon
+                    'coupon' => $coupon,
+
+                    'tax_rate' => yatra_get_tax_rate(),
+
+                    'tax_amount' => yatra()->cart->get_tax_amount()
 
                 );
 
@@ -326,6 +330,22 @@ if (!class_exists('Yatra_Tour_Booking')) {
             $meta_params = $booking_details->yatra_booking_meta_params ?? array();
 
             return $meta_params['coupon'] ?? array();
+        }
+
+        public function get_tax($rate_amount = 'rate')
+        {
+            $booking_details = $this->get_all_booking_details();
+
+            $meta_params = $booking_details->yatra_booking_meta_params ?? array();
+
+            $tax_rate = $meta_params['tax_rate'] ?? 0;
+
+            $tax_amount = $meta_params['tax_amount'] ?? 0;
+
+            if ($rate_amount === 'amount') {
+                return floatval($tax_amount);
+            }
+            return absint($tax_rate);
         }
 
         public function get_all_booking_by_user_id($user_id = null)

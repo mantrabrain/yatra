@@ -171,3 +171,9 @@ if (!function_exists('yatra_update_filter_meta_minimum_tour_price')) {
 
     }
 }
+if (!function_exists('yatra_get_tax_rate')) {
+    function yatra_get_tax_rate()
+    {
+        return absint(get_option('yatra_payment_tax_rate', 0));
+    }
+}

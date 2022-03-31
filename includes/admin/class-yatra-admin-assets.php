@@ -25,9 +25,6 @@ if (!class_exists('Yatra_Admin_Assets')) {
             $coupon_dependency = file_exists(YATRA_ABSPATH . 'assets/build/js/coupon.asset.php') ? include_once(YATRA_ABSPATH . 'assets/build/js/coupon.asset.php') : array();
             $coupon_dependency['dependencies'] = isset($coupon_dependency['dependencies']) ? $coupon_dependency['dependencies'] : array();
             $coupon_dependency['version'] = isset($coupon_dependency['version']) ? sanitize_text_field($coupon_dependency['version']) : YATRA_VERSION;
-            wp_register_script('yatra-coupon', YATRA_PLUGIN_URI . '/assets/build/js/coupon.js', $coupon_dependency['dependencies'], $coupon_dependency['version']);
-            wp_register_style('yatra-coupon-css', YATRA_PLUGIN_URI . '/assets/build/style-coupon.css', array('wp-components'), YATRA_VERSION);
-            wp_register_style('yatra-booking-meta-css', YATRA_PLUGIN_URI . '/assets/admin/css/booking-meta.css', array(), YATRA_VERSION);
 
             // Register Only Script
             wp_register_script('yatra-popper', YATRA_PLUGIN_URI . '/assets/lib/popperjs/popper.js', array(), YATRA_VERSION);
@@ -80,6 +77,16 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
             // Taxonomy Attributes JS
             wp_register_script('yatra-taxonomy-attributesjs', YATRA_PLUGIN_URI . '/assets/admin/js/attributes-taxonomy.js', array('jquery'), YATRA_VERSION);
+
+            $coupon_dependency_array = $coupon_dependency['dependencies'];
+
+            $coupon_dependency_array[] = 'yatra-tippy';
+
+            wp_register_script('yatra-coupon', YATRA_PLUGIN_URI . '/assets/build/js/coupon.js', $coupon_dependency_array, $coupon_dependency['version']);
+
+            wp_register_style('yatra-coupon-css', YATRA_PLUGIN_URI . '/assets/build/style-coupon.css', array('wp-components'), YATRA_VERSION);
+
+            wp_register_style('yatra-booking-meta-css', YATRA_PLUGIN_URI . '/assets/admin/css/booking-meta.css', array(), YATRA_VERSION);
 
 
             // Other Register and Enqueue

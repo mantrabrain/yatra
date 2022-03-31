@@ -2,7 +2,6 @@
     <?php
     $booking_statuses = yatra_get_booking_statuses();
     ?>
-
     <p class="flex">
         <label for="yatra_booking_status"><strong><?php esc_html_e('Booking Status', 'yatra'); ?>
                 : </strong></label>
@@ -18,13 +17,19 @@
         <label for="yatra_gross_price"><strong>Gross Booking Price: </strong></label>
         <span><?php echo esc_html(yatra_get_price($currency, $total_gross_price)); ?></span>
     </p>
+    <?php if ($tax_rate > 0) { ?>
+        <p class="flex">
+            <label for="yatra_coupon_code"><strong>Tax (<?php echo esc_html($tax_rate); ?>%) </strong></label>
+            <span>+ <?php echo esc_html(yatra_get_price($currency, $tax_amount)); ?></span>
+        </p>
+    <?php } ?>
     <p class="flex">
         <label for="yatra_coupon_code"><strong>Coupon Code: </strong></label>
         <span><strong><?php echo esc_html($discount_code); ?></strong></span>
     </p>
     <p class="flex">
         <label for="yatra_coupon_amount"><strong>Coupon Amount: </strong></label>
-        <span><?php echo esc_html(yatra_get_price($currency, $discount_amount)); ?></span>
+        <span>- <?php echo esc_html(yatra_get_price($currency, $discount_amount)); ?></span>
     </p>
     <p class="flex">
         <label for="yatra_gross_price"><strong>Net Booking Price: </strong></label>

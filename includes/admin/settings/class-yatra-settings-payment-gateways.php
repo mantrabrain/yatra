@@ -112,32 +112,12 @@ class Yatra_Settings_Payment_Gateways extends Yatra_Admin_Settings_Base
                     'options' => yatra_get_payment_gateways()
 
                 ),
-
-                array(
-                    'title' => __('Enable/Disable Tax', 'yatra'),
-                    'desc' => __('This option enable/disable tax option for the tour', 'yatra'),
-                    'id' => 'yatra_payment_enable_tax',
-                    'type' => 'checkbox',
-                    'default' => 'no'
-                ),
-                array(
-                    'title' => __('Tax Option', 'yatra'),
-                    'desc' => __('This option let you choose tax option', 'yatra'),
-                    'id' => 'yatra_payment_tax_option',
-                    'type' => 'select',
-                    'options' => array(
-                        'included' => __('Tax will be included on tour price', 'yatra'),
-                        'excluded' => __('Custom tax percentage', 'yatra'),
-                    ),
-                    'default' => 'excluded'
-                ),
-
                 array(
                     'title' => __('Tax percentage', 'yatra'),
-                    'desc' => __('Tax percentage', 'yatra'),
-                    'id' => 'yatra_payment_tax_percentage',
+                    'desc' => __('Add tax percentage only if you want to add tax on tour package. If you do not want to add tax then just leave it to 0.', 'yatra'),
+                    'id' => 'yatra_payment_tax_rate',
                     'type' => 'number',
-                    'default' => '13'
+                    'default' => '0'
                 ),
                 array(
                     'type' => 'sectionend',

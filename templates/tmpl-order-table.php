@@ -52,6 +52,20 @@
 
 
         </tr>
+        <?php if (yatra_get_tax_rate() > 0) { ?>
+            <tr>
+
+                <th colspan="3" class="tax">
+                    <strong><?php echo __('Tax:', 'yatra') ?></strong>
+                    <strong><?php echo esc_html(yatra_get_tax_rate()); ?>%</strong>
+                </th>
+                <td>
+                    <strong>+ <?php
+                        echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_tax_amount()); ?>
+                    </strong>
+                </td>
+            </tr>
+        <?php } ?>
         <?php if (isset($coupon['id'])) { ?>
             <tr>
                 <th colspan="3">

@@ -66,9 +66,22 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
                                 <span class="yatra-Price-amount amount"><?php echo yatra_get_price($currency_symbol, $booking_params['total_booking_gross_price']) ?></span>
                             </td>
 
-
                         </tr>
 
+                        <?php if ($tax_rate > 0) { ?>
+                            <tr>
+                                <th colspan="3">
+
+                                    <strong><?php echo __('Tax:', 'yatra') ?></strong>
+                                    <strong><?php echo esc_html($tax_rate); ?>%</strong>
+                                </th>
+                                <td class="tax-content">
+                                    <strong>+ <?php
+                                        echo yatra_get_price($currency_symbol, $tax_amount); ?>
+                                    </strong>
+                                </td>
+                            </tr>
+                        <?php } ?>
                         <?php if (isset($coupon['id'])) { ?>
                             <tr>
                                 <th colspan="3">
@@ -107,7 +120,7 @@ $currency_symbol = yatra_get_current_currency_symbol($currency);
                         <?php } ?>
 
                         <tr class="tour-book-total">
-                            <th colspan="3"><?php esc_html_e('Remaining Amount[Net Payable]', 'yatra');?></th>
+                            <th colspan="3"><?php esc_html_e('Remaining Amount[Net Payable]', 'yatra'); ?></th>
 
                             <td><strong><span
                                             class="yatra-Price-amount amount"><?php echo yatra_get_price($currency_symbol, $remaining_amount) ?></span>

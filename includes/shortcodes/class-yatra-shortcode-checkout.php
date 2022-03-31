@@ -87,7 +87,9 @@ class Yatra_Shortcode_Checkout
                     'booking_params' => $all_booking_details->yatra_booking_meta_params,
                     'payment' => $payment->get_all_info($booking_id, 'publish'),
                     'booking_id' => $booking_id,
-                    'coupon' => $coupon
+                    'coupon' => $coupon,
+                    'tax_rate' => $booking->get_tax(),
+                    'tax_amount' => $booking->get_tax('amount')
 
                 )
             );

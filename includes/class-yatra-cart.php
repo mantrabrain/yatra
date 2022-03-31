@@ -64,7 +64,11 @@ if (!class_exists('Yatra_Cart')) {
 
                 $coupon_value = isset($coupon['calculated_value']) ? floatval($coupon['calculated_value']) : 0;
 
-                return floatval($final_price) > $coupon_value ? floatval($final_price) - $coupon_value : 0;
+                $final_price = floatval($final_price) > $coupon_value ? floatval($final_price) - $coupon_value : 0;
+
+                $final_price += $this->get_tax_amount();
+
+                return $final_price;
 
             }
             return $final_price;
@@ -87,6 +91,23 @@ if (!class_exists('Yatra_Cart')) {
             }
 
             return yatra_get_booking_final_price($cart_parameters, $net_total);
+        }
+
+        public function get_tax_amount()
+        {
+            $tax_rate = yatra_get_tax_rate();
+
+            if ($tax_rate < 1) {
+                return 0;
+            }
+
+            $total = $this->get_cart_total();
+
+            if ($total < 1) {
+                return 0;
+            }
+            return ($total * $tax_rate / 100);
+
         }
 
         public function get_items()
@@ -133,7 +154,7 @@ if (!class_exists('Yatra_Cart')) {
             $calculated_value = 0;
 
             $total = $this->get_cart_total();
-            
+
             if ($type === "percentage") {
 
                 $calculated_value = floatval($total) > 0 ? ($total * $value) / 100 : 0;

@@ -53,7 +53,9 @@ if (!class_exists('Yatra_Metabox_Booking_CPT')) {
                 'discount_code' => $discount_code,
                 'total_gross_price' => $total_gross_price,
                 'total_net_price' => $total_net_price,
-                'current_status' => $current_status
+                'current_status' => $current_status,
+                'tax_rate' => $booking->get_tax(),
+                'tax_amount' => $booking->get_tax('amount'),
             ));
 
         }
