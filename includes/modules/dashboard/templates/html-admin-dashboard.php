@@ -182,7 +182,7 @@ if (!defined('ABSPATH')) {
                             <?php echo sprintf(__('If you would like to add a new feature on the yatra plugin or any of the addons you can send us a feature request. Our development team will check & validate your requested feature. If your requested feature passes the validation, then you will get that feature in the next upcoming versions of the plugin. You can send directly the request via email to %smantrabrain@gmail.com%s too.', 'yatra'), '<strong>', '</strong>'); ?>
                         </p></div>
                     <div class="yatra-card-footer"><a target="_blank"
-                                                      href="https://mantrabrain.com/request-new-feature/?ref=yatra-dashboard">
+                                                      href="https://wpyatra.com/yatra-plugin-roadmap/?ref=yatra-dashboard">
                             <?php echo __('Send feature request', 'yatra') ?></a></div>
                 </div>
             </div>
