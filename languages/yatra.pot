@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.8\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-02-22 09:36:59+00:00\n"
+"POT-Creation-Date: 2022-03-20 15:43:51+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,32 +35,33 @@ msgstr ""
 msgid "Select an Image"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:147
+#: includes/admin/class-yatra-admin-assets.php:136
+#: includes/admin/class-yatra-admin-assets.php:198
+msgid "Font Awesome"
+msgstr ""
+
+#: includes/admin/class-yatra-admin-assets.php:139
 msgid "Are you sure want to remove this item?"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:149
+#: includes/admin/class-yatra-admin-assets.php:141
 msgid ""
 "%1sWarning%2s: If you remove this tab, all of your contents associated with "
 "this tab will be deleted"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:151
-#: includes/admin/class-yatra-admin-assets.php:157
+#: includes/admin/class-yatra-admin-assets.php:143
+#: includes/admin/class-yatra-admin-assets.php:159
 msgid "Yes, Confirm"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:153
-#: includes/admin/class-yatra-admin-assets.php:159
+#: includes/admin/class-yatra-admin-assets.php:145
+#: includes/admin/class-yatra-admin-assets.php:160
 msgid "Cancel this process"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-assets.php:155
+#: includes/admin/class-yatra-admin-assets.php:158
 msgid "Are you sure want to delete attribute?"
-msgstr ""
-
-#: includes/admin/class-yatra-admin-assets.php:164
-msgid "Font Awesome"
 msgstr ""
 
 #: includes/admin/class-yatra-admin-export-import.php:16
@@ -200,7 +201,7 @@ msgstr ""
 
 #: includes/admin/class-yatra-admin-settings.php:711
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:17
-#: includes/template-tags.php:645
+#: includes/template-tags.php:647
 msgid "Add New"
 msgstr ""
 
@@ -208,6 +209,10 @@ msgstr ""
 #: includes/admin/class-yatra-admin-tour-enquiries.php:18
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:71
 msgid "Enquiries"
+msgstr ""
+
+#: includes/admin/class-yatra-admin-tour-enquiries.php:49
+msgid "All Enquiries"
 msgstr ""
 
 #: includes/admin/dashboard/class-mantrabrain-admin-dashboard.php:51
@@ -473,8 +478,8 @@ msgstr ""
 #: includes/class-yatra-enquiry-form.php:97
 #: includes/class-yatra-user-form.php:85 includes/class-yatra-user-form.php:86
 #: includes/class-yatra-user-form.php:94 includes/class-yatra-user-form.php:100
-#: includes/template-tags.php:710 includes/template-tags.php:714
-#: includes/template-tags.php:1147 templates/myaccount/tmpl-dashboard.php:47
+#: includes/template-tags.php:712 includes/template-tags.php:716
+#: includes/template-tags.php:1149 templates/myaccount/tmpl-dashboard.php:47
 #: templates/tour/additional.php:16
 msgid "Country"
 msgstr ""
@@ -1163,9 +1168,7 @@ msgid "Date Listing"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:29
-#: includes/admin/settings/class-yatra-settings-payment-gateways.php:109
-#: includes/functions.php:726
-msgid "Payment Gateways"
+msgid "Payment"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:90
@@ -1193,6 +1196,40 @@ msgid ""
 " While in test mode no live transactions are processed. To fully use test "
 "mode, you must have a sandbox (test) account for the payment gateway you "
 "are testing."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:109
+#: includes/functions.php:726
+msgid "Payment Gateways"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:117
+msgid "Enable/Disable Tax"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:118
+msgid "This option enable/disable tax option for the tour"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:124
+msgid "Tax Option"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:125
+msgid "This option let you choose tax option"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:129
+msgid "Tax will be included on tour price"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:130
+msgid "Custom tax percentage"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:136
+#: includes/admin/settings/class-yatra-settings-payment-gateways.php:137
+msgid "Tax percentage"
 msgstr ""
 
 #: includes/admin/setup/class-yatra-setup-wizard.php:51
@@ -1368,27 +1405,27 @@ msgstr ""
 #: includes/admin/templates/availability/availability-calendar.php:24
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:52
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:163
-#: includes/template-tags.php:802 templates/myaccount/tmpl-booking-item.php:65
+#: includes/template-tags.php:804 templates/myaccount/tmpl-booking-item.php:65
 #: templates/myaccount/tmpl-pricing-header.php:7
 msgid "Price Per"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:32
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:60
-#: includes/template-tags.php:807 templates/myaccount/tmpl-pricing-header.php:6
+#: includes/template-tags.php:809 templates/myaccount/tmpl-pricing-header.php:6
 msgid "Person"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:33
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:61
-#: includes/template-tags.php:808
+#: includes/template-tags.php:810
 msgid "Group"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:45
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:74
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:164
-#: includes/template-tags.php:813 includes/template-tags.php:817
+#: includes/template-tags.php:815 includes/template-tags.php:819
 #: templates/myaccount/tmpl-booking-item.php:66
 #: templates/myaccount/tmpl-pricing-header.php:8
 msgid "Group Size"
@@ -1425,7 +1462,7 @@ msgstr ""
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:6
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:13
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:159
-#: includes/template-tags.php:846 includes/template-tags.php:850
+#: includes/template-tags.php:848 includes/template-tags.php:852
 #: templates/myaccount/tmpl-booking-item.php:62
 msgid "Pricing Label"
 msgstr ""
@@ -1437,7 +1474,7 @@ msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:90
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:28
-#: includes/template-tags.php:735
+#: includes/template-tags.php:737
 msgid "Minimum People (Pax)"
 msgstr ""
 
@@ -1447,20 +1484,20 @@ msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:100
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:34
-#: includes/template-tags.php:740
+#: includes/template-tags.php:742
 msgid "Minimum number of people per booking"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:105
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:40
-#: includes/template-tags.php:746
+#: includes/template-tags.php:748
 msgid "Maximum People (Pax)"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:107
 #: includes/admin/templates/availability/availability-calendar.php:114
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:46
-#: includes/template-tags.php:751
+#: includes/template-tags.php:753
 msgid "Maximum number of people per booking"
 msgstr ""
 
@@ -1588,7 +1625,7 @@ msgid "Add new pricing option"
 msgstr ""
 
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:17
-#: includes/template-tags.php:447
+#: includes/template-tags.php:449
 #: includes/widgets/class-yatra-activity-widget.php:44
 #: includes/widgets/class-yatra-destination-widget.php:44
 #: includes/widgets/class-yatra-discount-deals-widget.php:44
@@ -1601,7 +1638,7 @@ msgid "Ex: Age Between age 16 to 18"
 msgstr ""
 
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:24
-#: includes/template-tags.php:856 includes/template-tags.php:860
+#: includes/template-tags.php:858 includes/template-tags.php:862
 msgid "Pricing Description"
 msgstr ""
 
@@ -2230,13 +2267,13 @@ msgstr ""
 msgid "Options"
 msgstr ""
 
-#: includes/functions.php:28 includes/template-tags.php:324
-#: includes/template-tags.php:338
+#: includes/functions.php:28 includes/template-tags.php:326
+#: includes/template-tags.php:340
 msgid "Itinerary"
 msgstr ""
 
-#: includes/functions.php:32 includes/template-tags.php:371
-#: includes/template-tags.php:385
+#: includes/functions.php:32 includes/template-tags.php:373
+#: includes/template-tags.php:387
 msgid "Cost Info"
 msgstr ""
 
@@ -2244,8 +2281,8 @@ msgstr ""
 msgid "Facts"
 msgstr ""
 
-#: includes/functions.php:40 includes/template-tags.php:416
-#: includes/template-tags.php:430
+#: includes/functions.php:40 includes/template-tags.php:418
+#: includes/template-tags.php:432
 msgid "FAQ"
 msgstr ""
 
@@ -2292,7 +2329,7 @@ msgstr ""
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:1071 includes/template-tags.php:848
+#: includes/functions.php:1071 includes/template-tags.php:850
 msgid "Guest"
 msgstr ""
 
@@ -4390,216 +4427,216 @@ msgstr ""
 msgid "N/A"
 msgstr ""
 
-#: includes/template-tags.php:258 includes/template-tags.php:310
+#: includes/template-tags.php:260 includes/template-tags.php:312
 msgid "Label Text"
 msgstr ""
 
-#: includes/template-tags.php:264 includes/template-tags.php:531
+#: includes/template-tags.php:266 includes/template-tags.php:533
 msgid "Content"
 msgstr ""
 
-#: includes/template-tags.php:298 includes/template-tags.php:312
+#: includes/template-tags.php:300 includes/template-tags.php:314
 msgid "Overview"
 msgstr ""
 
-#: includes/template-tags.php:316
+#: includes/template-tags.php:318
 msgid "Overview Description"
 msgstr ""
 
-#: includes/template-tags.php:336 includes/template-tags.php:383
-#: includes/template-tags.php:428 includes/template-tags.php:471
-#: includes/template-tags.php:498 templates/myaccount/tmpl-pricing-header.php:3
+#: includes/template-tags.php:338 includes/template-tags.php:385
+#: includes/template-tags.php:430 includes/template-tags.php:473
+#: includes/template-tags.php:500 templates/myaccount/tmpl-pricing-header.php:3
 msgid "Label"
 msgstr ""
 
-#: includes/template-tags.php:348
+#: includes/template-tags.php:350
 msgid "Heading"
 msgstr ""
 
-#: includes/template-tags.php:350
+#: includes/template-tags.php:352
 msgid "Day {index} "
 msgstr ""
 
-#: includes/template-tags.php:355
+#: includes/template-tags.php:357
 msgid "Title"
 msgstr ""
 
-#: includes/template-tags.php:360
+#: includes/template-tags.php:362
 msgid "Details"
 msgstr ""
 
-#: includes/template-tags.php:389
+#: includes/template-tags.php:391
 msgid "Price includes title"
 msgstr ""
 
-#: includes/template-tags.php:391
+#: includes/template-tags.php:393
 msgid "Price includes"
 msgstr ""
 
-#: includes/template-tags.php:395
+#: includes/template-tags.php:397
 msgid "Price include description"
 msgstr ""
 
-#: includes/template-tags.php:397 includes/template-tags.php:410
+#: includes/template-tags.php:399 includes/template-tags.php:412
 msgid "Type enter to show in new list."
 msgstr ""
 
-#: includes/template-tags.php:402
+#: includes/template-tags.php:404
 msgid "Price excludes title"
 msgstr ""
 
-#: includes/template-tags.php:404
+#: includes/template-tags.php:406
 msgid "Price excludes"
 msgstr ""
 
-#: includes/template-tags.php:408
+#: includes/template-tags.php:410
 msgid "Price excludes description"
 msgstr ""
 
-#: includes/template-tags.php:440
+#: includes/template-tags.php:442
 msgid "FAQ Heading"
 msgstr ""
 
-#: includes/template-tags.php:442
+#: includes/template-tags.php:444
 msgid "FAQ {index} "
 msgstr ""
 
-#: includes/template-tags.php:459 includes/template-tags.php:473
+#: includes/template-tags.php:461 includes/template-tags.php:475
 msgid "Map"
 msgstr ""
 
-#: includes/template-tags.php:478
+#: includes/template-tags.php:480
 msgid "Map Content"
 msgstr ""
 
-#: includes/template-tags.php:486 includes/template-tags.php:500
-#: includes/template-tags.php:505
+#: includes/template-tags.php:488 includes/template-tags.php:502
+#: includes/template-tags.php:507
 msgid "Gallery"
 msgstr ""
 
-#: includes/template-tags.php:526
+#: includes/template-tags.php:528
 msgid "Text Field"
 msgstr ""
 
-#: includes/template-tags.php:532 includes/template-tags.php:533
+#: includes/template-tags.php:534 includes/template-tags.php:535
 msgid "Default value for text field."
 msgstr ""
 
-#: includes/template-tags.php:541
+#: includes/template-tags.php:543
 msgid "Number Field"
 msgstr ""
 
-#: includes/template-tags.php:547 includes/template-tags.php:548
-#: includes/template-tags.php:549
+#: includes/template-tags.php:549 includes/template-tags.php:550
+#: includes/template-tags.php:551
 msgid "Default value for number field."
 msgstr ""
 
-#: includes/template-tags.php:555
+#: includes/template-tags.php:557
 msgid "Textarea Field"
 msgstr ""
 
-#: includes/template-tags.php:561 includes/template-tags.php:562
-#: includes/template-tags.php:563
+#: includes/template-tags.php:563 includes/template-tags.php:564
+#: includes/template-tags.php:565
 msgid "Default value for textarea field."
 msgstr ""
 
-#: includes/template-tags.php:570
+#: includes/template-tags.php:572
 msgid "Shortcode Field"
 msgstr ""
 
-#: includes/template-tags.php:575
+#: includes/template-tags.php:577
 msgid "Shortcode"
 msgstr ""
 
-#: includes/template-tags.php:576 includes/template-tags.php:577
+#: includes/template-tags.php:578 includes/template-tags.php:579
 msgid "Default value for shortcode field."
 msgstr ""
 
-#: includes/template-tags.php:638
+#: includes/template-tags.php:640
 msgid "Tour Attributes"
 msgstr ""
 
-#: includes/template-tags.php:664
+#: includes/template-tags.php:666
 msgid "Fixed Departure"
 msgstr ""
 
-#: includes/template-tags.php:666
+#: includes/template-tags.php:668
 msgid ""
 "This option let you enable/disable fix depdeparture option for this tour "
 "package. "
 msgstr ""
 
-#: includes/template-tags.php:674
+#: includes/template-tags.php:676
 msgid "Tour Availability Date Ranges"
 msgstr ""
 
-#: includes/template-tags.php:675
+#: includes/template-tags.php:677
 msgid ""
 "You can choose date range slot for this tour availability. Do not add any "
 "date range slot to show this tour on all dates."
 msgstr ""
 
-#: includes/template-tags.php:685
+#: includes/template-tags.php:687
 msgid "Tour Duration Days"
 msgstr ""
 
-#: includes/template-tags.php:686
+#: includes/template-tags.php:688
 msgid "Total duration days for this tour"
 msgstr ""
 
-#: includes/template-tags.php:690
+#: includes/template-tags.php:692
 msgid "Number of days"
 msgstr ""
 
-#: includes/template-tags.php:699
+#: includes/template-tags.php:701
 msgid "Tour Duration Nights"
 msgstr ""
 
-#: includes/template-tags.php:703
+#: includes/template-tags.php:705
 msgid "Number of nights"
 msgstr ""
 
-#: includes/template-tags.php:725
+#: includes/template-tags.php:727
 msgid "Feature this tour"
 msgstr ""
 
-#: includes/template-tags.php:727
+#: includes/template-tags.php:729
 msgid "This option let you enable/disable feature option for this tour package. "
 msgstr ""
 
-#: includes/template-tags.php:736
+#: includes/template-tags.php:738
 msgid ""
 "Minimum number of people per booking. Leave it blank to ignore minimum "
 "limit per booking."
 msgstr ""
 
-#: includes/template-tags.php:747
+#: includes/template-tags.php:749
 msgid ""
 "Maximum number of people per booking. Leave it blank to ignore maximum "
 "limit per booking."
 msgstr ""
 
-#: includes/template-tags.php:759 includes/template-tags.php:760
+#: includes/template-tags.php:761 includes/template-tags.php:762
 msgid "Maximum number of traveller"
 msgstr ""
 
-#: includes/template-tags.php:764
+#: includes/template-tags.php:766
 msgid "Maximum number of traveller for this tour package."
 msgstr ""
 
-#: includes/template-tags.php:826
+#: includes/template-tags.php:828
 msgid "Tour Price- Regular (%s)"
 msgstr ""
 
-#: includes/template-tags.php:830
+#: includes/template-tags.php:832
 msgid "Tour Price - Regular (%s)"
 msgstr ""
 
-#: includes/template-tags.php:836
+#: includes/template-tags.php:838
 msgid "Tour Price- Sales Price (%s)"
 msgstr ""
 
-#: includes/template-tags.php:840
+#: includes/template-tags.php:842
 msgid ""
 "Tour Price - Sales Price (%s). Leave it empty if you do not want to show "
 "sales price."
@@ -4946,12 +4983,12 @@ msgid ""
 "searching can help."
 msgstr ""
 
-#: templates/parts/content.php:56
+#: templates/parts/content.php:57
 #. translators: %s: Name of current post. Only visible to screen readers.
 msgid "Edit <span class=\"screen-reader-text\">%s</span>"
 msgstr ""
 
-#: templates/parts/content.php:71
+#: templates/parts/content.php:72
 msgid "Pages:"
 msgstr ""
 
@@ -5005,8 +5042,8 @@ msgstr ""
 
 #. Plugin URI of the plugin/theme
 msgid ""
-"https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/"
-"?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg"
+"https://wpyatra.com/?utm_source=wordpress&utm_medium=wppage&utm_"
+"campaign=wporg"
 msgstr ""
 
 #. Description of the plugin/theme
