@@ -392,14 +392,22 @@ class Yatra_Form_Handler
 
             if (!$is_email_already_exists && $password === $confirm_password && !empty($password) && !empty($email) && !$username_exists && !empty($username)) {
 
-                $userdata = array(
-                    'user_pass' => $password,
-                    'user_email' => $email,
-                    'user_login' => $username
+                $userdata = apply_filters(
+                    'yatra_new_customer_data',
+                    array(
+                        'user_login' => $username,
+                        'user_pass' => $password,
+                        'user_email' => $email,
+                    )
                 );
                 $user_id = wp_insert_user($userdata);
 
-                update_user_meta($user_id, 'yatra_user', true);
+                if (!is_wp_error($user_id)) {
+
+                    $role = new Yatra_User_Role();
+
+                    $role->add_customer_role($user_id);
+                }
 
                 if ($user_id) {
                     $creds = array(

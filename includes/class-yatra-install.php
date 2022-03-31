@@ -25,6 +25,9 @@ final class Yatra_Install
         ),
         '2.1.6' => array(
             'yatra_update_2160_tour_minimum_price',
+        ),
+        '2.1.9' => array(
+            'yatra_update_2190_user_roles',
         )
     );
 
@@ -39,6 +42,7 @@ final class Yatra_Install
         if (empty($yatra_version)) {
             self::create_tables();
             self::create_options();
+            self::create_roles();
             if (empty($yatra_version) && apply_filters('yatra_enable_setup_wizard', true)) {
                 set_transient('_yatra_activation_redirect', 1, 30);
             }
@@ -206,6 +210,13 @@ final class Yatra_Install
             update_option($option_key, $option_value);
         }
 
+    }
+
+    private static function create_roles()
+    {
+        $role = new Yatra_User_Role();
+
+        $role->init();
     }
 
     private static function versionwise_update()

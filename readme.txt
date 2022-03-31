@@ -3,7 +3,7 @@ Contributors: Mantrabrain, ughimire1
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
 Tested up to: 5.9
-Stable tag: 2.1.8
+Stable tag: 2.1.9
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -157,19 +157,4 @@ Shortcode for Tour Listing:
 
 == Changelog ==
 
-= 2.1.8 | 2022/02/21 =
-* Added - Payment History on My account & Booking Section
-* Added - Border radius on gallery
-* Added - Admin Gallery Design Updated
-* Added - Date listing feature added
-* Added - Primary color for yatra plugin
-* Added - Indicator option added
-* Fixed - Date range issue fixed on admin
-* Fixed - Single Tour Page Header Icon issue fixed
-* Fixed - P tag added on overview and other descriptive sections
-* Fixed - Nice button design fixed
-* Fixed - PayPal issue with coupon code
-* Update - Removed unused  metabox on booking page
-* Update - Enquiry form design fixed and minor updates
-* Update - Terms and condition alignment issue fixed on checkout and enquiry form
-* Update - Made checkout page form left/right alignment
+= 2.1.9 | 2022/04/02 =
