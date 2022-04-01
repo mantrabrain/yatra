@@ -517,6 +517,10 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
         public function yatra_add_attribute_meta()
         {
+            if (!current_user_can('manage_yatra')) {
+                
+                wp_send_json_error(array('error' => 'You do not have permission to  perform this action.', 'yatra'));
+            }
             $nonce_value = isset($_REQUEST['yatra_nonce']) ? $_REQUEST['yatra_nonce'] : '';
 
             $is_valid_nonce = wp_verify_nonce($nonce_value, 'wp_yatra_add_attribute_meta_nonce');

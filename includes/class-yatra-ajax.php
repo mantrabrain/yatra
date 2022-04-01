@@ -4,7 +4,6 @@ defined('ABSPATH') || exit;
 class Yatra_Ajax
 {
 
-
     private function admin_ajax_actions()
     {
         $actions = array(
@@ -53,6 +52,16 @@ class Yatra_Ajax
 
     }
 
+    private function validate_cap()
+    {
+        if (!current_user_can('manage_yatra')) {
+
+            wp_send_json_error(array('message' => __('You do not have permission to perform this action.', 'yatra'), 'status' => false));
+
+            exit;
+        }
+    }
+
     private function ajax_error()
     {
         return array('message' => __('Something wrong, please try again.', 'yatra'), 'status' => false);
@@ -98,6 +107,8 @@ class Yatra_Ajax
 
     public function update_tour_featured_status()
     {
+        $this->validate_cap();
+
         $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
 
         $nonce_action = 'yatra_tour_update_feature_status_' . $tour_id;
@@ -319,6 +330,9 @@ class Yatra_Ajax
 
     public function change_tour_attribute()
     {
+
+        $this->validate_cap();
+
         $status = $this->validate_nonce();
 
         if (!$status) {
@@ -345,6 +359,8 @@ class Yatra_Ajax
 
     public function import_content()
     {
+        $this->validate_cap();
+
         $status = $this->validate_nonce();
 
         if (!$status) {
@@ -392,6 +408,8 @@ class Yatra_Ajax
 
     public function import_sample_data_on_setup()
     {
+        $this->validate_cap();
+
         $status = $this->validate_nonce();
 
         if (!$status) {
@@ -416,6 +434,8 @@ class Yatra_Ajax
 
     public function tour_availability()
     {
+        $this->validate_cap();
+
         $status = $this->validate_nonce();
 
         if (!$status) {
@@ -445,6 +465,8 @@ class Yatra_Ajax
 
     public function day_wise_tour_availability()
     {
+        $this->validate_cap();
+
         $status = $this->validate_nonce();
 
         if (!$status) {
@@ -474,6 +496,8 @@ class Yatra_Ajax
 
     public function day_wise_tour_availability_save()
     {
+        $this->validate_cap();
+
         $status = $this->validate_nonce();
 
         if (!$status) {
@@ -574,7 +598,7 @@ class Yatra_Ajax
             yatra_get_calendar_date_listing($selected_date, $tour_id);
 
             $content = ob_get_clean();
-            
+
             wp_send_json_success(array('content' => $content));
 
             exit;

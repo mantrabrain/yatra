@@ -24,7 +24,7 @@ class Yatra_Admin_License_Manager
             'edit.php?post_type=tour',
             __('Licenses', 'yatra'),
             __('Licenses', 'yatra'),
-            'administrator',
+            'manage_yatra',
             'yatra-license', array($this, 'license_page'));
 
 
@@ -35,7 +35,7 @@ class Yatra_Admin_License_Manager
     {
         $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
 
-        if (!wp_verify_nonce($nonce, 'yatra_update_license_nonce')) {
+        if (!wp_verify_nonce($nonce, 'yatra_update_license_nonce') || !current_user_can('manage_yatra')) {
 
             wp_send_json_error();
             exit;
@@ -51,7 +51,7 @@ class Yatra_Admin_License_Manager
     {
         $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
 
-        if (!wp_verify_nonce($nonce, 'yatra_deactivate_license_nonce')) {
+        if (!wp_verify_nonce($nonce, 'yatra_deactivate_license_nonce') || !current_user_can('manage_yatra')) {
 
             wp_send_json_error();
             exit;
