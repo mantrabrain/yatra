@@ -40,7 +40,9 @@ if (!function_exists('yatra_update_2190_user_roles')) {
     {
         $role = new Yatra_User_Role();
 
-        $role->init();
+        $role->remove_roles();
+        
+        $role->create_roles();
 
         $all_users = get_users(array(
             'meta_key' => 'yatra_user',

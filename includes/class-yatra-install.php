@@ -216,7 +216,7 @@ final class Yatra_Install
     {
         $role = new Yatra_User_Role();
 
-        $role->init();
+        $role->create_roles();
     }
 
     private static function versionwise_update()

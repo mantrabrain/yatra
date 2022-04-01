@@ -42,13 +42,13 @@ if (!class_exists('Yatra_Custom_Post_Type_Coupons')) {
                 'show_in_menu' => 'edit.php?post_type=tour',
                 'query_var' => true,
                 'rewrite' => array('slug' => 'yatra-coupon'),
-                'capability_type' => 'post',
                 'has_archive' => false,
                 'hierarchical' => false,
                 'menu_position' => null,
                 'supports' => array('title'),
                 'menu_icon' => 'dashicons-location',
                 'with_front' => true,
+                'capability_type' => 'yatra-coupons',
             );
             register_post_type($this->slug, $args);
 

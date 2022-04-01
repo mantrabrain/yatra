@@ -36,7 +36,9 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'rewrite' => array(
                     'slug' => trim($permalinks['yatra_tour_base']),
                     'with_front' => true
-                )
+                ),
+                'capability_type' => 'tour',
+
             );
             register_post_type($this->slug, $args);
 

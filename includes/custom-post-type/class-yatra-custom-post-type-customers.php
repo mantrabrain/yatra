@@ -32,6 +32,8 @@ if (!class_exists('Yatra_Custom_Post_Type_Customers')) {
                     'create_posts' => 'do_not_allow', // false < WP 4.5, credit @Ewout
                     'delete_posts' => 'do_not_allow', // false < WP 4.5, credit @Ewout
                 ),
+                'capability_type' => 'yatra-customers',
+
 
 
             );

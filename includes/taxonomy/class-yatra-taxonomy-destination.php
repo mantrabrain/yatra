@@ -90,11 +90,16 @@ if (!class_exists('Yatra_Taxonomy_Destination')) {
                 'rewrite' => array(
                     'slug' => $permalinks['yatra_destination_base'],
                     'with_front' => true
-                )
+                ),
+                'capabilities' => array(
+                    'manage_terms' => 'manage_tour_terms',
+                    'edit_terms' => 'edit_tour_terms',
+                    'delete_terms' => 'delete_tour_terms',
+                    'assign_terms' => 'assign_tour_terms',
+                ),
             );
             register_taxonomy('destination', array('tour'), $args);
-
-
+            
         }
 
         public function form($taxonomy)

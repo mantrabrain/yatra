@@ -109,6 +109,8 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
                 'publicly_queryable' => false,
                 'exclude_from_search' => true,
                 'show_in_admin_bar' => false,
+                'capability_type' => 'yatra-booking',
+
 
 
             );

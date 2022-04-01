@@ -71,12 +71,12 @@ final class Yatra_Admin
 
     public function promotional_offer()
     {
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can('manage_yatra')) {
             return;
         }
 
         $offer_key = 'yatra_promo_notice_key';
-        
+
         $offer_start_date = strtotime('2022-01-09 00:00:01');
 
         $offer_end_date = strtotime('2022-01-23 23:59:00');
@@ -104,7 +104,7 @@ final class Yatra_Admin
 
         delete_transient('_yatra_activation_redirect');
 
-        if ((!empty($_GET['page']) && in_array($_GET['page'], array('yatra-setup'))) || is_network_admin() || isset($_GET['activate-multi']) || !current_user_can('manage_options')) {
+        if ((!empty($_GET['page']) && in_array($_GET['page'], array('yatra-setup'))) || is_network_admin() || isset($_GET['activate-multi']) || !current_user_can('manage_yatra')) {
             return;
         }
 
@@ -127,6 +127,11 @@ final class Yatra_Admin
      */
     public function setup_wizard()
     {
+        $role = new Yatra_User_Role();
+
+        $role->create_roles();
+
+
         // Setup/welcome
         if (!empty($_GET['page'])) {
 
@@ -142,7 +147,7 @@ final class Yatra_Admin
             'edit.php?post_type=tour',
             'Settings',
             'Settings',
-            'manage_options',
+            'manage_yatra',
             'yatra-settings',
             array($this, 'settings')
         );
@@ -155,7 +160,7 @@ final class Yatra_Admin
             'edit.php?post_type=tour',
             'Availability',
             'Availability',
-            'manage_options',
+            'manage_yatra',
             'yatra-availability',
             array($this, 'availability'),
             3

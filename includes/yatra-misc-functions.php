@@ -277,3 +277,14 @@ if (!function_exists('yatra_user_can_modify_booking')) {
         return false;
     }
 }
+
+if (!function_exists('yatra_has_cap')) {
+    function yatra_has_cap($context, $allowed_roles = 'administrator')
+    {
+        $allowed_roles = is_array($allowed_roles) ? $allowed_roles : array($allowed_roles);
+
+        $user_id = get_current_user_id();
+
+
+    }
+}
