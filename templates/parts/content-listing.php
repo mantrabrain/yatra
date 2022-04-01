@@ -16,7 +16,7 @@
             <div class="inner">
                 <?php
                 if (yatra_is_featured_tour()) {
-                    echo '<span class="yatra-featured-tour"><i class="icon fa fa-bullhorn"></i><small class="text">' . __('Featured', 'yatra') . '</small></span>';
+                    echo '<span class="yatra-featured-tour"><i class="yatra-icon fa fa-bullhorn"></i><small class="text">' . __('Featured', 'yatra') . '</small></span>';
                 }
                 yatra_tour_thumbnail(); ?>
             </div>

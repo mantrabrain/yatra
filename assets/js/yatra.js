@@ -105,10 +105,10 @@ window.yatra_global_tour_additional_price = 0;
                 $('body').on('click',
                     '.yatra-itinerary-list-item .itinerary-heading, .yatra-itinerary-list-item .itinerary-heading, .yatra-faq-list-item .faq-heading, .yatra-faq-list-item .faq-heading', function () {
 
-                        if ($(this).find('.icon').length === 0 && $(this).find('svg').length === 0) {
+                        if ($(this).find('.yatra-icon').length === 0 && $(this).find('svg').length === 0) {
                             return;
                         }
-                        var toggle_node = $(this).find('.icon').length !== 0 ? $(this).find('.icon') : $(this).find('svg');
+                        var toggle_node = $(this).find('.yatra-icon').length !== 0 ? $(this).find('.yatra-icon') : $(this).find('svg');
 
                         if (toggle_node.hasClass('fa-minus')) {
 
@@ -119,10 +119,10 @@ window.yatra_global_tour_additional_price = 0;
                     });
                 $('body').on('click', '.yatra-tab-content .tab-title, .yatra-tab-content .tab-title', function () {
 
-                    if ($(this).find('.icon').length === 0 && $(this).find('svg').length === 0) {
+                    if ($(this).find('.yatra-icon').length === 0 && $(this).find('svg').length === 0) {
                         return;
                     }
-                    var toggle_node = $(this).find('.icon').length !== 0 ? $(this).find('.icon') : $(this).find('svg');
+                    var toggle_node = $(this).find('.yatra-icon').length !== 0 ? $(this).find('.yatra-icon') : $(this).find('svg');
                     var span = $('<span class=""/>');
                     var heading = toggle_node.closest('h3');
                     toggle_node.hide();
@@ -137,7 +137,7 @@ window.yatra_global_tour_additional_price = 0;
 
                     $.each(toggle_node.closest('.yatra-tab-content').find('ul.yatra-list li.yatra-list-item .yatra-heading'), function () {
 
-                        var icon = $(this).find('.icon');
+                        var icon = $(this).find('.yatra-icon');
                         if (icon.length > 0) {
                             $this.toggleYatraList(icon, toggle_status);
                         }

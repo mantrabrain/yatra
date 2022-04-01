@@ -226,7 +226,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                     }
                     $class = $config === $active_tab_config ? 'active wowitsworking' : '';
 
-                    $icon = isset($setting['icon']) ? '<span class="icon ' . esc_attr($setting['icon']) . '"></span>' : '';
+                    $icon = isset($setting['icon']) ? '<span class="yatra-icon ' . esc_attr($setting['icon']) . '"></span>' : '';
 
                     $eye_icon_class = 'dashicons-visibility';
 
@@ -518,7 +518,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
         public function yatra_add_attribute_meta()
         {
             if (!current_user_can('manage_yatra')) {
-                
+
                 wp_send_json_error(array('error' => 'You do not have permission to  perform this action.', 'yatra'));
             }
             $nonce_value = isset($_REQUEST['yatra_nonce']) ? $_REQUEST['yatra_nonce'] : '';

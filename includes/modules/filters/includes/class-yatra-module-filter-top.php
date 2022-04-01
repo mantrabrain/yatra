@@ -196,10 +196,10 @@ class Yatra_Module_Filter_Top
         ?>
         <ul class="yatra-top-filter-display-list">
             <li class="yatra-display-type-grid<?php echo $selected === 'grid' ? ' selected' : ''; ?>">
-                <a href="<?php echo esc_attr($grid_mode_link) ?>"><i class="icon fa fa-th"></i></a>
+                <a href="<?php echo esc_attr($grid_mode_link) ?>"><i class="yatra-icon fa fa-th"></i></a>
             </li>
             <li class="yatra-display-type-list<?php echo $selected === 'list' ? ' selected' : ''; ?>">
-                <a href="<?php echo esc_attr($list_mode_link) ?>"><i class="icon fa fa-list"></i></a>
+                <a href="<?php echo esc_attr($list_mode_link) ?>"><i class="yatra-icon fa fa-list"></i></a>
             </li>
         </ul>
         <?php

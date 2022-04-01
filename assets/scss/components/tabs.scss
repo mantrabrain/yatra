@@ -80,7 +80,7 @@
   ul.yatra-tab-wrap {
     li.item {
       & > a {
-        .fa, svg, .icon {
+        .fa, svg, .yatra-icon {
           margin-right: 10px;
         }
       }
@@ -179,7 +179,7 @@
         .tab-title {
           padding: 5px 5px 10px 5px;
 
-          .icon {
+          .yatra-icon {
             float: right;
             cursor: pointer;
           }

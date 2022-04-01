@@ -1,7 +1,7 @@
 <div class="yatra-tour-additional-info">
     <div class="yatra-tour-additional-info-item">
         <div class="icon-wrap">
-            <i class="icon fa fa-clock"></i>
+            <i class="yatra-icon fa fa-clock"></i>
         </div>
         <div class="icon-content">
             <span class="info-title"><?php echo esc_html__('Duration', 'yatra'); ?></span>
@@ -10,7 +10,7 @@
     </div>
     <div class="yatra-tour-additional-info-item">
         <div class="icon-wrap">
-            <i class="icon fa fa-globe"></i>
+            <i class="yatra-icon fa fa-globe"></i>
         </div>
         <div class="icon-content">
             <span class="info-title"><?php echo esc_html__('Country', 'yatra'); ?></span>
@@ -22,7 +22,7 @@
         <span class="question yatra-tippy-tooltip fa fa-info-circle"
               data-tippy-content="This might be different as per your booking date"></span>
         <div class="icon-wrap">
-            <i class="icon fa fa-users"></i>
+            <i class="yatra-icon fa fa-users"></i>
         </div>
         <div class="icon-content">
             <span class="info-title"><?php echo esc_html__('Maximum Traveller', 'yatra'); ?></span>
@@ -34,7 +34,7 @@
         <span class="question yatra-tippy-tooltip fa fa-info-circle"
               data-tippy-content="This might be different as per your booking date"></span>
         <div class="icon-wrap">
-            <i class="icon fa fa-chair"></i>
+            <i class="yatra-icon fa fa-chair"></i>
         </div>
         <div class="icon-content">
             <span class="info-title"><?php echo esc_html__('Min Pax', 'yatra'); ?></span>

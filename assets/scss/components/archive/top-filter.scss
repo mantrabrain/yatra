@@ -38,7 +38,7 @@
           }
         }
 
-        a, .icon {
+        a, .yatra-icon {
           outline: none;
           font-size: 20px;
           cursor: pointer;
@@ -46,7 +46,7 @@
         }
 
         &.selected {
-          .icon {
+          .yatra-icon {
             color: #000;
           }
         }

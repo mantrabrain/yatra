@@ -8,7 +8,7 @@ if (!function_exists('yatra_get_taxonomy_term_lists')) {
         /* translators: used between list items, there is a space after the comma. */
         $terms = get_the_term_list($post_id, $taxonomy, '', __(',&nbsp;', 'yatra'));
 
-        $icon_html = $icon !== '' ? '<i class="icon ' . esc_attr($icon) . '"></i> ' : '';
+        $icon_html = $icon !== '' ? '<i class="yatra-icon ' . esc_attr($icon) . '"></i> ' : '';
 
         if ($terms) {
             printf(
@@ -201,7 +201,7 @@ if (!function_exists('yatra_entry_meta_options')) {
 
         yatra_get_taxonomy_term_lists($post_id, 'destination', false, 'fas fa-map-marker-alt');
 
-        echo '<span class="yatra-tour-duration"><i class="icon fa fa-clock"></i>' . esc_html($duration_string) . '</span>';
+        echo '<span class="yatra-tour-duration"><i class="yatra-icon fa fa-clock"></i>' . esc_html($duration_string) . '</span>';
 
         do_action('yatra_after_tour_meta', $post_id);
 
@@ -969,7 +969,7 @@ if (!function_exists('yatra_frontend_tabs')) {
                     ?>
                     <li class="item"><a
                                 href="#<?php echo esc_attr($tab_key); ?>"><?php if (isset($yatra_tour_tab_configurations[$tab_key]) && isset($yatra_tour_tab_configurations[$tab_key]['icon'])) {
-                                echo !empty($yatra_tour_tab_configurations[$tab_key]['icon']) ? '<span class="icon ' . esc_attr($yatra_tour_tab_configurations[$tab_key]['icon']) . '"></span>' : '';
+                                echo !empty($yatra_tour_tab_configurations[$tab_key]['icon']) ? '<span class="yatra-icon ' . esc_attr($yatra_tour_tab_configurations[$tab_key]['icon']) . '"></span>' : '';
                             }
                             echo esc_html($tab); ?></a></li>
                 <?php } ?>

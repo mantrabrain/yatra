@@ -1,6 +1,6 @@
 <h3 class="tab-title"><?php echo wp_kses($icon, array(
         'span' => array('class' => array())
-    )) ?><?php echo esc_html($title); ?><span class="icon fa fa-plus"></span></h3>
+    )) ?><?php echo esc_html($title); ?><span class="yatra-icon fa fa-plus"></span></h3>
 <div class="itinerary-section">
     <div class="yatra-tab-section-inner">
         <ul class="yatra-list yatra-itinerary-list">
@@ -11,7 +11,7 @@
 
                 echo '<div class="yatra-itinerary-list-item">';
 
-                echo '<h4 class="yatra-heading itinerary-heading">' . esc_html($itinerary_item['itinerary_heading']) . '<span class="icon fa fa-plus"></span></h4>';
+                echo '<h4 class="yatra-heading itinerary-heading">' . esc_html($itinerary_item['itinerary_heading']) . '<span class="yatra-icon fa fa-plus"></span></h4>';
 
                 echo '<div class="yatra-content itinerary-content" style="display: none">';
 

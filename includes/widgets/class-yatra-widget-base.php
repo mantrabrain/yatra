@@ -299,7 +299,7 @@ if (!class_exists('Yatra_Widget_Base')) {
 
                                     $class = $value == $icon_key ? 'active' : '';
 
-                                    echo '<li data-icon="' . esc_attr($icon_key) . '" class="icon ' . esc_attr($class) . '"><i class="fa ' . esc_attr($icon_key) . '"></i></li>';
+                                    echo '<li data-icon="' . esc_attr($icon_key) . '" class="yatra-icon ' . esc_attr($class) . '"><i class="fa ' . esc_attr($icon_key) . '"></i></li>';
                                 }
                                 ?>
 

@@ -13,7 +13,7 @@
                 </h2>
             </div>
             <div class="tour-info-pricing-content">
-                <p><span class="icon fa fa-tag"></span><?php echo __(' from ', 'yatra') ?>
+                <p><span class="yatra-icon fa fa-tag"></span><?php echo __(' from ', 'yatra') ?>
                     <?php if (absint($min_sales) < 1) { ?>
                         <span class="sales-price free"><?php echo __("Free", 'yatra'); ?></span>
                     <?php } else { ?>

@@ -2,7 +2,7 @@
     <div class="yatra-item-inner">
         <?php
         if (yatra_is_featured_tour($data['id'])) {
-            echo '<span class="yatra-featured-tour"><i class="icon fa fa-bullhorn"></i><small class="text">' . __('Featured', 'yatra') . '</small></span>';
+            echo '<span class="yatra-featured-tour"><i class="yatra-icon fa fa-bullhorn"></i><small class="text">' . __('Featured', 'yatra') . '</small></span>';
         } ?>
         <div class="yatra-figure-wrap">
             <figure><?php if (!empty($data['image'])) { ?>

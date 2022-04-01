@@ -262,7 +262,7 @@ if (!function_exists('yatra_nice_input_number_field')) {
         ?>
         <div class="yatra-nice-input-number">
             <button type="button" class="nice-button minus-button">
-                <span class="icon fa fa-minus"></span>
+                <span class="yatra-icon fa fa-minus"></span>
             </button>
 
             <input readonly
@@ -276,7 +276,7 @@ if (!function_exists('yatra_nice_input_number_field')) {
                    class="<?php echo esc_attr($class); ?>"
             />
             <button type="button" class="nice-button plus-button">
-                <span class="icon fa fa-plus"></span>
+                <span class="yatra-icon fa fa-plus"></span>
             </button>
 
         </div>
