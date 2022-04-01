@@ -109,7 +109,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 ),
                 array(
                     'title' => __('Email Content for customer', 'yatra'),
-                    'desc' => __('This option allows you to change booking notification email content for customer.', 'yatra'),
+                    'desc' => sprintf(__('This option allows you to change booking notification email content for customer. You can find all available email %s shortcodes from here%s.', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
                     'id' => 'yatra_booking_notification_email_content_for_customer',
                     'type' => 'textarea',
                     'editor' => true,
