@@ -127,11 +127,6 @@ final class Yatra_Admin
      */
     public function setup_wizard()
     {
-        $role = new Yatra_User_Role();
-
-        $role->create_roles();
-
-
         // Setup/welcome
         if (!empty($_GET['page'])) {
 
