@@ -21,6 +21,9 @@ if (!class_exists('Yatra_Assets')) {
             //Register Checkout Script
             wp_register_script('yatra-checkout', YATRA_PLUGIN_URI . '/assets/js/yatra-checkout.js', array('jquery'), YATRA_VERSION);
 
+            // Single Tour Scripts
+
+            wp_register_script('yatra-single-tour', YATRA_PLUGIN_URI . '/assets/js/yatra-single-tour.js', array('jquery'), YATRA_VERSION);
 
             wp_register_style('yatra-calendarcss', YATRA_PLUGIN_URI . '/assets/lib/yatra-calendar/css/yatra-calendar.css', false, YATRA_VERSION);
             wp_register_script('yatra-calendarjs', YATRA_PLUGIN_URI . '/assets/lib/yatra-calendar/js/yatra-calendar.js', false, YATRA_VERSION);
@@ -79,6 +82,7 @@ if (!class_exists('Yatra_Assets')) {
             $yatra_available_date_data = array();
 
             if (is_singular('tour') && get_option('yatra_date_selection_type', 'calendar') === 'calendar') {
+
                 $date_range = yatra_get_current_month_start_and_end_date();
 
                 $yatra_available_date_data = Yatra_Core_Tour_Availability::get_availability(get_the_ID(), $date_range['start'], $date_range['end'], array(
@@ -92,6 +96,12 @@ if (!class_exists('Yatra_Assets')) {
             } else if (yatra_is_checkout()) {
 
                 wp_enqueue_script('yatra-checkout');
+
+            }
+
+            if (is_singular('tour')) {
+
+                wp_enqueue_script('yatra-single-tour');
             }
             $yatra_params = apply_filters('yatra_script_localize_params', array(
 

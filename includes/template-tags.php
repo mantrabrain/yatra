@@ -976,7 +976,26 @@ if (!function_exists('yatra_frontend_tabs')) {
             </ul>
             <?php
             $loop_index = 0;
-            foreach ($frontend_tabs_config as $tab_content_key => $tab_content_title) { ?>
+
+            foreach ($frontend_tabs_config as $tab_content_key => $tab_content_title) {
+
+                $config = $yatra_tour_tab_configurations[$tab_content_key] ?? '';
+
+                $icon = '';
+
+                if (isset($config['icon']) && '' != $config['icon']) {
+                    $icon = '<span class="tab-icon ' . esc_attr($yatra_tour_tab_configurations[$tab_content_key]['icon']) . '"></span> ';
+                }
+                if ($loop_index > 0) {
+                    $toggle_icon = '<span class="tab-icon yatra-toggle-icon fa fa-angle-down"></span> ';
+                } else {
+                    $toggle_icon = '<span class="tab-icon yatra-toggle-icon fa fa-angle-up"></span> ';
+                }
+
+                $title_text = '<span class="title-text">' . esc_html($tab_content_title) . '</span> ';
+                ?>
+                <h3 class="yatra-responsive-tab-title"
+                    data-id="<?php echo esc_attr($tab_content_key) ?>"><?php echo $icon . ' ' . $title_text . ' ' . $toggle_icon ?></h3>
                 <section id="<?php echo esc_attr($tab_content_key); ?>"
                          class="yatra-tab-content" <?php if ($loop_index > 0) { ?> aria-hidden="true" <?php } ?>>
                     <div class="tab-inner">

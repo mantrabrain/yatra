@@ -1,0 +1,33 @@
+.yatra-responsive-tab-title {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .yatra-tabs {
+    &.yatra-single-tour-tabs {
+      ul.yatra-tab-wrap {
+        display: none;
+      }
+
+      .yatra-responsive-tab-title {
+
+        background: #eafffb;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 5px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0;
+        margin-bottom: 2px;
+        border: 1px solid #ddd;
+        gap: 20px;
+
+        .title-text {
+          flex: auto;
+        }
+      }
+    }
+  }
+}
+

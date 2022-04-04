@@ -132,7 +132,8 @@ class Yatra_Design_Hooks
         .yatra-tabs > ul,
         .yatra-calendar thead td, .yatra-calendar thead th,
         .yatra-tour-info-pricing-wrap .tour-info-pricing-header,
-        .yatra-calendar td.active
+        .yatra-calendar td.active,
+        .yatra-tabs.yatra-single-tour-tabs .yatra-responsive-tab-title
         {
         background:<?php echo $this->hex2rgba($primary_color, 0.06) ?>;
         }

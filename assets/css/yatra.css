@@ -3214,4 +3214,37 @@ body.single figure {
        -moz-box-pack: justify;
         -ms-flex-pack: justify;
             justify-content: space-between; } }
+
+.yatra-responsive-tab-title {
+  display: none; }
+
+@media (max-width: 768px) {
+  .yatra-tabs.yatra-single-tour-tabs ul.yatra-tab-wrap {
+    display: none; }
+  .yatra-tabs.yatra-single-tour-tabs .yatra-responsive-tab-title {
+    background: #eafffb;
+    font-size: 25px;
+    font-weight: 500;
+    padding: 5px 15px;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+       -moz-box-pack: justify;
+        -ms-flex-pack: justify;
+            justify-content: space-between;
+    -webkit-box-align: center;
+       -moz-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+    margin: 0;
+    margin-bottom: 2px;
+    border: 1px solid #ddd;
+    gap: 20px; }
+    .yatra-tabs.yatra-single-tour-tabs .yatra-responsive-tab-title .title-text {
+      -webkit-box-flex: 1;
+         -moz-box-flex: 1;
+          -ms-flex: auto;
+              flex: auto; } }
 /*# sourceMappingURL=yatra.css.map */
