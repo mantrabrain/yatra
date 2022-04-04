@@ -12,16 +12,17 @@
       .yatra-responsive-tab-title {
 
         background: #eafffb;
-        font-size: 25px;
+        font-size: 16px;
         font-weight: 500;
-        padding: 5px 15px;
+        padding: 8px 15px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin: 0;
         margin-bottom: 2px;
         border: 1px solid #ddd;
-        gap: 20px;
+        gap: 15px;
+        text-transform: uppercase;
 
         .title-text {
           flex: auto;

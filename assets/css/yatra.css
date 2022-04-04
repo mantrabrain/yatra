@@ -3223,9 +3223,9 @@ body.single figure {
     display: none; }
   .yatra-tabs.yatra-single-tour-tabs .yatra-responsive-tab-title {
     background: #eafffb;
-    font-size: 25px;
+    font-size: 16px;
     font-weight: 500;
-    padding: 5px 15px;
+    padding: 8px 15px;
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
@@ -3241,7 +3241,8 @@ body.single figure {
     margin: 0;
     margin-bottom: 2px;
     border: 1px solid #ddd;
-    gap: 20px; }
+    gap: 15px;
+    text-transform: uppercase; }
     .yatra-tabs.yatra-single-tour-tabs .yatra-responsive-tab-title .title-text {
       -webkit-box-flex: 1;
          -moz-box-flex: 1;
