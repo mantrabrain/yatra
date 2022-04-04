@@ -520,7 +520,6 @@ window.yatra_global_tour_additional_price = 0;
 
                     bindEvents: function () {
                         this.$tabLink.on('click', function (e) {
-
                             this.changeTab(e);
                         }.bind(this));
                         this.$tabLink.on('keydown', function (e) {
