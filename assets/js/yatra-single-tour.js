@@ -33,8 +33,6 @@
 
         };
     }(jQuery);
-
-
     $(document).ready(function () {
 
         YatraSingleTour.init();
