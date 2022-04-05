@@ -5,10 +5,21 @@ if (!class_exists('Yatra_Email')) {
 
     class Yatra_Email
     {
+        public function load_helper()
+        {
+            include_once YATRA_ABSPATH . 'includes/helpers/email-functions.php';
+        }
+
+        public function is_email_enabled()
+        {
+            return 'yes' != get_option('yatra_disable_all_email', 'no');
+
+        }
+
         public function __construct()
         {
 
-            if ('yes' === get_option('yatra_disable_all_email', 'no')) {
+            if (!$this->is_email_enabled()) {
                 return;
             }
 
@@ -20,9 +31,9 @@ if (!class_exists('Yatra_Email')) {
 
 
             // Booking Complete Email Hook
-            if ('yes' === get_option('yatra_enable_booking_notification_email_for_customer', 'yes')) {
-                add_action('yatra_after_tour_booking_completed', array($this, 'booking_completed_email'), 10);
-            }
+
+            add_action('yatra_after_tour_booking_completed', array($this, 'booking_completed_email'), 10);
+
             // Booking Status Change Hook
             add_action('yatra_after_booking_status_change', array($this, 'booking_status_change'), 10);
 
@@ -34,6 +45,9 @@ if (!class_exists('Yatra_Email')) {
 
         public function booking_completed_email($params = array())
         {
+            if (!$this->is_email_enabled()) {
+                return;
+            }
 
             $tour_ids = isset($params['tour_ids']) ? $params['tour_ids'] : array();
 
@@ -44,40 +58,42 @@ if (!class_exists('Yatra_Email')) {
                 return;
             }
 
-            // User Parameters
-            $user_message = Yatra_Admin_Emails_To_User::get_booking_completed_message();
-
-            $user_subject = Yatra_Admin_Emails_To_User::get_booking_completed_subject();
-
             $customer_detail = $this->get_customer_details($booking_id);
 
             $customer_email = isset($customer_detail['email']) ? $customer_detail['email'] : '';
 
+            $this->load_helper();
             // end of User Parameters
 
-            if (!empty($customer_email)) {
+            $yatra_all_smart_tags = yatra_all_smart_tags($booking_id);
 
-                $yatra_all_smart_tags = yatra_all_smart_tags($booking_id);
+            if (!empty($customer_email) && yatra_is_enable_email_notification("booking", "customer")) {
+
+                $user_message = Yatra_Admin_Emails_To_User::get_booking_completed_message();
+
+                $user_subject = Yatra_Admin_Emails_To_User::get_booking_completed_subject();
 
                 $this->send(array($customer_email), $user_subject, $user_message, $yatra_all_smart_tags, array());
+            }
 
-                if ($this->is_enable_admin_email()) {
+            if (yatra_is_enable_email_notification("booking", "admin")) {
 
-                    $admin_message = Yatra_Admin_Emails_To_Admin::get_booking_completed_message();
+                $admin_message = Yatra_Admin_Emails_To_Admin::get_booking_completed_message();
 
-                    $admin_subject = Yatra_Admin_Emails_To_Admin::get_booking_completed_subject();
+                $admin_subject = Yatra_Admin_Emails_To_Admin::get_booking_completed_subject();
 
-                    $admin_emails = $this->get_admin_emails();
+                $admin_emails = $this->get_admin_emails();
 
-                    $this->send($admin_emails, $admin_subject, $admin_message, $yatra_all_smart_tags, array(), true);
-
-                }
+                $this->send($admin_emails, $admin_subject, $admin_message, $yatra_all_smart_tags, array(), true);
 
             }
         }
 
         public function booking_status_change($params)
         {
+            if (!$this->is_email_enabled()) {
+                return;
+            }
 
             $booking_id = isset($params['booking_id']) ? $params['booking_id'] : 0;
 
@@ -90,47 +106,40 @@ if (!class_exists('Yatra_Email')) {
                 return false;
             }
 
-            // User Parameters
-            $user_message = Yatra_Admin_Emails_To_User::get_booking_status_change_message();
-
-            $user_subject = Yatra_Admin_Emails_To_User::get_booking_status_change_subject();
-
             $customer_detail = $this->get_customer_details($booking_id);
 
             $customer_email = isset($customer_detail['email']) ? $customer_detail['email'] : '';
 
             // end of User Parameters
 
-            if (!empty($customer_email)) {
+            $this->load_helper();
 
-                $yatra_all_smart_tags = yatra_all_smart_tags($booking_id);
+            $yatra_all_smart_tags = yatra_all_smart_tags($booking_id);
+
+            if (!empty($customer_email) && yatra_is_enable_email_notification("status_change", "customer")) {
+
+                // User Parameters
+                $user_message = Yatra_Admin_Emails_To_User::get_booking_status_change_message();
+
+                $user_subject = Yatra_Admin_Emails_To_User::get_booking_status_change_subject();
 
                 $this->send(array($customer_email), $user_subject, $user_message, $yatra_all_smart_tags, array());
 
-                if ($this->is_enable_admin_email()) {
+            }
 
-                    // Admin Parameters
-                    $admin_message = Yatra_Admin_Emails_To_Admin::get_booking_status_change_message();
+            if (yatra_is_enable_email_notification("status_change", "admin")) {
 
-                    $admin_subject = Yatra_Admin_Emails_To_Admin::get_booking_status_change_subject();
+                $admin_message = Yatra_Admin_Emails_To_Admin::get_booking_status_change_message();
 
-                    $admin_emails = $this->get_admin_emails();
+                $admin_subject = Yatra_Admin_Emails_To_Admin::get_booking_status_change_subject();
 
-                    $this->send($admin_emails, $admin_subject, $admin_message, $yatra_all_smart_tags, array(), true);
+                $admin_emails = $this->get_admin_emails();
 
-                }
+                $this->send($admin_emails, $admin_subject, $admin_message, $yatra_all_smart_tags, array(), true);
 
             }
 
-        }
 
-        private function is_enable_admin_email()
-        {
-            if ('yes' == get_option(' yatra_enable_admin_email ', 'yes')) {
-
-                return true;
-            }
-            return false;
         }
 
         private function get_admin_emails()
