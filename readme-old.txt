@@ -3,7 +3,6 @@ Contributors: Mantrabrain, ughimire1
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
 Tested up to: 5.9
-Requires PHP: 7.0
 Stable tag: 2.1.9
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -12,39 +11,42 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 == Description ==
 
-### Best Free WordPress Travel Booking Plugin - Yatra
-
-⭐ [View Demo](https://demo.wpyatra.com) ⭐ [Documentation](https://wpyatra.com/docs/) ⭐ [Facebook Community](https://www.facebook.com/groups/yatrawordpressplugin) ⭐
+**#Best WordPress Travel Booking Plugin**
 
 [Yatra]( https://wpyatra.com/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg) is a free, SEO friendly & scalable WordPress travel booking plugin to create travel and tour packages for tour operators and travel agencies.
 
 It's really simple & easy to create trip, itinerary & trekking packages with yatra WordPress travel management plugin and support different types of payment gateways so that its easy to accept payments. You can even modify your pricing as per trip date from availability calendar.
 
-⭐ [Yatra Main Site](https://wpyatra.com?ref=wordpress.org) ⭐ [Premium Extensions](https://wpyatra.com/yatra-premium-extensions/?ref=wporg) ⭐ [Feature Request](https://wpyatra.com/yatra-plugin-roadmap/?ref=wporg) ⭐
+⭐ [View Demo](https://demo.wpyatra.com) ⭐ | ⭐ [Documentation](https://wpyatra.com/docs/) ⭐ | ⭐ [Facebook Community](https://www.facebook.com/groups/yatrawordpressplugin) ⭐
+
+== Installation ==
+
+1. Install the plugin either via the WordPress.org plugin directory, or by uploading the files to your server (in the /wp-content/plugins/ directory).
+2. Activate the Yatra plugin through the 'Plugins' menu in WordPress.
 
 == Video Tour ==
 
 [youtube https://www.youtube.com/watch?v=URdGixOz760]
 
 == Yatra WordPress travel booking plugin features ==
-* Unlimited Travel & Tour Package with Activity & Destination pages
-* Easy & Smart booking process
-* Flexible/Dynamic Pricing with pricing label
-* Dynamic frontend tabs
-* Availability calendar with dynamic day wise pricing
-* Booking Calendar
-* Enquiry form
-* Unlimited Travel and Tour Categories
-* Translation Ready: The plugin is fully translation ready. So feel free to your website in any language.
-* Email notification
-* Smart Tags for email message
-* PayPal Payment gateway
-* My account section
-* Seperated customer section
-* Discount Coupon
-* Import/Export
-* Unlimited itineraries
-* Booking & Enquiry notification email
+  * Unlimited Travel & Tour Package with Activity & Destination pages
+  * Easy & Smart booking process
+  * Flexible/Dynamic Pricing with pricing label
+  * Dynamic frontend tabs
+  * Availability calendar with dynamic day wise pricing
+  * Booking Calendar
+  * Enquiry form
+  * Unlimited Travel and Tour Categories
+  * Translation Ready: The plugin is fully translation ready. So feel free to your website in any language.
+  * Email notification
+  * Smart Tags for email message
+  * PayPal Payment gateway
+  * My account section
+  * Seperated customer section
+  * Discount Coupon
+  * Import/Export
+  * Unlimited itineraries
+  * Booking & Enquiry notification email
 
 
 == Premium Payment Gateway Extensions/Addons ==
@@ -114,26 +116,33 @@ Shortcode for Tour Listing:
 * [Blocksy](https://wordpress.org/themes/blocksy/?ref=yatrapluginorg) by creativethemeshq
 * [Kadence](https://wordpress.org/themes/kadence/) by Ben Ritner - Kadence WP
 
-== Frequently Asked Questions ==
 
-= Does the plugin work with any WordPress themes?
+## 💙 LOVED YATRA TRAVEL BOOKING PLUGIN? 💙 ##
 
-Yes, Yatra WordPress Travel plugin is designed to work with any themes that have been coded following WordPress guidelines.
+- Join our [Facebook Group](https://www.facebook.com/groups/yatrawordpressplugin)
+- Rate us on [WordPress](https://wordpress.org/support/plugin/yatrawordpressplugin/reviews/?rate=5#new-post)
+- Request new feature from [Yatra Roadmaps](https://wpyatra.com/yatra-plugin-roadmap/?ref=wporg)
+- Visit [Yatra WordPress Plugin Page](https://wpyatra.com/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg)
 
-= Do you have any written documentation about Yatra WordPress plugin?
-
-Yes, we have. Check out this [documentation](https://wpyatra.com/docs/?ref=wporg)
-
-= Do I need to buy anything to work with Yatra? =
-
-No. You do not need to buy anything to work with yatra plugin. But if you think you need additional more feature than only you can buy our addon/extensions to extend more feature on Yatra plugin.
-
-= Do I need to have coding skills to use the Yatra WordPress plugin? =
-
-No, you don't need any coding skills. You can create unlimited tour packages with availability option & sell those packages easily.
-
+== Screenshots ==
+1. Add new tour option - Backend
+2. Add new tour with custom attributes - Backend
+3. Add new tour and manage frontend tabs while creating new tour - Backend
+4. Custom destination create option - Backend
+5. Custom activity create option - Backend
+6. Customer enquiries - Backend
+7. Booking listing page - Backend
+8. Booking view option - Backend
+9. General setting page - Backend
+10. Dynamic Tab Setting - Backend
+11. Availability options - Backend
+12. Dynamic day wise pricing as per availability - Backend
+13. Tour Single Page with booking calendar
+14. Enquiry form - frontend
+15. Frontend Tour Tab view
+16. Yatra Cart Page
+17. Yatra Checkout Page
 
 == Changelog ==
 
-= 1.0.0 - 16-09-2021 =
-- Initial Release.
+= 2.1.9 | 2022/04/02 =
