@@ -72,11 +72,6 @@ class Yatra_Setup_Wizard
                 'view' => array($this, 'setup_step_miscellaneous'),
                 'handler' => array($this, 'setup_step_miscellaneous_save'),
             ),
-            'themes' => array(
-                'name' => __('Themes', 'yatra'),
-                'view' => array($this, 'setup_step_themes'),
-                'handler' => array($this, 'setup_step_themes_save'),
-            ),
             'final' => array(
                 'name' => __('Final!', 'yatra'),
                 'view' => array($this, 'setup_final_ready'),
@@ -141,7 +136,8 @@ class Yatra_Setup_Wizard
             <title><?php _e('Yatra &rsaquo; Setup Wizard', 'yatra'); ?></title>
             <?php wp_print_scripts('yatra-setup'); ?>
             <?php do_action('admin_print_styles'); ?>
-            <?php //do_action('admin_head'); ?>
+            <?php //do_action('admin_head');
+            ?>
         </head>
         <body class="yatra-setup wp-core-ui">
         <h1 class="yatra-logo"><a
