@@ -14,13 +14,13 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 ### Best Free WordPress Travel Booking Plugin - Yatra
 
-⭐ [View Demo](https://demo.wpyatra.com) ⭐ [Documentation](https://wpyatra.com/docs/) ⭐ [Facebook Community](https://www.facebook.com/groups/yatrawordpressplugin) ⭐
+↪️ [View Demo](https://demo.wpyatra.com) ↪️ [Documentation](https://wpyatra.com/docs/) ↪️ [Join Facebook Community](https://www.facebook.com/groups/yatrawordpressplugin)
 
 [Yatra]( https://wpyatra.com/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg) is a free, SEO friendly & scalable WordPress travel booking plugin to create travel and tour packages for tour operators and travel agencies.
 
 It's really simple & easy to create trip, itinerary & trekking packages with yatra WordPress travel management plugin and support different types of payment gateways so that its easy to accept payments. You can even modify your pricing as per trip date from availability calendar.
 
-⭐ [Yatra Main Site](https://wpyatra.com?ref=wordpress.org) ⭐ [Premium Extensions](https://wpyatra.com/yatra-premium-extensions/?ref=wporg) ⭐ [Feature Request](https://wpyatra.com/yatra-plugin-roadmap/?ref=wporg) ⭐
+↪️ [Yatra Main Site](https://wpyatra.com?ref=wordpress.org) ↪️ [Premium Extensions](https://wpyatra.com/yatra-premium-extensions/?ref=wporg) ↪️ [Feature Request](https://wpyatra.com/yatra-plugin-roadmap/?ref=wporg)
 
 == Video Tour ==
 
@@ -60,7 +60,7 @@ It's really simple & easy to create trip, itinerary & trekking packages with yat
 * [Yatra Partial Payment](https://wpyatra.com/yatra-premium-extensions/yatra-partial-payment/?ref=wordpress.org)
 
 
-[View all Yatra Extensions/Addons](https://wpyatra.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
+[View all Yatra Premium Extensions/Addons](https://wpyatra.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
 
 
 == Shortcodes ==
@@ -114,6 +114,11 @@ Shortcode for Tour Listing:
 * [Blocksy](https://wordpress.org/themes/blocksy/?ref=yatrapluginorg) by creativethemeshq
 * [Kadence](https://wordpress.org/themes/kadence/) by Ben Ritner - Kadence WP
 
+## 💙 LOVED YATRA TRAVEL BOOKING PLUGIN? 💙 ##
+
+- Join our [Facebook Community Group](https://www.facebook.com/groups/yatrawordpressplugin)
+- Rate us on [WordPress](https://wordpress.org/support/plugin/yatrawordpressplugin/reviews/?rate=5#new-post)
+
 == Frequently Asked Questions ==
 
 = Does the plugin work with any WordPress themes?
@@ -124,13 +129,32 @@ Yes, Yatra WordPress Travel plugin is designed to work with any themes that have
 
 Yes, we have. Check out this [documentation](https://wpyatra.com/docs/?ref=wporg)
 
-= Do I need to buy anything to work with Yatra? =
+= Where can I report bugs? =
 
-No. You do not need to buy anything to work with yatra plugin. But if you think you need additional more feature than only you can buy our addon/extensions to extend more feature on Yatra plugin.
+You can Report bugs on the [Yatra GitHub repository](https://github.com/mantrabrain/yatra). You can also notify us via our email at mantrabrain@gmail.com directly.
 
 = Do I need to have coding skills to use the Yatra WordPress plugin? =
 
 No, you don't need any coding skills. You can create unlimited tour packages with availability option & sell those packages easily.
+
+== Screenshots ==
+1. Add new tour option - Backend
+2. Add new tour with custom attributes - Backend
+3. Add new tour and manage frontend tabs while creating new tour - Backend
+4. Custom destination create option - Backend
+5. Custom activity create option - Backend
+6. Customer enquiries - Backend
+7. Booking listing page - Backend
+8. Booking view option - Backend
+9. General setting page - Backend
+10. Dynamic Tab Setting - Backend
+11. Availability options - Backend
+12. Dynamic day wise pricing as per availability - Backend
+13. Tour Single Page with booking calendar
+14. Enquiry form - frontend
+15. Frontend Tour Tab view
+16. Yatra Cart Page
+17. Yatra Checkout Page
 
 
 == Changelog ==
