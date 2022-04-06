@@ -42,6 +42,7 @@ It's really simple & easy to create trip, itinerary & trekking packages with yat
 * My account section
 * Seperated customer section
 * Discount Coupon
+* Tax Option
 * Import/Export
 * Unlimited itineraries
 * Booking & Enquiry notification email
