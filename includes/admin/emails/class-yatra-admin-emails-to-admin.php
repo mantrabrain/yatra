@@ -113,7 +113,7 @@ if (!class_exists('Yatra_Admin_Emails_To_Admin')) {
             
             <br/>
 
-			{{enquiry_fullname}} send you an enquiry about  {{enquiry_tour_name}} to<a href="{{home_url}}">{{blog_info}}</a> with following details.
+			{{enquiry_fullname}} send you an enquiry about  {{enquiry_tour_name}} on<a target="_blank" href="{{home_url}}">{{blog_info}}</a> with following details.
 			
 			<br/>
 			
@@ -166,7 +166,7 @@ if (!class_exists('Yatra_Admin_Emails_To_Admin')) {
 
                 'yatra_enquiry_form_saved_admin_subject',
                 __(
-                    '{{enquiry_fullname}} send enquiry about {{enquiry_tour_name}}.',
+                    '{{enquiry_fullname}} send enquiry about {{enquiry_tour_name}}',
                     'yatra'
                 )
             );

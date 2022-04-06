@@ -563,7 +563,7 @@ if (!function_exists('yatra_enquiry_form_smart_tags')) {
             $enquiry_item = $enquiry[0];
 
             $country = $enquiry_item->country ? yatra_get_countries($enquiry_item->country) : '';
-            $tour_title = absint($enquiry_item->tour_id) > 0 ? get_the_title($enquiry_item->tour_id) : '';
+            $tour_title = isset($enquiry_item->tour_id) && absint($enquiry_item->tour_id) > 0 ? get_the_title($enquiry_item->tour_id) : '';
             $smart_tags = array(
                 'enquiry_fullname' => $enquiry_item->fullname ?? '',
                 'enquiry_tour_name' => $tour_title,
