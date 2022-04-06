@@ -88,7 +88,7 @@ Shortcode for Tour Listing:
 <pre>[yatra_tour order="asc" featured="1" posts_per_page="5"]</pre>
 
 
-== Smart Tags For Booking Notification ==
+== Smart Tags For Booking Notification Email ==
 * {{home_url}} : Get home page url
 * {{blog_info}} : Get blog info of a website
 * {{booking_code}} : Get booking code of specific booking
@@ -97,7 +97,7 @@ Shortcode for Tour Listing:
 * {{customer_name}} : Get customer name of specific booking
 * {{customer_email}} : Get customer email of specific booking
 
-== Smart Tags For Enquiry Notification ==
+== Smart Tags For Enquiry Notification Email ==
 * {{home_url}} : Get home page url
 * {{blog_info}} : Get blog info of a website
 * {{enquiry_fullname}} : Get Full name from enquiry form
