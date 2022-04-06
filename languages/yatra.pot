@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.9\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-04-06 05:34:26+00:00\n"
+"POT-Creation-Date: 2022-04-06 08:50:48+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -297,6 +297,59 @@ msgstr ""
 msgid ""
 "{{customer_name}}'s  tour booking({{booking_code}}) has been "
 "{{booking_status}}."
+msgstr ""
+
+#: includes/admin/emails/class-yatra-admin-emails-to-admin.php:111
+msgid ""
+"Hi Admin,\n"
+"            \n"
+"            <br/>\n"
+"\n"
+"\t\t\t{{enquiry_fullname}} send you an enquiry about  {{enquiry_tour_name}} "
+"on<a target=\"_blank\" href=\"{{home_url}}\">{{blog_info}}</a> with "
+"following details.\n"
+"\t\t\t\n"
+"\t\t\t<br/>\n"
+"\t\t\t\n"
+"\t\t    Email: <b>{{enquiry_email}}</b>\n"
+"\t\t    \n"
+"\t\t    <br/>\n"
+"\t\t\t\t    \n"
+"\t\t\tCountry: <b>{{enquiry_country}}</b>\n"
+"\t\t    \n"
+"\t\t    <br/>\n"
+"\t\t    \t\t\t\n"
+"\t\t    Phone Number: <b>{{enquiry_phone_number}}</b>\n"
+"\t\t    \n"
+"\t\t    <br/>\n"
+"\t\t    \t\t    \t\t\t\n"
+"\t\t    Number of adults: <b>{{enquiry_number_of_adults}}</b>\n"
+"\t\t    \n"
+"\t\t    <br/>\n"
+"\t\t    \t\t    \t\t    \t\t\t\n"
+"\t\t    Number of childs: <b>{{enquiry_number_of_childs}}</b>\n"
+"\t\t    \n"
+"\t\t    <br/>\n"
+"\t\t     \n"
+"\t\t    Subject: <b>{{enquiry_subject}}</b>\n"
+"\t\t    \n"
+"\t\t    <br/>\n"
+"\t\t    \n"
+"\t\t    Date: <b>{{enquiry_date}}</b>\n"
+"\t\t    \n"
+"\t\t    <br/>\n"
+"\t\t    \n"
+"\t\t    <b>Message</b>\n"
+"\t\t    <br/>\n"
+"\t\t\t\t    \n"
+"\t\t\t{{enquiry_message}}\n"
+"\n"
+"            <br/>\n"
+"\t\t\t"
+msgstr ""
+
+#: includes/admin/emails/class-yatra-admin-emails-to-admin.php:168
+msgid "{{enquiry_fullname}} send enquiry about {{enquiry_tour_name}}"
 msgstr ""
 
 #: includes/admin/emails/class-yatra-admin-emails-to-user.php:16
@@ -665,157 +718,184 @@ msgstr ""
 msgid "Booking Status Change Notification"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:88
+#: includes/admin/settings/class-yatra-settings-emails.php:45
+msgid "Enquiry Notification"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-emails.php:89
 msgid "Booking notification email: To Customer"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:94
-#: includes/admin/settings/class-yatra-settings-emails.php:181
+#: includes/admin/settings/class-yatra-settings-emails.php:95
+#: includes/admin/settings/class-yatra-settings-emails.php:182
 msgid "Enable/Disable Customer Email"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:95
+#: includes/admin/settings/class-yatra-settings-emails.php:96
 msgid ""
 "This option allows you to enable/disable booking notification email for "
 "customer."
-msgstr ""
-
-#: includes/admin/settings/class-yatra-settings-emails.php:101
-#: includes/admin/settings/class-yatra-settings-emails.php:188
-msgid "Email Subject for customer"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-emails.php:102
+#: includes/admin/settings/class-yatra-settings-emails.php:189
+msgid "Email Subject for customer"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-emails.php:103
 msgid ""
 "This option allows you to change booking notification email subject for "
 "customer."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:112
-#: includes/admin/settings/class-yatra-settings-emails.php:199
+#: includes/admin/settings/class-yatra-settings-emails.php:113
+#: includes/admin/settings/class-yatra-settings-emails.php:200
 msgid "Email Content for customer"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:113
+#: includes/admin/settings/class-yatra-settings-emails.php:114
 msgid ""
 "This option allows you to change booking notification email content for "
-"customer. You can find all available email %s shortcodes from here%s."
+"customer. View all available %sBooking Smart Tags%s"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:129
+#: includes/admin/settings/class-yatra-settings-emails.php:130
 msgid "Booking notification email: To Admin"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:135
-#: includes/admin/settings/class-yatra-settings-emails.php:222
+#: includes/admin/settings/class-yatra-settings-emails.php:136
+#: includes/admin/settings/class-yatra-settings-emails.php:224
+#: includes/admin/settings/class-yatra-settings-emails.php:269
 msgid "Enable/Disable Admin Email"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:136
+#: includes/admin/settings/class-yatra-settings-emails.php:137
 msgid ""
 "This option allows you to enable/disable booking notification email for "
 "admin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:142
-#: includes/admin/settings/class-yatra-settings-emails.php:229
+#: includes/admin/settings/class-yatra-settings-emails.php:143
+#: includes/admin/settings/class-yatra-settings-emails.php:231
+#: includes/admin/settings/class-yatra-settings-emails.php:276
 msgid "Email Subject for admin"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:143
+#: includes/admin/settings/class-yatra-settings-emails.php:144
 msgid ""
 "This option allows you to change booking notification email subject for "
 "admin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:153
-#: includes/admin/settings/class-yatra-settings-emails.php:240
+#: includes/admin/settings/class-yatra-settings-emails.php:154
+#: includes/admin/settings/class-yatra-settings-emails.php:242
+#: includes/admin/settings/class-yatra-settings-emails.php:287
 msgid "Email Content for admin"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:154
+#: includes/admin/settings/class-yatra-settings-emails.php:155
 msgid ""
 "This option allows you to change booking notification email content for "
-"admin. You can find all available email %s shortcodes from here%s."
+"admin. View all available %sBooking Smart Tags%s"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:175
+#: includes/admin/settings/class-yatra-settings-emails.php:176
 msgid "Booking status change notification email: To Customer"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:182
+#: includes/admin/settings/class-yatra-settings-emails.php:183
 msgid ""
 "This option allows you to enable/disable booking status changed "
 "notification email for customer."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:189
+#: includes/admin/settings/class-yatra-settings-emails.php:190
 msgid ""
 "This option allows you to change booking status change notification email "
 "subject for customer."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:200
+#: includes/admin/settings/class-yatra-settings-emails.php:202
 msgid ""
 "This option allows you to change booking status change notification email "
-"content for customer. You can find all available email %s shortcodes from "
-"here%s."
+"content for customer. View all available %sBooking Smart Tags%s"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:216
+#: includes/admin/settings/class-yatra-settings-emails.php:218
 msgid "Booking status change notification email: To Admin"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:223
+#: includes/admin/settings/class-yatra-settings-emails.php:225
 msgid ""
 "This option allows you to enable/disable booking status change notification "
 "email for admin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:230
+#: includes/admin/settings/class-yatra-settings-emails.php:232
 msgid ""
 "This option allows you to change booking status change notification email "
 "subject for admin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:241
+#: includes/admin/settings/class-yatra-settings-emails.php:243
 msgid ""
 "This option allows you to change booking status change notification email "
-"content for admin. You can find all available email %s shortcodes from "
-"here%s."
+"content for admin. View all available %sBooking Smart Tags%s"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:261
+#: includes/admin/settings/class-yatra-settings-emails.php:263
+msgid "Enquiry notification email: To Admin"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-emails.php:270
+msgid ""
+"This option allows you to enable/disable enquiry form notification email "
+"for admin."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-emails.php:277
+msgid ""
+"This option allows you to change enquiry notification email subject for "
+"admin."
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-emails.php:288
+msgid ""
+"This option allows you to change enquiry notification email content for "
+"admin. View all available %sEnquiry Form Smart Tags%s"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-emails.php:308
 msgid "General Email Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:267
+#: includes/admin/settings/class-yatra-settings-emails.php:314
 msgid "Disable all  emails"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:268
+#: includes/admin/settings/class-yatra-settings-emails.php:315
 msgid ""
 "This option disable all email ( admin and user email )  related to yatra "
 "plugin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:279
+#: includes/admin/settings/class-yatra-settings-emails.php:326
 msgid "Email Sender Options"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:285
+#: includes/admin/settings/class-yatra-settings-emails.php:332
 msgid "\"From\" name"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:286
+#: includes/admin/settings/class-yatra-settings-emails.php:333
 msgid "From name for outgoing email address from yatra plugin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:296
+#: includes/admin/settings/class-yatra-settings-emails.php:343
 msgid "\"From\" email address"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:297
+#: includes/admin/settings/class-yatra-settings-emails.php:344
 msgid "From email address for outgoing email address from yatra plugin."
 msgstr ""
 
@@ -1289,7 +1369,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:109
-#: includes/functions.php:726
+#: includes/functions.php:776
 msgid "Payment Gateways"
 msgstr ""
 
@@ -1919,11 +1999,11 @@ msgstr ""
 msgid "Confirm password  doesn't matched with password"
 msgstr ""
 
-#: includes/class-yatra-email.php:252
+#: includes/class-yatra-email.php:274
 msgid "Yatra Email successfully sent to %s"
 msgstr ""
 
-#: includes/class-yatra-email.php:256
+#: includes/class-yatra-email.php:278
 msgid "Yatra Email could not sent to %s via WP_Mail function"
 msgstr ""
 
@@ -2408,11 +2488,11 @@ msgstr ""
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:1071 includes/template-tags.php:850
+#: includes/functions.php:1121 includes/template-tags.php:850
 msgid "Guest"
 msgstr ""
 
-#: includes/functions.php:1211
+#: includes/functions.php:1261
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
 msgstr ""

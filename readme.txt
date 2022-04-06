@@ -17,11 +17,8 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 It's really simple & easy to create trip, itinerary & trekking packages with yatra WordPress travel management plugin and support different types of payment gateways so that its easy to accept payments. You can even modify your pricing as per trip date from availability calendar.
 
-Get [free support](https://mantrabrain.com/support-forum/)
+⭐ [View Demo](https://demo.wpyatra.com) ⭐ | ⭐ [Documentation](https://wpyatra.com/docs/) ⭐ | ⭐ [Facebook Community](https://www.facebook.com/groups/yatrawordpressplugin) ⭐
 
-Feature [request](https://mantrabrain.com/request-new-feature/)
-
-You can Join our [Facebook Community group](https://www.facebook.com/groups/yatrawordpressplugin)
 
 == Installation ==
 
@@ -32,42 +29,25 @@ You can Join our [Facebook Community group](https://www.facebook.com/groups/yatr
 
 [youtube https://www.youtube.com/watch?v=URdGixOz760]
 
-== Yatra - Features ==
-
-1. Unlimited Travel & Tour Package with Activity & Destination pages
-
-2. Easy & Smart booking process
-
-3. Flexible/Dynamic Pricing with pricing label
-
-4. Dynamic frontend tabs
-
-5. Availability calendar with dynamic day wise pricing
-
-6. Frontend Booking Calendar
-
-7. Enquiry form
-
-8. Unlimited Travel and Tour Categories
-
-9. Translation Ready: The plugin is fully translation ready. So feel free to your website in any language.
-
-10. Email notification
-
-11. Smart Tags for email message
-
-12. PayPal Payment gateway
-
-13. My account section
-
-14. Seperated customer section
-
-15. Discount Coupon
-
-16. Import/Export
-
-17. Unlimited itineraries
-
+== Yatra WordPress travel booking plugin features ==
+  * Unlimited Travel & Tour Package with Activity & Destination pages
+  * Easy & Smart booking process
+  * Flexible/Dynamic Pricing with pricing label
+  * Dynamic frontend tabs
+  * Availability calendar with dynamic day wise pricing
+  * Booking Calendar
+  * Enquiry form
+  * Unlimited Travel and Tour Categories
+  * Translation Ready: The plugin is fully translation ready. So feel free to your website in any language.
+  * Email notification
+  * Smart Tags for email message
+  * PayPal Payment gateway
+  * My account section
+  * Seperated customer section
+  * Discount Coupon
+  * Import/Export
+  * Unlimited itineraries
+  * Booking & Enquiry notification email
 
 
 == Premium Payment Gateway Extensions/Addons ==
@@ -109,7 +89,7 @@ Shortcode for Tour Listing:
 <pre>[yatra_tour order="asc" featured="1" posts_per_page="5"]</pre>
 
 
-== Smart Tags ==
+== Smart Tags For Booking Notification ==
 * {{home_url}} : Get home page url
 * {{blog_info}} : Get blog info of a website
 * {{booking_code}} : Get booking code of specific booking
@@ -118,16 +98,31 @@ Shortcode for Tour Listing:
 * {{customer_name}} : Get customer name of specific booking
 * {{customer_email}} : Get customer email of specific booking
 
+== Smart Tags For Enquiry Notification ==
+* {{home_url}} : Get home page url
+* {{blog_info}} : Get blog info of a website
+* {{enquiry_fullname}} : Get Full name from enquiry form
+* {{enquiry_tour_name}} : Get selected tour name from enquiry form
+* {{enquiry_email}} :  Get email used to submit enquiry form
+* {{enquiry_country}} : Get selected country from enquiry form
+* {{enquiry_phone_number}} : Phone number from enquiry form
+* {{enquiry_number_of_adults}} :  Number of adults from enquiry form
+* {{enquiry_number_of_childs}} :  Number of childs from enquiry form
+* {{enquiry_message}} : Enquiry message
+* {{enquiry_subject}} : Enquiry subject
+* {{enquiry_date}} :  Date of enquiry form submission
+
 
 == COMPATIBLE THEMES ==
 * [Blocksy](https://wordpress.org/themes/blocksy/?ref=yatrapluginorg) by creativethemeshq
-* [Yatri](https://wpyatri.com/?ref=yatrapluginorg) by MantraBrain
-* [MagazineNP](https://wordpress.org/themes/magazinenp/) by MantraBrain
-* [Zakra](https://wordpress.org/themes/zakra/) by ThemeGrill
-* [Astra](https://wordpress.org/themes/astra/) by Brainstorm Force
-* [OceanWP](https://wordpress.org/themes/oceanwp/) by OceanWP
 * [Kadence](https://wordpress.org/themes/kadence/) by Ben Ritner - Kadence WP
 
+
+## 💙 LOVED YATRA TRAVEL BOOKING PLUGIN? ##
+
+- Like on our [Facebook Page](https://www.facebook.com/academylmsteam)
+- Join our [Facebook Group](https://www.facebook.com/groups/academylmsteam)
+- Or rate us on [WordPress](https://wordpress.org/support/plugin/academy/reviews/?rate=5#new-post)
 
 == IMPORTANT LINKS ==
 
