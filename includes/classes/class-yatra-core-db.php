@@ -160,7 +160,12 @@ class Yatra_Core_DB
         );
         $sql = str_ireplace("'__NULL__'", "NULL", $sql);
 
-        return $wpdb->query($sql);
+        if ($wpdb->query($sql)) {
+            
+            return $wpdb->insert_id;
+        }
+        return false;
+
     }
 
     private static function update($table, $data = array(), $where = array(), $update_ignore = array())

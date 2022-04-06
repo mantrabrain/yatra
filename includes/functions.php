@@ -539,6 +539,56 @@ if (!function_exists('yatra_global_smart_tags')) {
     }
 }
 
+if (!function_exists('yatra_enquiry_form_smart_tags')) {
+    function yatra_enquiry_form_smart_tags($enquiry_id = 0)
+    {
+        $smart_tags = array(
+            'enquiry_fullname' => '',
+            'enquiry_tour_name' => '',
+            'enquiry_email' => '',
+            'enquiry_country' => '',
+            'enquiry_phone_number' => '',
+            'enquiry_number_of_adults' => '',
+            'enquiry_number_of_childs' => '',
+            'enquiry_message' => '',
+            'enquiry_subject' => '',
+            'enquiry_date' => '',
+        );
+
+        $where = array(
+            'id' => absint($enquiry_id)
+        );
+        $enquiry = Yatra_Core_DB::get_data(Yatra_Tables::TOUR_ENQUIRIES, array(), $where);
+        if (isset($enquiry[0])) {
+            $enquiry_item = $enquiry[0];
+
+            $country = $enquiry_item->country ? yatra_get_countries($enquiry_item->country) : '';
+            $tour_title = absint($enquiry_item->tour_id) > 0 ? get_the_title($enquiry_item->tour_id) : '';
+            $smart_tags = array(
+                'enquiry_fullname' => $enquiry_item->fullname ?? '',
+                'enquiry_tour_name' => $tour_title,
+                'enquiry_email' => $enquiry_item->email ?? '',
+                'enquiry_country' => !is_array($country) ? $country : '',
+                'enquiry_phone_number' => $enquiry_item->phone_number ?? '',
+                'enquiry_number_of_adults' => $enquiry_item->number_of_adults ?? '',
+                'enquiry_number_of_childs' => $enquiry_item->number_of_childs ?? '',
+                'enquiry_message' => $enquiry_item->message ?? '',
+                'enquiry_subject' => $enquiry_item->subject ?? '',
+                'enquiry_date' => $enquiry_item->created_at ?? '',
+            );
+        }
+
+        $smart_tags = apply_filters(
+            'yatra_enquiry_form_smart_tags',
+            $smart_tags
+        );
+
+        $yatra_global_smart_tags = yatra_global_smart_tags();
+
+        return array_merge($yatra_global_smart_tags, $smart_tags);
+
+    }
+}
 if (!function_exists('yatra_booking_smart_tags')) {
 
     function yatra_booking_smart_tags($booking_id = 0)

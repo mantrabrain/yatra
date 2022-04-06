@@ -42,6 +42,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
             '' => __('General', 'yatra'),
             'booking_notification' => __('Booking Notification', 'yatra'),
             'status_change' => __('Booking Status Change Notification', 'yatra'),
+            'enquiry_form' => __('Enquiry Notification', 'yatra'),
         );
 
         return apply_filters('yatra_get_sections_' . $this->id, $sections);
@@ -110,7 +111,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 ),
                 array(
                     'title' => __('Email Content for customer', 'yatra'),
-                    'desc' => sprintf(__('This option allows you to change booking notification email content for customer. You can find all available email %s shortcodes from here%s.', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
+                    'desc' => sprintf(__('This option allows you to change booking notification email content for customer. View all available %sBooking Smart Tags%s', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
                     'id' => 'yatra_booking_notification_email_content_for_customer',
                     'type' => 'textarea',
                     'editor' => true,
@@ -151,7 +152,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 ),
                 array(
                     'title' => __('Email Content for admin', 'yatra'),
-                    'desc' => sprintf(__('This option allows you to change booking notification email content for admin. You can find all available email %s shortcodes from here%s.', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
+                    'desc' => sprintf(__('This option allows you to change booking notification email content for admin. View all available %sBooking Smart Tags%s', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
                     'id' => 'yatra_booking_notification_email_content_for_admin',
                     'type' => 'textarea',
                     'editor' => true,
@@ -197,7 +198,8 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 ),
                 array(
                     'title' => __('Email Content for customer', 'yatra'),
-                    'desc' => sprintf(__('This option allows you to change booking status change notification email content for customer. You can find all available email %s shortcodes from here%s.', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
+
+                    'desc' => sprintf(__('This option allows you to change booking status change notification email content for customer. View all available %sBooking Smart Tags%s', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
                     'id' => 'yatra_booking_status_change_notification_email_content_for_customer',
                     'type' => 'textarea',
                     'editor' => true,
@@ -238,7 +240,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 ),
                 array(
                     'title' => __('Email Content for admin', 'yatra'),
-                    'desc' => sprintf(__('This option allows you to change booking status change notification email content for admin. You can find all available email %s shortcodes from here%s.', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
+                    'desc' => sprintf(__('This option allows you to change booking status change notification email content for admin. View all available %sBooking Smart Tags%s', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
                     'id' => 'yatra_booking_status_change_notification_email_content_for_admin',
                     'type' => 'textarea',
                     'editor' => true,
@@ -252,6 +254,51 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 array(
                     'type' => 'sectionend',
                     'id' => 'yatra_email_booking_status_change_notification_to_admin_options',
+                ),
+
+            );
+        } else if ('enquiry_form' === $current_section) {
+            $settings = array(
+                array(
+                    'title' => __('Enquiry notification email: To Admin', 'yatra'),
+                    'type' => 'title',
+                    'desc' => '',
+                    'id' => 'yatra_email_enquiry_notification_to_admin_options',
+                ),
+                array(
+                    'title' => __('Enable/Disable Admin Email', 'yatra'),
+                    'desc' => __('This option allows you to enable/disable enquiry form notification email for admin.', 'yatra'),
+                    'id' => 'yatra_enable_enquiry_notification_email_for_admin',
+                    'type' => 'checkbox',
+                    'default' => 'yes',
+                ),
+                array(
+                    'title' => __('Email Subject for admin', 'yatra'),
+                    'desc' => __('This option allows you to change enquiry notification email subject for admin.', 'yatra'),
+                    'id' => 'yatra_enquiry_notification_email_subject_for_admin',
+                    'type' => 'text',
+                    'custom_attributes' => array(
+                        'size' => 70
+                    ),
+                    'default' => Yatra_Admin_Emails_To_Admin::get_enquiry_form_saved_subject()
+
+                ),
+                array(
+                    'title' => __('Email Content for admin', 'yatra'),
+                    'desc' => sprintf(__('This option allows you to change enquiry notification email content for admin. View all available %sEnquiry Form Smart Tags%s', 'yatra'), '<a href="https://wpyatra.com/docs/yatra/yatra-settings/emails/" target="_blank">', '</a>'),
+                    'id' => 'yatra_enquiry_notification_email_content_for_admin',
+                    'type' => 'textarea',
+                    'editor' => true,
+                    'allow-html' => true,
+                    'custom_attributes' => array(
+                        'size' => 70
+                    ),
+                    'default' => Yatra_Admin_Emails_To_Admin::get_enquiry_form_saved_message()
+
+                ),
+                array(
+                    'type' => 'sectionend',
+                    'id' => 'yatra_email_enquiry_notification_to_admin_options',
                 ),
 
             );
