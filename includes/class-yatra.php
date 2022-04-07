@@ -216,14 +216,13 @@ final class Yatra
 
 
         /**
-         * Classes.
+         * Core Class.
          */
         include_once YATRA_ABSPATH . 'includes/class-yatra-modules.php';
 
-        include_once YATRA_ABSPATH . 'includes/class-yatra-install.php';
+
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-db.php';
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-coupon.php';
-
         include_once YATRA_ABSPATH . 'includes/class-yatra-tour-availability-validation.php';
         include_once YATRA_ABSPATH . 'includes/settings/class-yatra-tour-settings.php';
         include_once YATRA_ABSPATH . 'includes/payment-gateways/class-yatra-gateways-core.php';
@@ -238,6 +237,7 @@ final class Yatra
         include_once YATRA_ABSPATH . 'includes/class-yatra-metabox.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-widgets.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-shortcodes.php';
+        include_once YATRA_ABSPATH . 'includes/class-yatra-install.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-ajax.php';
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-tour-availability.php';
 
