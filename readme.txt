@@ -18,11 +18,13 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 [Yatra]( https://wpyatra.com/?utm_source=wordpress&utm_medium=wppage&utm_campaign=wporg) is a free, SEO friendly & scalable WordPress travel booking plugin to create travel and tour packages for tour operators and travel agencies.
 
-It's really simple & easy to create trip, itinerary & trekking packages with yatra WordPress travel management plugin and support different types of payment gateways so that its easy to accept payments. You can even modify your pricing as per trip date from availability calendar.
+It's really simple & easy to create trip, itinerary & trekking packages with the Yatra WordPress travel management plugin and supports different types of payment gateways so that it's easy to accept payments. You can even modify your pricing as per trip date from the availability calendar.
 
 ↪️ [Yatra Main Site](https://wpyatra.com?ref=wordpress.org) ↪️ [Premium Extensions](https://wpyatra.com/yatra-premium-extensions/?ref=wporg) ↪️ [Feature Request](https://wpyatra.com/yatra-plugin-roadmap/?ref=wporg)
 
-== Video Tour ==
+➡️ [Create FREE live demo testing site to test Yatra WordPress plugin  ](https://demo.tastewp.com/yatra-wordpress-plugin)
+
+== Travel Booking plugin for WordPress - Yatra Video Tour ==
 
 [youtube https://www.youtube.com/watch?v=URdGixOz760]
 
@@ -31,16 +33,16 @@ It's really simple & easy to create trip, itinerary & trekking packages with yat
 * Easy & Smart booking process
 * Flexible/Dynamic Pricing with pricing label
 * Dynamic frontend tabs
-* Availability calendar with dynamic day wise pricing
+* Availability calendar with dynamic day-wise pricing
 * Booking Calendar
 * Enquiry form
 * Unlimited Travel and Tour Categories
 * Translation Ready: The plugin is fully translation ready. So feel free to your website in any language.
 * Email notification
-* Smart Tags for email message
+* Smart Tags for the email message
 * PayPal Payment gateway
 * My account section
-* Seperated customer section
+* Separate customer section
 * Discount Coupon
 * Tax Option
 * Import/Export
@@ -128,7 +130,7 @@ Shortcode for Tour Listing:
 
 Yes, Yatra WordPress Travel plugin is designed to work with any themes that have been coded following WordPress guidelines.
 
-= Do you have any written documentation about Yatra WordPress plugin?
+= Do you have any written documentation about the Yatra WordPress plugin?
 
 Yes, we have. Check out this [documentation](https://wpyatra.com/docs/?ref=wporg)
 
@@ -141,9 +143,9 @@ You can Report bugs on the [Yatra GitHub repository](https://github.com/mantrabr
 No, you don't need any coding skills. You can create unlimited tour packages with availability option & sell those packages easily.
 
 == Screenshots ==
-1. Add new tour option - Backend
+1. Add a new tour option - Backend
 2. Add new tour with custom attributes - Backend
-3. Add new tour and manage frontend tabs while creating new tour - Backend
+3. Add a new tour and manage frontend tabs while creating a new tour - Backend
 4. Custom destination create option - Backend
 5. Custom activity create option - Backend
 6. Customer enquiries - Backend
