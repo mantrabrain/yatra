@@ -22,7 +22,7 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 
 ↪️ [Yatra Main Site](https://wpyatra.com?ref=wordpress.org) ↪️ [Premium Extensions](https://wpyatra.com/yatra-premium-extensions/?ref=wporg) ↪️ [Feature Request](https://wpyatra.com/yatra-plugin-roadmap/?ref=wporg)
 
-➡️ [Create FREE live demo testing site to test Yatra WordPress plugin  ](https://demo.tastewp.com/yatra-wordpress-plugin)
+⭐    [Create FREE live demo testing site to test Yatra WordPress plugin  ](https://demo.tastewp.com/yatra-wordpress-plugin) ⭐
 
 == Travel Booking plugin for WordPress - Yatra Video Tour ==
 
