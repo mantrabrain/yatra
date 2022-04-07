@@ -202,7 +202,8 @@ final class Yatra_Install
             'yatra_booking_notification_email_content_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_message(),
             'yatra_enable_booking_notification_email_for_customer' => 'yes',
             'yatra_enable_guest_checkout' => 'yes',
-            'yatra_payment_gateways' => array('booking_only' => 'yes')
+            'yatra_payment_gateways' => array('booking_only' => 'yes'),
+            'yatra_queue_flush_rewrite_rules' => 'yes'
         );
 
         foreach ($options as $option_key => $option_value) {
