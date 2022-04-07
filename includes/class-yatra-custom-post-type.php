@@ -126,8 +126,8 @@ class Yatra_Custom_Post_Type
 
     public function init()
     {
-        $this->hooks();
         $this->load();
+        $this->hooks();
         $this->init_cpt();
 
     }
