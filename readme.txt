@@ -122,7 +122,7 @@ Shortcode for Tour Listing:
 ## 💙 LOVED YATRA TRAVEL BOOKING PLUGIN? 💙 ##
 
 - Join our [Facebook Community Group](https://www.facebook.com/groups/yatrawordpressplugin)
-- Rate us on [WordPress](https://wordpress.org/support/plugin/yatrawordpressplugin/reviews/?rate=5#new-post)
+- Rate us on [WordPress](https://wordpress.org/support/plugin/yatra/reviews/?rate=5#new-post)
 
 == Frequently Asked Questions ==
 
