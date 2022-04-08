@@ -124,6 +124,7 @@ class Yatra_Core_Importer
                     }
                 }
             }
+            flush_rewrite_rules();
             return true;
 
         } catch (Exception $e) {
