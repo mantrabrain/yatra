@@ -128,6 +128,7 @@ class Yatra_Core_Importer
             return true;
 
         } catch (Exception $e) {
+            flush_rewrite_rules();
             return false;
         }
 
