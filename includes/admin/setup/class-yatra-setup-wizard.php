@@ -141,7 +141,7 @@ class Yatra_Setup_Wizard
         </head>
         <body class="yatra-setup wp-core-ui">
         <h1 class="yatra-logo"><a
-                    href="https://mantrabrain.com/downloads/yatra-wordpress-travel-booking-system/?utm_source=setup_wizard&utm_medium=logo&utm_campaign=plugin">Complete
+                    href="https://wpyatra.com/?utm_source=setup_wizard&utm_medium=logo&utm_campaign=plugin">Complete
                 Travel & Tour Booking System – Yatra</a></h1>
         <?php
     }
