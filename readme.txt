@@ -164,7 +164,7 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.9 | 2022/02/21 =
+= 2.1.9 | 2022/04/08 =
 * Update - Availability menu position change on admin dashboard
 * Update - WP version compatibility checked
 * Fixed - Cart with issue
