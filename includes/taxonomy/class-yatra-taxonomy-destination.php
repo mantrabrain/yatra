@@ -4,10 +4,8 @@ if (!class_exists('Yatra_Taxonomy_Destination')) {
     class Yatra_Taxonomy_Destination
     {
 
-
-        public function init()
+        public function __construct()
         {
-            add_action('init', array($this, 'register'));
             add_action('destination_add_form_fields', array($this, 'form'), 10, 2);
             add_action('destination_edit_form_fields', array($this, 'edit'), 10, 2);
             add_action('edited_destination', array($this, 'update'), 10, 2);
@@ -64,7 +62,7 @@ if (!class_exists('Yatra_Taxonomy_Destination')) {
         }
 
 
-        public function register()
+        public static function register()
         {
             $permalinks = yatra_get_permalink_structure();
             // Add new taxonomy, make it hierarchical (like categories)
@@ -99,7 +97,7 @@ if (!class_exists('Yatra_Taxonomy_Destination')) {
                 ),
             );
             register_taxonomy('destination', array('tour'), $args);
-            
+
         }
 
         public function form($taxonomy)

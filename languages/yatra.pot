@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.9\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-04-08 08:35:18+00:00\n"
+"POT-Creation-Date: 2022-04-08 10:47:02+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -200,7 +200,7 @@ msgid "Select a page&hellip;"
 msgstr ""
 
 #: includes/admin/class-yatra-admin-settings.php:711
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:17
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:15
 #: includes/template-tags.php:647
 msgid "Add New"
 msgstr ""
@@ -413,7 +413,7 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:73
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:16
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:14
 #: templates/myaccount/tmpl-user-checkout.php:35
 #: templates/tmpl-cart-table.php:16 templates/tmpl-cart-table.php:56
 #: templates/tmpl-order-table.php:6
@@ -1118,9 +1118,9 @@ msgstr ""
 #: includes/admin/settings/class-yatra-settings-general.php:238
 #: includes/functions.php:66 includes/hooks/yatra-list-table-hooks.php:20
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:57
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:178
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:179
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:180
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:189
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:188
 msgid "Attributes"
 msgstr ""
 
@@ -2170,7 +2170,7 @@ msgstr ""
 msgid "Yatra Customer"
 msgstr ""
 
-#: includes/class-yatra.php:377
+#: includes/class-yatra.php:376
 #. translators: 1: error message 2: file name and path 3: line number
 msgid "%1$s in %2$s on line %3$s"
 msgstr ""
@@ -2341,78 +2341,78 @@ msgstr ""
 msgid "Description."
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:12
-#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:21
+#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:11
+#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:20
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:83
 msgid "Customers"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:13
+#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:12
 msgid "Customer"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:14
+#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:13
 msgid "Edit Customers"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:15
+#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:14
 msgid "All Customers"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:16
+#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:15
 msgid "View Customer"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:17
+#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:16
 msgid "Search Customer"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:18
+#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:17
 msgid "No Customers found"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:19
+#: includes/custom-post-type/class-yatra-custom-post-type-customers.php:18
 msgid "No Customers found in the Trash"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:15
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:13
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:19
 msgid "Tours"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:18
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:16
 msgid "Add New Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:17
 msgid "Edit Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:18
 msgid "New Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
 msgid "All Tours"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:20
 msgid "View Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:21
 msgid "Search Tour"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:24
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:22
 msgid "No Tours found"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:23
 msgid "No Tours found in the Trash"
 msgstr ""
 
-#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:27
+#: includes/custom-post-type/class-yatra-custom-post-type-tour.php:25
 #: includes/modules/blocks/class-yatra-blocks.php:18
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:9
 msgid "Yatra"
@@ -3321,13 +3321,13 @@ msgstr ""
 
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:33
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-destinations.php:7
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:72
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:70
 msgid "Destinations"
 msgstr ""
 
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:45
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-activities.php:7
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:71
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:69
 msgid "Activities"
 msgstr ""
 
@@ -4420,152 +4420,152 @@ msgstr ""
 msgid "Your cart is empty. Please add any of the tour on the cart first."
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:38
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:108
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:39
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:108
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:36
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:106
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:37
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:106
 msgid "Image"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:52
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:115
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:53
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:115
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:50
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:113
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:51
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:113
 msgid "Add Image"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:53
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:54
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:116
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:117
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:54
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:55
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:116
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:117
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:51
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:52
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:114
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:115
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:52
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:53
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:114
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:115
 msgid "Choose Image"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:58
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:121
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:59
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:121
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:56
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:119
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:57
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:119
 msgid "Remove Image"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:72
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:81
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:70
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:79
 msgid "Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:73
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:71
 msgid "Search Activities"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:74
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:72
 msgid "All Activities"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:75
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:73
 msgid "Parent Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:76
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:74
 msgid "Parent Activity:"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:77
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:75
 msgid "Edit Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:78
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:76
 msgid "Update Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:79
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:77
 msgid "Add New Activity"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-activity.php:80
+#: includes/taxonomy/class-yatra-taxonomy-activity.php:78
 msgid "New Activity Name"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:21
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:139
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:219
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:20
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:138
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:218
 msgid "Icon"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:148
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:224
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:147
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:223
 msgid "Attribute Type"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:181
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:180
 msgid "Search Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:182
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:181
 msgid "All Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:183
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:182
 msgid "Parent Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:184
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:183
 msgid "Parent Attributes:"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:185
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:184
 msgid "Edit Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:186
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:185
 msgid "Update Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:187
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:186
 msgid "Add New Attributes"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-attributes.php:188
+#: includes/taxonomy/class-yatra-taxonomy-attributes.php:187
 msgid "New Attributes Name"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:73
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:82
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:71
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:80
 msgid "Destination"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:74
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:72
 msgid "Search Destinations"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:75
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:73
 msgid "All Destinations"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:76
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:74
 msgid "Parent Destination"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:77
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:75
 msgid "Parent Destination:"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:78
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:76
 msgid "Edit Destination"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:79
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:77
 msgid "Update Destination"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:80
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:78
 msgid "Add New Destination"
 msgstr ""
 
-#: includes/taxonomy/class-yatra-taxonomy-destination.php:81
+#: includes/taxonomy/class-yatra-taxonomy-destination.php:79
 msgid "New Destination Name"
 msgstr ""
 

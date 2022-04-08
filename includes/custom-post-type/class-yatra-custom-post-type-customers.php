@@ -3,10 +3,9 @@ if (!class_exists('Yatra_Custom_Post_Type_Customers')) {
 
     class Yatra_Custom_Post_Type_Customers
     {
-        private $slug = 'yatra-customers';
+        private static $slug = 'yatra-customers';
 
-
-        public function register()
+        public static function register()
         {
             $labels = array(
                 'name' => __('Customers', 'yatra'),
@@ -35,15 +34,13 @@ if (!class_exists('Yatra_Custom_Post_Type_Customers')) {
                 'capability_type' => 'yatra-customers',
 
 
-
             );
-            register_post_type($this->slug, $args);
+            register_post_type(self::$slug, $args);
 
         }
 
-        public function init()
+        public function __construct()
         {
-            add_action('init', array($this, 'register'));
             add_filter('bulk_actions-' . 'edit-yatra-customers', '__return_empty_array');
             add_filter('views_' . 'edit-yatra-customers', '__return_empty_array');
 

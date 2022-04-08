@@ -3,7 +3,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
 
     class Yatra_Custom_Post_Type_Booking
     {
-        private $slug = 'yatra-booking';
+        private static $slug = 'yatra-booking';
 
 
         public static function register_post_status()
@@ -76,7 +76,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
 
         public function remove($actions)
         {
-            if (get_post_type() === $this->slug) {
+            if (get_post_type() === self::$slug) {
                 unset($actions['edit']);
                 unset($actions['view']);
                 unset($actions['trash']);
@@ -85,7 +85,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
             return $actions;
         }
 
-        public function register()
+        public static function register()
         {
             $labels = array(
                 'name' => __('Bookings', 'yatra'),
@@ -112,25 +112,16 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
                 'capability_type' => 'yatra-booking',
 
 
-
             );
-            register_post_type($this->slug, $args);
+            register_post_type(self::$slug, $args);
 
         }
 
 
-        public function init()
+        public function __construct()
         {
-            add_action('init', array($this, 'register'));
-            add_action('init', array($this, 'register_post_status'));
             add_filter('post_row_actions', array($this, 'remove'));
-            // add_action('do_meta_boxes', array($this, 'hide_metabox'));
         }
 
-        public function hide_metabox()
-        {
-
-
-        }
     }
 }

@@ -59,20 +59,15 @@ final class Yatra_Install
 
         do_action('yatra_flush_rewrite_rules');
 
-
+        flush_rewrite_rules();
     }
 
     public static function setup_environment()
     {
+        Yatra_Post_types::register_post_types();
+        Yatra_Post_types::register_taxonomies();
 
-        $post_type = new Yatra_Custom_Post_Type();
-        $post_type->load();
-        $post_type->tour->register();
 
-        $taxonomy = new Yatra_Taxonomy();
-        $taxonomy->load();
-        $taxonomy->destination_taxonomy->register();
-        $taxonomy->attribute_taxonomy->register();
     }
 
     private static function create_options()
@@ -209,7 +204,6 @@ final class Yatra_Install
 
             update_option($option_key, $option_value);
         }
-        update_option( 'yatra_queue_flush_rewrite_rules', 'yes' );
 
     }
 

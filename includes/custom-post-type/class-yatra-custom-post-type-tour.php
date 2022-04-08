@@ -3,12 +3,10 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
 
     class Yatra_Custom_Post_Type_Tour
     {
-        private $slug = 'tour';
+        private static $slug = 'tour';
 
-
-        public function register()
+        public static function register()
         {
-
             $permalinks = yatra_get_permalink_structure();
 
             $labels = array(
@@ -40,15 +38,8 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'capability_type' => 'tour',
 
             );
-            register_post_type($this->slug, $args);
+            register_post_type(self::$slug, $args);
 
-            do_action('yatra_after_register_post_type');
-
-        }
-
-        public function init()
-        {
-            add_action('init', array($this, 'register'));
         }
     }
 

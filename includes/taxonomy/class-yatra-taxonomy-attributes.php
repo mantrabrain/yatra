@@ -5,9 +5,8 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
     {
         private $attribute_index = 'yatra_attribute_meta';
 
-        public function init()
+        public function __construct()
         {
-            add_action('init', array($this, 'register'));
             add_action('attributes_add_form_fields', array($this, 'form'), 10, 2);
             add_action('attributes_edit_form_fields', array($this, 'edit'), 10, 2);
             add_action('edited_attributes', array($this, 'save'), 10, 2);
@@ -171,7 +170,7 @@ if (!class_exists('Yatra_Taxonomy_Attributes')) {
         }
 
 
-        public function register()
+        public static function register()
         {
             $permalinks = yatra_get_permalink_structure();
             // Add new taxonomy, make it hierarchical (like categories)

@@ -3,18 +3,18 @@ if (!class_exists('Yatra_Custom_Post_Type_Coupons')) {
 
     class Yatra_Custom_Post_Type_Coupons
     {
-        private $slug = 'yatra-coupons';
+        private static $slug = 'yatra-coupons';
 
         public function remove($actions)
         {
-            if (get_post_type() === $this->slug) {
+            if (get_post_type() === self::$slug) {
                 unset($actions['view']);
                 unset($actions['inline hide-if-no-js']);
             }
             return $actions;
         }
 
-        public function register()
+        public static function register()
         {
             $labels = array(
                 'name' => _x('Coupons', 'post type general name', 'yatra'),
@@ -50,14 +50,13 @@ if (!class_exists('Yatra_Custom_Post_Type_Coupons')) {
                 'with_front' => true,
                 'capability_type' => 'yatra-coupons',
             );
-            register_post_type($this->slug, $args);
+            register_post_type(self::$slug, $args);
 
         }
 
 
-        public function init()
+        public function __construct()
         {
-            add_action('init', array($this, 'register'));
             add_filter('post_row_actions', array($this, 'remove'));
         }
 
