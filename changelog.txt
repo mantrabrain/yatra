@@ -1,3 +1,17 @@
+= 2.1.9 | 2022/04/08 =
+* Update - Availability menu position change on admin dashboard
+* Update - WP version compatibility checked
+* Fixed - Cart with issue
+* Fixed - Multiselect & select2 placeholder updated
+* Fixed - Minor design issue fixed
+* Fixed - Updated Sanitization filter issue
+* Fixed - Optimized admin scripts
+* Fixed - Elementor conflict with class
+* Fixed - Responsive view of tab layout of single tour page
+* Added - Enquiry notification email
+* Added - optimized email templates and email settings
+* Added - Tax feature added
+
 = 2.1.8 | 2022/02/21 =
 * Added - Payment History on My account & Booking Section
 * Added - Border radius on gallery
