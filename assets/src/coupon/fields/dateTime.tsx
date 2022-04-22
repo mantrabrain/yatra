@@ -42,7 +42,7 @@ const DateTime = (props: DateTimeProps) => {
                 htmlFor={settings.name}>{settings.title} </label>
             <input className="widefat" id={settings.name}
                    name={settings.name} type="hidden"
-                   value={dateValue === '' ? "" : dateI18n('F j, Y g:i a', dateValue, false)}
+                   value={dateValue === '' ? "" : dateValue}
                    placeholder={settings.placeholder}/>
 
             <Button isLink={true} onClick={() => setOpenDatePopup(!openDatePopup)}>
