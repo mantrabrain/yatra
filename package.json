@@ -28,7 +28,7 @@
     "@wordpress/element": "^4.0.4",
     "@wordpress/scripts": "^19.2.2",
     "autoprefixer": "~7.2.3",
-    "grunt": "^1.0.3",
+    "grunt": "^1.5.2",
     "grunt-checktextdomain": "^1.0.1",
     "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-concat": "~1.0.1",
