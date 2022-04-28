@@ -302,8 +302,9 @@ final class Yatra
         $locale = is_admin() && function_exists('get_user_locale') ? get_user_locale() : get_locale();
         $locale = apply_filters('plugin_locale', $locale, 'yatra');
         unload_textdomain('yatra');
+
         load_textdomain('yatra', WP_LANG_DIR . '/yatra/yatra-' . $locale . '.mo');
-        load_plugin_textdomain('yatra', false, plugin_basename(dirname(YATRA_FILE)) . '/i18n/languages');
+        load_plugin_textdomain('yatra', false, plugin_basename(dirname(YATRA_FILE)) . '/languages');
     }
 
     /**
