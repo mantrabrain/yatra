@@ -408,7 +408,14 @@ window.yatra_global_tour_additional_price = 0;
             onDateSelect: function (date) {
                 $(".yatra_tour_start_date").find('input').attr('data-selected-date', date).val(date);
                 const date_full = new Date(date);  // 2009-11-10
-                const month = date_full.toLocaleString('default', {month: 'long'});
+
+                let month = date_full.toLocaleString('default', {month: 'long'});
+
+                if (typeof yatra_params.months !== undefined) {
+                    if (yatra_params.months[date_full.getMonth()] !== undefined) {
+                        month = yatra_params.months[date_full.getMonth()];
+                    }
+                }
 
                 var date_string = month + ' ' + date_full.getDate() + ', ' + date_full.getFullYear();
 
