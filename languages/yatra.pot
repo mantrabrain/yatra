@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.9\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-04-08 11:15:51+00:00\n"
+"POT-Creation-Date: 2022-04-28 08:14:10+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1861,6 +1861,34 @@ msgstr ""
 
 #: includes/class-yatra-ajax.php:685
 msgid "Thank you for your query. We will get back to you soon"
+msgstr ""
+
+#: includes/class-yatra-assets.php:145
+msgid "sunday"
+msgstr ""
+
+#: includes/class-yatra-assets.php:146
+msgid "Monday"
+msgstr ""
+
+#: includes/class-yatra-assets.php:147
+msgid "Tuesday"
+msgstr ""
+
+#: includes/class-yatra-assets.php:148
+msgid "Wednesday"
+msgstr ""
+
+#: includes/class-yatra-assets.php:149
+msgid "Thursday"
+msgstr ""
+
+#: includes/class-yatra-assets.php:150
+msgid "Friday"
+msgstr ""
+
+#: includes/class-yatra-assets.php:151
+msgid "Saturday"
 msgstr ""
 
 #: includes/class-yatra-change-password-form.php:24

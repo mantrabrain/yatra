@@ -8,7 +8,7 @@
     var pluginName = "YatraCalendar",
         defaults = {
             months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'], //string of months starting from january
-            days: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'], //string of days starting from sunday
+            days: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
             displayYear: true, // display year in header
             fixedStartDay: true, // Week begin always by monday or by day set by number 0 = sunday, 7 = saturday, false = month always begin by first day of the month
             displayEvent: true, // display existing event
@@ -113,7 +113,7 @@
 
             //Header day in a week ( (x to x + 7) % 7 to start the week by monday if x = 1)
             for (var i = startDayOfWeek; i < startDayOfWeek + 7; i++) {
-                thead.append($('<td>' + this.settings.days[i % 7].substring(0, 3) + '</td>'));
+                thead.append($('<td class="yatra-tippy-tooltip" data-tippy-content="' + this.settings.days[i] + '">' + this.settings.days[i % 7].substring(0, 3) + '</td>'));
             }
 
             //For firstDay to lastDay

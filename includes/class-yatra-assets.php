@@ -46,14 +46,20 @@ if (!class_exists('Yatra_Assets')) {
 
             wp_register_script('yatra-filter', YATRA_PLUGIN_URI . '/assets/js/yatra-filter.js', array('jquery', 'jquery-ui-slider'), YATRA_VERSION);
 
+
+            $main_css_dependency = array('yatra-font-awesome', 'lightbox', 'yatra-jquery-ui');
+
+            $main_script_dependency = array('jquery', 'lightbox-script', 'yatra-moment', 'yatra-popper', 'yatra-tippy');
+            if (is_singular('tour')) {
+                $main_script_dependency[] = 'yatra-calendarjs';
+                $main_css_dependency[] = 'yatra-calendarcss';
+            }
+
             // Other Register and Enqueue
-            wp_register_style('yatra-style', YATRA_PLUGIN_URI . '/assets/css/yatra.css',
-                array('yatra-font-awesome', 'lightbox', 'yatra-calendarcss', 'yatra-jquery-ui'), YATRA_VERSION);
+            wp_register_style('yatra-style', YATRA_PLUGIN_URI . '/assets/css/yatra.css', $main_css_dependency, YATRA_VERSION);
 
             wp_register_script('yatra-script', YATRA_PLUGIN_URI . '/assets/js/yatra.js',
-                array('jquery', 'lightbox-script', 'yatra-moment', 'yatra-popper',
-                    'yatra-tippy', 'yatra-calendarjs',
-                ),
+                $main_script_dependency,
                 YATRA_VERSION);
         }
 
@@ -99,11 +105,8 @@ if (!class_exists('Yatra_Assets')) {
 
             }
 
-            if (is_singular('tour')) {
 
-                wp_enqueue_script('yatra-single-tour');
-            }
-            $yatra_params = apply_filters('yatra_script_localize_params', array(
+            $yatra_params = array(
 
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'booking_params' => array(
@@ -128,11 +131,24 @@ if (!class_exists('Yatra_Assets')) {
 
                 'currency_position' => get_option('yatra_currency_position', 'left'),
 
-                'show_enquiry_form' => get_option('yatra_enquiry_form_show', 'yes')
+                'show_enquiry_form' => get_option('yatra_enquiry_form_show', 'yes'),
 
 
-            ));
+            );
 
+
+            if (is_singular('tour')) {
+
+                wp_enqueue_script('yatra-single-tour');
+
+                global $wp_locale;
+
+                $yatra_params['week_days'] = $wp_locale->weekday;
+                
+                $yatra_params['months'] = array_values($wp_locale->month);
+            }
+
+            $yatra_params = apply_filters('yatra_script_localize_params', $yatra_params);
 
             wp_localize_script('yatra-script', 'yatra_params', $yatra_params);
         }
@@ -140,4 +156,5 @@ if (!class_exists('Yatra_Assets')) {
     }
 
 }
+
 return new Yatra_Assets();
