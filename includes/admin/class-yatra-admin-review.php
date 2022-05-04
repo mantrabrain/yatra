@@ -15,6 +15,9 @@ class Yatra_Admin_Review
 
         // Admin footer text.
         add_filter('admin_footer_text', [$this, 'admin_footer'], 1, 2);
+
+        add_filter('update_footer', array($this, 'admin_hide_wp_version'), PHP_INT_MAX);
+
     }
 
     public function review_request()
@@ -39,33 +42,33 @@ class Yatra_Admin_Review
         $time = time();
         $load = false;
 
-      /*  if (empty($notices['review_request'])) {
-            $notices['review_request'] = [
-                'time' => $time,
-                'dismissed' => false,
-            ];
+        /*  if (empty($notices['review_request'])) {
+              $notices['review_request'] = [
+                  'time' => $time,
+                  'dismissed' => false,
+              ];
 
-            update_option('yatra_admin_notices', $notices);
+              update_option('yatra_admin_notices', $notices);
 
-            return;
-        }
+              return;
+          }
 
-        // Check if it has been dismissed or not.
-        if (
-            (isset($notices['review_request']['dismissed']) &&
-                !$notices['review_request']['dismissed']) &&
-            (
-                isset($notices['review_request']['time']) &&
-                (($notices['review_request']['time'] + DAY_IN_SECONDS) <= $time)
-            )
-        ) {
-            $load = true;
-        }
+          // Check if it has been dismissed or not.
+          if (
+              (isset($notices['review_request']['dismissed']) &&
+                  !$notices['review_request']['dismissed']) &&
+              (
+                  isset($notices['review_request']['time']) &&
+                  (($notices['review_request']['time'] + DAY_IN_SECONDS) <= $time)
+              )
+          ) {
+              $load = true;
+          }
 
-        // If we cannot load, return early.
-        if (!$load) {
-            return;
-        }*/
+          // If we cannot load, return early.
+          if (!$load) {
+              return;
+          }*/
 
 
         $this->review();
@@ -83,7 +86,7 @@ class Yatra_Admin_Review
             return;
         }
 
-         ob_start();
+        ob_start();
 
         // We have a candidate! Output a review message.
         ?>
@@ -160,6 +163,31 @@ class Yatra_Admin_Review
                 $url,
                 $url
             );
+        }
+
+        return $text;
+    }
+
+
+    public function admin_hide_wp_version($text)
+    {
+
+        global $current_screen;
+
+
+        $yatra_screens = array(
+            'edit-tour',
+            'tour_page_yatra-dashboard',
+            'tour',
+            'edit-activity',
+            'edit-attributes',
+            'tour_page_enquiries',
+            'edit-destination'
+        );
+
+
+        if (!empty($current_screen->id) && (in_array($current_screen->id, $yatra_screens) || strpos($current_screen->id, 'yatra') !== false)) {
+            return 'Yatra Version: ' . YATRA_VERSION;
         }
 
         return $text;
