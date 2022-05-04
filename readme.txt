@@ -96,6 +96,7 @@ Shortcode for Tour Listing:
 * {{blog_info}} : Get blog info of a website
 * {{booking_code}} : Get booking code of specific booking
 * {{booking_status}} : Get current booking status of specific booking
+* {{net_booking_price}} : Get current booking net price of specific booking
 * {{tour_lists}} : Get booked tour lists of specific booking
 * {{customer_name}} : Get customer name of specific booking
 * {{customer_email}} : Get customer email of specific booking
