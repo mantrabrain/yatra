@@ -99,6 +99,8 @@ Shortcode for Tour Listing:
 * {{tour_lists}} : Get booked tour lists of specific booking
 * {{customer_name}} : Get customer name of specific booking
 * {{customer_email}} : Get customer email of specific booking
+* {{customer_phone_number}} : Get customer phone number of specific booking
+* {{customer_country}} : Get customer country of specific booking
 
 == Smart Tags For Enquiry Notification Email ==
 * {{home_url}} : Get home page url

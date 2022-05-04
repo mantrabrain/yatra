@@ -647,6 +647,14 @@ if (!function_exists('yatra_customer_smart_tags')) {
             $smart_tags['customer_name'] = isset($customer_info['fullname']) ? $customer_info['fullname'] : '';
 
             $smart_tags['customer_email'] = isset($customer_info['email']) ? $customer_info['email'] : '';
+
+            $smart_tags['customer_phone_number'] = isset($customer_info['phone_number']) ? $customer_info['phone_number'] : '';
+
+            $country_index = isset($customer_info['country']) ? $customer_info['country'] : '';
+
+            $country = $country_index !== '' ? yatra_get_countries($country_index) : '';
+
+            $smart_tags['customer_country'] = $country;
         }
 
         return apply_filters(
