@@ -1475,7 +1475,7 @@ if (!function_exists('yatra_fontawesome_icon_lists')) {
 			'fab fa-wordpress-simple',
 			'fab fa-wpbeginner',
 			'fab fa-wpexplorer',
-			'fab fa-wpforms',
+			'fab fa-yatra',
 			'fab fa-wpressr',
 			'fas fa-wrench',
 			'fas fa-x-ray',

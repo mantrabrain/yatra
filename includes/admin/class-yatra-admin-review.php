@@ -79,7 +79,7 @@ class Yatra_Admin_Review
     {
 
         // Fetch total entries.
-        $entries = 55;// wpforms()->entry->get_entries(['number' => 50], true);
+        $entries = 55;// yatra()->entry->get_entries(['number' => 50], true);
 
         // Only show review request if the site has collected at least 50 entries.
         if (empty($entries) || $entries < 50) {
@@ -96,11 +96,11 @@ class Yatra_Admin_Review
         </p>
         <p>
             <a href="https://wordpress.org/support/plugin/yatra/reviews/?filter=5#new-post"
-               class="wpforms-notice-dismiss wpforms-review-out" target="_blank"
+               class="yatra-notice-dismiss yatra-review-out" target="_blank"
                rel="noopener"><?php esc_html_e('Ok, you deserve it', 'yatra'); ?></a><br>
-            <a href="#" class="wpforms-notice-dismiss" target="_blank"
+            <a href="#" class="yatra-notice-dismiss" target="_blank"
                rel="noopener noreferrer"><?php esc_html_e('Nope, maybe later', 'yatra'); ?></a><br>
-            <a href="#" class="wpforms-notice-dismiss" target="_blank"
+            <a href="#" class="yatra-notice-dismiss" target="_blank"
                rel="noopener noreferrer"><?php esc_html_e('I already did', 'yatra'); ?></a>
         </p>
         <?php
@@ -111,7 +111,7 @@ class Yatra_Admin_Review
                 'dismiss' => Notices::DISMISS_GLOBAL,
                 'slug' => 'review_request',
                 'autop' => false,
-                'class' => 'wpforms-review-notice',
+                'class' => 'yatra-review-notice',
             ]
         );
     }
