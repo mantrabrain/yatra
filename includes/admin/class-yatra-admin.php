@@ -64,9 +64,21 @@ final class Yatra_Admin
         add_action('init', array($this, 'setup_wizard'));
         add_action('admin_init', array($this, 'admin_redirects'));
         add_action('admin_menu', array($this, 'admin_menu'));
+        add_action('admin_notices', array($this, 'notices'));
         add_action('admin_notices', array($this, 'promotional_offer'));
 
 
+    }
+
+    public function notices()
+    {
+
+        // At least one WPForms capability is needed to see admin notices.
+        if (!current_user_can('manage_yatra')) {
+            return;
+        }
+
+        echo implode(' ', yatra()->admin_notices);
     }
 
     public function promotional_offer()
@@ -234,6 +246,7 @@ final class Yatra_Admin
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-assets.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-post-types.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-permalinks.php';
+        include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-review.php';
 
 
     }

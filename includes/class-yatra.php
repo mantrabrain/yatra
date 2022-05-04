@@ -46,6 +46,8 @@ final class Yatra
     public $yatra_messages = null;
 
 
+    public $admin_notices = array();
+
     /**
      * Yatra_Core_Exporter instance.
      *

@@ -130,6 +130,13 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
                 'default' => 'yes',
             ),
             array(
+                'title' => __('Hide announcement related to Yatra', 'yatra'),
+                'desc' => __('Hide any announcement related to Yatra on admin dashboard', 'yatra'),
+                'id' => 'yatra_hide_all_announcement_of_yatra_plugin',
+                'type' => 'checkbox',
+                'default' => 'no',
+            ),
+            array(
                 'title' => __('Date Selection Type', 'yatra'),
                 'desc' => __('This option allows you to choose date selection type. You can choose either calendar type or date listing type.', 'yatra'),
                 'desc_tip' => true,

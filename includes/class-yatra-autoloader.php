@@ -64,19 +64,19 @@ class Yatra_Autoloader
     /**
      * Auto-load Yatra classes on demand to reduce memory consumption.
      *
-     * @param string $class Class name.
+     * @param string $main_class Class name.
      */
-    public function autoload($class)
+    public function autoload($main_class)
     {
 
-        $class = strtolower($class);
+        $class = strtolower($main_class);
 
-
-        if (0 !== strpos($class, 'yatra_')) {
+        if (0 !== strpos($class, 'yatra_') && 0 !== strpos($class, 'yatra\\core\\')) {
             return;
         }
 
         $file = $this->get_file_name_from_class($class);
+
 
         $path = '';
 
@@ -104,9 +104,16 @@ class Yatra_Autoloader
             $path = $this->include_path . 'interfaces/';
         } elseif (0 === strpos($class, 'yatra_log_handler')) {
             $path = $this->include_path . 'log-handlers/';
+        } elseif (0 === strpos($class, 'yatra\\core\\')) {
+            $class_path = str_replace('Yatra\\Core\\', '', $main_class);
+            $class_path = str_replace('\\', '/', $class_path);
+            $class_path = trim($class_path, "/");
+            $path = $this->include_path . '../core/' . $class_path;
+            $file = '.php';
         }
 
-        if (empty($path) || !$this->load_file($path . $file)) {
+         if (empty($path) || !$this->load_file($path . $file)) {
+
             $this->load_file($this->include_path . $file);
         }
     }
