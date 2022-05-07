@@ -27,11 +27,11 @@ class Yatra_Core_Tour_Availability
             return;
         }
         wp_enqueue_style('yatra-availability-style', YATRA_PLUGIN_URI . '/assets/admin/css/availability.css', array(
-            'yatra-fullcalendar-css'
+            'yatra-fullcalendar-css', 'yatra-daterangepickercss'
         ), YATRA_VERSION);
 
         wp_enqueue_script('yatra-availability-script', YATRA_PLUGIN_URI . '/assets/admin/js/availability.js',
-            array('yatra-fullcalendar-js', 'yatra-popper', 'yatra-tippy')
+            array('yatra-fullcalendar-js', 'yatra-popper', 'yatra-tippy', 'yatra-daterangepicker')
             , YATRA_VERSION);
 
         $yatra_availability_params = array(
