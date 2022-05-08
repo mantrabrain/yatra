@@ -66,7 +66,7 @@ class Notices
 
         wp_enqueue_script(
             'yatra-admin-notices',
-            YATRA_PLUGIN_URI . "/core/assets/js/components/admin/notices.js",
+            YATRA_PLUGIN_URI . "/core/Admin/assets/js/notices.js",
             ['jquery'],
             YATRA_VERSION,
             true
@@ -153,10 +153,11 @@ class Notices
         );
 
         if (empty($slug)) {
-            yatra()->admin_notices[] = $notice;
+            yatra()->admin_notice->notices[] = $notice;
         } else {
-            yatra()->admin_notices[$slug] = $notice;
+            yatra()->admin_notice->notices[$slug] = $notice;
         }
+
     }
 
     /**

@@ -73,12 +73,12 @@ final class Yatra_Admin
     public function notices()
     {
 
-        // At least one WPForms capability is needed to see admin notices.
         if (!current_user_can('manage_yatra')) {
             return;
         }
 
-        echo implode(' ', yatra()->admin_notices);
+        yatra()->admin_notice->display();
+
     }
 
     public function promotional_offer()

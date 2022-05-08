@@ -90,9 +90,11 @@ class Yatra_Admin_Review
 
         // We have a candidate! Output a review message.
         ?>
-        <p><?php echo esc_html__('Hey, I noticed you created a popup with WP Popups - that’s awesome! Could you please do me a BIG favor and give it a 5-star rating on WordPress ? It would be a tremendous help for us.', 'yatra'); ?></p>
+
+        <p><?php esc_html_e('Hey, I noticed you just get new tour booking from Yatra - that’s awesome! Could you please do me a BIG favor and give it a 5-star rating on WordPress to help us spread the word and boost our motivation?', 'yatra'); ?></p>
+
         <p>
-            <strong><?php echo wp_kses(__('~ Umesh Ghimire<br>Co-Founder of Yatra', 'yatra'), ['br' => []]); ?></strong>
+            <strong><?php echo wp_kses(__('Umesh Ghimire<br>Co-Founder of Yatra', 'yatra'), ['br' => []]); ?></strong>
         </p>
         <p>
             <a href="https://wordpress.org/support/plugin/yatra/reviews/?filter=5#new-post"
