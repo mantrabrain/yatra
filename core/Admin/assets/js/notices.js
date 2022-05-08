@@ -20,7 +20,7 @@ var YatraAdminNotices = window.YatraAdminNotices || (function (document, window,
         /**
          * Start the engine.
          *
-          */
+         */
         init: function () {
 
             $(app.ready);
@@ -29,7 +29,7 @@ var YatraAdminNotices = window.YatraAdminNotices || (function (document, window,
         /**
          * Document ready.
          *
-          */
+         */
         ready: function () {
 
             app.events();
@@ -38,8 +38,9 @@ var YatraAdminNotices = window.YatraAdminNotices || (function (document, window,
         /**
          * Dismissible notices events.
          *
-          */
+         */
         events: function () {
+
 
             $(document).on(
                 'click',
@@ -51,7 +52,7 @@ var YatraAdminNotices = window.YatraAdminNotices || (function (document, window,
         /**
          * Dismiss notice event handler.
          *
-          *
+         *
          * @param {object} e Event object.
          * */
         dismissNotice: function (e) {
@@ -67,6 +68,5 @@ var YatraAdminNotices = window.YatraAdminNotices || (function (document, window,
     return app;
 
 }(document, window, jQuery));
-
 // Initialize.
 YatraAdminNotices.init();

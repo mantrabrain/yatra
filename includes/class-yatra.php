@@ -45,8 +45,10 @@ final class Yatra
      */
     public $yatra_messages = null;
 
-
-    public $admin_notices = array();
+    /**
+     * @var Yatra\Core\Admin\Notices
+     */
+    public $admin_notice = null;
 
     /**
      * Yatra_Core_Exporter instance.
@@ -76,8 +78,6 @@ final class Yatra
      * Ensures only one instance of Yatra is loaded or can be loaded.
      *
      * @return Yatra - Main instance.
-     * @see mb_aec_addons()
-     * @since 1.0.0
      * @static
      */
     public static function instance()
@@ -257,6 +257,7 @@ final class Yatra
 
         $this->yatra_error = new WP_Error;
         $this->yatra_messages = new Yatra_Messages;
+        $this->admin_notice = new \Yatra\Core\Admin\Notices();
 
 
     }
