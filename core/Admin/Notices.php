@@ -44,7 +44,7 @@ class Notices
      * Init.
      *
      */
-    public function init()
+    public function __construct()
     {
 
         $this->hooks();
