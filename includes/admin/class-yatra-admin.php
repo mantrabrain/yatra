@@ -145,7 +145,8 @@ final class Yatra_Admin
             'Settings',
             'manage_yatra',
             'yatra-settings',
-            array($this, 'settings')
+            array($this, 'settings'),
+            997
         );
 
         add_action('load-' . $settings_page, array($this, 'settings_page_init'));
@@ -169,7 +170,7 @@ final class Yatra_Admin
             '<span style="color:#28d01d">' . esc_html__('Addons', 'yatra') . '</span>',
             'manage_yatra',
             'yatra-addons',
-            array($this, 'addon_page'), 300
+            array($this, 'addon_page'), 999
         );
 
         add_submenu_page(
@@ -177,7 +178,9 @@ final class Yatra_Admin
             esc_html__('Upgrade to Pro', 'yatra'),
             esc_html__('Upgrade to Pro', 'yatra'),
             'manage_yatra',
-            esc_url('https://wpyatra.com/pricing/?utm_campaign=liteplugin&utm_medium=admin-menu&utm_source=WordPress&utm_content=Upgrade+to+Pro')
+            esc_url('https://wpyatra.com/pricing/?utm_campaign=liteplugin&utm_medium=admin-menu&utm_source=WordPress&utm_content=Upgrade+to+Pro'),
+            '',
+            1000
         );
     }
 
