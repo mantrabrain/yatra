@@ -64,22 +64,11 @@ final class Yatra_Admin
         add_action('init', array($this, 'setup_wizard'));
         add_action('admin_init', array($this, 'admin_redirects'));
         add_action('admin_menu', array($this, 'admin_menu'));
-        add_action('admin_notices', array($this, 'notices'));
         add_action('admin_notices', array($this, 'promotional_offer'));
 
 
     }
 
-    public function notices()
-    {
-
-        if (!current_user_can('manage_yatra')) {
-            return;
-        }
-
-        yatra()->admin_notice->display();
-
-    }
 
     public function promotional_offer()
     {
@@ -173,6 +162,23 @@ final class Yatra_Admin
             3
         );
         add_action('load-' . $settings_page, array($this, 'availability_page_init'));
+
+        add_submenu_page(
+            'edit.php?post_type=tour',
+            esc_html__('Yatra Addons', 'yatra'),
+            '<span style="color:#28d01d">' . esc_html__('Addons', 'yatra') . '</span>',
+            'manage_yatra',
+            'yatra-addons',
+            array($this, 'addon_page'), 300
+        );
+
+        add_submenu_page(
+            'edit.php?post_type=tour',
+            esc_html__('Upgrade to Pro', 'yatra'),
+            esc_html__('Upgrade to Pro', 'yatra'),
+            'manage_yatra',
+            esc_url('https://wpyatra.com/pricing/?utm_campaign=liteplugin&utm_medium=admin-menu&utm_source=WordPress&utm_content=Upgrade+to+Pro')
+        );
     }
 
     public function settings()
@@ -221,6 +227,11 @@ final class Yatra_Admin
 
     }
 
+    public function addon_page()
+    {
+        do_action('yatra_admin_addon_page_output');
+    }
+
     public function availability_page_init()
     {
 
@@ -247,6 +258,7 @@ final class Yatra_Admin
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-post-types.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-permalinks.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-review.php';
+        include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-addons.php';
 
 
     }

@@ -111,8 +111,8 @@ class Yatra_Admin_Review
             ob_get_clean(),
             [
                 'dismiss' => Notices::DISMISS_GLOBAL,
-                'slug' => 'review_request',
-                'autop' => false,
+                'slug' => 'review_request1',
+                'autop' => true,
                 'class' => 'yatra-review-notice',
             ]
         );

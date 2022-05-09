@@ -105,15 +105,7 @@ class Notices
         }
     }
 
-    /**
-     * Add notice to the registry.
-     *
-     * @param string $message Message to display.
-     * @param string $type Type of the notice. Can be [ '' (default) | 'info' | 'error' | 'success' | 'warning' ].
-     * @param array $args The array of additional arguments. Please see the $defaults array below.
-     * @since 1.6.7.1
-     *
-     */
+
     public static function add($message, $type = '', $args = [])
     {
 
@@ -160,28 +152,13 @@ class Notices
 
     }
 
-    /**
-     * Add info notice.
-     *
-     * @param string $message Message to display.
-     * @param array $args Array of additional arguments. Details in the self::add() method.
-     * @since 1.6.7.1
-     *
-     */
+
     public static function info($message, $args = [])
     {
 
         self::add($message, 'info', $args);
     }
 
-    /**
-     * Add error notice.
-     *
-     * @param string $message Message to display.
-     * @param array $args Array of additional arguments. Details in the self::add() method.
-     * @since 1.6.7.1
-     *
-     */
     public static function error($message, $args = [])
     {
 

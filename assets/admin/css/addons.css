@@ -1,0 +1,312 @@
+#wpforms-admin-addons *,
+#wpforms-admin-addons *::before,
+#wpforms-admin-addons *::after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.wpforms-admin-content .wpforms-btn {
+    border: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-block;
+    margin: 0;
+    text-decoration: none;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    box-shadow: none;
+}
+.wpforms-admin-content .wpforms-btn-orange {
+    background-color: #e27730;
+    border-color: #e27730;
+    color: #fff;
+}
+.wpforms-admin-content .wpforms-btn-green {
+    background-color: #0d9504;
+    border-color: #0d9504;
+    color: #fff;
+}
+.wpforms-admin-content .wpforms-btn-green:hover, .wpforms-admin-content .wpforms-btn-green:focus {
+    background-color: #28d01d;
+    border-color: #28d01d;
+    color: #fff;
+}
+.wpforms-admin-content .wpforms-btn-orange:hover, .wpforms-admin-content .wpforms-btn-orange:focus {
+    background-color: #b85a1b;
+    border-color: #b85a1b;
+    color: #fff;
+}
+#wpforms-admin-addons #wpforms-admin-addons-list .list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    margin-left: -20px;
+    margin-right: -20px;
+}
+
+#wpforms-admin-addons #wpforms-admin-addons-list .list .action-button button {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-shadow: none;
+    font-weight: 600;
+    width: 140px;
+    text-align: center;
+    padding: 8px 5px;
+}
+
+#wpforms-admin-addons #wpforms-admin-addons-list .list .action-button button:hover, #wpforms-admin-addons #wpforms-admin-addons-list .list .action-button button:focus, #wpforms-admin-addons #wpforms-admin-addons-list .list .action-button button.loading {
+    background-color: #e9e9e9;
+}
+
+#wpforms-admin-addons #wpforms-admin-addons-list .list .action-button button:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: none;
+}
+
+#wpforms-admin-addons .addons-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    margin-left: -20px;
+    margin-right: -20px;
+}
+
+#wpforms-admin-addons .unlock-msg {
+    padding: 0;
+    margin-top: -20px;
+    clear: both;
+}
+
+#wpforms-admin-addons .unlock-msg h4 {
+    margin: 1.5em 0 8px;
+}
+
+#wpforms-admin-addons .unlock-msg p {
+    margin: 0 0 1.5em;
+}
+
+#wpforms-admin-addons #wpforms-admin-addons-search {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-shadow: none;
+    color: #333;
+    vertical-align: middle;
+    padding: 2px 12px;
+    margin: -2px 10px 0 0;
+    width: 200px;
+    min-height: 30px;
+    float: right;
+}
+
+#wpforms-admin-addons #wpforms-admin-addons-search:focus {
+    border-color: #bbb;
+}
+
+#wpforms-admin-addons .addon-container {
+    padding: 0 20px;
+    width: 33.333333%;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 1249px) {
+    #wpforms-admin-addons .addon-container {
+        width: 50%;
+    }
+}
+
+@media (max-width: 767px) {
+    #wpforms-admin-addons .addon-container {
+        width: 100%;
+    }
+}
+
+#wpforms-admin-addons h4 {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+#wpforms-admin-addons .addon-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    margin: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+#wpforms-admin-addons .addon-item img {
+    border: 1px solid #eee;
+    float: left;
+    max-width: 75px;
+}
+
+#wpforms-admin-addons .addon-item h5 {
+    margin: 0 0 10px 100px;
+    font-size: 16px;
+}
+
+#wpforms-admin-addons .addon-item h5 a {
+    color: #444;
+}
+
+#wpforms-admin-addons .addon-item h5 a:hover {
+    color: #006799;
+}
+
+#wpforms-admin-addons .addon-item p {
+    margin: 0 0 0 100px;
+}
+
+#wpforms-admin-addons .addon-item .details {
+    padding: 30px 20px;
+}
+
+#wpforms-admin-addons .addon-item .actions {
+    display: flex;
+    align-items: center;
+    background-color: #f7f7f7;
+    border-top: 1px solid #ddd;
+    padding: 20px;
+    min-height: 75px;
+    position: relative;
+}
+
+#wpforms-admin-addons .addon-item .actions .msg {
+    background-color: #f7f7f7;
+    border: none;
+    position: absolute;
+    text-align: center;
+    font-weight: 600;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    z-index: 99;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#wpforms-admin-addons .addon-item .actions .msg.success {
+    color: #2a9b39;
+}
+
+#wpforms-admin-addons .addon-item .actions .msg.error {
+    color: red;
+}
+
+#wpforms-admin-addons .addon-item .actions .msg p {
+    margin: 0;
+}
+
+#wpforms-admin-addons .addon-item .actions .msg a,
+#wpforms-admin-addons .addon-item .actions .msg a:hover {
+    color: inherit;
+}
+
+#wpforms-admin-addons .addon-item .status {
+    flex-grow: 1;
+}
+
+#wpforms-admin-addons .addon-item .status .status-missing,
+#wpforms-admin-addons .addon-item .status .status-go-to-url {
+    color: #666;
+}
+
+#wpforms-admin-addons .addon-item .status .status-installed {
+    color: red;
+}
+
+#wpforms-admin-addons .addon-item .status .status-active {
+    color: #2a9b39;
+}
+
+#wpforms-admin-addons .addon-item .upgrade-button {
+    text-align: center;
+}
+
+#wpforms-admin-addons .addon-item .upgrade-button a {
+    font-weight: 600;
+    width: 140px;
+    text-align: center;
+    padding: 8px 5px;
+}
+
+#wpforms-admin-addons .addon-item .action-button button {
+    width: 140px;
+}
+
+.addon-item .status {
+    flex-grow: 1;
+}
+
+.addon-item .status .status-inactive {
+    color: red;
+}
+
+.addon-item .status .status-active {
+    color: #2a9b39;
+}
+
+.addon-item .upgrade-button {
+    text-align: center;
+}
+
+.addon-item .upgrade-button a {
+    font-weight: 600;
+    width: 140px;
+    text-align: center;
+    padding: 8px 5px;
+}
+
+.addon-item .action-button button {
+    cursor: pointer;
+}
+
+.addon-item .action-button button .fa {
+    margin-right: 8px;
+}
+
+.addon-item .action-button button .fa.fa-spinner {
+    margin-right: 0;
+}
+
+.addon-item .action-button button.status-active .fa {
+    color: #2a9b39;
+}
+
+.addon-item .action-button button.status-inactive .fa {
+    color: red;
+}
+
+.addon-item .action-button button.status-missing .fa {
+    color: #999;
+}
+
+.addon-item .action-button button.disabled {
+    cursor: default;
+    pointer-events: none;
+}
+
+.addon-item .action-button button.loading {
+    cursor: default;
+}
+
+.addon-item .action-button button.loading .fa {
+    color: #666;
+}
+
+.addon-item .action-button a {
+    text-decoration: none;
+}
