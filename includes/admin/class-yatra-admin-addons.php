@@ -13,11 +13,12 @@ class Yatra_Admin_Addons
     {
         try {
 
-            $addons_json = file_get_contents(YATRA_PLUGIN_URI . '/assets/admin/addon-lists.json');
+            $addons_json = file_get_contents(YATRA_PLUGIN_DIR . 'assets/admin/addon-lists.json');
 
             $addons = json_decode($addons_json, true);
 
         } catch (\Exception $e) {
+
             $addons = [];
         }
 

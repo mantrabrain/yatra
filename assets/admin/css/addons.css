@@ -25,8 +25,8 @@
     color: #fff;
 }
 .wpforms-admin-content .wpforms-btn-green {
-    background-color: #0d9504;
-    border-color: #0d9504;
+    background-color: #008037;
+    border-color: #008037;
     color: #fff;
 }
 .wpforms-admin-content .wpforms-btn-green:hover, .wpforms-admin-content .wpforms-btn-green:focus {
@@ -147,6 +147,7 @@
     border: 1px solid #eee;
     float: left;
     max-width: 75px;
+    filter: grayscale(100%);
 }
 
 #wpforms-admin-addons .addon-item h5 {
@@ -178,6 +179,7 @@
     padding: 20px;
     min-height: 75px;
     position: relative;
+    justify-content: flex-end;
 }
 
 #wpforms-admin-addons .addon-item .actions .msg {

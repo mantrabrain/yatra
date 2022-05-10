@@ -1,10 +1,10 @@
 [
   {
-    "title": "Style Customizer",
-    "slug": "everest-forms-style-customizer",
-    "name": "Everest Forms Style Customizer",
+    "title": "Yatra Downloads",
+    "slug": "yatra-downloads",
+    "name": "Yatra Downloads",
     "image": "addons/style-customizer.png",
-    "excerpt": "Allows you to make design changes without coding. Powerful customizing panel with live preview helps you customize colors, fonts, spacing, background, alignment and more.",
+    "excerpt": "Allows you to add features to add additional files so that anyone can download those files from frontend. It is useful for tour operator to add brochure, tour guidelines pdf file and other costing details files, and any kind of other additional files, so that anyone can easily download those files from website frontend.",
     "link": "https://wpeverest.com/wordpress-plugins/everest-forms/style-customizer/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=style-customizer",
     "plan": [
       "personal",
