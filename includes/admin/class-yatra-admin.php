@@ -173,15 +173,18 @@ final class Yatra_Admin
             array($this, 'addon_page'), 999
         );
 
-        add_submenu_page(
-            'edit.php?post_type=tour',
-            esc_html__('Upgrade to Pro', 'yatra'),
-            esc_html__('Upgrade to Pro', 'yatra'),
-            'manage_yatra',
-            esc_url('https://wpyatra.com/pricing/?utm_campaign=liteplugin&utm_medium=admin-menu&utm_source=WordPress&utm_content=Upgrade+to+Pro'),
-            '',
-            1000
-        );
+        if (count(yatra_get_premium_addons()) < 1) {
+            
+            add_submenu_page(
+                'edit.php?post_type=tour',
+                esc_html__('Upgrade to Pro', 'yatra'),
+                '<span style="color:#e27730">' . esc_html__('Upgrade to Pro', 'yatra') . '</span>',
+                'manage_yatra',
+                esc_url('https://wpyatra.com/pricing/?utm_campaign=freeplugin&utm_medium=admin-menu&utm_source=WordPress&utm_content=Upgrade+to+Pro'),
+                '',
+                1000
+            );
+        }
     }
 
     public function settings()

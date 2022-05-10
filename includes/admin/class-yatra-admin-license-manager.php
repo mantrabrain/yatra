@@ -2,15 +2,10 @@
 
 class Yatra_Admin_License_Manager
 {
-
-    private function premium_addons()
-    {
-        return apply_filters('yatra_premium_addons', array());
-    }
-
+    
     public function __construct()
     {
-        if (count($this->premium_addons()) > 0) {
+        if (count(yatra_get_premium_addons()) > 0) {
             add_action('admin_menu', array($this, 'license_menu'), 55);
             add_action('admin_enqueue_scripts', array($this, 'license_scripts'), 11);
             add_action('wp_ajax_yatra_update_single_license', array($this, 'update_single_license'), 10);
@@ -81,7 +76,7 @@ class Yatra_Admin_License_Manager
 
         $all_valid_license = array();
 
-        $premium_addons = $this->premium_addons();
+        $premium_addons = yatra_get_premium_addons();
 
         foreach ($premium_addons as $addon_slug => $addon_config) {
 
@@ -110,7 +105,7 @@ class Yatra_Admin_License_Manager
 
     public function license_page()
     {
-        $premium_addons = $this->premium_addons();
+        $premium_addons = yatra_get_premium_addons();
 
         $all_license_details = get_option('yatra_license', array());
 
