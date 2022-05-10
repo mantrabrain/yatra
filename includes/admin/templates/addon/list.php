@@ -1,10 +1,10 @@
-<div id="wpforms-admin-addons" class="wrap wpforms-admin-wrap">
+<div id="yatra-admin-addons" class="wrap yatra-admin-wrap">
     <h1 class="page-title">
-        WPForms Addons <input type="search" placeholder="Search Addons" id="wpforms-admin-addons-search">
+        WPForms Addons
     </h1>
 
-    <div class="wpforms-admin-content">
-        <div id="wpforms-admin-addons-list">
+    <div class="yatra-admin-content">
+        <div id="yatra-admin-addons-list">
             <div class="list">
 
                 <?php foreach ($addons as $addon) {
@@ -26,7 +26,7 @@
                     ?>
                     <div class="addon-container">
                         <div class="addon-item">
-                            <div class="details wpforms-clear" style="">
+                            <div class="details yatra-clear" style="">
                                 <img src="<?php echo esc_attr($image_path) ?>"
                                      alt="<?php echo esc_attr($addon['title']) ?> logo">
                                 <h5 class="addon-name">
@@ -40,7 +40,7 @@
                                     <?php echo esc_html($addon['excerpt']); ?>
                                 </p>
                             </div>
-                            <div class="actions wpforms-clear">
+                            <div class="actions yatra-clear">
                                 <div class="upgrade-button">
 
                                 </div>
@@ -111,7 +111,7 @@
                                         ?>
                                         <a href="https://wpyatra.com/pricing/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=addons&utm_content=<?php echo esc_attr($addon->title) ?>"
                                            target="_blank" rel="noopener noreferrer"
-                                           class="button button-primary wpforms-btn-green">
+                                           class="button button-primary yatra-btn-green">
                                             Upgrade Now </a>
 
                                     <?php endif; ?>
