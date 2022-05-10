@@ -53,8 +53,7 @@
 
                                 </div>
                                 <?php $addon = (object)$addon;
-                                $license_plan = 'helo';
-                                ?>
+                                 ?>
 
                                 <div class="status column-status">
                                     <strong><?php esc_html_e('Status:', 'everest-forms'); ?></strong>
