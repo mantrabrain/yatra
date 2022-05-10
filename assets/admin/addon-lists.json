@@ -2,6 +2,7 @@
   {
     "title": "Yatra Downloads",
     "slug": "yatra-downloads",
+    "plugin_slug": "",
     "name": "Yatra Downloads",
     "image": "addons/yatra-downloads.png",
     "excerpt": "Allows you to add features to add additional files so that anyone can download those files from frontend. It is useful for tour operator to add brochure, tour guidelines pdf file and other costing details files, and any kind of other additional files, so that anyone can easily download those files from website frontend.",

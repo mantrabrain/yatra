@@ -22,7 +22,9 @@ class Yatra_Admin_Addons
             $addons = [];
         }
 
-        yatra_load_admin_template('addon.list', array('addons' => $addons));
+        $all_license_details = get_option('yatra_license', array());
+
+        yatra_load_admin_template('addon.list', array('addons' => $addons, 'licenses' => $all_license_details));
     }
 
     public function scripts($hook)

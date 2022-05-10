@@ -19,9 +19,7 @@
         </thead>
         <tbody>
         <?php foreach ($addons as $addon_slug => $addon) {
-
-            $license_details = get_option('yatra_license', array());
-
+            
             $addon_license = isset($license_details[$addon_slug]) ? $license_details[$addon_slug] : array();
 
             $server_response = isset($addon_license['server_response']) ? $addon_license['server_response'] : array();

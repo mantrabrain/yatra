@@ -112,6 +112,8 @@ class Yatra_Admin_License_Manager
     {
         $premium_addons = $this->premium_addons();
 
+        $all_license_details = get_option('yatra_license', array());
+
         $message = '';
 
         if (isset($_POST['yatra_license_save_button'])) {
@@ -131,7 +133,7 @@ class Yatra_Admin_License_Manager
 
         echo '<div class="wrap yatra-license-page-wrap">';
 
-        yatra_load_admin_template('license.license', array('addons' => $premium_addons, 'message' => $message));
+        yatra_load_admin_template('license.license', array('addons' => $premium_addons, 'message' => $message, 'license_details' => $all_license_details));
 
         echo '</div>';
     }
