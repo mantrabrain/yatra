@@ -44,29 +44,35 @@
                                 <div class="upgrade-button">
 
                                 </div>
-                                <?php $addon = (object)$addon;
-                                 ?>
+                                <?php
+
+                                $plugin_file_slug = $addon['plugin_file'] ?? $addon['slug'];
+
+                                $addon = (object)$addon;
+
+
+                                ?>
 
                                 <div class="status column-status">
-                                    <strong><?php esc_html_e('Status:', 'everest-forms'); ?></strong>
-                                    <?php if (is_plugin_active($addon->slug . '/' . $addon->slug . '.php')) : ?>
-                                        <span class="status-label status-active"><?php esc_html_e('Activated', 'everest-forms'); ?></span>
-                                    <?php elseif (file_exists(WP_PLUGIN_DIR . '/' . $addon->slug . '/' . $addon->slug . '.php')) : ?>
-                                        <span class="status-label status-inactive"><?php esc_html_e('Inactive', 'everest-forms'); ?></span>
+                                    <strong><?php esc_html_e('Status:', 'yatra'); ?></strong>
+                                    <?php if (is_plugin_active($plugin_file_slug . '/' . $plugin_file_slug . '.php')) : ?>
+                                        <span class="status-label status-active"><?php esc_html_e('Activated', 'yatra'); ?></span>
+                                    <?php elseif (file_exists(WP_PLUGIN_DIR . '/' . $plugin_file_slug . '/' . $plugin_file_slug . '.php')) : ?>
+                                        <span class="status-label status-inactive"><?php esc_html_e('Inactive', 'yatra'); ?></span>
                                     <?php else : ?>
-                                        <span class="status-label status-install-now"><?php esc_html_e('Not Installed', 'everest-forms'); ?></span>
+                                        <span class="status-label status-install-now"><?php esc_html_e('Not Installed', 'yatra'); ?></span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="upgrade-button action-button">
-                                    <?php if (is_plugin_active($addon->slug . '/' . $addon->slug . '.php')) : ?>
+                                    <?php if (is_plugin_active($plugin_file_slug . '/' . $plugin_file_slug . '.php')) : ?>
                                         <?php
                                         /* translators: %s: Add-on title */
-                                        $aria_label = sprintf(esc_html__('Deactivate %s now', 'everest-forms'), $addon->title);
-                                        $plugin_file = plugin_basename($addon->slug . '/' . $addon->slug . '.php');
+                                        $aria_label = sprintf(esc_html__('Deactivate %s now', 'yatra'), $addon->title);
+                                        $plugin_file = plugin_basename($plugin_file_slug . '/' . $plugin_file_slug . '.php');
                                         $url = wp_nonce_url(
                                             add_query_arg(
                                                 array(
-                                                    'page' => 'evf-addons',
+                                                    'page' => 'yatra-addons',
                                                     'action' => 'deactivate',
                                                     'plugin' => $plugin_file,
                                                 ),
@@ -77,16 +83,16 @@
                                         ?>
                                         <a class="button button-secondary deactivate-now"
                                            href="<?php echo esc_url($url); ?>"
-                                           aria-label="<?php echo esc_attr($aria_label); ?>"><?php esc_html_e('Deactivate', 'everest-forms'); ?></a>
-                                    <?php elseif (file_exists(WP_PLUGIN_DIR . '/' . $addon->slug . '/' . $addon->slug . '.php')) : ?>
+                                           aria-label="<?php echo esc_attr($aria_label); ?>"><?php esc_html_e('Deactivate', 'yatra'); ?></a>
+                                    <?php elseif (file_exists(WP_PLUGIN_DIR . '/' . $plugin_file_slug . '/' . $plugin_file_slug . '.php')) : ?>
                                         <?php
                                         /* translators: %s: Add-on title */
-                                        $aria_label = sprintf(esc_html__('Activate %s now', 'everest-forms'), $addon->title);
-                                        $plugin_file = plugin_basename($addon->slug . '/' . $addon->slug . '.php');
+                                        $aria_label = sprintf(esc_html__('Activate %s now', 'yatra'), $addon->title);
+                                        $plugin_file = plugin_basename($plugin_file_slug . '/' . $plugin_file_slug . '.php');
                                         $url = wp_nonce_url(
                                             add_query_arg(
                                                 array(
-                                                    'page' => 'evf-addons',
+                                                    'page' => 'yatra-addons',
                                                     'action' => 'activate',
                                                     'plugin' => $plugin_file,
                                                 ),
@@ -97,11 +103,11 @@
                                         ?>
                                         <a class="button button-primary activate-now"
                                            href="<?php echo esc_url($url); ?>"
-                                           aria-label="<?php echo esc_attr($aria_label); ?>"><?php esc_html_e('Activate', 'everest-forms'); ?></a>
+                                           aria-label="<?php echo esc_attr($aria_label); ?>"><?php esc_html_e('Activate', 'yatra'); ?></a>
                                     <?php else : ?>
                                         <?php
                                         /* translators: %s: Add-on title */
-                                        $aria_label = sprintf(esc_html__('Install %s now', 'everest-forms'), $addon->title);
+                                        $aria_label = sprintf(esc_html__('Install %s now', 'yatra'), $addon->title);
                                         ?>
                                         <a href="https://wpyatra.com/pricing/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=addons&utm_content=<?php echo esc_attr($addon->title) ?>"
                                            target="_blank" rel="noopener noreferrer"

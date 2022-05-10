@@ -2,7 +2,6 @@
   {
     "title": "Yatra Downloads",
     "slug": "yatra-downloads",
-    "plugin_slug": "",
     "name": "Yatra Downloads",
     "image": "addons/yatra-downloads.png",
     "excerpt": "Allows you to add features to add additional files so that anyone can download those files from frontend. It is useful for tour operator to add brochure, tour guidelines pdf file and other costing details files, and any kind of other additional files, so that anyone can easily download those files from website frontend.",
@@ -48,6 +47,7 @@
   {
     "title": "Yatra Authorize.net",
     "slug": "yatra-authorize-net",
+    "plugin_file": "yatra-authorizenet",
     "name": "Yatra Authorize.net",
     "image": "addons/yatra-authorizenet.png",
     "excerpt": "This is payment gateway addon for Yatra plugin. This is a gateway of authorize.net. This gateway will support different types of credit/debit cards. Any one can book the tour package with their credit/debit card.",
@@ -57,6 +57,7 @@
   {
     "title": "Review & Rating",
     "slug": "yatra-review-and-rating",
+    "plugin_file": "yatra-review",
     "name": "Yatra Review & Rating",
     "image": "addons/yatra-review-and-rating.png",
     "excerpt": "Yatra Review and rating is premium extension of Yatra WordPress Travel booking plugin. This extension is useful if you want to enable review and rating feature on your tour packages.",
