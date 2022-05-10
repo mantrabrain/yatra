@@ -151,7 +151,7 @@ class Yatra_Admin_Review
         if (!empty($current_screen->id) && (in_array($current_screen->id, $yatra_screens) || strpos($current_screen->id, 'yatra') !== false)) {
             $url = 'https://wordpress.org/support/plugin/yatra/reviews/?filter=5#new-post';
             $text = sprintf(
-                wp_kses( /* translators: $1$s - WPForms plugin name; $2$s - WP.org review link; $3$s - WP.org review link. */
+                wp_kses( /* translators: $1$s - Yatra plugin name; $2$s - WP.org review link; $3$s - WP.org review link. */
                     __('Please rate %1$s <a href="%2$s" target="_blank" rel="noopener noreferrer">&#9733;&#9733;&#9733;&#9733;&#9733;</a> on <a href="%3$s" target="_blank" rel="noopener">WordPress.org</a> to help us spread the word. Thank you from the Mantra Brain team!', 'yatra'),
                     [
                         'a' => [

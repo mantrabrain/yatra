@@ -1,6 +1,6 @@
 <div id="yatra-admin-addons" class="wrap yatra-admin-wrap">
     <h1 class="page-title">
-        WPForms Addons
+        Yatra Premium Addon/Extensions
     </h1>
 
     <div class="yatra-admin-content">
