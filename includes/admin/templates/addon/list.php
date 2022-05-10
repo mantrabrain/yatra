@@ -2,15 +2,7 @@
     <h1 class="page-title">
         WPForms Addons <input type="search" placeholder="Search Addons" id="wpforms-admin-addons-search">
     </h1>
-    <div class="notice wpforms-notice notice-info" id="wpforms-notice-1" style="display: block;"><p><strong>WPForms
-                Addons are a PRO feature</strong></p>
-        <p>Please upgrade to PRO to unlock our addons, advanced form fields, and more!</p>
-        <p>
-            <a href="https://wpforms.com/lite-upgrade/?discount=LITEUPGRADE&amp;utm_source=WordPress&amp;utm_campaign=liteplugin&amp;utm_medium=addons"
-               class="wpforms-btn wpforms-btn-orange wpforms-btn-md" rel="noopener noreferrer">
-                Upgrade Now
-            </a>
-        </p></div>
+
     <div class="wpforms-admin-content">
         <div id="wpforms-admin-addons-list">
             <div class="list">
