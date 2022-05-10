@@ -72,11 +72,11 @@
                                         $url = wp_nonce_url(
                                             add_query_arg(
                                                 array(
-                                                    'page' => 'yatra-addons',
+                                                    //'page' => 'yatra-addons',
                                                     'action' => 'deactivate',
                                                     'plugin' => $plugin_file,
                                                 ),
-                                                admin_url('admin.php')
+                                                admin_url('plugins.php')
                                             ),
                                             'deactivate-plugin_' . $plugin_file
                                         );
