@@ -21,6 +21,7 @@
                         'excerpt' => '',
                         'image' => '',
                         'slug' => '',
+                        'name' => '',
                     ));
 
 
@@ -33,8 +34,8 @@
                                 <img src="<?php echo esc_attr($image_path) ?>"
                                      alt="<?php echo esc_attr($addon['title']) ?> logo">
                                 <h5 class="addon-name">
-                                    <a href="https://wpyatra.com/pricing/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=addons&utm_content=<?php echo esc_attr($addon['title']) ?>"
-                                       title="Learn more" target="_blank" rel="noopener noreferrer"
+                                    <a href="https://wpyatra.com/yatra-premium-extensions/<?php echo esc_attr($addon['slug']) ?>/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=addons&utm_content=<?php echo esc_attr($addon['title']) ?>"
+                                       title="Learn more about <?php echo esc_attr($addon['name']); ?>" target="_blank" rel="noopener noreferrer"
                                        class="addon-link"><?php
                                         echo esc_html($addon['title']);
                                         ?></a></h5>

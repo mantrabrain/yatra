@@ -147,7 +147,6 @@
     border: 1px solid #eee;
     float: left;
     max-width: 75px;
-    filter: grayscale(100%);
 }
 
 #wpforms-admin-addons .addon-item h5 {
@@ -165,6 +164,8 @@
 
 #wpforms-admin-addons .addon-item p {
     margin: 0 0 0 100px;
+    font-size: 14px;
+    line-height: 1.7em;
 }
 
 #wpforms-admin-addons .addon-item .details {

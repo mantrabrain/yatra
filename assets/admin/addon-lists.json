@@ -3,272 +3,81 @@
     "title": "Yatra Downloads",
     "slug": "yatra-downloads",
     "name": "Yatra Downloads",
-    "image": "addons/style-customizer.png",
+    "image": "addons/yatra-downloads.png",
     "excerpt": "Allows you to add features to add additional files so that anyone can download those files from frontend. It is useful for tour operator to add brochure, tour guidelines pdf file and other costing details files, and any kind of other additional files, so that anyone can easily download those files from website frontend.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/style-customizer/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=style-customizer",
     "plan": [
-      "personal",
-      "plus",
-      "professional",
-      "agency"
     ]
   },
   {
-    "title": "Multi Part Forms",
-    "slug": "everest-forms-multi-part",
-    "name": "Everest Forms Multi Part",
-    "image": "addons/multi-part-forms.png",
-    "excerpt": "Allows you to easily break your long forms into multiple parts. It helps you to make a stepwise form instead of a long-form which adds rich user experience to your website.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/multi-part-forms/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=multi-part-forms",
+    "title": "Yatra Services",
+    "slug": "yatra-services",
+    "name": "Yatra Services",
+    "image": "addons/yatra-services.png",
+    "excerpt": "This addon add features to add additional services for your tour packages. For example if you want to add cleaning and other extra services along with your tour package ( Free Services or Charged Services), this addon is useful for you. You can customize the pricing as per tour package or individual person.",
     "plan": [
-      "personal",
-      "plus",
-      "professional",
-      "agency"
     ]
   },
   {
-    "title": "MailChimp",
-    "slug": "everest-forms-mailchimp",
-    "name": "Everest Forms MailChimp",
-    "image": "addons/mailchimp.png",
-    "excerpt": "Allows your users to subscribe to MailChimp through form submissions. Users filling up the forms can be directly added to your subscribers list in MailChimp.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/mailchimp/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=mailchimp",
+    "title": "Availability Conditions",
+    "slug": "yatra-availability-conditions",
+    "name": "Yatra Availability Conditions",
+    "image": "addons/availability-conditions.png",
+    "excerpt": "This addon add features to add different types of conditional logic for your tour packages. For example if you want to make available for booking the tour package for weekend only or each sunday only or each month only, then this addon is for you.",
     "plan": [
-      "personal",
-      "plus",
-      "professional",
-      "agency"
     ]
   },
   {
-    "title": "ConvertKit",
-    "slug": "everest-forms-convertkit",
-    "name": "Everest Forms ConvertKit",
-    "image": "addons/convertkit.png",
-    "excerpt": "Allows you to efficiently grow your business by generating more leads with ConvertKit. It also helps increase automated emails for better lead generation.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/convertkit/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=convertkit",
+    "title": "Partial Payment",
+    "slug": "yatra-partial-payment",
+    "name": "Yatra Partial Payment",
+    "image": "addons/yatra-partial-payment.png",
+    "excerpt": "This addon can be useful if you want to get amount partially from traveler. You can set how much money do you want to as deposit on percentage and you can simply use any of the payment gateway. Right now you can add first payment as deposit and remaining user can pay by themselves via any of the payment gateway.",
     "plan": [
-      "personal",
-      "plus",
-      "professional",
-      "agency"
     ]
   },
   {
-    "title": "PDF Form Submission",
-    "slug": "everest-forms-pdf-submission",
-    "name": "Everest Forms PDF Submission",
-    "image": "addons/pdf-submission.png",
-    "excerpt": "Allows you to generate digital PDF documents of any form submission to export them. It also lets you to send a PDF copy of the form submission via email attachment.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/pdf-form-submission/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=pdf-form-submission",
+    "title": "Yatra Stripe",
+    "slug": "yatra-stripe",
+    "name": "Yatra Stripe",
+    "image": "addons/yatra-stripe.png",
+    "excerpt": "This is payment gateway of stripe.com which support different types of credit/debit cards. While booking the tour package on yatra plugin the traveller no need to go any of the payment gateway pages to pay the tour price. Any one can easily book the tour package via this premium payment gateway addon.",
     "plan": [
-      "personal",
-      "plus",
-      "professional",
-      "agency"
     ]
   },
   {
-    "title": "Custom Captcha",
-    "slug": "everest-forms-captcha",
-    "name": "Everest Forms Captcha",
-    "image": "addons/custom-captcha.png",
-    "excerpt": "Allows you to add custom questions or math captcha to your form and fight back against spam form submissions. It also adds a security layer to your website.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/captcha/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=captcha",
+    "title": "Yatra Authorize.net",
+    "slug": "yatra-authorize-net",
+    "name": "Yatra Authorize.net",
+    "image": "addons/yatra-authorizenet.png",
+    "excerpt": "This is payment gateway addon for Yatra plugin. This is a gateway of authorize.net. This gateway will support different types of credit/debit cards. Any one can book the tour package with their credit/debit card.",
     "plan": [
-      "personal",
-      "plus",
-      "professional",
-      "agency"
     ]
   },
   {
-    "title": "Geolocation",
-    "slug": "everest-forms-geolocation",
-    "name": "Everest Forms Geolocation",
-    "image": "addons/geolocation.png",
-    "excerpt": "Allows you to collect precise location of your visitors and store their geolocation data like IP, Country, and Postal/Zip Code along with form submissions.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/geolocation/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=geolocation",
+    "title": "Review & Rating",
+    "slug": "yatra-review-and-rating",
+    "name": "Yatra Review & Rating",
+    "image": "addons/yatra-review-and-rating.png",
+    "excerpt": "Yatra Review and rating is premium extension of Yatra WordPress Travel booking plugin. This extension is useful if you want to enable review and rating feature on your tour packages.",
     "plan": [
-      "plus",
-      "professional",
-      "agency"
     ]
   },
   {
-    "title": "MailerLite",
-    "slug": "everest-forms-mailerlite",
-    "name": "Everest Forms MailerLite",
-    "image": "addons/mailerlite.png",
-    "excerpt": "Allows your users to subscribe to MailerLite through form submission via Everest Forms.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/mailerlite/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=mailerlite",
+    "title": "Yatra Square",
+    "slug": "yatra-square",
+    "name": "Yatra Square",
+    "image": "addons/yatra-square.png",
+    "excerpt": "Square Payment Gateway Premium extension for Yatra WordPress Plugin. It supports different cards & bank payments.",
     "plan": [
-      "plus",
-      "professional",
-      "agency"
     ]
   },
   {
-    "title": "ActiveCampaign",
-    "slug": "everest-forms-activecampaign",
-    "name": "Everest Forms ActiveCampaign",
-    "image": "addons/activecampaign.png",
-    "excerpt": "Allows your users to subscribe to ActiveCampaign through form submission via Everest Forms.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/activecampaign/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=mailerlite",
+    "title": "Yatra Razorpay",
+    "slug": "yatra-razorpay",
+    "name": "Yatra Razorpay",
+    "image": "addons/yatra-razorpay.png",
+    "excerpt": "Razorpay Payment Gateway Premium extension for Yatra WordPress Plugin. It supports different cards & bank payments.",
     "plan": [
-      "plus",
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Campaign Monitor",
-    "slug": "everest-forms-campaign-monitor",
-    "name": "Everest Forms Campaign Monitor",
-    "image": "addons/campaign-monitor.png",
-    "excerpt": "Allows your users to subscribe to Campaign Monitor through form submission via Everest Forms.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/campaign-monitor/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=campaign-monitor",
-    "plan": [
-      "plus",
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Google Sheets",
-    "slug": "everest-forms-google-sheets",
-    "name": "Everest Forms Google Sheets",
-    "image": "addons/google-sheets.png",
-    "excerpt": "Allows you to send form submission data to Google Sheets spreadsheets.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/google-sheets/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=google-sheets",
-    "plan": [
-      "plus",
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Survey Polls and Quiz",
-    "slug": "everest-forms-survey-polls-quiz",
-    "name": "Everest Forms Survey, Polls and Quiz",
-    "image": "addons/survey-polls-quiz.png",
-    "excerpt": "Allows you to create an intuitive survey, poll and quiz forms easily. It also provides admin reporting for data-driven decisions and other aditional fields like Likert and Scale Rating.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/survey-polls-and-quiz/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=survey-polls-and-quiz",
-    "plan": [
-      "plus",
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "User Registration",
-    "slug": "everest-forms-user-registration",
-    "name": "Everest Forms User Registration",
-    "image": "addons/user-registration.png",
-    "excerpt": "Allows you to create a custom WordPress user registration form instantly in few simple steps. You can add or remove input fields as per the style of your registration using this feature.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/user-registration/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=user-registration",
-    "plan": [
-      "plus",
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Form Restriction",
-    "slug": "everest-forms-form-restriction",
-    "name": "Everest Forms Form Restriction",
-    "image": "addons/form-restriction.png",
-    "excerpt": "Allows you to easily control and restrict by limiting entries, scheduling submission dates, password protection for the form submissions.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/form-restriction/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=form-restriction",
-    "plan": [
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Post Submissions",
-    "slug": "everest-forms-post-submissions",
-    "name": "Everest Forms Post Submissions",
-    "image": "addons/post-submissions.png",
-    "excerpt": "Allows you to have user-submitted content. It also lets your users to submit their blogs posts from front-end without the hassle of logging into the admin dashboard.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/post-submissions/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=post-submissions",
-    "plan": [
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Email Templates",
-    "slug": "everest-forms-email-templates",
-    "name": "Everest Forms Post Submissions",
-    "image": "addons/email-templates.png",
-    "excerpt": "Allows you to make email design changes without coding. Powerful customizing panel with live preview helps you customize colors, fonts, spacing, background, alignment and more.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/email-templates/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=email-templates",
-    "plan": [
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "PayPal Standard",
-    "slug": "everest-forms-paypal-standard",
-    "name": "Everest Forms PayPal Standard",
-    "image": "addons/payment-paypal.png",
-    "excerpt": "Allows you to integrate online payment service to your e-commerce website. You can connect your Everest forms with PayPal to easily collect payments, donations, and online orders.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/paypal-standard/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=paypal-standard",
-    "plan": [
-      "plus",
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Stripe",
-    "slug": "everest-forms-stripe",
-    "name": "Everest Forms Stripe",
-    "image": "addons/payment-stripe.png",
-    "excerpt": "Allows you to integrate online payment service to your e-commerce website. You can connect your Everest forms with Stripe to easily collect payments, donations, and online orders.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/stripe/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=stripe",
-    "plan": [
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Zapier",
-    "slug": "everest-forms-zapier",
-    "name": "Everest Forms Zapier",
-    "image": "addons/zapier.png",
-    "excerpt": "Allows you to easily connect your forms with over 1500+ popular web applications without any hassle. It makes integrating forms and apps buttery-smooth.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/zapier/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=zapier",
-    "plan": [
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Save And Continue",
-    "slug": "everest-forms-save-and-continue",
-    "name": "Everest Forms Save And Continue",
-    "image": "addons/save-and-continue.jpg",
-    "excerpt": "Allows users to save their partially filled information and continue to work on it later. Users can opt to receive a link if they wish to continue later with the form",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/save-and-continue/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=save-and-continue",
-    "plan": [
-      "professional",
-      "agency"
-    ]
-  },
-  {
-    "title": "Repeater Fields",
-    "slug": "everest-forms-repeater-fields",
-    "name": "Everest Forms Repeater Fields",
-    "image": "addons/repeater-fields.jpg",
-    "excerpt": "Repeater field add-on allows you to repeatedly add a set of form fields within your WordPress forms.",
-    "link": "https://wpeverest.com/wordpress-plugins/everest-forms/repeater-fields/?utm_source=addons-page&utm_medium=banner&utm_campaign=evf-upgrade-to-pro&utm_content=repeater-fields",
-    "plan": [
-      "professional",
-      "agency"
     ]
   }
 ]
