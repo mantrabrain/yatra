@@ -88,7 +88,7 @@ class Notices
         $dismissed_notices = get_user_meta(get_current_user_id(), 'yatra_admin_notices', true);
         $dismissed_notices = is_array($dismissed_notices) ? $dismissed_notices : [];
         $dismissed_notices = array_merge($dismissed_notices, (array)get_option('yatra_admin_notices', []));
-
+        
         foreach ($this->notices as $slug => $notice) {
             if (isset($dismissed_notices[$slug]) && !empty($dismissed_notices[$slug]['dismissed'])) {
                 unset($this->notices[$slug]);

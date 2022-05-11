@@ -18,6 +18,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'new_item' => __('New Tour', 'yatra'),
                 'all_items' => __('All Tours', 'yatra'),
                 'view_item' => __('View Tour', 'yatra'),
+                'view_items' => __('View Tours', 'yatra'),
                 'search_items' => __('Search Tour', 'yatra'),
                 'not_found' => __('No Tours found', 'yatra'),
                 'not_found_in_trash' => __('No Tours found in the Trash', 'yatra'),

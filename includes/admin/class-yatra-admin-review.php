@@ -11,7 +11,6 @@ class Yatra_Admin_Review
 
         // Admin notice requesting review.
         add_action('admin_init', [$this, 'review_request']);
-        add_action('wp_ajax_yatra_review_dismiss', [$this, 'review_dismiss']);
 
         // Admin footer text.
         add_filter('admin_footer_text', [$this, 'admin_footer'], 1, 2);
@@ -36,12 +35,25 @@ class Yatra_Admin_Review
 
         // Verify that we can do a check for reviews.
         $notices = get_option('yatra_admin_notices', []);
-        $notices['review_request']['time'] =
-        /*echo '<pre>';
-        print_r($notices);
-        echo '</pre>';*/
+
+       // delete_option('yatra_admin_notices');
+        //delete_user_meta(get_current_user_id(), 'yatra_admin_notices');
+        $notices['review_request']['time'] = time() + -1 - DAY_IN_SECONDS;
+        //$notices['review_request']['dismissed'] = false;
+        /* echo '<pre>';
+         print_r($notices);
+         echo '</pre>';
+         exit;*/
 
         $time = time();
+        /* echo "time " . $time . '<br/>';
+         echo "time_update " . ($notices['review_request']['time'] + DAY_IN_SECONDS) . '<br/>';
+         var_dump((($notices['review_request']['time'] + DAY_IN_SECONDS) <= $time));
+         exit;*/
+        /* echo '<pre>';
+         print_r($notices);
+         echo '</pre>';*/
+
         $load = false;
 
         if (empty($notices['review_request'])) {
@@ -69,6 +81,7 @@ class Yatra_Admin_Review
 
         // If we cannot load, return early.
         if (!$load) {
+
             return;
         }
 
@@ -79,6 +92,7 @@ class Yatra_Admin_Review
 
     public function review()
     {
+        //echo '<h1>Review Function</h1>';
 
         // Fetch total entries.
         $total_completed_bookings = 55;
@@ -86,6 +100,7 @@ class Yatra_Admin_Review
         if (empty($total_completed_bookings) || $total_completed_bookings < 50) {
             return;
         }
+
 
         ob_start();
 
@@ -117,18 +132,6 @@ class Yatra_Admin_Review
                 'class' => 'yatra-review-notice',
             ]
         );
-    }
-
-    public function review_dismiss()
-    {
-
-        $review = get_option('yatra_review', []);
-        $review['time'] = time();
-        $review['dismissed'] = true;
-
-        update_option('yatra_review', $review);
-
-        die;
     }
 
 
