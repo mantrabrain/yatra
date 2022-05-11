@@ -179,20 +179,6 @@ if (!defined('ABSPATH')) {
                             <?php echo __('Check Documentation', 'yatra') ?></a></div>
                 </div>
             </div>
-            <div class="yatra-row-admin">
-                <div class="yatra-dashboard-card yatra-card">
-                    <div class="yatra-card-header"><h2>
-                            <span class="dashicons dashicons-buddicons-forums"></span>
-                            <?php echo __('Support Forum', 'yatra') ?></h2>
-                    </div>
-                    <div class="yatra-card-body"><p>
-                            <?php echo __('Post your questions and query about yatra WordPress plugin on our support forum.', 'yatra'); ?>
-                        </p></div>
-                    <div class="yatra-card-footer"><a target="_blank"
-                                                      href="https://mantrabrain.com/support-forum/forum/yatra-wordpress-plugin/?ref=yatra-dashboard">
-                            <?php echo __('View Support Forum', 'yatra') ?></a></div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

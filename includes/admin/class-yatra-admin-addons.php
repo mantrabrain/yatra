@@ -5,6 +5,7 @@ class Yatra_Admin_Addons
     public function __construct()
     {
         add_action('yatra_admin_addon_page_output', array($this, 'addon_page'));
+
         add_action('admin_enqueue_scripts', array($this, 'scripts'), 11);
 
     }

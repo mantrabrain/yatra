@@ -28,50 +28,52 @@ class Yatra_Admin_Review
             return;
         }
 
-
+        // If the user has opted out of product announcement notifications, don't
+        // display the review request.
         if ('yes' === get_option('yatra_hide_all_announcement_of_yatra_plugin', 'no')) {
             return;
         }
+
         // Verify that we can do a check for reviews.
-        $notices = get_option('yatra_admin_notices', [
-            'review_request' => array(
-                'time' => time(),
-                'dimissed' => false
-            )
-        ]);
+        $notices = get_option('yatra_admin_notices', []);
+        $notices['review_request']['time'] =
+        /*echo '<pre>';
+        print_r($notices);
+        echo '</pre>';*/
+
         $time = time();
         $load = false;
 
-        /*  if (empty($notices['review_request'])) {
-              $notices['review_request'] = [
-                  'time' => $time,
-                  'dismissed' => false,
-              ];
+        if (empty($notices['review_request'])) {
+            $notices['review_request'] = [
+                'time' => $time,
+                'dismissed' => false,
+            ];
 
-              update_option('yatra_admin_notices', $notices);
+            update_option('yatra_admin_notices', $notices);
 
-              return;
-          }
+            return;
+        }
 
-          // Check if it has been dismissed or not.
-          if (
-              (isset($notices['review_request']['dismissed']) &&
-                  !$notices['review_request']['dismissed']) &&
-              (
-                  isset($notices['review_request']['time']) &&
-                  (($notices['review_request']['time'] + DAY_IN_SECONDS) <= $time)
-              )
-          ) {
-              $load = true;
-          }
+        // Check if it has been dismissed or not.
+        if (
+            (isset($notices['review_request']['dismissed']) &&
+                !$notices['review_request']['dismissed']) &&
+            (
+                isset($notices['review_request']['time']) &&
+                (($notices['review_request']['time'] + DAY_IN_SECONDS) <= $time)
+            )
+        ) {
+            $load = true;
+        }
 
-          // If we cannot load, return early.
-          if (!$load) {
-              return;
-          }*/
-
+        // If we cannot load, return early.
+        if (!$load) {
+            return;
+        }
 
         $this->review();
+
     }
 
 
@@ -79,10 +81,9 @@ class Yatra_Admin_Review
     {
 
         // Fetch total entries.
-        $entries = 55;// yatra()->entry->get_entries(['number' => 50], true);
+        $total_completed_bookings = 55;
 
-        // Only show review request if the site has collected at least 50 entries.
-        if (empty($entries) || $entries < 50) {
+        if (empty($total_completed_bookings) || $total_completed_bookings < 50) {
             return;
         }
 
@@ -111,7 +112,7 @@ class Yatra_Admin_Review
             ob_get_clean(),
             [
                 'dismiss' => Notices::DISMISS_GLOBAL,
-                'slug' => 'review_request1',
+                'slug' => 'review_request',
                 'autop' => true,
                 'class' => 'yatra-review-notice',
             ]
