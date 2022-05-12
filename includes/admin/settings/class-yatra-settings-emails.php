@@ -323,6 +323,26 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 ),
 
                 array(
+                    'title' => __('Admin Email Receiver Options', 'yatra'),
+                    'type' => 'title',
+                    'desc' => '',
+                    'id' => 'yatra_admin_email_receiver_options',
+                ),
+                array(
+                    'title' => __('Admin Email Receiver Lists', 'yatra'),
+                    'desc' => __('Receiver email list of all admin email messages. Enter the email address(es) that should receive a yatra notification, one per line.', 'yatra'),
+                    'id' => 'yatra_admin_email_recipient_lists',
+                    'type' => 'textarea',
+                    'default' => get_option('admin_email'),
+                    'custom_attributes' => array(
+                        'rows' => 10
+                    )
+                ),
+                array(
+                    'type' => 'sectionend',
+                    'id' => 'yatra_admin_email_receiver_options',
+                ),
+                array(
                     'title' => __('Email Sender Options', 'yatra'),
                     'type' => 'title',
                     'desc' => '',

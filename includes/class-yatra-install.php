@@ -28,6 +28,9 @@ final class Yatra_Install
         ),
         '2.1.9' => array(
             'yatra_update_2190_user_roles',
+        ),
+        '2.1.10' => array(
+            'yatra_update_2110_admin_email_recipient_lists',
         )
     );
 

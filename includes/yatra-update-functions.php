@@ -41,7 +41,7 @@ if (!function_exists('yatra_update_2190_user_roles')) {
         $role = new Yatra_User_Role();
 
         $role->remove_roles();
-        
+
         $role->create_roles();
 
         $all_users = get_users(array(
@@ -92,3 +92,11 @@ if (!function_exists('yatra_update_2190_user_roles')) {
     }
 }
 
+
+if (!function_exists('yatra_update_2110_admin_email_recipient_lists')) {
+
+    function yatra_update_2110_admin_email_recipient_lists()
+    {
+        update_option('yatra_admin_email_recipient_lists', get_option('admin_email'));
+    }
+}

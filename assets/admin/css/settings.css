@@ -64,3 +64,8 @@
 .yatra-setting-tab-options .yatra-switch-control .slider {
     line-height: 19px;
 }
+
+textarea#yatra_admin_email_recipient_lists {
+    width: 480px;
+    margin-top: 20px;
+}

@@ -166,13 +166,11 @@ if (!class_exists('Yatra_Email')) {
 
         private function get_admin_emails()
         {
-            $admin_emails = get_option('yatra_admin_email_receipents', get_option('admin_email'));
+            $admin_emails = get_option('yatra_admin_email_recipient_lists', '');
 
             $admin_emails = explode(',', $admin_emails);
 
-            $admin_emails = array_map('trim', $admin_emails);
-
-            return $admin_emails;
+            return array_map('trim', $admin_emails);
         }
 
 
