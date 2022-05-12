@@ -65,6 +65,7 @@ final class Yatra_Admin
         add_action('admin_init', array($this, 'admin_redirects'));
         add_action('admin_menu', array($this, 'admin_menu'));
         add_action('admin_notices', array($this, 'promotional_offer'));
+        add_filter('plugin_action_links_' . plugin_basename(YATRA_PLUGIN_DIR . 'yatra.php'), [$this, 'settings_link'], 10, 4);
 
 
     }
@@ -174,7 +175,7 @@ final class Yatra_Admin
         );
 
         if (count(yatra_get_premium_addons()) < 1) {
-            
+
             add_submenu_page(
                 'edit.php?post_type=tour',
                 esc_html__('Upgrade to Pro', 'yatra'),
@@ -267,6 +268,65 @@ final class Yatra_Admin
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-addons.php';
 
 
+    }
+
+    public function settings_link($links, $plugin_file, $plugin_data, $context)
+    {
+
+        $custom['pro'] = sprintf(
+            '<a href="%1$s" aria-label="%2$s" target="_blank" rel="noopener noreferrer" 
+				style="color: #00a32a; font-weight: 700;" 
+				onmouseover="this.style.color=\'#008a20\';" 
+				onmouseout="this.style.color=\'#00a32a\';"
+				>%3$s</a>',
+            esc_url(
+                add_query_arg(
+                    [
+                        'utm_content' => 'Get+Yatra+Premium',
+                        'utm_campaign' => 'freeplugin',
+                        'utm_medium' => 'all-plugins',
+                        'utm_source' => 'WordPress',
+                    ],
+                    'https://wpyatra.com/pricing/'
+                )
+            ),
+            esc_attr__('Get Yatra Pro', 'yatra'),
+            esc_html__('Get Yatra Pro', 'yatra')
+        );
+
+        $custom['settings'] = sprintf(
+            '<a href="%s" aria-label="%s">%s</a>',
+            esc_url(
+                add_query_arg(
+                    ['page' => 'yatra-settings'],
+                    admin_url('edit.php?post_type=tour')
+                )
+            ),
+            esc_attr__('Go to WPForms Settings page', 'wpforms-lite'),
+            esc_html__('Settings', 'wpforms-lite')
+        );
+
+        $custom['docs'] = sprintf(
+            '<a href="%1$s" aria-label="%2$s" target="_blank" rel="noopener noreferrer">%3$s</a>',
+            esc_url(
+                add_query_arg(
+                    [
+                        'utm_content' => 'Documentation',
+                        'utm_campaign' => 'freeplugin',
+                        'utm_medium' => 'all-plugins',
+                        'utm_source' => 'WordPress',
+                    ],
+                    'https://wpyatra.com/docs/'
+                )
+            ),
+            esc_attr__('Read the documentation', 'yatra'),
+            esc_html__('Docs', 'yatra')
+        );
+        if (count(yatra_get_premium_addons()) > 0) {
+            unset($custom['pro']);
+        }
+
+        return array_merge($custom, (array)$links);
     }
 
 
