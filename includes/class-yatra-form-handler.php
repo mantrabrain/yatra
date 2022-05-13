@@ -109,13 +109,29 @@ class Yatra_Form_Handler
 
         $yatra_get_active_payment_gateways = yatra_get_active_payment_gateways();
 
-        $cart_total = floatval(yatra()->cart->get_cart_total(true));
+        if (count($yatra_get_active_payment_gateways) < 1) {
 
-        if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways) && count($yatra_get_active_payment_gateways) > 0 && ($cart_total > 0 || $user_booking_id > 0)) {
+            yatra()->yatra_error->add('yatra_booking_errors', __('Invalid payment gateway', 'yatra'));
+
+            return;
+        }
+        if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways)) {
 
             yatra()->yatra_error->add('yatra_booking_errors', __('Please select at least one payment gateway', 'yatra'));
 
             return;
+        }
+        
+        if ($user_booking_id < 1) {
+
+            $cart_items = yatra()->cart->get_items();
+
+            if (!is_array($cart_items) || (is_array($cart_items) && count($cart_items) < 1)) {
+
+                yatra()->yatra_error->add('yatra_booking_errors', __('Empty cart items', 'yatra'));
+
+                return;
+            }
 
         }
 
@@ -124,14 +140,6 @@ class Yatra_Form_Handler
         if (!$process_ahead) {
 
             yatra()->yatra_error->add('yatra_booking_errors', __('Can\'t Process the payment', 'yatra'));
-
-            return;
-        }
-
-
-        if (!in_array($payment_gateway_id, $yatra_get_active_payment_gateways)) {
-
-            yatra()->yatra_error->add('yatra_booking_errors', __('Invalid payment gateway, please select at least one payment gateway', 'yatra'));
 
             return;
         }
