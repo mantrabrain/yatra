@@ -179,6 +179,10 @@ if (!class_exists('Yatra_Tour_Booking')) {
 
                     update_post_meta($booking_id, 'yatra_user_id', $current_user_id);
 
+                    $role = new Yatra_User_Role();
+
+                    $role->add_customer_role($current_user_id);
+
                 }
                 update_post_meta($booking_id, 'yatra_customer_id', $customer_id);
 
