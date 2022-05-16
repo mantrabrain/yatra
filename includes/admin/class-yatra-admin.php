@@ -302,8 +302,8 @@ final class Yatra_Admin
                     admin_url('edit.php?post_type=tour')
                 )
             ),
-            esc_attr__('Go to WPForms Settings page', 'wpforms-lite'),
-            esc_html__('Settings', 'wpforms-lite')
+            esc_attr__('Go to Yatra Settings page', 'yatra'),
+            esc_html__('Settings', 'yatra')
         );
 
         $custom['docs'] = sprintf(
