@@ -27,8 +27,6 @@ class Yatra_Admin_Review
             return;
         }
 
-        // If the user has opted out of product announcement notifications, don't
-        // display the review request.
         if ('yes' === get_option('yatra_hide_all_announcement_of_yatra_plugin', 'no')) {
             return;
         }
@@ -36,23 +34,8 @@ class Yatra_Admin_Review
         // Verify that we can do a check for reviews.
         $notices = get_option('yatra_admin_notices', []);
 
-       // delete_option('yatra_admin_notices');
-        //delete_user_meta(get_current_user_id(), 'yatra_admin_notices');
-        $notices['review_request']['time'] = time() + -1 - DAY_IN_SECONDS;
-        //$notices['review_request']['dismissed'] = false;
-        /* echo '<pre>';
-         print_r($notices);
-         echo '</pre>';
-         exit;*/
 
         $time = time();
-        /* echo "time " . $time . '<br/>';
-         echo "time_update " . ($notices['review_request']['time'] + DAY_IN_SECONDS) . '<br/>';
-         var_dump((($notices['review_request']['time'] + DAY_IN_SECONDS) <= $time));
-         exit;*/
-        /* echo '<pre>';
-         print_r($notices);
-         echo '</pre>';*/
 
         $load = false;
 
@@ -92,19 +75,13 @@ class Yatra_Admin_Review
 
     public function review()
     {
-        //echo '<h1>Review Function</h1>';
-
-        // Fetch total entries.
         $total_completed_bookings = 55;
 
         if (empty($total_completed_bookings) || $total_completed_bookings < 50) {
             return;
         }
 
-
         ob_start();
-
-        // We have a candidate! Output a review message.
         ?>
 
         <p><?php esc_html_e('Hey, I noticed you just get new tour booking from Yatra - that’s awesome! Could you please do me a BIG favor and give it a 5-star rating on WordPress to help us spread the word and boost our motivation?', 'yatra'); ?></p>
@@ -115,7 +92,7 @@ class Yatra_Admin_Review
         <p>
             <a href="https://wordpress.org/support/plugin/yatra/reviews/?filter=5#new-post"
                class="yatra-notice-dismiss yatra-review-out" target="_blank"
-               rel="noopener"><?php esc_html_e('Ok, you deserve it', 'yatra'); ?></a><br>
+               rel="noopener"><?php esc_html_e('Ok, sure. You deserve it', 'yatra'); ?></a><br>
             <a href="#" class="yatra-notice-dismiss" target="_blank"
                rel="noopener noreferrer"><?php esc_html_e('Nope, maybe later', 'yatra'); ?></a><br>
             <a href="#" class="yatra-notice-dismiss" target="_blank"
