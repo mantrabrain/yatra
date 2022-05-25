@@ -85,9 +85,9 @@ if (count($cart_items) < 1) {
         <td colspan="6" class="actions">
             <div class="coupon">
                 <input type="text" name="yatra_coupon_code" class="yatra-coupon-code"
-                       id="yatra_coupon_code" value="" placeholder="<?php echo esc_attr('Coupon Code', 'yatra') ?>"/>
+                       id="yatra_coupon_code" value="" placeholder="<?php echo esc_attr__('Coupon Code', 'yatra') ?>"/>
                 <button type="submit" class="yatra-button button yatra_apply_coupon" name="yatra_apply_coupon"
-                        value="<?php echo esc_attr('Apply coupon', 'yatra') ?>"><?php echo __('Apply coupon', 'yatra') ?>
+                        value="<?php echo esc_attr__('Apply coupon', 'yatra') ?>"><?php echo __('Apply coupon', 'yatra') ?>
                 </button>
             </div>
             <?php $update_cart_value = get_option('yatra_update_cart_text', 'Update Cart'); ?>
