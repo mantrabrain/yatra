@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.9\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-05-26 08:01:15+00:00\n"
+"POT-Creation-Date: 2022-05-29 10:37:58+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -191,30 +191,30 @@ msgstr ""
 msgid "Yatra My Account Page"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-review.php:87
+#: includes/admin/class-yatra-admin-review.php:92
 msgid ""
 "Hey, I noticed you just get new tour booking from Yatra - that’s awesome! "
 "Could you please do me a BIG favor and give it a 5-star rating on WordPress "
 "to help us spread the word and boost our motivation?"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-review.php:90
+#: includes/admin/class-yatra-admin-review.php:95
 msgid "Umesh Ghimire<br>Co-Founder of Yatra"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-review.php:95
+#: includes/admin/class-yatra-admin-review.php:100
 msgid "Ok, sure. You deserve it"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-review.php:97
+#: includes/admin/class-yatra-admin-review.php:102
 msgid "Nope, maybe later"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-review.php:99
+#: includes/admin/class-yatra-admin-review.php:104
 msgid "I already did"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-review.php:136
+#: includes/admin/class-yatra-admin-review.php:141
 #. translators: $1$s - Yatra plugin name; $2$s - WP.org review link; $3$s -
 #. WP.org review link.
 msgid ""
@@ -1459,7 +1459,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:109
-#: includes/functions.php:788
+#: includes/functions.php:790
 msgid "Payment Gateways"
 msgstr ""
 
@@ -1612,43 +1612,43 @@ msgstr ""
 msgid "Import Sample Data"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:57
+#: includes/admin/templates/addon/list.php:58
 msgid "Status:"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:59
+#: includes/admin/templates/addon/list.php:60
 msgid "Activated"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:61
+#: includes/admin/templates/addon/list.php:62
 msgid "Inactive"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:63
+#: includes/admin/templates/addon/list.php:64
 msgid "Not Installed"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:70
+#: includes/admin/templates/addon/list.php:71
 #. translators: %s: Add-on title
 msgid "Deactivate %s now"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:86
+#: includes/admin/templates/addon/list.php:87
 #: includes/admin/templates/license/license.php:39
 msgid "Deactivate"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:90
+#: includes/admin/templates/addon/list.php:91
 #. translators: %s: Add-on title
 msgid "Activate %s now"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:106
+#: includes/admin/templates/addon/list.php:107
 #: includes/admin/templates/availability/availability-calendar-date.php:25
 msgid "Activate"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:110
+#: includes/admin/templates/addon/list.php:111
 #. translators: %s: Add-on title
 msgid "Install %s now"
 msgstr ""
@@ -2122,11 +2122,11 @@ msgstr ""
 msgid "Confirm password  doesn't matched with password"
 msgstr ""
 
-#: includes/class-yatra-email.php:272
+#: includes/class-yatra-email.php:274
 msgid "Yatra Email successfully sent to %s"
 msgstr ""
 
-#: includes/class-yatra-email.php:276
+#: includes/class-yatra-email.php:278
 msgid "Yatra Email could not sent to %s via WP_Mail function"
 msgstr ""
 
@@ -2619,11 +2619,11 @@ msgstr ""
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:1133 includes/template-tags.php:850
+#: includes/functions.php:1135 includes/template-tags.php:850
 msgid "Guest"
 msgstr ""
 
-#: includes/functions.php:1273
+#: includes/functions.php:1275
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
 msgstr ""
@@ -3522,7 +3522,10 @@ msgid "Check Documentation"
 msgstr ""
 
 #: includes/modules/filters/class-yatra-module-filters.php:97
-msgid " Days"
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:42
+#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:43
+#: includes/template-tags.php:184 includes/template-tags.php:1183
+msgid "Days"
 msgstr ""
 
 #: includes/modules/filters/includes/abstract-class-yatra-module-filter-sections.php:86
@@ -3558,12 +3561,6 @@ msgstr ""
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:7
 #: templates/tour/additional.php:7
 msgid "Duration"
-msgstr ""
-
-#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:42
-#: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:43
-#: includes/template-tags.php:184
-msgid "Days"
 msgstr ""
 
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-price.php:7
@@ -4591,7 +4588,7 @@ msgstr ""
 msgid ",&nbsp;"
 msgstr ""
 
-#: includes/template-tags.php:189
+#: includes/template-tags.php:189 includes/template-tags.php:1187
 msgid "Nights"
 msgstr ""
 

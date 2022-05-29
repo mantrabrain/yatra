@@ -94,7 +94,7 @@ class Yatra_Module_Filters
             'days_range_max' => $days_range_max,
             'days_range_min_value' => isset($filter_params->min_days) ? absint($filter_params->min_days) : $days_range_min,
             'days_range_max_value' => isset($filter_params->max_days) ? absint($filter_params->max_days) : $days_range_max,
-            'days' => __(' Days', 'yatra'),
+            'days' => __('Days', 'yatra'),
             'current_url' => $current_url
         );
         return $params;

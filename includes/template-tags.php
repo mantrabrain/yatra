@@ -181,12 +181,12 @@ if (!function_exists('yatra_entry_meta_options')) {
 
         if ($yatra_tour_meta_tour_days != '') {
 
-            $duration_string .= $yatra_tour_meta_tour_days . ' ' . __("Days", 'yatra') . ' ';
+            $duration_string .= $yatra_tour_meta_tour_days . ' ' . __("Days", 'yatra');
 
         }
         if ($yatra_tour_meta_tour_nights != '') {
 
-            $duration_string .= $yatra_tour_meta_tour_nights . ' ' . __("Nights", 'yatra');
+            $duration_string .= ' ' . $yatra_tour_meta_tour_nights . ' ' . __("Nights", 'yatra');
 
         }
         if ($yatra_tour_meta_tour_nights == '' && $yatra_tour_meta_tour_days == '') {
@@ -1180,11 +1180,11 @@ if (!function_exists('yatra_tour_additional_info')) {
 
         if ('' != $yatra_tour_meta_tour_duration_days) {
 
-            $tour_duration_string = absint($yatra_tour_meta_tour_duration_days) . ' Days ';
+            $tour_duration_string = absint($yatra_tour_meta_tour_duration_days) . ' ' . __('Days', 'yatra');
         }
         if ('' != $yatra_tour_meta_tour_duration_nights) {
 
-            $tour_duration_string .= absint($yatra_tour_meta_tour_duration_nights) . ' Nights ';
+            $tour_duration_string .= ' ' . absint($yatra_tour_meta_tour_duration_nights) . ' ' . __('Nights', 'yatra');
         }
 
         $additional_info = array(
