@@ -52,17 +52,17 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 
 == Premium Payment Gateway Extensions/Addons ==
 
-* [Yatra Stripe](https://wpyatra.com/yatra-premium-extensions/yatra-stripe/?ref=wordpress.org)
-* [Yatra Authorize.Net](https://wpyatra.com/yatra-premium-extensions/yatra-authorize-net/?ref=wordpress.org)
-* [Yatra Razorpay](https://wpyatra.com/yatra-premium-extensions/yatra-razorpay/?ref=wordpress.org)
+* [Yatra Stripe](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-stripe)
+* [Yatra Authorize.Net](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-authorizenet)
+* [Yatra Razorpay](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-razorpay)
 
 == Other Premium Extensions/Addons ==
 
-* [Yatra Downloads](https://wpyatra.com/yatra-premium-extensions/yatra-downloads/?ref=wordpress.org)
-* [Yatra Services](https://wpyatra.com/yatra-premium-extensions/yatra-services/?ref=wordpress.org)
-* [Yatra Availability Conditions](https://wpyatra.com/yatra-premium-extensions/yatra-availability-conditions/?ref=wordpress.org)
-* [Yatra Partial Payment](https://wpyatra.com/yatra-premium-extensions/yatra-partial-payment/?ref=wordpress.org)
-* [Yatra Review and Rating](https://wpyatra.com/yatra-premium-extensions/yatra-review-and-rating/?ref=wordpress.org)
+* [Yatra Downloads](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-downloads)
+* [Yatra Services](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-services)
+* [Yatra Availability Conditions](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-availability-conditions)
+* [Yatra Partial Payment](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-partial-payment)
+* [Yatra Review and Rating](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-review-rating)
 
 
 [View all Yatra Premium Extensions/Addons](https://wpyatra.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
@@ -167,6 +167,12 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.10 | 2022/04/-- =
+= 2.1.10 | 2022/05/29 =
 * Fixed - is_tax called before wp_query init issue resolved
+* Added - Multiple email option for admin notifications
+* Fixed - Enquiry email notification
+* Fixed - WordPress 6.0 Compatibility issue
+* Fixed - Payment Gateway selection issue ( javascript issue fixed)
+* Added - Addon/Upgrade to pro with review notification
+* Fixed - Other minor issue fixed & enhancement
 
