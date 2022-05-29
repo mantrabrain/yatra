@@ -56,11 +56,14 @@ var YatraAdminNotices = window.YatraAdminNotices || (function (document, window,
          * @param {object} e Event object.
          * */
         dismissNotice: function (e) {
-
+            e.preventDefault();
             $.post(yatra_admin_notices.ajax_url, {
                 action: 'yatra_notice_dismiss',
                 nonce: yatra_admin_notices.nonce,
                 id: ($(this).closest('.yatra-notice').attr('id') || '').replace('yatra-notice-', ''),
+            }).done(function () {
+                window.location.reload();
+
             });
         },
     };
