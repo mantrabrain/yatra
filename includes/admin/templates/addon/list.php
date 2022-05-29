@@ -1,8 +1,10 @@
-<div id="yatra-admin-addons" class="wrap yatra-admin-wrap">
+<div id="yatra-admin-addons" class="wrap yatra-admin-wrap yatra-admin-addons-wrap">
     <h1 class="page-title">
-        Yatra Premium Addon/Extensions
+        <span>Yatra Premium Addon/Extensions</span>
+        <a href="https://wpyatra.com/yatra-premium-extensions/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=addons&utm_content=<?php echo esc_attr($addon->title) ?>"
+           target="_blank" rel="noopener noreferrer"
+           class="button button-primary yatra-btn-orange">View All Premium Extensions</a>
     </h1>
-
     <div class="yatra-admin-content">
         <div id="yatra-admin-addons-list">
             <div class="list">
@@ -91,7 +93,7 @@
                                         $url = wp_nonce_url(
                                             add_query_arg(
                                                 array(
-                                                   // 'page' => 'yatra-addons',
+                                                    // 'page' => 'yatra-addons',
                                                     'action' => 'activate',
                                                     'plugin' => $plugin_file,
                                                 ),
