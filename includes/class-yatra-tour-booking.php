@@ -371,6 +371,23 @@ if (!class_exists('Yatra_Tour_Booking')) {
             }
             return $all_bookings;
         }
+
+        public function get_all_bookings($booking_status = 'any', $number_of_bookings = 10)
+        {
+
+            $updated_bookings = array();
+
+            $all_bookings = get_posts(array(
+                'numberposts' => absint($number_of_bookings),
+                'post_type' => 'yatra-booking',
+                'post_status' => sanitize_text_field($booking_status)
+            ));
+            if (is_wp_error($all_bookings)) {
+
+                return $updated_bookings;
+            }
+            return $all_bookings;
+        }
     }
 
 }

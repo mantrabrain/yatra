@@ -49,7 +49,6 @@ class Yatra_Admin_Review
 
             return;
         }
-
         // Check if it has been dismissed or not.
         if (
             (isset($notices['review_request']['dismissed']) &&
@@ -75,9 +74,15 @@ class Yatra_Admin_Review
 
     public function review()
     {
-        $total_completed_bookings = 55;
+        
+        $booking = new Yatra_Tour_Booking();
 
-        if (empty($total_completed_bookings) || $total_completed_bookings < 50) {
+        $total_completed_bookings = $booking->get_all_bookings('yatra-completed', 1);
+
+        if (empty($total_completed_bookings) || !is_array($total_completed_bookings)) {
+            return;
+        }
+        if (count($total_completed_bookings) < 1) {
             return;
         }
 
