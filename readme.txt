@@ -169,3 +169,4 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 = 2.1.10 | 2022/04/-- =
 * Fixed - is_tax called before wp_query init issue resolved
+

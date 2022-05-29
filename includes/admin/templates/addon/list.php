@@ -16,7 +16,6 @@
                         'name' => '',
                     ));
 
-
                     $license = $licenses[$addon['slug']] ?? array();
 
                     $status = $license['status'] ?? '';
@@ -92,11 +91,11 @@
                                         $url = wp_nonce_url(
                                             add_query_arg(
                                                 array(
-                                                    'page' => 'yatra-addons',
+                                                   // 'page' => 'yatra-addons',
                                                     'action' => 'activate',
                                                     'plugin' => $plugin_file,
                                                 ),
-                                                admin_url('admin.php')
+                                                admin_url('plugins.php')
                                             ),
                                             'activate-plugin_' . $plugin_file
                                         );
