@@ -603,19 +603,21 @@ if (!function_exists('yatra_booking_smart_tags')) {
 
             $booking_post = get_post($booking_id);
 
-            $booking_status = isset($booking_post->post_status) ? $booking_post->post_status : '';
+            $booking_status = $booking_post->post_status ?? '';
 
             $booking = new Yatra_Tour_Booking($booking_id);
 
+            $booking_details = $booking->get_all_booking_details($booking_id);
+
             $all_post_statuses = yatra_get_booking_statuses();
 
-            $booking_meta_params = get_post_meta($booking_id, 'yatra_booking_meta_params', true);
+            $booking_meta_params = $booking_details->yatra_booking_meta_params ?? array();
 
-            $booking_meta = get_post_meta($booking_id, 'yatra_booking_meta', true);
+            $booking_meta = $booking_details->yatra_booking_meta ?? array();
 
-            $smart_tags['booking_code'] = isset($booking_meta_params['booking_code']) ? $booking_meta_params['booking_code'] : '';
+            $smart_tags['booking_code'] = $booking_meta_params['booking_code'] ?? '';
 
-            $smart_tags['booking_status'] = isset($all_post_statuses[$booking_status]) ? $all_post_statuses[$booking_status] : '';
+            $smart_tags['booking_status'] = $all_post_statuses[$booking_status] ?? '';
 
             $smart_tags['net_booking_price'] = yatra_get_price(yatra_get_current_currency_symbol($booking->get_currency_code()), $booking->get_total(true));
 
