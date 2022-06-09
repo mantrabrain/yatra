@@ -168,6 +168,7 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 == Changelog ==
 
 = 2.1.11 | 2022/00/00 =
+ISSUE NEED TO FIX: YATRA single page responsive view (top blocks and cost included and excluded )
 * Fixed -
 
 
