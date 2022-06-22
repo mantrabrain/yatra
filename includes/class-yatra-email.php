@@ -166,7 +166,7 @@ if (!class_exists('Yatra_Email')) {
 
         private function get_admin_emails()
         {
-            $admin_emails = get_option('yatra_admin_email_recipient_lists', '');
+            $admin_emails = get_option('yatra_admin_email_recipient_lists', get_option('admin_email'));
 
             $admin_emails = str_replace(',', PHP_EOL, $admin_emails);
 

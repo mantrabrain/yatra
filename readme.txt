@@ -167,8 +167,12 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.11 | 2022/00/00 =
-ISSUE NEED TO FIX: YATRA single page responsive view (top blocks and cost included and excluded )
-* Fixed -
-
+= 2.1.10 | 2022/05/29 =
+* Fixed - is_tax called before wp_query init issue resolved
+* Added - Multiple email option for admin notifications
+* Fixed - Enquiry email notification
+* Fixed - WordPress 6.0 Compatibility issue
+* Fixed - Payment Gateway selection issue ( javascript issue fixed)
+* Added - Addon/Upgrade to pro with review notification
+* Fixed - Other minor issue fixed & enhancement
 
