@@ -454,9 +454,8 @@ class Yatra_Module_Section_System_Status
      */
     public function get_security_info()
     {
-        $check_page = yatra_get_my_account_page(true);
         return array(
-            'secure_connection' => 'https' === substr($check_page, 0, 5),
+            'secure_connection' => is_ssl(),
             'hide_errors' => !(defined('WP_DEBUG') && defined('WP_DEBUG_DISPLAY') && WP_DEBUG && WP_DEBUG_DISPLAY) || 0 === intval(ini_get('display_errors')),
         );
     }
