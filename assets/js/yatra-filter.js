@@ -87,8 +87,8 @@
                         var max = ui.values[1];
                         $('#yatra-days-slider-min').val(min);
                         $('#yatra-days-slider-max').val(max);
-                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', min + yatra_params.filter_options.days).addClass('visible');
-                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', max + yatra_params.filter_options.days).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', min + " " + yatra_params.filter_options.days).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', max + " " + yatra_params.filter_options.days).addClass('visible');
                     },
                     create: function (event, ui) {
                         var min = yatra_params.filter_options.days_range_min_value;
@@ -98,8 +98,8 @@
                             $('#yatra-days-slider-max').val(max);
                             $('#yatra-days-slider-min').val(min);
                         }
-                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', (min + yatra_params.filter_options.days)).addClass('visible');
-                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', (max + yatra_params.filter_options.days)).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', (min + " " + yatra_params.filter_options.days)).addClass('visible');
+                        $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', (max + " " + yatra_params.filter_options.days)).addClass('visible');
                     },
                     stop: function (event, ui) {
 
