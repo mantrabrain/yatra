@@ -1,7 +1,7 @@
 <div id="yatra-admin-addons" class="wrap yatra-admin-wrap yatra-admin-addons-wrap">
     <h1 class="page-title">
         <span>Yatra Premium Addon/Extensions</span>
-        <a href="https://wpyatra.com/yatra-premium-extensions/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=addons&utm_content=<?php echo esc_attr($addon->title) ?>"
+        <a href="https://wpyatra.com/yatra-premium-extensions/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=view-all-addons"
            target="_blank" rel="noopener noreferrer"
            class="button button-primary yatra-btn-orange">View All Premium Extensions</a>
     </h1>
