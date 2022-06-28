@@ -331,14 +331,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     //jQuery(info.el).find('.fc-scrollgrid-sync-inner').append('<input type="checkbox" class="yatra-cal-header-checkbox"/>');
                 },
                 eventClick: function (info) {
-                    var td = $(info.el).closest('td.fc-day');
+                    var dateEl = $(info.el).closest('td.fc-day');
+                    if (dateEl.length < 1) {
+                        dateEl = $(info.el).closest('.fc-popover.fc-more-popover');
+                        $(info.el).closest('.fc-popover.fc-more-popover').find('.fc-popover-close').trigger('click');
+                    }
                     var ajax_data = {
                         data: {
                             yatra_nonce: yatra_availability_params.day_wise_tour_availability.nonce,
                             action: yatra_availability_params.day_wise_tour_availability.action,
                             tour_id: $('#yatra-availability-calendar-tour-id').val(),
-                            start_date: td.attr('data-date'),
-                            end_date: td.attr('data-date'),
+                            start_date: dateEl.attr('data-date'),
+                            end_date: dateEl.attr('data-date'),
 
                         }
                     }
