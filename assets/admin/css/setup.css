@@ -117,20 +117,17 @@ a:hover, a:active {
 
 .yatra-setup-content .form-table td select,
 .yatra-setup-content .form-table td input {
-    width: 100%;
-    box-sizing: border-box;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-.yatra-setup-content .form-table td select {
     border: 1px solid #ccc;
     padding: 5px 10px;
     vertical-align: middle;
     line-height: 1;
     height: 40px;
     font-size: 14px;
+    width: 100%;
+    max-width: 100%;
+
 }
+
 
 .yatra-setup-content .form-table td input[size] {
     width: auto;
