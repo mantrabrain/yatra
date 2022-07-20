@@ -17,7 +17,7 @@ class Yatra_Admin_Tour_Enquiries
             __('Enquiries', 'yatra'),
             __('Enquiries', 'yatra'),
             'administrator',
-            'enquiries', array($this, 'settings_page'), 6);
+            'enquiries', array($this, 'settings_page'), 7);
 
 
         add_action("load-" . $hook, array($this, 'mp_custom_page_screen_options'));
