@@ -1,6 +1,6 @@
 <?php
 /**
- * Yatra Miscellaneous Settings
+ * Yatra Email Settings
  *
  * @package Yatra/Admin
  * @version 1.0.0
@@ -9,6 +9,9 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
+use Yatra\Core\Admin\Emails\DefaultEmailMessages;
+
 
 if (class_exists('Yatra_Settings_Emails', false)) {
     return new Yatra_Settings_Emails();
@@ -106,7 +109,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 70
                     ),
-                    'default' => Yatra_Admin_Emails_To_User::get_booking_completed_subject()
+                    'default' => DefaultEmailMessages::get_booking_email_notification_subject_to_customer()
 
                 ),
                 array(
@@ -119,7 +122,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 70
                     ),
-                    'default' => Yatra_Admin_Emails_To_User::get_booking_completed_message()
+                    'default' => DefaultEmailMessages::get_booking_email_notification_message_to_customer()
 
                 ),
                 array(
@@ -147,7 +150,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 70
                     ),
-                    'default' => Yatra_Admin_Emails_To_Admin::get_booking_completed_subject()
+                    'default' => DefaultEmailMessages::get_booking_email_notification_subject_to_admin()
 
                 ),
                 array(
@@ -160,7 +163,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 70
                     ),
-                    'default' => Yatra_Admin_Emails_To_Admin::get_booking_completed_message()
+                    'default' => DefaultEmailMessages::get_booking_email_notification_message_to_admin()
 
                 ),
                 array(
@@ -193,7 +196,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 50
                     ),
-                    'default' => Yatra_Admin_Emails_To_User::get_booking_status_change_subject()
+                    'default' => DefaultEmailMessages::get_booking_status_change_email_notification_subject_to_customer()
 
                 ),
                 array(
@@ -207,7 +210,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 50
                     ),
-                    'default' => Yatra_Admin_Emails_To_User::get_booking_status_change_message()
+                    'default' => DefaultEmailMessages::get_booking_status_change_email_notification_message_to_customer()
 
                 ),
                 array(
@@ -235,7 +238,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 50
                     ),
-                    'default' => Yatra_Admin_Emails_To_Admin::get_booking_status_change_subject()
+                    'default' => DefaultEmailMessages::get_booking_status_change_email_notification_subject_to_admin()
 
                 ),
                 array(
@@ -248,7 +251,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 50
                     ),
-                    'default' => Yatra_Admin_Emails_To_Admin::get_booking_status_change_message()
+                    'default' => DefaultEmailMessages::get_booking_status_change_email_notification_message_to_admin()
 
                 ),
                 array(
@@ -280,7 +283,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 70
                     ),
-                    'default' => Yatra_Admin_Emails_To_Admin::get_enquiry_form_saved_subject()
+                    'default' => DefaultEmailMessages::get_enquiry_email_notification_subject_to_admin()
 
                 ),
                 array(
@@ -293,7 +296,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 70
                     ),
-                    'default' => Yatra_Admin_Emails_To_Admin::get_enquiry_form_saved_message()
+                    'default' => DefaultEmailMessages::get_enquiry_email_notification_message_to_admin()
 
                 ),
                 array(

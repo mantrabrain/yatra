@@ -6,6 +6,8 @@
  * @since   1.0.0
  */
 
+use Yatra\Core\Admin\Emails\DefaultEmailMessages;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -179,11 +181,6 @@ final class Yatra_Install
 
             }
         }
-
-        $tour_tab_configs = yatra_tour_tab_default_configurations();
-
-        $config_keys = array_keys($tour_tab_configs);
-
         $options = array(
             'yatra_currency' => 'USD',
             'yatra_booknow_button_text' => 'Book Now',
@@ -196,9 +193,6 @@ final class Yatra_Install
             'yatra_update_cart_text' => 'Update Cart',
             'yatra_proceed_to_checkout_text' => 'Proceed to Checkout',
             'yatra_order_booking_text' => 'Order Booking',
-            'yatra_booking_notification_email_subject_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_subject(),
-            'yatra_booking_notification_email_content_for_customer' => Yatra_Admin_Emails_To_User::get_booking_completed_message(),
-            'yatra_enable_booking_notification_email_for_customer' => 'yes',
             'yatra_enable_guest_checkout' => 'yes',
             'yatra_payment_gateways' => array('booking_only' => 'yes'),
         );

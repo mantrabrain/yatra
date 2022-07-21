@@ -90,14 +90,10 @@ class Yatra_Autoloader
             $path = $this->include_path . 'taxonomy/';
         } elseif (0 === strpos($class, 'yatra_custom_post_type')) {
             $path = $this->include_path . 'custom-post-type/';
-        } elseif (0 === strpos($class, 'yatra_admin_emails')) {
-            $path = $this->include_path . 'admin/emails/';
         } elseif (0 === strpos($class, 'yatra_admin')) {
             $path = $this->include_path . 'admin/';
         } elseif (0 === strpos($class, 'yatra_customizer_control')) {
             $path = $this->include_path . 'customizer/control/';
-        } elseif (0 === strpos($class, 'yatra_helper')) {
-            $path = $this->include_path . 'helper/';
         } elseif (0 === strpos($class, 'yatra_helper')) {
             $path = $this->include_path . 'helper/';
         } elseif (0 === strpos($class, 'yatra_interface')) {
@@ -108,11 +104,11 @@ class Yatra_Autoloader
             $class_path = str_replace('Yatra\\Core\\', '', $main_class);
             $class_path = str_replace('\\', '/', $class_path);
             $class_path = trim($class_path, "/");
-            $path = $this->include_path . '../core/' . $class_path;
+            $path = untrailingslashit(plugin_dir_path(YATRA_FILE)) . '/core/' . $class_path;
             $file = '.php';
         }
 
-         if (empty($path) || !$this->load_file($path . $file)) {
+        if (empty($path) || !$this->load_file($path . $file)) {
 
             $this->load_file($this->include_path . $file);
         }

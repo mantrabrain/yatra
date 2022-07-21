@@ -1,6 +1,9 @@
 <?php
 defined('ABSPATH') || exit;
 
+use Yatra\Core\Admin\Emails\AdminEmail;
+use Yatra\Core\Admin\Emails\CustomerEmail;
+
 if (!class_exists('Yatra_Email')) {
 
     class Yatra_Email
@@ -73,18 +76,18 @@ if (!class_exists('Yatra_Email')) {
 
             if (!empty($customer_email) && yatra_is_enable_email_notification("booking", "customer")) {
 
-                $user_message = Yatra_Admin_Emails_To_User::get_booking_completed_message();
+                $user_message = CustomerEmail::get_booking_completed_message();
 
-                $user_subject = Yatra_Admin_Emails_To_User::get_booking_completed_subject();
+                $user_subject = CustomerEmail::get_booking_completed_subject();
 
                 $this->send(array($customer_email), $user_subject, $user_message, $yatra_all_smart_tags, array());
             }
 
             if (yatra_is_enable_email_notification("booking", "admin")) {
 
-                $admin_message = Yatra_Admin_Emails_To_Admin::get_booking_completed_message();
+                $admin_message = AdminEmail::get_booking_completed_message();
 
-                $admin_subject = Yatra_Admin_Emails_To_Admin::get_booking_completed_subject();
+                $admin_subject = AdminEmail::get_booking_completed_subject();
 
                 $admin_emails = $this->get_admin_emails();
 
@@ -120,9 +123,9 @@ if (!class_exists('Yatra_Email')) {
             if (!empty($customer_email) && yatra_is_enable_email_notification("status_change", "customer")) {
 
                 // User Parameters
-                $user_message = Yatra_Admin_Emails_To_User::get_booking_status_change_message();
+                $user_message = CustomerEmail::get_booking_status_change_message();
 
-                $user_subject = Yatra_Admin_Emails_To_User::get_booking_status_change_subject();
+                $user_subject = CustomerEmail::get_booking_status_change_subject();
 
                 $this->send(array($customer_email), $user_subject, $user_message, $yatra_all_smart_tags, array());
 
@@ -130,9 +133,9 @@ if (!class_exists('Yatra_Email')) {
 
             if (yatra_is_enable_email_notification("status_change", "admin")) {
 
-                $admin_message = Yatra_Admin_Emails_To_Admin::get_booking_status_change_message();
+                $admin_message = AdminEmail::get_booking_status_change_message();
 
-                $admin_subject = Yatra_Admin_Emails_To_Admin::get_booking_status_change_subject();
+                $admin_subject = AdminEmail::get_booking_status_change_subject();
 
                 $admin_emails = $this->get_admin_emails();
 
@@ -152,9 +155,9 @@ if (!class_exists('Yatra_Email')) {
 
             if (yatra_is_enable_email_notification("enquiry_form", "admin")) {
 
-                $admin_message = Yatra_Admin_Emails_To_Admin::get_enquiry_form_saved_message();
+                $admin_message = AdminEmail::get_enquiry_form_saved_message();
 
-                $admin_subject = Yatra_Admin_Emails_To_Admin::get_enquiry_form_saved_subject();
+                $admin_subject = AdminEmail::get_enquiry_form_saved_subject();
 
                 $admin_emails = $this->get_admin_emails();
 
@@ -279,7 +282,7 @@ if (!class_exists('Yatra_Email')) {
 
                 }
 
-                $logger->info($log_message, array('source' => 'email'));
+                $logger->info($message, array('source' => 'email'));
 
             }
             do_action('yatra_email_send_after');
