@@ -282,7 +282,7 @@ if (!class_exists('Yatra_Email')) {
 
                 }
 
-                $logger->info($message, array('source' => 'email'));
+                $logger->info($log_message, array('source' => 'email'));
 
             }
             do_action('yatra_email_send_after');
