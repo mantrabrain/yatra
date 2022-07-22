@@ -46,10 +46,21 @@ if (!class_exists('Yatra_Email')) {
             add_action('yatra_enquiry_response_after_saved', array($this, 'enquiry_mail'), 10, 2);
 
             // Testing Hook - Please delete after testing finished
-            //add_action('init', array($this, 'booking_completed_email'), 10);
+            add_action('init', array($this, 'init'), 10);
             //add_action('init', array($this, 'booking_status_change'), 10);
         }
 
+        public function init()
+        {
+            $this->booking_completed_email(array(
+
+                'tour_ids' => [34, 30],
+
+                'booking_id' => 49,
+
+
+            ));
+        }
 
         public function booking_completed_email($params = array())
         {
@@ -57,9 +68,9 @@ if (!class_exists('Yatra_Email')) {
                 return;
             }
 
-            $tour_ids = isset($params['tour_ids']) ? $params['tour_ids'] : array();
+            $tour_ids = $params['tour_ids'] ?? array();
 
-            $booking_id = isset($params['booking_id']) ? $params['booking_id'] : 0;
+            $booking_id = $params['booking_id'] ?? 0;
 
             if ($booking_id < 1 || count($tour_ids) < 1) {
 
@@ -68,7 +79,7 @@ if (!class_exists('Yatra_Email')) {
 
             $customer_detail = $this->get_customer_details($booking_id);
 
-            $customer_email = isset($customer_detail['email']) ? $customer_detail['email'] : '';
+            $customer_email = $customer_detail['email'] ?? '';
 
             // end of User Parameters
 
@@ -256,15 +267,10 @@ if (!class_exists('Yatra_Email')) {
         public function send($emails, $subject, $message, $all_smart_tags = array(), $attachment = array(), $is_admin_email = false)
         {
 
-            foreach ($all_smart_tags as $tag => $tag_value) {
 
-                $smart_tag = "{{" . $tag . "}}";
+            $message = yatra_maybe_parse_smart_tags($all_smart_tags, $message);
 
-                $subject = str_replace($smart_tag, $tag_value, $subject);
-
-                $message = str_replace($smart_tag, $tag_value, $message);
-
-            }
+            $subject = yatra_maybe_parse_smart_tags($all_smart_tags, $subject);
 
             do_action('yatra_email_send_before');
 

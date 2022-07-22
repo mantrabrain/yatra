@@ -597,7 +597,7 @@ if (!function_exists('yatra_booking_smart_tags')) {
 
         $smart_tags['booking_status'] = '';
 
-        $smart_tags['tour_lists'] = '';
+        $tour_lists = array();
 
         if ($booking_id > 0) {
 
@@ -623,11 +623,26 @@ if (!function_exists('yatra_booking_smart_tags')) {
 
             foreach ($booking_meta as $tour_id => $meta) {
 
-                $smart_tags['tour_lists'] .= '<a href="' . get_permalink($tour_id) . '" target="_blank">' . $meta['yatra_tour_name'] . '</a><br/>';
+                $booked_date = $meta['yatra_selected_date'] ?? '';
 
+                $number_of_person = $meta['number_of_person'] ?? '';
+
+                $number_of_person = is_array($number_of_person) ? array_sum($number_of_person) : $number_of_person;
+
+                $tour_list = array();
+
+                $tour_list['tour_name'] = '<a href="' . get_permalink($tour_id) . '" target="_blank">' . $meta['yatra_tour_name'] . '</a>';
+
+                $tour_list['tour_date'] = $booked_date;
+
+                $tour_list['number_of_person'] = $number_of_person;
+
+                array_push($tour_lists, $tour_list);
             }
 
         }
+
+        $smart_tags['tour_lists'] = $tour_lists;
 
         return apply_filters(
             'yatra_booking_smart_tags',
@@ -681,6 +696,53 @@ if (!function_exists('yatra_get_date')) {
             return $datetime == '' ? date($date_format) : date($date_format, strtotime($datetime));
         }
         return $datetime == '' ? date($time_format) : date($time_format, strtotime($datetime));
+    }
+}
+
+if (!function_exists('yatra_maybe_parse_smart_tags')) {
+
+    function yatra_maybe_parse_smart_tags($all_smart_tags = array(), $content = '')
+    {
+
+        $content = str_replace("{{tour_lists}}", "{{tour_lists.tour_name}}", $content);
+
+        foreach ($all_smart_tags as $tag => $tag_value) {
+
+            $content = yatra_parse_smart_tag_item($tag, $tag_value, $content);
+
+        }
+        echo '<pre>';
+        print_r($content);
+        print_r($all_smart_tags);
+        echo '</pre>';
+        return $content;
+    }
+}
+if (!function_exists('yatra_parse_smart_tag_item')) {
+
+    function yatra_parse_smart_tag_item($tag, $tag_value, $content)
+    {
+        $smart_tag = "{{" . $tag . "}}";
+
+        if (!is_array($tag_value)) {
+
+            $content = str_replace($smart_tag, $tag_value, $content);
+
+        } else {
+            foreach ($tag_value as $new_tag_id => $new_tag_value) {
+
+                $new_tag_id_string = count(array_filter(array_keys($tag_value), 'is_string')) === 0 ? ($tag . '.' . $new_tag_id) : ($new_tag_id);
+
+                echo '<pre>';
+                print_r($tag_value);
+                var_dump($new_tag_id_string);
+                echo '</pre>';
+
+
+                $content = yatra_parse_smart_tag_item($new_tag_id_string, $new_tag_value, $content);
+            }
+        }
+        return $content;
     }
 }
 
