@@ -11,6 +11,7 @@
 /.wordpress-org export-ignore
 /package-lock.json  export-ignore
 /composer.json  export-ignore
+/phpcs.xml  export-ignore
 /.editorconfig	export-ignore
 /package.json  export-ignore
 /Gruntfile.js  export-ignore

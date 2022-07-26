@@ -711,10 +711,10 @@ if (!function_exists('yatra_maybe_parse_smart_tags')) {
             $content = yatra_parse_smart_tag_item($tag, $tag_value, $content);
 
         }
-        echo '<pre>';
+      /*  echo '<pre>';
         print_r($content);
         print_r($all_smart_tags);
-        echo '</pre>';
+        echo '</pre>';*/
         return $content;
     }
 }
@@ -733,10 +733,10 @@ if (!function_exists('yatra_parse_smart_tag_item')) {
 
                 $new_tag_id_string = count(array_filter(array_keys($tag_value), 'is_string')) === 0 ? ($tag . '.' . $new_tag_id) : ($new_tag_id);
 
-                echo '<pre>';
+             /*   echo '<pre>';
                 print_r($tag_value);
                 var_dump($new_tag_id_string);
-                echo '</pre>';
+                echo '</pre>';*/
 
 
                 $content = yatra_parse_smart_tag_item($new_tag_id_string, $new_tag_value, $content);

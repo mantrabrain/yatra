@@ -268,6 +268,7 @@ module.exports = function (grunt) {
                     '!webpack.config.js',
                     '!*.jshintrc',
                     '!.git',
+                    '!phpcs.xml',
                     '!requirement.txt',
                     '!assets/admin/src/**',
                     '!assets/src/**',
