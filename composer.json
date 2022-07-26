@@ -1,0 +1,90 @@
+{
+  "name": "mantrabrain/yatra",
+  "description": "WordPress Travel Plugin.",
+  "homepage": "https://mantrabrain.com/plugins/yatra/",
+  "type": "wordpress-plugin",
+  "license": "GPL-3.0-or-later",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "mantrabrain",
+      "email": "mantrabrain@gmail.com"
+    }
+  ],
+  "config": {
+    "process-timeout": 0,
+    "sort-packages": true,
+    "preferred-install": "dist",
+    "allow-plugins": {
+      "composer/installers": true,
+      "roots/wordpress-core-installer": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "require": {
+    "php": ">=5.6.20",
+    "composer/installers": "2.0.1"
+  },
+  "require-dev": {
+    "10up/wp_mock": "dev-enhance/allow-to-enable-disable-mock-constants-functions",
+    "phpunit/phpunit": "^5 || ^7",
+    "roots/wordpress": "5.8.3",
+    "spatie/phpunit-watcher": "1.8.3",
+    "psr/container": "1.0.0",
+    "jolicode/jolinotif": "2.3.0",
+    "vlucas/phpdotenv": "5.4.1",
+    "wp-cli/db-command": "2.0.19",
+    "wp-cli/i18n-command": "2.2.13",
+    "wp-phpunit/wp-phpunit": "5.8.2",
+    "yoast/phpunit-polyfills": "1.0.3"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:mi5t4n/wp_mock.git"
+    }
+  ],
+  "scripts": {
+    "phpcs": [
+      "phpcs -s -p"
+    ],
+    "phpcs-pre-commit": [
+      "phpcs -s -p -n"
+    ],
+    "phpcbf": [
+      "phpcbf -p"
+    ],
+    "test": [
+      "@test:reset",
+      "phpunit --verbose"
+    ],
+    "test:watch": [
+      "phpunit-watcher watch"
+    ],
+    "test:reset": [
+      "wp db reset --yes --path=tests/wordpress --color"
+    ],
+    "makepot": [
+      "@makepot:audit --skip-audit"
+    ],
+    "makepot:audit": [
+      "wp --allow-root i18n make-pot . --exclude=\".github,.wordpress-org,bin,node_modules,vendor,tests\" --slug=yatra"
+    ],
+    "post-update-cmd": [
+      "@php -r \"! file_exists( 'tests/.env' ) && copy( 'tests/.env.example', 'tests/.env' );\""
+    ]
+  },
+  "extra": {
+    "wordpress-install-dir": "tests/wordpress",
+    "scripts-description": {
+      "phpcs": "Analyze code against the WordPress coding standard with PHP_CodeSniffer",
+      "phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier",
+      "test": "Run unit tests",
+      "test:watch": "Automatically re-run unit tests on source file change",
+      "test:reset": "Removes all tables from the test database",
+      "makepot": "Generate langauges/yatra.pot file",
+      "makepot:audit": "Generate langauges/yatra.pot file and run audit"
+    }
+  }
+}
