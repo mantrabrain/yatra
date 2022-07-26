@@ -1,5 +1,5 @@
 name: Run code sniff on PR
-on: commit
+on: push
 jobs:
   test:
     name: Code sniff (PHP 7.4, WP Latest)
