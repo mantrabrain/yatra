@@ -37,8 +37,10 @@
     "wp-cli/db-command": "2.0.19",
     "wp-cli/i18n-command": "2.2.13",
     "wp-phpunit/wp-phpunit": "5.8.2",
-    "yoast/phpunit-polyfills": "1.0.3"
-  },
+    "yoast/phpunit-polyfills": "1.0.3",
+    "phpcompatibility/php-compatibility": "*"
+    },
+
   "repositories": [
     {
       "type": "vcs",
@@ -52,6 +54,7 @@
     "phpcs-pre-commit": [
       "phpcs -s -p -n"
     ],
+
     "phpcbf": [
       "phpcbf -p"
     ],
