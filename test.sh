@@ -1,58 +1,53 @@
 #!/usr/bin/env bash
 
 ##
- # Include dotfiles on file operations
- #
+# Include dotfiles on file operations
+#
 shopt -s dotglob
 
 ##
- # App
- #
+# App
+#
 
-function main()
-{
-    echo "Upgrading..."
+function main() {
+  echo "Upgrading..."
 
+  prepareEnvironment $1
 
-    prepareEnvironment $1
-
-    runTests
-}
-
-
-##
- # Prepare the environment
- #
-function prepareEnvironment()
-{
-    ##
-     # Define all variables
-     #
-    rootDir=.
-}
-
-
-##
- # Run tests
- #
-function runTests()
-{
-    echo "-- Running tests..."
-
-    if [ -f ${rootDir}/composer.lock ]; then
-        rm ${rootDir}/composer.lock
-    fi
-
-    if [ -d ${rootDir}/vendor ]; then
-        rm -rf ${rootDir}/vendor
-    fi
-
-    composer install
-
-    vendor/bin/phpunit
+  runTests
 }
 
 ##
- # Run the app
- #
+# Prepare the environment
+#
+function prepareEnvironment() {
+  ##
+  # Define all variables
+  #
+  rootDir=.
+}
+
+##
+# Run tests
+#
+function runTests() {
+  echo "-- Running tests..."
+
+  if [ -f ${rootDir}/composer.lock ]; then
+    rm ${rootDir}/composer.lock
+  fi
+
+  if [ -d ${rootDir}/vendor ]; then
+    rm -rf ${rootDir}/vendor
+  fi
+
+  composer install
+
+  echo "-- TESTING FUNNING FINISHED..."
+  ##vendor/bin/phpunit
+}
+
+##
+# Run the app
+#
 main $@
