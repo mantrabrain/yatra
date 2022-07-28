@@ -2,7 +2,7 @@
 <ruleset name="WordPress Coding Standards">
     <description>Yatra dev PHP CodeSniffer ruleset.</description>
 
-    <file>./core/</file>
+    <file>./testphpcs/</file>
 
     <!-- Exclude paths -->
     <exclude-pattern>includes/deprecated/</exclude-pattern>
