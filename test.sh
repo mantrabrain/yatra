@@ -44,7 +44,7 @@ function runTests() {
   composer install
 
   echo "-- TESTING FUNNING FINISHED..."
-  ##vendor/bin/phpunit
+  vendor/bin/phpunit
 }
 
 ##

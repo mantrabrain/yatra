@@ -1,13 +1,13 @@
 name: Run tests
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   tests:
     strategy:
       matrix:
-        os: [Ubuntu, macOS]
-        php: [7.2, 7.3, 7.4, 8.0]
+        os: [ Ubuntu, macOS ]
+        php: [ 7.2, 7.3, 7.4, 8.0 ]
 
         include:
           - os: Ubuntu
@@ -15,6 +15,9 @@ jobs:
 
           - os: macOS
             os-version: macos-latest
+
+          - os: Windows
+            os-version: windows-latest
 
     name: ${{ matrix.os }} - PHP ${{ matrix.php }}
 
@@ -33,6 +36,9 @@ jobs:
 
       - name: Install dependencies
         run: composer update --prefer-stable --prefer-dist --no-interaction --no-suggest --ignore-platform-reqs
+
+      - name: PHP Version Check
+        run: php -v
 
       - name: Run tests
         run: bash test.sh
