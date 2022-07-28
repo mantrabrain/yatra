@@ -6,18 +6,12 @@ jobs:
   tests:
     strategy:
       matrix:
-        os: [ Ubuntu, macOS, Windows ]
+        os: [ Ubuntu ]
         php: [ 7.2, 7.3, 7.4, 8.0 ]
 
         include:
           - os: Ubuntu
             os-version: ubuntu-latest
-
-          - os: macOS
-            os-version: macos-latest
-
-          - os: Windows
-            os-version: windows-latest
 
     name: ${{ matrix.os }} - PHP ${{ matrix.php }}
 
