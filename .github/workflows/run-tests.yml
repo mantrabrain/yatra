@@ -28,9 +28,6 @@ jobs:
           extensions: posix, dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
-      - name: Install dependencies
-        run: composer update --prefer-stable --prefer-dist --no-interaction --no-suggest --ignore-platform-reqs
-
       - name: PHP Version Check
         run: php -v
 
