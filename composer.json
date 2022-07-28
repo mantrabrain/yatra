@@ -15,63 +15,25 @@
   "config": {
     "process-timeout": 0,
     "sort-packages": true,
-    "preferred-install": "dist",
     "allow-plugins": {
-      "composer/installers": true,
-      "roots/wordpress-core-installer": true
+      "dealerdirect/phpcodesniffer-composer-installer": true
     }
   },
   "require": {
-    "php": ">=5.6.20",
-    "composer/installers": "2.0.1"
+    "php": ">=5.6.20"
   },
   "require-dev": {
-    "squizlabs/php_codesniffer": "3.*",
-    "phpunit/phpunit": "^9"
+    "wp-coding-standards/wpcs": "dev-master",
+    "dealerdirect/phpcodesniffer-composer-installer": "dev-master",
+    "phpcompatibility/phpcompatibility-wp": "dev-master",
+    "phpunit/phpunit": ">=5.7.27"
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "git@github.com:mi5t4n/wp_mock.git"
-    }
-  ],
   "scripts": {
     "phpcs": [
-      "phpcs -s -p"
-    ],
-    "phpcs-pre-commit": [
-      "phpcs -s -p -n"
+      "phpcs -p -s"
     ],
     "phpcbf": [
       "phpcbf -p"
-    ],
-    "test": [
-      "@test:reset",
-      "phpunit --verbose"
-    ],
-    "test:watch": [
-      "phpunit-watcher watch"
-    ],
-    "test:reset": [
-      "wp db reset --yes --path=tests/wordpress --color"
-    ],
-    "makepot": [
-      "@makepot:audit --skip-audit"
-    ],
-    "makepot:audit": [
-      "wp --allow-root i18n make-pot . --exclude=\".github,.wordpress-org,bin,node_modules,vendor,tests\" --slug=yatra"
     ]
-  },
-  "extra": {
-    "wordpress-install-dir": "tests/wordpress",
-    "scripts-description": {
-      "phpcs": "Analyze code against the WordPress coding standard with PHP_CodeSniffer",
-      "phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier",
-      "test": "Run unit tests",
-      "test:watch": "Automatically re-run unit tests on source file change",
-      "test:reset": "Removes all tables from the test database",
-      "makepot": "Generate langauges/yatra.pot file",
-      "makepot:audit": "Generate langauges/yatra.pot file and run audit"
-    }
   }
 }

@@ -40,5 +40,5 @@ jobs:
       - name: PHP Version Check
         run: php -v
 
-      - name: Run tests
+      - name: Run PHPCS Tests
         run: bash test.sh

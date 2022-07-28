@@ -43,7 +43,7 @@ function runTests() {
 
   composer install
 
-  vendor/bin/phpunit --version
+  vendor/bin/phpcs
 }
 
 ##

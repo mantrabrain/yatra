@@ -2,6 +2,8 @@
 <ruleset name="WordPress Coding Standards">
     <description>Yatra dev PHP CodeSniffer ruleset.</description>
 
+    <file>./core/</file>
+
     <!-- Exclude paths -->
     <exclude-pattern>includes/deprecated/</exclude-pattern>
     <exclude-pattern>includes/abstracts/legacy/</exclude-pattern>
@@ -31,7 +33,7 @@
     </rule>
 
     <!-- Rules -->
-    <rule ref="Yatra-Core"/>
+    <rule ref="WordPress-Core"/>
 
     <rule ref="PEAR.NamingConventions.ValidClassName">
         <exclude-pattern>includes/</exclude-pattern>
