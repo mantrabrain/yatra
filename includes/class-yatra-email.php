@@ -54,9 +54,9 @@ if (!class_exists('Yatra_Email')) {
         {
             $this->booking_completed_email(array(
 
-                'tour_ids' => [34, 30],
+                'tour_ids' => [30, 34],
 
-                'booking_id' => 49,
+                'booking_id' => 42,
 
 
             ));
