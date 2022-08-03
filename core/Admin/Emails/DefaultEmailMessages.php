@@ -26,9 +26,13 @@ class DefaultEmailMessages
  				Booking code: <b>{{booking_code}}</b> and here is the tour lists:
  				
  				<br/>
- 				{{tour_lists}}
-             
- 				You will get an email after your booking approved or cancelled.
+ 				<strong>Tour Name</strong>                       <strong>Tour Date</strong>                       <strong>Number of Person</strong>
+ 				<br/>
+ 				{{tour_lists_loop_start}}
+ 				{{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
+ 				{{tour_lists_loop_start}}
+              	<br/>
+              	You will get an email after your booking approved or cancelled.
  				
  				<br/>
 
@@ -63,8 +67,12 @@ class DefaultEmailMessages
 		    Tour Lists:
 		    
 		    <br/>
-		    
-		    {{tour_lists}}
+            <strong>Tour Name</strong>                       <strong>Tour Date</strong>                       <strong>Number of Person</strong>
+            <br/>
+            {{tour_lists_loop_start}}
+            {{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
+            {{tour_lists_loop_start}}
+            <br/>
 		    
 			Please review the booking details at \'<b>Tours</b>\' menu in your WP dashboard.
 
@@ -97,9 +105,11 @@ class DefaultEmailMessages
  				<br/>
  				Booking code: <b>{{booking_code}}</b> and here is the tour lists:
  				<br/>
- 				{{tour_lists}}
-             
- 						
+ 				<strong>Tour Name</strong>                       <strong>Tour Date</strong>                       <strong>Number of Person</strong>
+ 				<br/>
+ 				{{tour_lists_loop_start}}
+ 				{{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
+ 				{{tour_lists_loop_start}}
  				<br/>
 
  				Thank You!',
@@ -135,9 +145,12 @@ class DefaultEmailMessages
 		    Tour Lists:
 		    
 		    <br/>
-		    
-		    {{tour_lists}}
-
+            <strong>Tour Name</strong>                       <strong>Tour Date</strong>                       <strong>Number of Person</strong>
+            <br/>
+            {{tour_lists_loop_start}}
+            {{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
+            {{tour_lists_loop_start}}
+            <br/>
 			Thank You!',
             'yatra'
         );
