@@ -74,7 +74,7 @@ class DefaultEmailMessages
             {{tour_lists_loop_start}}
             <br/>
 		    
-			Please review the booking details at \'<b>Tours</b>\' menu in your WP dashboard.
+			Please review the booking details at \'<b>Yatra</b>\' menu in your dashboard.
 
             <br/>
 			Thank You!',
