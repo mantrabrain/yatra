@@ -716,6 +716,7 @@ function yatra_get_string_between(&$string_content, $startDelimiter, $endDelimit
         $substr_index = 'yatra_content_loop_' . $loop_index;
         $contents[$substr_index] = $substr;
         $string_content = substr_replace($string_content, '{{' . 'yatra_content_loop_' . $loop_index . '}}', $contentStart, ($contentEnd - $contentStart));
+        $contentEnd = strpos($string_content, $endDelimiter, $contentStart);
         $startFrom = $contentEnd + $endDelimiterLength;
     }
 
@@ -732,12 +733,13 @@ if (!function_exists('yatra_maybe_parse_smart_tags')) {
 
         $looped_content = yatra_get_string_between($content, '{{tour_lists_loop_start}}', '{{tour_lists_loop_end}}');
 
+
         foreach ($all_smart_tags as $tag => $tag_value) {
 
             $content = yatra_parse_smart_tag_item($tag, $tag_value, $content);
 
         }
-        $parsed_looped_content = [];
+        $parsed_looped_content = array();
 
         foreach ($looped_content as $loop_id => $loop_content) {
 
@@ -753,16 +755,15 @@ if (!function_exists('yatra_maybe_parse_smart_tags')) {
 
                 }
 
-                $parsed_looped_content[$loop_id] .= $loop_content . '<br/>';
+                $parsed_looped_content[$loop_id] = isset($parsed_looped_content[$loop_id]) ? $parsed_looped_content[$loop_id] . $loop_content : $loop_content;
             }
-
         }
 
         foreach ($parsed_looped_content as $parsed_loop_id => $parsed_loop_content) {
 
             $content = str_replace('{{tour_lists_loop_start}}{{' . $parsed_loop_id . '}}{{tour_lists_loop_end}}', $parsed_loop_content, $content);
         }
-        
+
         return $content;
     }
 }

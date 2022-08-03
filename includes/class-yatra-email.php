@@ -46,7 +46,7 @@ if (!class_exists('Yatra_Email')) {
             add_action('yatra_enquiry_response_after_saved', array($this, 'enquiry_mail'), 10, 2);
 
             // Testing Hook - Please delete after testing finished
-            add_action('init', array($this, 'init'), 10);
+            //add_action('init', array($this, 'init'), 10);
             //add_action('init', array($this, 'booking_status_change'), 10);
         }
 
@@ -56,7 +56,7 @@ if (!class_exists('Yatra_Email')) {
 
                 'tour_ids' => [30, 34],
 
-                'booking_id' => 42,
+                'booking_id' => 49,
 
 
             ));
@@ -266,7 +266,6 @@ if (!class_exists('Yatra_Email')) {
          */
         public function send($emails, $subject, $message, $all_smart_tags = array(), $attachment = array(), $is_admin_email = false)
         {
-
 
             $message = yatra_maybe_parse_smart_tags($all_smart_tags, $message);
 
