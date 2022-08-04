@@ -30,7 +30,7 @@ class DefaultEmailMessages
  				<br/>
  				{{tour_lists_loop_start}}
  				{{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
- 				{{tour_lists_loop_start}}
+ 				{{tour_lists_loop_end}}
               	<br/>
               	You will get an email after your booking approved or cancelled.
  				
@@ -71,7 +71,7 @@ class DefaultEmailMessages
             <br/>
             {{tour_lists_loop_start}}
             {{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
-            {{tour_lists_loop_start}}
+            {{tour_lists_loop_end}}
             <br/>
 		    
 			Please review the booking details at \'<b>Yatra</b>\' menu in your dashboard.
@@ -109,7 +109,7 @@ class DefaultEmailMessages
  				<br/>
  				{{tour_lists_loop_start}}
  				{{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
- 				{{tour_lists_loop_start}}
+ 				{{tour_lists_loop_end}}
  				<br/>
 
  				Thank You!',
@@ -149,7 +149,7 @@ class DefaultEmailMessages
             <br/>
             {{tour_lists_loop_start}}
             {{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
-            {{tour_lists_loop_start}}
+            {{tour_lists_loop_end}}
             <br/>
 			Thank You!',
             'yatra'
