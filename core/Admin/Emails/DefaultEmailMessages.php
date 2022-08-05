@@ -26,7 +26,7 @@ class DefaultEmailMessages
  				Booking code: <b>{{booking_code}}</b> and here is the tour lists:
  				
  				<br/>
-                <table style="width="100%">
+                <table style="width: 100%;">
                     <thead>
                         <tr>
                             <th style="text-align: left">Tour Name</th>
@@ -81,7 +81,7 @@ class DefaultEmailMessages
 		    Tour Lists:
 		    
 		    <br/>
-            <table style="width="100%">
+            <table style="width: 100%;">
                 <thead>
                     <tr>
                         <th style="text-align: left">Tour Name</th>
@@ -132,7 +132,7 @@ class DefaultEmailMessages
  				<br/>
  				Booking code: <b>{{booking_code}}</b> and here is the tour lists:
  				<br/>
- 				<table style="width="100%">
+ 				<table style="width: 100%;">
                     <thead>
                         <tr>
                             <th style="text-align: left">Tour Name</th>
@@ -185,7 +185,7 @@ class DefaultEmailMessages
 		    Tour Lists:
 		    
 		    <br/>
-            <table style="width="100%">
+            <table style="width: 100%;">
                 <thead>
                     <tr>
                         <th style="text-align: left">Tour Name</th>
