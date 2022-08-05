@@ -26,12 +26,26 @@ class DefaultEmailMessages
  				Booking code: <b>{{booking_code}}</b> and here is the tour lists:
  				
  				<br/>
- 				<strong>Tour Name</strong>                       <strong>Tour Date</strong>                       <strong>Number of Person</strong>
+                <table style="width="100%">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left">Tour Name</th>
+                            <th style="text-align: left">Tour Date</th>
+                            <th style="text-align: left">Number of Person</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    {{tour_lists_loop_start}}
+                    <tr>
+                        <td style="text-align: left">{{tour_name}}</td>
+                        <td style="text-align: left">{{tour_date}}</td>
+                        <td style="text-align: left">{{number_of_person}}</td>
+                    </tr>
+                    {{tour_lists_loop_end}}
+                </tbody>
+                </table>
+
  				<br/>
- 				{{tour_lists_loop_start}}
- 				{{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
- 				{{tour_lists_loop_end}}
-              	<br/>
               	You will get an email after your booking approved or cancelled.
  				
  				<br/>
@@ -67,11 +81,24 @@ class DefaultEmailMessages
 		    Tour Lists:
 		    
 		    <br/>
-            <strong>Tour Name</strong>                       <strong>Tour Date</strong>                       <strong>Number of Person</strong>
-            <br/>
-            {{tour_lists_loop_start}}
-            {{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
-            {{tour_lists_loop_end}}
+            <table style="width="100%">
+                <thead>
+                    <tr>
+                        <th style="text-align: left">Tour Name</th>
+                        <th style="text-align: left">Tour Date</th>
+                        <th style="text-align: left">Number of Person</th>
+                    </tr>
+                </thead>
+            <tbody>
+                {{tour_lists_loop_start}}
+                <tr>
+                    <td style="text-align: left">{{tour_name}}</td>
+                    <td style="text-align: left">{{tour_date}}</td>
+                    <td style="text-align: left">{{number_of_person}}</td>
+                </tr>
+                {{tour_lists_loop_end}}
+            </tbody>
+            </table>
             <br/>
 		    
 			Please review the booking details at \'<b>Yatra</b>\' menu in your dashboard.
@@ -105,11 +132,24 @@ class DefaultEmailMessages
  				<br/>
  				Booking code: <b>{{booking_code}}</b> and here is the tour lists:
  				<br/>
- 				<strong>Tour Name</strong>                       <strong>Tour Date</strong>                       <strong>Number of Person</strong>
- 				<br/>
- 				{{tour_lists_loop_start}}
- 				{{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
- 				{{tour_lists_loop_end}}
+ 				<table style="width="100%">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left">Tour Name</th>
+                            <th style="text-align: left">Tour Date</th>
+                            <th style="text-align: left">Number of Person</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    {{tour_lists_loop_start}}
+                    <tr>
+                        <td style="text-align: left">{{tour_name}}</td>
+                        <td style="text-align: left">{{tour_date}}</td>
+                        <td style="text-align: left">{{number_of_person}}</td>
+                    </tr>
+                    {{tour_lists_loop_end}}
+                </tbody>
+                </table>
  				<br/>
 
  				Thank You!',
@@ -145,11 +185,24 @@ class DefaultEmailMessages
 		    Tour Lists:
 		    
 		    <br/>
-            <strong>Tour Name</strong>                       <strong>Tour Date</strong>                       <strong>Number of Person</strong>
-            <br/>
-            {{tour_lists_loop_start}}
-            {{tour_name}}                                    {{tour_date}}                                    {{number_of_person}}
-            {{tour_lists_loop_end}}
+            <table style="width="100%">
+                <thead>
+                    <tr>
+                        <th style="text-align: left">Tour Name</th>
+                        <th style="text-align: left">Tour Date</th>
+                        <th style="text-align: left">Number of Person</th>
+                    </tr>
+                </thead>
+            <tbody>
+                {{tour_lists_loop_start}}
+                <tr>
+                    <td style="text-align: left">{{tour_name}}</td>
+                    <td style="text-align: left">{{tour_date}}</td>
+                    <td style="text-align: left">{{number_of_person}}</td>
+                </tr>
+                {{tour_lists_loop_end}}
+            </tbody>
+            </table>
             <br/>
 			Thank You!',
             'yatra'
