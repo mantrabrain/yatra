@@ -96,7 +96,14 @@ Shortcode for Tour Listing:
 * {{blog_info}} : Get blog info of a website
 * {{booking_code}} : Get booking code of specific booking
 * {{booking_status}} : Get current booking status of specific booking
-* {{net_booking_price}} : Get current booking net price of specific booking
+* {{net_booking_price}} : Get current booking net price of specific booking.
+To show the tour list, You need to wrap as follows.
+You have to start and end tour_list_loop by using **{{tour_lists_loop_start}}** and **{{tour_lists_loop_end}}** to use the **{{tour_name}}**, **{{tour_date}}** and **{{number_of_person}}**.
+* **{{tour_lists_loop_start}}**
+    * **{{tour_name}}** - Name of the particular tour
+    * **{{tour_date}}**  - Tour Date ( which was selected by user while booking the tour package )
+    * **{{number_of_person}}** - Number of person ( which was enter by user while booking the tour package )
+* **{{tour_lists_loop_end}}**
 * {{tour_lists}} : Get booked tour lists of specific booking
 * {{customer_name}} : Get customer name of specific booking
 * {{customer_email}} : Get customer email of specific booking
