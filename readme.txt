@@ -104,7 +104,6 @@ You have to start and end tour_list_loop by using **{{tour_lists_loop_start}}** 
     * **{{tour_date}}**  - Tour Date ( which was selected by user while booking the tour package )
     * **{{number_of_person}}** - Number of person ( which was enter by user while booking the tour package )
 * **{{tour_lists_loop_end}}**
-* {{tour_lists}} : Get booked tour lists of specific booking
 * {{customer_name}} : Get customer name of specific booking
 * {{customer_email}} : Get customer email of specific booking
 * {{customer_phone_number}} : Get customer phone number of specific booking
