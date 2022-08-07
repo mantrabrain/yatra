@@ -4,7 +4,7 @@ Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
 Tested up to: 6.0
 Requires PHP: 7.0
-Stable tag: 2.1.10
+Stable tag: 2.1.11
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -174,12 +174,11 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.10 | 2022/05/29 =
-* Fixed - is_tax called before wp_query init issue resolved
-* Added - Multiple email option for admin notifications
-* Fixed - Enquiry email notification
-* Fixed - WordPress 6.0 Compatibility issue
-* Fixed - Payment Gateway selection issue ( javascript issue fixed)
-* Added - Addon/Upgrade to pro with review notification
-* Fixed - Other minor issue fixed & enhancement
-
+= 2.1.11 | 2022/07/08 =
+* Fixed - Label update and setup wizard design update
+* Fixed - admin email feature restructured and fixed
+* Fixed - SSL issue fixed
+* Fixed - Filter issue fixed - For Duration days and number gap added
+* Fixed - Undefined issue solve on yatra addon page
+* Fixed - long pricing name issue on availability conditions calendar popup fixed
+* Added - More email smart tags
