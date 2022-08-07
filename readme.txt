@@ -174,7 +174,7 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.11 | 2022/07/08 =
+= 2.1.11 | 2022/08/07 =
 * Fixed - Label update and setup wizard design update
 * Fixed - admin email feature restructured and fixed
 * Fixed - SSL issue fixed
