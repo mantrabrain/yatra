@@ -18,8 +18,9 @@
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($addons as $addon_slug => $addon) {
-            
+        <?php
+        foreach ($addons as $addon_slug => $addon) {
+
             $addon_license = isset($license_details[$addon_slug]) ? $license_details[$addon_slug] : array();
 
             $server_response = isset($addon_license['server_response']) ? $addon_license['server_response'] : array();
@@ -38,9 +39,14 @@
 
             $button_label = __('Deactivate', 'yatra');
 
+            $constant = strtoupper(str_replace('-', '_', $addon_slug)) . '_VERSION';
+
+            $version_text = defined($constant) ? constant($constant) : null;
+
             ?>
             <tr data-addon-slug="<?php echo esc_attr($addon_slug) ?>">
-                <td><span class="product-name"><?php echo esc_html($addon['label']) ?></span>
+                <td>
+                    <span class="product-name"><?php echo esc_html($addon['label']) ?><?php echo !is_null($version_text) ? ' - <span class="version">' . esc_html($version_text) . '</span>' : ''; ?></span>
                 </td>
                 <td class="license-column">
                     <div class="license-column-inner"> <?php
