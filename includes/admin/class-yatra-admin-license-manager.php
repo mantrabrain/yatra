@@ -2,11 +2,11 @@
 
 class Yatra_Admin_License_Manager
 {
-    
+
     public function __construct()
     {
         if (count(yatra_get_premium_addons()) > 0) {
-            add_action('admin_menu', array($this, 'license_menu'), 55);
+            add_action('yatra_admin_menu', array($this, 'license_menu'));
             add_action('admin_enqueue_scripts', array($this, 'license_scripts'), 11);
             add_action('wp_ajax_yatra_update_single_license', array($this, 'update_single_license'), 10);
             add_action('wp_ajax_yatra_deactivate_single_license', array($this, 'deactivate_single_license'), 10);
@@ -16,11 +16,11 @@ class Yatra_Admin_License_Manager
     public function license_menu()
     {
         add_submenu_page(
-            'edit.php?post_type=tour',
+            YATRA_ADMIN_MENU_SLUG,
             __('Licenses', 'yatra'),
             __('Licenses', 'yatra'),
             'manage_yatra',
-            'yatra-license', array($this, 'license_page'));
+            'yatra-license', array($this, 'license_page'), 30);
 
 
     }
@@ -135,7 +135,7 @@ class Yatra_Admin_License_Manager
 
     public function license_scripts($hook)
     {
-        if ('tour_page_yatra-license' != $hook) {
+        if ('yatra_page_yatra-license' != $hook) {
             return;
         }
 

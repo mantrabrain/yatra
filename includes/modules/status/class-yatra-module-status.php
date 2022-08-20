@@ -5,7 +5,7 @@ class Yatra_Module_Status
     public function __construct()
     {
         add_action('admin_enqueue_scripts', array($this, 'load_admin_scripts'), 10);
-        add_action('admin_menu', array($this, 'status_menu'));
+        add_action('yatra_admin_menu', array($this, 'status_menu'), 50);
         add_action('admin_init', array($this, 'log_action_init'), 10);
         add_action('yatra_status_system_status', array($this, 'system_status'));
         add_action('yatra_status_logs', array($this, 'logs'));
@@ -14,13 +14,13 @@ class Yatra_Module_Status
     public function status_menu()
     {
         add_submenu_page(
-            'edit.php?post_type=tour',
+            YATRA_ADMIN_MENU_SLUG,
             'Status',
             'Status',
             'manage_options',
             'yatra-status',
             array($this, 'status'),
-            550
+            1001
         );
     }
 

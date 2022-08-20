@@ -141,13 +141,13 @@ final class Yatra_Admin
     function admin_menu()
     {
         $settings_page = add_submenu_page(
-            'edit.php?post_type=tour',
+            YATRA_ADMIN_MENU_SLUG,
             'Settings',
             'Settings',
             'manage_yatra',
             'yatra-settings',
             array($this, 'settings'),
-            997
+            20
         );
 
         add_action('load-' . $settings_page, array($this, 'settings_page_init'));
@@ -165,19 +165,21 @@ final class Yatra_Admin
         );
         add_action('load-' . $settings_page, array($this, 'availability_page_init'));
 
+        do_action('yatra_admin_menu');
+
         add_submenu_page(
-            'edit.php?post_type=tour',
+            YATRA_ADMIN_MENU_SLUG,
             esc_html__('Yatra Addons', 'yatra'),
             '<span style="color:#28d01d">' . esc_html__('Addons', 'yatra') . '</span>',
             'manage_yatra',
             'yatra-addons',
-            array($this, 'addon_page'), 999
+            array($this, 'addon_page'), 40
         );
 
         if (count(yatra_get_premium_addons()) < 1) {
 
             add_submenu_page(
-                'edit.php?post_type=tour',
+                YATRA_ADMIN_MENU_SLUG,
                 esc_html__('Upgrade to Pro', 'yatra'),
                 '<span style="color:#e27730">' . esc_html__('Upgrade to Pro', 'yatra') . '</span>',
                 'manage_yatra',

@@ -49,7 +49,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                 case "usage_count":
                     $usage_limit = ($this->get_value('yatra_coupon_using_limit', $coupon_id));
                     $usage_count_array = ($this->get_value('yatra_coupon_usages_bookings', $coupon_id));
-                    $usage_count_array = is_array($usage_count_array) ? $usage_count_array: array();
+                    $usage_count_array = is_array($usage_count_array) ? $usage_count_array : array();
                     $usage_count = count($usage_count_array);
                     printf(
                     /* translators: 1: count 2: limit */
@@ -147,13 +147,14 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
         {
 
             $screen = get_current_screen();
-            $screen_id = isset($screen->id) ? $screen->id : '';
+
+            $screen_id = $screen->id ?? '';
             if ($screen_id != 'yatra-coupons') {
                 return;
             }
             global $post;
 
-            $post_id = isset($post->ID) ? $post->ID : '';
+            $post_id = $post->ID ?? '';
 
             wp_enqueue_script('yatra-coupon');
             wp_enqueue_style('yatra-coupon-css');

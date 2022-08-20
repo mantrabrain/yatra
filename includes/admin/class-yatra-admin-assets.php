@@ -23,7 +23,9 @@ if (!class_exists('Yatra_Admin_Assets')) {
             $screen_id = isset($screen->id) ? $screen->id : '';
 
             $coupon_dependency = file_exists(YATRA_ABSPATH . 'assets/build/js/coupon.asset.php') ? include_once(YATRA_ABSPATH . 'assets/build/js/coupon.asset.php') : array();
+
             $coupon_dependency['dependencies'] = isset($coupon_dependency['dependencies']) ? $coupon_dependency['dependencies'] : array();
+
             $coupon_dependency['version'] = isset($coupon_dependency['version']) ? sanitize_text_field($coupon_dependency['version']) : YATRA_VERSION;
 
             // Register Only Script
@@ -134,7 +136,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
                 case "yatra-booking":
                     $css_dependencies[] = 'yatra-booking-meta-css';
                     break;
-                case "tour_page_yatra-settings":
+                case "yatra_page_yatra-settings":
                     array_push($js_dependencies, 'wp-color-picker', 'yatra-settings-script', 'yatra-tippy');
                     array_push($css_dependencies, 'wp-color-picker', 'yatra-settings-style');
                     $localization_array['font_awesome_icons'] = array(

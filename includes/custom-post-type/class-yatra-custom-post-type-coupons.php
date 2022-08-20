@@ -39,7 +39,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Coupons')) {
                 'public' => false,
                 'publicly_queryable' => false,
                 'show_ui' => true,
-                'show_in_menu' => 'edit.php?post_type=tour',
+                'show_in_menu' => YATRA_ADMIN_MENU_SLUG,
                 'query_var' => true,
                 'rewrite' => array('slug' => 'yatra-coupon'),
                 'has_archive' => false,

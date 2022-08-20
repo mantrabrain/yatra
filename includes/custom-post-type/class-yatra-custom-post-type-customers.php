@@ -24,7 +24,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Customers')) {
                 'public' => true,
                 'supports' => array('title'),
                 'has_archive' => false,
-                'show_in_menu' => 'edit.php?post_type=tour',
+                'show_in_menu' => YATRA_ADMIN_MENU_SLUG,
                 'publicly_queryable' => false,
                 'exclude_from_search' => true,
                 'capabilities' => array(
@@ -32,6 +32,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Customers')) {
                     'delete_posts' => 'do_not_allow', // false < WP 4.5, credit @Ewout
                 ),
                 'capability_type' => 'yatra-customers',
+                'menu_position' => 2
 
 
             );

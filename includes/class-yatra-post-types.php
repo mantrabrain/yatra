@@ -55,9 +55,9 @@ class Yatra_Post_Types
         do_action('yatra_register_post_type');
 
         Yatra_Custom_Post_Type_Tour::register();
-        Yatra_Custom_Post_Type_Customers::register();
-        Yatra_Custom_Post_Type_Coupons::register();
         Yatra_Custom_Post_Type_Booking::register();
+        Yatra_Custom_Post_Type_Coupons::register();
+        Yatra_Custom_Post_Type_Customers::register();
 
         do_action('yatra_after_register_post_type');
     }
@@ -70,7 +70,7 @@ class Yatra_Post_Types
 
     public static function maybe_flush_rewrite_rules()
     {
-        
+
         if ('yes' === get_option('yatra_queue_flush_rewrite_rules')) {
             update_option('yatra_queue_flush_rewrite_rules', 'no');
             self::flush_rewrite_rules();

@@ -30,10 +30,10 @@ class Yatra_Admin_Addons
 
     public function scripts($hook)
     {
-        if ('tour_page_yatra-addons' != $hook) {
+
+        if ('yatra_page_yatra-addons' != $hook) {
             return;
         }
-
 
         wp_enqueue_style('yatra-admin-addons', YATRA_PLUGIN_URI . '/assets/admin/css/addons.css', array(), YATRA_VERSION);
     }

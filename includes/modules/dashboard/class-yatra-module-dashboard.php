@@ -10,15 +10,17 @@ class Yatra_Module_Dashboard
 
     public function menu()
     {
-        add_submenu_page(
-            'edit.php?post_type=tour',
-            __('Dashboard', 'yatra'),
-            __('Dashboard', 'yatra'),
+        add_menu_page(
+            __('Yatra Dashboard', 'yatra'),
+            __('Yatra', 'yatra'),
             'manage_options',
             'yatra-dashboard',
             array($this, 'dashboard'),
-            0
+            YATRA_PLUGIN_URI . '/assets/images/menu-icon.png',
+            25
         );
+
+
     }
 
     public function dashboard()
@@ -78,7 +80,7 @@ class Yatra_Module_Dashboard
     public function load_admin_scripts($id)
     {
 
-        if ($id !== 'tour_page_yatra-dashboard') {
+        if ($id !== 'toplevel_page_yatra-dashboard') {
             return;
         }
 

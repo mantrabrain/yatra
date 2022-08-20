@@ -105,11 +105,12 @@ if (!class_exists('Yatra_Custom_Post_Type_Booking')) {
                 'public' => true,
                 'supports' => array('title'),
                 'has_archive' => false,
-                'show_in_menu' => 'edit.php?post_type=tour',
+                'show_in_menu' => YATRA_ADMIN_MENU_SLUG,
                 'publicly_queryable' => false,
                 'exclude_from_search' => true,
                 'show_in_admin_bar' => false,
                 'capability_type' => 'yatra-booking',
+                'menu_position' => 1
 
 
             );

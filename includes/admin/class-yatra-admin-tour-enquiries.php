@@ -5,7 +5,7 @@ class Yatra_Admin_Tour_Enquiries
 
     public function __construct()
     {
-        add_action('admin_menu', array($this, 'enquiries_menu'), 55);
+        add_action('admin_menu', array($this, 'enquiries_menu'));
         add_filter('set_screen_option_yatra_enquiries_page_size', array($this, 'set_screen_option'), 1, 10);
     }
 
@@ -13,11 +13,11 @@ class Yatra_Admin_Tour_Enquiries
     {
 
         $hook = add_submenu_page(
-            'edit.php?post_type=tour',
+            YATRA_ADMIN_MENU_SLUG,
             __('Enquiries', 'yatra'),
             __('Enquiries', 'yatra'),
             'administrator',
-            'enquiries', array($this, 'settings_page'), 7);
+            'enquiries', array($this, 'settings_page'), 10);
 
 
         add_action("load-" . $hook, array($this, 'mp_custom_page_screen_options'));

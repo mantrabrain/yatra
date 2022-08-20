@@ -74,7 +74,7 @@ class Yatra_Admin_Review
 
     public function review()
     {
-        
+
         $booking = new Yatra_Tour_Booking();
 
         $total_completed_bookings = $booking->get_all_bookings('yatra-completed', 1);
@@ -119,17 +119,15 @@ class Yatra_Admin_Review
 
     public function admin_footer($text)
     {
-
         global $current_screen;
-
 
         $yatra_screens = array(
             'edit-tour',
-            'tour_page_yatra-dashboard',
+            'toplevel_page_yatra-dashboard',
             'tour',
             'edit-activity',
             'edit-attributes',
-            'tour_page_enquiries',
+            'yatra_page_enquiries',
             'edit-destination'
         );
 
@@ -165,11 +163,11 @@ class Yatra_Admin_Review
 
         $yatra_screens = array(
             'edit-tour',
-            'tour_page_yatra-dashboard',
+            'toplevel_page_yatra-dashboard',
             'tour',
             'edit-activity',
             'edit-attributes',
-            'tour_page_enquiries',
+            'yatra_page_enquiries',
             'edit-destination'
         );
 
