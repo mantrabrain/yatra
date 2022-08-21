@@ -17,7 +17,7 @@ class Yatra_Module_Dashboard
             'yatra-dashboard',
             array($this, 'dashboard'),
             YATRA_PLUGIN_URI . '/assets/images/menu-icon.png',
-            25
+            26
         );
 
 

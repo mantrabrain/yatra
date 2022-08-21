@@ -28,6 +28,8 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
             $args = array(
                 'labels' => $labels,
                 'menu_icon' => 'dashicons-palmtree',
+                'show_in_menu' => true,
+                'menu_position' => 26,
                 'public' => true,
                 'supports' => array('title', 'editor', 'excerpt', 'thumbnail'),
                 'has_archive' => true,
