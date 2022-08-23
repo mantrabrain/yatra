@@ -24,7 +24,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Customers')) {
                 'public' => true,
                 'supports' => array('title'),
                 'has_archive' => false,
-                'show_in_menu' => YATRA_ADMIN_MENU_SLUG,
+                'show_in_menu' => false,// YATRA_ADMIN_MENU_SLUG,
                 'publicly_queryable' => false,
                 'exclude_from_search' => true,
                 'capabilities' => array(

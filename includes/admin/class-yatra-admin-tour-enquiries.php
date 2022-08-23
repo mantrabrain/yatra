@@ -5,23 +5,24 @@ class Yatra_Admin_Tour_Enquiries
 
     public function __construct()
     {
-        add_action('admin_menu', array($this, 'enquiries_menu'));
+        add_filter('yatra_admin_main_submenu', array($this, 'enquiries_menu'));
+
         add_filter('set_screen_option_yatra_enquiries_page_size', array($this, 'set_screen_option'), 1, 10);
     }
 
-    public function enquiries_menu()
+    public function enquiries_menu($submenu)
     {
-
-        $hook = add_submenu_page(
-            YATRA_ADMIN_MENU_SLUG,
-            __('Enquiries', 'yatra'),
-            __('Enquiries', 'yatra'),
-            'administrator',
-            'enquiries', array($this, 'settings_page'), 10);
-
-
-        add_action("load-" . $hook, array($this, 'mp_custom_page_screen_options'));
-
+        $submenu[] = array(
+            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+            'page_title' => __('Enquiries', 'yatra'),
+            'menu_title' => __('Enquiries', 'yatra'),
+            'capability' => 'manage_yatra',
+            'menu_slug' => 'enquiries',
+            'callback' => array($this, 'settings_page'),
+            'position' => 20,
+            'load_action' => array($this, 'enquiry_page')
+        );
+        return $submenu;
     }
 
     public function set_screen_option($screen_option, $option, $value)
@@ -29,7 +30,7 @@ class Yatra_Admin_Tour_Enquiries
         return absint($value);
     }
 
-    function mp_custom_page_screen_options()
+    function enquiry_page()
     {
 
         add_screen_option('per_page', array('label' => 'Per Page', 'default' => 10, 'option' => 'yatra_enquiries_page_size'));

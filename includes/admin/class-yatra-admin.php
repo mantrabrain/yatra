@@ -63,11 +63,31 @@ final class Yatra_Admin
 
         add_action('init', array($this, 'setup_wizard'));
         add_action('admin_init', array($this, 'admin_redirects'));
-        add_action('admin_menu', array($this, 'admin_menu'));
+        add_action('admin_menu', array($this, 'yatra_submenu'));
+        add_action('admin_menu', array($this, 'yatra_tour_submenu'));
         add_action('admin_notices', array($this, 'promotional_offer'));
         add_filter('plugin_action_links_' . plugin_basename(YATRA_PLUGIN_DIR . 'yatra.php'), [$this, 'settings_link'], 10, 4);
 
+        add_filter('parent_file', array($this, 'menu_parent_fix'));
 
+        add_filter('yatra_admin_main_submenu', array($this, 'submenu'));
+
+
+    }
+
+    public function menu_parent_fix($parent_file)
+    {
+        global $submenu_file, $current_screen;
+
+        $menu_post_types = array('yatra-booking', 'yatra-coupons', 'yatra-customers');
+
+        if (in_array($current_screen->post_type, $menu_post_types)) {
+
+            $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
+
+            $parent_file = YATRA_ADMIN_MENU_SLUG;
+        }
+        return $parent_file;
     }
 
 
@@ -138,22 +158,130 @@ final class Yatra_Admin
         }
     }
 
-    function admin_menu()
+    public function submenu($submenu)
     {
-        $settings_page = add_submenu_page(
-            YATRA_ADMIN_MENU_SLUG,
-            'Settings',
-            'Settings',
-            'manage_yatra',
-            'yatra-settings',
-            array($this, 'settings'),
-            20
+
+        $submenu[] = array(
+            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+            'page_title' => 'Yatra Dashboard',
+            'menu_title' => 'Yatra Dashboard',
+            'capability' => 'manage_yatra',
+            'menu_slug' => 'admin.php?page=yatra-dashboard',
+            'callback' => '',
+            'position' => 5,
         );
 
-        add_action('load-' . $settings_page, array($this, 'settings_page_init'));
+        $submenu[] = array(
+            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+            'page_title' => 'All Bookings',
+            'menu_title' => 'All Bookings',
+            'capability' => 'manage_yatra',
+            'menu_slug' => 'edit.php?post_type=yatra-booking',
+            'callback' => '',
+            'position' => 10,
+        );
 
-        // availablity menu
+        $submenu[] = array(
+            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+            'page_title' => 'All Customers',
+            'menu_title' => 'All Customers',
+            'capability' => 'manage_yatra',
+            'menu_slug' => 'edit.php?post_type=yatra-customers',
+            'callback' => '',
+            'position' => 15,
+        );
 
+
+        $submenu[] = array(
+            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+            'page_title' => 'Coupons',
+            'menu_title' => 'Coupons',
+            'capability' => 'manage_yatra',
+            'menu_slug' => 'edit.php?post_type=yatra-coupons',
+            'callback' => '',
+            'position' => 20,
+        );
+
+        $submenu[] = array(
+            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+            'page_title' => 'Settings',
+            'menu_title' => 'Settings',
+            'capability' => 'manage_yatra',
+            'menu_slug' => 'yatra-settings',
+            'callback' => array($this, 'settings'),
+            'position' => 25,
+            'load_action' => array($this, 'settings_page_init')
+        );
+        //do_action('yatra_admin_menu');
+
+        $submenu[] = array(
+            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+            'page_title' => esc_html__('Yatra Addons', 'yatra'),
+            'menu_title' => '<span style="color:#28d01d">' . esc_html__('Addons', 'yatra') . '</span>',
+            'capability' => 'manage_yatra',
+            'menu_slug' => 'yatra-addons',
+            'callback' => array($this, 'addon_page'),
+            'position' => 30,
+        );
+
+
+        if (count(yatra_get_premium_addons()) < 1) {
+
+            $submenu[] = array(
+                'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+                'page_title' => esc_html__('Upgrade to Pro', 'yatra'),
+                'menu_title' => '<span style="color:#e27730">' . esc_html__('Upgrade to Pro', 'yatra') . '</span>',
+                'capability' => 'manage_yatra',
+                'menu_slug' => esc_url('https://wpyatra.com/pricing/?utm_campaign=freeplugin&utm_medium=admin-menu&utm_source=WordPress&utm_content=Upgrade+to+Pro'),
+                'callback' => array($this, 'addon_page'),
+                'position' => 35,
+            );
+        }
+        return $submenu;
+    }
+
+    public function yatra_submenu()
+    {
+
+        $default_submenu_args = array(
+            'parent_slug' => '',
+            'page_title' => '',
+            'menu_title' => '',
+            'capability' => 'manage_yatra',
+            'menu_slug' => '',
+            'callback' => '',
+            'position' => null,
+            'load_action' => '',
+        );
+
+        $submenu_configurations = apply_filters('yatra_admin_main_submenu', array());
+        $submenu_columns = array_column($submenu_configurations, "position");
+        array_multisort($submenu_columns, SORT_ASC, $submenu_configurations);
+        foreach ($submenu_configurations as $configuration) {
+
+            $configuration = wp_parse_args($configuration, $default_submenu_args);
+
+            $hookname = add_submenu_page(
+                $configuration['parent_slug'],
+                $configuration['page_title'],
+                $configuration['menu_title'],
+                $configuration['capability'],
+                $configuration['menu_slug'],
+                $configuration['callback'],
+                $configuration['position']
+            );
+            if ($configuration['load_action'] !== '') {
+
+                add_action('load-' . $hookname, $configuration['load_action']);
+
+            }
+        }
+
+
+    }
+
+    public function yatra_tour_submenu()
+    {
         $availability_page = add_submenu_page(
             'edit.php?post_type=tour',
             'Availability',
@@ -161,39 +289,14 @@ final class Yatra_Admin
             'manage_yatra',
             'yatra-availability',
             array($this, 'availability'),
-            3
+            5
         );
-        add_action('load-' . $settings_page, array($this, 'availability_page_init'));
-
-        do_action('yatra_admin_menu');
-
-        add_submenu_page(
-            YATRA_ADMIN_MENU_SLUG,
-            esc_html__('Yatra Addons', 'yatra'),
-            '<span style="color:#28d01d">' . esc_html__('Addons', 'yatra') . '</span>',
-            'manage_yatra',
-            'yatra-addons',
-            array($this, 'addon_page'), 40
-        );
-
-        if (count(yatra_get_premium_addons()) < 1) {
-
-            add_submenu_page(
-                YATRA_ADMIN_MENU_SLUG,
-                esc_html__('Upgrade to Pro', 'yatra'),
-                '<span style="color:#e27730">' . esc_html__('Upgrade to Pro', 'yatra') . '</span>',
-                'manage_yatra',
-                esc_url('https://wpyatra.com/pricing/?utm_campaign=freeplugin&utm_medium=admin-menu&utm_source=WordPress&utm_content=Upgrade+to+Pro'),
-                '',
-                1000
-            );
-        }
+        add_action('load-' . $availability_page, array($this, 'availability_page_init'));
     }
 
     public function settings()
     {
         Yatra_Admin_Settings::output();
-
 
     }
 

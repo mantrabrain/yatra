@@ -6,22 +6,25 @@ class Yatra_Admin_License_Manager
     public function __construct()
     {
         if (count(yatra_get_premium_addons()) > 0) {
-            add_action('yatra_admin_menu', array($this, 'license_menu'));
+            add_filter('yatra_admin_main_submenu', array($this, 'license_menu'));
             add_action('admin_enqueue_scripts', array($this, 'license_scripts'), 11);
             add_action('wp_ajax_yatra_update_single_license', array($this, 'update_single_license'), 10);
             add_action('wp_ajax_yatra_deactivate_single_license', array($this, 'deactivate_single_license'), 10);
         }
     }
 
-    public function license_menu()
+    public function license_menu($submenu)
     {
-        add_submenu_page(
-            YATRA_ADMIN_MENU_SLUG,
-            __('Licenses', 'yatra'),
-            __('Licenses', 'yatra'),
-            'manage_yatra',
-            'yatra-license', array($this, 'license_page'), 30);
-
+        $submenu[] = array(
+            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+            'page_title' => __('Licenses', 'yatra'),
+            'menu_title' => __('Licenses', 'yatra'),
+            'capability' => 'manage_yatra',
+            'menu_slug' => 'yatra-license',
+            'callback' => array($this, 'license_page'),
+            'position' => 27,
+        );
+        return $submenu;
 
     }
 

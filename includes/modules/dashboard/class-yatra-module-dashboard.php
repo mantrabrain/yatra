@@ -19,8 +19,6 @@ class Yatra_Module_Dashboard
             YATRA_PLUGIN_URI . '/assets/images/menu-icon.png',
             26
         );
-
-
     }
 
     public function dashboard()
