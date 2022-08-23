@@ -14,10 +14,19 @@ class Yatra_Module_Dashboard
             __('Yatra Dashboard', 'yatra'),
             __('Yatra', 'yatra'),
             'manage_options',
-            'yatra-dashboard',
+            YATRA_ADMIN_MENU_SLUG,
             array($this, 'dashboard'),
             YATRA_PLUGIN_URI . '/assets/images/menu-icon.png',
             26
+        );
+        add_submenu_page(
+            YATRA_ADMIN_MENU_SLUG,
+            __('Yatra Dashboard', 'yatra'),
+            __('Dashboard', 'yatra'),
+            'manage_yatra',
+            YATRA_ADMIN_MENU_SLUG,
+            null,
+            5
         );
     }
 

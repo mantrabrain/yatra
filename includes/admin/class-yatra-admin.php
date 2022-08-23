@@ -161,15 +161,6 @@ final class Yatra_Admin
     public function submenu($submenu)
     {
 
-        $submenu[] = array(
-            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
-            'page_title' => 'Yatra Dashboard',
-            'menu_title' => 'Yatra Dashboard',
-            'capability' => 'manage_yatra',
-            'menu_slug' => 'admin.php?page=yatra-dashboard',
-            'callback' => '',
-            'position' => 5,
-        );
 
         $submenu[] = array(
             'parent_slug' => YATRA_ADMIN_MENU_SLUG,
@@ -212,7 +203,6 @@ final class Yatra_Admin
             'position' => 25,
             'load_action' => array($this, 'settings_page_init')
         );
-        //do_action('yatra_admin_menu');
 
         $submenu[] = array(
             'parent_slug' => YATRA_ADMIN_MENU_SLUG,
@@ -283,7 +273,7 @@ final class Yatra_Admin
     public function yatra_tour_submenu()
     {
         $availability_page = add_submenu_page(
-            'edit.php?post_type=tour',
+            YATRA_TOUR_ADMIN_MENU_SLUG,
             'Availability',
             'Availability',
             'manage_yatra',
