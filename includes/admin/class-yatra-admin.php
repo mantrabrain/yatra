@@ -165,7 +165,7 @@ final class Yatra_Admin
         $submenu[] = array(
             'parent_slug' => YATRA_ADMIN_MENU_SLUG,
             'page_title' => 'All Bookings',
-            'menu_title' => 'All Bookings',
+            'menu_title' => 'Bookings',
             'capability' => 'manage_yatra',
             'menu_slug' => 'edit.php?post_type=yatra-booking',
             'callback' => '',
@@ -175,7 +175,7 @@ final class Yatra_Admin
         $submenu[] = array(
             'parent_slug' => YATRA_ADMIN_MENU_SLUG,
             'page_title' => 'All Customers',
-            'menu_title' => 'All Customers',
+            'menu_title' => 'Customers',
             'capability' => 'manage_yatra',
             'menu_slug' => 'edit.php?post_type=yatra-customers',
             'callback' => '',

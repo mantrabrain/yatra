@@ -21,8 +21,8 @@ class Yatra_Module_Dashboard
         );
         add_submenu_page(
             YATRA_ADMIN_MENU_SLUG,
-            __('Yatra Dashboard', 'yatra'),
-            __('Dashboard', 'yatra'),
+            __('Yatra Home', 'yatra'),
+            __('Home', 'yatra'),
             'manage_yatra',
             YATRA_ADMIN_MENU_SLUG,
             null,
