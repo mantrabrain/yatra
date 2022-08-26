@@ -279,7 +279,7 @@ final class Yatra_Admin
             'manage_yatra',
             'yatra-availability',
             array($this, 'availability'),
-            5
+            500
         );
         add_action('load-' . $availability_page, array($this, 'availability_page_init'));
     }
