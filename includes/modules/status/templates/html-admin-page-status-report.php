@@ -363,25 +363,6 @@ $untested_plugins = array();
             </td>
         </tr>
         <tr>
-            <td data-export-label="SoapClient"><?php esc_html_e('SoapClient', 'yatra'); ?>:</td>
-
-            <td class="help">
-                <?php
-                yatra_tippy_tooltip(__('Some webservices like shipping use SOAP to get information from remote servers, for example, live shipping quotes from FedEx require SOAP to be installed.', 'yatra'));
-                ?>
-            </td>
-            <td>
-                <?php
-                if ($environment['soapclient_enabled']) {
-                    echo '<mark class="yes"><span class="dashicons dashicons-yes"></span></mark>';
-                } else {
-                    /* Translators: %s classname and link. */
-                    echo '<mark class="error"><span class="dashicons dashicons-warning"></span> ' . sprintf(esc_html__('Your server does not have the %s class enabled.', 'yatra'), '<a href="https://php.net/manual/en/class.soapclient.php">SoapClient</a>') . '</mark>';
-                }
-                ?>
-            </td>
-        </tr>
-        <tr>
             <td data-export-label="DOMDocument"><?php esc_html_e('DOMDocument', 'yatra'); ?>:</td>
             <td class="help">
                 <?php
