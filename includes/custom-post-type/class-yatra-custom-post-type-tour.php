@@ -29,7 +29,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                 'labels' => $labels,
                 'menu_icon' => 'dashicons-palmtree',
                 'show_in_menu' => true,
-                'menu_position' => 26,
+                'menu_position' => 29,
                 'public' => true,
                 'supports' => array('title', 'editor', 'excerpt', 'thumbnail'),
                 'has_archive' => true,
@@ -38,6 +38,7 @@ if (!class_exists('Yatra_Custom_Post_Type_Tour')) {
                     'with_front' => true
                 ),
                 'capability_type' => 'tour',
+
 
             );
             register_post_type(self::$slug, $args);

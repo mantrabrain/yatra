@@ -17,7 +17,7 @@ class Yatra_Module_Dashboard
             YATRA_ADMIN_MENU_SLUG,
             array($this, 'dashboard'),
             YATRA_PLUGIN_URI . '/assets/images/menu-icon.png',
-            26
+            28
         );
         add_submenu_page(
             YATRA_ADMIN_MENU_SLUG,

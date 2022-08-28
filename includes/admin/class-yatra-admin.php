@@ -164,8 +164,8 @@ final class Yatra_Admin
 
         $submenu[] = array(
             'parent_slug' => YATRA_ADMIN_MENU_SLUG,
-            'page_title' => 'All Bookings',
-            'menu_title' => 'Bookings',
+            'page_title' => __('All Bookings', 'yatra'),
+            'menu_title' => __('Bookings', 'yatra'),
             'capability' => 'manage_yatra',
             'menu_slug' => 'edit.php?post_type=yatra-booking',
             'callback' => '',
@@ -174,8 +174,8 @@ final class Yatra_Admin
 
         $submenu[] = array(
             'parent_slug' => YATRA_ADMIN_MENU_SLUG,
-            'page_title' => 'All Customers',
-            'menu_title' => 'Customers',
+            'page_title' => __('All Customers', 'yatra'),
+            'menu_title' => __('Customers', 'yatra'),
             'capability' => 'manage_yatra',
             'menu_slug' => 'edit.php?post_type=yatra-customers',
             'callback' => '',
@@ -185,8 +185,8 @@ final class Yatra_Admin
 
         $submenu[] = array(
             'parent_slug' => YATRA_ADMIN_MENU_SLUG,
-            'page_title' => 'Coupons',
-            'menu_title' => 'Coupons',
+            'page_title' => __('Coupons', 'yatra'),
+            'menu_title' => __('Coupons', 'yatra'),
             'capability' => 'manage_yatra',
             'menu_slug' => 'edit.php?post_type=yatra-coupons',
             'callback' => '',
@@ -195,8 +195,8 @@ final class Yatra_Admin
 
         $submenu[] = array(
             'parent_slug' => YATRA_ADMIN_MENU_SLUG,
-            'page_title' => 'Settings',
-            'menu_title' => 'Settings',
+            'page_title' => __('Settings', 'yatra'),
+            'menu_title' => __('Settings', 'yatra'),
             'capability' => 'manage_yatra',
             'menu_slug' => 'yatra-settings',
             'callback' => array($this, 'settings'),
