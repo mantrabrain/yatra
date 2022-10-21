@@ -223,7 +223,7 @@ final class Yatra_Admin
                 'menu_title' => '<span style="color:#e27730">' . esc_html__('Upgrade to Pro', 'yatra') . '</span>',
                 'capability' => 'manage_yatra',
                 'menu_slug' => esc_url('https://wpyatra.com/pricing/?utm_campaign=freeplugin&utm_medium=admin-menu&utm_source=WordPress&utm_content=Upgrade+to+Pro'),
-                'callback' => array($this, 'addon_page'),
+                'callback' => '',
                 'position' => 35,
             );
         }
