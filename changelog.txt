@@ -1,3 +1,12 @@
+= 2.1.11 | 2022/08/07 =
+* Fixed - Label update and setup wizard design update
+* Fixed - admin email feature restructured and fixed
+* Fixed - SSL issue fixed
+* Fixed - Filter issue fixed - For Duration days and number gap added
+* Fixed - Undefined issue solve on yatra addon page
+* Fixed - long pricing name issue on availability conditions calendar popup fixed
+* Added - More email smart tags
+
 = 2.1.10 | 2022/05/29 =
 * Fixed - is_tax called before wp_query init issue resolved
 * Added - Multiple email option for admin notifications

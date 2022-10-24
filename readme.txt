@@ -173,11 +173,7 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.11 | 2022/08/07 =
-* Fixed - Label update and setup wizard design update
-* Fixed - admin email feature restructured and fixed
-* Fixed - SSL issue fixed
-* Fixed - Filter issue fixed - For Duration days and number gap added
-* Fixed - Undefined issue solve on yatra addon page
-* Fixed - long pricing name issue on availability conditions calendar popup fixed
-* Added - More email smart tags
+= 2.1.12 | 2022
+* Fixed - jQuery UI mobile slider not working on touch or drag issue fixed
+
+
