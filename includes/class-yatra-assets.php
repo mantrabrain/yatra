@@ -44,7 +44,9 @@ if (!class_exists('Yatra_Assets')) {
 
             wp_register_script('lightbox-script', YATRA_PLUGIN_URI . '/assets/lib/lightbox2/js/lightbox.js', false, '2.11.0');
 
-            wp_register_script('yatra-filter', YATRA_PLUGIN_URI . '/assets/js/yatra-filter.js', array('jquery', 'jquery-ui-slider'), YATRA_VERSION);
+            wp_register_script('jquery.ui.touch-punch', YATRA_PLUGIN_URI . '/assets/lib/jquery.ui.touch-punch/jquery.ui.touch-punch.min.js', false, '0.2.3');
+
+            wp_register_script('yatra-filter', YATRA_PLUGIN_URI . '/assets/js/yatra-filter.js', array('jquery', 'jquery-ui-slider', 'jquery.ui.touch-punch'), YATRA_VERSION);
 
 
             $main_css_dependency = array('yatra-font-awesome', 'lightbox', 'yatra-jquery-ui');
@@ -144,7 +146,7 @@ if (!class_exists('Yatra_Assets')) {
                 global $wp_locale;
 
                 $yatra_params['week_days'] = $wp_locale->weekday;
-                
+
                 $yatra_params['months'] = array_values($wp_locale->month);
             }
 
