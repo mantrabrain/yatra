@@ -45,6 +45,32 @@ del {
 
 }
 
+.yatra-page-wrapper {
+
+  .pagination {
+    text-align: center;
+    display: block;
+    margin-bottom: 30px;
+
+    .page-numbers {
+      display: inline-block;
+      text-align: center;
+      font-weight: 400;
+      width: 40px;
+      height: 40px;
+      line-height: 35px;
+      border-radius: 5px;
+      border: 2px solid;
+      padding: 0;
+
+      &.current, &:hover {
+
+      }
+    }
+  }
+
+}
+
 .yatra-tabs {
   .row {
     margin-left: 0;
