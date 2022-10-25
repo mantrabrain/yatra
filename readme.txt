@@ -175,5 +175,6 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 = 2.1.12 | 2022
 * Fixed - jQuery UI mobile slider not working on touch or drag issue fixed
+* Fixed - Made normal pagination design
 
 
