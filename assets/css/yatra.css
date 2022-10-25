@@ -307,64 +307,6 @@ del {
   font-family: "Font Awesome 5 Free" !important;
   font-weight: 900; }
 
-.yatra-page-wrapper .nav-links .meta-nav {
-  display: none; }
-
-.yatra-page-wrapper .nav-links .nav-previous {
-  width: 50%;
-  float: left; }
-
-.yatra-page-wrapper .nav-links .nav-next {
-  width: 50%;
-  text-align: right;
-  float: right; }
-
-.yatra-page-wrapper .nav-links .nav-previous a:before {
-  content: "\f0d9";
-  font-family: FontAwesome;
-  font-style: normal;
-  margin-right: 5px; }
-
-.yatra-page-wrapper .nav-links .nav-next a:after {
-  content: "\f0da";
-  font-family: FontAwesome;
-  font-style: normal;
-  margin-left: 5px;
-  position: absolute;
-  right: 10px; }
-
-.yatra-page-wrapper .nav-links .nav-previous {
-  float: left;
-  width: 25%; }
-
-.yatra-page-wrapper .nav-links .nav-next {
-  width: 25%;
-  float: right; }
-  .yatra-page-wrapper .nav-links .nav-next a {
-    display: block;
-    overflow: hidden;
-    -o-text-overflow: ellipsis;
-       text-overflow: ellipsis;
-    white-space: nowrap;
-    position: relative;
-    padding-right: 20px; }
-
-.yatra-page-wrapper .nav-links .nav-previous a {
-  display: block;
-  overflow: hidden;
-  -o-text-overflow: ellipsis;
-     text-overflow: ellipsis;
-  white-space: nowrap; }
-
-.yatra-page-wrapper .navigation.pagination {
-  padding: 0 0 30px; }
-
-.yatra-page-wrapper .navigation .nav-links span.current,
-.yatra-page-wrapper .navigation .nav-links span.dots {
-  color: inherit;
-  background: inherit;
-  padding: 10px 12px; }
-
 .yatra-tabs .row {
   margin-left: 0;
   margin-right: 0; }
