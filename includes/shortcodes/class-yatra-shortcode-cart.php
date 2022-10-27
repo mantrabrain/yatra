@@ -39,6 +39,25 @@ class Yatra_Shortcode_Cart
 
     }
 
+    /**
+     * Output the shortcode.
+     *
+     * @param array $atts Shortcode attributes.
+     */
+    public static function mini_cart_output($atts)
+    {
+
+        $cart = yatra()->cart->get_cart();
+
+        if (!is_array($cart)) {
+            $cart = array();
+        }
+
+        yatra_get_template('tmpl-mini-cart.php', array('cart_items' => $cart));
+
+
+    }
+
 
     /**
      * Show the cart.

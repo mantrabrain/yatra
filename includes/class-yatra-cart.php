@@ -7,6 +7,9 @@ if (!class_exists('Yatra_Cart')) {
         function __construct()
         {
 
+            include_once YATRA_ABSPATH . 'includes/functions/cart-functions.php';
+
+
             add_action('init', array($this, 'remove_cart'));
             add_action('init', array($this, 'remove_coupon'));
             add_filter('yatra_booking_final_price', array($this, 'final_price'), 10, 3);
@@ -316,6 +319,34 @@ if (!class_exists('Yatra_Cart')) {
             ob_start();
 
             yatra_get_template('tmpl-cart-table.php', array(
+                    'cart_items' => $cart_items,
+                    'coupon' => $coupon
+                )
+            );
+
+            $content = ob_get_clean();
+
+            if ($return) {
+
+                return $content;
+            }
+            echo $content;
+
+        }
+
+        public function get_mini_cart_table($return = false, $cart_data = array())
+        {
+
+            if (count($cart_data) < 1) {
+
+                $cart_data = $this->get_cart();
+            }
+            $cart_items = isset($cart_data['items']) ? $cart_data['items'] : array();
+            $coupon = isset($cart_data['coupon']) ? $cart_data['coupon'] : array();
+
+            ob_start();
+
+            yatra_get_template('tmpl-mini-cart-table.php', array(
                     'cart_items' => $cart_items,
                     'coupon' => $coupon
                 )
