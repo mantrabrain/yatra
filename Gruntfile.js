@@ -129,7 +129,7 @@ module.exports = function (grunt) {
                     '<%= dirs.scss %>/**/*.scss'
 
                 ],
-                tasks: ['sass', 'postcss', 'cssmin', 'rtlcss'],
+                tasks: ['sass', 'postcss', 'cssmin'],
             },
             js: {
                 files: [
@@ -333,7 +333,7 @@ module.exports = function (grunt) {
         'sass',
         'postcss',
         'cssmin',
-        'rtlcss',
+        //'rtlcss',
         //'concat'
     ]);
 

@@ -10,12 +10,13 @@ if (count($cart_items) < 1) {
 ?>
 <table class="yatra_cart_table yatra_cart_table_responsive cart yatra-cart-form__contents" cellspacing="0">
     <thead>
-    <tr style="text-align:left;">
-        <th class="tour-remove">&nbsp;</th>
+    <tr>
+
         <th class="tour-thumbnail">&nbsp;</th>
         <th class="tour-name"><?php echo __('Tour', 'yatra'); ?></th>
         <th class="tour-person"><?php echo __('Persons', 'yatra'); ?></th>
         <th class="tour-subtotal"><?php echo __('Total', 'yatra'); ?></th>
+        <th class="tour-remove">&nbsp;</th>
     </tr>
     </thead>
     <tbody>
@@ -40,10 +41,7 @@ if (count($cart_items) < 1) {
 
             ), yatra_get_cart_page(true));
             ?>
-            <td class="tour-remove">
-                <a href="<?php echo $remove_url; ?>"
-                   class="remove">×</a>
-            </td>
+
 
             <td class="tour-thumbnail">
 
@@ -69,27 +67,34 @@ if (count($cart_items) < 1) {
                 </div>
             </td>
 
+
             <td class="tour-subtotal" data-title="<?php echo esc_attr__('Total', 'yatra') ?>">
                 <span class="yatra-Price-amount amount"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), yatra_get_final_tour_price($tour_cart->ID, $number_of_person, $cart_item['selected_date'])); ?></span>
                 <input type="hidden" name="yatra_tour_start_date[<?php echo esc_attr($tour_cart->ID) ?>]"
                        value="<?php echo esc_attr($cart_item['selected_date']) ?>"/>
             </td>
+            <td class="tour-remove">
+                <a href="<?php echo $remove_url; ?>"
+                   class="remove">×</a>
+            </td>
         </tr>
     <?php } ?>
 
     <tr>
-        <th colspan="2">
-        </th>
+
         <th colspan="2">
             <strong><?php echo __('Sub Total', 'yatra') ?></strong>
         </th>
-        <td colspan="2" style="text-align:right;" class="cart-subtotal-price"
+        <td colspan="2"  class="cart-subtotal-price"
             data-title="<?php echo esc_attr__('Sub Total', 'yatra') ?>">
             <strong>
                 <?php
                 echo yatra_get_price(yatra_get_current_currency_symbol(), yatra()->cart->get_cart_total()); ?>
             </strong>
         </td>
+        <th>
+        </th>
+
     </tr>
 
 

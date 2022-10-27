@@ -1,0 +1,23 @@
+.yatra-mini-cart {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 15px;
+
+  img {
+    height: 50px;
+    width: auto;
+    border-radius: 100%;
+  }
+
+  table {
+    text-align: left;
+
+    tr {
+      border: 1px solid #ddd;
+    }
+
+    th {
+      font-weight: bold;
+    }
+  }
+}

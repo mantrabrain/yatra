@@ -1,0 +1,15 @@
+.yatra-mini-cart {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 15px; }
+  .yatra-mini-cart img {
+    height: 50px;
+    width: auto;
+    border-radius: 100%; }
+  .yatra-mini-cart table {
+    text-align: left; }
+    .yatra-mini-cart table tr {
+      border: 1px solid #ddd; }
+    .yatra-mini-cart table th {
+      font-weight: bold; }
+/*# sourceMappingURL=yatra-mini-cart.css.map */

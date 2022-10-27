@@ -42,6 +42,9 @@ if (!class_exists('Yatra_Assets')) {
 
             wp_register_style('lightbox', YATRA_PLUGIN_URI . '/assets/lib/lightbox2/css/lightbox.css', false, '2.11.0');
 
+            // Mini Cart
+            wp_register_style('yatra-mini-cart', YATRA_PLUGIN_URI . '/assets/css/yatra-mini-cart.css', false, YATRA_VERSION);
+
             wp_register_script('lightbox-script', YATRA_PLUGIN_URI . '/assets/lib/lightbox2/js/lightbox.js', false, '2.11.0');
 
             wp_register_script('jquery.ui.touch-punch', YATRA_PLUGIN_URI . '/assets/lib/jquery.ui.touch-punch/jquery.ui.touch-punch.min.js', false, '0.2.3');
