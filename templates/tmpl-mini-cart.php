@@ -8,12 +8,14 @@ defined('ABSPATH') || exit;
 
 $items = $cart_items['items'] ?? array();
 
+$cart_page_url = yatra_get_cart_page(true);
+
 ?>
 <div class="yatra-mini-cart">
-    <div class="yatra-mini-cart-icon">
+    <a class="yatra-mini-cart-icon" href="<?php echo esc_attr($cart_page_url) ?>">
         <span class="yatra-icon fa fa-shopping-cart"></span>
         <span class="cart-icon-badge"><?php echo esc_html(count($items)) ?></span>
-    </div>
+    </a>
     <?php if (count($cart_items) > 0) {
         ?>
         <div class="yatra-mini-cart-inner">
@@ -27,8 +29,6 @@ $items = $cart_items['items'] ?? array();
             echo '</div>';
 
             $checkout_page_url = yatra_get_checkout_page(true);
-
-            $cart_page_url = yatra_get_cart_page(true);
 
             $proceed_to_checkout_button_text = get_option('yatra_proceed_to_checkout_text', 'Proceed to checkout');
 
