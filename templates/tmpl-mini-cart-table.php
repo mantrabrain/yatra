@@ -12,7 +12,6 @@ if (count($cart_items) < 1) {
     <thead>
     <tr>
 
-        <th class="tour-thumbnail">&nbsp;</th>
         <th class="tour-name"><?php echo __('Tour', 'yatra'); ?></th>
         <th class="tour-person"><?php echo __('Persons', 'yatra'); ?></th>
         <th class="tour-subtotal"><?php echo __('Total', 'yatra'); ?></th>
@@ -42,13 +41,6 @@ if (count($cart_items) < 1) {
             ), yatra_get_cart_page(true));
             ?>
 
-
-            <td class="tour-thumbnail">
-
-                <a href="<?php echo get_permalink($tour_cart->ID); ?>" target="_blank">
-                    <?php echo get_the_post_thumbnail($tour_cart->ID, 'thumbnail') ?>
-                </a>
-            </td>
 
             <td class="tour-name" data-title="<?php echo esc_attr__('Tour', 'yatra') ?>">
                 <a href="<?php echo get_permalink($tour_cart->ID); ?>"><?php echo esc_html($tour_cart->post_title) ?></a>
