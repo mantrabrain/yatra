@@ -179,7 +179,7 @@ class Session
 
         }
 
- 
+
         return $return;
     }
 
