@@ -43,8 +43,7 @@
     z-index: 9999;
     background: #fff;
     top: -moz-calc(100% + 15px);
-    top: calc(100% + 15px);
-    display: none; }
+    top: calc(100% + 15px); }
     .yatra-mini-cart .yatra-mini-cart-inner .yatra-mini-cart-table-wrapper {
       max-height: 300px;
       overflow-y: auto;
@@ -65,10 +64,14 @@
   .yatra-mini-cart table tr {
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd; }
+    .yatra-mini-cart table tr td:first-child, .yatra-mini-cart table tr th:first-child {
+      padding-left: 10px; }
   .yatra-mini-cart table th {
     font-weight: bold; }
   .yatra-mini-cart table td, .yatra-mini-cart table th {
-    text-align: left !important; }
+    text-align: left !important;
+    padding: 5px;
+    border: none; }
   .yatra-mini-cart .yatra-button-group {
     position: absolute;
     bottom: 10px;
