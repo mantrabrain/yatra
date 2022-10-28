@@ -2,7 +2,7 @@
 /**
  * The Template for displaying cart
  * @package     Yatra\Templates
- * @version     2.1.2
+ * @version     2.1.12
  */
 defined('ABSPATH') || exit;
 
