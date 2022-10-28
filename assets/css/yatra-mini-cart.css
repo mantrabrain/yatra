@@ -74,21 +74,11 @@
     padding: 5px;
     border: none; }
   .yatra-mini-cart .yatra-button-group {
-    position: absolute;
-    bottom: 10px;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: end;
-       -moz-box-pack: end;
-        -ms-flex-pack: end;
-            justify-content: flex-end;
-    gap: 10px;
-    -webkit-box-align: center;
-       -moz-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
+    text-align: right;
     width: 100%;
-    padding-right: 10px; }
+    position: absolute;
+    bottom: 23px; }
+    .yatra-mini-cart .yatra-button-group a {
+      margin-right: 10px;
+      float: none; }
 /*# sourceMappingURL=yatra-mini-cart.css.map */

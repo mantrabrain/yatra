@@ -90,7 +90,7 @@
       border-bottom: 1px solid #ddd;
 
       td:first-child, th:first-child {
-        padding-left:10px;
+        padding-left: 10px;
       }
     }
 
@@ -101,19 +101,20 @@
     td, th {
       text-align: left !important;
       padding: 5px;
-      border:none;
+      border: none;
 
     }
   }
 
   .yatra-button-group {
-    position: absolute;
-    bottom: 10px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    align-items: center;
+    text-align: right;
     width: 100%;
-    padding-right: 10px;
+    position: absolute;
+    bottom: 23px;
+
+    a {
+      margin-right: 10px;
+      float: none;
+    }
   }
 }
