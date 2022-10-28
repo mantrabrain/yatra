@@ -81,19 +81,9 @@ if (!function_exists('yatra_set_session')) {
 
     function yatra_set_session($key = '', $value = '')
     {
-        if (!session_id()) {
-            session_start();
-        }
+        $cart = yatra()->session->set($key, $value);
 
-        $yatra_session_id = "yatra_session";
-
-        if (!empty($key) && !empty($value)) {
-
-            $_SESSION[$yatra_session_id][$key] = $value;
-
-            return true;
-        }
-        return false;
+        return true;
 
     }
 }
@@ -102,23 +92,9 @@ if (!function_exists('yatra_get_session')) {
 
     function yatra_get_session($key = '')
     {
+        $sess = yatra()->session->get($key);
 
-        $yatra_session_id = "yatra_session";
-
-        if (!empty($key)) {
-
-            if (isset($_SESSION[$yatra_session_id][$key])) {
-
-                return $_SESSION[$yatra_session_id][$key];
-            }
-
-        }
-        if (isset($_SESSION[$yatra_session_id])) {
-
-            return $_SESSION[$yatra_session_id];
-        }
-
-        return array();
+        return $sess;
 
     }
 }
@@ -127,31 +103,9 @@ if (!function_exists('yatra_clear_session')) {
 
     function yatra_clear_session($key = '')
     {
-        if (!session_id()) {
-            session_start();
-        }
+        yatra()->session->set($key, '');
 
-
-        $yatra_session_id = "yatra_session";
-
-        if (!empty($key)) {
-
-            if (isset($_SESSION[$yatra_session_id][$key])) {
-
-                unset($_SESSION[$yatra_session_id][$key]);
-
-                return true;
-            }
-
-        }
-        if (isset($_SESSION[$yatra_session_id])) {
-
-            unset($_SESSION[$yatra_session_id]);
-
-            return true;
-        }
-
-        return false;
+        return true;
 
     }
 }

@@ -6,7 +6,6 @@
  * @since   1.0.0
  */
 
-use Yatra\Core\Cart;
 use Yatra\Core\Session;
 
 defined('ABSPATH') || exit;
@@ -28,9 +27,16 @@ final class Yatra
 
 
     /**
+     * EDD loader file.
+     *
+     * @since 2.1.12
+     * @var string
+     */
+    private $file = '';
+    /**
      * Cart instance.
      *
-     * @var Cart
+     * @var Yatra_Cart
      */
     public $cart = null;
 
@@ -82,6 +88,18 @@ final class Yatra
     protected static $_instance = null;
 
 
+    private static function is_instantiated()
+    {
+
+        // Return true if instance is correct class
+        if (!empty(self::$_instance) && (self::$_instance instanceof Yatra)) {
+            return true;
+        }
+
+        // Return false if not instantiated correctly
+        return false;
+    }
+
     /**
      * Main Yatra Instance.
      *
@@ -90,15 +108,20 @@ final class Yatra
      * @return Yatra - Main instance.
      * @static
      */
-    public static function instance()
+    public static function instance($file = '')
     {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new self();
+        if (self::is_instantiated()) {
+            return self::$_instance;
         }
+        self::setup_instance($file);
         self::$_instance->session = new Session();
-        self::$_instance->cart = new Cart();
-
         return self::$_instance;
+    }
+
+    private static function setup_instance($file = '')
+    {
+        self::$_instance = new Yatra;
+        self::$_instance->file = $file;
     }
 
     /**
@@ -302,10 +325,10 @@ final class Yatra
 
         // Classes/actions loaded for the frontend and for ajax requests.
         //if ($this->is_request('frontend')) {
-        /* if (is_null($this->cart) || !$this->cart instanceof Yatra_Cart) {
+        if (is_null($this->cart) || !$this->cart instanceof Yatra_Cart) {
 
-             $this->initialize_cart();
-         }*/
+            $this->initialize_cart();
+        }
 
         // Init action.
         do_action('yatra_init');

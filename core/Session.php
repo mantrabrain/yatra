@@ -111,8 +111,8 @@ class Session
         }
 
         $use_cookie = $this->use_cart_cookie();
-        $cart = $this->get('yatra_cart');
-        $purchase = $this->get('yatra_purchase');
+        $cart = $this->get('yatra_tour_cart');
+        $purchase = $this->get('yatra_tour_purchase');
 
         if ($use_cookie) {
             if (!empty($cart) || !empty($purchase)) {
@@ -157,7 +157,6 @@ class Session
                 $this->set($key, null);
                 return false;
             }
-
             if (is_numeric($this->session[$key])) {
                 $return = $this->session[$key];
             } else {
@@ -177,8 +176,10 @@ class Session
                     $return = json_decode($this->session[$key], true);
                 }
             }
+
         }
 
+ 
         return $return;
     }
 
@@ -239,7 +240,6 @@ class Session
      * @param int $exp Default expiration (1 hour).
      * @return int Cookie expiration variant time.
      * @since 2.1.12
-     * @since 3.1.12 Set default value of $exp parameter to 1 as it is unused.
      *
      */
     public function set_expiration_variant_time($exp = 1)
@@ -253,7 +253,6 @@ class Session
      * @param int $exp Default expiration (1 hour).
      * @return int Cookie expiration time.
      * @since 2.1.12
-     * @since 3.1.12 Set default value of $exp parameter to 1 as it is unused.
      *
      */
     public function set_expiration_time($exp = 1)
