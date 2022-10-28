@@ -43,7 +43,8 @@
     z-index: 9999;
     background: #fff;
     top: -moz-calc(100% + 15px);
-    top: calc(100% + 15px); }
+    top: calc(100% + 15px);
+    display: none; }
     .yatra-mini-cart .yatra-mini-cart-inner .yatra-mini-cart-table-wrapper {
       max-height: 300px;
       overflow-y: auto;
