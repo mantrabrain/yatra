@@ -8,7 +8,7 @@ defined('ABSPATH') || exit;
 /**
  * Session Class
  *
- * @since 1.1.12
+ * @since 2.1.12
  */
 class Session
 {
@@ -18,7 +18,7 @@ class Session
      *
      * @var array
      * @access private
-     * @since 1.1.12
+     * @since 2.1.12
      */
     private $session;
 
@@ -27,7 +27,7 @@ class Session
      *
      * @var bool
      * @access private
-     * @since 1.1.12
+     * @since 2.1.12
      */
     private $use_php_sessions = false;
 
@@ -46,7 +46,7 @@ class Session
      * Defines our WP_Session constants, includes the necessary libraries and
      * retrieves the WP Session instance.
      *
-     * @since 1.1.12
+     * @since 2.1.12
      */
     public function __construct()
     {
@@ -57,7 +57,7 @@ class Session
                 $this->prefix = '_' . get_current_blog_id();
             }
 
-            // Use PHP SESSION (must be enabled via the EDD_USE_PHP_SESSIONS constant)
+            // Use PHP SESSION (must be enabled via the YATRA_USE_PHP_SESSIONS constant)
             add_action('init', array($this, 'maybe_start_session'), -2);
         } else {
             if (!$this->should_start_session()) {
@@ -70,12 +70,12 @@ class Session
             }
 
             if (!class_exists('Recursive_ArrayAccess')) {
-                require_once EDD_PLUGIN_DIR . 'includes/libraries/class-recursive-arrayaccess.php';
+                require_once YATRA_ABSPATH . 'core/Libraries/class-recursive-arrayaccess.php';
             }
 
             if (!class_exists('WP_Session')) {
-                require_once EDD_PLUGIN_DIR . 'includes/libraries/class-wp-session.php';
-                require_once EDD_PLUGIN_DIR . 'includes/libraries/wp-session.php';
+                require_once YATRA_ABSPATH . 'core/Libraries/class-wp-session.php';
+                require_once YATRA_ABSPATH . 'core/Libraries/wp-session.php';
             }
 
             add_filter('wp_session_expiration_variant', array($this, 'set_expiration_variant_time'), 99999);
@@ -97,12 +97,12 @@ class Session
     /**
      * Setup the WP_Session instance.
      *
-     * @since 1.1.12
+     * @since 2.1.12
      */
     public function init()
     {
         if ($this->use_php_sessions) {
-            $key = 'edd' . $this->prefix;
+            $key = 'yatra' . $this->prefix;
             $this->session = isset($_SESSION[$key]) && is_array($_SESSION[$key])
                 ? $_SESSION[$key]
                 : array();
@@ -129,7 +129,7 @@ class Session
      * Retrieve session ID.
      *
      * @return string Session ID
-     * @since 1.1.12
+     * @since 2.1.12
      *
      */
     public function get_id()
@@ -142,7 +142,7 @@ class Session
      *
      * @param string $key Session key.
      * @return mixed Session variable.
-     * @since 1.1.12
+     * @since 2.1.12
      *
      */
     public function get($key)
@@ -189,7 +189,7 @@ class Session
      * @param int|string|array $value Session variable.
      *
      * @return mixed Session variable
-     * @since 1.1.12
+     * @since 2.1.12
      *
      */
     public function set($key, $value)
@@ -203,7 +203,7 @@ class Session
         }
 
         if ($this->use_php_sessions) {
-            $_SESSION['edd' . $this->prefix] = $this->session;
+            $_SESSION['yatra' . $this->prefix] = $this->session;
         }
 
         return $this->session[$key];
@@ -215,7 +215,7 @@ class Session
      * This is for hosts and caching plugins to identify if caching should be disabled.
      *
      * @param bool $set Whether to set or destroy. Default true.
-     * @since 1.1.12
+     * @since 2.1.12
      *
      */
     public function set_cart_cookie($set = true)
@@ -252,7 +252,7 @@ class Session
      *
      * @param int $exp Default expiration (1 hour).
      * @return int Cookie expiration time.
-     * @since 1.1.12
+     * @since 2.1.12
      * @since 3.1.12 Set default value of $exp parameter to 1 as it is unused.
      *
      */
@@ -265,7 +265,7 @@ class Session
      * Starts a new session if one hasn't started yet.
      *
      * Checks to see if the server supports PHP sessions
-     * or if the EDD_USE_PHP_SESSIONS constant is defined
+     * or if the YATRA_USE_PHP_SESSIONS constant is defined
      *
      * @return bool $ret True if we are using PHP sessions, false otherwise.
      * @since 2.1.12
@@ -296,10 +296,10 @@ class Session
             $ret = $yatra_use_php_sessions;
         }
 
-        // Enable or disable PHP Sessions based on the EDD_USE_PHP_SESSIONS constant.
-        if (defined('EDD_USE_PHP_SESSIONS') && EDD_USE_PHP_SESSIONS) {
+        // Enable or disable PHP Sessions based on the YATRA_USE_PHP_SESSIONS constant.
+        if (defined('YATRA_USE_PHP_SESSIONS') && YATRA_USE_PHP_SESSIONS) {
             $ret = true;
-        } else if (defined('EDD_USE_PHP_SESSIONS') && !EDD_USE_PHP_SESSIONS) {
+        } else if (defined('YATRA_USE_PHP_SESSIONS') && !YATRA_USE_PHP_SESSIONS) {
             $ret = false;
         }
 
@@ -308,7 +308,7 @@ class Session
     }
 
     /**
-     * Determines if a user has set the EDD_USE_CART_COOKIE.
+     * Determines if a user has set the YATRA_USE_CART_COOKIE.
      *
      * @return bool If the store should use the yatra_items_in_cart cookie to help avoid caching
      * @since 2.1.12
@@ -320,7 +320,7 @@ class Session
         // Set default return value to true.
         $ret = true;
 
-        if (defined('EDD_USE_CART_COOKIE') && !EDD_USE_CART_COOKIE) {
+        if (defined('YATRA_USE_CART_COOKIE') && !YATRA_USE_CART_COOKIE) {
             $ret = false;
         }
 
@@ -332,7 +332,7 @@ class Session
      * Determines if we should start sessions.
      *
      * @return bool True if sessions should start, false otherwise.
-     * @since 2.1.12.11
+     * @since 2.1.12
      *
      */
     public function should_start_session()
@@ -375,7 +375,7 @@ class Session
      * These are the URIs where we never start sessions.
      *
      * @return array URI blacklist.
-     * @since 2.1.12.11
+     * @since 2.1.12
      *
      */
     public function get_blacklist()
@@ -404,7 +404,7 @@ class Session
     /**
      * Starts a new session if one hasn't started yet.
      *
-     * @since 2.1.12.3
+     * @since 2.1.12
      */
     public function maybe_start_session()
     {

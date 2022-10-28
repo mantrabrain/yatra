@@ -6,6 +6,9 @@
  * @since   1.0.0
  */
 
+use Yatra\Core\Cart;
+use Yatra\Core\Session;
+
 defined('ABSPATH') || exit;
 
 /**
@@ -27,9 +30,16 @@ final class Yatra
     /**
      * Cart instance.
      *
-     * @var Yatra_Cart
+     * @var Cart
      */
     public $cart = null;
+
+    /**
+     * Session instance.
+     *
+     * @var Session
+     */
+    public $session = null;
 
     /**
      * Yatra_Error instance.
@@ -85,6 +95,9 @@ final class Yatra
         if (is_null(self::$_instance)) {
             self::$_instance = new self();
         }
+        self::$_instance->session = new Session();
+        self::$_instance->cart = new Cart();
+
         return self::$_instance;
     }
 
@@ -289,10 +302,10 @@ final class Yatra
 
         // Classes/actions loaded for the frontend and for ajax requests.
         //if ($this->is_request('frontend')) {
-        if (is_null($this->cart) || !$this->cart instanceof Yatra_Cart) {
+        /* if (is_null($this->cart) || !$this->cart instanceof Yatra_Cart) {
 
-            $this->initialize_cart();
-        }
+             $this->initialize_cart();
+         }*/
 
         // Init action.
         do_action('yatra_init');
