@@ -22,7 +22,7 @@ function yatra_maybe_add_site_mode_admin_bar_menu($wp_admin_bar)
     $wp_admin_bar->add_menu(
         array(
             'id' => 'yatra-admin-bar-menu',
-            'title' => 'Yatra',
+            'title' => '<span class="yatra-admin-bar-menu-title"><img src="' . esc_attr(YATRA_PLUGIN_URI . '/assets/images/menu-icon.png') . '" alt=""> <strong>Yatra</strong></span>',
             'href' => admin_url('admin.php?page=yatra-dashboard'),
 
         )
@@ -81,13 +81,29 @@ add_action('admin_bar_menu', 'yatra_maybe_add_site_mode_admin_bar_menu', 9999);
 function yatra_mode_admin_bar_print_link_styles()
 {
 
-     if (!current_user_can('manage_yatra')) {
+    if (!current_user_can('manage_yatra')) {
         return;
     } ?>
 
     <style type="text/css" id="yatra-admin-bar-menu-styling">
         #wp-admin-bar-yatra-site-status .yatra-mode {
             line-height: inherit;
+        }
+
+        #wp-admin-bar-yatra-admin-bar-menu .yatra-admin-bar-menu-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #wp-admin-bar-yatra-admin-bar-menu .yatra-admin-bar-menu-title strong {
+            font-weight: bold;
+        }
+
+        #wp-admin-bar-yatra-admin-bar-menu .yatra-admin-bar-menu-title img {
+            height: 15px;
+            margin-top: 3px;
+            margin-right: 2px;
         }
 
         #wp-admin-bar-yatra-site-status .yatra-mode-live {
