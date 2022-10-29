@@ -286,6 +286,7 @@ final class Yatra
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-tour-availability.php';
 
 
+
         // Compatibility
         include_once YATRA_ABSPATH . 'includes/class-yatra-compatibility.php';
 
@@ -301,6 +302,9 @@ final class Yatra
         $this->yatra_error = new WP_Error;
         $this->yatra_messages = new Yatra_Messages;
         $this->admin_notice = new \Yatra\Core\Admin\Notices();
+
+
+        include_once YATRA_ABSPATH . 'includes/admin/admin-bar.php';
 
 
     }

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.11\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-08-29 15:39:04+00:00\n"
+"POT-Creation-Date: 2022-10-29 07:13:32+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -594,6 +594,7 @@ msgstr ""
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:14
 #: templates/myaccount/tmpl-user-checkout.php:35
 #: templates/tmpl-cart-table.php:16 templates/tmpl-cart-table.php:56
+#: templates/tmpl-mini-cart-table.php:15 templates/tmpl-mini-cart-table.php:45
 #: templates/tmpl-order-table.php:6
 msgid "Tour"
 msgstr ""
@@ -635,6 +636,7 @@ msgstr ""
 #: templates/myaccount/tmpl-user-checkout.php:100
 #: templates/tmpl-cart-table.php:19 templates/tmpl-cart-table.php:76
 #: templates/tmpl-cart-table.php:163 templates/tmpl-cart-table.php:165
+#: templates/tmpl-mini-cart-table.php:17 templates/tmpl-mini-cart-table.php:63
 #: templates/tmpl-order-table.php:9 templates/tmpl-order-table.php:83
 msgid "Total"
 msgstr ""
@@ -1563,7 +1565,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:109
-#: includes/functions.php:897
+#: includes/functions.php:849
 msgid "Payment Gateways"
 msgstr ""
 
@@ -2169,11 +2171,11 @@ msgstr ""
 msgid "Your contact number"
 msgstr ""
 
-#: includes/class-yatra-compatibility.php:52 includes/class-yatra.php:98
+#: includes/class-yatra-compatibility.php:52 includes/class-yatra.php:134
 msgid "Cloning is forbidden."
 msgstr ""
 
-#: includes/class-yatra-compatibility.php:62 includes/class-yatra.php:108
+#: includes/class-yatra-compatibility.php:62 includes/class-yatra.php:144
 msgid "Unserializing instances of this class is forbidden."
 msgstr ""
 
@@ -2315,15 +2317,15 @@ msgid "%1$s was called with an invalid level \"%2$s\"."
 msgstr ""
 
 #: includes/class-yatra-payment.php:8 includes/class-yatra-payment.php:92
-#: includes/functions.php:307 includes/yatra-template-functions.php:213
+#: includes/functions.php:259 includes/yatra-template-functions.php:213
 msgid "Pending"
 msgstr ""
 
-#: includes/class-yatra-payment.php:9 includes/functions.php:310
+#: includes/class-yatra-payment.php:9 includes/functions.php:262
 msgid "Completed"
 msgstr ""
 
-#: includes/class-yatra-payment.php:10 includes/functions.php:309
+#: includes/class-yatra-payment.php:10 includes/functions.php:261
 msgid "On Hold"
 msgstr ""
 
@@ -2331,7 +2333,7 @@ msgstr ""
 msgid "Refunded"
 msgstr ""
 
-#: includes/class-yatra-payment.php:12 includes/functions.php:312
+#: includes/class-yatra-payment.php:12 includes/functions.php:264
 msgid "Failed"
 msgstr ""
 
@@ -2405,7 +2407,7 @@ msgstr ""
 msgid "Yatra Customer"
 msgstr ""
 
-#: includes/class-yatra.php:387
+#: includes/class-yatra.php:423
 #. translators: 1: error message 2: file name and path 3: line number
 msgid "%1$s in %2$s on line %3$s"
 msgstr ""
@@ -2667,42 +2669,42 @@ msgstr ""
 msgid "Tour Tabs"
 msgstr ""
 
-#: includes/functions.php:176
+#: includes/functions.php:128
 #. translators: %s template
 msgid "%s does not exist."
 msgstr ""
 
-#: includes/functions.php:193
+#: includes/functions.php:145
 msgid "action_args should not be overwritten when calling yatra_get_template."
 msgstr ""
 
-#: includes/functions.php:308
+#: includes/functions.php:260
 msgid "Processing"
 msgstr ""
 
-#: includes/functions.php:311
+#: includes/functions.php:263
 msgid "Cancelled"
 msgstr ""
 
-#: includes/functions.php:335
+#: includes/functions.php:287
 msgid "Previous Post"
 msgstr ""
 
-#: includes/functions.php:336
+#: includes/functions.php:288
 msgid "Next Post"
 msgstr ""
 
-#: includes/functions.php:367
+#: includes/functions.php:319
 #. translators: 1: SVG icon. 2: post author, only visible to screen readers. 3:
 #. author link.
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:1242 includes/template-tags.php:850
+#: includes/functions.php:1194 includes/template-tags.php:850
 msgid "Guest"
 msgstr ""
 
-#: includes/functions.php:1382
+#: includes/functions.php:1334
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
 msgstr ""
@@ -5097,6 +5099,7 @@ msgid "Total Price: "
 msgstr ""
 
 #: templates/myaccount/tmpl-booking-item.php:61
+#: templates/tmpl-mini-cart-table.php:54
 msgid "Number of person"
 msgstr ""
 
@@ -5262,11 +5265,24 @@ msgid "Apply coupon"
 msgstr ""
 
 #: templates/tmpl-cart-table.php:109 templates/tmpl-cart-table.php:112
+#: templates/tmpl-mini-cart-table.php:78 templates/tmpl-mini-cart-table.php:81
 msgid "Sub Total"
 msgstr ""
 
 #: templates/tmpl-cart-table.php:150
 msgid "[Remove]"
+msgstr ""
+
+#: templates/tmpl-mini-cart-table.php:16
+msgid "Persons"
+msgstr ""
+
+#: templates/tmpl-mini-cart.php:23
+msgid "You have %d items on the cart"
+msgstr ""
+
+#: templates/tmpl-mini-cart.php:35
+msgid "View Cart"
 msgstr ""
 
 #: templates/tour/additional.php:28

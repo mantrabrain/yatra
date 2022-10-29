@@ -81,7 +81,7 @@ if (!function_exists('yatra_set_session')) {
 
     function yatra_set_session($key = '', $value = '')
     {
-        $cart = yatra()->session->set($key, $value);
+        yatra()->session->set($key, $value);
 
         return true;
 
@@ -92,9 +92,7 @@ if (!function_exists('yatra_get_session')) {
 
     function yatra_get_session($key = '')
     {
-        $sess = yatra()->session->get($key);
-
-        return $sess;
+        return yatra()->session->get($key);
 
     }
 }

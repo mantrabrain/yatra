@@ -363,6 +363,7 @@ final class Yatra_Admin
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-addons.php';
 
 
+
     }
 
     public function settings_link($links, $plugin_file, $plugin_data, $context)

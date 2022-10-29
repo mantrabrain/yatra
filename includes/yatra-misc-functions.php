@@ -277,3 +277,10 @@ if (!function_exists('yatra_user_can_modify_booking')) {
         return false;
     }
 }
+if (!function_exists('yatra_get_premium_addons')) {
+
+    function yatra_get_premium_addons()
+    {
+        return apply_filters('yatra_premium_addons', array());
+    }
+}

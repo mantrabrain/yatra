@@ -53,10 +53,4 @@ if (!function_exists('yatra_get_admin_template')) {
     }
 }
 
-if (!function_exists('yatra_get_premium_addons')) {
-    
-    function yatra_get_premium_addons()
-    {
-        return apply_filters('yatra_premium_addons', array());
-    }
-}
+
