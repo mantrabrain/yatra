@@ -56,7 +56,7 @@ function yatra_maybe_add_site_mode_admin_bar_menu($wp_admin_bar)
         'parent' => 'yatra-admin-bar-menu',
         'id' => 'yatra-site-status',
         'title' => sprintf(__('Site Status: &nbsp; %s', 'yatra'), '<span class="yatra-mode yatra-mode-' . esc_attr($mode) . '">' . $text . '</span>'),
-        'href' => 'admin.php?page=yatra-settings&tab=payment-gateways',
+        'href' => admin_url('admin.php?page=yatra-settings&tab=payment-gateways'),
     ));
 
     if (count(yatra_get_premium_addons()) < 1) {
