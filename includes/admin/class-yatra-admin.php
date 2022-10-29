@@ -97,11 +97,11 @@ final class Yatra_Admin
             return;
         }
 
-        $offer_key = 'yatra_promo_notice_key';
+        $offer_key = 'yatra_black_friday_cyber_monday_promo';
 
-        $offer_start_date = strtotime('2022-01-09 00:00:01');
+        $offer_start_date = strtotime('2022-10-28 00:00:01');
 
-        $offer_end_date = strtotime('2022-01-23 23:59:00');
+        $offer_end_date = strtotime('2022-12-05 23:59:00');
 
         $hide_notice = get_option($offer_key, 'show');
 
@@ -361,7 +361,6 @@ final class Yatra_Admin
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-permalinks.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-review.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-addons.php';
-
 
 
     }

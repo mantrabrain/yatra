@@ -3,18 +3,18 @@
         <img src="<?php echo esc_attr(YATRA_PLUGIN_URI . '/assets/images/promo-icon.png') ?>" alt="Yatra">
     </div>
     <div class="content">
-        <p>Happy New Year 2022!</p>
+        <p>BLACK FRIDAY & CYMBER MONDAY</p>
 
-        <h3>New Year <span class="highlight-green">Mega Sale</span></h3>
-        <p>Get your discount on <span class="highlight-blue">Yatra Addons/Extensions</span> till 23rd January, 2022</p>
+        <h3>2022 <span class="highlight-green">Mega Sale</span></h3>
+        <p>Get your discount on <span class="highlight-blue">Yatra Addons/Extensions</span> till 10th December, 2022</p>
     </div>
     <div class="call-to-action">
         <a target="_blank"
-           href="https://mantrabrain.com/yatra-premium-extensions/?utm_campaign=new_year_2021_promo&utm_medium=banner&utm_source=plugin_dashboard"
-           class="save-button">Save 31% on each Addon/Extensions</a>
+           href="https://wpyatra.com/pricing/?utm_campaign=new_year_2022_promo&utm_medium=banner&utm_source=plugin_dashboard"
+           class="save-button">Save 55% on each Addon/Extensions</a>
         <p>
             <span class="highlight-green">COUPON: </span>
-            <span class="coupon-code">MEGA2022</span>
+            <span class="coupon-code">BFCM22</span>
         </p>
     </div>
 </div>
