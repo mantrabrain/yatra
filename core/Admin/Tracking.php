@@ -133,14 +133,8 @@ class Tracking
      * @return void
      * @since 2.1.12
      */
-    private function update_secret_key($res)
+    private function update_secret_key($secret_key)
     {
-        // get secret key from engine.
-        $get_secret_key = json_decode($res, true);
-        $secret_key = 'none';
-        if ($get_secret_key && is_array($get_secret_key) && isset($get_secret_key['secret_key'])) {
-            $secret_key = $get_secret_key['secret_key'];
-        }
         $this->update_opt_data($this->secret_opt_key, sanitize_text_field($secret_key));
     }
 
@@ -166,9 +160,10 @@ class Tracking
         // authenticate with engine.
         $this->api_url = $this->remote_url . 'handshake';
 
-        $get_secret_key = $this->send_data(true, true);
+        $secret_key = $this->send_data(true, true);
 
-        $this->update_secret_key($get_secret_key);
+
+        $this->update_secret_key($secret_key);
 
     }
 
@@ -271,9 +266,10 @@ class Tracking
     private function setup_data()
     {
         $data = array();
-        $data['agent_data'] = maybe_serialize($this->get_data());
-        $data['secret_key'] = $this->get_opt_data($this->secret_opt_key);
+
+
         $data['validate_callback'] = rest_url(YATRA_REST_GENERAL_NAMESPACE . '/track');
+        $data['agent_data'] = maybe_serialize($this->get_data());
         $this->data = $data;
     }
 
@@ -321,7 +317,11 @@ class Tracking
                 'redirection' => 5,
                 'httpversion' => '1.0',
                 'blocking' => true,
-                'headers' => array(),
+                'headers' => array(
+                    'Authorization' => 'Basic ' . base64_encode( $this->get_opt_data($this->secret_opt_key)),
+
+                    'secret_key' => $this->get_opt_data($this->secret_opt_key)
+                ),
                 'body' => $this->data,
             )
         );
@@ -335,8 +335,12 @@ class Tracking
 
             return $has_secret_key ? $response_array['secret_key'] : '';
         } else {
+            echo '<pre>';
+            print_r($response_array);
+            echo '</pre>';
+            exit;
             if ($has_secret_key) {
-                $this->update_secret_key(wp_remote_retrieve_body($response));
+                $this->update_secret_key($response_array['secret_key']);
             }
         }
 
