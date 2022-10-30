@@ -48,7 +48,6 @@ export default class Select extends React.Component<SelectProps> {
                 htmlFor={settings.name}>{settings.title} </label>
                 <SelectControl
                     defaultValue={settings.value}
-                    name={settings.name}
                     options={getOptions(settings.options)} onChange={handleInputChange}
                 />
                 {settings.desc_tip ? <Tooltip content={settings.desc}/> : ''}

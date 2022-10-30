@@ -26,7 +26,7 @@ export default class TextInput extends React.Component<TextProps> {
         const handleInputChange = (event: ChangeEvent<{ value: string }>) => {
             let value = event?.currentTarget?.value;
             // @ts-ignore
-            let name = event?.currentTarget?.name;
+            let name = settings.name;
             fieldChange(name, value)
 
         }
@@ -35,7 +35,7 @@ export default class TextInput extends React.Component<TextProps> {
             <div className="yatra-field-wrap"><label
                 htmlFor={settings.name}>{settings.title}</label>
                 <input className="yatra-input" id={settings.name}
-                       name={settings.name} type="text" defaultValue={settings.value}
+                       type="text" defaultValue={settings.value}
                        placeholder={settings.placeholder} onChange={handleInputChange}/>
                 {settings.desc_tip ? <Tooltip content={settings.desc}/> : ''}
             </div>

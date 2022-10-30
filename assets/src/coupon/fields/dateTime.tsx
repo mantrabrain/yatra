@@ -48,7 +48,7 @@ const DateTime = (props: DateTimeProps) => {
             <label
                 htmlFor={settings.name}>{settings.title} </label>
             <input className="widefat" id={settings.name}
-                   name={settings.name} type="hidden"
+                   type="hidden"
                    value={dateValue === '' ? "" : dateValue}
                    placeholder={settings.placeholder}/>
 
