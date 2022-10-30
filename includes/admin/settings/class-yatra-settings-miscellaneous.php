@@ -129,13 +129,7 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
                 'type' => 'checkbox',
                 'default' => 'yes',
             ),
-            array(
-                'title' => __('Hide announcement related to Yatra', 'yatra'),
-                'desc' => __('Hide any announcement related to Yatra on admin dashboard', 'yatra'),
-                'id' => 'yatra_hide_all_announcement_of_yatra_plugin',
-                'type' => 'checkbox',
-                'default' => 'no',
-            ),
+
             array(
                 'title' => __('Date Selection Type', 'yatra'),
                 'desc' => __('This option allows you to choose date selection type. You can choose either calendar type or date listing type.', 'yatra'),
@@ -147,6 +141,13 @@ class Yatra_Settings_Miscellaneous extends Yatra_Admin_Settings_Base
                     'calendar' => __('Calendar', 'yatra'),
                     'date_listing' => __('Date Listing', 'yatra'),
                 )
+            ),
+            array(
+                'title' => __('Usage Tracking', 'yatra'),
+                'desc' => __('Allow Yatra to anonymously track how this plugin is used and help us to make the plugin better. No sensitive data is tracked.', 'yatra'),
+                'id' => 'yatra_allow_tracking',
+                'type' => 'checkbox',
+                'default' => 'no',
             ),
             array(
                 'type' => 'sectionend',

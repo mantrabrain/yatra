@@ -26,11 +26,7 @@ class Yatra_Admin_Review
         if (!is_super_admin()) {
             return;
         }
-
-        if ('yes' === get_option('yatra_hide_all_announcement_of_yatra_plugin', 'no')) {
-            return;
-        }
-
+        
         // Verify that we can do a check for reviews.
         $notices = get_option('yatra_admin_notices', []);
 
@@ -104,9 +100,10 @@ class Yatra_Admin_Review
                rel="noopener noreferrer"><?php esc_html_e('I already did', 'yatra'); ?></a>
         </p>
         <?php
+        $notice_html = ob_get_clean();
 
         Notices::info(
-            ob_get_clean(),
+            $notice_html,
             [
                 'dismiss' => Notices::DISMISS_GLOBAL,
                 'slug' => 'review_request',

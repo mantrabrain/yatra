@@ -6,6 +6,9 @@
  * @since   1.0.0
  */
 
+use Yatra\Core\Admin\Notices;
+use Yatra\Core\Admin\Tracking;
+use Yatra\Core\API;
 use Yatra\Core\Session;
 
 defined('ABSPATH') || exit;
@@ -46,6 +49,13 @@ final class Yatra
      * @var Session
      */
     public $session = null;
+
+    /**
+     * Tracking instance.
+     *
+     * @var Tracking
+     */
+    public $tracking = null;
 
     /**
      * Yatra_Error instance.
@@ -115,6 +125,7 @@ final class Yatra
         }
         self::setup_instance($file);
         self::$_instance->session = new Session();
+        self::$_instance->tracking = new Tracking();
         return self::$_instance;
     }
 
@@ -195,7 +206,9 @@ final class Yatra
         $this->define('YATRA_ABSPATH', dirname(YATRA_FILE) . '/');
         $this->define('YATRA_BASENAME', plugin_basename(YATRA_FILE));
         $this->define('YATRA_ROUNDING_PRECISION', 6);
-        $this->define('YATRA_REST_WEBHOOKS_NAMESPACE', 'yatra/v1/webhooks');
+        $this->define('YATRA_REST_NAMESPACE', 'yatra/v1/');
+        $this->define('YATRA_REST_WEBHOOKS_NAMESPACE', YATRA_REST_NAMESPACE . 'webhooks');
+        $this->define('YATRA_REST_GENERAL_NAMESPACE', YATRA_REST_NAMESPACE . 'general');
 
         // Admin Menu Slugs
 
@@ -286,7 +299,6 @@ final class Yatra
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-tour-availability.php';
 
 
-
         // Compatibility
         include_once YATRA_ABSPATH . 'includes/class-yatra-compatibility.php';
 
@@ -301,7 +313,8 @@ final class Yatra
 
         $this->yatra_error = new WP_Error;
         $this->yatra_messages = new Yatra_Messages;
-        $this->admin_notice = new \Yatra\Core\Admin\Notices();
+        $this->admin_notice = new Notices();
+        API::init();
 
 
         include_once YATRA_ABSPATH . 'includes/admin/admin-bar.php';

@@ -170,7 +170,7 @@ class Notices
      *
      * @param string $message Message to display.
      * @param array $args Array of additional arguments. Details in the self::add() method.
-     * @since 1.6.7.1
+     * @since 2.1.11
      *
      */
     public static function success($message, $args = [])
@@ -184,7 +184,7 @@ class Notices
      *
      * @param string $message Message to display.
      * @param array $args Array of additional arguments. Details in the self::add() method.
-     * @since 1.6.7.1
+     * @since 2.1.11
      *
      */
     public static function warning($message, $args = [])
