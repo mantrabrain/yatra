@@ -4,10 +4,13 @@ import {SelectControl} from "@wordpress/components";
 import Tooltip from "../components/tooltip";
 import NumberInput from "./NumberInput";
 import TextInput from "./TextInput";
+import {ChangeEvent} from 'react';
 
 
 type SelectProps = {
-    settings: Setting
+    settings: Setting,
+    fieldChange: (name: string, value: any) => {},
+
 }
 
 type Setting = {
@@ -34,14 +37,19 @@ export default class Select extends React.Component<SelectProps> {
 
             return options;
         }
-        const {settings} = this.props;
+
+        const {settings, fieldChange} = this.props;
+
+        const handleInputChange = (value: string) => {
+            fieldChange(settings.name, value)
+        }
         return (
             <div className="yatra-field-wrap"><label
                 htmlFor={settings.name}>{settings.title} </label>
                 <SelectControl
                     defaultValue={settings.value}
                     name={settings.name}
-                    options={getOptions(settings.options)}
+                    options={getOptions(settings.options)} onChange={handleInputChange}
                 />
                 {settings.desc_tip ? <Tooltip content={settings.desc}/> : ''}
             </div>

@@ -4,7 +4,6 @@ import {Panel, PanelBody, RangeControl, ToggleControl, SelectControl} from '@wor
 import {__} from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
 import './editor.scss';
-
 const Edit = (props) => {
     const {attributes, setAttributes} = props;
     const blockProps = useBlockProps();

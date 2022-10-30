@@ -1,12 +1,13 @@
 import * as React from 'react';
 import Tooltip from "../components/tooltip";
 // @ts-ignore
-import {DateTimePicker, Popover, Button } from '@wordpress/components';
+import {DateTimePicker, Popover, Button} from '@wordpress/components';
 import {useState} from '@wordpress/element';
 import {dateI18n} from '@wordpress/date';
 
 type DateTimeProps = {
-    settings: Setting
+    settings: Setting,
+    fieldChange: (name: string, value: any) => {},
 }
 type Setting = {
     title: string,
@@ -20,7 +21,7 @@ type Setting = {
 
 const DateTime = (props: DateTimeProps) => {
 
-    const {settings} = props;
+    const {settings, fieldChange} = props;
     const [openDatePopup, setOpenDatePopup] = useState(false);
     const [dateValue, setDateValue] = useState(settings.value);
     const isInvalidDate = (to_date: Date) => {
@@ -36,6 +37,12 @@ const DateTime = (props: DateTimeProps) => {
     const currentDate = () => {
         return new Date();
     }
+
+    const handleInputChange = (date_value: string) => {
+        setDateValue(date_value);
+        fieldChange(settings.name, date_value)
+    }
+
     return (
         <div className="yatra-field-wrap">
             <label
@@ -54,7 +61,7 @@ const DateTime = (props: DateTimeProps) => {
                     <DateTimePicker
                         currentDate={currentDate()}
                         initialOpen={false}
-                        onChange={setDateValue}
+                        onChange={handleInputChange}
                         isInvalidDate={isInvalidDate}
                         is12Hour={true}/>
                 </Popover>

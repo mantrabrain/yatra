@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react';
 import {Card, CardBody} from '@wordpress/components';
-import NumberInput from "./fields/NumberInput";
-import TextInput from "./fields/TextInput";
-import Select from "./fields/Select";
-import DateTime from "./fields/dateTime";
+import NumberInput from "../fields/NumberInput";
+import TextInput from "../fields/TextInput";
+import Select from "../fields/Select";
+import DateTime from "../fields/dateTime";
 
 export const TabContent = (props) => {
     useEffect(() => {
@@ -14,17 +14,20 @@ export const TabContent = (props) => {
     const renderSwitch = (setting) => {
 
         const field_type = setting.type;
+        const onFieldValueChange = (name, value) => {
+            props.updateSettings(name, value)
+        }
         switch (field_type) {
             case "number":
-                return <NumberInput settings={setting}/>;
+                return <NumberInput settings={setting} fieldChange={onFieldValueChange}/>;
             case "text":
-                return <TextInput settings={setting}/>;
+                return <TextInput settings={setting} fieldChange={onFieldValueChange}/>;
             case "select":
-                return <Select settings={setting}/>;
+                return <Select settings={setting} fieldChange={onFieldValueChange}/>;
             case "datetime":
-                return <DateTime settings={setting}/>;
+                return <DateTime settings={setting} fieldChange={onFieldValueChange}/>;
             default:
-                return <TextInput settings={setting}/>;
+                return <TextInput settings={setting} fieldChange={onFieldValueChange}/>;
 
         }
     }
