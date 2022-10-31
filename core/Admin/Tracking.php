@@ -25,6 +25,7 @@ class Tracking
     private $api_url = '';
     private $remote_url = '';
     private $version = '';
+    private $is_test_environment = false;
 
     /**
      * Get things going
@@ -38,6 +39,9 @@ class Tracking
     {
         /*Changed with the plugin*/
         $this->remote_url = trailingslashit('https://tracking.mantrabrain.com/wp-json/mantrabrain/usage-tracking/v1/');
+        if ($this->is_test_environment) {
+            $this->remote_url = trailingslashit('http://localhost/wp-json/mantrabrain/usage-tracking/v1/');
+        }
         $this->slug = 'yatra';
         $this->version = '1.0.0';
         /*Changed with the plugin end*/
@@ -199,6 +203,9 @@ class Tracking
 
         $data['secret_key'] = $this->get_opt_data($this->secret_opt_key);
         $data['validate_callback'] = rest_url(YATRA_REST_GENERAL_NAMESPACE . '/track');
+        if ($this->is_test_environment) {
+            $data['validate_callback'] = ('http://localhost/wp-json/' . YATRA_REST_GENERAL_NAMESPACE . '/track');
+        }
         $data['agent_data'] = maybe_serialize($this->get_data());
         $this->data = $data;
     }
@@ -223,7 +230,7 @@ class Tracking
 
         /*Send a maximum of once per week*/
         $last_send = $this->get_last_send();
-        if (is_numeric($last_send) && $last_send > strtotime('-1 week')) {
+        if (is_numeric($last_send) && $last_send !== '' && $last_send > strtotime('-1 week') && !$this->is_test_environment) {
             return false;
         }
 
@@ -453,7 +460,6 @@ class Tracking
      */
     public function admin_notice()
     {
-
         if (!$this->can_show_notice()) {
             return;
         }
