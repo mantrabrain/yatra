@@ -351,7 +351,7 @@ class Tracking
         if (!wp_doing_cron()) {
             return;
         }
-        add_action('yatra_weekly_scheduled_events', array($this, 'do_post'));
+        add_action('yatra_weekly_scheduled_events', array($this, 'handshake_and_request_api'));
 
     }
 

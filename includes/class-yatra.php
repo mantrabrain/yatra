@@ -8,7 +8,7 @@
 
 use Yatra\Core\Admin\Notices;
 use Yatra\Core\Admin\Tracking;
-use Yatra\Core\API;
+use Yatra\Core\Initialize;
 use Yatra\Core\Session;
 
 defined('ABSPATH') || exit;
@@ -314,7 +314,7 @@ final class Yatra
         $this->yatra_error = new WP_Error;
         $this->yatra_messages = new Yatra_Messages;
         $this->admin_notice = new Notices();
-        API::init();
+        Initialize::run();
 
 
         include_once YATRA_ABSPATH . 'includes/admin/admin-bar.php';

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.11\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-10-31 13:02:59+00:00\n"
+"POT-Creation-Date: 2022-10-31 13:17:19+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -251,6 +251,10 @@ msgid ""
 "\n"
 "            <br/>\n"
 "\t\t\t"
+msgstr ""
+
+#: core/Cron.php:34
+msgid "Once Weekly"
 msgstr ""
 
 #: includes/abstracts/abstract-yatra-form.php:62
