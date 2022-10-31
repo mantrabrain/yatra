@@ -144,6 +144,12 @@ class Tracking
             $helper_options = array();
         }
         $helper_options[$key] = $val;
+
+        if ($key === 'allow_tracking') {
+            $value = (boolean)$val ? 'yes' : 'no';
+            delete_option('yatra_allow_tracking');
+            add_option('yatra_allow_tracking', $value);
+        }
         update_option(
             'yatra_helper_options',
             wp_json_encode($helper_options)
