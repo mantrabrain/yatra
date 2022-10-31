@@ -17,7 +17,7 @@
 
     .yatra-icon {
       font-size: 25px;
-      color: #1abc9c;
+      color: var(--yatra_primary_color);
     }
 
     .cart-icon-badge {
@@ -43,7 +43,7 @@
     font-size: 20px;
     color: #fff;
     padding: 10px;
-    background: #1abc9c;
+    background: var(--yatra_primary_color);
   }
 
 
@@ -71,7 +71,7 @@
       position: absolute;
       right: 10px;
       top: -15px;
-      border-bottom: 15px solid #1abc9c;
+      border-bottom: 15px solid var(--yatra_primary_color);
       border-left: 15px solid transparent;
       border-right: 15px solid transparent;
     }

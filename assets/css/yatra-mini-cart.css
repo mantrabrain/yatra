@@ -10,7 +10,7 @@
     cursor: pointer; }
     .yatra-mini-cart .yatra-mini-cart-icon .yatra-icon {
       font-size: 25px;
-      color: #1abc9c; }
+      color: var(--yatra_primary_color); }
     .yatra-mini-cart .yatra-mini-cart-icon .cart-icon-badge {
       padding: 0;
       background: #484848;
@@ -31,7 +31,7 @@
     font-size: 20px;
     color: #fff;
     padding: 10px;
-    background: #1abc9c; }
+    background: var(--yatra_primary_color); }
   .yatra-mini-cart .yatra-mini-cart-inner {
     width: 500px;
     padding-bottom: 70px;
@@ -55,7 +55,7 @@
       position: absolute;
       right: 10px;
       top: -15px;
-      border-bottom: 15px solid #1abc9c;
+      border-bottom: 15px solid var(--yatra_primary_color);
       border-left: 15px solid transparent;
       border-right: 15px solid transparent; }
   .yatra-mini-cart img {

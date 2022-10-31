@@ -1,0 +1,17 @@
+@mixin background-opacity($color, $opacity: 0.3) {
+  background: $color; /* The Fallback */
+  background: rgba($color, $opacity);
+}
+
+:root {
+
+  /* --------------------------------------------------------------------------
+      Colors variables
+  -------------------------------------------------------------------------- */
+   // Base colors
+   --yatra_primary_color: #1abc9c; //#1abc9c;
+  --yatra_primary_color_opacity: #1abc9c0f;
+  --yatra_black_color: #000000;
+  --yatra_white_color: #FFFFFF;
+}
+

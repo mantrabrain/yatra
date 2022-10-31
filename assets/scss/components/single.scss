@@ -70,7 +70,7 @@ body.single-tour {
 
     .icon-wrap {
       font-size: 30px;
-      color: #1abc9c;
+      color: var(--yatra_primary_color);
     }
 
     .info-title {
@@ -170,7 +170,7 @@ body.single-tour {
 
       .attribute-icon {
         font-size: 30px;
-        color: #1abc9c;
+        color: var(--yatra_primary_color);
       }
 
       .attribute-title, .attribute-content, .attribute-icon {
@@ -333,11 +333,11 @@ body.single-tour {
   border: 1px solid #ddd;
   padding: 0;
   border-bottom: none;
-  border-top: 4px solid #1abc9c;
+  border-top: 4px solid var(--yatra_primary_color);
 
   .tour-info-pricing-header {
     padding: 10px 15px;
-    background: #dffff9;
+    background-color: var(--yatra_primary_color_opacity);
 
     h2 {
       font-weight: 500;
@@ -356,7 +356,7 @@ body.single-tour {
     p {
       font-size: 20px;
       text-align: center;
-      color: #1abc9c;
+      color: var(--yatra_primary_color);
     }
   }
 

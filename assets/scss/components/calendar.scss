@@ -1,0 +1,7 @@
+.yatra-calendar thead td, .yatra-calendar thead th {
+  background: var(--yatra_primary_color_opacity);
+}
+
+.yatra-calendar .day.today, .yatra-calendar td.active {
+  background: var(--yatra_primary_color_opacity);
+}

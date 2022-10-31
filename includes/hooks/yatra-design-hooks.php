@@ -114,43 +114,9 @@ class Yatra_Design_Hooks
         }
         ob_start();
         ?>
-        .yatra-tour-additional-info .yatra-tour-additional-info-item .icon-wrap,
-        .yatra-tour-attribute-info .yatra-tour-additional-text-number .yatra-attribute-item .attribute-icon,
-        .yatra-tabs > ul li a[data-aria-selected], .yatra-tabs > ul li a:hover, .yatra-tabs > ul li.active a, .yatra-tabs > ul li.active:hover a, .yatra-tabs > ul li a:hover,
-        .yatra-tour-info-pricing-wrap .tour-info-pricing-content p,
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-more, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-less,
-        .yatra-tabs .yatra-tab-content .cost-info-half h4{
-        color: <?php echo $primary_color; ?>;
-        }
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle,
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:before, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:before,
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-price-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-days-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-price-slider .ui-slider-range, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-days-slider .ui-slider-range,
-        .yatra-page-wrapper.yatra-tour-archive-display-mode-list .yatra-archive-tour .yatra-tour-single-item span.yatra-featured-tour,
-        .yatra-page-wrapper.yatra-tour-archive-display-mode-grid .yatra-tour-single-item .yatra-tour-single-item-inner span.yatra-featured-tour{
-        background:<?php echo $primary_color; ?>;
-        }
-        .yatra-tabs > ul,
-        .yatra-calendar thead td, .yatra-calendar thead th,
-        .yatra-tour-info-pricing-wrap .tour-info-pricing-header,
-        .yatra-calendar td.active,
-        .yatra-tabs.yatra-single-tour-tabs .yatra-responsive-tab-title
-        {
-        background:<?php echo $this->hex2rgba($primary_color, 0.06) ?>;
-        }
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-price-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price #yatra-days-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-price-slider, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days #yatra-days-slider{
-        background:<?php echo $this->hex2rgba($primary_color, 0.2) ?>;
-        }
-        .yatra-tour-info-pricing-wrap,
-        .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.price .yatra-slider-wrap .ui-slider .ui-slider-handle:after, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field.days .yatra-slider-wrap .ui-slider .ui-slider-handle:after{
-        border-top-color:<?php echo $primary_color; ?>;
-        }
-        .yatra-tabs .yatra-tab-content .cost-info-half h4{
-        border-bottom-color:<?php echo $primary_color; ?>;
-
-        }
-        .yatra-destination-wrap .yatra-destination-item .yatra-item-inner:hover h2.destination-title,
-        .yatra-activity-wrap .yatra-activity-item .yatra-item-inner:hover h2.activity-title{
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, <?php echo $primary_color; ?> 100%)
+        :root {
+        --yatra_primary_color: <?php echo esc_attr($primary_color); ?>;
+        --yatra_primary_color_opacity: <?php echo esc_attr($this->hex2rgba($primary_color, 0.06)) ?>;
         }
         <?php
         return ob_get_clean();

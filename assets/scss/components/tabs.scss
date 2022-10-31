@@ -21,7 +21,7 @@
     list-style: none;
     border: 1px solid #ddd;
     font-size: 0;
-    background: #eafffb;
+    background: var(--yatra_primary_color_opacity);
     border-bottom: none;
   }
 
@@ -71,7 +71,7 @@
 .yatra-tabs > ul li.active a,
 .yatra-tabs > ul li.active:hover a,
 .yatra-tabs > ul li a:hover {
-  color: #1abc9c;
+  color: var(--yatra_primary_color);
   background: #fff;
 
 }

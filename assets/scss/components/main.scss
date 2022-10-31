@@ -33,7 +33,7 @@ del {
       height: auto;
       font-size: 15px;
       width: 100px;
-      border: 2px solid #1abc9c;
+      border: 2px solid var(--yatra_primary_color);
       border-radius: 0;
     }
   }
@@ -138,8 +138,8 @@ del {
         text-align: center;
         padding: 10px 0;
         /* background: #d77b5d; */
-        color: #1abc9c;
-        border-bottom: 2px solid #1abc9c;
+        color: var(--yatra_primary_color);
+        border-bottom: 2px solid var(--yatra_primary_color);
         margin-bottom: 20px;
 
       }
@@ -186,7 +186,7 @@ del {
 }
 
 .detail-tab .tabs h3 {
-  color: #1abc9c;
+  color: var(--yatra_primary_color);
 }
 
 .overview-section {
