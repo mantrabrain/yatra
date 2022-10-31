@@ -21,8 +21,6 @@ class Tracking
     private $secret_opt_key = '';
     private $last_send_opt_key = '';
     private $hide_notice_opt_key = '';
-    private $agents_opt_key = '';
-    private $agent_active_opt_key = '';
     private $data;
     private $api_url = '';
     private $remote_url = '';
@@ -39,7 +37,7 @@ class Tracking
     public function __construct()
     {
         /*Changed with the plugin*/
-        $this->remote_url = trailingslashit('http://localhost/wp-json/mantrabrain/usage-tracking/v1/');
+        $this->remote_url = trailingslashit('https://tracking.mantrabrain.com/wp-json/mantrabrain/usage-tracking/v1/');
         $this->slug = 'yatra';
         $this->version = '1.0.0';
         /*Changed with the plugin end*/
@@ -47,9 +45,6 @@ class Tracking
         $this->secret_opt_key = 'agent_secret_key';
         $this->last_send_opt_key = 'agent_last_send';
         $this->hide_notice_opt_key = 'agent_hide_notice';
-        $this->agent_active_opt_key = 'is_active_this_track';
-
-        $this->agents_opt_key = 'agent_' . md5($this->remote_url);/*unique per remote url*/
 
         $this->init();
 
@@ -66,65 +61,8 @@ class Tracking
 
         add_action('init', array($this, 'schedule_send'));
         add_action('yatra_admin_settings_sanitize_option_yatra_allow_tracking', array($this, 'after_tracking_enable'), 10, 3);
-        add_action('admin_init', array($this, 'do_agents'));
         add_action('admin_init', array($this, 'show_tracking_notice'));
         add_action('admin_notices', array($this, 'admin_notice'));
-    }
-
-    /**
-     * Update agents.
-     * Run once in the lifetime.
-     *
-     * @return void
-     * @since 2.1.12
-     */
-    public function do_agents()
-    {
-
-        $installed_agents = get_option($this->agents_opt_key, array());
-
-        if (isset($installed_agents[$this->slug])) {
-            return;
-        }
-
-        $installed_agents[$this->slug] = $this->version;
-
-        $active_agent = $this->get_opt_data($this->agent_active_opt_key, '');
-
-        if (!$active_agent) {
-            $active_agent = $this->slug;
-        } else {
-            if (is_array($installed_agents) && !empty($installed_agents)) {
-                $highest_ver = $this->version;
-                foreach ($installed_agents as $agent => $agent_ver) {
-                    if (version_compare($agent_ver, $highest_ver) > 0) {
-                        $highest_ver = $agent_ver;
-                        $active_agent = $agent;
-                    }
-                }
-            }
-        }
-
-        // register this agent locally.
-        $this->update_opt_data($this->agent_active_opt_key, $active_agent);
-
-        // register agent data globally.
-        update_option($this->agents_opt_key, $installed_agents);
-    }
-
-    /**
-     * Is this active agent
-     *
-     * @return boolean
-     * @since 2.1.12
-     */
-    private function is_active_agent()
-    {
-        if ($this->slug == $this->get_opt_data($this->agent_active_opt_key)) {
-            return true;
-        }
-        return false;
-
     }
 
     /**
@@ -146,24 +84,11 @@ class Tracking
      * @return void
      * @since 2.1.12
      */
-    public function do_handshake()
+    public function handshake_and_request_api()
     {
-        $secret_key = $this->get_opt_data($this->secret_opt_key);
+        $this->request_api(true, true); // for Handshake
+        $this->request_api(true); // For Request
 
-
-        /* if (!empty($secret_key)) {
-             // secret_key already exists.
-             // do nothing.
-             return;
-         }*/
-
-        // authenticate with engine.
-        $this->api_url = $this->remote_url . 'handshake';
-
-        $secret_key = $this->send_data(true, true);
-
-
-        $this->update_secret_key($secret_key);
 
     }
 
@@ -249,7 +174,6 @@ class Tracking
         $data['nicename'] = $user->data->user_nicename;
         $data['site_url'] = get_bloginfo('url');
         $data['version'] = get_bloginfo('version');
-
         $data['sender'] = $this->slug;
 
         return $data;
@@ -267,7 +191,7 @@ class Tracking
     {
         $data = array();
 
-
+        $data['secret_key'] = $this->get_opt_data($this->secret_opt_key);
         $data['validate_callback'] = rest_url(YATRA_REST_GENERAL_NAMESPACE . '/track');
         $data['agent_data'] = maybe_serialize($this->get_data());
         $this->data = $data;
@@ -279,12 +203,12 @@ class Tracking
      * @access public
      *
      * @param bool $override If we should override the tracking setting.
-     * @param bool $is_handshake If it is just handshake to get secret key.
+     * @param bool $do_handshake If it is just handshake to get secret key.
      *
-     * @return bool
+     * @return void|mixed
      * @since 2.1.12
      */
-    public function send_data($override = false, $is_handshake = false)
+    public function request_api($override = false, $do_handshake = false)
     {
 
         if (!$this->get_opt_data('allow_tracking') && !$override) {
@@ -293,57 +217,57 @@ class Tracking
 
         /*Send a maximum of once per week*/
         $last_send = $this->get_last_send();
-        if (is_numeric($last_send) && $last_send > strtotime('-1 week') && !$is_handshake) {
-            //   return false;
+        if (is_numeric($last_send) && $last_send > strtotime('-1 week')) {
+            return false;
         }
 
-        /*if this agent is not active agent*/
-        if (!$this->is_active_agent()) {
-            // return false;
-        }
 
-        if (!$is_handshake) {
+        if ($do_handshake) {
+
+            $this->api_url = $this->remote_url . 'handshake';
+
+        } else {
+
             $this->api_url = $this->remote_url . 'process';
+
             $this->update_last_send();
         }
 
         $this->setup_data();
 
+        $response_array = $this->send_request($this->api_url, $this->data);
+
+
+        $has_secret_key = isset($response_array['secret_key']);
+
+        if ($has_secret_key) {
+            $this->update_secret_key($response_array['secret_key']);
+
+        }
+        return $response_array;
+    }
+
+    public function send_request($url, $data)
+    {
+
+        $headers = array(
+            'user-agent' => 'Yatra/' . YATRA_VERSION . '; ' . get_bloginfo('url'),
+        );
+
         $response = wp_remote_post(
-            $this->api_url,
+            $url,
             array(
                 'method' => 'POST',
                 'timeout' => 45,
                 'redirection' => 5,
                 'httpversion' => '1.0',
                 'blocking' => true,
-                'headers' => array(
-                    'Authorization' => 'Basic ' . base64_encode( $this->get_opt_data($this->secret_opt_key)),
-
-                    'secret_key' => $this->get_opt_data($this->secret_opt_key)
-                ),
-                'body' => $this->data,
+                'headers' => $headers,
+                'body' => $data
             )
         );
 
-        $response_array = json_decode(wp_remote_retrieve_body($response), true);
-
-        $has_secret_key = isset($response_array['secret_key']);
-
-
-        if ($is_handshake) {
-
-            return $has_secret_key ? $response_array['secret_key'] : '';
-        } else {
-            echo '<pre>';
-            print_r($response_array);
-            echo '</pre>';
-            exit;
-            if ($has_secret_key) {
-                $this->update_secret_key($response_array['secret_key']);
-            }
-        }
-
+        return json_decode(wp_remote_retrieve_body($response), true);
     }
 
     /**
@@ -364,10 +288,9 @@ class Tracking
 
         }
 
-
         if ($this->get_opt_data('allow_tracking')) {
 
-            $this->send_data(true);
+            $this->handshake_and_request_api();
         }
 
         return $value;
@@ -381,8 +304,6 @@ class Tracking
      */
     public function show_tracking_notice()
     {
-
-        $this->do_handshake();
 
         // listen for our activate button to be clicked
         if (!isset($_GET[esc_attr($this->slug) . '_tracking'])) {
@@ -398,7 +319,7 @@ class Tracking
 
         if (1 == $_GET[esc_attr($this->slug) . '_tracking']) {
             $this->update_opt_data('allow_tracking', true);
-            $this->send_data(true);
+            $this->handshake_and_request_api();
         } else {
             $this->update_opt_data('allow_tracking', false);
         }
@@ -493,10 +414,6 @@ class Tracking
             return false;
         }
 
-        /*if this agent is not active agent*/
-        if (!$this->is_active_agent()) {
-            return false;
-        }
 
         return true;
 
