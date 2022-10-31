@@ -3,7 +3,7 @@
       Colors variables
   -------------------------------------------------------------------------- */
   --yatra_primary_color: #1abc9c;
-  --yatra_primary_color_opacity: #1abc9c0f;
+  --yatra_primary_color_opacity: #eafffb;
   --yatra_black_color: #000000;
   --yatra_white_color: #FFFFFF; }
 
@@ -1429,11 +1429,11 @@ del {
     width: 100%;
     background: #f9f9f9; }
   .yatra-destination-wrap .yatra-destination-item .yatra-item-inner:hover h2.destination-title {
-    background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0)), to(#1abc9c));
-    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, #1abc9c 100%);
-    background: -moz- oldlinear-gradient(top, rgba(0, 0, 0, 0) 0%, #1abc9c 100%);
-    background: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, #1abc9c 100%);
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #1abc9c 100%);
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0)), to(var(--yatra_primary_color)));
+    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, var(--yatra_primary_color) 100%);
+    background: -moz- oldlinear-gradient(top, rgba(0, 0, 0, 0) 0%, var(--yatra_primary_color) 100%);
+    background: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, var(--yatra_primary_color) 100%);
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, var(--yatra_primary_color) 100%);
     color: #fff; }
   .yatra-destination-wrap .yatra-destination-item .yatra-item-inner a:hover {
     color: #fff;
@@ -1495,11 +1495,11 @@ del {
     width: 100%;
     background: #f9f9f9; }
   .yatra-activity-wrap .yatra-activity-item .yatra-item-inner:hover h2.activity-title {
-    background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0)), to(#1abc9c));
-    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, #1abc9c 100%);
-    background: -moz- oldlinear-gradient(top, rgba(0, 0, 0, 0) 0%, #1abc9c 100%);
-    background: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, #1abc9c 100%);
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #1abc9c 100%);
+    background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0)), to(var(--yatra_primary_color)));
+    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, var(--yatra_primary_color) 100%);
+    background: -moz- oldlinear-gradient(top, rgba(0, 0, 0, 0) 0%, var(--yatra_primary_color) 100%);
+    background: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, var(--yatra_primary_color) 100%);
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, var(--yatra_primary_color) 100%);
     color: #fff; }
   .yatra-activity-wrap .yatra-activity-item .yatra-item-inner a:hover {
     color: #fff;
