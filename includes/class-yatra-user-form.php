@@ -74,7 +74,6 @@ class Yatra_User_Form extends Yatra_Form
                 'desc' => __('Your gender', 'yatra'),
                 'name' => 'yatra_user_gender',
                 'type' => 'select',
-                'class' => 'yatra-select2',
                 'options' => array(
                     '-' => __('Select Gender', 'yatra'),
                     'Male' => __('Male', 'yatra'),
@@ -86,8 +85,7 @@ class Yatra_User_Form extends Yatra_Form
                 'desc' => __('Country', 'yatra'),
                 'name' => 'yatra_user_country',
                 'type' => 'select',
-                'class' => 'yatra-select2',
-                'options' => yatra_get_countries()
+                 'options' => yatra_get_countries()
 
             ), array(
                 'title' => __('Phone Number', 'yatra'),
