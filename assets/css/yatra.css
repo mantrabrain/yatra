@@ -98,8 +98,7 @@
   display: block; }
 
 .yatra-tab-content label {
-  font-weight: bold;
-  font-size: 14px; }
+  font-weight: bold; }
 
 .yatra-tab-content .select2 {
   width: 100% !important; }
