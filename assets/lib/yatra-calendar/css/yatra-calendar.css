@@ -16,51 +16,31 @@
 
 .yatra-calendar header {
     margin: 0 !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .yatra-calendar header .yatra-calendar-btn {
-    display: inline-block;
-    position: absolute;
+    position: relative;
     width: 30px;
     height: 30px;
     text-align: center;
-    line-height: 30px;
-    color: #cbd1d2;
+    color: #484848;
     border-radius: 50%;
-    border: 2px solid #cbd1d2;
+    border: 2px solid #484848;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
 
 .yatra-calendar header .yatra-calendar-btn:hover {
-    background: #cbd1d2 !important;
+    background: #484848 !important;
     color: white !important;
 }
 
 .yatra-calendar header .yatra-calendar-btn:before {
-    content: '';
-    position: absolute;
-    top: 9px;
-    left: 8px;
-    width: 8px;
-    height: 8px;
-    border-style: solid;
-    border-width: 3px 3px 0 0;
-    transform: rotate(45deg);
-    transform-origin: center center;
-}
 
-.yatra-calendar header .btn-prev {
-    top: 0;
-    left: 0;
-    transform: rotate(-180deg);
-}
-
-.yatra-calendar header .btn-next {
-    top: 0;
-    right: 0;
-}
-
-.yatra-calendar header .btn-next:before {
-    transform: rotate(45deg);
 }
 
 .yatra-calendar header .month {
@@ -80,10 +60,7 @@
     width: 100% !important;
     margin: 0 !important;
     border-spacing: 0px;
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    table-layout: fixed;
-    border-collapse: separate;
+    border-collapse: collapse;
 }
 
 .yatra-calendar thead td, .yatra-calendar thead th {

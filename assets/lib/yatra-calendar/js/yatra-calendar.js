@@ -52,9 +52,9 @@
 
             var calendar = $('<div class="yatra-calendar"></div>');
             var header = $('<header>' +
+                '<a class="yatra-calendar-btn btn-prev" href="#"><span class="fas fa-chevron-left"></span></a>' +
                 '<h2 class="month"></h2>' +
-                '<a class="yatra-calendar-btn btn-prev" href="#"></a>' +
-                '<a class="yatra-calendar-btn btn-next" href="#"></a>' +
+                '<a class="yatra-calendar-btn btn-next" href="#"><span class="fas fa-chevron-right"></span></a>' +
                 '</header>');
 
             this.updateHeader(todayDate, header);
