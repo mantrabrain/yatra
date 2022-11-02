@@ -92,8 +92,13 @@ if (!function_exists('yatra_get_session')) {
 
     function yatra_get_session($key = '')
     {
-        return yatra()->session->get($key);
+        $session = yatra()->session->get($key);
 
+        if (is_array($session)) {
+
+            return $session;
+        }
+        return [];
     }
 }
 
