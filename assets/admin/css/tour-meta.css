@@ -632,6 +632,13 @@ body.post-type-yatra-booking #title {
     align-items: center;
 }
 
+#yatra_add_new_pricing_option{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+}
 .yatra-admin-tab--content-section .mb-meta-vertical-tab-content .yatra-field-wrap {
     padding: 10px 15px;
     display: block;
