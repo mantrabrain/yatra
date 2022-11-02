@@ -2762,11 +2762,7 @@ body.single-tour figure {
 
 .yatra-checkout-page-wrap form.yatra-checkout-form .yatra-field-wrap input, .yatra-checkout-page-wrap form.yatra-checkout-form .yatra-field-wrap select {
   width: 100%;
-  -webkit-appearance: none;
   color: #4a5568;
-  border: 1px solid #cbd5e0;
-  border-radius: 3px;
-  padding: 0.4em 0.5em;
   max-width: 100%; }
 
 .yatra-checkout-page-wrap form.yatra-checkout-form .yatra-field-wrap .select2-container--default .select2-selection--single .select2-selection__rendered {
