@@ -110,14 +110,6 @@
 .yatra-tab-content select,
 .yatra-tab-content textarea
 .yatra-tab-content .widefat {
-  font-size: 14px;
-  height: auto;
-  padding: 6px 10px;
-  border-radius: 0;
-  border: 1px solid #ddd;
-  -webkit-box-shadow: none;
-          box-shadow: none;
-  color: #000;
   margin-top: 5px; }
 
 @media (min-width: 600px) {
@@ -2472,10 +2464,7 @@ body.single-tour figure {
 
 .yatra-tour-enquiry-form-wrap input[type="text"], .yatra-tour-enquiry-form-wrap input[type="number"], .yatra-tour-enquiry-form-wrap input[type="email"], .yatra-tour-enquiry-form-wrap select, .yatra-tour-enquiry-form-wrap textarea {
   width: 100% !important;
-  max-width: 100% !important;
-  padding: 10px !important;
-  border-color: #ddd;
-  border-radius: 0; }
+  max-width: 100% !important; }
 
 .yatra-tour-enquiry-form-wrap .select2-container--default .select2-selection--single {
   border-radius: 0;

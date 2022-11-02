@@ -97,7 +97,6 @@ class Yatra_Enquiry_Form extends Yatra_Form
                 'title' => __('Country', 'yatra'),
                 'type' => 'select',
                 'options' => $countries,
-                'select2' => true
             ),
             'phone_number' => array(
                 'name' => 'phone_number',
