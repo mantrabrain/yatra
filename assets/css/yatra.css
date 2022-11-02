@@ -2691,12 +2691,6 @@ body.single-tour figure {
               -ms-flex: 1;
                   flex: 1;
           margin: 0; }
-        .yatra-shortcode-wrapper form.yatra-cart-form .actions .coupon input {
-          border-top-right-radius: 0;
-          border-bottom-right-radius: 0; }
-        .yatra-shortcode-wrapper form.yatra-cart-form .actions .coupon button {
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0; }
   .yatra-shortcode-wrapper .yatra-proceed-to-checkout-wrap {
     text-align: right;
     margin-top: 15px; }
@@ -3138,16 +3132,30 @@ body.single-tour figure {
             display: block;
             margin-top: 20px;*/ }
         table.yatra_cart_table_responsive tr td.actions {
-          display: block; }
-          table.yatra_cart_table_responsive tr td.actions .coupon, table.yatra_cart_table_responsive tr td.actions .yatra-coupon-code {
-            margin-bottom: 10px; }
-          table.yatra_cart_table_responsive tr td.actions .coupon, table.yatra_cart_table_responsive tr td.actions .yatra-coupon-code {
-            display: block !important;
+          display: -webkit-box;
+          display: -moz-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-orient: vertical;
+          -webkit-box-direction: normal;
+             -moz-box-orient: vertical;
+             -moz-box-direction: normal;
+              -ms-flex-direction: column;
+                  flex-direction: column;
+          gap: 10px; }
+          table.yatra_cart_table_responsive tr td.actions .coupon {
+            display: -webkit-box;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
             width: 100%;
-            -webkit-box-flex: 0 !important;
-               -moz-box-flex: 0 !important;
-                -ms-flex: none !important;
-                    flex: none !important; }
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+               -moz-box-orient: vertical;
+               -moz-box-direction: normal;
+                -ms-flex-direction: column;
+                    flex-direction: column;
+            gap: 10px; }
           table.yatra_cart_table_responsive tr td.actions .yatra-button {
             display: block;
             width: 100%;
@@ -3173,6 +3181,14 @@ body.single-tour figure {
        -moz-box-pack: justify;
         -ms-flex-pack: justify;
             justify-content: space-between; } }
+
+@media (min-width: 769px) {
+  .yatra-shortcode-wrapper form.yatra-cart-form .actions .coupon input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0; }
+  .yatra-shortcode-wrapper form.yatra-cart-form .actions .coupon button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0; } }
 
 .yatra-responsive-tab-title {
   display: none; }

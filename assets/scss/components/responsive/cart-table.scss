@@ -96,16 +96,15 @@
         }
 
         &.actions {
-          display: block;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
 
-          .coupon, .yatra-coupon-code {
-            margin-bottom: 10px;
-          }
-
-          .coupon, .yatra-coupon-code {
-            display: block !important;
+          .coupon {
+            display: flex;
             width: 100%;
-            flex: none !important;
+            flex-direction: column;
+            gap: 10px;
           }
 
           .yatra-button {
@@ -174,4 +173,23 @@
     }
   }
 
+}
+
+
+@media (min-width: 769px) {
+
+  .yatra-shortcode-wrapper form.yatra-cart-form .actions .coupon {
+
+
+    input {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    button {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+  }
 }
