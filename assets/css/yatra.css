@@ -2787,7 +2787,7 @@ body.single-tour figure {
 
 .yatra-checkout-page-wrap form.yatra-checkout-form .yatra-checkout-review-tour-book-table {
   text-align: center;
-  padding: 10px; }
+  margin: 0; }
 
 .yatra-checkout-page-wrap .select2-container {
   max-width: 100%; }
@@ -2827,7 +2827,8 @@ body.single-tour figure {
       width: 100%; }
   .yatra-checkout-page-wrap .yatra-form .yatra-checkout-review-tour-book {
     border: 1px solid #ddd;
-    background: #fff; }
+    background: #fff;
+    padding: 20px; }
 
 .yatra-checkout-page-wrap .yatra-checkout-login-registration-wrap, .yatra-checkout-page-wrap .yatra-checkout-form-inner {
   width: 100%;
