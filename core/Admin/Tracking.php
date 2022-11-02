@@ -160,6 +160,57 @@ class Tracking
         );
     }
 
+    private function get_data_items()
+    {
+
+        $theme_data = wp_get_theme();
+        $theme = $theme_data->Name . ' ' . $theme_data->Version;
+        $checkout_page = yatra_get_checkout_page();
+        $date = (absint($checkout_page) > 0)
+            ? get_post_field('post_date', $checkout_page)
+            : 'not set';
+        $server = isset($_SERVER['SERVER_SOFTWARE'])
+            ? $_SERVER['SERVER_SOFTWARE']
+            : '';
+
+        // Setup data.
+        $data = array(
+            'php_version' => phpversion(),
+            'yatra_version' => YATRA_VERSION,
+            'wp_version' => get_bloginfo('version'),
+            'server' => $server,
+            'install_date' => $date,
+            'multisite' => is_multisite(),
+            'url' => home_url(),
+            'theme' => $theme,
+            'email' => get_bloginfo('admin_email')
+        );
+
+        // Retrieve current plugin information.
+        if (!function_exists('get_plugins')) {
+            include ABSPATH . '/wp-admin/includes/plugin.php';
+        }
+
+        // Get plugins
+        $plugins = array_keys(get_plugins());
+        $active_plugins = get_option('active_plugins', array());
+
+        // Remove active plugins from list so we can show active and inactive separately.
+        foreach ($plugins as $key => $plugin) {
+            if (in_array($plugin, $active_plugins, true)) {
+                unset($plugins[$key]);
+            }
+        }
+
+        $data['active_plugins'] = $active_plugins;
+        $data['inactive_plugins'] = $plugins;
+        $data['active_gateways'] = array_keys(yatra_get_active_payment_gateways());
+        $data['tours'] = wp_count_posts('tour')->publish;
+        $data['locale'] = get_locale();
+        return $data;
+
+    }
+
     /**
      * Gather data to send to engine.
      *
@@ -168,17 +219,8 @@ class Tracking
      */
     private function get_data()
     {
-
-        if (!class_exists('WP_Debug_Data')) {
-            include_once ABSPATH . 'wp-admin/includes/class-wp-debug-data.php';
-        }
         $data = array();
-
-        if (method_exists('WP_Debug_Data', 'debug_data')) {
-            $data['data'] = \WP_Debug_Data::debug_data();
-        } else {
-            $data['data'] = array();
-        }
+        $data['data'] = $this->get_data_items();
         $data['admin_email'] = get_bloginfo('admin_email');
         $user = get_user_by('email', $data['admin_email']);
         $data['nicename'] = $user->data->user_nicename;
@@ -210,6 +252,15 @@ class Tracking
         $this->data = $data;
     }
 
+    public function is_last_send_pass()
+    {
+        $last_send = $this->get_last_send();
+        if (is_numeric($last_send) && $last_send !== '' && $last_send > strtotime('-1 week') && !$this->is_test_environment) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Send the data to the Engine server
      *
@@ -229,8 +280,7 @@ class Tracking
         }
 
         /*Send a maximum of once per week*/
-        $last_send = $this->get_last_send();
-        if (is_numeric($last_send) && $last_send !== '' && $last_send > strtotime('-1 week') && !$this->is_test_environment) {
+        if (!$this->is_last_send_pass()) {
             return false;
         }
 
@@ -348,6 +398,7 @@ class Tracking
      */
     public function schedule_send()
     {
+
         if (!wp_doing_cron()) {
             return;
         }
@@ -411,7 +462,7 @@ class Tracking
     public function can_show_notice()
     {
 
-        if ($this->get_opt_data('installed_time') > strtotime('-3 day')) {
+        if (get_option('yatra_install_date', 0) > strtotime('-3 day')) {
             return false;
         }
 
