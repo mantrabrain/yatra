@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.11\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-10-31 13:23:22+00:00\n"
+"POT-Creation-Date: 2022-11-02 06:32:57+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -725,8 +725,8 @@ msgstr ""
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:76
 #: includes/class-yatra-checkout-form.php:72
 #: includes/class-yatra-enquiry-form.php:97
-#: includes/class-yatra-user-form.php:85 includes/class-yatra-user-form.php:86
-#: includes/class-yatra-user-form.php:94 includes/class-yatra-user-form.php:100
+#: includes/class-yatra-user-form.php:84 includes/class-yatra-user-form.php:85
+#: includes/class-yatra-user-form.php:92 includes/class-yatra-user-form.php:98
 #: includes/template-tags.php:712 includes/template-tags.php:716
 #: includes/template-tags.php:1168 templates/myaccount/tmpl-dashboard.php:47
 #: templates/tour/additional.php:16
@@ -735,8 +735,8 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:77
 #: includes/class-yatra-checkout-form.php:80
-#: includes/class-yatra-enquiry-form.php:104
-#: includes/class-yatra-user-form.php:93
+#: includes/class-yatra-enquiry-form.php:103
+#: includes/class-yatra-user-form.php:91
 msgid "Phone Number"
 msgstr ""
 
@@ -754,8 +754,8 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:81
 #: includes/admin/templates/license/license.php:17
-#: includes/class-yatra-enquiry-form.php:131
-#: includes/class-yatra-enquiry-form.php:135
+#: includes/class-yatra-enquiry-form.php:130
+#: includes/class-yatra-enquiry-form.php:134
 #: includes/modules/status/list-tables/class-yatra-admin-log-list-table.php:109
 msgid "Message"
 msgstr ""
@@ -2187,7 +2187,7 @@ msgid "Invalid email address."
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:85
-#: includes/class-yatra-enquiry-form.php:108
+#: includes/class-yatra-enquiry-form.php:107
 msgid "Your contact number"
 msgstr ""
 
@@ -2256,13 +2256,13 @@ msgstr ""
 msgid "Yatra Email could not sent to %s via WP_Mail function"
 msgstr ""
 
-#: includes/class-yatra-enquiry-form.php:113
-#: includes/class-yatra-enquiry-form.php:117
+#: includes/class-yatra-enquiry-form.php:112
+#: includes/class-yatra-enquiry-form.php:116
 msgid "Number of Adults"
 msgstr ""
 
-#: includes/class-yatra-enquiry-form.php:122
-#: includes/class-yatra-enquiry-form.php:126
+#: includes/class-yatra-enquiry-form.php:121
+#: includes/class-yatra-enquiry-form.php:125
 msgid "Number of Children"
 msgstr ""
 
@@ -2406,19 +2406,19 @@ msgstr ""
 msgid "Your gender"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:79
+#: includes/class-yatra-user-form.php:78
 msgid "Select Gender"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:80
+#: includes/class-yatra-user-form.php:79
 msgid "Male"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:81
+#: includes/class-yatra-user-form.php:80
 msgid "Female"
 msgstr ""
 
-#: includes/class-yatra-user-form.php:99
+#: includes/class-yatra-user-form.php:97
 #: templates/myaccount/tmpl-dashboard.php:37
 msgid "Contact Address"
 msgstr ""
@@ -5277,7 +5277,7 @@ msgid "Person - Per - Pricing"
 msgstr ""
 
 #: templates/tmpl-cart-table.php:90
-msgid "Apply coupon"
+msgid "Apply Coupon"
 msgstr ""
 
 #: templates/tmpl-cart-table.php:109 templates/tmpl-cart-table.php:112

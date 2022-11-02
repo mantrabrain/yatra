@@ -73,7 +73,7 @@ class Yatra_Checkout_Form extends Yatra_Form
                 'type' => 'select',
                 'group_id' => 'yatra_tour_customer_info',
                 'options' => $countries,
-                'select2' => true
+                'select2' => false
             ),
             'phone_number' => array(
                 'name' => 'phone_number',
