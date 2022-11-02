@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.11\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-11-02 07:09:23+00:00\n"
+"POT-Creation-Date: 2022-11-02 13:16:30+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1803,7 +1803,7 @@ msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:22
 #: includes/admin/templates/availability/availability-calendar.php:24
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:52
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:60
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:165
 #: includes/template-tags.php:804 templates/myaccount/tmpl-booking-item.php:65
 #: templates/myaccount/tmpl-pricing-header.php:7
@@ -1811,19 +1811,19 @@ msgid "Price Per"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:32
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:60
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:68
 #: includes/template-tags.php:809 templates/myaccount/tmpl-pricing-header.php:6
 msgid "Person"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:33
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:61
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:69
 #: includes/template-tags.php:810
 msgid "Group"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:45
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:74
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:82
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:166
 #: includes/template-tags.php:815 includes/template-tags.php:819
 #: templates/myaccount/tmpl-booking-item.php:66
@@ -1833,34 +1833,34 @@ msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:47
 #: includes/admin/templates/availability/availability-calendar.php:54
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:80
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:88
 msgid "Number of people for one group"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:59
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:86
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:94
 msgid "Regular Price (%s)"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:63
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:90
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:98
 msgid "Please enter regular price (%s)"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:66
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:93
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:101
 msgid "Sales Price (%s)"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:70
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:97
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:105
 msgid "Please enter sales price (%s)"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:76
 #: includes/admin/templates/availability/availability-calendar.php:78
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:6
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:13
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:14
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:21
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:161
 #: includes/template-tags.php:848 includes/template-tags.php:852
 #: templates/myaccount/tmpl-booking-item.php:62
@@ -1868,12 +1868,12 @@ msgid "Pricing Label"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:84
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:11
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:19
 msgid "Enter pricing label. Ex. Adult Price"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:90
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:28
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:36
 #: includes/template-tags.php:737
 msgid "Minimum People (Pax)"
 msgstr ""
@@ -1883,20 +1883,20 @@ msgid "Minimum number of people per booking."
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:100
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:34
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:42
 #: includes/template-tags.php:742
 msgid "Minimum number of people per booking"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:105
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:40
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:48
 #: includes/template-tags.php:748
 msgid "Maximum People (Pax)"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:107
 #: includes/admin/templates/availability/availability-calendar.php:114
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:46
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:54
 #: includes/template-tags.php:753
 msgid "Maximum number of people per booking"
 msgstr ""
@@ -2021,10 +2021,15 @@ msgid "Total Price : "
 msgstr ""
 
 #: includes/admin/templates/metabox/tour/pricing/add-new.php:4
+#: includes/admin/templates/metabox/tour/pricing/add-new.php:6
 msgid "Add new pricing option"
 msgstr ""
 
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:17
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:5
+msgid "[Pricing Label]"
+msgstr ""
+
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:25
 #: includes/template-tags.php:449
 #: includes/widgets/class-yatra-activity-widget.php:44
 #: includes/widgets/class-yatra-destination-widget.php:44
@@ -2033,32 +2038,32 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:22
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:30
 msgid "Ex: Age Between age 16 to 18"
 msgstr ""
 
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:24
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:32
 #: includes/template-tags.php:858 includes/template-tags.php:862
 msgid "Pricing Description"
 msgstr ""
 
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:36
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:44
 msgid ""
 "Minimum number of people per booking for this pricing. Leave it blank to "
 "use this tour's minimum people (pax) ( From General & Date Settings )."
 msgstr ""
 
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:48
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:56
 msgid ""
 "Maximum number of people per booking for this pricing. Leave it blank to "
 "use this tour's maximum people (pax) ( From General & Date Settings )."
 msgstr ""
 
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:59
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:67
 msgid "Use Tours price Per"
 msgstr ""
 
-#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:82
+#: includes/admin/templates/metabox/tour/pricing/group-pricing.php:90
 msgid "Number of people for one group for this pricing option."
 msgstr ""
 
