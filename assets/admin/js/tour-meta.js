@@ -146,15 +146,27 @@
                 var pricing_option_id = _that.uniqid();
                 var tpl = $('#yatra-group-pricing-tmpl').html();
                 tpl = _that._replaceAll(tpl, '{%pricing_option_id%}', pricing_option_id);
+                tpl = _that._replaceAll(tpl, 'yatra-pricing-group-wrap-container', 'yatra-pricing-group-wrap-container active');
                 $(this).closest('.yatra-field-wrap').before(tpl);
-
             });
-            $('body').on('click', '.yatra-pricing-group-wrap .pricing-delete', function () {
+            $('body').on('click', '.yatra-pricing-group-header .pricing-delete', function (e) {
 
+                e.stopPropagation();
                 var sure = confirm('Are you sure want to delete this group pricing? Pricing will be deleted only after publish.');
                 if (sure) {
                     $(this).closest('.yatra-pricing-group-wrap-container').remove();
                 }
+            });
+
+            $('body').on('click', '.yatra-pricing-group-header', function () {
+
+                let container = $(this).closest('.yatra-pricing-group-wrap-container');
+                if (container.hasClass('active')) {
+                    container.removeClass('active');
+                } else {
+                    container.addClass('active');
+                }
+
             });
             $('body').on('change', '.yatra_multiple_pricing_price_per', function () {
                 var val = $(this).val();

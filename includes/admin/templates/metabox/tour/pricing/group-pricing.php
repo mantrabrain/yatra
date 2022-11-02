@@ -1,7 +1,15 @@
 <div class="yatra-pricing-group-wrap-container">
+    <div class="yatra-field-wrap yatra-pricing-group-header">
+        <div class="labels">
+            <span class="pricing-toggle action-button dashicons dashicons-arrow-down-alt2"></span>
+            <span class="label"><?php echo $multiple_pricing ['pricing_label'] !== '' ? esc_html($multiple_pricing ['pricing_label']) : __('[Pricing Label]', 'yatra'); ?></span>
+        </div>
+        <div class="actions">
+            <span class="pricing-delete action-button dashicons dashicons-remove"></span>
+        </div>
+    </div>
 
     <div class="yatra-pricing-group-wrap">
-        <span type="button" class="pricing-delete dashicons dashicons-trash"></span>
         <div class="yatra-field-wrap">
             <label for="<?php echo $pricing_option_id . '[pricing_label]'; ?>"><?php echo __('Pricing Label', 'yatra') ?></label>
             <input value="<?php echo esc_attr($multiple_pricing ['pricing_label']); ?>"
