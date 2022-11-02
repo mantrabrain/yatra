@@ -598,7 +598,7 @@ body.post-type-yatra-booking #title {
 .yatra-admin--tabs li.active, .yatra-admin--tabs li:hover {
     background: #bce5ff;
     color: #000;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid transparent;
 }
 
 .yatra-admin-tab--content-section {
