@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.11\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-11-02 13:16:30+00:00\n"
+"POT-Creation-Date: 2022-11-02 14:04:09+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1585,7 +1585,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:109
-#: includes/functions.php:849
+#: includes/functions.php:854
 msgid "Payment Gateways"
 msgstr ""
 
@@ -2342,15 +2342,15 @@ msgid "%1$s was called with an invalid level \"%2$s\"."
 msgstr ""
 
 #: includes/class-yatra-payment.php:8 includes/class-yatra-payment.php:92
-#: includes/functions.php:259 includes/yatra-template-functions.php:213
+#: includes/functions.php:264 includes/yatra-template-functions.php:213
 msgid "Pending"
 msgstr ""
 
-#: includes/class-yatra-payment.php:9 includes/functions.php:262
+#: includes/class-yatra-payment.php:9 includes/functions.php:267
 msgid "Completed"
 msgstr ""
 
-#: includes/class-yatra-payment.php:10 includes/functions.php:261
+#: includes/class-yatra-payment.php:10 includes/functions.php:266
 msgid "On Hold"
 msgstr ""
 
@@ -2358,7 +2358,7 @@ msgstr ""
 msgid "Refunded"
 msgstr ""
 
-#: includes/class-yatra-payment.php:12 includes/functions.php:264
+#: includes/class-yatra-payment.php:12 includes/functions.php:269
 msgid "Failed"
 msgstr ""
 
@@ -2690,42 +2690,42 @@ msgstr ""
 msgid "Tour Tabs"
 msgstr ""
 
-#: includes/functions.php:128
+#: includes/functions.php:133
 #. translators: %s template
 msgid "%s does not exist."
 msgstr ""
 
-#: includes/functions.php:145
+#: includes/functions.php:150
 msgid "action_args should not be overwritten when calling yatra_get_template."
 msgstr ""
 
-#: includes/functions.php:260
+#: includes/functions.php:265
 msgid "Processing"
 msgstr ""
 
-#: includes/functions.php:263
+#: includes/functions.php:268
 msgid "Cancelled"
 msgstr ""
 
-#: includes/functions.php:287
+#: includes/functions.php:292
 msgid "Previous Post"
 msgstr ""
 
-#: includes/functions.php:288
+#: includes/functions.php:293
 msgid "Next Post"
 msgstr ""
 
-#: includes/functions.php:319
+#: includes/functions.php:324
 #. translators: 1: SVG icon. 2: post author, only visible to screen readers. 3:
 #. author link.
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:1194 includes/template-tags.php:850
+#: includes/functions.php:1199 includes/template-tags.php:850
 msgid "Guest"
 msgstr ""
 
-#: includes/functions.php:1334
+#: includes/functions.php:1339
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
 msgstr ""
