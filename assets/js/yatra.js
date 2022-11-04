@@ -547,7 +547,7 @@ window.yatra_global_tour_additional_price = 0;
                     },
 
                     changeTab: function (event) {
-                        var self = $(event.target);
+                        var self = $(event.currentTarget);
                         event.preventDefault();
                         this.removeTabFocus();
                         this.setSelectedTab(self);
@@ -636,7 +636,7 @@ window.yatra_global_tour_additional_price = 0;
                     },
 
                     setSelectedTabPanel: function (self) {
-                        this.$el.find('#' + self.attr('aria-controls')).attr('aria-hidden', null);
+                        this.$el.find('#' + self.attr('aria-controls')).attr('aria-hidden', false);
                     },
 
                 };
