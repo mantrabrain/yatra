@@ -1,11 +1,13 @@
 html {
-    background: #f9f9f9;
+    background: #ccc;
+    margin: 0;
+    padding: 0;
 }
 
 body {
     margin: 60px auto 24px;
     box-shadow: none;
-    background: #f9f9f9;
+    background: #edfffd;
     padding: 0;
 }
 
@@ -14,7 +16,13 @@ body {
 }
 
 .yatra-logo a {
+    font-weight: bolder;
     text-decoration: none;
+}
+
+.yatra-logo p {
+    font-weight: 500;
+    font-size:15px;
 }
 
 .yatra-setup-content {
@@ -57,6 +65,10 @@ a:hover, a:active {
     background: #017760;
     border-color: #017760;
     color: #fff;
+}
+
+.yatra-setup-content .button-primary:focus, .yatra-setup-content .button-primary:focus {
+    box-shadow: none;
 }
 
 .yatra-setup-content h1,
@@ -244,11 +256,12 @@ a:hover, a:active {
     margin: 0;
     list-style: none outside;
     overflow: hidden;
-    color: #ccc;
+    color: #aaa;
     width: 100%;
     display: -webkit-inline-flex;
     display: -ms-inline-flexbox;
     display: inline-flex;
+    border-bottom: 1px solid #ddd;
 }
 
 .yatra-setup-steps li {

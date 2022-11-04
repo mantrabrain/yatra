@@ -116,7 +116,7 @@ class Yatra_Setup_Wizard
         wp_register_script('yatra-select2', YATRA_PLUGIN_URI . '/assets/lib/select2/js/select2.min.js', false, false, true);
 
         if (!empty($_POST['save_step']) && isset($this->steps[$this->step]['handler'])) {
-            if(is_callable($this->steps[$this->step]['handler'])) {
+            if (is_callable($this->steps[$this->step]['handler'])) {
                 call_user_func($this->steps[$this->step]['handler']);
             }
         }
@@ -154,8 +154,11 @@ class Yatra_Setup_Wizard
         </head>
         <body class="yatra-setup wp-core-ui">
         <h1 class="yatra-logo"><a
-                    href="https://wpyatra.com/?utm_source=setup_wizard&utm_medium=logo&utm_campaign=plugin">Complete
-                Travel & Tour Booking System – Yatra</a></h1>
+                    href="https://wpyatra.com/?utm_source=setup_wizard&utm_medium=logo&utm_campaign=plugin"
+                    target="_blank">Yatra</a>
+            <p>Complete Travel & Tour Booking System for WordPress</p>
+        </h1>
+
         <?php
     }
 
@@ -229,7 +232,7 @@ class Yatra_Setup_Wizard
     public function setup_step_introduction()
     {
         ?>
-        <h1><?php _e('Welcome to Complete Travel & Tour Booking System – Yatra!', 'yatra'); ?></h1>
+        <h1><?php _e('Welcome to WordPress Travel Booking System – Yatra!', 'yatra'); ?></h1>
         <p><?php _e('Thank you for choosing Yatra plugin for your travel & tour booking site. This setup wizard will help you configure the basic settings of the plugin. <strong>It’s completely optional and shouldn’t take longer than one minutes.</strong>', 'yatra'); ?></p>
         <p><?php _e('No time right now? If you don’t want to go through the wizard, you can skip and return to the WordPress dashboard.', 'yatra'); ?></p>
         <p class="yatra-setup-actions step">
@@ -581,7 +584,7 @@ class Yatra_Setup_Wizard
     public function setup_step_themes()
     {
         ?>
-        <h1 style="text-align: center;font-weight: bold;text-transform: uppercase;"><?php _e('Best Compatible Theme for Yatra', 'yatra'); ?></h1>
+        <h1 style="text-align: center;font-weight: bold;"><?php _e('Best Compatible Theme for Yatra', 'yatra'); ?></h1>
         <form method="post">
             <?php
 
