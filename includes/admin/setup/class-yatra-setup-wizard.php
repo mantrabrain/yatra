@@ -116,7 +116,9 @@ class Yatra_Setup_Wizard
         wp_register_script('yatra-select2', YATRA_PLUGIN_URI . '/assets/lib/select2/js/select2.min.js', false, false, true);
 
         if (!empty($_POST['save_step']) && isset($this->steps[$this->step]['handler'])) {
-            call_user_func($this->steps[$this->step]['handler']);
+            if(is_callable($this->steps[$this->step]['handler'])) {
+                call_user_func($this->steps[$this->step]['handler']);
+            }
         }
 
         ob_start();
