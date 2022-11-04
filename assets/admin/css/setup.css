@@ -430,14 +430,14 @@ a:hover, a:active {
 
 .yatra-setup-content .theme-browser .theme .theme-screenshot {
     display: block;
-     position: relative;
+    position: relative;
     min-height: 300px;
 }
 
 .yatra-setup-content .theme-browser .theme .theme-screenshot img {
 
     width: 100%;
-    display:block;
+    display: block;
 
 }
 
@@ -528,5 +528,19 @@ a:hover, a:active {
 
 .yatra-setup-next-steps-last {
     padding: 10px 0;
-    display: block;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.yatra-setup-content .yatra-import-dummy-data, .yatra-setup-content .go-to-dashboard {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.yatra-setup-content .yatra-import-dummy-data .dashicons,
+.yatra-setup-content .go-to-dashboard .dashicons {
+    margin-top: 2px;
 }

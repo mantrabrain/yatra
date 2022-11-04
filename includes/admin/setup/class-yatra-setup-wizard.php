@@ -564,14 +564,14 @@ class Yatra_Setup_Wizard
     {
         return array(
             array(
-                'slug' => 'astra',
+                'slug' => 'resa',
                 'title' => __('Resa', 'yatra'),
-                'demo_url' => 'https://wpyatri.com',
+                'demo_url' => 'https://wpyatra.com',
                 'is_free' => true,
                 'screenshot' => 'https://raw.githubusercontent.com/mantrabrain/yatri/master/screenshot.png',
-                'landing_page' => 'https://wpyatri.com/?ref=yatrasetup',
+                'landing_page' => 'https://wpyatra.com/?ref=yatrasetup',
                 'is_installable' => false,
-                'download_link' => 'https://downloads.wordpress.org/theme/yatri.zip'
+                'download_link' => 'https://downloads.wordpress.org/theme/resa.zip'
             )
         );
     }
@@ -655,7 +655,6 @@ class Yatra_Setup_Wizard
     public function setup_final_ready()
     {
         ?>
-
         <div class="final-step">
             <h1><?php _e('Your Site is Ready!', 'yatra'); ?></h1>
 
@@ -663,13 +662,15 @@ class Yatra_Setup_Wizard
                 <div class="yatra-setup-next-steps-last">
                     <h2><?php _e('Next Steps &rarr;', 'yatra'); ?></h2>
 
-                    <a class="button button-primary button-large"
+                    <a class="button button-primary button-large go-to-dashboard"
                        href="<?php echo esc_url(admin_url('edit.php?post_type=tour&page=yatra-dashboard')); ?>">
-                        <?php _e('Go to Dashboard!', 'yatra'); ?>
+                        <span class="dashicons dashicons-dashboard"></span>
+                        <span>&nbsp;&nbsp;<?php _e('Go to Dashboard!', 'yatra'); ?></span>
                     </a>
                     <button class="button button-primary button-large yatra-import-dummy-data"
                             href="<?php echo esc_url(admin_url('edit.php?post_type=tour&page=yatra-dashboard')); ?>">
-                        <?php _e('Import Sample Data', 'yatra'); ?>
+                        <span class="dashicons dashicons-download"></span>
+                        <span>&nbsp;&nbsp;<?php _e('Import Sample Data', 'yatra'); ?></span>
                     </button>
                 </div>
             </div>

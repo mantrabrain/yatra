@@ -31,7 +31,8 @@ class ThemeController
 
     private function get_source_zip_url()
     {
-        return apply_filters('yatra_theme_controller_theme_source', "https://downloads.wordpress.org/theme/{$this->theme}.latest-stable.zip", $this->source);
+
+        return apply_filters('yatra_theme_controller_theme_source', "https://downloads.wordpress.org/theme/{$this->theme}.latest-stable.zip", $this->theme, $this->source);
     }
 
     public function install()
