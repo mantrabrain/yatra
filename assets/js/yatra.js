@@ -684,7 +684,15 @@ window.yatra_global_tour_additional_price = 0;
             } else {
                 $(el).prepend(error_html);
             }
-            document.getElementById("yatra-message").scrollIntoView();
+            let target = document.getElementById("yatra-message");
+
+            if (target.getBoundingClientRect().bottom > window.innerHeight) {
+                target.scrollIntoView(false);
+            }
+
+            if (target.getBoundingClientRect().top < 0) {
+                target.scrollIntoView();
+            }
 
             if (fade_out_delay > 0) {
 
