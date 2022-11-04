@@ -92,7 +92,7 @@
     height: auto;
     line-height: 2.5em;
     border-radius: 0;
-    border: 2px solid transparent;
+    border: 1px solid #ddd !important;
     cursor: pointer;
     text-align: center;
     font-size: 15px;

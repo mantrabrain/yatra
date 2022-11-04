@@ -140,7 +140,7 @@ class Yatra_Design_Hooks
             }
             .day.yatra-availability-booking,
             .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-booking{
-            border-color: <?php echo $booking; ?>!important;
+            border-bottom-color: <?php echo $booking; ?>!important;
             }
             <?php
         }
@@ -153,7 +153,7 @@ class Yatra_Design_Hooks
             }
             .day.yatra-availability-enquiry,
             .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-enquiry{
-            border-color: <?php echo $enquiry; ?>!important;
+            border-bottom-color: <?php echo $enquiry; ?>!important;
             }
             <?php
         }
@@ -166,7 +166,7 @@ class Yatra_Design_Hooks
             }
             .day.yatra-availability-none,
             .yatra-calendar-date-listing ul.yatra-calendar-listing li span.yatra-availability-none{
-            border-color: <?php echo $not_available; ?>!important;
+            border-bottom-color: <?php echo $not_available; ?>!important;
             }
             <?php
         }
