@@ -416,10 +416,9 @@ a:hover, a:active {
 
 .yatra-setup-content .theme-browser .theme {
     cursor: pointer;
-    float: left;
-    margin: 0 4% 4% 0;
+    margin: 15px auto;
     position: relative;
-    width: 46%;
+    width: 70%;
     border: 1px solid #ddd;
     box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
@@ -431,25 +430,19 @@ a:hover, a:active {
 
 .yatra-setup-content .theme-browser .theme .theme-screenshot {
     display: block;
-    overflow: hidden;
-    position: relative;
-    -webkit-backface-visibility: hidden;
-    transition: opacity 0.2s ease-in-out;
+     position: relative;
+    min-height: 300px;
 }
 
 .yatra-setup-content .theme-browser .theme .theme-screenshot img {
-    height: auto;
-    position: absolute;
-    left: 0;
-    top: 0;
+
     width: 100%;
-    transition: opacity 0.2s ease-in-out;
+    display:block;
+
 }
 
 .yatra-setup-content .theme-browser .theme .theme-screenshot:after {
-    content: "";
-    display: block;
-    padding-top: 66.66666%;
+
 }
 
 .yatra-setup-content .theme-browser:after {
@@ -460,41 +453,34 @@ a:hover, a:active {
 
 .yatra-setup-content .theme-id-container {
     position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(5, 152, 123, 0.1);
+    padding: 10px 20px;
+    border-top: 1px solid #ddd;
 }
 
 .yatra-setup-content .theme-browser .theme .theme-name {
     font-size: 15px;
     font-weight: 600;
-    height: 18px;
     margin: 0;
-    padding: 15px;
-    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
+
+
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    background: #05997c0d;
-    background: rgba(5, 152, 123, 0.05);
     color: #000;
     text-transform: uppercase;
 }
 
 .yatra-setup-content .theme-browser .theme.active .theme-actions,
 .yatra-setup-content .theme-browser .theme .theme-actions {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    right: 0;
-    padding: 10px 15px;
-    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.1);
+
 }
 
 .yatra-setup-content .theme-browser .theme .theme-actions {
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-    opacity: 0;
-    transition: opacity 0.1s ease-in-out;
-    height: auto;
-    background: rgba(224, 224, 224, 0.7);
-    border-left: 1px solid rgba(0, 0, 0, 0.05);
+
 }
 
 .yatra-setup-content .theme-browser .theme:hover .theme-actions,
