@@ -92,14 +92,14 @@ class Yatra_List_Table_Hooks
     {
         $is_featured = (boolean)get_post_meta($tour_id, 'yatra_tour_meta_tour_featured', true);
 
-        $star_class = $is_featured ? 'star-filled' : 'star-empty';
+        $star_class = $is_featured ? 'fa fa-flag' : 'far fa-flag';
 
         $nonce = wp_create_nonce('yatra_tour_update_feature_status_' . $tour_id);
 
         $featured_status = $is_featured ? 1 : 0;
 
         ?>
-        <span class="yatra-featured-tour yatra-pointer yatra-update-feature-tour-icon dashicons dashicons-<?php echo esc_attr($star_class) ?>"
+        <span style="font-size:20px" class="yatra-featured-tour yatra-pointer yatra-update-feature-tour-icon <?php echo esc_attr($star_class) ?>"
               data-tour-id="<?php echo absint($tour_id); ?>"
               data-tour-nonce="<?php echo esc_attr($nonce); ?>"
               data-is-featured="<?php echo absint($featured_status) ?>"

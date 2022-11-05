@@ -156,6 +156,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
                 case "edit-tour":
                     array_push($js_dependencies, 'yatra-tour-listing-script', 'yatra-tippy');
                     $localization_array['tour_featured_status_update_action'] = 'yatra_update_tour_featured_status';
+                    $css_dependencies[] = 'yatra-font-awesome';
                     break;
                 case "tour":
                     array_push($js_dependencies, 'yatra-tour-meta-script', 'yatra-tippy');

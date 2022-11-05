@@ -39,17 +39,16 @@
 
                         var response_status = response.data;
 
-                        $(el).removeClass('dashicons-star-empty');
-
-                        $(el).removeClass('dashicons-star-filled');
+                        $(el).removeClass('far');
+                        $(el).removeClass('fa');
 
                         if (response_status === 1) {
 
-                            $(el).addClass('dashicons-star-filled');
+                            $(el).addClass('fa');
 
                         } else {
 
-                            $(el).addClass('dashicons-star-empty');
+                            $(el).addClass('far');
                         }
                         $(el).attr('data-is-featured', response_status);
                     }
