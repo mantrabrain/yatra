@@ -362,13 +362,16 @@ if (!function_exists('yatra_privacy_agreement')) {
 
             ob_start();
             if ($privacy_page > 0) {
+
+                $is_checked_privacy = yatra()->helper->input('yatra_agree_to_privacy_policy');
+                $is_checked_privacy = absint($is_checked_privacy) === 1 ? 1 : 0;
                 ?>
 
                 <fieldset id="yatra-privacy-policy-agreement">
 
                     <div class="yatra-privacy-policy-agreement">
                         <input name="yatra_agree_to_privacy_policy" class="required" type="checkbox"
-                               id="yatra-agree-to-privacy-policy" value="1"/>
+                               id="yatra-agree-to-privacy-policy" value="1" <?php checked($is_checked_privacy, 1) ?>/>
                         <label for="yatra-agree-to-privacy-policy"><?php echo stripslashes($agree_label); ?></label>
                         <a href="<?php echo esc_url(get_permalink($privacy_page)) ?>"
                            target="_blank"><?php echo __('View Privacy Policy', 'yatra') ?></a>
@@ -400,19 +403,23 @@ if (!function_exists('yatra_terms_agreement')) {
 
         if ($show_terms_agreement === 'yes') {
 
-            $agree_label = get_option('yatra_terms_and_conditions_agree_label', __('Agree to Privacy Policy?', 'yatra'));
+            $agree_label = get_option('yatra_terms_and_conditions_agree_label', __('Agree to Terms and conditions?', 'yatra'));
 
             $terms_page = absint(get_option('yatra_terms_and_conditions_page', 0));
 
             ob_start();
 
             if ($terms_page > 0) {
+
+                $is_checked_terms = yatra()->helper->input('yatra_agree_to_terms_and_conditions');
+                $is_checked_terms = absint($is_checked_terms) === 1 ? 1 : 0;
                 ?>
 
                 <fieldset id="yatra-terms-agreement">
 
                     <div class="yatra-terms-agreement">
-                        <input name="yatra_agree_to_terms_and_conditions" class="required" type="checkbox"
+                        <input name="yatra_agree_to_terms_and_conditions" class="required"
+                               type="checkbox" <?php checked($is_checked_terms, 1) ?>
                                id="yatra-agree-to-terms" value="1"/>
                         <label for="yatra-agree-to-terms"><?php echo stripslashes($agree_label); ?></label>
                         <a href="<?php echo esc_url(get_permalink($terms_page)) ?>"

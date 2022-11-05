@@ -8,6 +8,7 @@
 
 use Yatra\Core\Admin\Notices;
 use Yatra\Core\Admin\Tracking;
+use Yatra\Core\Helper;
 use Yatra\Core\Initialize;
 use Yatra\Core\Session;
 
@@ -56,6 +57,13 @@ final class Yatra
      * @var Tracking
      */
     public $tracking = null;
+
+    /**
+     * Tracking instance.
+     *
+     * @var Helper
+     */
+    public $helper = null;
 
     /**
      * Yatra_Error instance.
@@ -126,6 +134,7 @@ final class Yatra
         self::setup_instance($file);
         self::$_instance->session = new Session();
         self::$_instance->tracking = new Tracking();
+        self::$_instance->helper = new Helper();
         return self::$_instance;
     }
 

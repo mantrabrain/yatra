@@ -16,6 +16,7 @@ if (!defined('ABSPATH')) {
 
 abstract class Yatra_Form
 {
+    protected $echo_post_value = false;
 
     protected function valid_data($data = array(), $form_fields_all = array(), $error_code = 'yatra_form_validation_errors')
     {
@@ -182,7 +183,6 @@ abstract class Yatra_Form
     protected function form_html($field = array())
     {
 
-
         $extra_attributes = array();
 
         if (!isset($field['name']) || !isset($field['type'])) {
@@ -225,10 +225,23 @@ abstract class Yatra_Form
 
         $name = $field_key;
 
+        $name_id = $field_key;
+
         if (isset($field['group_id'])) {
 
             $name = $field['group_id'] . '[' . $field_key . ']';
+
+            $name_id = $field['group_id'] . '.' . $name_id;
         }
+        if ($this->echo_post_value) {
+
+            $input_value = yatra()->helper->input($name_id);
+
+            if ($input_value !== '') {
+                $value = $input_value;
+            }
+        }
+
         echo '<div class="yatra-field-wrap ' . esc_attr($wrap_class) . '">';
 
         switch ($field['type']) {

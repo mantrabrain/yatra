@@ -17,14 +17,19 @@
                         return false;
                     }
 
-
                     _that.load_gateway(payment_mode);
 
                 });
 
                 $(document).ready(function () {
+
                     if ($('input[name="yatra-payment-gateway"]:checked').length < 1) {
+
                         $('input[name="yatra-payment-gateway"]').eq(0).trigger('click');
+
+                    } else {
+
+                        $('input[name="yatra-payment-gateway"]:checked').trigger('change');
                     }
                 });
 

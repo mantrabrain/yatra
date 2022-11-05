@@ -855,6 +855,12 @@ if (!function_exists('yatra_payment_gateway_fields')) {
 
             echo '<ul class="yatra-payment-gateway">';
 
+            $selected_gateway_id = $yatra_get_payment_gateways[0]['id'] ?? '';
+
+            $selected_gateway = yatra()->helper->input('yatra-payment-gateway');
+
+            $selected_gateway = $selected_gateway === '' ? $selected_gateway_id : $selected_gateway;
+
             foreach ($yatra_get_payment_gateways as $gateway) {
 
                 $gateway_id = isset($gateway['id']) ? $gateway['id'] : '';
@@ -865,7 +871,7 @@ if (!function_exists('yatra_payment_gateway_fields')) {
 
                     echo '<label for="yatra-payment-gateway-' . esc_attr($gateway_id) . '">';
 
-                    echo '<input type="radio" id="yatra-payment-gateway-' . esc_attr($gateway_id) . '" name="yatra-payment-gateway" value="' . esc_attr($gateway_id) . '"/>';
+                    echo '<input type="radio" id="yatra-payment-gateway-' . esc_attr($gateway_id) . '" name="yatra-payment-gateway" value="' . esc_attr($gateway_id) . '" ' . checked($gateway_id, $selected_gateway, false) . '/>';
 
                     echo '&nbsp;<span>' . $gateway['frontend_title'] . '</span>';
 

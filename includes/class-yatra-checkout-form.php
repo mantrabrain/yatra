@@ -5,6 +5,7 @@ class Yatra_Checkout_Form extends Yatra_Form
 {
     private static $instance;
 
+    protected $echo_post_value = true;
 
     public static function get_instance()
     {

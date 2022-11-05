@@ -696,9 +696,9 @@ window.yatra_global_tour_additional_price = 0;
 
             if (fade_out_delay > 0) {
 
-                $(el).find('.yatra-message').delay(fade_out_delay).fadeOut(800, function () {
-                    $(this).remove()
-                });
+               /* $(el).find('.yatra-message').delay(fade_out_delay).fadeOut(800, function () {
+                  //  $(this).remove()
+                });*/
             }
 
         },
@@ -718,7 +718,15 @@ window.yatra_global_tour_additional_price = 0;
             } else {
                 $(el).prepend(error_html);
             }
-            document.getElementById("yatra-message").scrollIntoView();
+            let target = document.getElementById("yatra-message");
+
+            if (target.getBoundingClientRect().bottom > window.innerHeight) {
+                target.scrollIntoView(false);
+            }
+
+            if (target.getBoundingClientRect().top < 0) {
+                target.scrollIntoView();
+            }
 
             if (fade_out_delay > 0) {
                 $(el).find('.yatra-message').delay(fade_out_delay).fadeOut(800, function () {
