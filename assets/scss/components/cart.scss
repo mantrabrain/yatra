@@ -78,6 +78,8 @@
       display: flex;
       position: relative;
       width: 50%;
+      align-items: center;
+      flex: 5;
 
 
       span {
@@ -104,6 +106,7 @@
     .yatra-traveller-price {
 
       width: 30%;
+      flex: 3;
 
       ins {
         font-weight: 500;

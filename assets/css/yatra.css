@@ -2715,7 +2715,15 @@ body.single-tour figure {
       display: -ms-flexbox;
       display: flex;
       position: relative;
-      width: 50%; }
+      width: 50%;
+      -webkit-box-align: center;
+         -moz-box-align: center;
+          -ms-flex-align: center;
+              align-items: center;
+      -webkit-box-flex: 5;
+         -moz-box-flex: 5;
+          -ms-flex: 5;
+              flex: 5; }
       .yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-number span {
         font-weight: 500;
         font-size: 14px; }
@@ -2731,7 +2739,11 @@ body.single-tour figure {
           padding: 0 10px;
           background: #fff; }
     .yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-price {
-      width: 30%; }
+      width: 30%;
+      -webkit-box-flex: 3;
+         -moz-box-flex: 3;
+          -ms-flex: 3;
+              flex: 3; }
       .yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-price ins {
         font-weight: 500; }
       .yatra-tour-cart-edit-form-fields .yatra-traveller-info-wrap .yatra-traveller-price span {
