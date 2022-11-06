@@ -11,6 +11,7 @@ use Yatra\Core\Admin\Tracking;
 use Yatra\Core\Helper;
 use Yatra\Core\Initialize;
 use Yatra\Core\Session;
+ use Yatra\Core\Tour\TourFactory;
 
 defined('ABSPATH') || exit;
 
@@ -57,6 +58,13 @@ final class Yatra
      * @var Tracking
      */
     public $tracking = null;
+
+    /**
+     * Tracking instance.
+     *
+     * @var TourFactory
+     */
+    public $tour_factory = null;
 
     /**
      * Tracking instance.
@@ -135,6 +143,7 @@ final class Yatra
         self::$_instance->session = new Session();
         self::$_instance->tracking = new Tracking();
         self::$_instance->helper = new Helper();
+        self::$_instance->tour_factory = new TourFactory();
         return self::$_instance;
     }
 

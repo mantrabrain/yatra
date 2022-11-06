@@ -732,6 +732,16 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 //'row_end' => true,
 
             ),
+            'yatra_tour_meta_disable_booking' => array(
+                'name' => 'yatra_tour_meta_disable_booking',
+                'title' => esc_html__('Disable booking', 'yatra'),
+                'type' => 'switch',
+                'description' => esc_html__('This option let you enable/disable booking option for this tour package. Booking calendar will be hidden if you enable this option. User can only send enquiry.', 'yatra'),
+
+                //'wrap_class' => 'yatra-right',
+                //'row_end' => true,
+
+            ),
             'yatra_tour_minimum_pax' => array(
                 'name' => 'yatra_tour_minimum_pax',
                 'title' => esc_html__('Minimum People (Pax)', 'yatra'),

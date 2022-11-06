@@ -8,6 +8,8 @@ class Initialize
 {
     public static function run()
     {
+        require_once YATRA_ABSPATH . 'core/globals.php';
+
         $self = new self;
 
         $self->api_init();

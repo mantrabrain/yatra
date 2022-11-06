@@ -103,7 +103,7 @@ class Yatra_Ajax
             wp_send_json_error('You do not have permission');
         }
         $theme = new ThemeController($theme);
-        
+
         $status = $theme->install_and_activate();
 
         if (!$status) {
@@ -174,6 +174,13 @@ class Yatra_Ajax
         }
 
         $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
+        
+        $tour = new \Yatra\Core\Tours\Tour();
+        exit;
+
+        if (yatra()->tour->is_booking_disabled()) {
+            wp_send_json_error('You cant make booking for this tour package.');
+        }
 
         $number_of_persons = isset($_POST['yatra_number_of_person']) ? ($_POST['yatra_number_of_person']) : array();
 
