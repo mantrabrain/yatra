@@ -484,6 +484,8 @@ body.yatra-popup-open {
 #yatra-availability-calendar-container .yatra-availability-tour-lists li.booking-disabled a {
     color: #ddd;
     outline: none;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 #yatra-availability-calendar-container .yatra-availability-tour-lists li a {
