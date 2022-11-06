@@ -262,6 +262,13 @@ if (!class_exists('Yatra_Cart')) {
                     $unset_this = true;
                 }
             }
+            $tour = yatra_get_tour($tour_id);
+
+            if ($tour->is_booking_disabled()) {
+
+                $unset_this = true;
+            }
+
 
             if ($unset_this) {
 

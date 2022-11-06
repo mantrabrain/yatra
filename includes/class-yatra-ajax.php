@@ -174,12 +174,12 @@ class Yatra_Ajax
         }
 
         $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
-        
-        $tour = new \Yatra\Core\Tours\Tour();
-        exit;
 
-        if (yatra()->tour->is_booking_disabled()) {
-            wp_send_json_error('You cant make booking for this tour package.');
+        $tour = yatra_get_tour($tour_id);
+
+        if ($tour->is_booking_disabled()) {
+
+            wp_send_json_error('Booking is disabled for this tour package by admin.');
         }
 
         $number_of_persons = isset($_POST['yatra_number_of_person']) ? ($_POST['yatra_number_of_person']) : array();
