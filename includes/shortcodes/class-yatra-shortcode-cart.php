@@ -46,8 +46,6 @@ class Yatra_Shortcode_Cart
      */
     public static function mini_cart_output($atts)
     {
-        wp_enqueue_style('yatra-mini-cart');
-
         $cart = yatra()->cart->get_cart();
 
         if (!is_array($cart)) {

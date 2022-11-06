@@ -52,7 +52,7 @@ if (!class_exists('Yatra_Assets')) {
             wp_register_script('yatra-filter', YATRA_PLUGIN_URI . '/assets/js/yatra-filter.js', array('jquery', 'jquery-ui-slider', 'jquery.ui.touch-punch'), YATRA_VERSION);
 
 
-            $main_css_dependency = array('yatra-font-awesome', 'lightbox', 'yatra-jquery-ui');
+            $main_css_dependency = array('yatra-font-awesome', 'lightbox', 'yatra-jquery-ui', 'yatra-mini-cart');
 
             $main_script_dependency = array('jquery', 'lightbox-script', 'yatra-moment', 'yatra-popper', 'yatra-tippy');
             if (is_singular('tour')) {
