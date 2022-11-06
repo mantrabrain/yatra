@@ -661,11 +661,24 @@ if (!function_exists('yatra_tour_general_configurations')) {
         $countries = yatra_get_countries();
 
         $tour_options = array(
+            'yatra_tour_meta_disable_booking' => array(
+                'name' => 'yatra_tour_meta_disable_booking',
+                'title' => esc_html__('Disable booking', 'yatra'),
+                'type' => 'switch',
+                'description' => esc_html__('This option let you enable/disable booking option for this tour package. Booking calendar will be hidden if you enable this option. User can only send enquiry.', 'yatra'),
+
+                //'wrap_class' => 'yatra-right',
+                //'row_end' => true,
+
+            ),
             'yatra_tour_meta_tour_fixed_departure' => array(
                 'name' => 'yatra_tour_meta_tour_fixed_departure',
                 'title' => esc_html__('Fixed Departure', 'yatra'),
                 'type' => 'switch',
                 'description' => esc_html__('This option let you enable/disable fix depdeparture option for this tour package. ', 'yatra'),
+                'visibility_condition' => array(
+                    'yatra_tour_meta_disable_booking' => false
+                )
                 //'wrap_class' => 'yatra-right',
                 //'row_end' => true,
 
@@ -677,7 +690,8 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 'description' => esc_html__('You can choose date range slot for this tour availability. Do not add any date range slot to show this tour on all dates.', 'yatra'),
                 'type' => 'date_range',
                 'visibility_condition' => array(
-                    'yatra_tour_meta_tour_fixed_departure' => true
+                    'yatra_tour_meta_tour_fixed_departure' => true,
+                    'yatra_tour_meta_disable_booking' => false
                 )
                 //'row_start' => true,
 
@@ -732,16 +746,7 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 //'row_end' => true,
 
             ),
-            'yatra_tour_meta_disable_booking' => array(
-                'name' => 'yatra_tour_meta_disable_booking',
-                'title' => esc_html__('Disable booking', 'yatra'),
-                'type' => 'switch',
-                'description' => esc_html__('This option let you enable/disable booking option for this tour package. Booking calendar will be hidden if you enable this option. User can only send enquiry.', 'yatra'),
 
-                //'wrap_class' => 'yatra-right',
-                //'row_end' => true,
-
-            ),
             'yatra_tour_minimum_pax' => array(
                 'name' => 'yatra_tour_minimum_pax',
                 'title' => esc_html__('Minimum People (Pax)', 'yatra'),

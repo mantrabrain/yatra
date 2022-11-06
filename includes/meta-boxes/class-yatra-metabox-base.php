@@ -264,7 +264,7 @@ if (!class_exists('Yatra_Metabox_Base')) {
                     }
 
                 }
-                if (!$visibility_total == count($visibility_condition)) {
+                if ($visibility_total != count($visibility_condition)) {
 
                     $is_visible = false;
                 }
