@@ -481,6 +481,11 @@ body.yatra-popup-open {
     padding: 0 10px;
 }
 
+#yatra-availability-calendar-container .yatra-availability-tour-lists li.booking-disabled a {
+    color: #ddd;
+    outline: none;
+}
+
 #yatra-availability-calendar-container .yatra-availability-tour-lists li a {
 
     padding: 10px;

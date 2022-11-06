@@ -397,6 +397,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var _that = this;
             $('body').on('click', '.yatra-availability-tour-lists li a', function (event) {
                 event.preventDefault();
+                if ($(this).closest('li').hasClass('booking-disabled')) {
+                    return;
+                }
                 $(this).closest('ul').find('li').removeClass('active-tour');
                 $(this).closest('li').addClass('active-tour');
                 var tour_id = $(this).attr('data-id');

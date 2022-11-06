@@ -589,8 +589,22 @@ class Yatra_Core_Tour_Availability
         while ($the_query->have_posts()):
 
             $the_query->the_post();
-            echo '<li>';
+
+            $tour = yatra_get_tour(get_the_ID());
+
+            $class = '';
+            $tippy = '';
+
+            if ($tour->is_booking_disabled()) {
+
+                $class = 'booking-disabled yatra-tippy-tooltip';
+                $tippy = 'This tour [ ID: ' . get_the_ID() . ' ] is disabled for booking.';
+            }
+
+            echo '<li class="' . esc_attr($class) . '" data-tippy-content="' . esc_attr($tippy) . '">';
+
             echo '<a data-title="' . esc_attr(get_the_title()) . '" data-id="' . absint(get_the_ID()) . '" target="_blank" href="' . esc_url(get_the_permalink()) . '">#' . absint(get_the_ID()) . ' - ' . esc_html(get_the_title()) . '</a>';
+
             echo '</li>';
 
         endwhile;
