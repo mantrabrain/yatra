@@ -548,7 +548,7 @@ a:hover, a:active {
 }
 
 .yatra-setup-content .yatra-import-dummy-data, .yatra-setup-content .go-to-dashboard {
-    display: flex !important;
+    display: flex;
     justify-content: space-between;
     align-items: center;
 }
