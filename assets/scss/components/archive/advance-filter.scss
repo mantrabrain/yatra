@@ -79,6 +79,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 15px;
+            align-items: center;
 
 
             label {
@@ -89,6 +90,7 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
+              flex:10;
             }
 
             input.yatra-filter-item {
@@ -137,6 +139,7 @@
               text-align: center;
               color: #fff;
               font-weight: 600;
+              flex:1;
             }
 
 

@@ -7,7 +7,8 @@
                 <span class="label"><?php echo esc_html__('Destination', 'yatra'); ?></span>
             </div>
             <div class="yatra-search-item-fields">
-                <input type="text" placeholder="<?php echo esc_attr__('Pick a destination', 'yatra'); ?>"/>
+                <input type="hidden" class="input-field"/>
+                <span class="input-placeholder"><?php echo esc_html__('Pick a destination', 'yatra'); ?></span>
                 <div class="yatra-search-model">
                     <?php $destinations = yatra_get_terms_by_id('destination');
 
@@ -35,9 +36,8 @@
                 <span class="label"><?php echo esc_html__('Activities', 'yatra'); ?></span>
             </div>
             <div class="yatra-search-item-fields">
-                <input type="text"
-                       placeholder="<?php echo esc_attr__('Choose a activity', 'yatra'); ?>"/>
-
+                <input type="hidden" class="input-field"/>
+                <span class="input-placeholder"><?php echo esc_html__('Choose a activity', 'yatra'); ?></span>
                 <div class="yatra-search-model">
                     <?php $activities = yatra_get_terms_by_id('activity');
 
@@ -66,7 +66,8 @@
                 <span class="label"><?php echo esc_html__('Duration', 'yatra'); ?></span>
             </div>
             <div class="yatra-search-item-fields">
-                <input type="text" placeholder="<?php echo esc_attr__('Pick trip duration', 'yatra'); ?>"/>
+                <span class="input-placeholder">Pick a destination</span>
+                <input type="hidden" readonly placeholder="<?php echo esc_attr__('Pick trip duration', 'yatra'); ?>"/>
             </div>
 
         </div>
@@ -76,7 +77,8 @@
                 <span class="label"><?php echo esc_html__('Budget', 'yatra'); ?></span>
             </div>
             <div class="yatra-search-item-fields">
-                <input type="text" placeholder="<?php echo esc_attr__('Your budget range', 'yatra'); ?>"/>
+                <span class="input-placeholder">Pick a destination</span>
+                <input type="hidden" readonly placeholder="<?php echo esc_attr__('Your budget range', 'yatra'); ?>"/>
             </div>
 
         </div>

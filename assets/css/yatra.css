@@ -1728,7 +1728,11 @@ del {
            -moz-box-pack: justify;
             -ms-flex-pack: justify;
                 justify-content: space-between;
-        margin-bottom: 15px; }
+        margin-bottom: 15px;
+        -webkit-box-align: center;
+           -moz-box-align: center;
+            -ms-flex-align: center;
+                align-items: center; }
         .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li .yatra-filter-term-content label {
           font-size: 14px;
           font-weight: normal;
@@ -1745,7 +1749,11 @@ del {
           -webkit-box-align: center;
              -moz-box-align: center;
               -ms-flex-align: center;
-                  align-items: center; }
+                  align-items: center;
+          -webkit-box-flex: 10;
+             -moz-box-flex: 10;
+              -ms-flex: 10;
+                  flex: 10; }
         .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li .yatra-filter-term-content input.yatra-filter-item {
           display: none !important; }
           .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li .yatra-filter-term-content input.yatra-filter-item:checked + .yatra-filter-term-name:before {
@@ -1793,7 +1801,11 @@ del {
           background: #484848;
           text-align: center;
           color: #fff;
-          font-weight: 600; }
+          font-weight: 600;
+          -webkit-box-flex: 1;
+             -moz-box-flex: 1;
+              -ms-flex: 1;
+                  flex: 1; }
       .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-more, .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li span.show-less {
         text-decoration: none;
         color: var(--yatra_primary_color); }

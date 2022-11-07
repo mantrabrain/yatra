@@ -16,72 +16,122 @@
        -moz-box-pack: justify;
         -ms-flex-pack: justify;
             justify-content: space-between;
-    -webkit-box-align: center;
-       -moz-box-align: center;
-        -ms-flex-align: center;
-            align-items: center; }
+    -webkit-box-align: stretch;
+       -moz-box-align: stretch;
+        -ms-flex-align: stretch;
+            align-items: stretch; }
     .yatra-search-module-form .yatra-search-module .search-title {
       font-weight: bold;
-      text-transform: uppercase; }
+      text-transform: uppercase;
+      margin-bottom: 10px; }
       .yatra-search-module-form .yatra-search-module .search-title .yatra-icon {
         color: #aaa; }
     .yatra-search-module-form .yatra-search-module .yatra-icon {
       margin-right: 10px; }
-    .yatra-search-module-form .yatra-search-module .yatra-search-item-fields {
-      position: relative; }
-      .yatra-search-module-form .yatra-search-module .yatra-search-item-fields input {
-        border: none;
-        padding: 0;
-        background: none;
-        font-size: 17px;
-        height: 40px;
-        color: #000; }
-      .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model {
-        position: absolute;
-        width: 500px;
-        background: #fff;
-        top: -moz-calc(100% + 20px);
-        top: calc(100% + 20px);
-        z-index: 999;
-        -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        border: 1px solid #ddd;
-        min-height: 50px;
-        max-height: 350px;
-        overflow-x: auto;
-        display: none;
-        left: -25px; }
-        .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul {
-          padding: 0;
-          margin: 0; }
-          .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li {
-            list-style: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            display: -webkit-box;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-pack: justify;
-               -moz-box-pack: justify;
-                -ms-flex-pack: justify;
-                    justify-content: space-between;
-            -webkit-box-align: center;
-               -moz-box-align: center;
-                -ms-flex-align: center;
-                    align-items: center; }
-            .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li label, .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li .count {
-              cursor: pointer; }
-            .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li .count {
-              font-size: 13px;
-              width: 20px;
-              color: #fff;
-              background-color: #484848;
-              text-align: center; }
-            .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li:hover {
-              background: #ddd; }
     .yatra-search-module-form .yatra-search-module .yatra-search-module-item {
-      border-right: 1px solid #ddd; }
+      border-right: 1px solid #ddd;
+      -webkit-box-flex: 1;
+         -moz-box-flex: 1;
+          -ms-flex: 1;
+              flex: 1;
+      text-align: center;
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+         -moz-box-orient: vertical;
+         -moz-box-direction: normal;
+          -ms-flex-direction: column;
+              flex-direction: column;
+      -webkit-box-pack: center;
+         -moz-box-pack: center;
+          -ms-flex-pack: center;
+              justify-content: center;
+      position: relative; }
       .yatra-search-module-form .yatra-search-module .yatra-search-module-item.active .yatra-search-model {
         display: block; }
+      .yatra-search-module-form .yatra-search-module .yatra-search-module-item.yatra-search-destination .yatra-search-model {
+        left: -25px; }
+    .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .input-placeholder {
+      border: none;
+      padding: 0;
+      background: none;
+      font-size: 17px;
+      height: 40px;
+      color: #9b9b9b;
+      width: 100%;
+      cursor: pointer; }
+      .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .input-placeholder.active {
+        color: #484848;
+        font-weight: bold; }
+    .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model {
+      position: absolute;
+      width: 500px;
+      background: #fff;
+      top: -moz-calc(100% + 20px);
+      top: calc(100% + 20px);
+      z-index: 999;
+      -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      border: 1px solid #ddd;
+      min-height: 50px;
+      max-height: 350px;
+      overflow-x: auto;
+      display: none;
+      left: 0; }
+      .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul {
+        padding: 0;
+        margin: 0; }
+        .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li {
+          list-style: none;
+          padding: 10px 15px;
+          cursor: pointer;
+          display: -webkit-box;
+          display: -moz-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-pack: justify;
+             -moz-box-pack: justify;
+              -ms-flex-pack: justify;
+                  justify-content: space-between;
+          -webkit-box-align: center;
+             -moz-box-align: center;
+              -ms-flex-align: center;
+                  align-items: center;
+          text-align: left; }
+          .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li label, .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li .count {
+            cursor: pointer; }
+          .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li label {
+            -webkit-box-flex: 10px;
+               -moz-box-flex: 10px;
+                -ms-flex: 10px;
+                    flex: 10px; }
+          .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li .count {
+            font-size: 13px;
+            width: 20px;
+            color: #fff;
+            background-color: #484848;
+            text-align: center; }
+          .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li:hover, .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model ul li.active {
+            background: #ddd; }
+    .yatra-search-module-form .yatra-search-module .yatra-search-submit {
+      -webkit-box-flex: 1;
+         -moz-box-flex: 1;
+          -ms-flex: 1;
+              flex: 1;
+      text-align: right;
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-pack: end;
+         -moz-box-pack: end;
+          -ms-flex-pack: end;
+              justify-content: end;
+      -webkit-box-align: center;
+         -moz-box-align: center;
+          -ms-flex-align: center;
+              align-items: center; }
 /*# sourceMappingURL=yatra-search.css.map */

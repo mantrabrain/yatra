@@ -10,11 +10,13 @@
   .yatra-search-module {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+
+    align-items: stretch;
 
     .search-title {
       font-weight: bold;
       text-transform: uppercase;
+      margin-bottom: 10px;
 
       .yatra-icon {
         color: #aaa;
@@ -26,18 +28,44 @@
       margin-right: 10px;
     }
 
+    .yatra-search-module-item {
+      border-right: 1px solid #ddd;
+      flex: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+
+      &.active {
+        .yatra-search-model {
+          display: block;
+        }
+      }
+
+      &.yatra-search-destination {
+        .yatra-search-model {
+          left: -25px;
+        }
+      }
+    }
+
     .yatra-search-item-fields {
-      input {
+      .input-placeholder {
         border: none;
         padding: 0;
         background: none;
         font-size: 17px;
         height: 40px;
-        color: #000;
+        color: #9b9b9b;
+        width: 100%;
+        cursor: pointer;
 
+        &.active {
+          color: #484848;
+          font-weight: bold;
+        }
       }
-
-      position: relative;
 
       .yatra-search-model {
         position: absolute;
@@ -51,7 +79,7 @@
         max-height: 350px;
         overflow-x: auto;
         display: none;
-        left: -25px;
+        left: 0;
 
         ul {
           padding: 0;
@@ -64,9 +92,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            text-align: left;
 
             label, .count {
               cursor: pointer;
+            }
+
+            label {
+              flex: 10px;
             }
 
             .count {
@@ -77,7 +110,7 @@
               text-align: center;
             }
 
-            &:hover {
+            &:hover, &.active {
               background: #ddd;
             }
           }
@@ -85,14 +118,13 @@
       }
     }
 
-    .yatra-search-module-item {
-      border-right: 1px solid #ddd;
 
-      &.active {
-        .yatra-search-model {
-          display: block;
-        }
-      }
+    .yatra-search-submit {
+      flex: 1;
+      text-align: right;
+      display: flex;
+      justify-content: end;
+      align-items: center;
     }
   }
 }
