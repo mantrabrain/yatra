@@ -71,8 +71,8 @@
                 <div class="yatra-search-model">
                     <div class="yatra-search-model-inner">
                         <div class="yatra-slider-wrap">
-                            <input type="hidden" id="yatra-search-days-slider-min" data-name="min_price"/>
-                            <input type="hidden" id="yatra-search-days-slider-max" data-name="max_price"/>
+                            <input type="hidden" id="yatra-search-days-slider-min" data-name="min_days"/>
+                            <input type="hidden" id="yatra-search-days-slider-max" data-name="max_days"/>
                             <div id="yatra-search-days-slider"></div>
                         </div>
                         <div class="slider-content">
