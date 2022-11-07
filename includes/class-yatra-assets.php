@@ -47,7 +47,7 @@ if (!class_exists('Yatra_Assets')) {
 
             wp_register_style('yatra-search-style', YATRA_PLUGIN_URI . '/assets/css/yatra-search.css', false, YATRA_VERSION);
 
-            wp_register_script('yatra-search-script', YATRA_PLUGIN_URI . '/assets/js/yatra-search.js', array('jquery'), YATRA_VERSION);
+            wp_register_script('yatra-search-script', YATRA_PLUGIN_URI . '/assets/js/yatra-search.js', array('jquery', 'jquery-ui-slider', 'jquery.ui.touch-punch'), YATRA_VERSION);
 
             wp_register_script('lightbox-script', YATRA_PLUGIN_URI . '/assets/lib/lightbox2/js/lightbox.js', false, '2.11.0');
 
@@ -65,7 +65,6 @@ if (!class_exists('Yatra_Assets')) {
             }
             if (yatra_has_search_shortcode()) {
 
-                $main_script_dependency[] = 'yatra-search-script';
                 $main_css_dependency[] = 'yatra-search-style';
             }
 
@@ -95,6 +94,9 @@ if (!class_exists('Yatra_Assets')) {
             if (yatra_is_archive_page()) {
 
                 wp_enqueue_script('yatra-filter');
+            }
+            if (yatra_has_search_shortcode()) {
+                wp_enqueue_script('yatra-search-script');
             }
 
             $enabled_date = array();

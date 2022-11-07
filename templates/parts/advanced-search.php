@@ -66,8 +66,21 @@
                 <span class="label"><?php echo esc_html__('Duration', 'yatra'); ?></span>
             </div>
             <div class="yatra-search-item-fields">
-                <span class="input-placeholder">Pick a destination</span>
-                <input type="hidden" readonly placeholder="<?php echo esc_attr__('Pick trip duration', 'yatra'); ?>"/>
+                <span class="input-placeholder"><?php echo esc_html__('Pick trip duration', 'yatra'); ?></span>
+                <input type="hidden" class="input-field"/>
+                <div class="yatra-search-model">
+                    <div class="yatra-search-model-inner">
+                        <div class="yatra-slider-wrap">
+                            <input type="hidden" id="yatra-search-days-slider-min" data-name="min_price"/>
+                            <input type="hidden" id="yatra-search-days-slider-max" data-name="max_price"/>
+                            <div id="yatra-search-days-slider"></div>
+                        </div>
+                        <div class="slider-content">
+                            <span class="min-days"><?php echo absint($min_days) . ' ' . __('Days', 'yatra') ?></span>
+                            <span class="max-days"><?php echo absint($max_days) . ' ' . __('Days', 'yatra') ?></span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -77,8 +90,20 @@
                 <span class="label"><?php echo esc_html__('Budget', 'yatra'); ?></span>
             </div>
             <div class="yatra-search-item-fields">
-                <span class="input-placeholder">Pick a destination</span>
-                <input type="hidden" readonly placeholder="<?php echo esc_attr__('Your budget range', 'yatra'); ?>"/>
+                <span class="input-placeholder"><?php echo esc_html__('Your budget range', 'yatra'); ?></span>
+                <div class="yatra-search-model">
+                    <div class="yatra-search-model-inner">
+                        <div class="yatra-slider-wrap">
+                            <input type="hidden" id="yatra-search-price-slider-min" data-name="min_price"/>
+                            <input type="hidden" id="yatra-search-price-slider-max" data-name="max_price"/>
+                            <div id="yatra-search-price-slider"></div>
+                        </div>
+                        <div class="slider-content">
+                            <span class="min-price"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), $min_price) ?></span>
+                            <span class="max-price"><?php echo yatra_get_price(yatra_get_current_currency_symbol(), $max_price) ?></span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>

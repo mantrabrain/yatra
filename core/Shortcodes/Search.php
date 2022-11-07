@@ -29,7 +29,24 @@ class Search
      */
     public static function output($atts)
     {
-        yatra_get_template('parts/advanced-search.php', []);
+
+        $duration = yatra_get_duration_ranges_for_filter();
+
+        $min_days = $duration->min_days ?? 0;
+
+        $max_days = $duration->max_days ?? 0;
+
+        $price = yatra_get_price_ranges_for_filter();
+
+        $min_price = $price->min_price ?? 0;
+
+        $max_price = $price->max_price ?? 0;
+
+        yatra_get_template('parts/advanced-search.php',
+            [
+                'min_price' => $min_price, 'max_price' => $max_price, 'min_days' => $min_days, 'max_days' => $max_days
+            ]
+        );
 
     }
 

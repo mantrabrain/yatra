@@ -37,7 +37,34 @@
       justify-content: center;
       position: relative;
 
+      .yatra-search-item-fields {
+        position: relative;
+
+        &:before {
+          content: "\f078";
+          height: 100%;
+          width: 30px;
+          /* background: red; */
+          position: absolute;
+          font-family: var(--yatra-fa-style-family);
+          font-weight: 900;
+          display: flex;
+          justify-content: space-evenly;
+          align-items: center;
+          color: #9b9b9b;
+        }
+      }
+
       &.active {
+        .yatra-search-item-fields {
+          position: relative;
+
+          &:before {
+            content: "\f077";
+
+          }
+        }
+
         .yatra-search-model {
           display: block;
         }
@@ -125,6 +152,88 @@
       display: flex;
       justify-content: end;
       align-items: center;
+    }
+    .slider-content {
+      padding: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .yatra-search-model-inner {
+      padding: 20px 50px;
+    }
+
+    #yatra-price-slider, #yatra-days-slider {
+      border-radius: 0;
+      height: 2px;
+      border: none;
+      background: rgba(26, 188, 156, 0.3);
+      margin: 45px 10px 0;
+
+      .ui-slider-range {
+        height: 2px;
+        border: none;
+        background: var(--yatra_primary_color);
+      }
+    }
+
+    .yatra-slider-wrap {
+      .ui-slider .ui-slider-handle {
+        border: none;
+        height: 16px;
+        width: 16px;
+        border-radius: 50%;
+        background: var(--yatra_primary_color);
+        margin-top: -3px;
+
+        &:focus {
+          border: none;
+          outline: none;
+        }
+
+        &:before {
+          content: attr(data-value);
+          font-size: 10px;
+          letter-spacing: 1.5px;
+          line-height: 1;
+          color: #fff;
+          background-color: var(--yatra_primary_color);
+          padding: 3px 8px;
+          border-radius: 3px;
+          position: absolute;
+          bottom: 100%;
+          margin-bottom: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          visibility: hidden;
+          opacity: 0;
+          transition: all .2s ease;
+          white-space: nowrap;
+        }
+
+        &:after {
+          content: "";
+          border: 4px solid transparent;
+          border-top: 6px solid var(--yatra_primary_color);
+          position: absolute;
+          left: 50%;
+          bottom: 100%;
+          transform: translateX(-50%);
+          visibility: hidden;
+          opacity: 0;
+          transition: all .2s ease;
+        }
+
+        &.visible {
+          &:before, &:after {
+            opacity: 1;
+            visibility: visible;
+          }
+        }
+
+      }
     }
   }
 }
