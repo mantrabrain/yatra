@@ -29,7 +29,7 @@ class Search
      */
     public static function output($atts)
     {
-        yatra_get_template('parts/search.php', []);
+        yatra_get_template('parts/advanced-search.php', []);
 
     }
 

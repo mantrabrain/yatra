@@ -9,6 +9,7 @@ class Initialize
     public static function run()
     {
         require_once YATRA_ABSPATH . 'core/globals.php';
+        require_once YATRA_ABSPATH . 'core/functions/pages.php';
 
         $self = new self;
 

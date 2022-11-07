@@ -44,8 +44,13 @@ class Yatra_Module_Filter_Sidebar
 
         echo '<div class="yatra-filter-sidebar-header">';
 
-        echo '<h2>' . __('Filter Criteria', 'yatra') . '</h2>';
+        echo '<h2>';
 
+        echo '<span class="yatra-icon fa fa-filter"></span>';
+
+        echo __('Filter Criteria', 'yatra');
+
+        echo '</h2>';
 
         $clear_class = count((array)$filter) < 1 ? 'yatra-hide' : '';
 
@@ -93,7 +98,10 @@ class Yatra_Module_Filter_Sidebar
             echo '<input type="hidden" name="display_mode" value="' . esc_attr($filter->display_mode) . '"/>';
         }
 
-        echo '<button type="submit" class="yatra-button button yatra-filter-sidebar-submit">' . __('Filter', 'yatra') . '</button>';
+        echo '<button type="submit" class="yatra-button button yatra-filter-sidebar-submit">';
+        echo '<span class="yatra-icon fa fa-filter"></span>';
+        echo __('Filter', 'yatra');
+        echo '</button>';
         echo '</form>';
         echo '</div>';
         echo '</div>';

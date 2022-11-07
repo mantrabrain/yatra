@@ -19,7 +19,9 @@ class Yatra_Module_Filter_Section_Destinations extends Yatra_Module_Filter_Secti
 
         ?>
         <div class="yatra-sidebar-filter-field">
-            <h3 class="yatra-sidebar-filter-section-title"><?php echo esc_html($this->get_label()); ?></h3>
+            <h3 class="yatra-sidebar-filter-section-title">
+                <span class="yatra-icon fa fa-map-marker-alt"></span>
+                <?php echo esc_html($this->get_label()); ?></h3>
             <div class="yatra-sidebar-filter-section-content">
                 <?php $this->taxonomy_filter_html($terms); ?>
             </div>

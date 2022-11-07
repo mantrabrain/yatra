@@ -31,7 +31,9 @@ class Yatra_Module_Filter_Section_Price extends Yatra_Module_Filter_Sections
     {
         ?>
         <div class="yatra-sidebar-filter-field price">
-            <h3 class="yatra-sidebar-filter-section-title"><?php echo esc_html($this->get_label()); ?></h3>
+            <h3 class="yatra-sidebar-filter-section-title">
+                <span class="yatra-icon fa fa-dollar-sign"></span>
+                <?php echo esc_html($this->get_label()); ?></h3>
             <div class="yatra-sidebar-filter-section-content">
                 <div class="yatra-slider-wrap">
                     <input type="hidden" id="yatra-price-slider-min" name="min_price"/>

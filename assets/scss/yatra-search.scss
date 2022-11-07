@@ -1,0 +1,98 @@
+.yatra-search-module-form {
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 25px;
+  position: relative;
+  z-index: 99;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+  .yatra-search-module {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .search-title {
+      font-weight: bold;
+      text-transform: uppercase;
+
+      .yatra-icon {
+        color: #aaa;
+      }
+
+    }
+
+    .yatra-icon {
+      margin-right: 10px;
+    }
+
+    .yatra-search-item-fields {
+      input {
+        border: none;
+        padding: 0;
+        background: none;
+        font-size: 17px;
+        height: 40px;
+        color: #000;
+
+      }
+
+      position: relative;
+
+      .yatra-search-model {
+        position: absolute;
+        width: 500px;
+        background: #fff;
+        top: calc(100% + 20px);
+        z-index: 999;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ddd;
+        min-height: 50px;
+        max-height: 350px;
+        overflow-x: auto;
+        display: none;
+        left: -25px;
+
+        ul {
+          padding: 0;
+          margin: 0;
+
+          li {
+            list-style: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            label, .count {
+              cursor: pointer;
+            }
+
+            .count {
+              font-size: 13px;
+              width: 20px;
+              color: #fff;
+              background-color: #484848;
+              text-align: center;
+            }
+
+            &:hover {
+              background: #ddd;
+            }
+          }
+        }
+      }
+    }
+
+    .yatra-search-module-item {
+      border-right: 1px solid #ddd;
+
+      &.active {
+        .yatra-search-model {
+          display: block;
+        }
+      }
+    }
+  }
+}

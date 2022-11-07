@@ -31,7 +31,9 @@ class Yatra_Module_Filter_Section_Duration extends Yatra_Module_Filter_Sections
 
         ?>
         <div class="yatra-sidebar-filter-field days">
-            <h3 class="yatra-sidebar-filter-section-title"><?php echo esc_html($this->get_label()); ?></h3>
+            <h3 class="yatra-sidebar-filter-section-title">
+                <span class="yatra-icon fa fa-clock"></span>
+                <?php echo esc_html($this->get_label()); ?></h3>
             <div class="yatra-sidebar-filter-section-content">
                 <div class="yatra-slider-wrap">
                     <input type="hidden" id="yatra-days-slider-min" name="min_days"/>
