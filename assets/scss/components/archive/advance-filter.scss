@@ -86,8 +86,8 @@
               &:checked + .yatra-filter-term-name {
                 &:before {
                   border: 1px solid;
-                  font-family: "Font Awesome 5 Free" !important;
-                  font-weight: 900;
+                  font-family: var(--yatra-fa-style-family) !important;
+                  font-weight: var(--yatra-fa-style-weight);
                   content: "\f00c";
                   line-height: 16px;
                   text-align: center;

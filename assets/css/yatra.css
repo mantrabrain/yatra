@@ -5,7 +5,9 @@
   --yatra_primary_color: #1abc9c;
   --yatra_primary_color_opacity: #eafffb;
   --yatra_black_color: #000000;
-  --yatra_white_color: #FFFFFF; }
+  --yatra_white_color: #FFFFFF;
+  --yatra-fa-style-family: "Font Awesome 6 Free";
+  --yatra-fa-style-weight: 900; }
 
 .yatra-tabs section.yatra-tab-content .tab-inner {
   background: #fff;
@@ -304,8 +306,8 @@ del {
   border-radius: 0; }
 
 .yatra-content-area .fa, .yatra-content-area .far, .yatra-content-area .fas {
-  font-family: "Font Awesome 5 Free" !important;
-  font-weight: 900; }
+  font-family: var(--yatra-fa-style-family) !important;
+  font-weight: var(--yatra-fa-style-weight); }
 
 .yatra-page-wrapper .pagination {
   text-align: center;
@@ -345,8 +347,8 @@ del {
     margin: 5px 0 15px; }
     .yatra-tabs .yatra-tab-content .cost-info-half li:before {
       position: absolute;
-      font-family: "Font Awesome 5 Free";
-      font-weight: 900;
+      font-family: var(--yatra-fa-style-family);
+      font-weight: var(--yatra-fa-style-weight);
       font-size: 13px;
       left: 0;
       top: 4px; }
@@ -1730,8 +1732,8 @@ del {
           display: none !important; }
           .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li .yatra-filter-term-content input.yatra-filter-item:checked + .yatra-filter-term-name:before {
             border: 1px solid;
-            font-family: "Font Awesome 5 Free" !important;
-            font-weight: 900;
+            font-family: var(--yatra-fa-style-family) !important;
+            font-weight: var(--yatra-fa-style-weight);
             content: "\f00c";
             line-height: 16px;
             text-align: center;
@@ -3030,6 +3032,29 @@ body.single-tour figure {
 
 .yatra-calendar .day.today, .yatra-calendar td.active {
   background: var(--yatra_primary_color_opacity); }
+
+.yatra-search-module {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+     -moz-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+     -moz-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 12px 12px 24px;
+  position: relative;
+  z-index: 99; }
+  .yatra-search-module .search-title {
+    font-weight: bold;
+    text-transform: uppercase; }
 
 .elementor-element .yatra-widget-header {
   max-width: 660px;

@@ -1,0 +1,16 @@
+.yatra-search-module {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 12px 12px 24px;
+  position: relative;
+  z-index: 99;
+
+  .search-title {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+}

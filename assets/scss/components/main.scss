@@ -39,8 +39,8 @@ del {
   }
 
   .fa, .far, .fas {
-    font-family: "Font Awesome 5 Free" !important;
-    font-weight: 900;
+    font-family: var(--yatra-fa-style-family) !important;
+    font-weight: var(--yatra-fa-style-weight);
   }
 
 }
@@ -102,8 +102,8 @@ del {
 
         &:before {
           position: absolute;
-          font-family: "Font Awesome 5 Free";
-          font-weight: 900;
+          font-family: var(--yatra-fa-style-family);
+          font-weight: var(--yatra-fa-style-weight);
           font-size: 13px;
           left: 0;
           top: 4px

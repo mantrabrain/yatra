@@ -69,7 +69,7 @@ if (!class_exists('Yatra_Admin_Assets')) {
             wp_register_style('yatra-daterangepickercss', YATRA_PLUGIN_URI . '/assets/lib/daterangepicker/daterangepicker.css', false, YATRA_VERSION);
 
             // Font Awesome
-            wp_register_style('yatra-font-awesome', YATRA_PLUGIN_URI . '/assets/lib/font-awesome/css/fontawesome.min.css', false, YATRA_VERSION);
+            wp_register_style('yatra-font-awesome', YATRA_PLUGIN_URI . '/assets/lib/font-awesome/css/fontawesome.min.css', false, '6.2.0');
 
             // Taxonomy Activity JS
             wp_register_script('yatra-taxonomy-activityjs', YATRA_PLUGIN_URI . '/assets/admin/js/activity-taxonomy.js', array('jquery'), YATRA_VERSION);
