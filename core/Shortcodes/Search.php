@@ -29,7 +29,8 @@ class Search
      */
     public static function output($atts)
     {
-        echo '<h1>Hello This is Search Template</h1>';
+        yatra_get_template('parts/search.php', []);
+
     }
 
 }
