@@ -9,10 +9,10 @@
             bindEvents: function () {
 
                 var _that = this;
-                $('body').on('click', '.yatra-search-module-item', function () {
+                $('body').on('click', '.yatra-search-module-item input[type="text"]', function () {
                     var module = $(this).closest('.yatra-search-module');
                     module.find('.yatra-search-module-item').removeClass('active');
-                    $(this).addClass('active');
+                    $(this).closest('.yatra-search-module-item').addClass('active');
 
                 });
 
@@ -20,6 +20,7 @@
                     var module = $(this).closest('.yatra-search-module-item');
                     var name = module.attr('data-name');
                     module.find('input[type="text"]').attr('name', name).val($(this).attr('data-slug'));
+                    module.removeClass('active');
                 });
 
             },

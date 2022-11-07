@@ -29,7 +29,7 @@
                 </div>
             </div>
         </div>
-        <div class="yatra-search-module-item yatra-search-activity" data-nam="filter_activity">
+        <div class="yatra-search-module-item yatra-search-activity" data-name="filter_activity">
             <div class="search-title">
                 <span class="yatra-icon fa fa-universal-access"></span>
                 <span class="label"><?php echo esc_html__('Activities', 'yatra'); ?></span>
