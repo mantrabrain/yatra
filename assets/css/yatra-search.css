@@ -267,7 +267,8 @@
       .yatra-search-module-form .yatra-search-module .yatra-search-module-item .yatra-search-model {
         position: relative;
         width: 100%;
-        left: 0; }
+        left: 0;
+        margin-top: 15px; }
       .yatra-search-module-form .yatra-search-module .yatra-search-module-item.yatra-search-destination .yatra-search-model {
         left: 0; }
       .yatra-search-module-form .yatra-search-module .yatra-search-module-item .yatra-search-item-fields:before {
