@@ -29,6 +29,7 @@ class Search
      */
     public static function output($atts)
     {
+        $search_type = isset($atts['type']) ? sanitize_text_field($atts['type']) : 'advanced';
 
         $duration = yatra_get_duration_ranges_for_filter();
 
@@ -44,7 +45,7 @@ class Search
 
         yatra_get_template('parts/advanced-search.php',
             [
-                'min_price' => $min_price, 'max_price' => $max_price, 'min_days' => $min_days, 'max_days' => $max_days
+                'min_price' => $min_price, 'max_price' => $max_price, 'min_days' => $min_days, 'max_days' => $max_days, 'search_type' => $search_type
             ]
         );
 

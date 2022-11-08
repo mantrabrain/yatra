@@ -81,6 +81,13 @@
         display: block; }
       .yatra-search-module-form .yatra-search-module .yatra-search-module-item.yatra-search-destination .yatra-search-model {
         left: -25px; }
+      .yatra-search-module-form .yatra-search-module .yatra-search-module-item.yatra-search-text {
+        -webkit-box-flex: 10;
+           -moz-box-flex: 10;
+            -ms-flex: 10;
+                flex: 10; }
+        .yatra-search-module-form .yatra-search-module .yatra-search-module-item.yatra-search-text .yatra-search-item-fields:before {
+          content: none; }
     .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .input-placeholder {
       border: none;
       padding: 0;

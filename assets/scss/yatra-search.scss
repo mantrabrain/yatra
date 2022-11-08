@@ -75,6 +75,16 @@
           left: -25px;
         }
       }
+
+      &.yatra-search-text {
+        flex: 10;
+
+        .yatra-search-item-fields {
+          &:before {
+            content: none;
+          }
+        }
+      }
     }
 
     .yatra-search-item-fields {

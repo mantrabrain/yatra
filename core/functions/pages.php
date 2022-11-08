@@ -7,7 +7,7 @@ if (!function_exists('yatra_has_search_shortcode')) {
 
         global $wpdb;
 
-        $page_id = $wpdb->get_var('SELECT ID FROM ' . $wpdb->prefix . 'posts WHERE post_content LIKE "%[yatra_search]%" AND post_parent = 0');
+        $page_id = $wpdb->get_var('SELECT ID FROM ' . $wpdb->prefix . 'posts WHERE post_content LIKE "%[yatra_search%" AND post_parent = 0');
 
         if (is_wp_error($page_id)) {
             return false;
