@@ -242,4 +242,20 @@
       .yatra-search-module-form .yatra-search-module .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:before, .yatra-search-module-form .yatra-search-module .yatra-slider-wrap .ui-slider .ui-slider-handle.visible:after {
         opacity: 1;
         visibility: visible; }
+
+@media (max-width: 1024px) {
+  .yatra-search-module-form .yatra-search-module {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+       -moz-box-orient: vertical;
+       -moz-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column; }
+    .yatra-search-module-form .yatra-search-module .yatra-search-module-item {
+      border-right: none;
+      border-bottom: 1px solid #ddd;
+      padding: 20px; }
+      .yatra-search-module-form .yatra-search-module .yatra-search-module-item .yatra-search-model {
+        position: relative;
+        width: 100%; } }
 /*# sourceMappingURL=yatra-search.css.map */

@@ -11,7 +11,11 @@
 
                 var _that = this;
 
-                $('body').on('click', '.yatra-search-module-item .input-placeholder', function () {
+                $('body').on('click', '.yatra-search-module-item .yatra-search-item-fields', function (event) {
+
+                    if ($(event.target).closest('.yatra-search-model').length > 0) {
+                        return;
+                    }
                     var module = $(this).closest('.yatra-search-module');
                     if ($(this).closest('.yatra-search-module-item').hasClass('active')) {
                         $(this).closest('.yatra-search-module-item').removeClass('active');
@@ -28,11 +32,10 @@
                     module.find('input[type="hidden"].input-field').attr('name', name).val($(this).attr('data-slug'));
                     module.find('.input-placeholder').text($(this).find('label').text()).addClass('active');
                     module.removeClass('active');
-                    module.next('.yatra-search-module-item').find('.input-placeholder').trigger('click');
                 });
-                $(document).keyup(function(e) {
+                $(document).keyup(function (e) {
                     if (e.key === "Escape") { // escape key maps to keycode `27`
-                      $('.yatra-search-module-item').removeClass('active');
+                        $('.yatra-search-module-item').removeClass('active');
                     }
                 });
 
@@ -48,13 +51,13 @@
                         var max = ui.values[1];
                         var data_name_min = $('#yatra-search-price-slider-min').attr('data-name');
                         var data_name_max = $('#yatra-search-price-slider-max').attr('data-name');
-                        $('#yatra-search-price-slider-min').val(min).attr('name',data_name_min);
+                        $('#yatra-search-price-slider-min').val(min).attr('name', data_name_min);
                         $('#yatra-search-price-slider-max').val(max).attr('name', data_name_max);
 
 
                         var min_value = window.YatraPricingCalculator.getPrice(null, min);
                         var max_value = window.YatraPricingCalculator.getPrice(null, max);
-                        $(event.target).closest('.yatra-search-module-item').find('.input-placeholder').html(min_value+' to '+max_value).addClass('active');
+                        $(event.target).closest('.yatra-search-module-item').find('.input-placeholder').html(min_value + ' to ' + max_value).addClass('active');
                         $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', min_value).addClass('visible');
                         $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', max_value).addClass('visible');
                     },
@@ -93,7 +96,7 @@
                         var min_value = min + " " + yatra_params.filter_options.days;
                         var max_value = max + " " + yatra_params.filter_options.days;
 
-                        $(event.target).closest('.yatra-search-module-item').find('.input-placeholder').html(min_value+' to '+max_value).addClass('active');
+                        $(event.target).closest('.yatra-search-module-item').find('.input-placeholder').html(min_value + ' to ' + max_value).addClass('active');
 
                         $(event.target).find('.ui-slider-handle').eq(0).attr('data-value', min_value).addClass('visible');
                         $(event.target).find('.ui-slider-handle').eq(1).attr('data-value', max_value).addClass('visible');

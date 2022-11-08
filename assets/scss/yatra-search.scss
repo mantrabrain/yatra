@@ -240,3 +240,22 @@
     }
   }
 }
+
+@media(max-width: 1024px) {
+  .yatra-search-module-form {
+    .yatra-search-module {
+      flex-direction: column;
+
+      .yatra-search-module-item {
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        padding: 20px;
+
+        .yatra-search-model {
+          position: relative;
+          width: 100%;
+        }
+      }
+    }
+  }
+}
