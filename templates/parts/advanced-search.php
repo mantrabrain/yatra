@@ -1,6 +1,13 @@
+<?php
+$action = get_post_type_archive_link('tour');
+?>
 <form method="get" class="yatra-search-module-form"
-      action="<?php echo esc_url(get_post_type_archive_link('tour')); ?>"
+      action="<?php echo esc_url($action); ?>"
       data-search-type="<?php echo esc_attr($search_type) ?>">
+
+    <?php if (strpos($action, "post_type=tour") !== false) {
+        echo '<input type="hidden" name="post_type" value="tour"/>';
+    } ?>
     <div class="yatra-search-module">
 
         <?php if ($search_type === 'regular') { ?>
