@@ -52,24 +52,27 @@ class Yatra_Module_Filter_Sidebar
 
         echo '</h2>';
 
-        $clear_class = count((array)$filter) < 1 ? 'yatra-hide' : '';
+        $search_text = get_query_var('s');
+
+        $clear_class = count((array)$filter) < 1 && $search_text == '' ? 'yatra-hide' : '';
 
         echo '<a href="' . esc_attr($action) . '"  class="yatra-clear-filter ' . esc_attr($clear_class) . '">' . __('Clear filter', 'yatra') . '</a>';
 
         echo '</div>';
 
         $search_text = get_query_var('s');
-        if ('' != $search_text) {
-            ?>
-            <div class="yatra-sidebar-filter-field">
-                <h3 class="yatra-sidebar-filter-section-title"><?php echo __('Search', 'yatra') ?></h3>
-                <div class="yatra-sidebar-filter-section-content">
-                    <input type="text" name="s" value="<?php echo esc_attr($search_text) ?>"
-                           placeholder="<?php echo esc_attr__('Search …', 'yatra') ?>"/>
-                </div>
+
+        ?>
+        <div class="yatra-sidebar-filter-field">
+            <h3 class="yatra-sidebar-filter-section-title">
+                <span class="yatra-icon fa fa-magnifying-glass"></span>
+                <?php echo __('Search', 'yatra') ?></h3>
+            <div class="yatra-sidebar-filter-section-content">
+                <input type="text" name="s" value="<?php echo esc_attr($search_text) ?>"
+                       placeholder="<?php echo esc_attr__('Type keyword here..', 'yatra') ?>"/>
             </div>
-            <?php
-        }
+        </div>
+        <?php
         $sidebar_filter_sections = yatra_get_sidebar_filter_sections();
 
         foreach ($sidebar_filter_sections as $section_id) {
