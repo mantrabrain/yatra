@@ -38,6 +38,16 @@
                         $('.yatra-search-module-item').removeClass('active');
                     }
                 });
+                $(document).on('click', 'body', function (event) {
+
+                    if ($(event.target).closest('.yatra-search-module-form').length > 0) {
+                        return;
+                    }
+                    if ($(event.target).hasClass('.yatra-search-module-form')) {
+                        return;
+                    }
+                    $('.yatra-search-module-item').removeClass('active');
+                });
 
             },
             initLib: function () {

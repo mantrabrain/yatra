@@ -47,7 +47,7 @@
                 </div>
                 <div class="yatra-search-item-fields">
                     <input type="hidden" class="input-field"/>
-                    <span class="input-placeholder"><?php echo esc_html__('Choose a activity', 'yatra'); ?></span>
+                    <span class="input-placeholder"><?php echo esc_html__('Choose an activity', 'yatra'); ?></span>
                     <div class="yatra-search-model">
                         <?php $activities = yatra_get_terms_by_id('activity');
 
@@ -76,7 +76,7 @@
                     <span class="label"><?php echo esc_html__('Duration', 'yatra'); ?></span>
                 </div>
                 <div class="yatra-search-item-fields">
-                    <span class="input-placeholder"><?php echo esc_html__('Pick trip duration', 'yatra'); ?></span>
+                    <span class="input-placeholder"><?php echo esc_html__('Trip duration', 'yatra'); ?></span>
                     <input type="hidden" class="input-field"/>
                     <div class="yatra-search-model">
                         <div class="yatra-search-model-inner">
