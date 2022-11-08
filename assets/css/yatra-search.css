@@ -262,7 +262,13 @@
       border-right: none;
       border-bottom: 1px solid #ddd;
       padding: 20px; }
+      .yatra-search-module-form .yatra-search-module .yatra-search-module-item.yatra-search-text {
+        border-bottom: 0; }
       .yatra-search-module-form .yatra-search-module .yatra-search-module-item .yatra-search-model {
         position: relative;
-        width: 100%; } }
+        width: 100%; }
+    .yatra-search-module-form .yatra-search-module .yatra-search-submit {
+      padding: 20px;
+      -ms-flex-pack: distribute;
+          justify-content: space-around; } }
 /*# sourceMappingURL=yatra-search.css.map */

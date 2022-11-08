@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.11\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-11-07 16:01:41+00:00\n"
+"POT-Creation-Date: 2022-11-08 05:48:19+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2469,7 +2469,7 @@ msgid "Booking Full"
 msgstr ""
 
 #: includes/classes/class-yatra-core-tour-availability.php:584
-#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:65
+#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:69
 msgid "Search"
 msgstr ""
 
@@ -3583,7 +3583,7 @@ msgstr ""
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:45
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-activities.php:7
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:69
-#: templates/parts/advanced-search.php:36
+#: templates/parts/advanced-search.php:46
 msgid "Activities"
 msgstr ""
 
@@ -3645,8 +3645,8 @@ msgstr ""
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:44
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:45
 #: includes/template-tags.php:184 includes/template-tags.php:1198
-#: templates/parts/advanced-search.php:79
-#: templates/parts/advanced-search.php:80
+#: templates/parts/advanced-search.php:89
+#: templates/parts/advanced-search.php:90
 msgid "Days"
 msgstr ""
 
@@ -3662,16 +3662,15 @@ msgstr ""
 msgid "Filter Criteria"
 msgstr ""
 
-#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:57
+#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:59
 msgid "Clear filter"
 msgstr ""
 
-#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:68
-#: includes/modules/filters/includes/class-yatra-module-filter-top.php:138
-msgid "Search …"
+#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:72
+msgid "Type keyword here.."
 msgstr ""
 
-#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:103
+#: includes/modules/filters/includes/class-yatra-module-filter-sidebar.php:106
 #: includes/modules/status/list-tables/class-yatra-admin-log-list-table.php:215
 msgid "Filter"
 msgstr ""
@@ -3680,8 +3679,12 @@ msgstr ""
 msgid "Sort"
 msgstr ""
 
+#: includes/modules/filters/includes/class-yatra-module-filter-top.php:138
+msgid "Search …"
+msgstr ""
+
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:7
-#: templates/parts/advanced-search.php:66 templates/tour/additional.php:7
+#: templates/parts/advanced-search.php:76 templates/tour/additional.php:7
 msgid "Duration"
 msgstr ""
 
@@ -4650,7 +4653,7 @@ msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:71
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:80
-#: templates/parts/advanced-search.php:7
+#: templates/parts/advanced-search.php:17
 msgid "Destination"
 msgstr ""
 
@@ -5255,23 +5258,27 @@ msgstr ""
 msgid "Make Payment "
 msgstr ""
 
-#: templates/parts/advanced-search.php:11
+#: templates/parts/advanced-search.php:10
+msgid "Type search keyword here.."
+msgstr ""
+
+#: templates/parts/advanced-search.php:21
 msgid "Pick a destination"
 msgstr ""
 
-#: templates/parts/advanced-search.php:40
+#: templates/parts/advanced-search.php:50
 msgid "Choose a activity"
 msgstr ""
 
-#: templates/parts/advanced-search.php:69
+#: templates/parts/advanced-search.php:79
 msgid "Pick trip duration"
 msgstr ""
 
-#: templates/parts/advanced-search.php:90
+#: templates/parts/advanced-search.php:100
 msgid "Budget"
 msgstr ""
 
-#: templates/parts/advanced-search.php:93
+#: templates/parts/advanced-search.php:103
 msgid "Your budget range"
 msgstr ""
 
