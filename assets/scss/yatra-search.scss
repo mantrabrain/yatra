@@ -260,18 +260,30 @@
         border-right: none;
         border-bottom: 1px solid #ddd;
         padding: 20px;
-        &.yatra-search-text{
-          border-bottom:0;
+
+        &.yatra-search-text {
+          border-bottom: 0;
         }
 
         .yatra-search-model {
           position: relative;
           width: 100%;
+          left: 0;
+
+        }
+
+        &.yatra-search-destination .yatra-search-model {
+          left: 0;
+        }
+
+        .yatra-search-item-fields:before {
+          height: auto;
         }
       }
-      .yatra-search-submit{
-        padding:20px;
-        justify-content:space-around;
+
+      .yatra-search-submit {
+        padding: 20px;
+        justify-content: space-around;
       }
     }
   }
