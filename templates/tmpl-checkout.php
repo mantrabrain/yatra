@@ -1,7 +1,10 @@
 <?php
 defined('ABSPATH') || exit;
 
-if (count($checkout) < 1) {
+
+$items = $checkout['items'] ?? array();
+
+if (count($items) < 1) {
 
     echo '<p>' . esc_html__('Your cart is empty. Please add any of the tour on the cart first.', 'yatra') . '</p>';
 

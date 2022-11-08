@@ -253,6 +253,11 @@ if (!class_exists('Yatra_Tour_Booking')) {
             if ($post->post_status != 'publish') {
                 return false;
             }
+            $tour = yatra_get_tour($post->ID);
+
+            if ($tour->is_booking_disabled()) {
+                return false;
+            }
 
             return true;
         }

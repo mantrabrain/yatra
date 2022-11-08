@@ -5,7 +5,10 @@
  * @version     2.1.2
  */
 defined('ABSPATH') || exit;
-if (count($cart_items) < 1) {
+
+$items = $cart_items['items'] ?? array();
+
+if (count($items) < 1) {
 
     echo '<p>Your tour cart is empty. Please select any of the booking first.</p>';
     return;

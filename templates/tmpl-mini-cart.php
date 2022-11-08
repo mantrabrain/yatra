@@ -16,7 +16,7 @@ $cart_page_url = yatra_get_cart_page(true);
         <span class="yatra-icon fa fa-shopping-cart"></span>
         <span class="cart-icon-badge"><?php echo esc_html(count($items)) ?></span>
     </a>
-    <?php if (count($cart_items) > 0) {
+    <?php if (count($items) > 0) {
         ?>
         <div class="yatra-mini-cart-inner">
             <?php
