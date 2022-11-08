@@ -77,12 +77,17 @@
       }
 
       &.yatra-search-text {
+        border-right: 0;
         flex: 10;
 
         .yatra-search-item-fields {
           &:before {
             content: none;
           }
+        }
+
+        input[name="s"] {
+          width: 100%;
         }
       }
     }
