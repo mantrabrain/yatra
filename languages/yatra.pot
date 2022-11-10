@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.11\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-11-08 06:04:38+00:00\n"
+"POT-Creation-Date: 2022-11-10 13:55:48+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -257,9 +257,25 @@ msgstr ""
 msgid "Once Weekly"
 msgstr ""
 
-#: core/Tour/functions.php:15
+#: core/functions/tour.php:16
 #. translators: 1: yatra_loaded
 msgid "%1$s should not be called before the %2$s actions have finished."
+msgstr ""
+
+#: core/functions/tour.php:47
+msgid "Regular tour"
+msgstr ""
+
+#: core/functions/tour.php:48
+msgid "External/Affiliate tour"
+msgstr ""
+
+#: core/functions/tour.php:49
+msgid "One Day tour"
+msgstr ""
+
+#: core/functions/tour.php:50
+msgid "Multi Days tour"
 msgstr ""
 
 #: includes/abstracts/abstract-yatra-form.php:63
@@ -732,8 +748,8 @@ msgstr ""
 #: includes/class-yatra-enquiry-form.php:97
 #: includes/class-yatra-user-form.php:84 includes/class-yatra-user-form.php:85
 #: includes/class-yatra-user-form.php:92 includes/class-yatra-user-form.php:98
-#: includes/template-tags.php:726 includes/template-tags.php:730
-#: includes/template-tags.php:1183 templates/myaccount/tmpl-dashboard.php:47
+#: includes/template-tags.php:702 includes/template-tags.php:706
+#: includes/template-tags.php:1211 templates/myaccount/tmpl-dashboard.php:47
 #: templates/tour/additional.php:16
 msgid "Country"
 msgstr ""
@@ -907,6 +923,7 @@ msgstr ""
 #: includes/admin/settings/class-yatra-settings-general.php:42
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:42
 #: includes/admin/setup/class-yatra-setup-wizard.php:60
+#: includes/functions.php:56
 #: includes/meta-boxes/class-yatra-metabox-coupons-cpt.php:73
 msgid "General"
 msgstr ""
@@ -1216,7 +1233,7 @@ msgid "Text for loading book now button."
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:165
-#: templates/tour/book-now-button.php:5
+#: templates/tour/book-now-button.php:23
 msgid "Loading...."
 msgstr ""
 
@@ -1331,7 +1348,7 @@ msgid "Title for custom attributes"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:238
-#: includes/functions.php:66 includes/hooks/yatra-list-table-hooks.php:20
+#: includes/functions.php:70 includes/hooks/yatra-list-table-hooks.php:20
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:57
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:178
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:179
@@ -1591,7 +1608,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:109
-#: includes/functions.php:854
+#: includes/functions.php:858
 msgid "Payment Gateways"
 msgstr ""
 
@@ -1810,27 +1827,27 @@ msgstr ""
 #: includes/admin/templates/availability/availability-calendar.php:24
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:60
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:165
-#: includes/template-tags.php:819 templates/myaccount/tmpl-booking-item.php:65
+#: includes/template-tags.php:847 templates/myaccount/tmpl-booking-item.php:65
 #: templates/myaccount/tmpl-pricing-header.php:7
 msgid "Price Per"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:32
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:68
-#: includes/template-tags.php:824 templates/myaccount/tmpl-pricing-header.php:6
+#: includes/template-tags.php:852 templates/myaccount/tmpl-pricing-header.php:6
 msgid "Person"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:33
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:69
-#: includes/template-tags.php:825
+#: includes/template-tags.php:853
 msgid "Group"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:45
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:82
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:166
-#: includes/template-tags.php:830 includes/template-tags.php:834
+#: includes/template-tags.php:858 includes/template-tags.php:862
 #: templates/myaccount/tmpl-booking-item.php:66
 #: templates/myaccount/tmpl-pricing-header.php:8
 msgid "Group Size"
@@ -1867,7 +1884,7 @@ msgstr ""
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:14
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:21
 #: includes/meta-boxes/class-yatra-metabox-booking-cpt.php:161
-#: includes/template-tags.php:863 includes/template-tags.php:867
+#: includes/template-tags.php:891 includes/template-tags.php:895
 #: templates/myaccount/tmpl-booking-item.php:62
 msgid "Pricing Label"
 msgstr ""
@@ -1879,7 +1896,7 @@ msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:90
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:36
-#: includes/template-tags.php:752
+#: includes/template-tags.php:719
 msgid "Minimum People (Pax)"
 msgstr ""
 
@@ -1889,20 +1906,20 @@ msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:100
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:42
-#: includes/template-tags.php:757
+#: includes/template-tags.php:724
 msgid "Minimum number of people per booking"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:105
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:48
-#: includes/template-tags.php:763
+#: includes/template-tags.php:730
 msgid "Maximum People (Pax)"
 msgstr ""
 
 #: includes/admin/templates/availability/availability-calendar.php:107
 #: includes/admin/templates/availability/availability-calendar.php:114
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:54
-#: includes/template-tags.php:768
+#: includes/template-tags.php:735
 msgid "Maximum number of people per booking"
 msgstr ""
 
@@ -2025,6 +2042,17 @@ msgstr ""
 msgid "Total Price : "
 msgstr ""
 
+#: includes/admin/templates/metabox/tour/box.php:22
+msgid ""
+"This option let you enable/disable booking option for this tour package. "
+"Booking calendar will be hidden if you enable this option. User can only "
+"send enquiry."
+msgstr ""
+
+#: includes/admin/templates/metabox/tour/box.php:22
+msgid "Disable booking? "
+msgstr ""
+
 #: includes/admin/templates/metabox/tour/pricing/add-new.php:4
 #: includes/admin/templates/metabox/tour/pricing/add-new.php:6
 msgid "Add new pricing option"
@@ -2048,7 +2076,7 @@ msgid "Ex: Age Between age 16 to 18"
 msgstr ""
 
 #: includes/admin/templates/metabox/tour/pricing/group-pricing.php:32
-#: includes/template-tags.php:873 includes/template-tags.php:877
+#: includes/template-tags.php:901 includes/template-tags.php:905
 msgid "Pricing Description"
 msgstr ""
 
@@ -2082,7 +2110,7 @@ msgstr ""
 msgid "You do not have permission to perform this action."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:71 includes/class-yatra-ajax.php:717
+#: includes/class-yatra-ajax.php:71 includes/class-yatra-ajax.php:721
 msgid "Something wrong, please try again."
 msgstr ""
 
@@ -2106,23 +2134,23 @@ msgstr ""
 msgid "File upload failed. Please try again."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:680
+#: includes/class-yatra-ajax.php:684
 msgid "Enquiry form is disabled by admin."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:694
+#: includes/class-yatra-ajax.php:698
 msgid "Error::Enquiry form is disabled by admin."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:703
+#: includes/class-yatra-ajax.php:707
 msgid "You must have to agree privacy policy."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:707 includes/class-yatra-form-handler.php:103
+#: includes/class-yatra-ajax.php:711 includes/class-yatra-form-handler.php:103
 msgid "You must have to agree terms and conditions."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:719
+#: includes/class-yatra-ajax.php:723
 msgid "Thank you for your query. We will get back to you soon"
 msgstr ""
 
@@ -2347,15 +2375,15 @@ msgid "%1$s was called with an invalid level \"%2$s\"."
 msgstr ""
 
 #: includes/class-yatra-payment.php:8 includes/class-yatra-payment.php:92
-#: includes/functions.php:264 includes/yatra-template-functions.php:213
+#: includes/functions.php:268 includes/yatra-template-functions.php:213
 msgid "Pending"
 msgstr ""
 
-#: includes/class-yatra-payment.php:9 includes/functions.php:267
+#: includes/class-yatra-payment.php:9 includes/functions.php:271
 msgid "Completed"
 msgstr ""
 
-#: includes/class-yatra-payment.php:10 includes/functions.php:266
+#: includes/class-yatra-payment.php:10 includes/functions.php:270
 msgid "On Hold"
 msgstr ""
 
@@ -2363,7 +2391,7 @@ msgstr ""
 msgid "Refunded"
 msgstr ""
 
-#: includes/class-yatra-payment.php:12 includes/functions.php:269
+#: includes/class-yatra-payment.php:12 includes/functions.php:273
 msgid "Failed"
 msgstr ""
 
@@ -2683,54 +2711,54 @@ msgstr ""
 msgid "FAQ"
 msgstr ""
 
-#: includes/functions.php:56
-msgid "General & Dates"
+#: includes/functions.php:61
+msgid "Date & Durations"
 msgstr ""
 
-#: includes/functions.php:61
+#: includes/functions.php:65
 msgid "Pricing"
 msgstr ""
 
-#: includes/functions.php:70
+#: includes/functions.php:74
 msgid "Tour Tabs"
 msgstr ""
 
-#: includes/functions.php:133
+#: includes/functions.php:137
 #. translators: %s template
 msgid "%s does not exist."
 msgstr ""
 
-#: includes/functions.php:150
+#: includes/functions.php:154
 msgid "action_args should not be overwritten when calling yatra_get_template."
 msgstr ""
 
-#: includes/functions.php:265
+#: includes/functions.php:269
 msgid "Processing"
 msgstr ""
 
-#: includes/functions.php:268
+#: includes/functions.php:272
 msgid "Cancelled"
 msgstr ""
 
-#: includes/functions.php:292
+#: includes/functions.php:296
 msgid "Previous Post"
 msgstr ""
 
-#: includes/functions.php:293
+#: includes/functions.php:297
 msgid "Next Post"
 msgstr ""
 
-#: includes/functions.php:324
+#: includes/functions.php:328
 #. translators: 1: SVG icon. 2: post author, only visible to screen readers. 3:
 #. author link.
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:1205 includes/template-tags.php:865
+#: includes/functions.php:1209 includes/template-tags.php:893
 msgid "Guest"
 msgstr ""
 
-#: includes/functions.php:1345
+#: includes/functions.php:1349
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
 msgstr ""
@@ -3541,8 +3569,8 @@ msgstr ""
 msgid "Coupon Settings"
 msgstr ""
 
-#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:51
-msgid "Tour Additional Information"
+#: includes/meta-boxes/class-yatra-metabox-tour-cpt.php:52
+msgid "Tour data"
 msgstr ""
 
 #: includes/modules/blocks/class-yatra-blocks.php:18
@@ -3583,7 +3611,7 @@ msgstr ""
 #: includes/modules/dashboard/templates/html-admin-dashboard.php:45
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-activities.php:7
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:69
-#: templates/parts/advanced-search.php:46
+#: templates/parts/advanced-search.php:53
 msgid "Activities"
 msgstr ""
 
@@ -3644,9 +3672,9 @@ msgstr ""
 #: includes/modules/filters/class-yatra-module-filters.php:97
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:44
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:45
-#: includes/template-tags.php:184 includes/template-tags.php:1198
-#: templates/parts/advanced-search.php:89
-#: templates/parts/advanced-search.php:90
+#: includes/template-tags.php:184 includes/template-tags.php:1226
+#: templates/parts/advanced-search.php:96
+#: templates/parts/advanced-search.php:97
 msgid "Days"
 msgstr ""
 
@@ -3684,7 +3712,7 @@ msgid "Search …"
 msgstr ""
 
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-duration.php:7
-#: templates/parts/advanced-search.php:76 templates/tour/additional.php:7
+#: templates/parts/advanced-search.php:83 templates/tour/additional.php:7
 msgid "Duration"
 msgstr ""
 
@@ -4535,7 +4563,7 @@ msgid "Paypal Standard"
 msgstr ""
 
 #: includes/shortcodes/class-yatra-shortcode-checkout.php:69
-#: templates/tmpl-checkout.php:6
+#: templates/tmpl-checkout.php:9
 msgid "Your cart is empty. Please add any of the tour on the cart first."
 msgstr ""
 
@@ -4653,7 +4681,7 @@ msgstr ""
 
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:71
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:80
-#: templates/parts/advanced-search.php:17
+#: templates/parts/advanced-search.php:24
 msgid "Destination"
 msgstr ""
 
@@ -4694,7 +4722,7 @@ msgstr ""
 msgid ",&nbsp;"
 msgstr ""
 
-#: includes/template-tags.php:189 includes/template-tags.php:1202
+#: includes/template-tags.php:189 includes/template-tags.php:1230
 msgid "Nights"
 msgstr ""
 
@@ -4831,98 +4859,103 @@ msgstr ""
 msgid "Tour Attributes"
 msgstr ""
 
-#: includes/template-tags.php:666
-msgid "Disable booking"
+#: includes/template-tags.php:667
+msgid "External tour URL"
 msgstr ""
 
-#: includes/template-tags.php:668
-msgid ""
-"This option let you enable/disable booking option for this tour package. "
-"Booking calendar will be hidden if you enable this option. User can only "
-"send enquiry."
+#: includes/template-tags.php:669
+msgid "Enter the external URL to the tour package. "
 msgstr ""
 
-#: includes/template-tags.php:676
-msgid "Fixed Departure"
+#: includes/template-tags.php:680
+msgid "Button text"
 msgstr ""
 
-#: includes/template-tags.php:678
-msgid ""
-"This option let you enable/disable fix depdeparture option for this tour "
-"package. "
+#: includes/template-tags.php:682
+msgid "This text will be shown on the button linking to the external tour package "
 msgstr ""
 
-#: includes/template-tags.php:689
-msgid "Tour Availability Date Ranges"
-msgstr ""
-
-#: includes/template-tags.php:690
-msgid ""
-"You can choose date range slot for this tour availability. Do not add any "
-"date range slot to show this tour on all dates."
-msgstr ""
-
-#: includes/template-tags.php:701
-msgid "Tour Duration Days"
-msgstr ""
-
-#: includes/template-tags.php:702
-msgid "Total duration days for this tour"
-msgstr ""
-
-#: includes/template-tags.php:706
-msgid "Number of days"
-msgstr ""
-
-#: includes/template-tags.php:715
-msgid "Tour Duration Nights"
-msgstr ""
-
-#: includes/template-tags.php:719
-msgid "Number of nights"
-msgstr ""
-
-#: includes/template-tags.php:741
+#: includes/template-tags.php:692
 msgid "Feature this tour"
 msgstr ""
 
-#: includes/template-tags.php:743
+#: includes/template-tags.php:694
 msgid "This option let you enable/disable feature option for this tour package. "
 msgstr ""
 
-#: includes/template-tags.php:753
+#: includes/template-tags.php:720
 msgid ""
 "Minimum number of people per booking. Leave it blank to ignore minimum "
 "limit per booking."
 msgstr ""
 
-#: includes/template-tags.php:764
+#: includes/template-tags.php:731
 msgid ""
 "Maximum number of people per booking. Leave it blank to ignore maximum "
 "limit per booking."
 msgstr ""
 
-#: includes/template-tags.php:776 includes/template-tags.php:777
+#: includes/template-tags.php:743 includes/template-tags.php:744
 msgid "Maximum number of traveller"
 msgstr ""
 
-#: includes/template-tags.php:781
+#: includes/template-tags.php:748
 msgid "Maximum number of traveller for this tour package."
 msgstr ""
 
-#: includes/template-tags.php:843
+#: includes/template-tags.php:784
+msgid "Fixed Departure"
+msgstr ""
+
+#: includes/template-tags.php:786
+msgid ""
+"This option let you enable/disable fix depdeparture option for this tour "
+"package. "
+msgstr ""
+
+#: includes/template-tags.php:795
+msgid "Tour Availability Date Ranges"
+msgstr ""
+
+#: includes/template-tags.php:796
+msgid ""
+"You can choose date range slot for this tour availability. Do not add any "
+"date range slot to show this tour on all dates."
+msgstr ""
+
+#: includes/template-tags.php:806
+msgid "Tour Duration Days"
+msgstr ""
+
+#: includes/template-tags.php:807
+msgid "Total duration days for this tour"
+msgstr ""
+
+#: includes/template-tags.php:811
+msgid "Number of days"
+msgstr ""
+
+#: includes/template-tags.php:820
+msgid "Tour Duration Nights"
+msgstr ""
+
+#: includes/template-tags.php:824
+msgid "Number of nights"
+msgstr ""
+
+#: includes/template-tags.php:871
 msgid "Tour Price- Regular (%s)"
 msgstr ""
 
-#: includes/template-tags.php:847
+#: includes/template-tags.php:875
 msgid "Tour Price - Regular (%s)"
 msgstr ""
 
-#: includes/template-tags.php:853
+#: includes/template-tags.php:881
 msgid "Tour Price- Sales Price (%s)"
 msgstr ""
 
-#: includes/template-tags.php:857
+#: includes/template-tags.php:885
 msgid ""
 "Tour Price - Sales Price (%s). Leave it empty if you do not want to show "
 "sales price."
@@ -5258,27 +5291,27 @@ msgstr ""
 msgid "Make Payment "
 msgstr ""
 
-#: templates/parts/advanced-search.php:10
+#: templates/parts/advanced-search.php:17
 msgid "Type search keyword here.."
 msgstr ""
 
-#: templates/parts/advanced-search.php:21
+#: templates/parts/advanced-search.php:28
 msgid "Pick a destination"
 msgstr ""
 
-#: templates/parts/advanced-search.php:50
-msgid "Choose a activity"
+#: templates/parts/advanced-search.php:57
+msgid "Choose an activity"
 msgstr ""
 
-#: templates/parts/advanced-search.php:79
-msgid "Pick trip duration"
+#: templates/parts/advanced-search.php:86
+msgid "Trip duration"
 msgstr ""
 
-#: templates/parts/advanced-search.php:100
+#: templates/parts/advanced-search.php:107
 msgid "Budget"
 msgstr ""
 
-#: templates/parts/advanced-search.php:103
+#: templates/parts/advanced-search.php:110
 msgid "Your budget range"
 msgstr ""
 
@@ -5357,7 +5390,7 @@ msgstr ""
 msgid "Min Pax"
 msgstr ""
 
-#: templates/tour/book-now-button.php:2
+#: templates/tour/book-now-button.php:6
 msgid "Book now"
 msgstr ""
 

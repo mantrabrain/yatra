@@ -56,6 +56,12 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+#yatra-availability-calendar .fc-event .fc-event-title.yatra-active-event {
+    border-bottom: 3px solid #40cd51de;
 }
 
 #yatra-availability-calendar-container .yatra-availability-calendar-header {

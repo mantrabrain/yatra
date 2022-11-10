@@ -10,4 +10,6 @@ class RegularTour extends TourParent
     {
         parent::__construct($tour);
     }
+
+
 }

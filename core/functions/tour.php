@@ -1,10 +1,11 @@
 <?php
 
 use Yatra\Core\Tour\RegularTour;
+use Yatra\Core\Tour\ExternalTour;
 
 /**
  * @param mixed $the_tour Post object or post ID of the tour.
- * @return RegularTour|null|false
+ * @return RegularTour|ExternalTour|null|false
  * @since 2.1.12
  *
  */
@@ -22,7 +23,7 @@ function yatra_get_tour($the_tour = false)
 function yatra_setup_tour_data($post)
 {
     /**
-     * @global RegularTour $yatra_tour
+     * @global RegularTour|ExternalTour $yatra_tour
      * @since 2.1.12
      */
     global $yatra_tour;

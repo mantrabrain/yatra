@@ -37,6 +37,8 @@ abstract class TourParent extends YatraData
         'can_book' => true,
         'is_featured' => false,
         'is_fixed_departure' => false,
+        'external_url' => '',
+        'book_now_text' => '',
     );
 
 
@@ -103,7 +105,12 @@ abstract class TourParent extends YatraData
      */
     public function get_can_book($context = 'view')
     {
-        return $this->get_prop('can_book', $context);
+        return $this->get_prop('can_book', $context) && !self::is_type('external');
+    }
+
+    public function get_can_show_calendar($context = 'view')
+    {
+        return $this->get_prop('can_book', $context) || self::is_type('external');
     }
 
     /*
@@ -180,6 +187,28 @@ abstract class TourParent extends YatraData
     public function set_is_fixed_departure($is_fixed_departure)
     {
         $this->set_prop('is_fixed_departure', $is_fixed_departure);
+    }
+
+    /**
+     * Set external url
+     *
+     * @param string $external_url external url
+     * @since 2.1.12
+     */
+    public function set_external_url($external_url)
+    {
+        $this->set_prop('external_url', $external_url);
+    }
+
+    /**
+     * Set  book now button text
+     *
+     * @param string $book_now_text book now text
+     * @since 2.1.12
+     */
+    public function set_book_now_text($book_now_text)
+    {
+        $this->set_prop('book_now_text', $book_now_text);
     }
 
     /*

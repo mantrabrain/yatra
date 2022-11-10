@@ -672,7 +672,6 @@ body.post-type-yatra-booking #title {
     max-width: 200px;
     float: left;
     font-weight: 600;
-    text-transform: capitalize;
 }
 
 .yatra-admin-tab--content-section .yatra-field-wrap input[type="text"],

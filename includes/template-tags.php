@@ -662,6 +662,31 @@ if (!function_exists('yatra_tour_general_configurations')) {
 
         $tour_options = array(
 
+            'yatra_tour_meta_tour_external_url' => array(
+                'name' => 'yatra_tour_meta_tour_external_url',
+                'title' => esc_html__('External tour URL', 'yatra'),
+                'type' => 'text',
+                'description' => esc_html__('Enter the external URL to the tour package. ', 'yatra'),
+
+                'visibility_condition' => array(
+                    'yatra_tour_meta_tour_type' => 'external',
+                )
+                //'wrap_class' => 'yatra-right',
+                //'row_end' => true,
+
+            ),
+            'yatra_tour_meta_tour_external_button_text' => array(
+                'name' => 'yatra_tour_meta_tour_external_button_text',
+                'title' => esc_html__('Button text', 'yatra'),
+                'type' => 'text',
+                'description' => esc_html__('This text will be shown on the button linking to the external tour package ', 'yatra'),
+                'visibility_condition' => array(
+                    'yatra_tour_meta_tour_type' => 'external',
+                )
+                //'wrap_class' => 'yatra-right',
+                //'row_end' => true,
+
+            ),
             'yatra_tour_meta_tour_featured' => array(
                 'name' => 'yatra_tour_meta_tour_featured',
                 'title' => esc_html__('Feature this tour', 'yatra'),

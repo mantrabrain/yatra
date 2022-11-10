@@ -585,6 +585,10 @@ class Yatra_Ajax
 
         }
 
+        global $yatra_tour;
+
+        $yatra_tour = yatra_get_tour($tour_id);
+
         $yatra_tour_options = new Yatra_Tour_Options($tour_id, $selected_date, $selected_date);
 
         $todayDataSettings = $yatra_tour_options->getTodayData($selected_date);

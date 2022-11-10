@@ -56,7 +56,7 @@ class TourFactory
 
     public static function get_tour_classname($tour_id, $tour_type)
     {
-        $classname = apply_filters('yatra_tour_class', self::get_classname_from_tour_type($tour_type), $tour_type, $tour_id);
+        $classname = apply_filters('yatra_tour_class_name', self::get_classname_from_tour_type($tour_type), $tour_type, $tour_id);
 
         if (!$classname || !class_exists($classname)) {
 
