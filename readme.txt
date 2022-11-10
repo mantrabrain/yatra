@@ -90,6 +90,12 @@ Shortcode for Discount & Deals Listing:
 Shortcode for Tour Listing:
 <pre>[yatra_tour order="asc" featured="1" posts_per_page="5"]</pre>
 
+Shortcode for Mini Cart:
+<pre>[yatra_mini_cart]</pre>
+
+Shortcode for Search:
+<pre>[yatra_search]</pre>
+
 
 == Smart Tags For Booking Notification Email ==
 * {{home_url}} : Get home page url
