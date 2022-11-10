@@ -45,9 +45,7 @@ if (!function_exists('yatra_get_tour_types')) {
             'tour_type_selector',
             array(
                 'regular' => __('Regular tour', 'yatra'),
-                'external' => __('External/Affiliate tour', 'yatra'),
-                'one_day' => __('One Day tour', 'yatra'),
-                'multi_days' => __('Multi Days tour', 'yatra'),
+                'external' => __('External/Affiliate tour', 'yatra')
             )
         );
     }

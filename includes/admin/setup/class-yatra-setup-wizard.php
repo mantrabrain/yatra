@@ -76,11 +76,11 @@ class Yatra_Setup_Wizard
                 'view' => array($this, 'setup_step_miscellaneous'),
                 'handler' => array($this, 'setup_step_miscellaneous_save'),
             ),
-            'theme' => array(
+           /* 'theme' => array(
                 'name' => __('Theme', 'yatra'),
                 'view' => array($this, 'setup_step_themes'),
                 'handler' => array($this, 'setup_step_themes_save'),
-            ),
+            ),*/
             'final' => array(
                 'name' => __('Final!', 'yatra'),
                 'view' => array($this, 'setup_final_ready'),
@@ -573,7 +573,7 @@ class Yatra_Setup_Wizard
                 'title' => __('Resa', 'yatra'),
                 'demo_url' => 'https://wpyatra.com',
                 'is_free' => true,
-                'screenshot' => 'https://raw.githubusercontent.com/mantrabrain/yatri/master/screenshot.png',
+                'screenshot' => 'https://raw.githubusercontent.com/mantrabrain/resa/master/screenshot.png',
                 'landing_page' => 'https://wpyatra.com/?ref=yatrasetup',
                 'is_installable' => false,
                 'download_link' => 'https://downloads.wordpress.org/theme/resa.zip'

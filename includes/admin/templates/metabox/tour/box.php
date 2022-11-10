@@ -19,7 +19,7 @@
             ?>
             <label for="yatra_tour_meta_disable_booking">
                 <span class="yatra-tippy-tooltip"
-                      data-tippy-content="<?php esc_attr_e('This option let you enable/disable booking option for this tour package. Booking calendar will be hidden if you enable this option. User can only send enquiry.'); ?>"><?php echo esc_html__('Disable booking? ', 'yatra') ?></span>
+                      data-tippy-content="<?php esc_attr_e('This option let you enable/disable booking option for this tour package. Booking calendar will be hidden if you enable this option. User can only send enquiry.', 'yatra'); ?>"><?php echo esc_html__('Disable booking? ', 'yatra') ?></span>
                 <input type="checkbox" id="yatra_tour_meta_disable_booking"
                        name="yatra_tour_meta_disable_booking" <?php checked(true, $is_disable_booking) ?>
                        value="1"/>

@@ -2,10 +2,10 @@
   "name": "yatra",
   "title": "Yatra",
   "version": "1.0.0",
-  "homepage": "https://mantrabrain.com/downloads/yatri-travel-tour-theme/",
+  "homepage": "https://wpyatra.com/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mantrabrain/yatri.git"
+    "url": "https://github.com/mantrabrain/yatra.git"
   },
   "license": "GPL-3.0+",
   "main": "Gruntfile.js",
