@@ -53,9 +53,13 @@ if (!function_exists('yatra_tour_metabox_tabs')) {
         $metabox_tabs = array(
 
             'general' => array(
-                'title' => esc_html__('General & Dates', 'yatra'),
+                'title' => esc_html__('General', 'yatra'),
                 'is_active' => true,
                 'settings' => yatra_tour_general_configurations()
+            ),
+            'duration' => array(
+                'title' => esc_html__('Date & Durations', 'yatra'),
+                'settings' => yatra_tour_duration_configurations()
             ),
             'pricing' => array(
                 'title' => esc_html__('Pricing', 'yatra'),

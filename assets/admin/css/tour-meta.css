@@ -561,6 +561,17 @@ body.post-type-yatra-booking #title {
 .yatra-admin-editor .yatra-box-data-head .heading {
     padding: 10px 0;
     margin: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+
+.yatra-admin-editor .yatra-box-data-head .heading label {
+    padding-right: 1em;
+    font-size: 13px;
+    vertical-align: baseline;
+    border-right: 1px solid #ddd;
 }
 
 .yatra-box-data .yatra-box-data-content {
@@ -632,13 +643,14 @@ body.post-type-yatra-booking #title {
     align-items: center;
 }
 
-#yatra_add_new_pricing_option{
+#yatra_add_new_pricing_option {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
     font-size: 15px;
 }
+
 .yatra-admin-tab--content-section .mb-meta-vertical-tab-content .yatra-field-wrap {
     padding: 10px 15px;
     display: block;

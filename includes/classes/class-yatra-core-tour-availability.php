@@ -595,7 +595,7 @@ class Yatra_Core_Tour_Availability
             $class = '';
             $tippy = '';
 
-            if ($tour->is_booking_disabled()) {
+            if (!$tour->get_can_book()) {
 
                 $class = 'booking-disabled yatra-tippy-tooltip';
                 $tippy = 'This tour [ ID: ' . get_the_ID() . ' ] is disabled for booking.';

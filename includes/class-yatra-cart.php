@@ -264,7 +264,7 @@ if (!class_exists('Yatra_Cart')) {
             }
             $tour = yatra_get_tour($tour_id);
 
-            if ($tour->is_booking_disabled()) {
+            if (!$tour->get_can_book()) {
 
                 $unset_this = true;
             }

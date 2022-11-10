@@ -35,6 +35,19 @@ function yatra_setup_tour_data($post)
         return;
     }
     $yatra_tour = yatra_get_tour($post);
-
 }
 
+if (!function_exists('yatra_get_tour_types')) {
+    function yatra_get_tour_types()
+    {
+        return (array)apply_filters(
+            'tour_type_selector',
+            array(
+                'regular' => __('Regular tour', 'yatra'),
+                'external' => __('External/Affiliate tour', 'yatra'),
+                'one_day' => __('One Day tour', 'yatra'),
+                'multi_days' => __('Multi Days tour', 'yatra'),
+            )
+        );
+    }
+}

@@ -661,64 +661,15 @@ if (!function_exists('yatra_tour_general_configurations')) {
         $countries = yatra_get_countries();
 
         $tour_options = array(
-            'yatra_tour_meta_disable_booking' => array(
-                'name' => 'yatra_tour_meta_disable_booking',
-                'title' => esc_html__('Disable booking', 'yatra'),
+
+            'yatra_tour_meta_tour_featured' => array(
+                'name' => 'yatra_tour_meta_tour_featured',
+                'title' => esc_html__('Feature this tour', 'yatra'),
                 'type' => 'switch',
-                'description' => esc_html__('This option let you enable/disable booking option for this tour package. Booking calendar will be hidden if you enable this option. User can only send enquiry.', 'yatra'),
+                'description' => esc_html__('This option let you enable/disable feature option for this tour package. ', 'yatra'),
 
                 //'wrap_class' => 'yatra-right',
                 //'row_end' => true,
-
-            ),
-            'yatra_tour_meta_tour_fixed_departure' => array(
-                'name' => 'yatra_tour_meta_tour_fixed_departure',
-                'title' => esc_html__('Fixed Departure', 'yatra'),
-                'type' => 'switch',
-                'description' => esc_html__('This option let you enable/disable fix depdeparture option for this tour package. ', 'yatra'),
-                'visibility_condition' => array(
-                    'yatra_tour_meta_disable_booking' => false
-                )
-                //'wrap_class' => 'yatra-right',
-                //'row_end' => true,
-
-            ),
-
-            'yatra_tour_meta_availability_date_ranges' => array(
-                'name' => 'yatra_tour_meta_availability_date_ranges',
-                'title' => esc_html__('Tour Availability Date Ranges', 'yatra'),
-                'description' => esc_html__('You can choose date range slot for this tour availability. Do not add any date range slot to show this tour on all dates.', 'yatra'),
-                'type' => 'date_range',
-                'visibility_condition' => array(
-                    'yatra_tour_meta_tour_fixed_departure' => true,
-                    'yatra_tour_meta_disable_booking' => false
-                )
-                //'row_start' => true,
-
-            ),
-            'yatra_tour_meta_tour_duration_days' => array(
-                'name' => 'yatra_tour_meta_tour_duration_days',
-                'title' => esc_html__('Tour Duration Days', 'yatra'),
-                'description' => esc_html__('Total duration days for this tour', 'yatra'),
-                'type' => 'number',
-                // 'wrap_class' => 'yatra-left',
-                'extra_attributes' => array(
-                    'placeholder' => __('Number of days', 'yatra'),
-                ),
-
-
-                //'row_start' => true,
-
-            ),
-            'yatra_tour_meta_tour_duration_nights' => array(
-                'name' => 'yatra_tour_meta_tour_duration_nights',
-                'title' => esc_html__('Tour Duration Nights', 'yatra'),
-                'type' => 'number',
-                //'wrap_class' => 'yatra-right',
-                'extra_attributes' => array(
-                    'placeholder' => __('Number of nights', 'yatra'),
-                ),
-                ///'row_end' => true,
 
             ),
             'yatra_tour_meta_tour_country' => array(
@@ -736,16 +687,7 @@ if (!function_exists('yatra_tour_general_configurations')) {
                 //'row_start' => true,
 
             ),
-            'yatra_tour_meta_tour_featured' => array(
-                'name' => 'yatra_tour_meta_tour_featured',
-                'title' => esc_html__('Feature this tour', 'yatra'),
-                'type' => 'switch',
-                'description' => esc_html__('This option let you enable/disable feature option for this tour package. ', 'yatra'),
 
-                //'wrap_class' => 'yatra-right',
-                //'row_end' => true,
-
-            ),
 
             'yatra_tour_minimum_pax' => array(
                 'name' => 'yatra_tour_minimum_pax',
@@ -802,6 +744,67 @@ if (!function_exists('yatra_tour_general_configurations')) {
             ),
         );
         return apply_filters('yatra_tour_general_configurations', $tour_options);
+    }
+}
+
+if (!function_exists('yatra_tour_duration_configurations')) {
+
+    function yatra_tour_duration_configurations()
+    {
+
+        $tour_options = array(
+
+            'yatra_tour_meta_tour_fixed_departure' => array(
+                'name' => 'yatra_tour_meta_tour_fixed_departure',
+                'title' => esc_html__('Fixed Departure', 'yatra'),
+                'type' => 'switch',
+                'description' => esc_html__('This option let you enable/disable fix depdeparture option for this tour package. ', 'yatra'),
+
+                //'wrap_class' => 'yatra-right',
+                //'row_end' => true,
+
+            ),
+
+            'yatra_tour_meta_availability_date_ranges' => array(
+                'name' => 'yatra_tour_meta_availability_date_ranges',
+                'title' => esc_html__('Tour Availability Date Ranges', 'yatra'),
+                'description' => esc_html__('You can choose date range slot for this tour availability. Do not add any date range slot to show this tour on all dates.', 'yatra'),
+                'type' => 'date_range',
+                'visibility_condition' => array(
+                    'yatra_tour_meta_tour_fixed_departure' => true,
+                )
+                //'row_start' => true,
+
+            ),
+            'yatra_tour_meta_tour_duration_days' => array(
+                'name' => 'yatra_tour_meta_tour_duration_days',
+                'title' => esc_html__('Tour Duration Days', 'yatra'),
+                'description' => esc_html__('Total duration days for this tour', 'yatra'),
+                'type' => 'number',
+                // 'wrap_class' => 'yatra-left',
+                'extra_attributes' => array(
+                    'placeholder' => __('Number of days', 'yatra'),
+                ),
+
+
+                //'row_start' => true,
+
+            ),
+            'yatra_tour_meta_tour_duration_nights' => array(
+                'name' => 'yatra_tour_meta_tour_duration_nights',
+                'title' => esc_html__('Tour Duration Nights', 'yatra'),
+                'type' => 'number',
+                //'wrap_class' => 'yatra-right',
+                'extra_attributes' => array(
+                    'placeholder' => __('Number of nights', 'yatra'),
+                ),
+                ///'row_end' => true,
+
+            ),
+
+
+        );
+        return apply_filters('yatra_tour_duration_configurations', $tour_options);
     }
 }
 

@@ -13,6 +13,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             add_action('wp_ajax_yatra_add_attribute_meta', array($this, 'yatra_add_attribute_meta'));
             add_action('yatra_tour_meta_body_content', array($this, 'tour_meta'));
             add_action('yatra_tour_meta_tab_content_general', array($this, 'general_tab_content'));
+            add_action('yatra_tour_meta_tab_content_duration', array($this, 'duration_tab_content'));
             add_action('yatra_tour_meta_tab_content_pricing', array($this, 'pricing_tab_content'));
             add_action('yatra_tour_meta_tab_content_attributes', array($this, 'attributes_tab_content'));
             add_action('yatra_tour_meta_tab_content_tour_tabs', array($this, 'tour_tabs_tab_content'));
@@ -48,7 +49,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 return;
             }
             $args = array(
-                'title' => esc_html__('Tour Additional Information', 'yatra')
+                'title' => esc_html__('Tour data', 'yatra')
             );
             yatra_load_admin_template('metabox.tour.box', $args);
         }
@@ -70,6 +71,17 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
         }
 
         public function general_tab_content($content)
+        {
+            $settings = isset($content['settings']) ? $content['settings'] : array();
+
+            foreach ($settings as $field) {
+
+                $this->metabox_html($field);
+            }
+
+        }
+
+        public function duration_tab_content($content)
         {
             $settings = isset($content['settings']) ? $content['settings'] : array();
 
@@ -318,6 +330,11 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                         $this->save_general_options($settings, $post_id);
 
                         break;
+
+                    case "duration":
+                        $this->save_duration_options($settings, $post_id);
+
+                        break;
                     case "pricing":
                         $this->save_pricing_options($settings, $post_id);
 
@@ -396,6 +413,18 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
         }
 
         private function save_general_options($configs, $post_id)
+        {
+            foreach ($configs as $field_key => $field) {
+
+                $field_value = isset($_POST[$field_key]) ? $_POST[$field_key] : '';
+
+                $valid_field_value = $this->sanitize($field_value, $field);
+
+                update_post_meta($post_id, $field_key, $valid_field_value);
+            }
+        }
+
+        private function save_duration_options($configs, $post_id)
         {
             foreach ($configs as $field_key => $field) {
 

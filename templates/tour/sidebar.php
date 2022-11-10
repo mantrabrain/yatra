@@ -7,7 +7,7 @@ $enquiry_hide_class = $show_hide_enquiry_form === "no" ? 'yatra-hide' : '';
 <div class="yatra-tour-info">
     <div class="yatra-tour-info-inner">
         <div class="yatra-tour-info-pricing-wrap">
-            <?php if (!$yatra_tour->is_booking_disabled()) { ?>
+            <?php if ($yatra_tour->get_can_book()) { ?>
                 <div class="tour-info-pricing-header">
                     <h2>
                         <?php
@@ -31,7 +31,7 @@ $enquiry_hide_class = $show_hide_enquiry_form === "no" ? 'yatra-hide' : '';
         </div>
         <div class="yatra-tabs" id="yatra-tour-sidebar-tabs">
             <ul class="yatra-tab-wrap" role="tablist">
-                <?php if (!$yatra_tour->is_booking_disabled()) { ?>
+                <?php if ($yatra_tour->get_can_book()) { ?>
                     <li class="item active" role="presentation">
                         <a href="#yatra-tour-booking-form" role="tab" tabindex="0"
                            aria-controls="yatra-tour-booking-form"
@@ -48,7 +48,7 @@ $enquiry_hide_class = $show_hide_enquiry_form === "no" ? 'yatra-hide' : '';
                     </a>
                 </li>
             </ul>
-            <?php if (!$yatra_tour->is_booking_disabled()) { ?>
+            <?php if ($yatra_tour->get_can_book()) { ?>
                 <section id="yatra-tour-booking-form" class="yatra-tab-content" role="tabpanel">
                     <div class="tab-inner" tabindex="0">
                         <div class="yatra-tour-booking-form-section">

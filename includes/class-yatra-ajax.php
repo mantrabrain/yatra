@@ -177,7 +177,7 @@ class Yatra_Ajax
 
         $tour = yatra_get_tour($tour_id);
 
-        if ($tour->is_booking_disabled()) {
+        if (!$tour->get_can_book()) {
 
             wp_send_json_error('Booking is disabled for this tour package by admin.');
         }

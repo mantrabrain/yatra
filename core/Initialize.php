@@ -3,6 +3,7 @@
 namespace Yatra\Core;
 
 use Yatra\Core\API\TrackerAPI;
+use Yatra\Core\Hooks\TourHooks;
 
 class Initialize
 {
@@ -10,11 +11,13 @@ class Initialize
     {
         require_once YATRA_ABSPATH . 'core/globals.php';
         require_once YATRA_ABSPATH . 'core/functions/pages.php';
+        require_once YATRA_ABSPATH . 'core/functions/tour.php';
 
         $self = new self;
 
         $self->api_init();
         $self->cron_init();
+        $self->hooks_init();
     }
 
     public function api_init()
@@ -25,6 +28,11 @@ class Initialize
     public function cron_init()
     {
         Cron::init();
+    }
+
+    public function hooks_init()
+    {
+        TourHooks::init();
     }
 }
 
