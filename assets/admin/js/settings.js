@@ -12,7 +12,7 @@
 
 
         },
-        cacheDom:function(){
+        cacheDom: function () {
             this.button = $('#yatra-setting-tab-option-add-new-tab');
         },
         initLib: function () {
@@ -29,13 +29,13 @@
                 _that.addNewTab($(this));
             });
             $('body').on('change', 'input.yatra_frontend_tabs_available_options_icon', function () {
-                var className = 'label';
+                var className = 'icon';
                 className += ' ' + $(this).val();
-                $(this).closest('li').find('span.label').attr('class', className);
+                $(this).closest('li').find('.label .icon').attr('class', className);
             });
             $('body').on('keyup', 'input.yatra_frontend_tabs_available_options_label', function () {
 
-                $(this).closest('li').find('span.label').text($(this).val());
+                $(this).closest('li').find('.label .text').text($(this).val());
             });
 
             $('body').on('click', 'button.available-tab-remove-item', function (e) {
@@ -72,7 +72,7 @@
             var uuid = this.getUniqueID('text_');
             var li = $('<li data-tab-type="' + uuid + '"/>');
             //name
-            li.append('<span class="label">Tab Label Goes Here</span><input class="yatra_frontend_tabs_available_options_label" name="' + this.replaceAll(label_name, uuid) + '" type="text" value="Tab Label"/>');
+            li.append('<div class="label"><span class="icon"></span><span class="text">Tab Label Goes Here</span></div><input class="yatra_frontend_tabs_available_options_label" name="' + this.replaceAll(label_name, uuid) + '" type="text" value="Tab Label"/>');
             //label
             li.append('<input class="yatra_frontend_tabs_available_options_icon icopick" name="' + this.replaceAll(icon_name, uuid) + '" type="text" value=""/>');
             //visbility

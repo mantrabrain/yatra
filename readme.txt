@@ -4,7 +4,7 @@ Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
 Tested up to: 6.1
 Requires PHP: 7.0
-Stable tag: 2.1.11
+Stable tag: 2.1.12
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -48,6 +48,8 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 * Import/Export
 * Unlimited itineraries
 * Booking & Enquiry notification email
+* Advanced search & filter
+* Mini cart
 
 
 == Premium Payment Gateway Extensions/Addons ==
@@ -179,8 +181,30 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.12 | 2022
+= 2.1.12 | 2022-11-10
+* Added - Show current version of addon on license manager
+* Added - Mini cart shortcode [yatra_mini_cart]
+* Added - Search shortcode [yatra_search]
+* Added - Disable booking option for each tour
+* Added - Tour type option added on each tour ( regular and external)
+* Added - Icon added on admin bar menu
+* Update - Separate menu on admin
+* Update - Session management restructured
+* Update - Button css update
+* Update - CSS color style update with css variable style
+* Update - Booking calendar design optimized
+* Update - Variable pricing design update
+* Update - Setup wizard design fixes
+* Update - Feature icon update on admin tour list table
+* Update - Update font awesome to Font Awesome 6.2.0
+* Fixed - Responsive issue fixed
 * Fixed - jQuery UI mobile slider not working on touch or drag issue fixed
 * Fixed - Made normal pagination design
+* Fixed - Figure css for single tour only
+* Fixed - Pagination issue resolved
+* Fixed - Upgrade to pro link issue fixed
+* Fixed - Coupon issue fixed
+* Fixed - Tab issue fixed
+* Removed - Remove unused content from status page
 
 

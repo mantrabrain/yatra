@@ -9,10 +9,15 @@
     text-align: center;
 }
 
-.yatra-setting-tab-options ul li span.label {
+.yatra-setting-tab-options ul li .label {
     text-align: left;
     padding-left: 10px;
     font-weight: bold;
+    width: 30%;
+}
+
+.yatra-setting-tab-options ul li .label .icon {
+    margin-right: 10px;
 }
 
 .yatra-setting-tab-options ul li span.label:before {
