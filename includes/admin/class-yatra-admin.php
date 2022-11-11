@@ -395,7 +395,7 @@ final class Yatra_Admin
             esc_url(
                 add_query_arg(
                     ['page' => 'yatra-settings'],
-                    admin_url('edit.php?post_type=tour')
+                    admin_url('admin.php')
                 )
             ),
             esc_attr__('Go to Yatra Settings page', 'yatra'),
