@@ -72,7 +72,7 @@ if (!defined('ABSPATH')) {
                     </div>
                     <div class="yatra-card-body"><p class="count"><?php echo absint($enquiry_count); ?></p></div>
                     <div class="yatra-card-footer">
-                        <a href="<?php echo esc_url(admin_url('edit.php?post_type=tour&page=enquiries')) ?>">
+                        <a href="<?php echo esc_url(admin_url('admin.php?page=enquiries')) ?>">
                             <?php echo __('View All', 'yatra'); ?>
                         </a>
                     </div>

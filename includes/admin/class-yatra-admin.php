@@ -93,7 +93,7 @@ final class Yatra_Admin
 
     public function promotional_offer()
     {
-        return;
+return;
         if (!current_user_can('manage_yatra')) {
             return;
         }

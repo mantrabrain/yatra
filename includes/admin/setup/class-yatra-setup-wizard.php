@@ -76,11 +76,11 @@ class Yatra_Setup_Wizard
                 'view' => array($this, 'setup_step_miscellaneous'),
                 'handler' => array($this, 'setup_step_miscellaneous_save'),
             ),
-           /* 'theme' => array(
+            'theme' => array(
                 'name' => __('Theme', 'yatra'),
                 'view' => array($this, 'setup_step_themes'),
                 'handler' => array($this, 'setup_step_themes_save'),
-            ),*/
+            ),
             'final' => array(
                 'name' => __('Final!', 'yatra'),
                 'view' => array($this, 'setup_final_ready'),
