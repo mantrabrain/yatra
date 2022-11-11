@@ -90,8 +90,8 @@ class Tracking
      */
     public function handshake_and_request_api()
     {
-        $this->request_api(true, true); // for Handshake
-        $this->request_api(true); // For Request
+        $this->request_api(true); //handshake
+        $this->request_api(); // For Request
 
 
     }
@@ -267,16 +267,15 @@ class Tracking
      *
      * @access public
      *
-     * @param bool $override If we should override the tracking setting.
      * @param bool $do_handshake If it is just handshake to get secret key.
      *
      * @return void|mixed
      * @since 2.1.12
      */
-    public function request_api($override = false, $do_handshake = false)
+    public function request_api($do_handshake = false)
     {
 
-        if (!$this->get_opt_data('allow_tracking') && !$override) {
+        if (!$this->get_opt_data('allow_tracking')) {
             return false;
         }
 
@@ -401,6 +400,9 @@ class Tracking
     {
 
         if (!wp_doing_cron()) {
+            return;
+        }
+        if (!$this->get_opt_data('allow_tracking')) {
             return;
         }
         add_action('yatra_weekly_scheduled_events', array($this, 'handshake_and_request_api'));
