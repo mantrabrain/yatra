@@ -173,13 +173,14 @@ class Tracking
             ? $_SERVER['SERVER_SOFTWARE']
             : '';
 
+        $installed_date = date('Y-m-d H:i:s', get_option('yatra_install_date', strtotime($date)));
         // Setup data.
         $data = array(
             'php_version' => phpversion(),
             'yatra_version' => YATRA_VERSION,
             'wp_version' => get_bloginfo('version'),
             'server' => $server,
-            'install_date' => $date,
+            'install_date' => $installed_date,
             'multisite' => is_multisite(),
             'url' => home_url(),
             'theme' => $theme,
@@ -204,7 +205,7 @@ class Tracking
 
         $data['active_plugins'] = $active_plugins;
         $data['inactive_plugins'] = $plugins;
-        $data['active_gateways'] = array_keys(yatra_get_active_payment_gateways());
+        $data['active_gateways'] = yatra_get_active_payment_gateways();
         $data['tours'] = wp_count_posts('tour')->publish;
         $data['locale'] = get_locale();
         return $data;
