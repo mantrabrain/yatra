@@ -36,8 +36,6 @@
   flex-direction: row;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  margin-right: -0.5rem;
-  margin-left: -0.5rem;
 }
 
 .yatra-row.reverse {
@@ -280,9 +278,6 @@
 }
 
 @media only screen and (min-width: 48em) {
-  .yatra-container1 {
-    width: 49rem;
-  }
 
   .yatra-col-sm,
   .yatra-col-sm-1,
@@ -508,12 +503,13 @@
     -ms-flex-order: 1;
     order: 1;
   }
+  .yatra-row {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+  }
 }
 
 @media only screen and (min-width: 64em) {
-  .yatra-container1 {
-    width: 65rem;
-  }
 
   .yatra-col-md,
   .yatra-col-md-1,
@@ -742,9 +738,6 @@
 }
 
 @media only screen and (min-width: 75em) {
-  .yatra-container1 {
-    width: 76rem;
-  }
 
   .yatra-col-lg,
   .yatra-col-lg-1,

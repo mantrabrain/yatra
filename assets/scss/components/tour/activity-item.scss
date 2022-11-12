@@ -7,6 +7,7 @@
       margin: 15px 0;
       background: #ddd;
       width: 100%;
+
       img, figure {
         vertical-align: top;
         height: 275px;
@@ -23,11 +24,12 @@
       h2.activity-title {
         position: absolute;
         bottom: 0;
-        width: 100%;
+        left: 0;
+        right: 0;
         font-size: 30px;
         line-height: 1.2em;
         color: #fff;
-         font-weight: 600;
+        font-weight: 600;
         margin: 0;
         padding: 15px;
         pointer-events: none;
@@ -55,6 +57,7 @@
           color: #fff
         }
       }
+
       a:hover {
         color: #fff;
         opacity: 1;

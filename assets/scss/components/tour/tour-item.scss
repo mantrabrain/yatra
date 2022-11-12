@@ -58,7 +58,8 @@
       margin: 0;
       text-align: center;
       font-size: 22px;
-      width: 100%;
+      max-width: 100%;
+      display: block;
       padding: 20px;
     }
 
@@ -107,7 +108,7 @@
     .yatra-tour-more {
       width: 90%;
       margin-left: 5%;
-      
+
       .yatra-button {
         display: block;
       }
@@ -121,7 +122,6 @@
   }
 
   .yatra-tour-list-item {
-    padding: 0 15px;
 
   }
 

@@ -96,10 +96,19 @@
         }
 
         .yatra-meta-content-wrap {
+
           @import "../parts/tour-meta";
 
           .inner {
             padding: 0;
+
+            .yatra-tour-meta {
+              width: 100%;
+              display: inline-block;
+              .yatra-cat-links, .yatra-tour-duration {
+                float: left;
+              }
+            }
           }
         }
 
