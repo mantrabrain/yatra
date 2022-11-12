@@ -2293,6 +2293,12 @@ body.single-tour .yatra-single-tour .yatra-site-main .yatra-tour-meta {
     font-size: 15px;
     display: block; }
 
+body.single-tour .yatra-single-tour .yatra-site-main .yatra-tour-meta {
+  width: 100%;
+  display: inline-block; }
+  body.single-tour .yatra-single-tour .yatra-site-main .yatra-tour-meta .yatra-cat-links, body.single-tour .yatra-single-tour .yatra-site-main .yatra-tour-meta .yatra-tour-duration {
+    float: left; }
+
 body.single-tour .yatra-single-tour .yatra-tour-info {
   display: block; }
   body.single-tour .yatra-single-tour .yatra-tour-info .yatra-tour-info-inner {

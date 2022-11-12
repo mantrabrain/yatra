@@ -6,6 +6,14 @@ body.single-tour {
   .yatra-single-tour {
     .yatra-site-main {
       @import "parts/tour-meta";
+
+      .yatra-tour-meta {
+        width: 100%;
+        display: inline-block;
+        .yatra-cat-links, .yatra-tour-duration {
+          float: left;
+        }
+      }
     }
 
     .yatra-tour-info {
