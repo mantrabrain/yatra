@@ -571,10 +571,10 @@ class Yatra_Setup_Wizard
             array(
                 'slug' => 'resa',
                 'title' => __('Resa', 'yatra'),
-                'demo_url' => 'https://wpyatra.com',
+                'demo_url' => 'https://demo.wpyatra.com',
                 'is_free' => true,
                 'screenshot' => 'https://raw.githubusercontent.com/mantrabrain/resa/master/screenshot.png',
-                'landing_page' => 'https://wpyatra.com/?ref=yatrasetup',
+                'landing_page' => 'https://wpyatra.com/best-wordpress-travel-theme/?ref=yatrasetup',
                 'is_installable' => false,
                 'download_link' => 'https://downloads.wordpress.org/theme/resa.zip'
             )
