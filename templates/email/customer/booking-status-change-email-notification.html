@@ -1,0 +1,30 @@
+Hi {{customer_name}},
+                
+<br/>
+
+Your booking on <a href="{{home_url}}">{{blog_info}}</a> has been <b>{{booking_status}}</b>.
+
+<br/>
+Booking code: <b>{{booking_code}}</b> and here is the tour lists:
+<br/>
+<table style="width: 100%;">
+    <thead>
+        <tr>
+            <th style="text-align: left">Tour Name</th>
+            <th style="text-align: left">Tour Date</th>
+            <th style="text-align: left">Number of Person</th>
+        </tr>
+    </thead>
+<tbody>
+    {{tour_lists_loop_start}}
+    <tr>
+        <td style="text-align: left">{{tour_name}}</td>
+        <td style="text-align: left">{{tour_date}}</td>
+        <td style="text-align: left">{{number_of_person}}</td>
+    </tr>
+    {{tour_lists_loop_end}}
+</tbody>
+</table>
+<br/>
+
+Thank You!

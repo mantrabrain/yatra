@@ -53,22 +53,14 @@ class ThemeController
 
         $this->set_current_theme();
 
-        if ($this->is_installed()) {
-
-            return true;
-        }
-        return false;
+        return $this->is_installed();
     }
 
     public function activate()
     {
         switch_theme($this->theme);
 
-        if ($this->is_activated()) {
-
-            return true;
-        }
-        return false;
+        return $this->is_activated();
     }
 
     public function install_and_activate()
@@ -77,35 +69,23 @@ class ThemeController
 
             return $this->activate();
 
-        } else {
-
-            ob_start();
-
-            $this->install();
-
-            $install = ob_get_clean();
-
-            return $this->activate();
-
         }
+
+        ob_start();
+        $this->install();
+        $install = ob_get_clean();
+        return $this->activate();
     }
 
     public function is_installed()
     {
-        if ($this->current_theme->exists()) {
-            return true;
-        }
-        return false;
+        return $this->current_theme->exists();
     }
 
     public function is_activated()
     {
         $active_theme = wp_get_theme();
 
-        if ($active_theme->get_template() == $this->theme) {
-
-            return true;
-        }
-        return false;
+        return $active_theme->get_template() == $this->theme;
     }
 }
