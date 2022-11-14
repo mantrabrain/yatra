@@ -1,0 +1,39 @@
+Hi Admin,
+            
+<br/>
+
+{{customer_name}} ( {{customer_email}} ) has successfully booked your tour package to your site <a href="{{home_url}}">{{blog_info}}</a>.
+
+<br/>
+
+Booking code: <b>{{booking_code}}</b>
+
+<br/>
+
+Tour Lists:
+
+<br/>
+<table style="width: 100%;">
+    <thead>
+        <tr>
+            <th style="text-align: left">Tour Name</th>
+            <th style="text-align: left">Tour Date</th>
+            <th style="text-align: left">Number of Person</th>
+        </tr>
+    </thead>
+<tbody>
+    {{tour_lists_loop_start}}
+    <tr>
+        <td style="text-align: left">{{tour_name}}</td>
+        <td style="text-align: left">{{tour_date}}</td>
+        <td style="text-align: left">{{number_of_person}}</td>
+    </tr>
+    {{tour_lists_loop_end}}
+</tbody>
+</table>
+<br/>
+
+Please review the booking details at \'<b>Yatra</b>\' menu in your dashboard.
+
+<br/>
+Thank You!
