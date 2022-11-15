@@ -132,7 +132,11 @@ You have to start and end tour_list_loop by using **{{tour_lists_loop_start}}** 
 * {{enquiry_date}} :  Date of enquiry form submission
 
 
+== YATRA SPECIFIC THEME ==
+* [Resa](https://wordpress.org/themes/resa/?ref=yatrapluginorg) by mantrabrain
+
 == COMPATIBLE THEMES ==
+* [Resa](https://wordpress.org/themes/resa/?ref=yatrapluginorg) by mantrabrain
 * [Blocksy](https://wordpress.org/themes/blocksy/?ref=yatrapluginorg) by creativethemeshq
 * [Kadence](https://wordpress.org/themes/kadence/) by Ben Ritner - Kadence WP
 
