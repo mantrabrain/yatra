@@ -648,7 +648,7 @@ if (!function_exists('yatra_tour_attributes')) {
 
             )
         );
-        return apply_filters('yatra_tour_attributes', $tour_attributes);
+        return apply_filters('yatra_tour_attribute_configurations', $tour_attributes);
     }
 }
 
@@ -907,7 +907,7 @@ if (!function_exists('yatra_tour_pricing_configurations')) {
                 //'row_end' => true,
             )
         );
-        return apply_filters('yatra_tour_general_configurations', $tour_options);
+        return apply_filters('yatra_tour_pricing_configurations', $tour_options);
     }
 }
 
