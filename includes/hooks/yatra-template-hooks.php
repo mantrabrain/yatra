@@ -40,12 +40,12 @@ class Yatra_Template_Hooks
         echo '<div class="yatra-single-tour-sidebar yatra-col-md-4 yatra-col-xs-12">';
 
         yatra_get_template('tour/sidebar.php',
-            array(
+            apply_filters('yatra_single_tour_sidebar_parameters', array(
                 'data' => $tourData,
                 'currency' => yatra_get_current_currency_symbol(),
                 'min_regular' => $minimum_pricing['regular_price'],
                 'min_sales' => $minimum_pricing['sales_price']
-            )
+            ))
         );
         echo '</div>';
     }
