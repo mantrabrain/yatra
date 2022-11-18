@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.12\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-11-18 13:36:41+00:00\n"
+"POT-Creation-Date: 2022-11-18 15:21:46+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -257,6 +257,52 @@ msgstr ""
 msgid "Once Weekly"
 msgstr ""
 
+#: core/Hooks/TourHooks.php:41
+msgid "Tour updated. <a href=\"%s\">View tour</a>"
+msgstr ""
+
+#: core/Hooks/TourHooks.php:42
+#: includes/admin/class-yatra-admin-post-types.php:99
+msgid "Custom field updated."
+msgstr ""
+
+#: core/Hooks/TourHooks.php:43
+#: includes/admin/class-yatra-admin-post-types.php:100
+msgid "Custom field deleted."
+msgstr ""
+
+#: core/Hooks/TourHooks.php:44
+msgid "Tour updated."
+msgstr ""
+
+#: core/Hooks/TourHooks.php:46
+#. translators: %s: date and time of the revision
+msgid "Tour restored to revision from %s"
+msgstr ""
+
+#: core/Hooks/TourHooks.php:47
+msgid "Book published. <a href=\"%s\">View book</a>"
+msgstr ""
+
+#: core/Hooks/TourHooks.php:48
+msgid "Tour saved."
+msgstr ""
+
+#: core/Hooks/TourHooks.php:49
+msgid "Tour submitted. <a target=\"_blank\" href=\"%s\">Preview tour</a>"
+msgstr ""
+
+#: core/Hooks/TourHooks.php:50
+msgid ""
+"Tour scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" "
+"href=\"%2$s\">Preview tour</a>"
+msgstr ""
+
+#: core/Hooks/TourHooks.php:53
+#. translators: Publish box date format, see http:php.net/date
+msgid "Tour draft updated. <a target=\"_blank\" href=\"%s\">Preview tour</a>"
+msgstr ""
+
 #: core/functions/tour.php:16
 #. translators: 1: yatra_loaded
 msgid "%1$s should not be called before the %2$s actions have finished."
@@ -383,14 +429,6 @@ msgstr ""
 
 #: includes/admin/class-yatra-admin-post-types.php:98
 msgid "updated."
-msgstr ""
-
-#: includes/admin/class-yatra-admin-post-types.php:99
-msgid "Custom field updated."
-msgstr ""
-
-#: includes/admin/class-yatra-admin-post-types.php:100
-msgid "Custom field deleted."
 msgstr ""
 
 #: includes/admin/class-yatra-admin-post-types.php:101
