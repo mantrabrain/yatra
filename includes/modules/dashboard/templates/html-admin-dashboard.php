@@ -5,10 +5,6 @@ if (!defined('ABSPATH')) {
 } ?>
 <div class="wrap">
     <h2></h2>
-    <div class="yatra-dashboard-heading">
-        <h2><?php echo __('Yatra', 'yatra'); ?></h2>
-        <p class="version"><?php echo esc_html(YATRA_VERSION); ?></p>
-    </div>
     <div class="yatra-dashboard-wrap">
 
         <div class="yatra-dashboard-content">

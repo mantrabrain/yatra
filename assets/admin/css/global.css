@@ -130,3 +130,77 @@
     font-weight: 600;
     margin-bottom: 4px;
 }
+
+#yatra-header {
+    border-top: 5px solid #2f582b;
+    border-bottom: 1px solid #c3c4c7;
+    padding: 20px 0;
+    margin-left: -20px;
+    background: #fff;
+}
+
+#yatra-header-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 20px;
+    align-items: center;
+}
+
+body.post-type-tour #contextual-help-link-wrap, body.post-type-tour #screen-options-link-wrap,
+body[class*="post-type-yatra"] #contextual-help-link-wrap, body[class*="post-type-yatra"] #screen-options-link-wrap,
+body[class*="yatra_page"] #contextual-help-link-wrap, body[class*="yatra_page"] #screen-options-link-wrap {
+    top: 5px !important;
+}
+
+body.post-type-tour #screen-meta,
+body[class*="post-type-yatra"] #screen-meta,
+body[class*="yatra_page"] #screen-meta {
+    margin: 0 0 -1px -20px;
+}
+
+#yatra-header-wrapper #yatra-header-branding {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+#yatra-header-wrapper #yatra-header-branding .name {
+    font-size: 25px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#yatra-header-wrapper #yatra-header-branding .version {
+    background: #818181;
+    color: #fff;
+    padding: 2px 5px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 3px;
+}
+
+#yatra-header-wrapper .yatra-header-page-title-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.75em;
+    margin-top: -5px;
+    margin-right: auto;
+    padding-left: 7px;
+
+}
+
+.yatra-header-page-title {
+    font-weight: 400;
+    font-size: 1em;
+    line-height: 1.3em;
+    display: inline;
+}
+
+#yatra-header-wrapper .yatra-header-separator {
+    margin-left: 10px;
+    font-size: 20px;
+    opacity: 0.25;
+}
