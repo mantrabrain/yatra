@@ -53,10 +53,21 @@ if (!class_exists('Yatra_Cart')) {
 
             $items = isset($cart['items']) ? $cart['items'] : array();
 
+            $item_lists = array();
+
             foreach ($items as $item_id => $item) {
 
-                $cart['items'][$item_id]['tour'] = get_post($item_id);
+                if (get_post_status($item_id) === 'publish' && get_post_type($item_id) === 'tour') {
+
+                    $single_item = $item;
+
+                    $single_item['tour'] = get_post($item_id);
+
+                    $item_lists[$item_id] = $single_item;
+                }
             }
+
+            $cart['items'] = $item_lists;
 
             return $cart;
 
