@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.12\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-11-18 15:21:46+00:00\n"
+"POT-Creation-Date: 2022-11-27 07:42:57+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -257,6 +257,24 @@ msgstr ""
 msgid "Once Weekly"
 msgstr ""
 
+#: core/Hooks/NoticeHooks.php:47 includes/admin/admin-bar.php:41
+#: includes/admin/class-yatra-admin.php:199
+#: includes/admin/class-yatra-admin.php:200
+#: includes/admin/class-yatra-admin.php:402
+#: includes/modules/status/templates/html-admin-page-status-report.php:738
+msgid "Settings"
+msgstr ""
+
+#: core/Hooks/NoticeHooks.php:50
+msgid "Import & Export"
+msgstr ""
+
+#: core/Hooks/NoticeHooks.php:63 core/Hooks/NoticeHooks.php:104
+#: includes/modules/blocks/class-yatra-blocks.php:18
+#: includes/modules/dashboard/class-yatra-module-dashboard.php:15
+msgid "Yatra"
+msgstr ""
+
 #: core/Hooks/TourHooks.php:41
 msgid "Tour updated. <a href=\"%s\">View tour</a>"
 msgstr ""
@@ -341,13 +359,6 @@ msgstr ""
 #: includes/admin/admin-bar.php:34
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:19
 msgid "All Tours"
-msgstr ""
-
-#: includes/admin/admin-bar.php:41 includes/admin/class-yatra-admin.php:199
-#: includes/admin/class-yatra-admin.php:200
-#: includes/admin/class-yatra-admin.php:402
-#: includes/modules/status/templates/html-admin-page-status-report.php:738
-msgid "Settings"
 msgstr ""
 
 #: includes/admin/admin-bar.php:47
@@ -565,7 +576,7 @@ msgstr ""
 
 #: includes/admin/class-yatra-admin-tour-enquiries.php:17
 #: includes/admin/class-yatra-admin-tour-enquiries.php:18
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:71
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:67
 msgid "Enquiries"
 msgstr ""
 
@@ -582,7 +593,7 @@ msgstr ""
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:125
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:91
 #: includes/custom-post-type/class-yatra-custom-post-type-booking.php:100
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:107
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:103
 #: includes/yatra-template-functions.php:26
 msgid "Bookings"
 msgstr ""
@@ -595,14 +606,14 @@ msgstr ""
 #: includes/admin/class-yatra-admin.php:179
 #: includes/custom-post-type/class-yatra-custom-post-type-customers.php:11
 #: includes/custom-post-type/class-yatra-custom-post-type-customers.php:20
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:83
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:79
 msgid "Customers"
 msgstr ""
 
 #: includes/admin/class-yatra-admin.php:189
 #: includes/admin/class-yatra-admin.php:190
 #: includes/custom-post-type/class-yatra-custom-post-type-coupons.php:29
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:95
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:91
 msgid "Coupons"
 msgstr ""
 
@@ -1379,7 +1390,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:238
 #: includes/functions.php:70 includes/hooks/yatra-list-table-hooks.php:20
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:57
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:53
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:178
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:179
 #: includes/taxonomy/class-yatra-taxonomy-attributes.php:188
@@ -2682,7 +2693,7 @@ msgid "No Customers found in the Trash"
 msgstr ""
 
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:13
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:19
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:15
 msgid "Tours"
 msgstr ""
 
@@ -3603,12 +3614,6 @@ msgstr ""
 msgid "Tour data"
 msgstr ""
 
-#: includes/modules/blocks/class-yatra-blocks.php:18
-#: includes/modules/dashboard/class-yatra-module-dashboard.php:15
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:9
-msgid "Yatra"
-msgstr ""
-
 #: includes/modules/dashboard/class-yatra-module-dashboard.php:14
 msgid "Yatra Dashboard"
 msgstr ""
@@ -3621,35 +3626,35 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:24
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:38
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:50
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:62
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:76
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:88
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:100
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:112
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:20
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:34
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:46
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:58
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:72
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:84
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:96
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:108
 msgid "View All"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:33
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:29
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-destinations.php:7
 #: includes/taxonomy/class-yatra-taxonomy-destination.php:70
 msgid "Destinations"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:45
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:41
 #: includes/modules/filters/includes/sections/class-yatra-module-filter-section-activities.php:7
 #: includes/taxonomy/class-yatra-taxonomy-activity.php:69
 #: templates/parts/advanced-search.php:53
 msgid "Activities"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:121
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:117
 msgid "Feature Request"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:124
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:120
 msgid ""
 "If you would like to add a new feature on the yatra plugin or any of the "
 "addons you can send us a feature request. Our development team will check & "
@@ -3659,23 +3664,23 @@ msgid ""
 "%smantrabrain@gmail.com%s too."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:128
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:124
 msgid "Send feature request"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:137
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:133
 msgid "Video Introduction"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:150
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:146
 msgid "Watch on youtube"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:157
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:153
 msgid "Facebook Community Group"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:160
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:156
 msgid ""
 "Join our facebook community group. You can post your query or share your "
 "thought and\n"
@@ -3683,19 +3688,19 @@ msgid ""
 "the group."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:165
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:161
 msgid "Join Yatra Facebook Community Group"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:172
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:168
 msgid "Documentation"
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:175
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:171
 msgid "You can read documentation about yatra WordPress plugin."
 msgstr ""
 
-#: includes/modules/dashboard/templates/html-admin-dashboard.php:179
+#: includes/modules/dashboard/templates/html-admin-dashboard.php:175
 msgid "Check Documentation"
 msgstr ""
 

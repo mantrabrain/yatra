@@ -58,8 +58,8 @@ class Yatra_Module_Filters
         echo '</div><!-- end of .yatra-archive-main-content-area-inner-->';
 
         the_posts_pagination(array(
-            'prev_text' => '<i class="fa fa-angle-double-left"></i>',
-            'next_text' => '<i class="fa fa-angle-double-right"></i>'
+            'prev_text' => '<i class="fa fa-angle-left"></i>',
+            'next_text' => '<i class="fa fa-angle-right"></i>'
         ));
 
         echo '</div><!-- end of .yatra-archive-main-content-area -->';
