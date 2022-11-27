@@ -107,7 +107,12 @@ class Yatra_Core_Coupon
 
     public function get_coupon_details()
     {
-        $coupon_details = array(
+
+        $coupon_type = get_post_meta($this->coupon_id, 'yatra_coupon_type', true);
+
+        $coupon_type = !$coupon_type ? 'percentage' : $coupon_type;
+
+        return array(
 
             'id' => $this->coupon_id,
 
@@ -117,11 +122,10 @@ class Yatra_Core_Coupon
 
             'is_usage_limit_crossed' => $this->is_usage_limit_crossed($this->coupon_id),
 
-            'type' => get_post_meta($this->coupon_id, 'yatra_coupon_type', true),
+            'type' => $coupon_type,
 
             'value' => get_post_meta($this->coupon_id, 'yatra_coupon_value', true)
         );
-        return $coupon_details;
     }
 
     public function apply()

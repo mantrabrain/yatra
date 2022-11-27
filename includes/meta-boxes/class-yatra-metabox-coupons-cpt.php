@@ -41,7 +41,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                     echo '<strong>' . esc_html($this->get_value('yatra_coupon_code', $coupon_id)) . '</strong>';
                     break;
                 case "coupon_type":
-                    echo esc_html(ucwords($this->get_value('yatra_coupon_type', $coupon_id)));
+                    echo esc_html(ucwords($this->get_value('yatra_coupon_type', $coupon_id, 'percentage')));
                     break;
                 case "discount_value":
                     echo esc_html($this->get_value('yatra_coupon_value', $coupon_id));
@@ -88,7 +88,7 @@ if (!class_exists('Yatra_Metabox_Coupons_CPT')) {
                                     'desc_tip' => true,
                                     'name' => 'yatra_coupon_type',
                                     'type' => 'select',
-                                    'value' => $this->get_value('yatra_coupon_type', $post_id),
+                                    'value' => $this->get_value('yatra_coupon_type', $post_id, 'percentage'),
                                     'options' => array(
                                         'percentage' => __('Percentage Discount', 'yatra'),
                                         'fixed' => __('Fixed Discount', 'yatra'),
