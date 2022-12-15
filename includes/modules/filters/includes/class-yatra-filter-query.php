@@ -102,6 +102,10 @@ class Yatra_Filter_Query
                 $query->set('orderby', 'title');
                 $query->set('order', 'DESC');
                 break;
+            case "date-asc":
+                $query->set('orderby', 'date');
+                $query->set('order', 'ASC');
+                break;
             case "price":
                 $query->set('meta_key', 'yatra_filter_meta_minimum_tour_price');
                 $query->set('orderby', 'meta_value_num');

@@ -122,7 +122,8 @@ if (!function_exists('yatra_filter_get_sort_by')) {
     function yatra_filter_get_sort_by()
     {
         return array(
-            'default' => __('Default Sorting', 'yatra'),
+            'default' => __('Sort by date: descending', 'yatra'),
+            'date-asc' => __('Sort by date: ascending', 'yatra'),
             'price' => __('Sort by price: low to high', 'yatra'),
             'price-desc' => __('Sort by price: high to low', 'yatra'),
             'days' => __('Sort by days: low to high', 'yatra'),
