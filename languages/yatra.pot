@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.12\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2022-11-27 07:42:57+00:00\n"
+"POT-Creation-Date: 2022-12-15 14:55:46+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2527,7 +2527,7 @@ msgstr ""
 msgid "Valid Coupon"
 msgstr ""
 
-#: includes/classes/class-yatra-core-coupon.php:135
+#: includes/classes/class-yatra-core-coupon.php:139
 msgid "Coupon applied successfully"
 msgstr ""
 
@@ -3756,30 +3756,34 @@ msgid "Price Range"
 msgstr ""
 
 #: includes/modules/filters/includes/yatra-filter-functions.php:125
-msgid "Default Sorting"
+msgid "Sort by date: descending"
 msgstr ""
 
 #: includes/modules/filters/includes/yatra-filter-functions.php:126
-msgid "Sort by price: low to high"
+msgid "Sort by date: ascending"
 msgstr ""
 
 #: includes/modules/filters/includes/yatra-filter-functions.php:127
-msgid "Sort by price: high to low"
+msgid "Sort by price: low to high"
 msgstr ""
 
 #: includes/modules/filters/includes/yatra-filter-functions.php:128
-msgid "Sort by days: low to high"
+msgid "Sort by price: high to low"
 msgstr ""
 
 #: includes/modules/filters/includes/yatra-filter-functions.php:129
-msgid "Sort by days: high to low"
+msgid "Sort by days: low to high"
 msgstr ""
 
 #: includes/modules/filters/includes/yatra-filter-functions.php:130
-msgid "Sort by name: a - z"
+msgid "Sort by days: high to low"
 msgstr ""
 
 #: includes/modules/filters/includes/yatra-filter-functions.php:131
+msgid "Sort by name: a - z"
+msgstr ""
+
+#: includes/modules/filters/includes/yatra-filter-functions.php:132
 msgid "Sort by name: z - a"
 msgstr ""
 

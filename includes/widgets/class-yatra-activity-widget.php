@@ -55,7 +55,7 @@ if (!class_exists('Yatra_Activity_Widget')) :
                     'default' => 'asc'
                 ),
                 'columns' => array(
-                    'name' => 'order',
+                    'name' => 'columns',
                     'title' => esc_html__('Columns', 'yatra'),
                     'type' => 'select',
                     'options' => array(
