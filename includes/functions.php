@@ -558,7 +558,11 @@ if (!function_exists('yatra_booking_smart_tags')) {
 
         $smart_tags['booking_status'] = '';
 
+        $smart_tags['total_number_of_persons'] = '';
+
         $tour_lists = array();
+
+        $total_number_of_persons = 0;
 
         if ($booking_id > 0) {
 
@@ -590,6 +594,8 @@ if (!function_exists('yatra_booking_smart_tags')) {
 
                 $number_of_person = is_array($number_of_person) ? array_sum($number_of_person) : $number_of_person;
 
+                $total_number_of_persons += absint($number_of_person);
+
                 $tour_list = array();
 
                 $tour_list['tour_name'] = '<a href="' . get_permalink($tour_id) . '" target="_blank">' . $meta['yatra_tour_name'] . '</a>';
@@ -604,6 +610,8 @@ if (!function_exists('yatra_booking_smart_tags')) {
         }
 
         $smart_tags['tour_lists'] = $tour_lists;
+
+        $smart_tags['total_number_of_persons'] = $total_number_of_persons;
 
         return apply_filters(
             'yatra_booking_smart_tags',
@@ -689,7 +697,7 @@ if (!function_exists('yatra_maybe_parse_smart_tags')) {
     function yatra_maybe_parse_smart_tags($all_smart_tags = array(), $content = '')
     {
 
-
+        //For Back Compatibility
         $content = str_replace("{{tour_lists}}", "{{tour_lists_loop_start}}{{tour_name}}{{tour_lists_loop_end}}", $content);
 
         $looped_content = yatra_get_string_between($content, '{{tour_lists_loop_start}}', '{{tour_lists_loop_end}}');
@@ -698,6 +706,8 @@ if (!function_exists('yatra_maybe_parse_smart_tags')) {
         foreach ($all_smart_tags as $tag => $tag_value) {
 
             $content = yatra_parse_smart_tag_item($tag, $tag_value, $content);
+
+            $looped_content = yatra_parse_smart_tag_item($tag, $tag_value, $looped_content);
 
         }
         $parsed_looped_content = array();
