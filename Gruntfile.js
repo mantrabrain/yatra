@@ -147,8 +147,8 @@ module.exports = function (grunt) {
                 domainPath: 'languages/',
                 potHeaders: {
                     'report-msgid-bugs-to': 'mantrabrain@gmail.com',
-                    'last-translator': 'Mantrabrain <mantrabrain@gmail.com>',
-                    'language-team': 'Mantrabrain <mantrabrain@gmail.com>',
+                    'last-translator': 'MantraBrain <mantrabrain@gmail.com>',
+                    'language-team': 'MantraBrain <mantrabrain@gmail.com>',
                 },
                 //updatePoFiles: true,
 

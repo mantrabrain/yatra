@@ -2,7 +2,7 @@
 /**
  * Yatra Settings Page/Tab
  *
- * @author      Mantrabrain
+ * @author      MantraBrain
  * @category    Admin
  * @package     Yatra/Admin
  * @version     1.0.0

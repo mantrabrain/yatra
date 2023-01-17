@@ -1,5 +1,5 @@
 === Best Travel Booking WordPress Plugin, Tour Booking System, Trip Booking WordPress Plugin - Yatra ===
-Contributors: Mantrabrain, ughimire1
+Contributors: MantraBrain, ughimire1
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
 Tested up to: 6.1
@@ -134,10 +134,10 @@ You have to start and end tour_list_loop by using **{{tour_lists_loop_start}}** 
 
 
 == YATRA SPECIFIC THEME ==
-* [Resa](https://wordpress.org/themes/resa/?ref=yatrapluginorg) by mantrabrain
+* [Resa](https://wordpress.org/themes/resa/?ref=yatrapluginorg) by MantraBrain
 
 == COMPATIBLE THEMES ==
-* [Resa](https://wordpress.org/themes/resa/?ref=yatrapluginorg) by mantrabrain
+* [Resa](https://wordpress.org/themes/resa/?ref=yatrapluginorg) by MantraBrain
 * [Blocksy](https://wordpress.org/themes/blocksy/?ref=yatrapluginorg) by creativethemeshq
 * [Kadence](https://wordpress.org/themes/kadence/) by Ben Ritner - Kadence WP
 

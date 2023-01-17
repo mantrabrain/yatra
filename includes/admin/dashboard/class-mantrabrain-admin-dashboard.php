@@ -3,8 +3,8 @@
  * MantraBrain
  *
  * @package WordPress
- * @subpackage Mantrabrain Starter Sites
- * @author Mantrabrain <mantrabrain.com>
+ * @subpackage MantraBrain Starter Sites
+ * @author MantraBrain <mantrabrain.com>
  *
  * This source file is subject to the GNU GENERAL PUBLIC LICENSE (GPL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
