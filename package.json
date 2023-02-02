@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "node-bourbon": "^4.2.8",
-    "npm": "^6.4.1",
+    "npm": "^9.4.1",
     "typescript": "^4.5.2",
     "uglify": "^0.1.5"
   }
