@@ -19,7 +19,7 @@
                     echo '<h4 class="itinerary-title">' . esc_html($itinerary_item['itinerary_title']) . '</h4>';
                 }
 
-                echo '<div class="itinerary-details">' . wpautop($itinerary_item['itinerary_details']) . '</div>';
+                echo '<div class="itinerary-details">' . do_shortcode(wpautop($itinerary_item['itinerary_details'])) . '</div>';
 
                 echo '</div>';
 

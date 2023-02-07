@@ -16,7 +16,7 @@
 
                 echo '<div class="yatra-content faq-content" style="display:none">';
 
-                echo '<div class="faq-details">' . wpautop($faqs_item['faq_description']) . '</div>';
+                echo '<div class="faq-details">' . do_shortcode(wpautop($faqs_item['faq_description'])) . '</div>';
 
                 echo '</div>';
 
