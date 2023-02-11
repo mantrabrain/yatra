@@ -31,4 +31,18 @@ class EmailTemplates
         return ob_get_clean();
 
     }
+
+    public static function get_template($content)
+    {
+        ob_start();
+
+        self::get_header();
+
+        echo $content;
+
+        self::get_footer();
+
+        return ob_get_clean();
+
+    }
 }
