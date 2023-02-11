@@ -14,6 +14,15 @@ class DefaultEmailMessages
 
     public static function get_booking_email_notification_message_to_customer()
     {
+        return EmailTemplates::get_content(
+            [
+                'greetings' => sprintf(__('Hi %s', 'yatra'), '{{customer_name}}'),
+                'byline_text' => __('Your booking  on <a href="{{home_url}}">{{blog_info}}</a> has been confirmed and waiting for admin moderation', 'yatra'),
+                'heading' => __("New Booking", 'yatra'),
+                'email_to' => 'customer',
+            ]
+        );
+
 
         return __(
             'Hi {{customer_name}},

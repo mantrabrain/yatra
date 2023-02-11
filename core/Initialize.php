@@ -3,6 +3,7 @@
 namespace Yatra\Core;
 
 use Yatra\Core\API\TrackerAPI;
+use Yatra\Core\Hooks\EmailHooks;
 use Yatra\Core\Hooks\NoticeHooks;
 use Yatra\Core\Hooks\TourHooks;
 
@@ -35,6 +36,7 @@ class Initialize
     {
         TourHooks::init();
         NoticeHooks::init();
+        EmailHooks::init();
     }
 }
 
