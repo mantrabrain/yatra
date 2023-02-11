@@ -63,7 +63,7 @@ class Yatra_Module_Filter_Sidebar
         $search_text = get_query_var('s');
 
         ?>
-        <div class="yatra-sidebar-filter-field">
+        <div class="yatra-sidebar-filter-field search">
             <h3 class="yatra-sidebar-filter-section-title">
                 <span class="yatra-icon fa fa-magnifying-glass"></span>
                 <?php echo __('Search', 'yatra') ?></h3>
