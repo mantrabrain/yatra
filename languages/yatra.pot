@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.12\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2023-02-11 14:53:28+00:00\n"
+"POT-Creation-Date: 2023-02-12 07:02:48+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,207 +18,84 @@ msgid "Your tour booking has been confirmed"
 msgstr ""
 
 #: core/Admin/Emails/DefaultEmailMessages.php:19
-msgid "Hi %s"
+#: core/Admin/Emails/DefaultEmailMessages.php:63
+msgid "Hi %s,"
 msgstr ""
 
 #: core/Admin/Emails/DefaultEmailMessages.php:20
 msgid ""
 "Your booking  on <a href=\"{{home_url}}\">{{blog_info}}</a> has been "
-"confirmed and waiting for admin moderation"
+"confirmed and waiting for admin moderation.<br/><br/>You will get an email "
+"after your booking approved or cancelled.<br/><br/> Booking code: "
+"<strong>%s</strong>"
 msgstr ""
 
 #: core/Admin/Emails/DefaultEmailMessages.php:21
-msgid "New Booking"
+msgid "Booking Confirmation"
 msgstr ""
 
-#: core/Admin/Emails/DefaultEmailMessages.php:27
-msgid ""
-"Hi {{customer_name}},\n"
-"                \n"
-"                <br/>\n"
-"\n"
-" \t\t\t\tYour booking  on <a href=\"{{home_url}}\">{{blog_info}}</a> has "
-"been confirmed and waiting for admin moderation.\n"
-" \t\t\t\t\n"
-" \t\t\t\t<br/>\n"
-" \t\t\t\tBooking code: <b>{{booking_code}}</b> and here is the tour lists:\n"
-" \t\t\t\t\n"
-" \t\t\t\t<br/>\n"
-"                <table style=\"width: 100%;\">\n"
-"                    <thead>\n"
-"                        <tr>\n"
-"                            <th style=\"text-align: left\">Tour Name</th>\n"
-"                            <th style=\"text-align: left\">Tour Date</th>\n"
-"                            <th style=\"text-align: left\">Number of "
-"Person</th>\n"
-"                        </tr>\n"
-"                    </thead>\n"
-"                <tbody>\n"
-"                    {{tour_lists_loop_start}}\n"
-"                    <tr>\n"
-"                        <td style=\"text-align: left\">{{tour_name}}</td>\n"
-"                        <td style=\"text-align: left\">{{tour_date}}</td>\n"
-"                        <td style=\"text-align: "
-"left\">{{number_of_person}}</td>\n"
-"                    </tr>\n"
-"                    {{tour_lists_loop_end}}\n"
-"                </tbody>\n"
-"                </table>\n"
-"\n"
-" \t\t\t\t<br/>\n"
-"              \tYou will get an email after your booking approved or "
-"cancelled.\n"
-" \t\t\t\t\n"
-" \t\t\t\t<br/>\n"
-"\n"
-" \t\t\t\tThank You!"
-msgstr ""
-
-#: core/Admin/Emails/DefaultEmailMessages.php:69
+#: core/Admin/Emails/DefaultEmailMessages.php:29
 msgid "{{customer_name}} booked tour package."
 msgstr ""
 
-#: core/Admin/Emails/DefaultEmailMessages.php:77
-msgid ""
-"Hi Admin,\n"
-"            \n"
-"            <br/>\n"
-"\n"
-"\t\t\t{{customer_name}} ( {{customer_email}} ) has successfully booked your "
-"tour package to your site <a href=\"{{home_url}}\">{{blog_info}}</a>.\n"
-"\t\t\t\n"
-"\t\t\t<br/>\n"
-"\t\t\t\n"
-"\t\t    Booking code: <b>{{booking_code}}</b>\n"
-"\t\t    \n"
-"\t\t    <br/>\n"
-"\t\t    \n"
-"\t\t    Tour Lists:\n"
-"\t\t    \n"
-"\t\t    <br/>\n"
-"            <table style=\"width: 100%;\">\n"
-"                <thead>\n"
-"                    <tr>\n"
-"                        <th style=\"text-align: left\">Tour Name</th>\n"
-"                        <th style=\"text-align: left\">Tour Date</th>\n"
-"                        <th style=\"text-align: left\">Number of "
-"Person</th>\n"
-"                    </tr>\n"
-"                </thead>\n"
-"            <tbody>\n"
-"                {{tour_lists_loop_start}}\n"
-"                <tr>\n"
-"                    <td style=\"text-align: left\">{{tour_name}}</td>\n"
-"                    <td style=\"text-align: left\">{{tour_date}}</td>\n"
-"                    <td style=\"text-align: "
-"left\">{{number_of_person}}</td>\n"
-"                </tr>\n"
-"                {{tour_lists_loop_end}}\n"
-"            </tbody>\n"
-"            </table>\n"
-"            <br/>\n"
-"\t\t    \n"
-"\t\t\tPlease review the booking details at '<b>Yatra</b>' menu in your "
-"dashboard.\n"
-"\n"
-"            <br/>\n"
-"\t\t\tThank You!"
+#: core/Admin/Emails/DefaultEmailMessages.php:39
+#: core/Admin/Emails/DefaultEmailMessages.php:85
+#: core/Admin/Emails/DefaultEmailMessages.php:106
+msgid "Hi Admin,"
 msgstr ""
 
-#: core/Admin/Emails/DefaultEmailMessages.php:124
+#: core/Admin/Emails/DefaultEmailMessages.php:40
+msgid ""
+"%s ( %s ) has successfully booked your tour package to your site  <a "
+"href=\"%s\">%s</a>.<br/><br/> Booking code: <strong>%s</strong>"
+msgstr ""
+
+#: core/Admin/Emails/DefaultEmailMessages.php:42
+msgid "New Booking"
+msgstr ""
+
+#: core/Admin/Emails/DefaultEmailMessages.php:51
 msgid "Your tour booking has been {{booking_status}}"
 msgstr ""
 
-#: core/Admin/Emails/DefaultEmailMessages.php:134
+#: core/Admin/Emails/DefaultEmailMessages.php:64
 msgid ""
-"Hi {{customer_name}},\n"
-"                \n"
-"                <br/>\n"
-"\n"
-" \t\t\t\tYour booking on <a href=\"{{home_url}}\">{{blog_info}}</a> has "
-"been <b>{{booking_status}}</b>.\n"
-" \t\t\t\t\n"
-" \t\t\t\t<br/>\n"
-" \t\t\t\tBooking code: <b>{{booking_code}}</b> and here is the tour lists:\n"
-" \t\t\t\t<br/>\n"
-" \t\t\t\t<table style=\"width: 100%;\">\n"
-"                    <thead>\n"
-"                        <tr>\n"
-"                            <th style=\"text-align: left\">Tour Name</th>\n"
-"                            <th style=\"text-align: left\">Tour Date</th>\n"
-"                            <th style=\"text-align: left\">Number of "
-"Person</th>\n"
-"                        </tr>\n"
-"                    </thead>\n"
-"                <tbody>\n"
-"                    {{tour_lists_loop_start}}\n"
-"                    <tr>\n"
-"                        <td style=\"text-align: left\">{{tour_name}}</td>\n"
-"                        <td style=\"text-align: left\">{{tour_date}}</td>\n"
-"                        <td style=\"text-align: "
-"left\">{{number_of_person}}</td>\n"
-"                    </tr>\n"
-"                    {{tour_lists_loop_end}}\n"
-"                </tbody>\n"
-"                </table>\n"
-" \t\t\t\t<br/>\n"
-"\n"
-" \t\t\t\tThank You!"
+"Your booking  on <a href=\"%s\">%s</a> has been %s.<br/><br/>Booking code: "
+"<strong>%s</strong>"
 msgstr ""
 
-#: core/Admin/Emails/DefaultEmailMessages.php:171
+#: core/Admin/Emails/DefaultEmailMessages.php:65
+#: core/Admin/Emails/DefaultEmailMessages.php:88
+msgid "Booking %s"
+msgstr ""
+
+#: core/Admin/Emails/DefaultEmailMessages.php:73
 msgid ""
 "{{customer_name}}'s  tour booking({{booking_code}}) has been "
 "{{booking_status}}."
 msgstr ""
 
-#: core/Admin/Emails/DefaultEmailMessages.php:181
+#: core/Admin/Emails/DefaultEmailMessages.php:86
 msgid ""
-"Hi Admin,\n"
-"            \n"
-"            <br/>\n"
-"\n"
-"\t\t\t{{customer_name}} ( {{customer_email}} )'s tour booking has been "
-"{{booking_status}} on your site <a href=\"{{home_url}}\">{{blog_info}}</a>.\n"
-"\t\t\t\n"
-"\t\t\t<br/>\n"
-"\t\t\t\n"
-"\t\t    Booking code: <b>{{booking_code}}</b>\n"
-"\t\t    \n"
-"\t\t    <br/>\n"
-"\t\t    \n"
-"\t\t    Tour Lists:\n"
-"\t\t    \n"
-"\t\t    <br/>\n"
-"            <table style=\"width: 100%;\">\n"
-"                <thead>\n"
-"                    <tr>\n"
-"                        <th style=\"text-align: left\">Tour Name</th>\n"
-"                        <th style=\"text-align: left\">Tour Date</th>\n"
-"                        <th style=\"text-align: left\">Number of "
-"Person</th>\n"
-"                    </tr>\n"
-"                </thead>\n"
-"            <tbody>\n"
-"                {{tour_lists_loop_start}}\n"
-"                <tr>\n"
-"                    <td style=\"text-align: left\">{{tour_name}}</td>\n"
-"                    <td style=\"text-align: left\">{{tour_date}}</td>\n"
-"                    <td style=\"text-align: "
-"left\">{{number_of_person}}</td>\n"
-"                </tr>\n"
-"                {{tour_lists_loop_end}}\n"
-"            </tbody>\n"
-"            </table>\n"
-"            <br/>\n"
-"\t\t\tThank You!"
+"%s ( %s )'s tour booking has been %s on your site <a "
+"href=\"%s\">%s</a>.<br/><br/> Booking code: <strong>%s</strong>"
 msgstr ""
 
-#: core/Admin/Emails/DefaultEmailMessages.php:223
+#: core/Admin/Emails/DefaultEmailMessages.php:96
 msgid "{{enquiry_fullname}} send enquiry about {{enquiry_tour_name}}"
 msgstr ""
 
-#: core/Admin/Emails/DefaultEmailMessages.php:231
+#: core/Admin/Emails/DefaultEmailMessages.php:107
+msgid ""
+"%s send you an enquiry about %s on <a href=\"%s\">%s</a> with following "
+"details"
+msgstr ""
+
+#: core/Admin/Emails/DefaultEmailMessages.php:109
+msgid "New Enquiry"
+msgstr ""
+
+#: core/Admin/Emails/DefaultEmailMessages.php:115
 msgid ""
 "Hi Admin,\n"
 "            \n"
@@ -702,6 +579,7 @@ msgstr ""
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
 #: includes/hooks/yatra-list-table-hooks.php:25
 #: templates/emails/booking/notification.php:10
+#: templates/emails/enquiry/enquiry.php:17
 #: templates/myaccount/tmpl-payment-history.php:9
 #: templates/myaccount/tmpl-user-checkout.php:36
 #: templates/tmpl-cart-table.php:17 templates/tmpl-cart-table.php:60
@@ -724,6 +602,7 @@ msgstr ""
 #: includes/class-yatra-enquiry-form.php:78
 #: includes/class-yatra-user-form.php:41 includes/class-yatra-user-form.php:42
 #: templates/emails/booking/notification.php:15
+#: templates/emails/enquiry/enquiry.php:11
 #: templates/myaccount/tmpl-dashboard.php:32
 msgid "Email"
 msgstr ""
@@ -733,6 +612,7 @@ msgid "Full name"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
+#: templates/emails/booking/notification.php:21
 #: templates/myaccount/tmpl-booking.php:10
 #: templates/myaccount/tmpl-user-checkout.php:38
 #: templates/myaccount/tmpl-user-checkout.php:100
@@ -774,6 +654,7 @@ msgstr ""
 #: includes/admin/list-tables/class-yatra-admin-list-table-customers.php:123
 #: includes/modules/status/templates/html-admin-page-status-report.php:848
 #: templates/emails/booking/notification.php:14
+#: templates/emails/enquiry/enquiry.php:10
 #: templates/myaccount/tmpl-dashboard.php:23
 msgid "Name"
 msgstr ""
@@ -810,6 +691,7 @@ msgstr ""
 #: includes/class-yatra-user-form.php:92 includes/class-yatra-user-form.php:98
 #: includes/template-tags.php:702 includes/template-tags.php:706
 #: includes/template-tags.php:1211 templates/emails/booking/notification.php:17
+#: templates/emails/enquiry/enquiry.php:12
 #: templates/myaccount/tmpl-dashboard.php:47 templates/tour/additional.php:16
 msgid "Country"
 msgstr ""
@@ -819,6 +701,7 @@ msgstr ""
 #: includes/class-yatra-enquiry-form.php:103
 #: includes/class-yatra-user-form.php:91
 #: templates/emails/booking/notification.php:16
+#: templates/emails/enquiry/enquiry.php:13
 msgid "Phone Number"
 msgstr ""
 
@@ -831,6 +714,7 @@ msgid "Childs"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:80
+#: templates/emails/enquiry/enquiry.php:16
 msgid "Subject"
 msgstr ""
 
@@ -5224,15 +5108,13 @@ msgid "Persons"
 msgstr ""
 
 #: templates/emails/booking/notification.php:20
-msgid "Trip Price"
-msgstr ""
-
-#: templates/emails/booking/notification.php:21
-msgid "Total Cost"
+#: templates/myaccount/tmpl-user-checkout.php:63
+#: templates/tmpl-order-table.php:47
+msgid "Subtotal"
 msgstr ""
 
 #: templates/emails/booking/notification.php:22
-msgid "Due"
+msgid "Discount"
 msgstr ""
 
 #: templates/emails/booking/notification.php:48
@@ -5243,8 +5125,32 @@ msgstr ""
 msgid "Billing Details"
 msgstr ""
 
-#: templates/emails/booking/notification.php:87
-msgid "View booking on your website site"
+#: templates/emails/booking/notification.php:81
+msgid "Payment Details"
+msgstr ""
+
+#: templates/emails/booking/notification.php:91
+msgid "Net total"
+msgstr ""
+
+#: templates/emails/booking/notification.php:103
+msgid "View booking on your website"
+msgstr ""
+
+#: templates/emails/enquiry/enquiry.php:14
+msgid "Number of adults"
+msgstr ""
+
+#: templates/emails/enquiry/enquiry.php:15
+msgid "Number of childs"
+msgstr ""
+
+#: templates/emails/enquiry/enquiry.php:45
+msgid "Enquiry Details"
+msgstr ""
+
+#: templates/emails/enquiry/enquiry.php:64
+msgid "View enquiry on your website"
 msgstr ""
 
 #: templates/emails/footer.php:14
@@ -5358,11 +5264,6 @@ msgstr ""
 #: templates/myaccount/tmpl-user-checkout.php:37
 #: templates/tmpl-order-table.php:8
 msgid "Number of people"
-msgstr ""
-
-#: templates/myaccount/tmpl-user-checkout.php:63
-#: templates/tmpl-order-table.php:47
-msgid "Subtotal"
 msgstr ""
 
 #: templates/myaccount/tmpl-user-checkout.php:75

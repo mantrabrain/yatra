@@ -55,7 +55,7 @@ class AdminEmail
     public static function get_enquiry_form_saved_message()
     {
 
-        return apply_filters(
+        return EmailTemplates::get_template(apply_filters(
 
             'yatra_enquiry_email_notification_message_to_admin',
 
@@ -63,7 +63,7 @@ class AdminEmail
 
                 DefaultEmailMessages::get_enquiry_email_notification_message_to_admin()
             )
-        );
+        ));
 
     }
 

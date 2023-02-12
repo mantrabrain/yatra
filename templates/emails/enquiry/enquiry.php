@@ -39,54 +39,19 @@ $enquiry_details = array(
                                 <tr>
                                     <td style="margin: 0; padding: 5px 0;" valign="top">
                                         <table class="invoice-items" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td class="title-holder" style="margin: 0;" valign="top" colspan="2">
-                                                    <h3 class="alignleft"><?php echo esc_html__('Tour Lists ({{booking_tours_count}})', 'yatra'); ?></h3>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2">
-                                                    <ul style="margin:0;padding:0;">
-                                                        {{tour_lists_loop_start}}
-                                                        <li style="list-style:none;padding:0; margin:0;margin-top:10px;">
-                                                            <?php foreach ($tour_details as $tag_id => $label_name) : ?>
-                                                                <div>
-                                                                    <strong><?php echo esc_html($label_name); ?></strong>:
-                                                                    <span><?php echo esc_html($tag_id); ?></span></div>
-                                                            <?php endforeach; ?>
-                                                        </li>
-                                                        {{tour_lists_loop_end}}
-                                                    </ul>
-                                                </td>
 
-                                            </tr>
                                             <tr>
                                                 <td class="title-holder" style="margin: 0;" valign="top">
-                                                    <h3 class="alignleft"><?php echo esc_html__('Billing Details', 'yatra'); ?></h3>
+                                                    <h3 class="alignleft"><?php echo esc_html__('Enquiry Details', 'yatra'); ?></h3>
                                                 </td>
                                             </tr>
-                                            <?php foreach ($billing_details as $tag => $label) : ?>
+                                            <?php foreach ($enquiry_details as $tag => $label) : ?>
                                                 <tr>
                                                     <td><?php echo esc_html($label); ?></td>
                                                     <td class="alignright"><?php echo esc_html($tag); ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
 
-                                            <tr>
-                                                <td class="title-holder" style="margin: 0;" valign="top">
-                                                    <h3 class="alignleft"><?php echo esc_html__('Payment Details', 'yatra'); ?></h3>
-                                                </td>
-                                            </tr>
-                                            <?php foreach ($payment_details as $p_tag_id => $p_label) : ?>
-                                                <tr>
-                                                    <td><?php echo esc_html($p_label); ?></td>
-                                                    <td class="alignright"><?php echo esc_html($p_tag_id); ?></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                            <tr class="total">
-                                                <td class="alignright"><?php echo esc_html__('Net total', 'yatra'); ?></td>
-                                                <td class="alignright"><?php echo esc_html("{{net_booking_price}}"); ?></td>
-                                            </tr>
                                         </table>
                                     </td>
                                 </tr>
@@ -96,7 +61,7 @@ $enquiry_details = array(
                     <?php if ('admin' === $email_to) : ?>
                         <tr>
                             <td class="content-block aligncenter">
-                                <a href="{{home_url}}"><?php esc_html_e('View booking on your website', 'yatra'); ?></a>
+                                <a href="{{home_url}}"><?php esc_html_e('View enquiry on your website', 'yatra'); ?></a>
                             </td>
                         </tr>
                     <?php endif; ?>

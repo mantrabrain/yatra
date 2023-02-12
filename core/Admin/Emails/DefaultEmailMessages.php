@@ -101,6 +101,17 @@ class DefaultEmailMessages
 
     public static function get_enquiry_email_notification_message_to_admin()
     {
+        return EmailTemplates::get_content(
+            [
+                'greetings' => __('Hi Admin,', 'yatra'),
+                'byline_text' => sprintf(__('%s send you an enquiry about %s on <a href="%s">%s</a> with following details', 'yatra'),
+                    '{{enquiry_fullname}}', '{{enquiry_tour_name}}', '{{home_url}}', '{{blog_info}}'),
+                'heading' => __('New Enquiry', 'yatra'),
+                'email_to' => 'admin',
+            ],
+            'enquiry'
+        );
+
         return __(
             'Hi Admin,
             

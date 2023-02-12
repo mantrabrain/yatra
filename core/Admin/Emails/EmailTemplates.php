@@ -25,7 +25,7 @@ class EmailTemplates
                 yatra_get_template('emails/booking/notification.php', $args);
                 break;
             case "enquiry":
-                yatra_get_template('emails/enquiry/notification.php', $args);
+                yatra_get_template('emails/enquiry/enquiry.php', $args);
                 break;
         }
         return ob_get_clean();

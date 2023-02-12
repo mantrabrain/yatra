@@ -56,6 +56,10 @@ class EmailHooks
         } else if ($type === "booking_status_change" && $to === "customer") {
 
             echo CustomerEmail::get_booking_status_change_message();
+
+        } else if ($type === 'enquiry' && $to === 'admin') {
+
+            echo AdminEmail::get_enquiry_form_saved_message();
         }
 
         exit;
