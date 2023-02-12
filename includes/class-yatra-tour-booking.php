@@ -341,6 +341,13 @@ if (!class_exists('Yatra_Tour_Booking')) {
             return $meta_params['coupon'] ?? array();
         }
 
+        public function get_discount_amount()
+        {
+           $coupon = $this->get_coupon();
+
+            return $coupon['calculated_value'] ?? 0;
+        }
+
         public function get_tax($rate_amount = 'rate')
         {
             $booking_details = $this->get_all_booking_details();

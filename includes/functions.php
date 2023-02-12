@@ -586,6 +586,10 @@ if (!function_exists('yatra_booking_smart_tags')) {
 
             $smart_tags['net_booking_price'] = yatra_get_price(yatra_get_current_currency_symbol($booking->get_currency_code()), $booking->get_total(true));
 
+            $smart_tags['gross_booking_price'] = yatra_get_price(yatra_get_current_currency_symbol($booking->get_currency_code()), $booking->get_total());
+
+            $smart_tags['discount'] = yatra_get_price(yatra_get_current_currency_symbol($booking->get_currency_code()), $booking->get_discount_amount());
+
             foreach ($booking_meta as $tour_id => $meta) {
 
                 $booked_date = $meta['yatra_selected_date'] ?? '';
@@ -610,6 +614,8 @@ if (!function_exists('yatra_booking_smart_tags')) {
         }
 
         $smart_tags['tour_lists'] = $tour_lists;
+
+        $smart_tags['booking_tours_count'] = count($tour_lists);
 
         $smart_tags['total_number_of_persons'] = $total_number_of_persons;
 

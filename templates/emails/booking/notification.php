@@ -17,8 +17,7 @@ $billing_details = array(
     '{{customer_country}}' => __('Country', 'yatra'),
 );
 $payment_details = array(
-    '{{subtotal}}' => __('Subtotal', 'yatra'),
-    '{{total}}' => __('Total', 'yatra'),
+    '{{gross_booking_price}}' => __('Subtotal', 'yatra'),
     '{{discount}}' => __('Discount', 'yatra'),
 );
 ?>
@@ -35,7 +34,7 @@ $payment_details = array(
                         <td class="content-block aligncenter">
                             <table class="invoice">
                                 <tr>
-                                    <td style="margin: 0; padding: 5px 0;"
+                                    <td style="margin: 0; padding: 0px 0;"
                                         valign="top"><?php echo esc_html($greetings); ?><br><br>
                                         <?php echo wp_kses($byline_text, array('a' => array('href' => array()), 'br'=>array(), 'strong'=>array())); ?>
                                     </td>
@@ -45,7 +44,7 @@ $payment_details = array(
                                         <table class="invoice-items" cellpadding="0" cellspacing="0">
                                             <tr>
                                                 <td class="title-holder" style="margin: 0;" valign="top" colspan="2">
-                                                    <h3 class="alignleft"><?php echo esc_html__('Tour Lists ({{booking_tours_count}})', 'yatra'); ?></h3>
+                                                    <h3 class="alignleft"><?php echo esc_html__('Tour Lists [ {{booking_tours_count}} ]', 'yatra'); ?></h3>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -84,7 +83,7 @@ $payment_details = array(
                                             <?php foreach ($payment_details as $p_tag_id => $p_label) : ?>
                                                 <tr>
                                                     <td><?php echo esc_html($p_label); ?></td>
-                                                    <td class="alignright"><?php echo esc_html($p_tag_id); ?></td>
+                                                    <td class="alignright"><?php echo $p_tag_id==='{{discount}}' ? ' - ': ''; echo esc_html($p_tag_id); ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                             <tr class="total">
