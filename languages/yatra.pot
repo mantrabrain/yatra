@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.12\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2023-02-12 15:59:56+00:00\n"
+"POT-Creation-Date: 2023-02-12 16:16:45+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -889,7 +889,7 @@ msgid "Booking notification email: To Customer"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-emails.php:98
-#: includes/admin/settings/class-yatra-settings-emails.php:186
+#: includes/admin/settings/class-yatra-settings-emails.php:187
 msgid "Enable/Disable Customer Email"
 msgstr ""
 
@@ -900,7 +900,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-emails.php:105
-#: includes/admin/settings/class-yatra-settings-emails.php:193
+#: includes/admin/settings/class-yatra-settings-emails.php:194
 msgid "Email Subject for customer"
 msgstr ""
 
@@ -911,7 +911,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-emails.php:116
-#: includes/admin/settings/class-yatra-settings-emails.php:204
+#: includes/admin/settings/class-yatra-settings-emails.php:205
 msgid "Email Content for customer"
 msgstr ""
 
@@ -927,8 +927,8 @@ msgid "Booking notification email: To Admin"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-emails.php:140
-#: includes/admin/settings/class-yatra-settings-emails.php:228
-#: includes/admin/settings/class-yatra-settings-emails.php:273
+#: includes/admin/settings/class-yatra-settings-emails.php:230
+#: includes/admin/settings/class-yatra-settings-emails.php:276
 msgid "Enable/Disable Admin Email"
 msgstr ""
 
@@ -939,8 +939,8 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-emails.php:147
-#: includes/admin/settings/class-yatra-settings-emails.php:235
-#: includes/admin/settings/class-yatra-settings-emails.php:280
+#: includes/admin/settings/class-yatra-settings-emails.php:237
+#: includes/admin/settings/class-yatra-settings-emails.php:283
 msgid "Email Subject for admin"
 msgstr ""
 
@@ -951,8 +951,8 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-emails.php:158
-#: includes/admin/settings/class-yatra-settings-emails.php:246
-#: includes/admin/settings/class-yatra-settings-emails.php:291
+#: includes/admin/settings/class-yatra-settings-emails.php:248
+#: includes/admin/settings/class-yatra-settings-emails.php:294
 msgid "Email Content for admin"
 msgstr ""
 
@@ -963,128 +963,128 @@ msgid ""
 "this template%s."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:180
+#: includes/admin/settings/class-yatra-settings-emails.php:181
 msgid "Booking status change notification email: To Customer"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:187
+#: includes/admin/settings/class-yatra-settings-emails.php:188
 msgid ""
 "This option allows you to enable/disable booking status changed "
 "notification email for customer."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:194
+#: includes/admin/settings/class-yatra-settings-emails.php:195
 msgid ""
 "This option allows you to change booking status change notification email "
 "subject for customer."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:206
+#: includes/admin/settings/class-yatra-settings-emails.php:207
 msgid ""
 "This option allows you to change booking status change notification email "
 "content for customer. View all available %sBooking Smart Tags%s. Click "
 "%shere to preview this template%s."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:222
+#: includes/admin/settings/class-yatra-settings-emails.php:224
 msgid "Booking status change notification email: To Admin"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:229
+#: includes/admin/settings/class-yatra-settings-emails.php:231
 msgid ""
 "This option allows you to enable/disable booking status change notification "
 "email for admin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:236
+#: includes/admin/settings/class-yatra-settings-emails.php:238
 msgid ""
 "This option allows you to change booking status change notification email "
 "subject for admin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:247
+#: includes/admin/settings/class-yatra-settings-emails.php:249
 msgid ""
 "This option allows you to change booking status change notification email "
 "content for admin. View all available %sBooking Smart Tags%s. Click %shere "
 "to preview this template%s."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:267
+#: includes/admin/settings/class-yatra-settings-emails.php:270
 msgid "Enquiry notification email: To Admin"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:274
+#: includes/admin/settings/class-yatra-settings-emails.php:277
 msgid ""
 "This option allows you to enable/disable enquiry form notification email "
 "for admin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:281
+#: includes/admin/settings/class-yatra-settings-emails.php:284
 msgid ""
 "This option allows you to change enquiry notification email subject for "
 "admin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:292
+#: includes/admin/settings/class-yatra-settings-emails.php:295
 msgid ""
 "This option allows you to change enquiry notification email content for "
 "admin. View all available %sEnquiry Form Smart Tags%s.  Click %shere to "
 "preview this template%s."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:312
+#: includes/admin/settings/class-yatra-settings-emails.php:316
 msgid "General Email Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:318
+#: includes/admin/settings/class-yatra-settings-emails.php:322
 msgid "Disable all  emails"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:319
+#: includes/admin/settings/class-yatra-settings-emails.php:323
 msgid ""
 "This option disable all email ( admin and user email )  related to yatra "
 "plugin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:329
+#: includes/admin/settings/class-yatra-settings-emails.php:333
 msgid "Admin Email Recipient Options"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:335
+#: includes/admin/settings/class-yatra-settings-emails.php:339
 msgid "Admin Email Recipient Lists"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:336
+#: includes/admin/settings/class-yatra-settings-emails.php:340
 msgid ""
 "Recipient email list of all admin email messages. Enter the email "
 "address(es) that should receive a yatra notification, one per line."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:349
+#: includes/admin/settings/class-yatra-settings-emails.php:353
 msgid "Email Sender Options"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:355
+#: includes/admin/settings/class-yatra-settings-emails.php:359
 msgid "\"From\" name"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:356
+#: includes/admin/settings/class-yatra-settings-emails.php:360
 msgid "From name for outgoing email address from yatra plugin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:366
+#: includes/admin/settings/class-yatra-settings-emails.php:370
 msgid "\"From\" email address"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:367
+#: includes/admin/settings/class-yatra-settings-emails.php:371
 msgid "From email address for outgoing email address from yatra plugin."
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:377
+#: includes/admin/settings/class-yatra-settings-emails.php:381
 msgid "Disable powered by"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-emails.php:378
+#: includes/admin/settings/class-yatra-settings-emails.php:382
 msgid "This option disable powered by link on email footer."
 msgstr ""
 
