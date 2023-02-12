@@ -228,6 +228,11 @@
 			display: inline-block;
 			min-width: 200px
 		}
+        .tour-lists{
+            margin:0;
+            padding:0;
+            list-style:none;
+        }
 
 		@media only screen and (max-width:640px) {
 			body {

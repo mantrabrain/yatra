@@ -49,7 +49,7 @@ $payment_details = array(
                                             </tr>
                                             <tr>
                                                 <td colspan="2">
-                                                    <ul style="margin:0;padding:0;">
+                                                    <ul class="tour-lists" style="margin:0;padding:0;">
                                                         {{tour_lists_loop_start}}
                                                         <li style="list-style:none;padding:0; margin:0;margin-top:10px;">
                                                             <?php foreach ($tour_details as $tag_id => $label_name) : ?>
