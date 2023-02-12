@@ -35,16 +35,27 @@ class EmailHooks
         }
         $valid_to_array = array('admin', 'customer');
 
-        $valid_type_array = array('booking', 'enquiry');
+        $valid_type_array = array('booking', 'booking_status_change', 'enquiry');
 
         if (!in_array($to, $valid_to_array, true) || !in_array($type, $valid_type_array, true)) {
             return;
         }
 
         if ($type === "booking" && $to === "admin") {
-           // echo CustomerEmail::get_booking_completed_message();
+
             echo AdminEmail::get_booking_completed_message();
 
+        } else if ($type === "booking" && $to === "customer") {
+
+            echo CustomerEmail::get_booking_completed_message();
+
+        } else if ($type === "booking_status_change" && $to === "admin") {
+
+            echo AdminEmail::get_booking_status_change_message();
+
+        } else if ($type === "booking_status_change" && $to === "customer") {
+
+            echo CustomerEmail::get_booking_status_change_message();
         }
 
         exit;
