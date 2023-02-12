@@ -105,7 +105,7 @@ $payment_details = array(
                     <?php endif; ?>
                     <tr>
                         <td class="content-block aligncenter">
-                            {{blog_info}}
+                            <a target="_blank" href="{{home_url}}">{{blog_info}}</a>
                         </td>
                     </tr>
                 </table>

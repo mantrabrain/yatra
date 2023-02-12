@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.12\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2023-02-12 13:28:13+00:00\n"
+"POT-Creation-Date: 2023-02-12 13:57:38+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -612,7 +612,6 @@ msgid "Full name"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
-#: templates/emails/booking/notification.php:21
 #: templates/myaccount/tmpl-booking.php:10
 #: templates/myaccount/tmpl-user-checkout.php:38
 #: templates/myaccount/tmpl-user-checkout.php:100
@@ -1553,7 +1552,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-payment-gateways.php:109
-#: includes/functions.php:868
+#: includes/functions.php:874
 msgid "Payment Gateways"
 msgstr ""
 
@@ -2699,11 +2698,11 @@ msgstr ""
 msgid "Posted by"
 msgstr ""
 
-#: includes/functions.php:1219 includes/template-tags.php:893
+#: includes/functions.php:1225 includes/template-tags.php:893
 msgid "Guest"
 msgstr ""
 
-#: includes/functions.php:1359
+#: includes/functions.php:1365
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
 msgstr ""
@@ -5113,27 +5112,27 @@ msgstr ""
 msgid "Subtotal"
 msgstr ""
 
-#: templates/emails/booking/notification.php:22
+#: templates/emails/booking/notification.php:21
 msgid "Discount"
 msgstr ""
 
-#: templates/emails/booking/notification.php:48
-msgid "Tour Lists ({{booking_tours_count}})"
+#: templates/emails/booking/notification.php:47
+msgid "Tour Lists [ {{booking_tours_count}} ]"
 msgstr ""
 
-#: templates/emails/booking/notification.php:69
+#: templates/emails/booking/notification.php:68
 msgid "Billing Details"
 msgstr ""
 
-#: templates/emails/booking/notification.php:81
+#: templates/emails/booking/notification.php:80
 msgid "Payment Details"
 msgstr ""
 
-#: templates/emails/booking/notification.php:91
+#: templates/emails/booking/notification.php:90
 msgid "Net total"
 msgstr ""
 
-#: templates/emails/booking/notification.php:103
+#: templates/emails/booking/notification.php:102
 msgid "View booking on your website"
 msgstr ""
 

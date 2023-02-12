@@ -121,7 +121,7 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'allow-html' => true,
                     'custom_attributes' => array(
                         'cols' => '100%',
-                        'rows'=>30
+                        'rows' => 30
                     ),
                     'default' => DefaultEmailMessages::get_booking_email_notification_message_to_customer()
 
@@ -317,7 +317,6 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                 array(
                     'title' => __('Disable all  emails', 'yatra'),
                     'desc' => __('This option disable all email ( admin and user email )  related to yatra plugin.', 'yatra'),
-
                     'id' => 'yatra_disable_all_email',
                     'type' => 'checkbox',
                 ),
@@ -373,6 +372,12 @@ class Yatra_Settings_Emails extends Yatra_Admin_Settings_Base
                     'custom_attributes' => array(
                         'size' => 50
                     )
+                ),
+                array(
+                    'title' => __('Disable powered by', 'yatra'),
+                    'desc' => __('This option disable powered by link on email footer.', 'yatra'),
+                    'id' => 'yatra_disable_powered_by_link_on_email',
+                    'type' => 'checkbox',
                 ),
                 array(
                     'type' => 'sectionend',

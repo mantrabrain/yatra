@@ -3,11 +3,11 @@
  * Email footer template.
  */
 
-$hide_powered_by = false;
+$hide_powered_by = get_option('yatra_disable_powered_by_link_on_email', 'no');
 ?>
 						<div class="footer">
 							<?php
-							if ( ! $hide_powered_by ) :
+							if ( $hide_powered_by != 'yes' ) :
 								?>
 							<table width="100%">
 								<tr>
