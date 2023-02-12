@@ -2,6 +2,7 @@
 
 namespace Yatra\Core\Hooks;
 
+use Yatra\Core\Admin\Emails\AdminEmail;
 use Yatra\Core\Admin\Emails\CustomerEmail;
 use Yatra\Core\Admin\Emails\DefaultEmailMessages;
 use Yatra\Core\Admin\Emails\EmailTemplates;
@@ -40,17 +41,10 @@ class EmailHooks
             return;
         }
 
-        switch ($type) {
+        if ($type === "booking" && $to === "admin") {
+           // echo CustomerEmail::get_booking_completed_message();
+            echo AdminEmail::get_booking_completed_message();
 
-            case "booking":
-                EmailTemplates::get_header();
-                echo CustomerEmail::get_booking_completed_message();
-                EmailTemplates::get_footer();
-                break;
-
-            case "enquiry":
-
-                break;
         }
 
         exit;

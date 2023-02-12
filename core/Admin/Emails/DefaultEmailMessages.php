@@ -74,6 +74,16 @@ class DefaultEmailMessages
 
     public static function get_booking_email_notification_message_to_admin()
     {
+        return EmailTemplates::get_content(
+            [
+                'greetings' => __('Hi Admin,', 'yatra'),
+                'byline_text' => sprintf(__('%s ( %s ) has successfully booked your tour package to your site  <a href="%s">%s</a>. <br/><br/> Booking code: <strong>%s</strong>', 'yatra'),
+                    '{{customer_name}}', '{{customer_email}}', '{{home_url}}', '{{blog_info}}', '{{booking_code}}'),
+                'heading' => __("New Booking", 'yatra'),
+                'email_to' => 'admin',
+            ]
+        );
+
         return __(
             'Hi Admin,
             

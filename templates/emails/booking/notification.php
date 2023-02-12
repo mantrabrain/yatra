@@ -17,9 +17,9 @@ $billing_details = array(
     '{{customer_country}}' => __('Country', 'yatra'),
 );
 $payment_details = array(
-    '{tprice}' => __('Trip Price', 'yatra'),
-    '{total_cost}' => __('Total Cost', 'yatra'),
-    '{due}' => __('Due', 'yatra'),
+    '{{subtotal}}' => __('Subtotal', 'yatra'),
+    '{{total}}' => __('Total', 'yatra'),
+    '{{discount}}' => __('Discount', 'yatra'),
 );
 ?>
     <table class="main" width="100%" cellpadding="0" cellspacing="0">
@@ -37,7 +37,7 @@ $payment_details = array(
                                 <tr>
                                     <td style="margin: 0; padding: 5px 0;"
                                         valign="top"><?php echo esc_html($greetings); ?><br><br>
-                                        <?php echo wp_kses($byline_text, array('a' => array('href' => array()))); ?>
+                                        <?php echo wp_kses($byline_text, array('a' => array('href' => array()), 'br'=>array(), 'strong'=>array())); ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -75,16 +75,32 @@ $payment_details = array(
                                                     <td class="alignright"><?php echo esc_html($tag); ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
+
+                                            <tr>
+                                                <td class="title-holder" style="margin: 0;" valign="top">
+                                                    <h3 class="alignleft"><?php echo esc_html__('Payment Details', 'yatra'); ?></h3>
+                                                </td>
+                                            </tr>
+                                            <?php foreach ($payment_details as $p_tag_id => $p_label) : ?>
+                                                <tr>
+                                                    <td><?php echo esc_html($p_label); ?></td>
+                                                    <td class="alignright"><?php echo esc_html($p_tag_id); ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                            <tr class="total">
+                                                <td class="alignright"><?php echo esc_html__('Net total', 'yatra'); ?></td>
+                                                <td class="alignright"><?php echo esc_html("{{net_booking_price}}"); ?></td>
+                                            </tr>
                                         </table>
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
-                    <?php if ('customer' === $email_to) : ?>
+                    <?php if ('admin' === $email_to) : ?>
                         <tr>
                             <td class="content-block aligncenter">
-                                <a href="{{home_url}}"><?php esc_html_e('View booking on your website site', 'yatra'); ?></a>
+                                <a href="{{home_url}}"><?php esc_html_e('View booking on your website', 'yatra'); ?></a>
                             </td>
                         </tr>
                     <?php endif; ?>

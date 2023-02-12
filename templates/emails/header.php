@@ -44,13 +44,13 @@
 
 		.container {
 			display: block !important;
-			max-width: 600px !important;
+			max-width: 650px !important;
 			margin: 0 auto !important;
 			clear: both !important
 		}
 
 		.content {
-			max-width: 600px;
+			max-width: 650px;
 			margin: 0 auto;
 			display: block;
 			padding: 20px
@@ -278,6 +278,6 @@
 		<table class="body-wrap">
 			<tr>
 				<td></td>
-				<td class="container" width="600">
+				<td class="container" width="650">
 					<div class="content">
 						<?php
