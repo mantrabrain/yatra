@@ -161,7 +161,7 @@ class Yatra_Core_DB
         $sql = str_ireplace("'__NULL__'", "NULL", $sql);
 
         if ($wpdb->query($sql)) {
-            
+
             return $wpdb->insert_id;
         }
         return false;
@@ -236,6 +236,50 @@ class Yatra_Core_DB
     public static function save_data($table, $data = array(), $save_ignore = array())
     {
         return self::insert($table, $data, $save_ignore);
+
+    }
+
+    public static function delete($table, $where = array())
+    {
+
+        global $wpdb;
+
+
+        if (count($where) < 1) {
+            return false;
+        }
+        $delete_query_text = "DELETE FROM " . self::get_table($table);
+
+        $prepare_args = array();
+
+        $where_query = ' WHERE ';
+
+        foreach ($where as $wh => $wh_value) {
+
+
+            $wh_cond_array = explode('|', $wh);
+
+            $left_field = sanitize_text_field(wp_unslash($wh_cond_array[0]));
+
+            $operator = $wh_cond_array[1] ?? "=";
+
+            $operator = in_array($operator, array(">", "<", "=", ">=", "<=")) ? $operator : "=";
+
+            $right_field = isset($wh_cond_array[2]) ? sanitize_text_field(wp_unslash($wh_cond_array[2])) : "%s";
+
+            $where_query .= "{$left_field}{$operator}{$right_field} AND ";
+
+            array_push($prepare_args, $wh_value);
+        }
+
+        $where_query = rtrim(trim($where_query), "AND");
+
+        $delete_query_text .= " " . $where_query;
+
+
+        $query = $wpdb->prepare($delete_query_text, $prepare_args);
+
+        return $wpdb->query($query);
 
     }
 

@@ -4,8 +4,6 @@ namespace Yatra\Core\Hooks;
 
 use Yatra\Core\Admin\Emails\AdminEmail;
 use Yatra\Core\Admin\Emails\CustomerEmail;
-use Yatra\Core\Admin\Emails\DefaultEmailMessages;
-use Yatra\Core\Admin\Emails\EmailTemplates;
 
 class EmailHooks
 {
