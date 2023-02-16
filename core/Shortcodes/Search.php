@@ -48,6 +48,9 @@ class Search
                 'min_price' => $min_price, 'max_price' => $max_price, 'min_days' => $min_days, 'max_days' => $max_days, 'search_type' => $search_type
             ]
         );
+        wp_enqueue_script('yatra-search-script');
+        wp_enqueue_style('yatra-search-style');
+
 
     }
 
