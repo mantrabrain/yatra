@@ -97,7 +97,6 @@
         border: none;
         padding: 0;
         background: none;
-        font-size: 17px;
         height: 40px;
         color: #9b9b9b;
         width: 100%;
@@ -105,7 +104,7 @@
 
         &.active {
           color: #484848;
-          font-weight: bold;
+          font-weight: 500;
         }
       }
 

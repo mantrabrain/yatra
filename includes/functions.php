@@ -596,6 +596,8 @@ if (!function_exists('yatra_booking_smart_tags')) {
 
                 $number_of_person = $meta['number_of_person'] ?? '';
 
+                $total_tour_price = $meta['total_tour_price'] ?? '';
+
                 $number_of_person = is_array($number_of_person) ? array_sum($number_of_person) : $number_of_person;
 
                 $total_number_of_persons += absint($number_of_person);
@@ -607,6 +609,8 @@ if (!function_exists('yatra_booking_smart_tags')) {
                 $tour_list['tour_date'] = $booked_date;
 
                 $tour_list['number_of_person'] = $number_of_person;
+
+                $tour_list['total_tour_price'] = yatra_get_price(yatra_get_current_currency_symbol($booking->get_currency_code()), $total_tour_price);
 
                 array_push($tour_lists, $tour_list);
             }
@@ -620,8 +624,8 @@ if (!function_exists('yatra_booking_smart_tags')) {
         $smart_tags['total_number_of_persons'] = $total_number_of_persons;
 
         return apply_filters(
-            'yatra_booking_smart_tags',
-            $smart_tags
+            'yatra_booking_smart_tags', $smart_tags,
+            ['booking_id' => $booking_id]
         );
     }
 }
@@ -654,8 +658,8 @@ if (!function_exists('yatra_customer_smart_tags')) {
         }
 
         return apply_filters(
-            'yatra_customer_smart_tags',
-            $smart_tags
+            'yatra_customer_smart_tags', $smart_tags,
+            ['booking_id' => $booking_id]
         );
     }
 }
@@ -780,7 +784,7 @@ if (!function_exists('yatra_all_smart_tags')) {
 
         $all_tags = array_merge($yatra_global_smart_tags, $yatra_booking_smart_tags, $yatra_customer_smart_tags);
 
-        return apply_filters('yatra_all_smart_tags', $all_tags);
+        return apply_filters('yatra_all_smart_tags', $all_tags, ['booking_id' => $booking_id]);
     }
 }
 

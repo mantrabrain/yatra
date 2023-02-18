@@ -95,14 +95,13 @@
       border: none;
       padding: 0;
       background: none;
-      font-size: 17px;
       height: 40px;
       color: #9b9b9b;
       width: 100%;
       cursor: pointer; }
       .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .input-placeholder.active {
         color: #484848;
-        font-weight: bold; }
+        font-weight: 500; }
     .yatra-search-module-form .yatra-search-module .yatra-search-item-fields .yatra-search-model {
       position: absolute;
       width: 500px;
