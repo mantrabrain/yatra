@@ -4,7 +4,7 @@ Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
 Tested up to: 6.1
 Requires PHP: 7.0
-Stable tag: 2.1.12
+Stable tag: 2.1.13
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
