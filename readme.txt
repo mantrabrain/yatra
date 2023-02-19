@@ -57,6 +57,7 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 * [Yatra Stripe](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-stripe)
 * [Yatra Authorize.Net](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-authorizenet)
 * [Yatra Razorpay](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-razorpay)
+* [Yatra 2Checkout](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-2checkout)
 
 == Other Premium Extensions/Addons ==
 
