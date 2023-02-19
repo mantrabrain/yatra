@@ -190,30 +190,17 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.12 | 2022-11-10
-* Added - Show current version of addon on license manager
-* Added - Mini cart shortcode [yatra_mini_cart]
-* Added - Search shortcode [yatra_search]
-* Added - Disable booking option for each tour
-* Added - Tour type option added on each tour ( regular and external)
-* Added - Icon added on admin bar menu
-* Update - Separate menu on admin
-* Update - Session management restructured
-* Update - Button css update
-* Update - CSS color style update with css variable style
-* Update - Booking calendar design optimized
-* Update - Variable pricing design update
-* Update - Setup wizard design fixes
-* Update - Feature icon update on admin tour list table
-* Update - Update font awesome to Font Awesome 6.2.0
-* Fixed - Responsive issue fixed
-* Fixed - jQuery UI mobile slider not working on touch or drag issue fixed
-* Fixed - Made normal pagination design
-* Fixed - Figure css for single tour only
-* Fixed - Pagination issue resolved
-* Fixed - Upgrade to pro link issue fixed
-* Fixed - Coupon issue fixed
-* Fixed - Tab issue fixed
-* Removed - Remove unused content from status page
+= 2.1.13 | 2023-02-19
+* Added - Page header ( on admin ) for all yatra pages
+* Added - Order by date added on archive page
+* Added - New smart tag added
+* Added - Shortcode support on tabs & custom tabs
+* Added - CSS class added for sidebar filter blocks
+* Added - Powered by link added on email template
+* Update - Pagination icon issue fixed
+* Update - Email template design enhancement
+* Fixed - Setting link issue resolved
+* Fixed - Tour update message issue fixed
+* Fixed - Cart issue fixed
 
 
