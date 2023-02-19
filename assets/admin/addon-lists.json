@@ -45,6 +45,15 @@
     ]
   },
   {
+    "title": "Yatra 2Checkout",
+    "slug": "yatra-2checkout",
+    "name": "Yatra Stripe",
+    "image": "addons/yatra-2checkout.png",
+    "excerpt": "This is payment gateway of 2checkout.com which support different types of credit/debit cards. While booking the tour package on yatra plugin the traveller no need to go any of the payment gateway pages to pay the tour price. Any one can easily book the tour package via this premium payment gateway addon.",
+    "plan": [
+    ]
+  },
+  {
     "title": "Yatra Authorize.net",
     "slug": "yatra-authorize-net",
     "plugin_file": "yatra-authorizenet",
