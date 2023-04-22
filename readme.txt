@@ -1,10 +1,10 @@
 === Best Travel Booking WordPress Plugin, Tour Booking System, Trip Booking WordPress Plugin - Yatra ===
-Contributors: MantraBrain, ughimire1
+Contributors: MantraBrain, gangadharkashyap
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
-Tested up to: 6.1
+Tested up to: 6.2
 Requires PHP: 7.0
-Stable tag: 2.1.13
+Stable tag: 2.1.14
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -191,17 +191,7 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.13 | 2023-02-19
-* Added - Page header ( on admin ) for all yatra pages
-* Added - Order by date added on archive page
-* Added - New smart tag added
-* Added - Shortcode support on tabs & custom tabs
-* Added - CSS class added for sidebar filter blocks
-* Added - Powered by link added on email template
-* Update - Pagination icon issue fixed
-* Update - Email template design enhancement
-* Fixed - Setting link issue resolved
-* Fixed - Tour update message issue fixed
-* Fixed - Cart issue fixed
+= 2.1.14 | 2023-04-17
+* Fixed - WordPress 6.2 compatibility issue fixed
 
 
