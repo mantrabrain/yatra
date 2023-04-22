@@ -28,3 +28,4 @@
 /pax_global_header  export-ignore
 /yatra.tar  export-ignore
 /yatra.zip  export-ignore
+/test.sh  export-ignore

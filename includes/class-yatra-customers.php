@@ -29,7 +29,14 @@ class Yatra_Customers
 
             return 0;
         }
-        $customer_object = get_page_by_title($email, OBJECT, 'yatra-customers');
+
+        $args = array(
+            'post_title'         => $email,
+            'post_type'        => 'yatra-customers'
+        );
+        $customer_object_array = get_posts( $args );
+
+        $customer_object = $customer_object_array[0] ?? new stdClass();
 
         $customer_id = isset($customer_object->ID) ? $customer_object->ID : 0;
 

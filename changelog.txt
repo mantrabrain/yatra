@@ -1,3 +1,16 @@
+= 2.1.13 | 2023-02-19
+* Added - Page header ( on admin ) for all yatra pages
+* Added - Order by date added on archive page
+* Added - New smart tag added
+* Added - Shortcode support on tabs & custom tabs
+* Added - CSS class added for sidebar filter blocks
+* Added - Powered by link added on email template
+* Update - Pagination icon issue fixed
+* Update - Email template design enhancement
+* Fixed - Setting link issue resolved
+* Fixed - Tour update message issue fixed
+* Fixed - Cart issue fixed
+
 = 2.1.12 | 2022-11-10
 * Added - Show current version of addon on license manager
 * Added - Mini cart shortcode [yatra_mini_cart]
