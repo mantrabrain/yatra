@@ -1,10 +1,10 @@
-# Copyright (C) 2023 Mantrabrain
+# Copyright (C) 2023 MantraBrain
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.13\n"
+"Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.1.14\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2023-02-19 07:29:23+00:00\n"
+"POT-Creation-Date: 2023-04-22 05:16:47+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -5424,7 +5424,7 @@ msgid ""
 msgstr ""
 
 #. Author of the plugin/theme
-msgid "Mantrabrain"
+msgid "MantraBrain"
 msgstr ""
 
 #. Author URI of the plugin/theme
