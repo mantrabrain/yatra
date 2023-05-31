@@ -1,3 +1,6 @@
+= 2.1.14 | 2023-04-17
+* Fixed - WordPress 6.2 compatibility issue fixed
+
 = 2.1.13 | 2023-02-19
 * Added - Page header ( on admin ) for all yatra pages
 * Added - Order by date added on archive page
