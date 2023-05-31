@@ -14,7 +14,7 @@ if (!class_exists('Yatra_Taxonomy_Activity')) {
         public function save($term_id, $id)
         {
             if (isset($_POST['activity_image_id']) && '' !== $_POST['activity_image_id']) {
-                $image = $_POST['activity_image_id'];
+                $image = absint($_POST['activity_image_id']);
                 add_term_meta($term_id, 'activity_image_id', $image, true);
             }
         }
@@ -22,7 +22,7 @@ if (!class_exists('Yatra_Taxonomy_Activity')) {
         public function update($term_id, $id)
         {
             if (isset($_POST['activity_image_id']) && '' !== $_POST['activity_image_id']) {
-                $image = $_POST['activity_image_id'];
+                $image = absint($_POST['activity_image_id']);
                 update_term_meta($term_id, 'activity_image_id', $image);
             } else {
                 update_term_meta($term_id, 'activity_image_id', '');
@@ -38,7 +38,7 @@ if (!class_exists('Yatra_Taxonomy_Activity')) {
                 <td>
                     <?php $image_id = get_term_meta($term->term_id, 'activity_image_id', true); ?>
                     <input type="hidden" id="activity_image_id" name="activity_image_id"
-                           value="<?php echo $image_id; ?>">
+                           value="<?php echo esc_attr($image_id); ?>">
                     <div id="activity_image_wrapper">
                         <?php if ($image_id) { ?>
                             <?php echo wp_get_attachment_image($image_id, 'thumbnail'); ?>
