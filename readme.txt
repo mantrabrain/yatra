@@ -4,7 +4,7 @@ Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
 Tested up to: 6.2
 Requires PHP: 7.0
-Stable tag: 2.1.14
+Stable tag: 2.1.15
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -191,7 +191,7 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.14 | 2023-04-17
-* Fixed - WordPress 6.2 compatibility issue fixed
+= 2.1.15 | 2023-05-31
+* Fixed - XSS issue fixed  [ Reported by patchstack ]
 
 
