@@ -21,7 +21,7 @@ window.yatra_global_tour_additional_price = 0;
                     var page_number = $(this).text();
                     if ($(this).hasClass('next')) {
                         page_number = current_page + 1;
-                    } else if ($(this).hasClass('previous')) {
+                    } else if ($(this).hasClass('prev')) {
                         page_number = current_page - 1;
                     }
                     var attributes = wrap.attr('attributes')
