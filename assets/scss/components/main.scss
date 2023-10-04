@@ -282,8 +282,10 @@ del {
 @import "tour/destination-item";
 @import "tour/activity-item";
 @import "tour/deals-item";
+@import "tour/parts-pagination";
 @import "archive";
 @import "parts/button";
+
 .yatra-flex-row {
   display: flex;
 }

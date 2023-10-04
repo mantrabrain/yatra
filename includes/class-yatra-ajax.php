@@ -18,7 +18,8 @@ class Yatra_Ajax
             'day_wise_tour_availability',
             'day_wise_tour_availability_save',
             'update_tour_featured_status',
-            'install_theme'
+            'install_theme',
+            'dismiss_admin_promo_notice',
         );
 
         return $actions;
@@ -33,7 +34,7 @@ class Yatra_Ajax
             'tour_frontend_availability',
             'tour_frontend_availability_month',
             'tour_enquiry',
-            'dismiss_admin_promo_notice'
+            'parts_pagination'
         );
         return $actions;
     }
@@ -723,6 +724,35 @@ class Yatra_Ajax
         wp_send_json_success(__(
             'Thank you for your query. We will get back to you soon'
             , 'yatra'));
+    }
+
+    public function parts_pagination()
+    {
+        $status = $this->validate_nonce();
+
+        if (!$status) {
+            wp_send_json_error($this->ajax_error());
+        }
+
+        $page_number = isset($_POST['page_number']) ? absint($_POST['page_number']) : 1;
+
+        $attributes = isset($_POST['attributes']) ? json_decode(stripslashes($_POST['attributes']), true) : array();
+
+        $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : 'tour';
+
+        $attributes['current'] = $page_number;
+
+        ob_start();
+
+        if ($type === 'tour') {
+            yatra_get_tour_lists($attributes);
+        } else if ($type = 'destination') {
+
+        }
+
+        $response = ob_get_clean();
+
+        wp_send_json_success($response);
     }
 
 

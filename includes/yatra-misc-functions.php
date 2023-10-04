@@ -86,6 +86,10 @@ if (!function_exists('yatra_get_tour_lists')) {
 
         $columns = isset($atts['columns']) ? absint($atts['columns']) : 3;
 
+        $current_page = isset($atts['current']) ? absint($atts['current']) : 1;
+
+        $current_page = $current_page < 1 ? 1 : $current_page;
+
         $meta_query = array();
 
         switch ($featured) {
@@ -131,7 +135,22 @@ if (!function_exists('yatra_get_tour_lists')) {
             $args['meta_query'] = $meta_query;
         }
 
-        $posts = get_posts($args);
+        $query_args = $args;
+
+        $query_args['posts_per_page'] = -1;
+
+
+        $query = new WP_Query($query_args);
+
+        $post_count = is_wp_error($query) ? 0 : $query->post_count;
+
+        $total_page = ceil($post_count / $posts_per_page);
+
+        $current_page = $total_page < $current_page ? 1 : $current_page;
+
+        $args['offset'] = ($current_page - 1) * $posts_per_page;
+
+        $post_items = get_posts($args);
 
         $grid_class = 'yatra-col-sm-6 ';
 
@@ -151,32 +170,44 @@ if (!function_exists('yatra_get_tour_lists')) {
 
         echo '<div class="yatra-tour-list-container">';
 
-            echo '<div class="yatra-row yatra-tour-list-wrap">';
+        echo '<div class="yatra-row yatra-tour-list-wrap">';
 
-            foreach ($posts as $item) {
+        foreach ($post_items as $item) {
 
-                $data['data'] = array(
-                    'id' => $item->ID,
-                    'title' => $item->post_title,
-                    'excerpt' => $item->post_excerpt,
-                    'permalink' => get_permalink($item->ID),
-                    'image' => '',
-                    'class' => $grid_class,
-                );
+            $data['data'] = array(
+                'id' => $item->ID,
+                'title' => $item->post_title,
+                'excerpt' => $item->post_excerpt,
+                'permalink' => get_permalink($item->ID),
+                'image' => '',
+                'class' => $grid_class,
+            );
 
-                $attachment_id = (int)get_post_thumbnail_id($item);
+            $attachment_id = (int)get_post_thumbnail_id($item);
 
-                if (($attachment_id) > 0) {
+            if (($attachment_id) > 0) {
 
-                    $attachment_link = wp_get_attachment_image_url($attachment_id, 'full');
+                $attachment_link = wp_get_attachment_image_url($attachment_id, 'full');
 
-                    $data['data']['image'] = $attachment_link;
-                }
-
-                yatra_get_template('tmpl-tour-item.php', $data);
-
+                $data['data']['image'] = $attachment_link;
             }
-            echo '</div>';
+
+            yatra_get_template('tmpl-tour-item.php', $data);
+
+        }
+
+        echo '</div>';
+
+
+        yatra_get_template('parts/pagination.php', [
+            'total' => $total_page,
+            'current' => $current_page,
+            'base' => '',
+            'format' => '',
+            'class' => 'yatra-ajax-pagination',
+            'attributes' => $atts,
+            'type' => 'tour'
+        ]);
 
         echo '</div>';
 
