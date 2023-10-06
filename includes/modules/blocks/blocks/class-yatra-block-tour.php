@@ -33,11 +33,12 @@ class Yatra_Tour_Block
 
     public function callback($attributes, $content)
     {
+
         $attributes['order'] = isset($attributes['order']) ? sanitize_text_field($attributes['order']) : 'DESC';
 
         $attributes['order'] = in_array(strtolower($attributes['order']), array('asc', 'desc')) ? $attributes['order'] : 'desc';
 
-        $attributes['featured'] = isset($attributes['featured']) ? absint($attributes['featured']) : 2;
+        $attributes['featured'] = isset($attributes['featured']) && $attributes['featured'] ? absint($attributes['featured']) : 2;
 
         $attributes['posts_per_page'] = isset($attributes['posts_per_page']) ? absint($attributes['posts_per_page']) : 9;
 

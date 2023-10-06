@@ -25,7 +25,7 @@ const Edit = (props) => {
                         <PanelBody title={__('Tour Settings', 'yatra')} initialOpen={true}>
 
                             <RangeControl
-                                label={__('Number of posts')}
+                                label={__('Posts Per Page')}
                                 value={attributes.posts_per_page}
                                 onChange={(value) => onChangePostPerPage(value)}
                                 min={1}
