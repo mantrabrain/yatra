@@ -2,7 +2,7 @@
 Contributors: MantraBrain, gangadharkashyap
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
-Tested up to: 6.2
+Tested up to: 6.3
 Requires PHP: 7.0
 Stable tag: 2.1.15
 License: GPLv3 or later
@@ -192,7 +192,5 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.15 | 2023-05-31
-* Fixed - XSS issue fixed  [ Reported by patchstack ]
-
-
+= 2.1.16 | 2023-10-
+* Added - Pagination on Yatra blocks, shortcodes and widgets
