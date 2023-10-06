@@ -744,10 +744,22 @@ class Yatra_Ajax
 
         ob_start();
 
-        if ($type === 'tour') {
-            yatra_get_tour_lists($attributes);
-        } else if ($type = 'destination') {
+        if ($type == 'tour') {
 
+            yatra_get_tour_lists($attributes);
+
+        } else if ($type == 'activity') {
+
+            yatra_get_activity_lists($attributes);
+
+        } else if ($type == 'destination') {
+
+            yatra_get_destination_lists($attributes);
+
+        } else if ($type == "discount-deal") {
+
+            yatra_get_discount_deals_lists($attributes);
+            
         }
 
         $response = ob_get_clean();

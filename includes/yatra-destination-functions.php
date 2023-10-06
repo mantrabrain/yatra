@@ -9,13 +9,33 @@ if (!function_exists('yatra_get_destination_lists')) {
 
         $columns = isset($atts['columns']) ? absint($atts['columns']) : 4;
 
+        $per_page = isset($atts['per_page']) ? intval($atts['per_page']) : -1;
 
-        $destination_terms = get_terms(array(
+        $current_page = isset($atts['current']) ? absint($atts['current']) : 1;
+
+        $current_page = $current_page < 1 ? 1 : $current_page;
+
+        $term_args = array(
             'taxonomy' => 'destination',
             'hide_empty' => false,
             'order' => $order,
 
-        ));
+        );
+        $term_count = wp_count_terms($term_args);
+
+        $total_page = $per_page < 1 ? 0 : ceil($term_count / $per_page);
+
+        $current_page = $total_page < $current_page ? 1 : $current_page;
+
+        if ($per_page > 0) {
+
+            $term_args['number'] = $per_page;
+
+        }
+
+        $term_args['offset'] = ($current_page - 1) * $per_page;
+
+        $destination_terms = get_terms($term_args);
 
         $grid_class = 'yatra-col-sm-6 ';
 
@@ -58,6 +78,16 @@ if (!function_exists('yatra_get_destination_lists')) {
 
         }
         echo '</div>';
+
+        yatra_get_template('parts/pagination.php', [
+            'total' => $total_page,
+            'current' => $current_page,
+            'base' => '',
+            'format' => '',
+            'class' => 'yatra-ajax-pagination',
+            'attributes' => $atts,
+            'type' => 'destination'
+        ]);
 
         echo '</div>';
 
