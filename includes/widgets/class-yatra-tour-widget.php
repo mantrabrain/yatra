@@ -44,14 +44,6 @@ if (!class_exists('Yatra_Tour_Widget')) :
                     'title' => esc_html__('Description', 'yatra'),
                     'type' => 'textarea',
                 ),
-
-                'posts_per_page' => array(
-                    'name' => 'posts_per_page',
-                    'title' => esc_html__('Per Page Posts', 'yatra'),
-                    'type' => 'number',
-                    'default' => 9
-
-                ),
                 'order' => array(
                     'name' => 'order',
                     'title' => esc_html__('Ordering', 'yatra'),
@@ -83,7 +75,14 @@ if (!class_exists('Yatra_Tour_Widget')) :
                         '4' => esc_html__('Four (4)', 'yatra'),
                     ),
                     'default' => '3'
-                )
+                ),
+                'posts_per_page' => array(
+                    'name' => 'posts_per_page',
+                    'title' => esc_html__('Per Page Posts', 'yatra'),
+                    'type' => 'number',
+                    'default' => 9
+
+                ),
 
 
             );
@@ -111,8 +110,11 @@ if (!class_exists('Yatra_Tour_Widget')) :
             $widget_arguments = array();
 
             $widget_arguments['order'] = $valid_widget_instance['order'];
+
             $widget_arguments['featured'] = $valid_widget_instance['featured'];
+
             $widget_arguments['posts_per_page'] = $valid_widget_instance['posts_per_page'] ?? 9;
+
             $widget_arguments['columns'] = $valid_widget_instance['columns'] ?? 3;
             ?>
             <div class="yatra-tour-list-widget-wrap">

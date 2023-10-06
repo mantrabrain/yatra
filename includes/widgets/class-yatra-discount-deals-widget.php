@@ -64,7 +64,13 @@ if (!class_exists('Yatra_Discount_Deals_Widget')) :
                         '4' => esc_html__('Four (4)', 'yatra'),
                     ),
                     'default' => '3'
-                )
+                ),
+                'posts_per_page' => array(
+                    'name' => 'posts_per_page',
+                    'title' => esc_html__('Posts Per Page', 'yatra'),
+                    'type' => 'number',
+                    'default' => '9'
+                ),
 
 
             );
@@ -76,11 +82,11 @@ if (!class_exists('Yatra_Discount_Deals_Widget')) :
         /**
          * Echo the widget content.
          *
-         * @since 1.0.0
-         *
          * @param array $args Display arguments including before_title, after_title,
          *                        before_widget, and after_widget.
          * @param array $instance The settings for the particular instance of the widget.
+         * @since 1.0.0
+         *
          */
         function widget($args, $instance)
         {
@@ -92,7 +98,10 @@ if (!class_exists('Yatra_Discount_Deals_Widget')) :
             $widget_arguments = array();
 
             $widget_arguments['order'] = $valid_widget_instance['order'];
+
             $widget_arguments['columns'] = $valid_widget_instance['columns'];
+
+            $widget_arguments['posts_per_page'] = $valid_widget_instance['posts_per_page'];
             ?>
             <div class="yatra-discount-deals-widget-wrap">
 

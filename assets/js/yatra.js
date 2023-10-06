@@ -33,24 +33,24 @@ window.yatra_global_tour_additional_price = 0;
                         attributes: attributes,
                         type:type,
                     };
-                    var shortcode_wrap = $(this).closest('.yatra-shortcode-wrapper');
+                    var list_wrap = $(this).closest('.yatra-pagination-wrap').closest('div').parent();
                     $.ajax({
                         type: "POST",
                         url: yatra_params.ajax_url,
                         data: data,
                         beforeSend: function () {
-                            shortcode_wrap.addClass('yatra-loading');
+                            list_wrap.addClass('yatra-loading');
                         },
                         success: function (response) {
                             if (response.success === true) {
-                                shortcode_wrap.html(response.data);
+                                list_wrap.html(response.data);
                             } else {
 
                             }
 
                         },
                         complete: function () {
-                            shortcode_wrap.removeClass('yatra-loading');
+                            list_wrap.removeClass('yatra-loading');
                         }
                     });
                 });
