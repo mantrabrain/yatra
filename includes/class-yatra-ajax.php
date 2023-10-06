@@ -738,6 +738,8 @@ class Yatra_Ajax
 
         $attributes = isset($_POST['attributes']) ? json_decode(stripslashes($_POST['attributes']), true) : array();
 
+        $attributes = is_array($attributes) ? $attributes: array();
+
         $type = isset($_POST['type']) ? sanitize_text_field($_POST['type']) : 'tour';
 
         $attributes['current'] = $page_number;

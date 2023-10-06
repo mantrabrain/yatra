@@ -7,6 +7,7 @@ if (!defined('ABSPATH')) {
 if ($total <= 1) {
     return;
 }
+$attributes = is_array($attributes) ? $attributes: array();
 ?>
 <div class="yatra-row yatra-pagination-wrap">
     <nav id="post-navigation" class="yatra-pagination navigation pagination <?php echo esc_attr($class) ?>"
