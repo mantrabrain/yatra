@@ -174,6 +174,11 @@ const Edit = props => {
     attributes,
     setAttributes
   } = props;
+  const onChangePerPage = value => {
+    setAttributes({
+      per_page: value
+    });
+  };
   const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)();
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", blockProps, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)((_wordpress_server_side_render__WEBPACK_IMPORTED_MODULE_5___default()), {
     block: "yatra/activity",
@@ -214,6 +219,12 @@ const Edit = props => {
     onChange: columns => setAttributes({
       columns: columns
     })
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.RangeControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_4__.__)('Per Page'),
+    value: attributes.per_page,
+    onChange: value => onChangePerPage(value),
+    min: -1,
+    max: 50
   }))))));
 };
 (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_1__.registerBlockType)('yatra/activity', {

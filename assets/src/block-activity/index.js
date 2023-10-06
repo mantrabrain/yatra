@@ -7,6 +7,9 @@ import './editor.scss';
 
 const Edit = (props) => {
     const {attributes, setAttributes} = props;
+    const onChangePerPage = (value) => {
+        setAttributes({per_page: value});
+    };
     const blockProps = useBlockProps();
     return (
         <div {...blockProps}>
@@ -37,6 +40,13 @@ const Edit = (props) => {
                                     {label: __('Four (4)', 'yatra'), value: 4},
                                 ]}
                                 onChange={(columns) => setAttributes({columns: columns})}
+                            />
+                            <RangeControl
+                                label={__('Per Page')}
+                                value={attributes.per_page}
+                                onChange={(value) => onChangePerPage(value)}
+                                min={-1}
+                                max={50}
                             />
                         </PanelBody>
                     </Panel>
