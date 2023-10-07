@@ -64,7 +64,12 @@ if (!class_exists('Yatra_Activity_Widget')) :
                         '4' => esc_html__('Four (4)', 'yatra'),
                     ),
                     'default' => '4'
-                )
+                ),
+                'per_page' => array(
+                    'name' => 'per_page',
+                    'title' => esc_html__('Per Page', 'yatra'),
+                    'type' => 'number',
+                ),
 
 
             );
@@ -92,7 +97,10 @@ if (!class_exists('Yatra_Activity_Widget')) :
             $widget_arguments = array();
 
             $widget_arguments['order'] = $valid_widget_instance['order'];
+
             $widget_arguments['columns'] = $valid_widget_instance['columns'];
+
+            $widget_arguments['per_page'] = $valid_widget_instance['per_page'];
             ?>
             <div class="yatra-activity-widget-wrap">
                 <?php if (!empty($valid_widget_instance['title']) || !empty($valid_widget_instance['description'])) { ?>

@@ -19,6 +19,10 @@ class Yatra_Block_Activity
                 'type' => 'number',
                 'default' => 4
             ),
+            'per_page' => array(
+                'type' => 'number',
+                'default' => -1,
+            ),
         );
 
     }
@@ -26,6 +30,8 @@ class Yatra_Block_Activity
     public function callback($attributes, $content)
     {
         $attributes['order'] = isset($attributes['order']) ? sanitize_text_field($attributes['order']) : 'asc';
+
+        $attributes['per_page'] = isset($attributes['per_page']) ? intval($attributes['per_page']) : -1;
 
         $attributes['columns'] = isset($attributes['columns']) ? absint($attributes['columns']) : 4;
 

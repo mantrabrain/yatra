@@ -15,6 +15,10 @@ class BookingHooks
 
         add_action('yatra_after_booking_status_change', array($self, 'on_booking_status_change'), 11);
 
+        add_action('transition_post_status', array($self, 'booking_status_modified'), 11, 3);
+
+        add_action('before_delete_post', array($self, 'booking_deleted'));
+
     }
 
     public function on_booking_status_change($params)
@@ -78,6 +82,42 @@ class BookingHooks
 
         }
 
+
+    }
+
+
+    public function booking_status_modified($new_status, $old_status, $post)
+    {
+
+        $status = array('trash', 'draft');
+
+        if (get_post_type($post->ID) !== 'yatra-booking') {
+            return;
+        }
+
+        if (!in_array($old_status, $status) && !in_array($new_status, $status)) {
+            return;
+        }
+        if ($new_status === 'draft') {
+
+            yatra_update_booking_status($post->ID);
+
+        } else {
+
+            Yatra_Core_DB::delete(Yatra_Tables::TOUR_BOOKING_STATS, array(
+                'booking_id' => $post->ID
+            ));
+        }
+    }
+
+    public function booking_deleted($booking_id)
+    {
+        if (get_post_type($booking_id) !== 'yatra-booking') {
+            return;
+        }
+        Yatra_Core_DB::delete(Yatra_Tables::TOUR_BOOKING_STATS, array(
+            'booking_id' => $booking_id
+        ));
 
     }
 }

@@ -11,6 +11,49 @@ window.yatra_global_tour_additional_price = 0;
                 this.initLib();
                 this.initNiceNumber();
                 this.initDateTimePicker();
+                this.initPartsPagination();
+            },
+            initPartsPagination: function () {
+                $('body').on('click', '.yatra-pagination-wrap .page-numbers', function (e) {
+                    e.preventDefault();
+                    var wrap = $(this).closest('.yatra-ajax-pagination');
+                    var current_page = parseInt(wrap.find('.current').text());
+                    var page_number = $(this).text();
+                    if ($(this).hasClass('next')) {
+                        page_number = current_page + 1;
+                    } else if ($(this).hasClass('prev')) {
+                        page_number = current_page - 1;
+                    }
+                    var attributes = wrap.attr('attributes')
+                    var type = wrap.attr('type')
+                    var data = {
+                        page_number: page_number,
+                        action: yatra_params.pagination.pagination_action,
+                        yatra_nonce: yatra_params.pagination.pagination_nonce,
+                        attributes: attributes,
+                        type:type,
+                    };
+                    var list_wrap = $(this).closest('.yatra-pagination-wrap').closest('div').parent();
+                    $.ajax({
+                        type: "POST",
+                        url: yatra_params.ajax_url,
+                        data: data,
+                        beforeSend: function () {
+                            list_wrap.addClass('yatra-loading');
+                        },
+                        success: function (response) {
+                            if (response.success === true) {
+                                list_wrap.html(response.data);
+                            } else {
+
+                            }
+
+                        },
+                        complete: function () {
+                            list_wrap.removeClass('yatra-loading');
+                        }
+                    });
+                });
             },
             initNiceNumber: function () {
                 var _that = this;

@@ -2,9 +2,9 @@
 Contributors: MantraBrain, gangadharkashyap
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 4.7
-Tested up to: 6.2
+Tested up to: 6.3
 Requires PHP: 7.0
-Stable tag: 2.1.15
+Stable tag: 2.1.16
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -83,13 +83,13 @@ Shortcode for My Account Page:
 <pre>[yatra_my_account]</pre>
 
 Shortcode for Activity Listing:
-<pre>[yatra_activity order="desc"]</pre>
+<pre>[yatra_activity order="desc" per_page="2"]</pre>
 
 Shortcode for Destination Listing:
-<pre>[yatra_destination order="desc"]</pre>
+<pre>[yatra_destination order="desc" per_page="2"]</pre>
 
 Shortcode for Discount & Deals Listing:
-<pre>[yatra_discount_and_deals order="asc"]</pre>
+<pre>[yatra_discount_and_deals order="asc" posts_per_page="2"]</pre>
 
 Shortcode for Tour Listing:
 <pre>[yatra_tour order="asc" featured="1" posts_per_page="5"]</pre>
@@ -192,7 +192,6 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.15 | 2023-05-31
-* Fixed - XSS issue fixed  [ Reported by patchstack ]
-
-
+= 2.1.16 | 2023-10-
+* Added - Pagination on Yatra blocks, shortcodes and widgets
+* Added - On tour delete remove booking number of people

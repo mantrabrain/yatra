@@ -1,12 +1,15 @@
 import {registerBlockType} from "@wordpress/blocks";
 import {InspectorControls, useBlockProps} from "@wordpress/block-editor";
-import {Panel, PanelBody, SelectControl} from '@wordpress/components';
+import {Panel, PanelBody, RangeControl, SelectControl} from '@wordpress/components';
 import {__} from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
 import './editor.scss';
 
 const Edit = (props) => {
     const {attributes, setAttributes} = props;
+    const onChangePerPage = (value) => {
+        setAttributes({per_page: value});
+    };
     const blockProps = useBlockProps();
     return (
         <div {...blockProps}>
@@ -37,6 +40,13 @@ const Edit = (props) => {
                                     {label: __('Four (4)', 'yatra'), value: 4},
                                 ]}
                                 onChange={(columns) => setAttributes({columns: columns})}
+                            />
+                            <RangeControl
+                                label={__('Per Page')}
+                                value={attributes.per_page}
+                                onChange={(value) => onChangePerPage(value)}
+                                min={-1}
+                                max={50}
                             />
                         </PanelBody>
                     </Panel>

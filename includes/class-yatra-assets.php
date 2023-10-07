@@ -137,6 +137,10 @@ if (!class_exists('Yatra_Assets')) {
                     'availability_month_action' => 'yatra_tour_frontend_availability_month',
                     'availability_month_nonce' => wp_create_nonce('wp_yatra_tour_frontend_availability_month_nonce')
                 ),
+                'pagination' => array(
+                    'pagination_nonce' => wp_create_nonce('wp_yatra_parts_pagination_nonce'),
+                    'pagination_action' => 'yatra_parts_pagination',
+                ),
                 'currency_symbol' => yatra_get_current_currency_symbol(),
 
                 'decimals' => get_option('yatra_price_number_decimals', 2),

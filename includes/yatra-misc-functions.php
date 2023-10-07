@@ -4,22 +4,53 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
     function yatra_get_discount_deals_lists($atts = array())
     {
         $order = isset($atts['order']) ? sanitize_text_field($atts['order']) : 'DESC';
+
         $order = in_array(strtolower($order), array('asc', 'desc')) ? $order : 'desc';
+
+        $posts_per_page = isset($atts['posts_per_page']) ? intval($atts['posts_per_page']) : 9;
+
         $columns = isset($atts['columns']) ? absint($atts['columns']) : 3;
+
+        $current_page = isset($atts['current']) ? absint($atts['current']) : 1;
+
+        $current_page = $current_page < 1 ? 1 : $current_page;
+
         $args = array(
             'meta_query' => array(
                 array(
                     'key' => 'yatra_tour_meta_sales_price',
-                    'value' => array('', 0, '0'),
+                    'value' => array('', 0),
                     'compare' => 'NOT IN'
                 )
             ),
-            'post_type' => 'tour',
-            'order' => $order,
-            'posts_per_page' => 9
-        );
-        $posts = get_posts($args);
 
+            'post_type' => 'tour',
+
+            'order' => $order,
+
+            'posts_per_page' => -1,
+
+            'post_status' => 'publish'
+        );
+
+
+        $query = new WP_Query($args);
+
+        $post_count = is_wp_error($query) ? 0 : $query->post_count;
+
+        $total_page = $posts_per_page < 1 ? 0 : ceil($post_count / $posts_per_page);
+
+        $current_page = $total_page < $current_page ? 1 : $current_page;
+
+        if ($posts_per_page > 0) {
+
+            $args['posts_per_page'] = $posts_per_page;
+
+        }
+
+        $args['offset'] = ($current_page - 1) * $posts_per_page;
+
+        $posts = get_posts($args);
 
         $grid_class = 'yatra-col-sm-6 ';
 
@@ -66,6 +97,16 @@ if (!function_exists('yatra_get_discount_deals_lists')) {
         }
         echo '</div>';
 
+        yatra_get_template('parts/pagination.php', [
+            'total' => $total_page,
+            'current' => $current_page,
+            'base' => '',
+            'format' => '',
+            'class' => 'yatra-ajax-pagination',
+            'attributes' => $atts,
+            'type' => 'discount-deal'
+        ]);
+
         echo '</div>';
 
     }
@@ -82,9 +123,13 @@ if (!function_exists('yatra_get_tour_lists')) {
 
         $featured = isset($atts['featured']) ? absint($atts['featured']) : 2;
 
-        $posts_per_page = isset($atts['posts_per_page']) ? absint($atts['posts_per_page']) : 9;
+        $posts_per_page = isset($atts['posts_per_page']) ? intval($atts['posts_per_page']) : 9;
 
         $columns = isset($atts['columns']) ? absint($atts['columns']) : 3;
+
+        $current_page = isset($atts['current']) ? absint($atts['current']) : 1;
+
+        $current_page = $current_page < 1 ? 1 : $current_page;
 
         $meta_query = array();
 
@@ -122,7 +167,8 @@ if (!function_exists('yatra_get_tour_lists')) {
         $args = array(
             'post_type' => 'tour',
             'order' => $order,
-            'posts_per_page' => $posts_per_page
+            'posts_per_page' => -1,
+            'post_status' => 'publish'
         );
 
 
@@ -131,7 +177,23 @@ if (!function_exists('yatra_get_tour_lists')) {
             $args['meta_query'] = $meta_query;
         }
 
-        $posts = get_posts($args);
+        $query = new WP_Query($args);
+
+        $post_count = is_wp_error($query) ? 0 : $query->post_count;
+
+        $total_page = $posts_per_page < 1 ? 0 : ceil($post_count / $posts_per_page);
+
+        $current_page = $total_page < $current_page ? 1 : $current_page;
+
+        if ($posts_per_page > 0) {
+
+            $args['posts_per_page'] = $posts_per_page;
+
+        }
+
+        $args['offset'] = ($current_page - 1) * $posts_per_page;
+
+        $post_items = get_posts($args);
 
         $grid_class = 'yatra-col-sm-6 ';
 
@@ -153,7 +215,7 @@ if (!function_exists('yatra_get_tour_lists')) {
 
         echo '<div class="yatra-row yatra-tour-list-wrap">';
 
-        foreach ($posts as $item) {
+        foreach ($post_items as $item) {
 
             $data['data'] = array(
                 'id' => $item->ID,
@@ -176,7 +238,19 @@ if (!function_exists('yatra_get_tour_lists')) {
             yatra_get_template('tmpl-tour-item.php', $data);
 
         }
+
         echo '</div>';
+
+
+        yatra_get_template('parts/pagination.php', [
+            'total' => $total_page,
+            'current' => $current_page,
+            'base' => '',
+            'format' => '',
+            'class' => 'yatra-ajax-pagination',
+            'attributes' => $atts,
+            'type' => 'tour'
+        ]);
 
         echo '</div>';
 

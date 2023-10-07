@@ -1,6 +1,7 @@
 <?php
 
 if (!function_exists('yatra_get_activity_lists')) {
+
     function yatra_get_activity_lists($atts = array())
     {
         $order = isset($atts['order']) ? sanitize_text_field($atts['order']) : 'ASC';
@@ -9,11 +10,33 @@ if (!function_exists('yatra_get_activity_lists')) {
 
         $order = in_array(strtolower($order), array('asc', 'desc')) ? $order : 'asc';
 
-        $activity_terms = get_terms(array(
+        $per_page = isset($atts['per_page']) ? intval($atts['per_page']) : -1;
+
+        $current_page = isset($atts['current']) ? absint($atts['current']) : 1;
+
+        $current_page = $current_page < 1 ? 1 : $current_page;
+
+        $term_args = array(
             'taxonomy' => 'activity',
             'hide_empty' => false,
             'order' => $order,
-        ));
+        );
+
+        $term_count = wp_count_terms($term_args);
+
+        $total_page = $per_page < 1 ? 0 : ceil($term_count / $per_page);
+
+        $current_page = $total_page < $current_page ? 1 : $current_page;
+
+        if ($per_page > 0) {
+
+            $term_args['number'] = $per_page;
+
+        }
+
+        $term_args['offset'] = ($current_page - 1) * $per_page;
+
+        $activity_terms = get_terms($term_args);
 
         $grid_class = 'yatra-col-sm-6 ';
 
@@ -55,6 +78,16 @@ if (!function_exists('yatra_get_activity_lists')) {
 
         }
         echo '</div>';
+
+        yatra_get_template('parts/pagination.php', [
+            'total' => $total_page,
+            'current' => $current_page,
+            'base' => '',
+            'format' => '',
+            'class' => 'yatra-ajax-pagination',
+            'attributes' => $atts,
+            'type' => 'activity'
+        ]);
 
         echo '</div>';
 

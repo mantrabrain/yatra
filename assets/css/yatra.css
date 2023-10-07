@@ -1629,6 +1629,10 @@ del {
   clear: both;
   width: 100%; }
 
+.yatra-pagination-wrap {
+  -ms-flex-pack: distribute;
+      justify-content: space-around; }
+
 .yatra-page-wrapper .yatra-archive-tour {
   display: inline-block;
   width: 100%;
