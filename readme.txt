@@ -192,6 +192,6 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.1.16 | 2023-10-
+= 2.1.16 | 2023-10-07
 * Added - Pagination on Yatra blocks, shortcodes and widgets
 * Added - On tour delete remove booking number of people
