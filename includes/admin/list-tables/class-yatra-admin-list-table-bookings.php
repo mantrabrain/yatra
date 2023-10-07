@@ -223,6 +223,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
     {
         $yatra_booking_statuses = yatra_get_booking_statuses();
 
+
         $status = isset($yatra_booking_statuses[$this->object->post_status]) ? $yatra_booking_statuses[$this->object->post_status] : 'Unknown';
         $background = "#e47703";
         switch (substr($this->object->post_status, 6)) {
@@ -241,12 +242,15 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
             case "failed":
                 $background = "#ff0000";
                 break;
+            case "trash":
+                $background = "#ff0000";
+                break;
         }
 
         printf('<mark 
     style="padding: 3px 10px 5px 10px;background: %s;color: #fff;border-radius: 4px;display: inline-block;text-align: center;text-transform: capitalize;" 
     class="booking-status %s tips" 
-    data-tip="%s"><span>%s</span></mark>', esc_attr($background), esc_attr(sanitize_html_class('status-' . $status)), wp_kses_post($status), esc_html($status));
+    data-tip="%s"><span>%s</span></mark>', esc_attr($background), esc_attr(sanitize_html_class('status-' . strtolower($status))), wp_kses_post($status), esc_html($status));
 
     }
 
