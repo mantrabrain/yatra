@@ -100,6 +100,9 @@ Shortcode for Mini Cart:
 Shortcode for Search:
 <pre>[yatra_search]</pre>
 
+Shortcode for Login:
+<pre>[yatra_login redirect="https://yourdomain.com/your-redirect-link"]</pre>
+
 
 == Smart Tags For Booking Notification Email ==
 * {{home_url}} : Get home page url
