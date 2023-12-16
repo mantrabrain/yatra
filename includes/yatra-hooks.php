@@ -129,14 +129,30 @@ if (!function_exists('yatra_enquiry_form_fields')) {
 
 }
 
-function yatra_book_now_button($availability)
+function yatra_book_now_button($availability, $selected_date)
 {
     do_action('yatra_before_booking_button', $availability);
 
+    $selected_date = yatra_format_date(strtotime($selected_date));
+
     if ($availability == "booking") {
-        yatra_get_template('tour/book-now-button.php');
+
+        $book_now_text = get_option('yatra_booknow_button_text', __('Book now', 'yatra'));
+
+        $book_now_text = str_replace('{selected_date}', $selected_date, $book_now_text);
+
+        yatra_get_template('tour/book-now-button.php', array(
+
+                'selected_date' => $selected_date,
+
+                'book_now_text' => $book_now_text
+            )
+        );
     } else if ($availability == "enquiry") {
-        yatra_get_template('tour/enquiry-button.php');
+
+        $enquiry_button_text = get_option('yatra_enquiry_button_text', __('Send Enquiry', 'yatra'));
+
+        yatra_get_template('tour/enquiry-button.php', array('selected_date' => $selected_date, 'enquiry_button_text'=>$enquiry_button_text));
     }
 
     do_action('yatra_after_booking_button', $availability);

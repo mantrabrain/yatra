@@ -531,7 +531,7 @@ if (!function_exists('yatra_get_calendar_date_listing')) {
 
                     echo '<option value="' . esc_attr($month_year) . '">';
 
-                    echo date("F - Y ", strtotime($month_year));
+                    echo yatra_format_date(strtotime($month_year), "F - Y ");
 
                     echo '</option>';
 
@@ -555,7 +555,7 @@ if (!function_exists('yatra_get_calendar_date_listing')) {
 
                 echo '<li>';
 
-                echo '<span data-date="' . esc_attr($single_date) . '" ' . $tippy_content . ' class="' . esc_attr($class) . '">' . date('M d', strtotime($single_date)) . '</span>';
+                echo '<span data-date="' . esc_attr($single_date) . '" ' . $tippy_content . ' class="' . esc_attr($class) . '">' . yatra_format_date(strtotime($single_date), 'M d') . '</span>';
 
                 echo '</li>';
             }

@@ -3,7 +3,7 @@
 
     global $yatra_tour;
 
-    $book_now_text = get_option('yatra_booknow_button_text', __('Book now', 'yatra'));
+    $book_now_text = $book_now_text ?? __('Book now', 'yatra');
 
     if ($yatra_tour->is_type('external')) {
         $book_now = $yatra_tour->get_book_now_text();

@@ -120,7 +120,7 @@ class Yatra_Template_Hooks
         echo '<span data-total-price="' . esc_attr($total_price) . '">' . yatra_get_price(yatra_get_current_currency_symbol(), $total_price) . '</span>';
         echo '</div>';
 
-        yatra_book_now_button($date_wise_info->getAvailabilityFor($tour_id, $selected_date));
+        yatra_book_now_button($date_wise_info->getAvailabilityFor($tour_id, $selected_date), $selected_date);
     }
 
     public function single_tour_enquiry_form($tourData)
