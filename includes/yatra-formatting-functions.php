@@ -116,3 +116,13 @@ if (!function_exists('yatra_time_format')) {
         return apply_filters('yatra_time_format', $time_format);
     }
 }
+
+if (!function_exists('yatra_format_date')) {
+
+    function yatra_format_date($timestamp, $format = null)
+    {
+        $format = $format == null ? yatra_date_format() : $format;
+
+        return wp_date($format, $timestamp);
+    }
+}

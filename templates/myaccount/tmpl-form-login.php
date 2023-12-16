@@ -5,11 +5,16 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 
-do_action('yatra_before_customer_login_form'); ?>
+do_action('yatra_before_customer_login_form');
 
+$title = $title ?? __('Login', 'yatra');
 
-<h2><?php esc_html_e('Login', 'yatra'); ?></h2>
+$redirect = $redirect ?? '';
 
+if ($title !== '') {
+    ?>
+    <h2><?php esc_html($title); ?></h2>
+<?php } ?>
 <form class="yatra-form yatra-form-login login" method="post">
 
     <?php do_action('yatra_login_form_start'); ?>
@@ -40,6 +45,7 @@ do_action('yatra_before_customer_login_form'); ?>
                    id="rememberme" value="forever"/> <span><?php esc_html_e('Remember me', 'yatra'); ?></span>
         </label>
         <?php wp_nonce_field('yatra-login', 'yatra-login-nonce'); ?>
+        <input type="hidden" name="redirect" value="<?php echo esc_url($redirect) ?>"/>
         <button type="submit" class="yatra-button button yatra-form-login__submit" name="login"
                 value="<?php esc_attr_e('Log in', 'yatra'); ?>"><?php esc_html_e('Log in', 'yatra'); ?></button>
     </p>

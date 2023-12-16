@@ -30,6 +30,7 @@ class Yatra_Shortcodes
             'yatra_discount_and_deals' => __CLASS__ . '::discount_deals',
             'yatra_tour' => __CLASS__ . '::tour',
             'yatra_search' => __CLASS__ . '::search',
+            'yatra_login' => __CLASS__ . '::login',
         );
 
         foreach ($shortcodes as $shortcode => $function) {
@@ -169,6 +170,17 @@ class Yatra_Shortcodes
     public static function search($atts)
     {
         return self::shortcode_wrapper(array('\Yatra\Core\Shortcodes\Search', 'output'), $atts);
+    }
+
+    /**
+     * login section shortcode.
+     *
+     * @param array $atts Attributes.
+     * @return string
+     */
+    public static function login($atts)
+    {
+        return self::shortcode_wrapper(array('\Yatra\Core\Shortcodes\Login', 'output'), $atts);
     }
 
 
