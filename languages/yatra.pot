@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.2\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2023-12-17 03:23:59+00:00\n"
+"POT-Creation-Date: 2023-12-17 03:28:38+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2072,8 +2072,21 @@ msgstr ""
 msgid "You do not have permission to perform this action."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:72 includes/class-yatra-ajax.php:722
+#: includes/class-yatra-ajax.php:72 includes/class-yatra-ajax.php:251
+#: includes/class-yatra-ajax.php:722
 msgid "Something wrong, please try again."
+msgstr ""
+
+#: includes/class-yatra-ajax.php:174
+msgid "Please select proper date from above calendar"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:183
+msgid "Booking is disabled for this tour package by admin."
+msgstr ""
+
+#: includes/class-yatra-ajax.php:228 includes/class-yatra-ajax.php:340
+msgid "Something wrong, please try again"
 msgstr ""
 
 #: includes/class-yatra-ajax.php:274
@@ -2082,6 +2095,22 @@ msgstr ""
 
 #: includes/class-yatra-ajax.php:286
 msgid "Coupon Successfully applied"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:301
+msgid "Invalid Date"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:306
+msgid "Invalid Tour ID"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:348
+msgid "Invalid tour type"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:353
+msgid "Invalid Tour ID on cart"
 msgstr ""
 
 #: includes/class-yatra-ajax.php:359
