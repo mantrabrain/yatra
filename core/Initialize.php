@@ -5,6 +5,7 @@ namespace Yatra\Core;
 use Yatra\Core\API\TrackerAPI;
 use Yatra\Core\Hooks\BookingHooks;
 use Yatra\Core\Hooks\EmailHooks;
+use Yatra\Core\Hooks\EnquiryHooks;
 use Yatra\Core\Hooks\NoticeHooks;
 use Yatra\Core\Hooks\TourHooks;
 
@@ -39,6 +40,7 @@ class Initialize
         NoticeHooks::init();
         EmailHooks::init();
         BookingHooks::init();
+        EnquiryHooks::init();
     }
 }
 

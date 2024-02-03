@@ -52,6 +52,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 				$settings[] = include 'settings/class-yatra-settings-checkout.php';
 				$settings[] = include 'settings/class-yatra-settings-payment-gateways.php';
 				$settings[] = include 'settings/class-yatra-settings-frontend-tabs.php';
+				$settings[] = new \Yatra\Core\Admin\Settings\Integrations();
 				$settings[] = include 'settings/class-yatra-settings-miscellaneous.php';
 
 
