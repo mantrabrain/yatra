@@ -8,17 +8,41 @@ class ReCaptchaHooks
     {
         $self = new self;
 
-        add_filter('yatra_after_enquiry_form_fields', array($self, 'recaptcha'));
-        add_filter('yatra_enquiry_response_before_saved', array($self, 'validate_captcha'));
+        add_filter('yatra_after_enquiry_form_fields', array($self, 'enquiry_recaptcha'));
+        add_filter('yatra_enquiry_response_before_saved', array($self, 'enquiry_validate_captcha'));
 
 
-        add_filter('yatra_checkout_after_form_fields', array($self, 'recaptcha'));
-        add_filter('yatra_before_booking_process', array($self, 'validate_captcha'));
+        add_filter('yatra_checkout_after_form_fields', array($self, 'booking_recaptcha'));
+        add_filter('yatra_before_booking_process', array($self, 'booking_validate_captcha'));
 
+    }
+
+    public function enquiry_recaptcha()
+    {
+        if(get_option('`'))
+
+        $this->recaptcha();
+    }
+
+    public function enquiry_validate_captcha($valid_data)
+    {
+
+        $this->validate_captcha();
+    }
+
+    public function booking_recaptcha()
+    {
+        $this->recaptcha();
+    }
+
+    public function booking_validate_captcha()
+    {
+        $this->validate_captcha();
     }
 
     public function recaptcha()
     {
+
         wp_enqueue_script('yatra-recaptcha');
 
         $site_key = get_option('yatra_integration_captcha_site_key', '');
@@ -32,7 +56,7 @@ class ReCaptchaHooks
 
     }
 
-    public function validate_captcha($valid_data)
+    public function validate_captcha()
     {
         $secret_key = get_option('yatra_integration_captcha_secret_key', '');
 

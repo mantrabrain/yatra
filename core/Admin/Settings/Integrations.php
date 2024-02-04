@@ -173,6 +173,20 @@ class Integrations extends \Yatra_Admin_Settings_Base
                 )
             ),
             array(
+                'title' => __('Enable CAPTCHA on enquiry form', 'yatra'),
+                'desc' => __('Enable CAPTCHA on enquiry form', 'yatra'),
+                'id' => 'yatra_integration_captcha_on_enquiry_form',
+                'type' => 'checkbox',
+                'default' => 'no',
+            ),
+            array(
+                'title' => __('Enable CAPTCHA on booking form', 'yatra'),
+                'desc' => __('Enable CAPTCHA on booking form', 'yatra'),
+                'id' => 'yatra_integration_captcha_on_booking_form',
+                'type' => 'checkbox',
+                'default' => 'no',
+            ),
+            array(
                 'title' => __('Site Key', 'yatra'),
                 'id' => 'yatra_integration_captcha_site_key',
                 'type' => 'text',
