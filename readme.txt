@@ -66,7 +66,7 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 * [Yatra Availability Conditions](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-availability-conditions)
 * [Yatra Partial Payment](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-partial-payment)
 * [Yatra Review and Rating](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-review-rating)
-* [Yatra Google Calendar](https://wpyatra.com/yatra-premium-extensions/yatra-google-calendar/)
+* [Yatra Google Calendar](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-google-calendar)
 
 
 [View all Yatra Premium Extensions/Addons](https://wpyatra.com/extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
