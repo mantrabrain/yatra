@@ -20,7 +20,7 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 It's really simple & easy to create trip, itinerary & trekking packages with the Yatra WordPress travel management plugin and supports different types of payment gateways so that it's easy to accept payments. You can even modify your pricing as per trip date from the availability calendar.
 
-↪️ [Yatra Main Site](https://wpyatra.com?ref=wordpress.org) ↪️ [Premium Extensions](https://wpyatra.com/yatra-premium-extensions/?ref=wporg) ↪️ [Feature Request](https://wpyatra.com/yatra-plugin-roadmap/?ref=wporg)
+↪️ [Yatra Main Site](https://wpyatra.com?ref=wordpress.org) ↪️ [Premium Extensions](https://wpyatra.com/extensions/?ref=wporg) ↪️ [Feature Request](https://wpyatra.com/roadmap/?ref=wporg)
 
 ⭐    [Create FREE live demo testing site to test Yatra WordPress plugin  ](https://demo.tastewp.com/yatra-wordpress-plugin) ⭐
 
@@ -69,7 +69,7 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 * [Yatra Google Calendar](https://wpyatra.com/yatra-premium-extensions/yatra-google-calendar/)
 
 
-[View all Yatra Premium Extensions/Addons](https://wpyatra.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
+[View all Yatra Premium Extensions/Addons](https://wpyatra.com/extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
 
 
 == Shortcodes ==
