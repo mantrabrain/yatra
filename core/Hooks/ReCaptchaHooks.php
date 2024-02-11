@@ -19,25 +19,32 @@ class ReCaptchaHooks
 
     public function enquiry_recaptcha()
     {
-        if(get_option('`'))
+        if (get_option('yatra_integration_captcha_on_enquiry_form', 'no') === 'yes') {
 
-        $this->recaptcha();
+            $this->recaptcha();
+        }
     }
 
     public function enquiry_validate_captcha($valid_data)
     {
+        if (get_option('yatra_integration_captcha_on_enquiry_form', 'no') === 'yes') {
 
-        $this->validate_captcha();
+            $this->validate_captcha();
+        }
     }
 
     public function booking_recaptcha()
     {
-        $this->recaptcha();
+        if (get_option('yatra_integration_captcha_on_booking_form', 'no') === 'yes') {
+            $this->recaptcha();
+        }
     }
 
     public function booking_validate_captcha()
     {
-        $this->validate_captcha();
+        if (get_option('yatra_integration_captcha_on_booking_form', 'no') === 'yes') {
+            $this->validate_captcha();
+        }
     }
 
     public function recaptcha()
@@ -48,6 +55,7 @@ class ReCaptchaHooks
         $site_key = get_option('yatra_integration_captcha_site_key', '');
 
         $recaptcha_inline = 'var YatraRecaptcha = function(){grecaptcha.execute("' . esc_html($site_key) . '",{action:"yatra"}).then(function(token){var f=document.getElementsByName("yatra_recaptcha");for(var i=0;i<f.length;i++){f[i].value = token;}});};grecaptcha.ready(YatraRecaptcha);setInterval(YatraRecaptcha, 110000);';
+
         $recaptcha_inline .= 'grecaptcha.ready(function(){grecaptcha.execute("' . esc_html($site_key) . '",{action:"yatra"}).then(function(token){var f=document.getElementsByName("yatra_recaptcha");for(var i=0;i<f.length;i++){f[i].value = token;}});});';
 
         wp_add_inline_script('yatra-recaptcha', $recaptcha_inline);

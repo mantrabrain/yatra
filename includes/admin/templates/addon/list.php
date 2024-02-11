@@ -41,7 +41,9 @@
                                     <?php echo esc_html($addon['excerpt']); ?>
                                 </p>
                             </div>
-                            <div class="actions yatra-clear">
+                            <div class="actions yatra-clear">+
+                                63
+                                3
                                 <div class="upgrade-button">
 
                                 </div>

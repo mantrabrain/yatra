@@ -188,12 +188,14 @@ class Integrations extends \Yatra_Admin_Settings_Base
             ),
             array(
                 'title' => __('Site Key', 'yatra'),
+                'desc' => sprintf(__('Make sure to use the correct site key for the CAPTCHA to avoid issues with form submission. Get %s reCAPTCHA Site Key%s', 'yatra'), "<a target='_blank' href='https://www.google.com/recaptcha/about/'>", '</a>'),
                 'id' => 'yatra_integration_captcha_site_key',
                 'type' => 'text',
                 'default' => '',
             ),
             array(
                 'title' => __('Secret Key', 'yatra'),
+                'desc' => sprintf(__('Make sure to use the correct secret key for the CAPTCHA to avoid issues with form submission. Get %s reCAPTCHA Site Key%s', 'yatra'), "<a target='_blank' href='https://www.google.com/recaptcha/about/'>", '</a>'),
                 'id' => 'yatra_integration_captcha_secret_key',
                 'type' => 'text',
                 'default' => '',
@@ -209,13 +211,13 @@ class Integrations extends \Yatra_Admin_Settings_Base
                     'step' => '0.1'
                 )
             ),
-            array(
-                'title' => __('CAPTCHA Language', 'yatra'),
-                'id' => 'yatra_integration_captcha_language',
-                'type' => 'select',
-                'default' => 'en',
-                'options' => $language
-            ),
+//            array(
+//                'title' => __('CAPTCHA Language', 'yatra'),
+//                'id' => 'yatra_integration_captcha_language',
+//                'type' => 'select',
+//                'default' => 'en',
+//                'options' => $language
+//            ),
             array(
                 'type' => 'sectionend',
                 'id' => 'yatra_checkout_captcha_options',
