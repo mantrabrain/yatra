@@ -104,8 +104,14 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
     public function define_sortable_columns($columns)
     {
         $custom = array(
-            'cb' => 'cb',
             'booking_date' => 'date',
+            'full_name' => 'full_name',
+            'booking_status' => 'booking_status',
+            'yatra_tour_name' => 'yatra_tour_name',
+            'phone_number' => 'phone_number',
+            'email_address' => 'email_address',
+            'booking_total' => 'booking_total',
+            'paid_amount' => 'paid_amount',
         );
         unset($columns['comments']);
 
@@ -128,6 +134,7 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
         $show_columns['booking_status'] = __('Status', 'yatra');
         $show_columns['email_address'] = __('Email', 'yatra');
         $show_columns['full_name'] = __('Full name', 'yatra');
+        $show_columns['phone_number'] = __('Phone', 'yatra');
         $show_columns['booking_total'] = __('Total', 'yatra');
         $show_columns['paid_amount'] = __('Paid Amount', 'yatra');
 
@@ -263,6 +270,17 @@ class Yatra_Admin_List_Table_Bookings extends Yatra_Admin_List_Table
         $email = isset($this->booking_customer_info['email']) ? $this->booking_customer_info['email'] : '';
 
         printf('<span>%s</span>', esc_html($email));
+
+    }
+    /**
+     * Render columm: phone.
+     */
+    protected function render_phone_number_column()
+    {
+
+        $phone_number = isset($this->booking_customer_info['phone_number']) ? $this->booking_customer_info['phone_number'] : '';
+
+        printf('<span>%s</span>', esc_html($phone_number));
 
     }
 
