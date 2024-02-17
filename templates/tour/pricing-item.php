@@ -43,10 +43,10 @@ $number_of_people = absint($yatra_booking_pricing->getMinimumPax()) === 0 ? 1 : 
             <?php
             if (strtolower($yatra_booking_pricing->getPricingPer()) == 'group') {
 
-                $pricing_per_string = yatra_get_price($currency_symbol, $sales_price) . ' Per ' . $yatra_booking_pricing->getGroupSize() . ' ' . $yatra_booking_pricing->getLabel();
+                $pricing_per_string = yatra_get_price($currency_symbol, $sales_price) . ' '.__('Per', 'yatra').' ' . $yatra_booking_pricing->getGroupSize() . ' ' . $yatra_booking_pricing->getLabel();
             } else {
 
-                $pricing_per_string = yatra_get_price($currency_symbol, $sales_price) . ' Per ' . $yatra_booking_pricing->getLabel();
+                $pricing_per_string = yatra_get_price($currency_symbol, $sales_price) . ' '.__('Per', 'yatra').' ' . $yatra_booking_pricing->getLabel();
             }
 
             if ($yatra_booking_pricing->getDescription() != '') {

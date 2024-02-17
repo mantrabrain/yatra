@@ -3,9 +3,12 @@
 namespace Yatra\Core;
 
 use Yatra\Core\API\TrackerAPI;
+use Yatra\Core\Compatibility\Astra;
 use Yatra\Core\Hooks\BookingHooks;
 use Yatra\Core\Hooks\EmailHooks;
+use Yatra\Core\Hooks\EnquiryHooks;
 use Yatra\Core\Hooks\NoticeHooks;
+use Yatra\Core\Hooks\ReCaptchaHooks;
 use Yatra\Core\Hooks\TourHooks;
 
 class Initialize
@@ -21,6 +24,7 @@ class Initialize
         $self->api_init();
         $self->cron_init();
         $self->hooks_init();
+        $self->compatibility_init();
     }
 
     public function api_init()
@@ -39,6 +43,12 @@ class Initialize
         NoticeHooks::init();
         EmailHooks::init();
         BookingHooks::init();
+        ReCaptchaHooks::init();
+    }
+
+    public function compatibility_init()
+    {
+        Astra::init();
     }
 }
 

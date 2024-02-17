@@ -1,7 +1,7 @@
-<div class="yatra-tour-price">
-    <?php
-    $tour_pricing = yatra_get_minimum_tour_pricing($yatra_tour_id);
-    ?>
+<?php
+$tour_pricing = yatra_get_minimum_tour_pricing($yatra_tour_id);
+?>
+<div class="yatra-tour-price <?php echo (floatval($tour_pricing['sales_price']) < 1) ? 'free-price' : ''; ?>">
     <p><span><?php echo __('From ', 'yatra') ?></span>
         <?php if (floatval($tour_pricing['sales_price']) < 1) { ?>
             <span class="sales-price free"><?php echo __("Free", 'yatra'); ?></span>

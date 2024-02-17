@@ -34,9 +34,9 @@
             <?php
             if (strtolower($pricing->getPricingPer()) == 'group') {
 
-                $pricing_per_string = yatra_get_price($currency, $sales_price) . ' Per ' . $pricing->getGroupSize() . ' ' . $pricing->getLabel();
+                $pricing_per_string = yatra_get_price($currency, $sales_price) . ' '.__('Per', 'yatra').' ' . $pricing->getGroupSize() . ' ' . $pricing->getLabel();
             } else {
-                $pricing_per_string = yatra_get_price($currency, $sales_price) . ' Per ' . $pricing->getLabel();
+                $pricing_per_string = yatra_get_price($currency, $sales_price) . ' '.__('Per', 'yatra').' ' . $pricing->getLabel();
             }
 
             ?>

@@ -2,6 +2,8 @@
 
 namespace Yatra\Core\Hooks;
 
+use Yatra\Core\Constant;
+
 class NoticeHooks
 {
     public static function init()
@@ -38,6 +40,8 @@ class NoticeHooks
         }
         $current_page = !empty($_GET['page']) ? sanitize_text_field($_GET['page']) : '';
 
+        $action = !empty($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
+
         $is_single_view = (bool)apply_filters('yatra_admin_is_single_view', !empty($_GET['view']));
 
         $page_title = '';
@@ -59,7 +63,10 @@ class NoticeHooks
                     } else if (!empty($_GET['post_type']) && !empty($_GET['taxonomy'])) {
                         $taxonomy = get_taxonomy(sanitize_text_field($_GET['taxonomy']));
                         $page_title = $taxonomy->labels->name;
-                    } else {
+                    } else if ($current_screen->id == Constant::TOUR_POST_TYPE && $action == "edit") {
+                        $post_type = get_post_type_object(Constant::TOUR_POST_TYPE);
+                        $page_title = $post_type->labels->name;
+                     } else {
                         $page_title = __('Yatra', 'yatra');
                     }
                 }

@@ -1,14 +1,14 @@
-# Copyright (C) 2023 MantraBrain
+# Copyright (C) 2024 MantraBrain
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.2\n"
+"Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.2.1\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2023-12-16 13:36:53+00:00\n"
+"POT-Creation-Date: 2024-02-17 05:11:07+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2023-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
 "Last-Translator: MantraBrain <mantrabrain@gmail.com>\n"
 "Language-Team: MantraBrain <mantrabrain@gmail.com>\n"
 "X-Generator: grunt-wp-i18n 1.0.3\n"
@@ -144,11 +144,65 @@ msgid ""
 "\t\t\t"
 msgstr ""
 
+#: core/Admin/Settings/Integrations.php:18
+msgid "Integrations"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:31
+msgid "CAPTCHA Integration"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:160
+msgid "CAPTCHA Settings"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:166
+msgid "CAPTCHA type"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:167
+msgid "Get detailed of %s reCAPTCHA %s"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:176
+#: core/Admin/Settings/Integrations.php:177
+msgid "Enable CAPTCHA on enquiry form"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:183
+#: core/Admin/Settings/Integrations.php:184
+msgid "Enable CAPTCHA on booking form"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:190
+msgid "Site Key"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:191
+msgid ""
+"Make sure to use the correct site key for the CAPTCHA to avoid issues with "
+"form submission. Get %s reCAPTCHA Site Key%s"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:197
+msgid "Secret Key"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:198
+msgid ""
+"Make sure to use the correct secret key for the CAPTCHA to avoid issues "
+"with form submission. Get %s reCAPTCHA Site Key%s"
+msgstr ""
+
+#: core/Admin/Settings/Integrations.php:204
+msgid "Threshold Score"
+msgstr ""
+
 #: core/Cron.php:34
 msgid "Once Weekly"
 msgstr ""
 
-#: core/Hooks/NoticeHooks.php:47 includes/admin/admin-bar.php:41
+#: core/Hooks/NoticeHooks.php:51 includes/admin/admin-bar.php:41
 #: includes/admin/class-yatra-admin.php:199
 #: includes/admin/class-yatra-admin.php:200
 #: includes/admin/class-yatra-admin.php:402
@@ -156,15 +210,19 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: core/Hooks/NoticeHooks.php:50
+#: core/Hooks/NoticeHooks.php:54
 msgid "Import & Export"
 msgstr ""
 
-#: core/Hooks/NoticeHooks.php:63 core/Hooks/NoticeHooks.php:104
+#: core/Hooks/NoticeHooks.php:70 core/Hooks/NoticeHooks.php:111
 #: includes/modules/blocks/class-yatra-blocks.php:18
 #: includes/modules/dashboard/class-yatra-module-dashboard.php:15
 #: templates/emails/footer.php:14
 msgid "Yatra"
+msgstr ""
+
+#: core/Hooks/ReCaptchaHooks.php:85
+msgid "Captcha, validation error! Please refresh the page and try again."
 msgstr ""
 
 #: core/Hooks/TourHooks.php:41
@@ -453,18 +511,18 @@ msgid ""
 "Please rate %1$s <a href=\"%2$s\" target=\"_blank\" rel=\"noopener "
 "noreferrer\">&#9733;&#9733;&#9733;&#9733;&#9733;</a> on <a href=\"%3$s\" "
 "target=\"_blank\" rel=\"noopener\">WordPress.org</a> to help us spread the "
-"word. Thank you from the Mantra Brain team!"
+"word. Thank you from the MantraBrain team!"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-settings.php:77
+#: includes/admin/class-yatra-admin-settings.php:78
 msgid "Your settings have been saved."
 msgstr ""
 
-#: includes/admin/class-yatra-admin-settings.php:645
+#: includes/admin/class-yatra-admin-settings.php:646
 msgid "Select a page&hellip;"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-settings.php:714
+#: includes/admin/class-yatra-admin-settings.php:715
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:15
 #: includes/template-tags.php:647
 msgid "Add New"
@@ -564,12 +622,12 @@ msgstr ""
 msgid "When you receive a new booking, it will appear here."
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:125
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
 #: templates/myaccount/tmpl-booking.php:7
 msgid "Booking Code"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:126
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:132
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:73
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:14
 #: templates/emails/booking/notification.php:9
@@ -580,7 +638,7 @@ msgstr ""
 msgid "Tour"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:127
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:133
 #: includes/hooks/yatra-list-table-hooks.php:25
 #: templates/emails/booking/notification.php:10
 #: templates/emails/enquiry/enquiry.php:17
@@ -591,7 +649,7 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:128
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:134
 #: includes/admin/templates/license/license.php:16
 #: includes/modules/status/class-yatra-module-status.php:18
 #: includes/modules/status/class-yatra-module-status.php:19
@@ -599,11 +657,11 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:129
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:135
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:75
 #: includes/class-yatra-checkout-form.php:53
 #: includes/class-yatra-create-account-form.php:40
-#: includes/class-yatra-enquiry-form.php:78
+#: includes/class-yatra-enquiry-form.php:79
 #: includes/class-yatra-user-form.php:41 includes/class-yatra-user-form.php:42
 #: templates/emails/booking/notification.php:15
 #: templates/emails/enquiry/enquiry.php:11
@@ -611,11 +669,16 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:130
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:136
 msgid "Full name"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:131
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:137
+#: templates/myaccount/tmpl-dashboard.php:52
+msgid "Phone"
+msgstr ""
+
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:138
 #: templates/myaccount/tmpl-booking.php:10
 #: templates/myaccount/tmpl-user-checkout.php:38
 #: templates/myaccount/tmpl-user-checkout.php:100
@@ -626,27 +689,27 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:132
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:139
 msgid "Paid Amount"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:149
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:156
 msgid "Change status to Pending"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:150
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:157
 msgid "Change status to Processing"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:151
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:158
 msgid "Change status to On-hold"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:152
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:159
 msgid "Change status to Completed"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:153
+#: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:160
 msgid "Change status to Cancelled"
 msgstr ""
 
@@ -683,13 +746,13 @@ msgid "ID"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:74
-#: includes/class-yatra-enquiry-form.php:62
+#: includes/class-yatra-enquiry-form.php:63
 msgid "Full Name"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:76
 #: includes/class-yatra-checkout-form.php:73
-#: includes/class-yatra-enquiry-form.php:97
+#: includes/class-yatra-enquiry-form.php:98
 #: includes/class-yatra-user-form.php:84 includes/class-yatra-user-form.php:85
 #: includes/class-yatra-user-form.php:92 includes/class-yatra-user-form.php:98
 #: includes/template-tags.php:702 includes/template-tags.php:706
@@ -701,7 +764,7 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:77
 #: includes/class-yatra-checkout-form.php:81
-#: includes/class-yatra-enquiry-form.php:103
+#: includes/class-yatra-enquiry-form.php:104
 #: includes/class-yatra-user-form.php:91
 #: templates/emails/booking/notification.php:16
 #: templates/emails/enquiry/enquiry.php:13
@@ -723,8 +786,8 @@ msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:81
 #: includes/admin/templates/license/license.php:17
-#: includes/class-yatra-enquiry-form.php:130
-#: includes/class-yatra-enquiry-form.php:134
+#: includes/class-yatra-enquiry-form.php:131
+#: includes/class-yatra-enquiry-form.php:135
 #: includes/modules/status/list-tables/class-yatra-admin-log-list-table.php:109
 msgid "Message"
 msgstr ""
@@ -1231,7 +1294,7 @@ msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-general.php:190
 #: includes/yatra-hooks.php:153 templates/tour/enquiry-button.php:3
-#: templates/tour/enquiry-form.php:18
+#: templates/tour/enquiry-form.php:21
 msgid "Send Enquiry"
 msgstr ""
 
@@ -1705,12 +1768,12 @@ msgid "Install & Activate"
 msgstr ""
 
 #: includes/admin/setup/class-yatra-setup-wizard.php:621
-#: includes/admin/templates/addon/list.php:60
+#: includes/admin/templates/addon/list.php:62
 msgid "Activated"
 msgstr ""
 
 #: includes/admin/setup/class-yatra-setup-wizard.php:623
-#: includes/admin/templates/addon/list.php:107
+#: includes/admin/templates/addon/list.php:109
 #: includes/admin/templates/availability/availability-calendar-date.php:25
 msgid "Activate"
 msgstr ""
@@ -1731,34 +1794,34 @@ msgstr ""
 msgid "Import Sample Data"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:58
+#: includes/admin/templates/addon/list.php:60
 msgid "Status:"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:62
+#: includes/admin/templates/addon/list.php:64
 msgid "Inactive"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:64
+#: includes/admin/templates/addon/list.php:66
 msgid "Not Installed"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:71
+#: includes/admin/templates/addon/list.php:73
 #. translators: %s: Add-on title
 msgid "Deactivate %s now"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:87
+#: includes/admin/templates/addon/list.php:89
 #: includes/admin/templates/license/license.php:40
 msgid "Deactivate"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:91
+#: includes/admin/templates/addon/list.php:93
 #. translators: %s: Add-on title
 msgid "Activate %s now"
 msgstr ""
 
-#: includes/admin/templates/addon/list.php:111
+#: includes/admin/templates/addon/list.php:113
 #. translators: %s: Add-on title
 msgid "Install %s now"
 msgstr ""
@@ -2072,8 +2135,21 @@ msgstr ""
 msgid "You do not have permission to perform this action."
 msgstr ""
 
-#: includes/class-yatra-ajax.php:72 includes/class-yatra-ajax.php:722
+#: includes/class-yatra-ajax.php:72 includes/class-yatra-ajax.php:251
+#: includes/class-yatra-ajax.php:722
 msgid "Something wrong, please try again."
+msgstr ""
+
+#: includes/class-yatra-ajax.php:174
+msgid "Please select proper date from above calendar"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:183
+msgid "Booking is disabled for this tour package by admin."
+msgstr ""
+
+#: includes/class-yatra-ajax.php:228 includes/class-yatra-ajax.php:340
+msgid "Something wrong, please try again"
 msgstr ""
 
 #: includes/class-yatra-ajax.php:274
@@ -2082,6 +2158,22 @@ msgstr ""
 
 #: includes/class-yatra-ajax.php:286
 msgid "Coupon Successfully applied"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:301
+msgid "Invalid Date"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:306
+msgid "Invalid Tour ID"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:348
+msgid "Invalid tour type"
+msgstr ""
+
+#: includes/class-yatra-ajax.php:353
+msgid "Invalid Tour ID on cart"
 msgstr ""
 
 #: includes/class-yatra-ajax.php:359
@@ -2155,39 +2247,39 @@ msgid "Confirm password  not matched with old password"
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:27
-#: includes/class-yatra-enquiry-form.php:53
+#: includes/class-yatra-enquiry-form.php:54
 msgid "Select Country"
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:36
 #: includes/class-yatra-checkout-form.php:40
-#: includes/class-yatra-enquiry-form.php:66
+#: includes/class-yatra-enquiry-form.php:67
 msgid "Your full name"
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:45
-#: includes/class-yatra-enquiry-form.php:71
+#: includes/class-yatra-enquiry-form.php:72
 msgid "Fullname field is required."
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:58
-#: includes/class-yatra-enquiry-form.php:82
+#: includes/class-yatra-enquiry-form.php:83
 msgid "Email address"
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:64
-#: includes/class-yatra-enquiry-form.php:88
+#: includes/class-yatra-enquiry-form.php:89
 #: includes/class-yatra-user-form.php:48
 msgid "Email field is required."
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:66
-#: includes/class-yatra-enquiry-form.php:90
+#: includes/class-yatra-enquiry-form.php:91
 msgid "Invalid email address."
 msgstr ""
 
 #: includes/class-yatra-checkout-form.php:86
-#: includes/class-yatra-enquiry-form.php:107
+#: includes/class-yatra-enquiry-form.php:108
 msgid "Your contact number"
 msgstr ""
 
@@ -2256,13 +2348,13 @@ msgstr ""
 msgid "Yatra Email could not sent to %s via WP_Mail function"
 msgstr ""
 
-#: includes/class-yatra-enquiry-form.php:112
-#: includes/class-yatra-enquiry-form.php:116
+#: includes/class-yatra-enquiry-form.php:113
+#: includes/class-yatra-enquiry-form.php:117
 msgid "Number of Adults"
 msgstr ""
 
-#: includes/class-yatra-enquiry-form.php:121
-#: includes/class-yatra-enquiry-form.php:125
+#: includes/class-yatra-enquiry-form.php:122
+#: includes/class-yatra-enquiry-form.php:126
 msgid "Number of Children"
 msgstr ""
 
@@ -2294,35 +2386,35 @@ msgstr ""
 msgid "Empty cart items"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:142
+#: includes/class-yatra-form-handler.php:148
 msgid "Can't Process the payment"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:189
+#: includes/class-yatra-form-handler.php:195
 msgid "Something went wrong! Booking could not complete. Please try again later"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:251
+#: includes/class-yatra-form-handler.php:257
 msgid "User profile successfully updated."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:288
+#: includes/class-yatra-form-handler.php:294
 msgid "Old Password doesn't match"
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:306
+#: includes/class-yatra-form-handler.php:312
 msgid "Password successfully changed."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:333
+#: includes/class-yatra-form-handler.php:339
 msgid "Username is required."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:396
+#: includes/class-yatra-form-handler.php:402
 msgid "Email or Usrename already exists, please try again.."
 msgstr ""
 
-#: includes/class-yatra-form-handler.php:437
+#: includes/class-yatra-form-handler.php:443
 msgid "Something wrong on registration, please check all form fields once."
 msgstr ""
 
@@ -2723,6 +2815,962 @@ msgstr ""
 #: includes/functions.php:1369
 #. translators: 1: class name 2: yatra_logging_class 3: Yatra_Interface_Logger
 msgid "The class %1$s provided by %2$s filter must implement %3$s."
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:12
+msgid "Afghanistan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:13
+msgid "Albania"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:14
+msgid "Algeria"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:15
+msgid "American Samoa"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:16
+msgid "Andorra"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:17
+msgid "Angola"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:18
+msgid "Anguilla"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:19
+msgid "Antarctica"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:20
+msgid "Antigua and Barbuda"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:21
+msgid "Argentina"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:22
+msgid "Armenia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:23
+msgid "Aruba"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:24
+msgid "Australia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:25
+msgid "Austria"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:26
+msgid "Azerbaijan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:27
+msgid "Bahamas"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:28
+msgid "Bahrain"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:29
+msgid "Bangladesh"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:30
+msgid "Barbados"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:31
+msgid "Belarus"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:32
+msgid "Belgium"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:33
+msgid "Belize"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:34
+msgid "Benin"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:35
+msgid "Bermuda"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:36
+msgid "Bhutan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:37
+msgid "Bolivia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:38
+msgid "Bosnia and Herzegovina"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:39
+msgid "Botswana"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:40
+msgid "Bouvet Island"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:41
+msgid "Brazil"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:42
+msgid "British Indian Ocean Territory"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:43
+msgid "Brunei Darussalam"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:44
+msgid "Bulgaria"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:45
+msgid "Burkina Faso"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:46
+msgid "Burundi"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:47
+msgid "Cambodia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:48
+msgid "Cameroon"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:49
+msgid "Canada"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:50
+msgid "Cape Verde"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:51
+msgid "Cayman Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:52
+msgid "Central African Republic"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:53
+msgid "Chad"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:54
+msgid "Chile"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:55
+msgid "China"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:56
+msgid "Christmas Island"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:57
+msgid "Cocos (Keeling) Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:58
+msgid "Colombia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:59
+msgid "Comoros"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:60
+msgid "Congo"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:61
+msgid "Congo, the Democratic Republic of the"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:62
+msgid "Cook Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:63
+msgid "Costa Rica"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:64
+msgid "Cote D'Ivoire"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:65
+msgid "Croatia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:66
+msgid "Cuba"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:67
+msgid "Cyprus"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:68
+msgid "Czech Republic"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:69
+msgid "Denmark"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:70
+msgid "Djibouti"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:71
+msgid "Dominica"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:72
+msgid "Dominican Republic"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:73
+msgid "Ecuador"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:74
+msgid "Egypt"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:75
+msgid "El Salvador"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:76
+msgid "Equatorial Guinea"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:77
+msgid "Eritrea"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:78
+msgid "Estonia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:79
+msgid "Ethiopia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:80
+msgid "Falkland Islands (Malvinas)"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:81
+msgid "Faroe Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:82
+msgid "Fiji"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:83
+msgid "Finland"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:84
+msgid "France"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:85
+msgid "French Guiana"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:86
+msgid "French Polynesia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:87
+msgid "French Southern Territories"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:88
+msgid "Gabon"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:89
+msgid "Gambia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:90
+msgid "Georgia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:91
+msgid "Germany"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:92
+msgid "Ghana"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:93
+msgid "Gibraltar"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:94
+msgid "Greece"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:95
+msgid "Greenland"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:96
+msgid "Grenada"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:97
+msgid "Guadeloupe"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:98
+msgid "Guam"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:99
+msgid "Guatemala"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:100
+msgid "Guinea"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:101
+msgid "Guinea-Bissau"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:102
+msgid "Guyana"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:103
+msgid "Haiti"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:104
+msgid "Heard Island and Mcdonald Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:105
+msgid "Holy See (Vatican City State)"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:106
+msgid "Honduras"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:107
+msgid "Hong Kong"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:108
+msgid "Hungary"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:109
+msgid "Iceland"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:110
+msgid "India"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:111
+msgid "Indonesia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:112
+msgid "Iran, Islamic Republic of"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:113
+msgid "Iraq"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:114
+msgid "Ireland"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:115
+msgid "Israel"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:116
+msgid "Italy"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:117
+msgid "Jamaica"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:118
+msgid "Japan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:119
+msgid "Jordan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:120
+msgid "Kazakhstan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:121
+msgid "Kenya"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:122
+msgid "Kiribati"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:123
+msgid "Korea, Democratic People's Republic of"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:124
+msgid "Korea, Republic of"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:125
+msgid "Kuwait"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:126
+msgid "Kyrgyzstan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:127
+msgid "Lao People's Democratic Republic"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:128
+msgid "Latvia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:129
+msgid "Lebanon"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:130
+msgid "Lesotho"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:131
+msgid "Liberia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:132
+msgid "Libyan Arab Jamahiriya"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:133
+msgid "Liechtenstein"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:134
+msgid "Lithuania"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:135
+msgid "Luxembourg"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:136
+msgid "Macao"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:137
+msgid "Macedonia, the Former Yugoslav Republic of"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:138
+msgid "Madagascar"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:139
+msgid "Malawi"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:140
+msgid "Malaysia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:141
+msgid "Maldives"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:142
+msgid "Mali"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:143
+msgid "Malta"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:144
+msgid "Marshall Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:145
+msgid "Martinique"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:146
+msgid "Mauritania"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:147
+msgid "Mauritius"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:148
+msgid "Mayotte"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:149
+msgid "Mexico"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:150
+msgid "Micronesia, Federated States of"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:151
+msgid "Moldova, Republic of"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:152
+msgid "Monaco"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:153
+msgid "Mongolia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:154
+msgid "Montserrat"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:155
+msgid "Morocco"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:156
+msgid "Mozambique"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:157
+msgid "Myanmar"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:158
+msgid "Namibia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:159
+msgid "Nauru"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:160
+msgid "Nepal"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:161
+msgid "Netherlands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:162
+msgid "Netherlands Antilles"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:163
+msgid "New Caledonia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:164
+msgid "New Zealand"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:165
+msgid "Nicaragua"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:166
+msgid "Niger"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:167
+msgid "Nigeria"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:168
+msgid "Niue"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:169
+msgid "Norfolk Island"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:170
+msgid "Northern Mariana Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:171
+msgid "Norway"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:172
+msgid "Oman"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:173
+msgid "Pakistan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:174
+msgid "Palau"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:175
+msgid "Palestinian Territory, Occupied"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:176
+msgid "Panama"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:177
+msgid "Papua New Guinea"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:178
+msgid "Paraguay"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:179
+msgid "Peru"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:180
+msgid "Philippines"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:181
+msgid "Pitcairn"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:182
+msgid "Poland"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:183
+msgid "Portugal"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:184
+msgid "Puerto Rico"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:185
+msgid "Qatar"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:186
+msgid "Reunion"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:187
+msgid "Romania"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:188
+msgid "Russian Federation"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:189
+msgid "Rwanda"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:190
+msgid "Saint Helena"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:191
+msgid "Saint Kitts and Nevis"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:192
+msgid "Saint Lucia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:193
+msgid "Saint Pierre and Miquelon"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:194
+msgid "Saint Vincent and the Grenadines"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:195
+msgid "Samoa"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:196
+msgid "San Marino"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:197
+msgid "Sao Tome and Principe"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:198
+msgid "Saudi Arabia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:199
+msgid "Senegal"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:200
+msgid "Serbia and Montenegro"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:201
+msgid "Seychelles"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:202
+msgid "Sierra Leone"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:203
+msgid "Singapore"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:204
+msgid "Slovakia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:205
+msgid "Slovenia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:206
+msgid "Solomon Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:207
+msgid "Somalia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:208
+msgid "South Africa"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:209
+msgid "South Georgia and the South Sandwich Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:210
+msgid "Spain"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:211
+msgid "Sri Lanka"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:212
+msgid "Sudan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:213
+msgid "Suriname"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:214
+msgid "Svalbard and Jan Mayen"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:215
+msgid "Swaziland"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:216
+msgid "Sweden"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:217
+msgid "Switzerland"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:218
+msgid "Syrian Arab Republic"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:219
+msgid "Taiwan, Province of China"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:220
+msgid "Tajikistan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:221
+msgid "Tanzania, United Republic of"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:222
+msgid "Thailand"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:223
+msgid "Timor-Leste"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:224
+msgid "Togo"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:225
+msgid "Tokelau"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:226
+msgid "Tonga"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:227
+msgid "Trinidad and Tobago"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:228
+msgid "Tunisia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:229
+msgid "Turkey"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:230
+msgid "Turkmenistan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:231
+msgid "Turks and Caicos Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:232
+msgid "Tuvalu"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:233
+msgid "Uganda"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:234
+msgid "Ukraine"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:235
+msgid "United Arab Emirates"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:236
+msgid "United Kingdom"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:237
+msgid "United States"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:238
+msgid "United States Minor Outlying Islands"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:239
+msgid "Uruguay"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:240
+msgid "Uzbekistan"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:241
+msgid "Vanuatu"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:242
+msgid "Venezuela"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:243
+msgid "Viet Nam"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:244
+msgid "Virgin Islands, British"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:245
+msgid "Virgin Islands, U.s."
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:246
+msgid "Wallis and Futuna"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:247
+msgid "Western Sahara"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:248
+msgid "Yemen"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:249
+msgid "Zambia"
+msgstr ""
+
+#: includes/helpers/yatra-country-helper.php:250
+msgid "Zimbabwe"
 msgstr ""
 
 #: includes/helpers/yatra-currency-helper.php:10
@@ -5232,10 +6280,6 @@ msgstr[1] ""
 msgid "Date of Birth"
 msgstr ""
 
-#: templates/myaccount/tmpl-dashboard.php:52
-msgid "Phone"
-msgstr ""
-
 #: templates/myaccount/tmpl-form-edit-account.php:6
 msgid "Edit Account Details"
 msgstr ""
@@ -5374,6 +6418,11 @@ msgstr ""
 
 #: templates/parts/price.php:7 templates/tour/sidebar.php:22
 msgid "Free"
+msgstr ""
+
+#: templates/tmpl-cart-item.php:37 templates/tmpl-cart-item.php:39
+#: templates/tour/pricing-item.php:46 templates/tour/pricing-item.php:49
+msgid "Per"
 msgstr ""
 
 #: templates/tmpl-cart-table.php:18 templates/tmpl-cart-table.php:68

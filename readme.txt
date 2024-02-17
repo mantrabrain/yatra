@@ -4,7 +4,7 @@ Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 5.6
 Tested up to: 6.4
 Requires PHP: 7.0
-Stable tag: 2.2
+Stable tag: 2.2.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -20,7 +20,7 @@ Yatra is a free travel & tour booking WordPress plugin to create travel and tour
 
 It's really simple & easy to create trip, itinerary & trekking packages with the Yatra WordPress travel management plugin and supports different types of payment gateways so that it's easy to accept payments. You can even modify your pricing as per trip date from the availability calendar.
 
-↪️ [Yatra Main Site](https://wpyatra.com?ref=wordpress.org) ↪️ [Premium Extensions](https://wpyatra.com/yatra-premium-extensions/?ref=wporg) ↪️ [Feature Request](https://wpyatra.com/yatra-plugin-roadmap/?ref=wporg)
+↪️ [Yatra Main Site](https://wpyatra.com?ref=wordpress.org) ↪️ [Premium Extensions](https://wpyatra.com/extensions/?ref=wporg) ↪️ [Feature Request](https://wpyatra.com/roadmap/?ref=wporg)
 
 ⭐    [Create FREE live demo testing site to test Yatra WordPress plugin  ](https://demo.tastewp.com/yatra-wordpress-plugin) ⭐
 
@@ -47,9 +47,11 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 * Tax Option
 * Import/Export
 * Unlimited itineraries
+* Easy itinerary builder
 * Booking & Enquiry notification email
 * Advanced search & filter
 * Mini cart
+* Google reCaptcha
 
 
 == Premium Payment Gateway Extensions/Addons ==
@@ -66,10 +68,10 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 * [Yatra Availability Conditions](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-availability-conditions)
 * [Yatra Partial Payment](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-partial-payment)
 * [Yatra Review and Rating](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-review-rating)
-* [Yatra Google Calendar](https://wpyatra.com/yatra-premium-extensions/yatra-google-calendar/)
+* [Yatra Google Calendar](https://wpyatra.com/pricing/?ref=wordpress.org&addon=yatra-google-calendar)
 
 
-[View all Yatra Premium Extensions/Addons](https://wpyatra.com/yatra-premium-extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
+[View all Yatra Premium Extensions/Addons](https://wpyatra.com/extensions/?utm_source=addons&utm_medium=viewall&utm_campaign=wporg)
 
 
 == Shortcodes ==
@@ -195,7 +197,7 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.2 | 2023-11-17
-* Added - [yatra_login] Shortcode for login page
-* Fixed - Date translation issue fixed
-* Fixed - 6.4 Compatibility issue fixed
+= 2.2.1 | 2024-02-17
+* Added - Google reCaptcha
+* Added - Yatra Pro addon
+* Fixed - Small typo and minor issue fixed

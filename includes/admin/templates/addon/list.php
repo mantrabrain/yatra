@@ -1,7 +1,7 @@
 <div id="yatra-admin-addons" class="wrap yatra-admin-wrap yatra-admin-addons-wrap">
     <h1 class="page-title">
         <span>Yatra Premium Addon/Extensions</span>
-        <a href="https://wpyatra.com/yatra-premium-extensions/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=view-all-addons"
+        <a href="https://wpyatra.com/extensions/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=view-all-addons"
            target="_blank" rel="noopener noreferrer"
            class="button button-primary yatra-btn-orange">View All Premium Extensions</a>
     </h1>
@@ -31,7 +31,7 @@
                                 <img src="<?php echo esc_attr($image_path) ?>"
                                      alt="<?php echo esc_attr($addon['title']) ?> logo">
                                 <h5 class="addon-name">
-                                    <a href="https://wpyatra.com/yatra-premium-extensions/<?php echo esc_attr($addon['slug']) ?>/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=addons&utm_content=<?php echo esc_attr($addon['title']) ?>"
+                                    <a href="https://wpyatra.com/extensions/<?php echo esc_attr(str_replace('yatra-','',$addon['slug'])) ?>/?utm_source=WordPress&utm_campaign=Yatra Free Plugin&utm_medium=addons&utm_content=<?php echo esc_attr($addon['title']) ?>"
                                        title="Learn more about <?php echo esc_attr($addon['name']); ?>" target="_blank"
                                        rel="noopener noreferrer"
                                        class="addon-link"><?php
@@ -41,7 +41,9 @@
                                     <?php echo esc_html($addon['excerpt']); ?>
                                 </p>
                             </div>
-                            <div class="actions yatra-clear">
+                            <div class="actions yatra-clear">+
+                                63
+                                3
                                 <div class="upgrade-button">
 
                                 </div>

@@ -171,7 +171,7 @@ class Yatra_Ajax
 
         if ($start_date == '') {
 
-            wp_send_json_error('Please select proper date from above calendar');
+            wp_send_json_error(__('Please select proper date from above calendar', 'yatra'));
         }
 
         $tour_id = isset($_POST['tour_id']) ? absint($_POST['tour_id']) : 0;
@@ -180,7 +180,7 @@ class Yatra_Ajax
 
         if (!$tour->get_can_book()) {
 
-            wp_send_json_error('Booking is disabled for this tour package by admin.');
+            wp_send_json_error(__('Booking is disabled for this tour package by admin.', 'yatra'));
         }
 
         $number_of_persons = isset($_POST['yatra_number_of_person']) ? ($_POST['yatra_number_of_person']) : array();
@@ -225,7 +225,7 @@ class Yatra_Ajax
                 wp_send_json_error(yatra()->yatra_error->get_error_messages());
 
             } else {
-                wp_send_json_error("Something wrong, please try again");
+                wp_send_json_error(__("Something wrong, please try again", "yatra"));
             }
         }
 
@@ -248,7 +248,7 @@ class Yatra_Ajax
             wp_send_json_success($return_data);
         }
 
-        wp_send_json_error('Something wrong, please try again.');
+        wp_send_json_error(__("Something wrong, please try again.", "yatra"));
 
     }
 
@@ -298,12 +298,12 @@ class Yatra_Ajax
 
                 if ($start_date === '') {
 
-                    wp_send_json_error('Invalid Date');
+                    wp_send_json_error(__('Invalid Date', 'yatra'));
 
                 }
 
                 if ($tour_id < 1) {
-                    wp_send_json_error('Invalid Tour ID');
+                    wp_send_json_error(__('Invalid Tour ID', 'yatra'));
 
                 }
 
@@ -337,7 +337,7 @@ class Yatra_Ajax
                         wp_send_json_error(yatra()->yatra_error->get_error_messages());
 
                     } else {
-                        wp_send_json_error("Something wrong, please try again");
+                        wp_send_json_error(__("Something wrong, please try again", "yatra"));
                     }
                 }
 
@@ -345,12 +345,12 @@ class Yatra_Ajax
 
                 if (!isset($tour->post_type) || $tour->post_type != 'tour') {
 
-                    wp_send_json_error("Invalid tour type");
+                    wp_send_json_error(__("Invalid tour type", "yatra"));
                 }
 
                 if (!yatra()->cart->is_valid_tour_id_on_cart($tour_id)) {
 
-                    wp_send_json_error("Invalid Tour ID on cart");
+                    wp_send_json_error(__("Invalid Tour ID on cart", "yatra"));
                 }
 
                 $status = yatra()->cart->update_cart($tour_id, $number_of_person, $type, $start_date);
