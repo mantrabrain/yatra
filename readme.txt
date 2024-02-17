@@ -4,7 +4,7 @@ Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 5.6
 Tested up to: 6.4
 Requires PHP: 7.0
-Stable tag: 2.2
+Stable tag: 2.2.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -47,9 +47,11 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 * Tax Option
 * Import/Export
 * Unlimited itineraries
+* Easy itinerary builder
 * Booking & Enquiry notification email
 * Advanced search & filter
 * Mini cart
+* Google reCaptcha
 
 
 == Premium Payment Gateway Extensions/Addons ==
@@ -195,7 +197,7 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.2 | 2023-11-17
-* Added - [yatra_login] Shortcode for login page
-* Fixed - Date translation issue fixed
-* Fixed - 6.4 Compatibility issue fixed
+= 2.2.1 | 2024-02-17
+* Added - Google reCaptcha
+* Added - Yatra Pro addon
+* Fixed - Small typo and minor issue fixed
