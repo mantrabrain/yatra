@@ -55,6 +55,22 @@ if (!class_exists('Yatra_Assets')) {
 
             wp_register_script('yatra-filter', YATRA_PLUGIN_URI . '/assets/js/yatra-filter.js', array('jquery', 'jquery-ui-slider', 'jquery.ui.touch-punch'), YATRA_VERSION);
 
+            $site_key = get_option('yatra_integration_captcha_site_key', '');
+
+            if ($site_key !== '') {
+
+                $recaptcha_api = apply_filters('yatra_frontend_recaptcha_url', 'https://www.google.com/recaptcha/api.js?render=' . $site_key);
+
+                wp_register_script(
+                    'yatra-recaptcha',
+                    $recaptcha_api,
+                    array(),
+                    '3.0.0'
+                );
+            }
+
+            wp_register_script('yatra-filter', YATRA_PLUGIN_URI . '/assets/js/yatra-filter.js', array('jquery', 'jquery-ui-slider', 'jquery.ui.touch-punch'), YATRA_VERSION);
+
 
             $main_css_dependency = array('yatra-font-awesome', 'lightbox', 'yatra-jquery-ui', 'yatra-mini-cart');
 

@@ -121,7 +121,7 @@ class Yatra_Form_Handler
 
             return;
         }
-        
+
         if ($user_booking_id < 1) {
 
             $cart_items = yatra()->cart->get_items();
@@ -133,6 +133,12 @@ class Yatra_Form_Handler
                 return;
             }
 
+        }
+
+        do_action('yatra_before_booking_process');
+
+        if (yatra()->yatra_error->has_errors()) {
+            return;
         }
 
         $process_ahead = apply_filters('yatra_process_payment_gateway_' . $payment_gateway_id, true);
@@ -165,7 +171,7 @@ class Yatra_Form_Handler
 
                 $payment_id = $yatra_payment->create($booking_id, $payment_gateway_id);
 
-               yatra_clear_session('yatra_tour_cart');
+                yatra_clear_session('yatra_tour_cart');
 
                 do_action('yatra_payment_checkout_payment_gateway_' . $payment_gateway_id, $booking_id, $payment_id);
 

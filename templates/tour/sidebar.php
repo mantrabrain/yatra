@@ -16,12 +16,12 @@ $enquiry_hide_class = $show_hide_enquiry_form === "no" ? 'yatra-hide' : '';
                     </h2>
                 </div>
             <?php } ?>
-            <div class="tour-info-pricing-content">
+            <div class="tour-info-pricing-content <?php echo (floatval($min_sales) < 1) ? 'free-price' : ''; ?>">
                 <p><span class="yatra-icon fa fa-tag"></span><?php echo __(' from ', 'yatra') ?>
-                    <?php if (absint($min_sales) < 1) { ?>
+                    <?php if (floatval($min_sales) < 1) { ?>
                         <span class="sales-price free"><?php echo __("Free", 'yatra'); ?></span>
                     <?php } else { ?>
-                        <?php if (absint($min_regular) != absint($min_sales)) { ?>
+                        <?php if (floatval($min_regular) != floatval($min_sales)) { ?>
                             <del class="regular-price"><?php echo yatra_get_price($currency, $min_regular) ?></del>
                         <?php } ?>
                         <span class="sales-price"><?php echo yatra_get_price($currency, $min_sales) ?></span>

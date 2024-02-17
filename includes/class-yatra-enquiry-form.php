@@ -31,10 +31,11 @@ class Yatra_Enquiry_Form extends Yatra_Form
 
         $valid_data['ip_address'] = sanitize_text_field(yatra_get_visitor_ip_address());
 
+        do_action('yatra_enquiry_response_before_saved', $valid_data);
+
         if (yatra()->yatra_error->has_errors()) {
             return false;
         }
-        do_action('yatra_enquiry_response_before_saved', $valid_data);
 
         $status = Yatra_Core_DB::save_data(Yatra_Tables::TOUR_ENQUIRIES, $valid_data);
 

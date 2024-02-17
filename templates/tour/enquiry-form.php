@@ -5,10 +5,13 @@
     <fieldset>
         <div class="yatra-tour-enquiry-form-wrap">
 
-            <?php do_action('yatra_enquiry_form_fields');
+            <?php
+            do_action('yatra_enquiry_form_fields');
 
             yatra_privacy_agreement('yatra_enquiry_form_show_agree_to_privacy_policy');
             yatra_terms_agreement('yatra_enquiry_form_show_agree_to_terms_policy');
+
+            do_action('yatra_after_enquiry_form_fields');
             ?>
 
         </div>
