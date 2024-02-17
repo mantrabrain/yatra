@@ -11,7 +11,7 @@ class Yatra_Blocks
 
     public function register_category($categories, $context)
     {
-        array_push(
+        array_unshift(
             $categories,
             array(
                 'slug' => 'yatra',
