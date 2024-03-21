@@ -41,12 +41,8 @@
                                     <?php echo esc_html($addon['excerpt']); ?>
                                 </p>
                             </div>
-                            <div class="actions yatra-clear">+
-                                63
-                                3
-                                <div class="upgrade-button">
+                            <div class="actions yatra-clear">
 
-                                </div>
                                 <?php
 
                                 $plugin_file_slug = $addon['plugin_file'] ?? $addon['slug'];
@@ -57,7 +53,7 @@
                                 ?>
 
                                 <div class="status column-status">
-                                    <strong><?php esc_html_e('Status:', 'yatra'); ?></strong>
+                                    <strong><?php esc_html_e('Status: ', 'yatra'); ?></strong>
                                     <?php if (is_plugin_active($plugin_file_slug . '/' . $plugin_file_slug . '.php')) : ?>
                                         <span class="status-label status-active"><?php esc_html_e('Activated', 'yatra'); ?></span>
                                     <?php elseif (file_exists(WP_PLUGIN_DIR . '/' . $plugin_file_slug . '/' . $plugin_file_slug . '.php')) : ?>

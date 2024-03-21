@@ -1157,6 +1157,8 @@ if (!function_exists('yatra_parse_args')) {
 
     function yatra_parse_args($args, $defaults = array(), $limited_to_defaults = false)
     {
+        $defaults = is_array($defaults) ? $defaults: array();
+
         $parsed = wp_parse_args($args, $defaults);
 
         if (!$limited_to_defaults) {

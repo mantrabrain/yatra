@@ -67,7 +67,7 @@ class Yatra_List_Table_Hooks
 
             $term = get_term($term_id, 'attributes');
 
-            $term_content = $term->name;
+            $term_content = $term->name ?? '';
 
             if (isset($content['content'])) {
                 $term_content .= " : <strong>" . esc_html($content['content']) . '</strong>';

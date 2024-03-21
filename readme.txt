@@ -2,9 +2,9 @@
 Contributors: MantraBrain, gangadharkashyap
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 5.6
-Tested up to: 6.4
+Tested up to: 6.5
 Requires PHP: 7.0
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -157,6 +157,20 @@ You have to start and end tour_list_loop by using **{{tour_lists_loop_start}}** 
 - Join our [Facebook Community Group](https://www.facebook.com/groups/yatrawordpressplugin)
 - Rate us on [WordPress](https://wordpress.org/support/plugin/yatra/reviews/?rate=5#new-post)
 
+== Installation ==
+### How to install the plugin ###
+1. Open WordPress admin, go to Plugins, and click Add New
+2. Enter "Yatra" in search and hit Enter
+3. Plugin will show up as the first on the list, click "Install Now"
+4. Activate & open the plugin's page from the admin menu
+
+Or if needed, upload manually;
+
+1. Download the latest stable version from <a href="https://downloads.wordpress.org/plugin/yatra.zip">downloads.wordpress.org/plugin/yatra.zip</a>
+2. Unzip it and upload it to _/wp-content/plugins/_
+3. Open WordPress Dashboard > Plugins and click "Activate" next to "Yatra"
+4. Open the plugin's page from the admin menu
+
 == Frequently Asked Questions ==
 
 = Does the plugin work with any WordPress themes?
@@ -197,7 +211,8 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.2.1 | 2024-02-17
-* Added - Google reCaptcha
-* Added - Yatra Pro addon
-* Fixed - Small typo and minor issue fixed
+= 2.2.2 | 2024-03-21
+* Fixed - Minor undefined issues
+
+[See changelog for all versions](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
+
