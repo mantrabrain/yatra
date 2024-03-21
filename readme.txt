@@ -2,9 +2,9 @@
 Contributors: MantraBrain, gangadharkashyap
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 5.6
-Tested up to: 6.4
+Tested up to: 6.5
 Requires PHP: 7.0
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -211,10 +211,8 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.2.1 | 2024-02-17
-* Added - Google reCaptcha
-* Added - Yatra Pro addon
-* Fixed - Small typo and minor issue fixed
+= 2.2.2 | 2024-03-21
+* Fixed - Minor undefined issues
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
 
