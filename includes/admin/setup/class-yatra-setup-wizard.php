@@ -148,7 +148,11 @@ class Yatra_Setup_Wizard
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
             <title><?php _e('Yatra &rsaquo; Setup Wizard', 'yatra'); ?></title>
             <?php wp_print_scripts('yatra-setup'); ?>
-            <?php do_action('admin_print_styles'); ?>
+            <?php
+            if(function_exists('print_emoji_styles')) {
+                remove_action('admin_print_styles', 'print_emoji_styles');
+            }
+            do_action('admin_print_styles'); ?>
             <?php //do_action('admin_head');
             ?>
         </head>
