@@ -91,7 +91,7 @@ class Yatra_Module_Dashboard
             return;
         }
 
-        wp_register_style('yatra-admin-dashboard', YATRA_PLUGIN_URI . '/includes/modules/dashboard/assets/css/yatra-admin-dashboard.css', array(), YATRA_VERSION);
+        wp_register_style('yatra-admin-dashboard', YATRA_PLUGIN_URI . '/includes/modules/dashboard/assets/css/dashboard.css', array(), YATRA_VERSION);
 
         wp_enqueue_style('yatra-admin-dashboard');
     }
