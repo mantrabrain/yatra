@@ -101,7 +101,6 @@ class Yatra_Admin_List_Table_Customers extends Yatra_Admin_List_Table
     public function define_sortable_columns($columns)
     {
         $custom = array(
-            'cb' => 'cb',
             'email' => 'email',
             'date_created' => 'date_created',
         );
