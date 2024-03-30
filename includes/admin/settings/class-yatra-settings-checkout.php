@@ -99,6 +99,13 @@ class Yatra_Settings_Checkout extends Yatra_Admin_Settings_Base
                 'default' => 'yes',
             ),
             array(
+                'title' => __('Collect traveller information', 'yatra'),
+                'desc' => __('This option allows you to enable/disable additional traveller form in checkout.', 'yatra'),
+                'id' => 'yatra_enable_traveller_form',
+                'type' => 'checkbox',
+                'default' => 'no',
+            ),
+            array(
                 'title' => __('Show Terms on checkout', 'yatra'),
                 'desc' => sprintf(__('Show terms and condition agree checkbox on checkout page. You can setup terms and conditions page from %s here %s', 'yatra'), "<a target='_blank' href='{$terms_setup_link}'>", '</a>'),
                 'id' => 'yatra_checkout_show_agree_to_terms_policy',

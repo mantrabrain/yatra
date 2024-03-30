@@ -23,7 +23,7 @@ class Yatra_Customers
     public function update($yatra_tour_customer_info, $yatra_booking_meta_params)
     {
 
-        $email = isset($yatra_tour_customer_info['email']) ? $yatra_tour_customer_info['email'] : '';
+        $email = $yatra_tour_customer_info['email'] ?? '';
 
         if (empty($email)) {
 
@@ -31,16 +31,16 @@ class Yatra_Customers
         }
 
         $args = array(
-            'post_title'         => $email,
-            'post_type'        => 'yatra-customers'
+            'post_title' => $email,
+            'post_type' => 'yatra-customers'
         );
-        $customer_object_array = get_posts( $args );
+        $customer_object_array = get_posts($args);
 
         $customer_object = $customer_object_array[0] ?? new stdClass();
 
-        $customer_id = isset($customer_object->ID) ? $customer_object->ID : 0;
+        $customer_id = $customer_object->ID ?? 0;
 
-        if (empty($customer_object) && $customer_id < 1) {
+        if ($customer_id < 1) {
 
             $customer_arguments = array(
 
@@ -51,6 +51,7 @@ class Yatra_Customers
 
 
             );
+            
             $customer_id = wp_insert_post($customer_arguments);
 
         }
