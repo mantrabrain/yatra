@@ -1028,11 +1028,11 @@ if (!function_exists('yatra_frontend_tabs_available_options')) {
 
     function yatra_frontend_tabs_available_options($post_id = null)
     {
-        $all_valid_available_tabs = get_option('yatra_frontend_tabs_available_options', false);
+        $all_valid_available_tabs = get_option('yatra_frontend_tabs_available_options', array());
 
         $tour_tab_configs = yatra_tour_tab_default_configurations();
 
-        $all_valid_available_tabs_keys = !$all_valid_available_tabs ? array() : array_keys($all_valid_available_tabs);
+        $all_valid_available_tabs_keys = !(is_array($all_valid_available_tabs)) ? array() : array_keys($all_valid_available_tabs);
 
         $yatra_tour_tabs_additional_types = yatra_tour_tabs_additional_types();
 
