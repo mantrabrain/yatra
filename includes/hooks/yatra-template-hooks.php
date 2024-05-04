@@ -68,7 +68,7 @@ class Yatra_Template_Hooks
             return;
         }
 
-        $selected_date = is_null($selected_date) ? time() : $selected_date;
+        $selected_date = is_null($selected_date) ? date("Y-m-d") : $selected_date;
 
         $total_price = 0;
 
