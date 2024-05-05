@@ -17,7 +17,22 @@ class Yatra_User_Form extends Yatra_Form
 
     public function default_field_keys()
     {
-        return array_keys($this->default_fields());
+        $default_fields = $this->default_fields();
+
+        $default_keys = [];
+
+
+        foreach($default_fields as $field){
+
+            $name = isset($field['name']) ? $field['name']: '';
+
+            if($name!==''){
+
+                $default_keys[]=$name;
+            }
+
+        }
+        return $default_keys;
     }
 
     public function system_fields()

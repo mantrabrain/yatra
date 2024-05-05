@@ -13,7 +13,7 @@ assets/lib/fullcalendar/examples/
 # Grunt
 /node_modules/
 /assets/admin/src/node_modules/
-
+package-lock.json
 # Sass
 .sass-cache/
 

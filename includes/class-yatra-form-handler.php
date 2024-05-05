@@ -242,6 +242,7 @@ class Yatra_Form_Handler
 
             return;
         }
+    
         foreach ($valid_form_data as $valid_key => $valid_value) {
 
             if (!in_array($valid_key, $user_custom_meta_keys)) {
