@@ -12,7 +12,8 @@
                 'height' => array(),
                 'frameborder' => array(),
                 'allowfullscreen' => array()
-            )
+            ),
+            'img' => array('src' => array(), 'height' => array(), 'width' => array())
         ))); ?>
     </div><!-- .yatra-tab-section-inner -->
 </div>
