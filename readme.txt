@@ -4,7 +4,7 @@ Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 5.6
 Tested up to: 6.5
 Requires PHP: 7.0
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -211,8 +211,10 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.2.4 | 2024-05-04
-* Fixed - Date issue fixed
+= 2.2.5 | 2024-06-02
+* Fixed - Image link issue on tour shortcode and block
+* Fixed - Profile not updating issue
+* Fixed - Add image inside map tab
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
 
