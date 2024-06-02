@@ -5,10 +5,12 @@
             echo '<span class="yatra-featured-tour"><i class="yatra-icon fa fa-bullhorn"></i><small class="text">' . __('Featured', 'yatra') . '</small></span>';
         } ?>
         <div class="yatra-figure-wrap">
-            <figure><?php if (!empty($data['image'])) { ?>
-                    <img src="<?php echo esc_attr($data['image']) ?>"/>
-                <?php } ?>
-            </figure>
+            <a href="<?php echo esc_url($data['permalink']) ?>">
+                <figure><?php if (!empty($data['image'])) { ?>
+                        <img src="<?php echo esc_attr($data['image']) ?>"/>
+                    <?php } ?>
+                </figure>
+            </a>
             <?php yatra_get_price_html($data['id']); ?>
         </div>
         <?php yatra_entry_meta_options($data['id']); ?>
