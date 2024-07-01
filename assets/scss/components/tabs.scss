@@ -171,9 +171,12 @@
         .tab-title {
           padding: 5px 5px 10px 5px;
 
-          .yatra-icon {
+          .yatra-expand-collapse {
             float: right;
             cursor: pointer;
+            font-size: 16px;
+            font-weight: 400;
+            text-decoration: underline;
           }
         }
 

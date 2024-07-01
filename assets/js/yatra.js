@@ -153,7 +153,7 @@ window.yatra_global_tour_additional_price = 0;
                         }
                         var toggle_node = $(this).find('.yatra-icon').length !== 0 ? $(this).find('.yatra-icon') : $(this).find('svg');
 
-                        if (toggle_node.hasClass('fa-minus')) {
+                        if (toggle_node.hasClass('fa-angle-up')) {
 
                             $this.toggleYatraList(toggle_node, 'close');
                         } else {
@@ -162,20 +162,19 @@ window.yatra_global_tour_additional_price = 0;
                     });
                 $('body').on('click', '.yatra-tab-content .tab-title, .yatra-tab-content .tab-title', function () {
 
-                    if ($(this).find('.yatra-icon').length === 0 && $(this).find('svg').length === 0) {
+                    if ($(this).find('.yatra-expand-collapse').length === 0 && $(this).find('svg').length === 0) {
                         return;
                     }
-                    var toggle_node = $(this).find('.yatra-icon').length !== 0 ? $(this).find('.yatra-icon') : $(this).find('svg');
-                    var span = $('<span class=""/>');
-                    var heading = toggle_node.closest('h3');
-                    toggle_node.hide();
+                    var toggle_node = $(this).find('.yatra-expand-collapse').length !== 0 ? $(this).find('.yatra-expand-collapse') : $(this).find('svg');
+                    var expand_text = toggle_node.data('expand-text');
+                    var collapse_text = toggle_node.data('collapse-text');
                     var toggle_status = 'close';
-                    if (toggle_node.hasClass('fa-minus')) {
+                    if (toggle_node.hasClass('expanded')) {
                         toggle_status = 'close';
-                        span.addClass('yatra-icon fa fa-plus');
+                        toggle_node.removeClass('expanded').addClass('collapsed').text(expand_text);
                     } else {
                         toggle_status = 'open';
-                        span.addClass('yatra-icon fa fa-minus');
+                        toggle_node.removeClass('collapsed').addClass('expanded').text(collapse_text);
                     }
 
                     $.each(toggle_node.closest('.yatra-tab-content').find('ul.yatra-list li.yatra-list-item .yatra-heading'), function () {
@@ -187,8 +186,8 @@ window.yatra_global_tour_additional_price = 0;
                     });
 
 
-                    heading.append(span);
-                    toggle_node.remove();
+                    //heading.append(span);
+                    //toggle_node.remove();
 
                 });
                 $('body').on('click', '.yatra-enquiry-now-btn', function (event) {
@@ -240,7 +239,7 @@ window.yatra_global_tour_additional_price = 0;
             },
             listToggleOpen: function ($toggle_node) {
                 $toggle_node.closest('li.yatra-list-item').find('.yatra-content').slideDown('slow');
-                var span = $('<span class="yatra-icon fa fa-minus"/>');
+                var span = $('<span class="yatra-icon fa fa-angle-up"/>');
                 var heading = $toggle_node.closest('h4');
                 $toggle_node.hide();
                 heading.append(span);
@@ -249,7 +248,7 @@ window.yatra_global_tour_additional_price = 0;
             },
             listToggleClose: function ($toggle_node) {
                 $toggle_node.closest('li.yatra-list-item').find('.yatra-content').slideUp('slow');
-                var span = $('<span class="yatra-icon fa fa-plus"/>');
+                var span = $('<span class="yatra-icon fa fa-angle-down"/>');
                 var heading = $toggle_node.closest('h4');
                 $toggle_node.hide();
                 heading.append(span);
