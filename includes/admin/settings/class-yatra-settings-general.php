@@ -239,6 +239,23 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
                     'type' => 'text',
                 ),
                 array(
+                    'title' => __('Expand All Text', 'yatra'),
+                    'desc' => __('Expand all text.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_expand_all_text',
+                    'default' => __('Expand All', 'yatra'),
+                    'type' => 'text',
+                ),
+                array(
+                    'title' => __('Collapse All Text', 'yatra'),
+                    'desc' => __('Collapse all text.', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_collapse_all_text',
+                    'default' => __('Collapse All', 'yatra'),
+                    'type' => 'text',
+                ),
+
+                array(
                     'title' => __('Update cart button text', 'yatra'),
                     'desc' => __('Text for update cart button', 'yatra'),
                     'desc_tip' => true,

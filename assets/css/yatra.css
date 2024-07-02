@@ -90,6 +90,13 @@
   float: right;
   cursor: pointer; }
 
+.yatra-tabs section.yatra-tab-content h3.tab-title .yatra-expand-collapse {
+  float: right;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 400;
+  text-decoration: underline; }
+
 .yatra-field-wrap p {
   padding-left: 10px;
   padding-right: 10px; }
@@ -135,6 +142,9 @@
     padding: 15px 0; }
     .yatra-tabs.heading-and-content .yatra-tab-item .yatra-tab-content .tab-title {
       padding: 5px 5px 10px 5px; }
+      .yatra-tabs.heading-and-content .yatra-tab-item .yatra-tab-content .tab-title .yatra-icon {
+        float: right;
+        cursor: pointer; }
       .yatra-tabs.heading-and-content .yatra-tab-item .yatra-tab-content .tab-title .yatra-expand-collapse {
         float: right;
         cursor: pointer;

@@ -1,6 +1,8 @@
 <h3 class="tab-title"><?php echo wp_kses($icon, array(
         'span' => array('class' => array())
-    )) ?><?php echo esc_html($title); ?><span class="yatra-expand-collapse" data-expand-text="<?php esc_html_e('Expand All', 'yatra'); ?>" data-collapse-text="<?php esc_html_e('Collapse All', 'yatra'); ?>"><?php esc_html_e('Expand All', 'yatra'); ?></span></h3>
+    )) ?><?php echo esc_html($title); ?>
+   <span class="yatra-expand-collapse" data-expand-text="<?php echo esc_attr(get_option('yatra_expand_all_text', 'Expand All')); ?>" data-collapse-text="<?php echo esc_attr(get_option('yatra_collapse_all_text', 'Collapse All')); ?>"><?php echo esc_html(get_option('yatra_expand_all_text', 'Expand All')); ?></span>
+</h3>
 <div class="itinerary-section">
     <div class="yatra-tab-section-inner">
         <ul class="yatra-list yatra-itinerary-list">
