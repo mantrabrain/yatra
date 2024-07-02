@@ -3,7 +3,60 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
+if ( ! function_exists( 'yatra_header' ) ) {
+    
+function yatra_header( $header_name ) {
+    global $wp_version;
+    if (
+        version_compare( $wp_version, '5.9', '>=' ) &&
+        function_exists( 'wp_is_block_theme' ) &&
+        wp_is_block_theme()
+    ) {
+        ?>
+        <!doctype html>
+            <html <?php language_attributes(); ?>>
+            <head>
+                <meta charset="<?php bloginfo( 'charset' ); ?>">
+                <?php wp_head(); ?>
+            </head>
 
+            <body <?php body_class(); ?>>
+            <?php wp_body_open(); ?>
+                <div class="wp-site-blocks">
+                    <header class="wp-block-template-part site-header">
+                        <?php block_header_area(); ?>
+                    </header>
+        <?php
+    } else {
+        get_header( $header_name );
+    }
+}
+}
+if ( ! function_exists( 'yatra_footer' ) ) {
+
+
+	function yatra_footer( $footer_name ) {
+		global $wp_version;
+		if (
+			version_compare( $wp_version, '5.9', '>=' ) &&
+			function_exists( 'wp_is_block_theme' ) &&
+			wp_is_block_theme()
+		) {
+			?>
+			<footer class="wp-block-template-part site-footer">
+			<?php block_footer_area(); ?>
+			</footer>
+			</div>
+            <?php yatra_block_support_styles(); ?>
+			<?php wp_footer(); ?>
+			</body>
+			</html>
+			<?php
+		} else {
+			get_footer( $footer_name );
+		}
+	}
+}
 
 if (!function_exists('yatra_html_form_help')) {
     function yatra_html_form_help($value = '')

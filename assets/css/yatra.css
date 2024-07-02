@@ -454,8 +454,8 @@ del {
   cursor: pointer; }
 
 .yatra-itinerary-list .itinerary-heading, .yatra-itinerary-list .faq-heading, .yatra-faq-list-item .itinerary-heading, .yatra-faq-list-item .faq-heading {
-  font-size: 20px;
-  font-weight: 500; }
+  font-size: 17px;
+  font-weight: 600; }
   .yatra-itinerary-list .itinerary-heading .fa, .yatra-itinerary-list .itinerary-heading svg, .yatra-itinerary-list .faq-heading .fa, .yatra-itinerary-list .faq-heading svg, .yatra-faq-list-item .itinerary-heading .fa, .yatra-faq-list-item .itinerary-heading svg, .yatra-faq-list-item .faq-heading .fa, .yatra-faq-list-item .faq-heading svg {
     float: right;
     cursor: pointer; }
