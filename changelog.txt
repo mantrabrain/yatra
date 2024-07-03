@@ -1,3 +1,8 @@
+= 2.2.5 | 2024-06-02
+* Fixed - Image link issue on tour shortcode and block
+* Fixed - Profile not updating issue
+* Fixed - Add image inside map tab
+
 = 2.2.4 | 2024-05-04
 * Fixed - Date issue fixed
 
