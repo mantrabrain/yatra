@@ -53,7 +53,7 @@ class Yatra_Shortcodes
         $function,
         $atts = array(),
         $wrapper = array(
-            'class' => 'yatra-shortcode-wrapper',
+            'class' => 'yatra-shortcode-wrapper alignwide',
             'before' => null,
             'after' => null,
         )
