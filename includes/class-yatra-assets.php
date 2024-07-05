@@ -1,4 +1,5 @@
 <?php
+use const Avifinfo\UNDEFINED;
 if (!class_exists('Yatra_Assets')) {
     class Yatra_Assets
     {
@@ -175,6 +176,8 @@ if (!class_exists('Yatra_Assets')) {
 
             if (is_singular('tour')) {
 
+                $start_of_week = get_option('start_of_week', 0);
+
                 wp_enqueue_script('yatra-single-tour');
 
                 global $wp_locale;
@@ -182,6 +185,8 @@ if (!class_exists('Yatra_Assets')) {
                 $yatra_params['week_days'] = $wp_locale->weekday;
 
                 $yatra_params['months'] = array_values($wp_locale->month);
+
+                $yatra_params['fixedStartDay'] = $start_of_week==='' ? "": $start_of_week;
             }
 
             $yatra_params = apply_filters('yatra_script_localize_params', $yatra_params);

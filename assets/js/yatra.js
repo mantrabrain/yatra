@@ -441,6 +441,11 @@ window.yatra_global_tour_additional_price = 0;
                 if (typeof yatra_params.months !== undefined) {
                     calendar_options.months = yatra_params.months;
                 }
+
+                if (typeof yatra_params.fixedStartDay !== undefined && yatra_params.fixedStartDay!=='') {
+                    calendar_options.fixedStartDay = parseInt(yatra_params.fixedStartDay);
+                }
+                
                 let container = $(".yatra-calendar-wrap").YatraCalendar(calendar_options);
 
                 tippy('.yatra-tippy-tooltip', {

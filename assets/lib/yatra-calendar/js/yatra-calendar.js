@@ -110,7 +110,6 @@
                     lastDay.setDate(lastDay.getDate() + 1);
                 }
             }
-
             //Header day in a week ( (x to x + 7) % 7 to start the week by monday if x = 1)
             for (var i = startDayOfWeek; i < startDayOfWeek + 7; i++) {
                 thead.append($('<td class="yatra-tippy-tooltip" data-tippy-content="' + this.settings.days[i] + '">' + this.settings.days[i % 7].substring(0, 3) + '</td>'));
