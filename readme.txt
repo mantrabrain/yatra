@@ -2,9 +2,9 @@
 Contributors: MantraBrain, gangadharkashyap
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 5.6
-Tested up to: 6.5
+Tested up to: 6.6
 Requires PHP: 7.0
-Stable tag: 2.2.6
+Stable tag: 2.2.7
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -211,10 +211,8 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.2.6 | 2024-07-03
-* Fixed - Single tour accordion icon changed and font size update
-* Added - FSE Theme Compatibility
-* Fixed - Other minor issues
+= 2.2.7 | 2024-07-06
+* Fixed - Week Start days sync with WordPress Core.
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
 
