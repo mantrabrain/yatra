@@ -459,7 +459,7 @@ if (!function_exists('yatra_tour_tab_default_configurations')) {
             ),
             'map' => array(
                 'label' => __('Map', 'yatra'),
-                'icon' => 'fas fa-directions',
+                'icon' => 'fa fa-map',
                 'options' =>
                     array(
                         'map_visibility' => array(
