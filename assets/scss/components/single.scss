@@ -10,6 +10,7 @@ body.single-tour {
       .yatra-tour-meta {
         width: 100%;
         display: inline-block;
+
         .yatra-cat-links, .yatra-tour-duration {
           float: left;
         }
@@ -428,25 +429,30 @@ body.single-tour {
 
 @import "parts/calendar-date-listing";
 
-.tour-slider{
-  width:100%;
+.tour-slider {
+  width: 100%;
+
   .demo {
-    width:100%;
-}
-ul {
+    width: 100%;
+  }
+
+  ul {
     list-style: none outside none;
     padding-left: 0;
-    margin-bottom:0;
-}
-li {
+    margin-bottom: 0;
+  }
+
+  li {
     display: block;
     float: left;
     margin-right: 6px;
-    cursor:pointer;
-}
-img {
+    cursor: pointer;
+  }
+
+  img {
     display: block;
     height: auto;
     max-width: 100%;
-}
+    width: 100%;
+  }
 }
