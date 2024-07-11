@@ -8,6 +8,7 @@
             bindEvents: function () {
                 var _that = this;
                 $('body').on('click', '.yatra-responsive-tab-title', _that.toggle_tabs);
+                _that.initSlider();
             },
             toggle_tabs: function (event) {
                 var _that = this;
@@ -28,6 +29,16 @@
 
                 }
 
+            },
+            initSlider:function(){
+
+                $('#lightSlider').lightSlider({
+                    gallery: true,
+                    item: 1,
+                    loop: true,
+                    slideMargin: 0,
+                    thumbItem: 9
+                });
             }
 
 

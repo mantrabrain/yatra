@@ -32,9 +32,16 @@ if (!class_exists('Yatra_Assets')) {
             // Register Only Script
             wp_register_script('yatra-select2js', YATRA_PLUGIN_URI . '/assets/lib/select2/js/select2.min.js', false, YATRA_VERSION);
 
+
+            // Register Light Slider Script
+            wp_register_script('yatra-lightslider', YATRA_PLUGIN_URI . '/assets/lib/lightslider/js/lightslider.min.js', false, '1.1.3');
+
             // Register Only Styles
             wp_register_style('yatra-select2css', YATRA_PLUGIN_URI . '/assets/lib/select2/css/select2.min.css', false, YATRA_VERSION);
 
+
+             //Light Slider css
+             wp_register_style('yatra-lightslider', YATRA_PLUGIN_URI . '/assets/lib/lightslider/css/lightslider.css', false, '1.1.3');
             //jQuery UI css
             wp_register_style('yatra-jquery-ui', YATRA_PLUGIN_URI . '/assets/lib/jquery-ui/jquery-ui.css', false, '1.12.1');
 
@@ -187,6 +194,9 @@ if (!class_exists('Yatra_Assets')) {
                 $yatra_params['months'] = array_values($wp_locale->month);
 
                 $yatra_params['fixedStartDay'] = $start_of_week==='' ? "": $start_of_week;
+
+                wp_enqueue_script('yatra-lightslider');
+                wp_enqueue_style('yatra-lightslider');
             }
 
             $yatra_params = apply_filters('yatra_script_localize_params', $yatra_params);

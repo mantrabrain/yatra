@@ -14,7 +14,9 @@
     yatra_single_tour_additional_information();
     if (has_post_thumbnail()) {
         yatra_tour_thumbnail('full');
-    } ?>
+    } 
+    yatra_tour_slider();
+    ?>
     <div class="yatra-single-meta-content">
 
         <header class="yatra-tour-header">

@@ -2726,6 +2726,24 @@ body.single-tour figure {
     content: "";
     clear: both; }
 
+.tour-slider {
+  width: 100%; }
+  .tour-slider .demo {
+    width: 100%; }
+  .tour-slider ul {
+    list-style: none outside none;
+    padding-left: 0;
+    margin-bottom: 0; }
+  .tour-slider li {
+    display: block;
+    float: left;
+    margin-right: 6px;
+    cursor: pointer; }
+  .tour-slider img {
+    display: block;
+    height: auto;
+    max-width: 100%; }
+
 .yatra-shortcode-wrapper {
   max-width: 100%;
   margin: 0 auto !important;
