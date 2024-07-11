@@ -18,6 +18,11 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             add_action('yatra_tour_meta_tab_content_attributes', array($this, 'attributes_tab_content'));
             add_action('yatra_tour_meta_tab_content_tour_tabs', array($this, 'tour_tabs_tab_content'));
 
+            //Featured Gallery
+
+
+            add_filter('admin_post_thumbnail_html', array($this, 'slider_meta'), 10, 3);
+
 
         }
 
@@ -636,6 +641,36 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             return $content;
 
+
+        }
+
+        public function slider_meta($content, $post_id, $thumbnail_id)
+        {
+            if (get_post_type($post_id) !== 'tour') {
+                return $content;
+            }
+            ob_start();
+            ?>
+
+            <div class="mb-admin-gallery">
+
+                <p><label for="yatra_tour_meta_gallery">Gallery</label>
+
+                    <input class="widefat" id="yatra_tour_meta_gallery" name="yatra_tour_meta_gallery" type="hidden" value="0,28,27,26,25,24,23,20,19">
+                </p><div class="mb-gallery-add-wrap">
+                    <a class="mb-gallery-add" href="#" data-uploader-title="Add image(s) to gallery" data-uploader-button-text="Add image(s)">
+                        <img src="http://localhost:10008/wp-content/plugins/yatra/assets/images/upload-image.png">
+                        <h3>Drop your file here, or <span>browse</span></h3>
+                        <p>Supports: JPG, JPEG, PNG</p>
+                    </a>
+                </div>
+                <ul class="mb-selected-gallery-list"><li data-id="28"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/skiing.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="27"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/rafting.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="26"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/peak-climbing.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="25"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/paragliding.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="24"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/kayaking.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="23"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/jungle-safari.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="20"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/city-sightseeing.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="19"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/thailand.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li></ul>                        <p></p>
+            </div>
+
+            <?php
+            $content .= ob_get_clean();
+
+            return $content;
 
         }
 
