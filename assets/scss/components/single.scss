@@ -432,10 +432,6 @@ body.single-tour {
 .tour-slider {
   width: 100%;
 
-  .demo {
-    width: 100%;
-  }
-
   ul {
     list-style: none outside none;
     padding-left: 0;
@@ -454,5 +450,18 @@ body.single-tour {
     height: auto;
     max-width: 100%;
     width: 100%;
+  }
+
+  #yatra-tour-slider:not(.lightSlider) li {
+    display: none;
+
+    &:first-child {
+      display: block;
+      float: none;
+      margin: 0;
+      cursor: initial;
+      max-height: 500px;
+      overflow:hidden;
+    }
   }
 }

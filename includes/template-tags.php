@@ -72,49 +72,46 @@ if (!function_exists('yatra_tour_slider')) {
 
     function yatra_tour_slider()
     {
+        $tour_id = get_the_ID();
+
+        $enable_slider = (boolean)get_post_meta($tour_id, 'yatra_tour_enable_slider', true);
+
+        if (!$enable_slider) {
+            return;
+        }
+
+        $slider_item_array = get_post_meta($tour_id, 'yatra_tour_slider_items', true);
+
+        if (!is_array($slider_item_array)) {
+            return;
+        }
+        if (count($slider_item_array) < 1) {
+            return;
+        }
+
         ?>
         <div class="tour-slider">
-        <div class="demo">
-    <ul id="lightSlider">
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-1.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-1.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-2.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-2.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-3.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-3.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-4.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-4.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-5.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-5.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-6.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-6.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-7.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-7.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-8.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-8.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-9.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-9.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-10.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-10.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-11.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-12.jpg" />
-        </li>
-        <li data-thumb="http://sachinchoolur.github.io/lightslider/img/thumb/cS-13.jpg">
-            <img src="http://sachinchoolur.github.io/lightslider/img/cS-13.jpg" />
-        </li>
-    </ul>
-</div>
-           
+
+            <ul id="yatra-tour-slider">
+                <?php
+                for ($item_array = 0; $item_array < count($slider_item_array); $item_array++) {
+
+                    $image_src = wp_get_attachment_url($slider_item_array[$item_array]);
+
+                    if (wp_attachment_is_image($slider_item_array[$item_array]) && $image_src) {
+
+                        ?>
+                        <li data-thumb="<?php echo wp_get_attachment_image_url($slider_item_array[$item_array]) ?>">
+                            <img src="<?php echo esc_url_raw($image_src) ?>"/>
+                        </li>
+                        <?php
+
+
+                    }
+
+                }
+                ?>
+            </ul>
         </div>
         <?php
     }

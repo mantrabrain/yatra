@@ -12,9 +12,10 @@
 <div id="tour-<?php the_ID(); ?>" <?php yatra_tour_class(); ?>>
     <?php
     yatra_single_tour_additional_information();
-    if (has_post_thumbnail()) {
+    $enable_slider = (boolean)get_post_meta(get_the_ID(), 'yatra_tour_enable_slider', true);
+    if (has_post_thumbnail() && !$enable_slider) {
         yatra_tour_thumbnail('full');
-    } 
+    }
     yatra_tour_slider();
     ?>
     <div class="yatra-single-meta-content">

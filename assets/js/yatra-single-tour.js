@@ -30,14 +30,29 @@
                 }
 
             },
-            initSlider:function(){
+            initSlider: function () {
 
-                $('#lightSlider').lightSlider({
+                $('#yatra-tour-slider').lightSlider({
                     gallery: true,
+                    adaptiveHeight: false,
                     item: 1,
                     loop: true,
                     slideMargin: 0,
-                    thumbItem: 9
+                    thumbItem: 9,
+                    type: 'fade',
+                    onSliderLoad: function (el) {
+                        var maxHeight = 0,
+                            container = $(el),
+                            children = container.children();
+                        children.each(function () {
+                            var childHeight = $(this).height();
+                            if (childHeight > maxHeight) {
+                                maxHeight = childHeight;
+                            }
+                        });
+                        container.height(500);
+                    }
+
                 });
             }
 

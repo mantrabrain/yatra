@@ -669,13 +669,14 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
             $is_slider_enabled = (boolean)get_post_meta($post_id, 'yatra_tour_enable_slider', true);
 
             $slider_items_comma = implode(',', $slider_item_array);
+
             ?>
 
             <div class="yatra-tour-slider-admin">
                 <p>
                     <input class="widefat" id="yatra_tour_enable_slider" name="yatra_tour_enable_slider"
-                           type="checkbox" <?php checked(true, $is_slider_enabled) ?>
-                           value="">
+                           type="checkbox" <?php checked($is_slider_enabled, true) ?>
+                           value="1">
                     <label for="yatra_tour_enable_slider"><?php echo esc_html__("Enable tour slider", "yatra"); ?></label>
                 </p>
                 <div class="mb-admin-gallery <?php echo !$is_slider_enabled ? "hidden" : ""; ?> add-slider-item">
@@ -695,15 +696,14 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                     </div>
                     <ul class="mb-selected-gallery-list">
                         <?php
-                        $gallery_item_array = [];
-                        if (count($gallery_item_array) > 0) {
+                        if (count($slider_item_array) > 0) {
                             //wp_attachment_is_image
 
-                            for ($i = 0; $i < count($gallery_item_array); $i++) {
-                                $src = wp_get_attachment_url($gallery_item_array[$i]);
-                                if (wp_attachment_is_image($gallery_item_array[$i]) && $src) {
+                            for ($i = 0; $i < count($slider_item_array); $i++) {
+                                $src = wp_get_attachment_url($slider_item_array[$i]);
+                                if (wp_attachment_is_image($slider_item_array[$i]) && $src) {
 
-                                    echo '<li data-id="' . absint($gallery_item_array[$i]) . '">';
+                                    echo '<li data-id="' . absint($slider_item_array[$i]) . '">';
                                     echo '<div class="image-wrapper">';
                                     echo '<div class="image-content">';
                                     echo '<img src="' . esc_url_raw($src) . '" alt="">';
@@ -719,16 +719,7 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
                         }
                         ?>
-                        <li data-id="28">
-                            <div class="image-wrapper">
-                                <div class="image-content"><img
-                                            src="http://localhost:10008/wp-content/uploads/2024/06/skiing.jpg" alt="">
-                                    <div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div>
-                                </div>
-                            </div>
-                        </li>
                     </ul>
-                    <p></p>
                 </div>
             </div>
 
