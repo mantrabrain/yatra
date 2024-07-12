@@ -762,4 +762,11 @@ ul.yatra-daterange-list li:hover small.dashicons {
     width: 30px;
 }
 
+.yatra-tour-slider-admin ul.mb-selected-gallery-list li {
+    width: calc(33% - 15px);
+    margin-bottom: 10px;
+}
 
+#postimagediv .inside .yatra-tour-slider-admin img {
+    height: 100%;
+}

@@ -17,6 +17,17 @@
         },
         initElement: function () {
             this.gallery_upload_frame = '';
+            let tour_slider = $('#yatra_tour_enable_slider');
+            tour_slider.on('click', function () {
+                let main = $(this).closest('.yatra-tour-slider-admin');
+
+                if ($(this).is(':checked')) {
+
+                    main.find('.add-slider-item').removeClass('hidden');
+                } else {
+                    main.find('.add-slider-item').addClass('hidden');
+                }
+            });
 
         },
         conditionalVisibility: function () {
@@ -70,14 +81,17 @@
 
         initGalleryBuilder: function () {
             var uploadBtn = $('.mb-gallery-add');
-            var parent = uploadBtn.closest('.mb-admin-gallery');
             var $this = this;
+            var parentClass = '.mb-admin-gallery';
+
             uploadBtn.on('click', function (event) {
+                var parent = $(this).closest(parentClass);
                 event.preventDefault();
                 $this.initMediaUploader(uploadBtn, parent);
             });
             $('body').on('click', 'ul.mb-selected-gallery-list li a.remove', function (event) {
                 event.preventDefault();
+                var parent = $(this).closest(parentClass);
                 $this.removeGalleryItem($(this).closest('li'), parent);
 
             });

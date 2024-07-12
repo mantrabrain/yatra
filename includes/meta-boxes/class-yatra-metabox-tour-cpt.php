@@ -355,6 +355,17 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 }
             }
 
+            // Slider Item & Enable Disable Code
+            $is_slider_enabled = isset($_POST['yatra_tour_enable_slider']) ? absint($_POST['yatra_tour_enable_slider']) : 0;
+
+            $slider_items_comma = isset($_POST['yatra_tour_slider_items']) ? sanitize_text_field($_POST['yatra_tour_slider_items']) : "";
+
+            $slider_item_array = explode(',', $slider_items_comma);
+
+            $slider_item_array = array_map('absint', $slider_item_array);
+
+            update_post_meta($post_id, 'yatra_tour_slider_items', $slider_item_array);
+            update_post_meta($post_id, 'yatra_tour_enable_slider', $is_slider_enabled);
 
             do_action('yatra_after_tour_update', $post_id);
         }
@@ -650,21 +661,75 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
                 return $content;
             }
             ob_start();
+
+            $slider_item_array = get_post_meta($post_id, 'yatra_tour_slider_items', true);
+
+            $slider_item_array = is_array($slider_item_array) ? $slider_item_array : array();
+
+            $is_slider_enabled = (boolean)get_post_meta($post_id, 'yatra_tour_enable_slider', true);
+
+            $slider_items_comma = implode(',', $slider_item_array);
             ?>
 
-            <div class="mb-admin-gallery">
+            <div class="yatra-tour-slider-admin">
+                <p>
+                    <input class="widefat" id="yatra_tour_enable_slider" name="yatra_tour_enable_slider"
+                           type="checkbox" <?php checked(true, $is_slider_enabled) ?>
+                           value="">
+                    <label for="yatra_tour_enable_slider"><?php echo esc_html__("Enable tour slider", "yatra"); ?></label>
+                </p>
+                <div class="mb-admin-gallery <?php echo !$is_slider_enabled ? "hidden" : ""; ?> add-slider-item">
+                    <p><input class="widefat" id="yatra_tour_slider_items" name="yatra_tour_slider_items" type="hidden"
+                              value="<?php echo esc_attr($slider_items_comma); ?>">
+                    </p>
+                    <div class="mb-gallery-add-wrap">
+                        <a class="mb-gallery-add" href="#"
+                           data-uploader-title="<?php esc_attr_e('Add image(s) to gallery', 'yatra'); ?>"
+                           data-uploader-button-text="<?php esc_attr_e('Add image(s)', 'yatra'); ?>"
+                        >
+                            <img src="<?php echo YATRA_PLUGIN_URI; ?>/assets/images/upload-image.png"/>
+                            <h3><?php echo esc_html__('Drop your file here, or', 'yatra'); ?>
+                                <span><?php echo esc_html__('browse', 'yatra'); ?></span></h3>
+                            <p><?php echo esc_html__('Supports: JPG, JPEG, PNG', 'yatra'); ?></p>
+                        </a>
+                    </div>
+                    <ul class="mb-selected-gallery-list">
+                        <?php
+                        $gallery_item_array = [];
+                        if (count($gallery_item_array) > 0) {
+                            //wp_attachment_is_image
 
-                <p><label for="yatra_tour_meta_gallery">Gallery</label>
+                            for ($i = 0; $i < count($gallery_item_array); $i++) {
+                                $src = wp_get_attachment_url($gallery_item_array[$i]);
+                                if (wp_attachment_is_image($gallery_item_array[$i]) && $src) {
 
-                    <input class="widefat" id="yatra_tour_meta_gallery" name="yatra_tour_meta_gallery" type="hidden" value="0,28,27,26,25,24,23,20,19">
-                </p><div class="mb-gallery-add-wrap">
-                    <a class="mb-gallery-add" href="#" data-uploader-title="Add image(s) to gallery" data-uploader-button-text="Add image(s)">
-                        <img src="http://localhost:10008/wp-content/plugins/yatra/assets/images/upload-image.png">
-                        <h3>Drop your file here, or <span>browse</span></h3>
-                        <p>Supports: JPG, JPEG, PNG</p>
-                    </a>
+                                    echo '<li data-id="' . absint($gallery_item_array[$i]) . '">';
+                                    echo '<div class="image-wrapper">';
+                                    echo '<div class="image-content">';
+                                    echo '<img src="' . esc_url_raw($src) . '" alt="">';
+                                    echo '<div class="image-overlay">';
+                                    echo '<a class="remove dashicons dashicons-trash"></a>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '</li>';
+                                }
+                            }
+
+
+                        }
+                        ?>
+                        <li data-id="28">
+                            <div class="image-wrapper">
+                                <div class="image-content"><img
+                                            src="http://localhost:10008/wp-content/uploads/2024/06/skiing.jpg" alt="">
+                                    <div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <p></p>
                 </div>
-                <ul class="mb-selected-gallery-list"><li data-id="28"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/skiing.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="27"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/rafting.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="26"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/peak-climbing.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="25"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/paragliding.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="24"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/kayaking.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="23"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/jungle-safari.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="20"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/city-sightseeing.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li><li data-id="19"><div class="image-wrapper"><div class="image-content"><img src="http://localhost:10008/wp-content/uploads/2024/06/thailand.jpg" alt=""><div class="image-overlay"><a class="remove dashicons dashicons-trash"></a></div></div></div></li></ul>                        <p></p>
             </div>
 
             <?php
