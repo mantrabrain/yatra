@@ -1,14 +1,14 @@
-=== Travel Booking For WordPress, Tour Booking System, Trip Booking WordPress Plugin - Yatra ===
+=== Yatra - Travel and Tour Booking Solution ===
 Contributors: MantraBrain, gangadharkashyap
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 5.6
 Tested up to: 6.6
 Requires PHP: 7.0
-Stable tag: 2.2.7
+Stable tag: 2.2.8
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Yatra is a free travel & tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
+Yatra is a free tour booking WordPress plugin to create travel and tour packages for tour operators and travel agencies.
 
 == Description ==
 
@@ -52,6 +52,8 @@ It's really simple & easy to create trip, itinerary & trekking packages with the
 * Advanced search & filter
 * Mini cart
 * Google reCaptcha
+* Image Slider
+* Travel Map
 
 
 == Premium Payment Gateway Extensions/Addons ==
@@ -211,8 +213,10 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.2.7 | 2024-07-06
-* Fixed - Week Start days sync with WordPress Core.
+= 2.2.8 | 2024-07-13
+* Fixed - Tour Archive page search bar design issue
+* Added - Image Slider on tour single page
+* Fixed - Minor other design tweaks
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
 

@@ -1,3 +1,6 @@
+= 2.2.7 | 2024-07-06
+* Fixed - Week Start days sync with WordPress Core.
+
 = 2.2.6 | 2024-07-03
 * Fixed - Single tour accordion icon changed and font size update
 * Added - FSE Theme Compatibility
