@@ -1828,6 +1828,8 @@ del {
         display: none; }
       .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field ul.yatra-terms-list li.yatra-terms-more .show-less {
         display: none; }
+  .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field input[name="s"] {
+    width: 100%; }
   .yatra-tour-filter-sidebar .yatra-tour-filter-sidebar-inner .yatra-sidebar-filter-field:not(:last-child) {
     padding-bottom: 24px;
     margin-bottom: 24px;
@@ -2334,7 +2336,8 @@ body.single-tour .tour-thumbnail-inner img {
 body.single-tour figure {
   margin: 0; }
   body.single-tour figure img {
-    max-width: 100%; }
+    max-width: 100%;
+    height: auto; }
 
 .yatra-tour-additional-info {
   padding: 0;
