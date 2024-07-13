@@ -2745,7 +2745,19 @@ body.single-tour figure {
     width: 100%;
     -o-object-fit: cover;
        object-fit: cover;
-    margin: 0 auto; }
+    margin: 0 auto;
+    border-radius: 10px; }
+  .tour-slider .lSSlideOuter .lSPager.lSGallery img {
+    border-radius: 0px; }
+  .tour-slider .lSAction .prev, .tour-slider .lSAction .next {
+    -webkit-tap-highlight-color: transparent;
+    color: #fff;
+    font-size: 40px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+    z-index: 99999; }
+  .tour-slider .lSAction > a {
+    background-image: none;
+    opacity: 1; }
   .tour-slider #yatra-tour-slider:not(.lightSlider) li {
     display: none; }
     .tour-slider #yatra-tour-slider:not(.lightSlider) li:first-child {

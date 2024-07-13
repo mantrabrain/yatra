@@ -457,8 +457,27 @@ body.single-tour {
     width:100%;
     object-fit: cover;
     margin:0 auto;
+    border-radius:10px;
 
   }
+  .lSSlideOuter .lSPager.lSGallery img{
+    border-radius:0px;
+  }
+  .lSAction { 
+    .prev,.next{
+    -webkit-tap-highlight-color: transparent;
+    color: #fff;
+    font-size: 40px;
+    
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, .15);
+    z-index: 99999;
+    }
+    & > a
+    {
+    background-image:none;
+    opacity:1;
+    }
+}
 
   #yatra-tour-slider:not(.lightSlider) li {
     display: none;

@@ -40,6 +40,8 @@
                     slideMargin: 0,
                     thumbItem: 9,
                     mode: 'fade',
+                    prevHtml: '<i class="fa fa-angle-left prev" aria-hidden="true"></i>',
+                    nextHtml: '<i class="fa fa-angle-right next" aria-hidden="true"></i>',
                     onSliderLoad: function (el) {
                         var maxHeight = 0,
                             container = $(el),
