@@ -39,7 +39,7 @@
                     loop: true,
                     slideMargin: 0,
                     thumbItem: 9,
-                    type: 'fade',
+                    mode: 'fade',
                     onSliderLoad: function (el) {
                         var maxHeight = 0,
                             container = $(el),
@@ -50,7 +50,9 @@
                                 maxHeight = childHeight;
                             }
                         });
-                        container.height(500);
+
+
+                        //container.height(500);
                     }
 
                 });

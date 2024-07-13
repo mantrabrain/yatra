@@ -364,7 +364,18 @@ if (!class_exists('Yatra_Metabox_Tour_CPT')) {
 
             $slider_item_array = array_map('absint', $slider_item_array);
 
+
+            // Remove elements with value 0
+            $slider_item_array = array_filter($slider_item_array, function($value) {
+                return $value !== 0;
+            });
+
+            // Reindex array to maintain sequential keys if needed
+            $slider_item_array = array_values($slider_item_array);
+
+
             update_post_meta($post_id, 'yatra_tour_slider_items', $slider_item_array);
+
             update_post_meta($post_id, 'yatra_tour_enable_slider', $is_slider_enabled);
 
             do_action('yatra_after_tour_update', $post_id);

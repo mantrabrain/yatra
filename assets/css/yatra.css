@@ -2736,12 +2736,16 @@ body.single-tour figure {
     display: block;
     float: left;
     margin-right: 6px;
-    cursor: pointer; }
+    cursor: pointer;
+    height: auto; }
   .tour-slider img {
     display: block;
-    height: auto;
+    height: 500px;
     max-width: 100%;
-    width: 100%; }
+    width: 100%;
+    -o-object-fit: cover;
+       object-fit: cover;
+    margin: 0 auto; }
   .tour-slider #yatra-tour-slider:not(.lightSlider) li {
     display: none; }
     .tour-slider #yatra-tour-slider:not(.lightSlider) li:first-child {
