@@ -1,4 +1,4 @@
-=== Yatra - Travel and Tour Booking Solution ===
+=== Yatra - Tour and Travel Booking Solution ===
 Contributors: MantraBrain, gangadharkashyap
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 5.6
