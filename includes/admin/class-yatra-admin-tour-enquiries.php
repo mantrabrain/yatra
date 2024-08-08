@@ -41,6 +41,8 @@ class Yatra_Admin_Tour_Enquiries
 
         echo '<div class="wrap">';
 
+        echo '<form method="post">';
+
         include_once 'list-tables/class-yatra-admin-list-table-enquiries.php';
 
         $enquiriesTable = new Yatra_Admin_List_Table_Enquiries();
@@ -50,6 +52,8 @@ class Yatra_Admin_Tour_Enquiries
         echo '<h2>' . esc_html__('All Enquiries', 'yatra') . '</h2>';
 
         $enquiriesTable->display();
+
+        echo '</form>';
 
         echo '</div>';
     }

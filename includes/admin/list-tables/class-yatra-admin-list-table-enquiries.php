@@ -21,31 +21,21 @@ if (!class_exists('Yatra_Admin_List_Table', false)) {
 
 class Yatra_Admin_List_Table_Enquiries extends WP_List_Table
 {
-    /**
-     * Prepare the items for the table to process
-     *
-     * @return Void
-     */
+
+
     public function prepare_items()
     {
+        $this->process_bulk_action(); // Process bulk actions
+
         $columns = $this->get_columns();
-
         $hidden = $this->get_hidden_columns();
-
         $sortable = $this->get_sortable_columns();
-
-
         $user = get_current_user_id();
-
         $screen = get_current_screen();
-
         $screen_option = $screen->get_option('per_page', 'option');
-
         $perPage = get_user_meta($user, $screen_option, true);
 
-
         if (is_array($perPage) || empty($perPage)) {
-
             $perPage = $screen->get_option('per_page', 'default');
         }
 
@@ -61,14 +51,10 @@ class Yatra_Admin_List_Table_Enquiries extends WP_List_Table
         $this->items = $this->table_data($perPage);
     }
 
-    /**
-     * Override the parent columns method. Defines the columns to use in your listing table
-     *
-     * @return Array
-     */
     public function get_columns()
     {
-        $columns = array(
+        return array(
+            'cb' => '<input type="checkbox" />',
             'id' => __('ID', 'yatra'),
             'tour' => __('Tour', 'yatra'),
             'fullname' => __('Full Name', 'yatra'),
@@ -81,25 +67,50 @@ class Yatra_Admin_List_Table_Enquiries extends WP_List_Table
             'message' => __('Message', 'yatra'),
             'created_at' => __('Created At', 'yatra')
         );
-
-        return $columns;
     }
 
-    /**
-     * Define which columns are hidden
-     *
-     * @return Array
-     */
+    public function column_cb($item)
+    {
+        return sprintf(
+            '<input type="checkbox" name="enquiry_id[]" value="%s" />',
+            $item->id
+        );
+    }
+
+    public function get_bulk_actions()
+    {
+        $actions = array(
+            'delete' => __('Permanently Delete', 'yatra'),
+            //'export' => __('Export', 'yatra')
+        );
+
+        return $actions;
+    }
+
+    public function process_bulk_action()
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        if ('delete' === $this->current_action()) {
+            if (isset($_POST['enquiry_id'])) {
+                $enquiry_ids = array_map('absint', $_POST['enquiry_id']);
+                foreach ($enquiry_ids as $id) {
+                    Yatra_Core_DB::delete(Yatra_Tables::TOUR_ENQUIRIES, array('id' => $id));
+                }
+            }
+        }
+
+        if ('export' === $this->current_action()) {
+            // Implement export logic here
+        }
+    }
+
     public function get_hidden_columns()
     {
         return array();
     }
 
-    /**
-     * Define the sortable columns
-     *
-     * @return Array
-     */
     public function get_sortable_columns()
     {
         return array(
@@ -107,19 +118,15 @@ class Yatra_Admin_List_Table_Enquiries extends WP_List_Table
         );
     }
 
-
     private function getTotalCount()
     {
         return Yatra_Core_DB::get_count(Yatra_Tables::TOUR_ENQUIRIES);
-
     }
 
     private function table_data($perPage)
     {
         $currentPage = $this->get_pagenum();
-
         $offset = (($currentPage - 1) * $perPage);
-
         $sort_data = $this->sort_data();
 
         $additional_args = array(
@@ -128,23 +135,11 @@ class Yatra_Admin_List_Table_Enquiries extends WP_List_Table
             'offset' => absint($offset),
             'limit' => absint($perPage)
         );
-        $data = Yatra_Core_DB::get_data(Yatra_Tables::TOUR_ENQUIRIES, array(), array(), $additional_args);
-
-
-        return $data;
+        return Yatra_Core_DB::get_data(Yatra_Tables::TOUR_ENQUIRIES, array(), array(), $additional_args);
     }
 
-    /**
-     * Define what data to show on each column of the table
-     *
-     * @param Array $item Data
-     * @param String $column_name - Current column name
-     *
-     * @return Mixed
-     */
     public function column_default($item, $column_name)
     {
-
         $value = '';
         switch ($column_name) {
             case "id":
@@ -173,26 +168,19 @@ class Yatra_Admin_List_Table_Enquiries extends WP_List_Table
         return sanitize_text_field($value);
     }
 
-    /**
-     * Allows you to sort the data by the variables set in the $_GET
-     *
-     * @return Mixed
-     */
     private function sort_data()
     {
-        // Set defaults
         $orderby = 'id';
         $order = 'DESC';
 
-        // If orderby is set, use this as the sort column
         if (!empty($_GET['orderby'])) {
             $orderby = sanitize_text_field($_GET['orderby']);
         }
 
-        // If order is set use this as the order
         if (!empty($_GET['order'])) {
             $order = sanitize_text_field($_GET['order']);
         }
+
         $sortable_columns = $this->get_sortable_columns();
 
         if (!isset($sortable_columns[$orderby])) {
@@ -201,11 +189,10 @@ class Yatra_Admin_List_Table_Enquiries extends WP_List_Table
         if (!in_array(strtoupper($order), array('ASC', 'DESC'))) {
             $order = 'DESC';
         }
+
         return [
             'order' => $order,
             'order_by' => $orderby
         ];
-
-
     }
 }
