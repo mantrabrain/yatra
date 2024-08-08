@@ -1,3 +1,8 @@
+= 2.2.8 | 2024-07-13
+* Fixed - Tour Archive page search bar design issue
+* Added - Image Slider on tour single page
+* Fixed - Minor other design tweaks
+
 = 2.2.7 | 2024-07-06
 * Fixed - Week Start days sync with WordPress Core.
 
