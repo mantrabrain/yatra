@@ -29,3 +29,4 @@
 /yatra.tar  export-ignore
 /yatra.zip  export-ignore
 /test.sh  export-ignore
+/dev export-ignore
