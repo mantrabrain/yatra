@@ -8,6 +8,7 @@
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /.DS_Store export-ignore
+/.git export-ignore
 /.github export-ignore
 /.wordpress-org export-ignore
 /package-lock.json  export-ignore
