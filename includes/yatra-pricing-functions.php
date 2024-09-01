@@ -50,6 +50,10 @@ if (!function_exists('yatra_get_minimum_tour_pricing')) {
 
                 $min_sales_price = $single_pricing_item->getFinalPrice();
 
+
+                $min_sales_price = $min_sales_price == 0 && $single_pricing_item->getSalesPrice()!=0 ? $single_pricing_item->getSalesPrice(): $min_sales_price;
+                $min_regular_price = $min_regular_price == 0 && $single_pricing_item->getRegularPrice()!=0 ? $single_pricing_item->getRegularPrice(): $min_regular_price;
+
             }
         }
 
