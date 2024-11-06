@@ -671,10 +671,11 @@ if (!function_exists('yatra_get_archive_display_mode')) {
 
         $default_layout = get_option('yatra_setting_layouts_tour_archive', 'list');
 
+        $display_mode = isset($filter_params->display_mode) ? $filter_params->display_mode : $default_layout;
 
-        $display_mode = $filter_params->display_mode ?? $default_layout;s
+        $display_mode = $display_mode === 'grid' || $display_mode === 'list' ? $display_mode : 'list';
 
-        return $display_mode === 'grid' || $display_mode === 'list' ? $display_mode : 'list';
+        return $display_mode;
     }
 }
 if (!function_exists('yatra_is_featured_tour')) {
