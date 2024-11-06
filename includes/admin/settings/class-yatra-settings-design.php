@@ -103,6 +103,18 @@ class Yatra_Settings_Design extends Yatra_Admin_Settings_Base
                     'default' => ''
                 ),
                 array(
+                    'title' => __('Default Tour Archive Layout', 'yatra'),
+                    'desc' => __('Default Tour Archive Layout', 'yatra'),
+                    'desc_tip' => true,
+                    'id' => 'yatra_setting_layouts_tour_archive',
+                    'type' => 'select',
+                    'options' => array(
+                        '' => __('List', 'yatra'),
+                        'grid' => __('Grid', 'yatra')
+                    ),
+                    'default' => ''
+                ),
+                array(
                     'type' => 'sectionend',
                     'id' => 'yatra_templates_options',
                 ),

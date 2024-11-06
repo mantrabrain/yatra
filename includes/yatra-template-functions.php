@@ -296,7 +296,7 @@ if (!function_exists('yatra_account_booking_payment_history')) {
         $booking_id = yatra_get_var($_GET['booking_id'], 0);
 
         $booking_id = absint($booking_id);
-        
+
         if (!yatra_user_can_modify_booking($booking_id)) {
 
             return;
@@ -669,11 +669,12 @@ if (!function_exists('yatra_get_archive_display_mode')) {
     {
         $filter_params = yatra_get_filter_params();
 
-        $display_mode = $filter_params->display_mode ?? 'list';
+        $default_layout = get_option('yatra_setting_layouts_tour_archive', 'list');
 
-        $display_mode = $display_mode === 'grid' || $display_mode === 'list' ? $display_mode : 'list';
 
-        return $display_mode;
+        $display_mode = $filter_params->display_mode ?? $default_layout;s
+
+        return $display_mode === 'grid' || $display_mode === 'list' ? $display_mode : 'list';
     }
 }
 if (!function_exists('yatra_is_featured_tour')) {

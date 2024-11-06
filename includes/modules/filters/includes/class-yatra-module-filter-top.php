@@ -160,7 +160,10 @@ class Yatra_Module_Filter_Top
     {
         global $wp;
 
-        $selected = isset($_GET['display_mode']) ? sanitize_text_field($_GET['display_mode']) : 'list';
+        $default_layout = get_option('yatra_setting_layouts_tour_archive', 'list');
+
+
+        $selected = isset($_GET['display_mode']) ? sanitize_text_field($_GET['display_mode']) : $default_layout;
 
         $selected = $selected === 'list' || $selected === 'grid' ? $selected : 'list';
 
