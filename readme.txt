@@ -2,9 +2,9 @@
 Contributors: MantraBrain, gangadharkashyap
 Tags: travel-agency, travel, tour-booking, travel-booking, tour-operator
 Requires at least: 5.6
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.0
-Stable tag: 2.2.9
+Stable tag: 2.2.10
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -213,8 +213,8 @@ No, you don't need any coding skills. You can create unlimited tour packages wit
 
 == Changelog ==
 
-= 2.2.9 | 2024-08-08
-* Added - Bulk delete enquiry option added!
+= 2.2.10 | 2024-11-07
+* Added - Grid/List View
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
 
