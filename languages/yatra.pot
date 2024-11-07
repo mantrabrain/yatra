@@ -2,9 +2,9 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.2.8\n"
+"Project-Id-Version: Yatra - Best Travel & Tour Booking Plugin 2.2.9\n"
 "Report-Msgid-Bugs-To: mantrabrain@gmail.com\n"
-"POT-Creation-Date: 2024-07-13 14:28:32+00:00\n"
+"POT-Creation-Date: 2024-11-07 13:13:05+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -534,7 +534,7 @@ msgstr ""
 msgid "Enquiries"
 msgstr ""
 
-#: includes/admin/class-yatra-admin-tour-enquiries.php:50
+#: includes/admin/class-yatra-admin-tour-enquiries.php:52
 msgid "All Enquiries"
 msgstr ""
 
@@ -628,7 +628,7 @@ msgid "Booking Code"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:132
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:73
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:59
 #: includes/custom-post-type/class-yatra-custom-post-type-tour.php:14
 #: templates/emails/booking/notification.php:9
 #: templates/myaccount/tmpl-user-checkout.php:35
@@ -658,7 +658,7 @@ msgid "Status"
 msgstr ""
 
 #: includes/admin/list-tables/class-yatra-admin-list-table-bookings.php:135
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:75
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:61
 #: includes/class-yatra-checkout-form.php:53
 #: includes/class-yatra-create-account-form.php:40
 #: includes/class-yatra-enquiry-form.php:79
@@ -741,16 +741,16 @@ msgstr ""
 msgid "Date Created"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:72
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:58
 msgid "ID"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:74
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:60
 #: includes/class-yatra-enquiry-form.php:63
 msgid "Full Name"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:76
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:62
 #: includes/class-yatra-checkout-form.php:73
 #: includes/class-yatra-enquiry-form.php:98
 #: includes/class-yatra-user-form.php:99 includes/class-yatra-user-form.php:100
@@ -763,7 +763,7 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:77
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:63
 #: includes/class-yatra-checkout-form.php:81
 #: includes/class-yatra-enquiry-form.php:104
 #: includes/class-yatra-user-form.php:106
@@ -772,20 +772,20 @@ msgstr ""
 msgid "Phone Number"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:78
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:64
 msgid "Adults"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:79
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:65
 msgid "Childs"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:80
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:66
 #: templates/emails/enquiry/enquiry.php:16
 msgid "Subject"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:81
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:67
 #: includes/admin/templates/license/license.php:17
 #: includes/class-yatra-enquiry-form.php:131
 #: includes/class-yatra-enquiry-form.php:135
@@ -793,8 +793,12 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
-#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:82
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:68
 msgid "Created At"
+msgstr ""
+
+#: includes/admin/list-tables/class-yatra-admin-list-table-enquiries.php:83
+msgid "Permanently Delete"
 msgstr ""
 
 #: includes/admin/settings/class-yatra-settings-checkout.php:29
@@ -887,51 +891,64 @@ msgstr ""
 msgid "Heading & Content Style Tab"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:115
+#: includes/admin/settings/class-yatra-settings-design.php:106
+#: includes/admin/settings/class-yatra-settings-design.php:107
+msgid "Default Tour Archive Layout"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-design.php:112
+msgid "List"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-design.php:113
+msgid "Grid"
+msgstr ""
+
+#: includes/admin/settings/class-yatra-settings-design.php:127
 msgid "Color Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:121
+#: includes/admin/settings/class-yatra-settings-design.php:133
 msgid "Primary Color"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:122
+#: includes/admin/settings/class-yatra-settings-design.php:134
 msgid "Primary Color of Yatra Plugin"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:129
+#: includes/admin/settings/class-yatra-settings-design.php:141
 msgid "Available For Booking Color"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:130
+#: includes/admin/settings/class-yatra-settings-design.php:142
 msgid "Background Color for Available for Booking"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:137
+#: includes/admin/settings/class-yatra-settings-design.php:149
 msgid "Available For Enquiry Color"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:138
+#: includes/admin/settings/class-yatra-settings-design.php:150
 msgid "Background Color for Available for Enquiry Only"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:145
+#: includes/admin/settings/class-yatra-settings-design.php:157
 msgid "Not Available Color"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:146
+#: includes/admin/settings/class-yatra-settings-design.php:158
 msgid "Background Color for Not available for booking & enquiry"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:162
+#: includes/admin/settings/class-yatra-settings-design.php:174
 msgid "CSS Classes Settings"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:168
+#: includes/admin/settings/class-yatra-settings-design.php:180
 msgid "Page Container Class"
 msgstr ""
 
-#: includes/admin/settings/class-yatra-settings-design.php:169
+#: includes/admin/settings/class-yatra-settings-design.php:181
 #: includes/admin/setup/class-yatra-setup-wizard.php:469
 msgid "Container class for all page templates for yatra plugin."
 msgstr ""
