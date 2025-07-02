@@ -1,0 +1,1225 @@
+## Composer Configuration & Autoloading
+
+### composer.json (Enterprise Setup)
+```json
+{
+    "name": "yatra/travel-booking-plugin",
+    "description": "Professional WordPress travel booking and management plugin",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Yatra Development Team",
+            "email": "dev@yatra.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.0",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "monolog/monolog": "^3.0",
+        "respect/validation": "^2.0",
+        "vlucas/phpdotenv": "^5.0",
+        "league/fractal": "^0.20",
+        "ramsey/uuid": "^4.0",
+        "brick/money": "^0.5",
+        "nesbot/carbon": "^2.0",
+        "symfony/mailer": "^6.0",
+        "symfony/http-foundation": "^6.0",
+        "symfony/console": "^6.0",
+        "league/flysystem": "^3.0",
+        "predis/predis": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "mockery/mockery": "^1.5",
+        "brain/monkey": "^2.6",
+        "phpstan/phpstan": "^1.8",
+        "squizlabs/php_codesniffer": "^3.7",
+        "wp-coding-standards/wpcs": "^2.3",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Yatra\\": "src/",
+            "Yatra\\Database\\": "database/"
+        },
+        "files": [
+            "src/Config/constants.php",
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Yatra\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage",
+        "phpcs": "phpcs src/ --standard=WordPress",
+        "phpcbf": "phpcbf src/ --standard=WordPress",
+        "phpstan": "phpstan analyse src/",
+        "build": [
+            "@phpcs",
+            "@phpstan",
+            "@test"
+        ],
+        "post-autoload-dump": [
+            "@php -r \"file_exists('config/app.php') || copy('config/app.example.php', 'config/app.php');\""
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "extra": {
+        "wordpress-install-dir": "wp",
+        "installer-paths": {
+            "wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
+            "wp-content/themes/{$name}/": ["type:wordpress-theme"]
+        }
+    }
+}
+```
+
+### Main Plugin Bootstrap File (yatra.php)
+```php
+<?php
+/**
+ * Plugin Name: Yatra - Travel Booking & Management
+ * Plugin URI: https://yatra.com
+ * Description: Professional travel booking and management system for WordPress
+ * Version: 1.0.0
+ * Requires at least: 6.0
+ * Requires PHP: 8.0
+ * Author: Yatra Development Team
+ * Author URI: https://yatra.com
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: yatra
+ * Domain Path: /resources/lang
+ * Network: false
+ * Update URI: https://updates.yatra.com
+ */
+
+declare(strict_types=1);
+
+// Prevent direct access
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// Define plugin constants
+define('YATRA_PLUGIN_FILE', __FILE__);
+define('YATRA_PLUGIN_PATH', plugin_dir_path(__FILE__));
+define('YATRA_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('YATRA_PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('YATRA_VERSION', '1.0.0');
+define('YATRA_MIN_PHP_VERSION', '8.0');
+define('YATRA_MIN_WP_VERSION', '6.0');
+
+// Check minimum requirements
+if (!yatra_check_requirements()) {
+    return;
+}
+
+// Load Composer autoloader
+require_once YATRA_PLUGIN_PATH . 'vendor/autoload.php';
+
+// Bootstrap the plugin
+try {
+    $yatra = new \Yatra\Bootstrap();
+    $yatra->init();
+} catch (Throwable $e) {
+    wp_die(
+        sprintf(
+            esc_html__('Yatra plugin failed to initialize: %s', 'yatra'),
+            esc_html($e->getMessage())
+        )
+    );
+}
+
+/**
+ * Check if the minimum requirements are met
+ */
+function yatra_check_requirements(): bool {
+    global $wp_version;
+    
+    $errors = [];
+    
+    // Check PHP version
+    if (version_compare(PHP_VERSION, YATRA_MIN_PHP_VERSION, '<')) {
+        $errors[] = sprintf(
+            __('PHP version %s or higher is required. You are running version %s.', 'yatra'),
+            YATRA_MIN_PHP_VERSION,
+            PHP_VERSION
+        );
+    }
+    
+    // Check WordPress version
+    if (version_compare($wp_version, YATRA_MIN_WP_VERSION, '<')) {
+        $errors[] = sprintf(
+            __('WordPress version %s or higher is required. You are running version %s.', 'yatra'),
+            YATRA_MIN_WP_VERSION,
+            $wp_version
+        );
+    }
+    
+    // Check required PHP extensions
+    $required_extensions = ['curl', 'json', 'mbstring'];
+    foreach ($required_extensions as $extension) {
+        if (!extension_loaded($extension)) {
+            $errors[] = sprintf(
+                __('The PHP extension %s is required but not installed.', 'yatra'),
+                $extension
+            );
+        }
+    }
+    
+    if (!empty($errors)) {
+        add_action('admin_notices', function() use ($errors) {
+            echo '<div class="notice notice-error"><p>';
+            echo '<strong>' . esc_html__('Yatra Plugin Error:', 'yatra') . '</strong><br>';
+            foreach ($errors as $error) {
+                echo esc_html($error) . '<br>';
+            }
+            echo '</p></div>';
+        });
+        return false;
+    }
+    
+    return true;
+}
+
+/**
+ * Plugin activation hook
+ */
+register_activation_hook(__FILE__, function() {
+    if (!yatra_check_requirements()) {
+        deactivate_plugins(plugin_basename(__FILE__));
+        wp_die(__('Yatra plugin could not be activated due to unmet requirements.', 'yatra'));
+    }
+    
+    \Yatra\Core\Installer::activate();
+});
+
+/**
+ * Plugin deactivation hook
+ */
+register_deactivation_hook(__FILE__, function() {
+    \Yatra\Core\Installer::deactivate();
+});
+
+/**
+ * Plugin uninstall hook
+ */
+register_uninstall_hook(__FILE__, [\Yatra\Core\Installer::class, 'uninstall']);
+```
+
+### Application Bootstrap (src/Bootstrap.php)
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace Yatra;
+
+use Yatra\Core\Container;
+use Yatra\Core\ServiceProvider;
+use Yatra\Providers\AppServiceProvider;
+use Yatra\Providers\DatabaseServiceProvider;
+use Yatra\Providers## SaaS-Style UI Design Requirements
+
+### Custom Admin Interface (NO WordPress Default Styling)
+**Complete UI Overhaul** - Create a standalone admin interface that completely bypasses WordPress admin styling. The admin area should feel like a modern SaaS application with its own branding and design system.
+
+**Modern SaaS Design Elements:**
+- Clean, minimalist sidebar navigation with icons
+- Modern card-based layouts for content sections
+- Contemporary color schemes (dark/light mode toggle)
+- Smooth micro-animations and transitions
+- Professional typography (Google Fonts integration)
+- Modern form controls and input styling
+- Advanced data tables with sorting, filtering, and pagination
+- Modal dialogs and slide-out panels
+- Toast notifications for user feedback
+- Progressive loading states and skeleton screens
+
+**Custom Admin Layout Structure:**
+```html
+<!-- Custom Yatra Admin Layout -->
+<div class="yatra-admin-wrapper">
+    <aside class="yatra-sidebar">
+        <!-- Custom sidebar with modern navigation -->
+    </aside>
+    <main class="yatra-main-content">
+        <header class="yatra-top-bar">
+            <!-- Custom header with search, notifications, profile -->
+        </header>
+        <div class="yatra-content-area">
+            <!-- Dynamic content area -->
+        </div>
+    </main>
+</div>
+```
+
+**CSS Framework Requirements:**
+- Use modern CSS Grid and Flexbox for layouts
+- CSS Custom Properties for theming
+- Smooth animations with CSS transitions
+- Responsive design with mobile-first approach
+- Modern shadows, gradients, and visual effects
+- No Bootstrap or similar frameworks - custom CSS only
+
+**Color Scheme & Branding:**
+```css
+:root {
+    /* Primary Brand Colors */
+    --yatra-primary: #2563eb; /* Modern blue */
+    --yatra-primary-dark: #1d4ed8;
+    --yatra-primary-light: #3b82f6;
+    
+    /* Secondary Colors */
+    --yatra-secondary: #10b981; /* Success green */
+    --yatra-warning: #f59e0b;   /* Warning amber */
+    --yatra-danger: #ef4444;    /* Error red */
+    
+    /* Neutral Colors */
+    --yatra-gray-50: #f9fafb;
+    --yatra-gray-100: #f3f4f6;
+    --yatra-gray-200: #e5e7eb;
+    --yatra-gray-300: #d1d5db;
+    --yatra-gray-400: #9ca3af;
+    --yatra-gray-500: #6b7280;
+    --yatra-gray-600: #4b5563;
+    --yatra-gray-700: #374151;
+    --yatra-gray-800: #1f2937;
+    --yatra-gray-900: #111827;
+    
+    /* Dark Mode */
+    --yatra-dark-bg: #0f172a;
+    --yatra-dark-surface: #1e293b;
+    --yatra-dark-border: #334155;
+}
+```
+
+### Admin UI Components Library
+**Reusable Components** - Build a comprehensive component library:
+
+**Data Display Components:**
+- Advanced data tables with built-in search, filters, and export
+- Statistics cards with charts and trend indicators
+- Timeline components for booking history
+- Kanban boards for booking status management
+- Calendar views for trip scheduling
+
+**Form Components:**
+- Multi-step wizard forms
+- Rich text editors for descriptions
+- Image upload with drag & drop
+- Date/time pickers with advanced features
+- Multi-select with search and tagging
+- Toggle switches and modern checkboxes
+
+**Navigation Components:**
+- Breadcrumb navigation
+- Tab navigation with badges
+- Accordion panels
+- Sidebar navigation with collapsible sections
+
+**Feedback Components:**
+- Loading spinners and progress bars
+- Toast notifications (success, error, warning, info)
+- Confirmation modals
+- Empty states with illustrations
+
+### Frontend SaaS-Style Design
+**Customer-Facing Interface** - Modern, conversion-optimized design:
+
+**Trip Listing & Search:**
+- Pinterest-style grid layout for trip cards
+- Advanced filtering sidebar with smooth animations
+- Search autocomplete with instant results
+- Map integration with trip locations
+- Quick view modals for trip previews
+
+**Booking Flow:**
+- Multi-step booking process with progress indicators
+- Modern checkout design similar to Airbnb/Booking.com
+- Real-time availability checking
+- Secure payment forms with modern styling
+- Confirmation pages with detailed information
+
+**Customer Dashboard:**
+- Personal dashboard with upcoming trips
+- Booking history with status tracking
+- Document upload for travel requirements
+- Communication center for trip updates
+
+### Performance & UX Optimizations
+**Advanced Performance Features:**
+
+**Caching Strategy:**
+- Implement intelligent caching for frequently accessed data
+- Cache API responses and database queries
+- Progressive loading for large datasets
+- Lazy loading for images and non-critical content
+
+**Real-time Features:**
+- WebSocket connections for live availability updates
+- Real-time notifications for booking status changes
+- Live chat integration for customer support
+- Progressive Web App (PWA) capabilities
+
+**Mobile Optimization:**
+- Touch-friendly interface design
+- Swipe gestures for mobile navigation
+- Optimized forms for mobile input
+- Fast loading on mobile networks
+
+### Extension System Architecture
+**Plugin Extensibility Framework:**
+```php
+// Hook system for third-party extensions
+class Yatra_Extension_System {
+    public function register_extension($extension_name, $config) {
+        // Register custom extensions
+    }
+    
+    public function add_admin_menu_item($item_config) {
+        // Allow extensions to add admin menu items
+    }
+    
+    public function register_custom_field_type($field_type, $renderer) {
+        // Allow custom field types in forms
+    }
+    
+    public function add_payment_gateway($gateway_class) {
+        // Register new payment gateways
+    }
+    
+    public function register_notification_channel($channel_class) {
+        // Add new notification methods (SMS, Slack, etc.)
+    }
+}
+```
+
+**Database Extensibility:**
+- Custom entity system for flexible data storage
+- Meta fields system for additional attributes
+- API endpoints for third-party integrations
+- Webhook system for external notifications
+
+## Advanced UI Implementation Requirements# Yatra WordPress Travel Booking Plugin - Development Prompt
+
+## Project Overview
+Create a comprehensive WordPress plugin called "Yatra" for travel websites that enables trip and travel booking functionality. The plugin should be modular, scalable, and follow WordPress best practices.
+
+## Priority Implementation Phases
+
+### Phase 1: Core Foundation (Priority 1)
+**Essential features that must be implemented first:**
+
+#### Custom Database Structure (Performance Optimized & Extensible)
+```sql
+-- Core configuration table for extensibility
+CREATE TABLE wp_yatra_config (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    config_key VARCHAR(100) UNIQUE NOT NULL,
+    config_value LONGTEXT,
+    config_type ENUM('string', 'json', 'number', 'boolean') DEFAULT 'string',
+    is_autoload BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_config_key (config_key),
+    INDEX idx_autoload (is_autoload)
+);
+
+-- Extensible entity system for custom fields
+CREATE TABLE wp_yatra_entities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    entity_type VARCHAR(50) NOT NULL, -- 'trip', 'destination', 'booking', etc.
+    entity_id INT NOT NULL,
+    meta_key VARCHAR(100) NOT NULL,
+    meta_value LONGTEXT,
+    meta_type ENUM('string', 'number', 'json', 'boolean', 'date') DEFAULT 'string',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_entity_lookup (entity_type, entity_id),
+    INDEX idx_meta_key (meta_key),
+    INDEX idx_composite (entity_type, entity_id, meta_key),
+    UNIQUE KEY unique_entity_meta (entity_type, entity_id, meta_key)
+);
+
+-- Optimized destinations table
+CREATE TABLE wp_yatra_destinations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    description LONGTEXT,
+    short_description TEXT,
+    featured_image VARCHAR(500),
+    gallery JSON, -- Structured JSON for better querying
+    country VARCHAR(100),
+    region VARCHAR(100),
+    timezone VARCHAR(50),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    elevation INT, -- meters above sea level
+    climate_info JSON,
+    best_time_to_visit JSON,
+    currency VARCHAR(10),
+    language VARCHAR(100),
+    emergency_contacts JSON,
+    visa_requirements TEXT,
+    status ENUM('active', 'inactive', 'draft') DEFAULT 'active',
+    sort_order INT DEFAULT 0,
+    seo_title VARCHAR(255),
+    seo_description TEXT,
+    seo_keywords TEXT,
+    view_count INT DEFAULT 0,
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_status (status),
+    INDEX idx_country_region (country, region),
+    INDEX idx_slug (slug),
+    INDEX idx_sort_order (sort_order),
+    FULLTEXT idx_search (name, description, short_description),
+    FOREIGN KEY (created_by) REFERENCES wp_users(ID)
+);
+
+-- Optimized trips table with better indexing
+CREATE TABLE wp_yatra_trips (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    description LONGTEXT,
+    short_description TEXT,
+    destination_id INT,
+    duration_days INT NOT NULL,
+    duration_nights INT NOT NULL,
+    max_people INT DEFAULT 20,
+    min_people INT DEFAULT 1,
+    difficulty_level ENUM('easy', 'moderate', 'challenging', 'expert') DEFAULT 'moderate',
+    trip_type ENUM('adventure', 'cultural', 'wildlife', 'pilgrimage', 'leisure', 'business', 'custom') DEFAULT 'leisure',
+    featured_image VARCHAR(500),
+    gallery JSON,
+    base_price DECIMAL(12, 2) NOT NULL,
+    child_price DECIMAL(12, 2),
+    single_supplement DECIMAL(12, 2) DEFAULT 0,
+    group_discount_rules JSON, -- Flexible discount structure
+    seasonal_pricing JSON, -- Date-based pricing rules
+    includes JSON,
+    excludes JSON,
+    itinerary JSON, -- Structured itinerary data
+    equipment_list JSON,
+    fitness_requirements TEXT,
+    age_restrictions JSON,
+    cancellation_policy TEXT,
+    terms_conditions TEXT,
+    status ENUM('active', 'inactive', 'draft', 'archived') DEFAULT 'draft',
+    featured BOOLEAN DEFAULT FALSE,
+    priority INT DEFAULT 0, -- For sorting featured trips
+    seo_title VARCHAR(255),
+    seo_description TEXT,
+    seo_keywords TEXT,
+    booking_count INT DEFAULT 0,
+    view_count INT DEFAULT 0,
+    average_rating DECIMAL(3, 2) DEFAULT 0,
+    total_reviews INT DEFAULT 0,
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_status (status),
+    INDEX idx_destination (destination_id),
+    INDEX idx_type_difficulty (trip_type, difficulty_level),
+    INDEX idx_featured (featured, priority DESC),
+    INDEX idx_price (base_price),
+    INDEX idx_duration (duration_days),
+    INDEX idx_popularity (booking_count DESC, average_rating DESC),
+    FULLTEXT idx_search (title, description, short_description),
+    FOREIGN KEY (destination_id) REFERENCES wp_yatra_destinations(id),
+    FOREIGN KEY (created_by) REFERENCES wp_users(ID)
+);
+
+-- Optimized trip dates with better performance
+CREATE TABLE wp_yatra_trip_dates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    trip_id INT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    available_seats INT NOT NULL,
+    booked_seats INT DEFAULT 0,
+    waitlist_count INT DEFAULT 0,
+    price_modifier DECIMAL(8, 4) DEFAULT 1.0000, -- Multiplier for base price
+    fixed_price DECIMAL(12, 2) NULL, -- Override price if set
+    guide_id INT NULL, -- Assigned guide
+    special_notes TEXT,
+    status ENUM('available', 'full', 'cancelled', 'completed') DEFAULT 'available',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_trip_dates (trip_id, start_date),
+    INDEX idx_availability (status, start_date),
+    INDEX idx_date_range (start_date, end_date),
+    FOREIGN KEY (trip_id) REFERENCES wp_yatra_trips(id) ON DELETE CASCADE,
+    FOREIGN KEY (guide_id) REFERENCES wp_users(ID)
+);
+
+-- Enhanced bookings table
+CREATE TABLE wp_yatra_bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_number VARCHAR(25) UNIQUE NOT NULL,
+    trip_id INT NOT NULL,
+    trip_date_id INT NOT NULL,
+    customer_id INT,
+    lead_traveler JSON NOT NULL, -- Primary contact details
+    travelers JSON NOT NULL, -- All traveler details
+    adults INT DEFAULT 1,
+    children INT DEFAULT 0,
+    infants INT DEFAULT 0,
+    total_amount DECIMAL(12, 2) NOT NULL,
+    paid_amount DECIMAL(12, 2) DEFAULT 0,
+    due_amount DECIMAL(12, 2) GENERATED ALWAYS AS (total_amount - paid_amount) STORED,
+    currency VARCHAR(10) DEFAULT 'USD',
+    exchange_rate DECIMAL(10, 4) DEFAULT 1.0000,
+    payment_status ENUM('pending', 'partial', 'completed', 'refunded', 'cancelled') DEFAULT 'pending',
+    booking_status ENUM('confirmed', 'pending', 'cancelled', 'completed', 'no_show') DEFAULT 'pending',
+    source VARCHAR(50) DEFAULT 'website', -- booking source tracking
+    referral_code VARCHAR(50),
+    special_requirements TEXT,
+    dietary_restrictions JSON,
+    emergency_contacts JSON,
+    insurance_details JSON,
+    booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    confirmation_date TIMESTAMP NULL,
+    cancellation_date TIMESTAMP NULL,
+    cancellation_reason TEXT,
+    refund_amount DECIMAL(12, 2) DEFAULT 0,
+    commission_rate DECIMAL(5, 4) DEFAULT 0,
+    agent_id INT NULL, -- Travel agent/affiliate
+    notes TEXT,
+    internal_notes TEXT, -- Admin only notes
+    INDEX idx_booking_number (booking_number),
+    INDEX idx_trip_date (trip_id, trip_date_id),
+    INDEX idx_customer (customer_id),
+    INDEX idx_status (booking_status, payment_status),
+    INDEX idx_booking_date (booking_date),
+    INDEX idx_agent (agent_id),
+    FOREIGN KEY (trip_id) REFERENCES wp_yatra_trips(id),
+    FOREIGN KEY (trip_date_id) REFERENCES wp_yatra_trip_dates(id),
+    FOREIGN KEY (customer_id) REFERENCES wp_users(ID),
+    FOREIGN KEY (agent_id) REFERENCES wp_users(ID)
+);
+
+-- Enhanced payments table
+CREATE TABLE wp_yatra_payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT NOT NULL,
+    payment_type ENUM('deposit', 'installment', 'final', 'refund', 'fee') DEFAULT 'deposit',
+    amount DECIMAL(12, 2) NOT NULL,
+    currency VARCHAR(10) DEFAULT 'USD',
+    payment_method VARCHAR(50) NOT NULL,
+    gateway VARCHAR(50) NOT NULL,
+    transaction_id VARCHAR(150),
+    gateway_transaction_id VARCHAR(150),
+    payment_status ENUM('pending', 'processing', 'completed', 'failed', 'refunded', 'cancelled') DEFAULT 'pending',
+    gateway_response JSON,
+    failure_reason TEXT,
+    processing_fee DECIMAL(8, 2) DEFAULT 0,
+    net_amount DECIMAL(12, 2) GENERATED ALWAYS AS (amount - processing_fee) STORED,
+    scheduled_date DATE NULL, -- For installment payments
+    payment_date TIMESTAMP NULL,
+    refund_date TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_booking (booking_id),
+    INDEX idx_status (payment_status),
+    INDEX idx_gateway (gateway, transaction_id),
+    INDEX idx_payment_date (payment_date),
+    FOREIGN KEY (booking_id) REFERENCES wp_yatra_bookings(id) ON DELETE CASCADE
+);
+
+-- Enhanced reviews with media support
+CREATE TABLE wp_yatra_reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    trip_id INT NOT NULL,
+    booking_id INT,
+    customer_id INT,
+    overall_rating DECIMAL(2, 1) CHECK (overall_rating >= 1 AND overall_rating <= 5),
+    guide_rating DECIMAL(2, 1) CHECK (guide_rating >= 1 AND guide_rating <= 5),
+    accommodation_rating DECIMAL(2, 1) CHECK (accommodation_rating >= 1 AND accommodation_rating <= 5),
+    transport_rating DECIMAL(2, 1) CHECK (transport_rating >= 1 AND transport_rating <= 5),
+    value_rating DECIMAL(2, 1) CHECK (value_rating >= 1 AND value_rating <= 5),
+    title VARCHAR(255),
+    review_text TEXT,
+    photos JSON, -- Array of photo URLs
+    verified_booking BOOLEAN DEFAULT FALSE,
+    helpful_votes INT DEFAULT 0,
+    total_votes INT DEFAULT 0,
+    response_text TEXT, -- Admin response
+    response_date TIMESTAMP NULL,
+    status ENUM('approved', 'pending', 'rejected', 'flagged') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_trip (trip_id),
+    INDEX idx_customer (customer_id),
+    INDEX idx_status (status),
+    INDEX idx_rating (overall_rating),
+    INDEX idx_verified (verified_booking),
+    FOREIGN KEY (trip_id) REFERENCES wp_yatra_trips(id),
+    FOREIGN KEY (booking_id) REFERENCES wp_yatra_bookings(id),
+    FOREIGN KEY (customer_id) REFERENCES wp_users(ID)
+);
+
+-- Activity log for audit trail
+CREATE TABLE wp_yatra_activity_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    entity_type VARCHAR(50) NOT NULL,
+    entity_id INT NOT NULL,
+    action VARCHAR(100) NOT NULL,
+    old_values JSON,
+    new_values JSON,
+    user_id INT,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_entity (entity_type, entity_id),
+    INDEX idx_user (user_id),
+    INDEX idx_action (action),
+    INDEX idx_created (created_at),
+    FOREIGN KEY (user_id) REFERENCES wp_users(ID)
+);
+
+-- Notification system
+CREATE TABLE wp_yatra_notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    recipients JSON, -- User IDs or email addresses
+    channels JSON, -- email, sms, push, etc.
+    data JSON, -- Additional data for templates
+    scheduled_at TIMESTAMP NULL,
+    sent_at TIMESTAMP NULL,
+    status ENUM('pending', 'sent', 'failed', 'cancelled') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_status (status),
+    INDEX idx_scheduled (scheduled_at),
+    INDEX idx_type (type)
+);
+
+-- Caching table for performance
+CREATE TABLE wp_yatra_cache (
+    cache_key VARCHAR(255) PRIMARY KEY,
+    cache_value LONGTEXT,
+    expiry_time TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_expiry (expiry_time)
+);
+
+-- Activities table for global activities management
+CREATE TABLE wp_yatra_activities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    time VARCHAR(10),
+    location VARCHAR(255),
+    image VARCHAR(255),
+    meta JSON,
+    status ENUM('active','inactive') DEFAULT 'active',
+    created_by INT,
+    updated_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_status (status),
+    INDEX idx_created_by (created_by),
+    INDEX idx_updated_by (updated_by)
+);
+```
+
+#### Enterprise-Grade Plugin Structure (PSR-4 Compliant with Composer)
+```
+yatra/
+├── yatra.php                          # Main plugin bootstrap file
+├── composer.json                      # Composer configuration
+├── composer.lock                      # Composer lock file
+├── vendor/                           # Composer dependencies
+├── .gitignore                        # Git ignore rules
+├── README.md                         # Plugin documentation
+├── CHANGELOG.md                      # Version history
+├── phpunit.xml                       # PHPUnit configuration
+├── webpack.config.js                 # Asset compilation
+├── package.json                      # NPM dependencies
+├── src/                              # PSR-4 compliant source code
+│   ├── Application.php               # Main application container
+│   ├── Bootstrap.php                 # Plugin initialization
+│   ├── Config/                       # Configuration files
+│   │   ├── app.php                   # Main app config
+│   │   ├── database.php              # Database configuration
+│   │   ├── services.php              # Service container bindings
+│   │   └── constants.php             # Plugin constants
+│   ├── Core/                         # Core framework classes
+│   │   ├── Container.php             # Dependency injection container
+│   │   ├── ServiceProvider.php       # Abstract service provider
+│   │   ├── Database/                 # Database layer
+│   │   │   ├── Connection.php        # Database connection manager
+│   │   │   ├── QueryBuilder.php      # Query builder
+│   │   │   ├── Migration.php         # Database migrations
+│   │   │   ├── Schema.php            # Schema builder
+│   │   │   └── Seeder.php            # Database seeding
+│   │   ├── Cache/                    # Caching system
+│   │   │   ├── CacheInterface.php    # Cache contract
+│   │   │   ├── FileCache.php         # File-based cache
+│   │   │   ├── ObjectCache.php       # WordPress object cache
+│   │   │   └── RedisCache.php        # Redis cache adapter
+│   │   ├── Events/                   # Event system
+│   │   │   ├── EventManager.php      # Event dispatcher
+│   │   │   ├── EventInterface.php    # Event contract
+│   │   │   └── ListenerInterface.php # Event listener contract
+│   │   ├── Validation/               # Data validation
+│   │   │   ├── Validator.php         # Main validator
+│   │   │   ├── Rules/                # Validation rules
+│   │   │   └── ValidationException.php
+│   │   ├── Http/                     # HTTP layer
+│   │   │   ├── Request.php           # HTTP request wrapper
+│   │   │   ├── Response.php          # HTTP response wrapper
+│   │   │   ├── JsonResponse.php      # JSON response
+│   │   │   └── RedirectResponse.php  # Redirect response
+│   │   ├── Security/                 # Security utilities
+│   │   │   ├── Nonce.php             # WordPress nonce wrapper
+│   │   │   ├── Sanitizer.php         # Data sanitization
+│   │   │   ├── Capability.php        # Permission management
+│   │   │   └── CSRF.php              # CSRF protection
+│   │   └── Utilities/                # Helper utilities
+│   │       ├── Str.php               # String utilities
+│   │       ├── Arr.php               # Array utilities
+│   │       ├── Date.php              # Date utilities
+│   │       └── Currency.php          # Currency utilities
+│   ├── Models/                       # Domain models (Active Record pattern)
+│   │   ├── BaseModel.php             # Abstract base model
+│   │   ├── Destination.php           # Destination model
+│   │   ├── Trip.php                  # Trip model
+│   │   ├── TripDate.php              # Trip date model
+│   │   ├── Booking.php               # Booking model
+│   │   ├── Payment.php               # Payment model
+│   │   ├── Review.php                # Review model
+│   │   ├── Customer.php              # Customer model
+│   │   ├── Notification.php          # Notification model
+│   │   ├── ActivityLog.php           # Activity log model
+│   │   ├── Entity.php                # Custom entity model
+│   │   └── Relations/                # Model relationships
+│   │       ├── HasMany.php           # One-to-many relation
+│   │       ├── BelongsTo.php         # Many-to-one relation
+│   │       └── ManyToMany.php        # Many-to-many relation
+│   ├── Repositories/                 # Repository pattern for data access
+│   │   ├── RepositoryInterface.php   # Repository contract
+│   │   ├── BaseRepository.php        # Abstract repository
+│   │   ├── DestinationRepository.php # Destination data access
+│   │   ├── TripRepository.php        # Trip data access
+│   │   ├── BookingRepository.php     # Booking data access
+│   │   ├── PaymentRepository.php     # Payment data access
+│   │   ├── ReviewRepository.php      # Review data access
+│   │   └── CustomerRepository.php    # Customer data access
+│   ├── Services/                     # Business logic services
+│   │   ├── BookingService.php        # Booking business logic
+│   │   ├── PaymentService.php        # Payment processing
+│   │   ├── PricingService.php        # Dynamic pricing logic
+│   │   ├── NotificationService.php   # Notification management
+│   │   ├── EmailService.php          # Email handling
+│   │   ├── SearchService.php         # Search functionality
+│   │   ├── ReportService.php         # Analytics and reporting
+│   │   ├── InventoryService.php      # Seat availability management
+│   │   ├── CurrencyService.php       # Multi-currency support
+│   │   └── ImportExportService.php   # Data import/export
+│   ├── Controllers/                  # HTTP controllers
+│   │   ├── BaseController.php        # Abstract controller
+│   │   ├── Admin/                    # Admin controllers
+│   │   │   ├── DashboardController.php
+│   │   │   ├── TripController.php
+│   │   │   ├── BookingController.php
+│   │   │   ├── CustomerController.php
+│   │   │   ├── PaymentController.php
+│   │   │   ├── ReviewController.php
+│   │   │   ├── SettingsController.php
+│   │   │   ├── ReportController.php
+│   │   │   └── ApiController.php
+│   │   ├── Frontend/                 # Frontend controllers
+│   │   │   ├── TripController.php
+│   │   │   ├── BookingController.php
+│   │   │   ├── SearchController.php
+│   │   │   ├── CustomerController.php
+│   │   │   └── ReviewController.php
+│   │   └── Api/                      # REST API controllers
+│   │       ├── V1/                   # API version 1
+│   │       │   ├── TripApiController.php
+│   │       │   ├── BookingApiController.php
+│   │       │   ├── PaymentApiController.php
+│   │       │   └── WebhookController.php
+│   │       └── V2/                   # API version 2 (future)
+│   ├── Middleware/                   # Request middleware
+│   │   ├── MiddlewareInterface.php   # Middleware contract
+│   │   ├── AuthMiddleware.php        # Authentication
+│   │   ├── PermissionMiddleware.php  # Authorization
+│   │   ├── RateLimitMiddleware.php   # Rate limiting
+│   │   ├── CacheMiddleware.php       # Response caching
+│   │   └── LoggingMiddleware.php     # Request logging
+│   ├── Providers/                    # Service providers
+│   │   ├── AppServiceProvider.php    # Core app services
+│   │   ├── DatabaseServiceProvider.php # Database services
+│   │   ├── CacheServiceProvider.php  # Cache services
+│   │   ├── EventServiceProvider.php  # Event services
+│   │   ├── PaymentServiceProvider.php # Payment gateways
+│   │   ├── AdminServiceProvider.php  # Admin interface
+│   │   └── ApiServiceProvider.php    # API services
+│   ├── Gateways/                     # Payment gateways
+│   │   ├── GatewayInterface.php      # Gateway contract
+│   │   ├── AbstractGateway.php       # Base gateway class
+│   │   ├── PayPalGateway.php         # PayPal integration
+│   │   ├── StripeGateway.php         # Stripe integration
+│   │   ├── RazorpayGateway.php       # Razorpay integration
+│   │   ├── PaystackGateway.php       # Paystack integration
+│   │   └── BankTransferGateway.php   # Manual bank transfer
+│   ├── Notifications/                # Notification channels
+│   │   ├── NotificationInterface.php # Notification contract
+│   │   ├── MailNotification.php      # Email notifications
+│   │   ├── SmsNotification.php       # SMS notifications
+│   │   ├── SlackNotification.php     # Slack notifications
+│   │   └── WebhookNotification.php   # Webhook notifications
+│   ├── Extensions/                   # Extension system
+│   │   ├── ExtensionManager.php      # Extension loader
+│   │   ├── ExtensionInterface.php    # Extension contract
+│   │   ├── HookManager.php           # WordPress hooks wrapper
+│   │   └── FilterManager.php         # WordPress filters wrapper
+│   ├── Exceptions/                   # Custom exceptions
+│   │   ├── YatraException.php        # Base exception
+│   │   ├── ValidationException.php   # Validation errors
+│   │   ├── PaymentException.php      # Payment errors
+│   │   ├── BookingException.php      # Booking errors
+│   │   └── DatabaseException.php     # Database errors
+│   ├── Commands/                     # CLI commands (WP-CLI)
+│   │   ├── BaseCommand.php           # Abstract command
+│   │   ├── MigrateCommand.php        # Database migrations
+│   │   ├── SeedCommand.php           # Database seeding
+│   │   ├── CacheCommand.php          # Cache management
+│   │   └── ImportCommand.php         # Data import
+│   ├── Jobs/                         # Background jobs
+│   │   ├── JobInterface.php          # Job contract
+│   │   ├── SendEmailJob.php          # Email sending
+│   │   ├── ProcessPaymentJob.php     # Payment processing
+│   │   ├── GenerateReportJob.php     # Report generation
+│   │   └── BackupDataJob.php         # Data backup
+│   ├── Traits/                       # Reusable traits
+│   │   ├── Singleton.php             # Singleton pattern
+│   │   ├── Cacheable.php             # Caching functionality
+│   │   ├── Loggable.php              # Logging functionality
+│   │   ├── Validatable.php           # Validation functionality
+│   │   └── Timestampable.php         # Timestamp handling
+│   └── Enums/                        # Type-safe enumerations (PHP 8.1+)
+│       ├── BookingStatus.php         # Booking statuses
+│       ├── PaymentStatus.php         # Payment statuses
+│       ├── TripStatus.php            # Trip statuses
+│       ├── DifficultyLevel.php       # Difficulty levels
+│       └── TripType.php              # Trip types
+├── database/                         # Database files
+│   ├── migrations/                   # Database migrations
+│   │   ├── 001_create_destinations_table.php
+│   │   ├── 002_create_trips_table.php
+│   │   ├── 003_create_trip_dates_table.php
+│   │   ├── 004_create_bookings_table.php
+│   │   ├── 005_create_payments_table.php
+│   │   ├── 006_create_reviews_table.php
+│   │   ├── 007_create_notifications_table.php
+│   │   ├── 008_create_activity_log_table.php
+│   │   ├── 009_create_entities_table.php
+│   │   └── 010_create_cache_table.php
+│   ├── seeds/                        # Database seeders
+│   │   ├── DestinationSeeder.php     # Sample destinations
+│   │   ├── TripSeeder.php            # Sample trips
+│   │   └── UserSeeder.php            # Sample users
+│   └── factories/                    # Model factories for testing
+│       ├── DestinationFactory.php
+│       ├── TripFactory.php
+│       └── BookingFactory.php
+├── resources/                        # Resource files
+│   ├── views/                        # Template files
+│   │   ├── admin/                    # Admin templates
+│   │   │   ├── layouts/              # Layout templates
+│   │   │   │   ├── app.php           # Main admin layout
+│   │   │   │   ├── auth.php          # Authentication layout
+│   │   │   │   └── components/       # Reusable components
+│   │   │   ├── dashboard/            # Dashboard views
+│   │   │   ├── trips/                # Trip management views
+│   │   │   ├── bookings/             # Booking management views
+│   │   │   ├── customers/            # Customer management views
+│   │   │   ├── payments/             # Payment views
+│   │   │   ├── reports/              # Report views
+│   │   │   └── settings/             # Settings views
+│   │   ├── frontend/                 # Frontend templates
+│   │   │   ├── layouts/              # Frontend layouts
+│   │   │   ├── trips/                # Trip listing and details
+│   │   │   ├── booking/              # Booking flow
+│   │   │   ├── customer/             # Customer dashboard
+│   │   │   └── partials/             # Partial templates
+│   │   └── emails/                   # Email templates
+│   │       ├── layouts/              # Email layouts
+│   │       ├── booking/              # Booking emails
+│   │       ├── payment/              # Payment emails
+│   │       └── marketing/            # Marketing emails
+│   ├── lang/                         # Language files
+│   │   ├── en/                       # English translations
+│   │   ├── es/                       # Spanish translations
+│   │   └── fr/                       # French translations
+│   └── config/                       # Configuration templates
+│       ├── admin-menu.php            # Admin menu structure
+│       ├── capabilities.php          # User capabilities
+│       └── cron-jobs.php             # Scheduled tasks
+├── assets/                           # Frontend assets (source)
+│   ├── admin/                        # Admin assets
+│   │   ├── scss/                     # Sass stylesheets
+│   │   │   ├── app.scss              # Main admin styles
+│   │   │   ├── components/           # Component styles
+│   │   │   ├── layouts/              # Layout styles
+│   │   │   └── themes/               # Theme variations
+│   │   ├── js/                       # JavaScript files
+│   │   │   ├── app.js                # Main admin script
+│   │   │   ├── components/           # JS components
+│   │   │   ├── pages/                # Page-specific scripts
+│   │   │   └── utils/                # Utility functions
+│   │   └── images/                   # Images and icons
+│   ├── frontend/                     # Frontend assets
+│   │   ├── scss/                     # Frontend styles
+│   │   ├── js/                       # Frontend scripts
+│   │   └── images/                   # Frontend images
+│   └── shared/                       # Shared assets
+│       ├── fonts/                    # Custom fonts
+│       ├── icons/                    # SVG icons
+│       └── vendor/                   # Third-party assets
+├── public/                           # Public assets (compiled)
+│   ├── admin/                        # Compiled admin assets
+│   │   ├── css/                      # Minified CSS
+│   │   ├── js/                       # Minified JavaScript
+│   │   └── images/                   # Optimized images
+│   ├── frontend/                     # Compiled frontend assets
+│   └── shared/                       # Shared compiled assets
+├── tests/                            # Test files
+│   ├── Unit/                         # Unit tests
+│   │   ├── Models/                   # Model tests
+│   │   ├── Services/                 # Service tests
+│   │   └── Repositories/             # Repository tests
+│   ├── Integration/                  # Integration tests
+│   │   ├── Controllers/              # Controller tests
+│   │   ├── Gateways/                 # Gateway tests
+│   │   └── Api/                      # API tests
+│   ├── Feature/                      # Feature tests
+│   │   ├── BookingFlow/              # Booking process tests
+│   │   ├── PaymentFlow/              # Payment process tests
+│   │   └── AdminFlow/                # Admin workflow tests
+│   ├── fixtures/                     # Test data fixtures
+│   └── bootstrap.php                 # Test bootstrap
+├── docs/                             # Documentation
+│   ├── api/                          # API documentation
+│   ├── developer/                    # Developer guides
+│   ├── user/                         # User documentation
+│   └── deployment/                   # Deployment guides
+├── config/                           # Environment configuration
+│   ├── development.php               # Development config
+│   ├── staging.php                   # Staging config
+│   └── production.php                # Production config
+└── storage/                          # Storage directory
+    ├── logs/                         # Log files
+    ├── cache/                        # File cache
+    ├── uploads/                      # Uploaded files
+    └── temp/                         # Temporary files
+```
+
+#### Core Functionality Requirements
+
+**1. Trip Management System**
+- Create custom post type for trips with meta fields
+- CRUD operations for trips, destinations, and bookings
+- Dynamic pricing based on dates and availability
+- Inventory management with real-time seat tracking
+
+**2. Booking System**
+- Real-time availability checking
+- Booking form with validation
+- Automatic booking number generation
+- Email confirmations and notifications
+
+**3. Payment Integration**
+- Support for PayPal and Stripe initially
+- Secure payment processing with hooks for additional gateways
+- Partial payment and installment support
+- Refund management
+
+**4. Admin Dashboard**
+- Trip management interface
+- Booking management with status updates
+- Basic reporting (revenue, popular trips, booking trends)
+- Settings panel for plugin configuration
+
+### Phase 2: Enhanced Features (Priority 2)
+
+**1. Advanced Search & Filtering**
+- AJAX-powered search with filters
+- Date range picker for availability
+- Price range slider
+- Trip type and difficulty filters
+
+**2. Customer Management**
+- Customer dashboard for booking history
+- Profile management
+- Wishlist functionality
+- Booking modifications (within policy)
+
+**3. Dynamic Pricing Engine**
+- Seasonal pricing rules
+- Early bird discounts
+- Group discounts
+- Last-minute deals
+
+**4. Enhanced Admin Features**
+- Bulk operations for trips and bookings
+- Advanced reporting with charts
+- Export functionality (CSV, PDF)
+- Email template customization
+
+### Phase 3: Advanced Features (Priority 3)
+
+**1. Multi-currency Support**
+- Currency conversion API integration
+- Location-based currency detection
+- Price display in multiple currencies
+
+**2. Review System**
+- Customer review submission
+- Rating display and aggregation
+- Photo uploads with reviews
+- Review moderation system
+
+**3. Mobile Optimization**
+- Progressive Web App features
+- Touch-friendly interfaces
+- Mobile payment optimization
+
+**4. Integration Features**
+- REST API for third-party integrations
+- Webhook support for external systems
+- Social media sharing
+- Newsletter integration
+
+## Technical Requirements
+
+### WordPress Standards
+- Follow WordPress Coding Standards
+- Use WordPress hooks and filters extensively
+- Implement proper sanitization and validation
+- Support WordPress multisite
+- Translation ready with proper text domains
+
+### Security Requirements
+- Nonce verification for all forms
+- SQL injection prevention
+- XSS protection
+- Capability checks for admin functions
+- Secure payment processing
+
+### Performance Requirements
+- Database query optimization
+- Caching support (WP Object Cache, Redis)
+- Image optimization for galleries
+- Lazy loading for frontend components
+- Minimize JavaScript and CSS files
+
+### Code Organization
+- Object-oriented programming approach
+- Singleton pattern for main classes
+- Factory pattern for payment gateways
+- Observer pattern for booking notifications
+- Proper autoloading with Composer (optional)
+
+## Shortcodes to Implement
+
+```php
+// Trip listing
+[yatra_trips limit="12" destination="nepal" type="adventure"]
+
+// Single trip display
+[yatra_trip id="123"]
+
+// Search form
+[yatra_search_form]
+
+// Booking form
+[yatra_booking_form trip_id="123"]
+
+// Customer dashboard
+[yatra_customer_dashboard]
+
+// Popular destinations
+[yatra_destinations featured="true" limit="6"]
+```
+
+## Admin Menu Structure
+```
+Yatra
+├── Dashboard (Overview stats)
+├── Trips
+│   ├── All Trips
+│   ├── Add New Trip
+│   └── Categories
+├── Destinations
+│   ├── All Destinations
+│   └── Add New Destination
+├── Bookings
+│   ├── All Bookings
+│   ├── Confirmed
+│   ├── Pending
+│   └── Cancelled
+├── Customers
+├── Reviews
+├── Reports
+└── Settings
+    ├── General
+    ├── Payment Gateways
+    ├── Email Templates
+    └── Advanced
+```
+
+## Initial Settings Panel Options
+- Currency settings
+- Date formats
+- Email configurations
+- Payment gateway settings
+- Booking policies
+- Terms and conditions
+- Privacy policy links
+
+## Development Notes
+- Start with Phase 1 features only
+- Create proper activation/deactivation hooks
+- Implement uninstall.php for clean removal
+- Add proper error handling and logging
+- Create unit tests for critical functions
+- Document all hooks and filters for extensibility
+
+## File Naming Conventions
+- Classes: `{name}.php`
+- Templates: `{name}.php`
+- JavaScript: `{name}.js`
+- CSS: `{name}.css`
+
+## Hook Naming Conventions
+- Actions: `yatra_{action_name}`
+- Filters: `yatra_{filter_name}`
+- AJAX: `wp_ajax_yatra_{action}`
+
+You need to focus we need to build premium version so please make the thing that much dynamic.

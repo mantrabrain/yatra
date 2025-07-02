@@ -1,52 +1,51 @@
 <?php
-
 /**
- * Fired when the plugin is uninstalled.
- *
- * When populating this file, consider the following flow
- * of control:
- *
- * - This method should be static
- * - Check if the $_REQUEST content actually is the plugin name
- * - Run an admin referrer check to make sure it goes through authentication
- * - Verify the output of $_GET makes sense
- * - Repeat with other user roles. Best directly by using the links/query string parameters.
- * - Repeat things for multisite. Once for a single site in the network, once sitewide.
- *
- * This file may be updated more in future version of the Boilerplate; however, this is the
- * general skeleton and outline for how the file should work.
- *
- * For more information, see the following discussion:
- * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
- *
- *
- * @since      1.0.0
- * * @package    Yatra
+ * Uninstall Yatra Plugin
+ * 
+ * This file is executed when the plugin is deleted from WordPress.
+ * It removes all plugin data including database tables, options, and files.
  */
 
-// If uninstall not called from WordPress, then exit.
+// If uninstall not called from WordPress, exit
 if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
+// Include the installer class to use its cleanup methods
+require_once plugin_dir_path(__FILE__) . 'src/Core/Installer.php';
 
-if (!defined('YATRA_REMOVE_ALL_DATA')) {
+// Run the uninstall process
+\Yatra\Core\Installer::uninstall();
 
-    define('YATRA_REMOVE_ALL_DATA', true);
-}
+// Additional cleanup
+global $wpdb;
 
+// Remove any remaining options that might not be in the installer
+$wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE 'yatra_%'");
+
+// Remove any user meta related to Yatra
+$wpdb->query("DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE 'yatra_%'");
+
+// Remove any post meta related to Yatra
+$wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE 'yatra_%'");
+
+// Remove any terms related to Yatra
+$wpdb->query("DELETE FROM {$wpdb->terms} WHERE slug LIKE 'yatra_%'");
+
+// Clear any cached data
+wp_cache_flush();
+
+// Remove uploaded files (optional - uncomment if you want to remove all Yatra uploads)
 /*
- * Only remove ALL demo importer data if YATRA_REMOVE_ALL_DATA constant is set to true in user's
- * wp-config.php. This is to prevent data loss when deleting the plugin from the backend
- * and to ensure only the site owner can perform this action.
- */
-if (defined('YATRA_REMOVE_ALL_DATA') && true === YATRA_REMOVE_ALL_DATA && apply_filters('yatra_remove_all_data_on_uninstall', false)) {
-
-    global $wpdb, $wp_version;
-
-
-    include_once dirname(__FILE__) . '/includes/class-yatra-install.php';
-
-    Yatra_Install::drop_tables();
-
+$upload_dir = wp_upload_dir();
+$yatra_upload_dir = $upload_dir['basedir'] . '/yatra/';
+if (is_dir($yatra_upload_dir)) {
+    require_once(ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php');
+    require_once(ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php');
+    $filesystem = new WP_Filesystem_Direct(null);
+    $filesystem->rmdir($yatra_upload_dir, true);
 }
+*/
+
+// Log the uninstall for debugging
+error_log('Yatra plugin uninstalled successfully'); 

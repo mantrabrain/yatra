@@ -1,0 +1,342 @@
+/**
+ * Yatra Admin Styles
+ */
+
+/* Admin Menu Styling */
+#adminmenu .wp-menu-image.dashicons-palmtree:before {
+    color: #0073aa;
+}
+
+/* Dashboard Stats */
+.yatra-dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.yatra-stat-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.yatra-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.yatra-stat-icon {
+    margin-right: 15px;
+}
+
+.yatra-stat-icon .dashicons {
+    font-size: 2.5em;
+    color: #0073aa;
+}
+
+.yatra-stat-content h3 {
+    margin: 0 0 5px 0;
+    font-size: 2em;
+    color: #333;
+    font-weight: 600;
+}
+
+.yatra-stat-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Dashboard Content */
+.yatra-dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.yatra-dashboard-section {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.yatra-dashboard-section h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #0073aa;
+    padding-bottom: 10px;
+    color: #333;
+    font-size: 1.3em;
+}
+
+/* Tables */
+.yatra-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.yatra-table th,
+.yatra-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.yatra-table th {
+    background-color: #f9f9f9;
+    font-weight: 600;
+    color: #333;
+}
+
+.yatra-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Forms */
+.yatra-form {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.yatra-form-row {
+    margin-bottom: 20px;
+}
+
+.yatra-form-row label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.yatra-form-row input[type="text"],
+.yatra-form-row input[type="email"],
+.yatra-form-row input[type="number"],
+.yatra-form-row input[type="url"],
+.yatra-form-row textarea,
+.yatra-form-row select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.yatra-form-row input[type="text"]:focus,
+.yatra-form-row input[type="email"]:focus,
+.yatra-form-row input[type="number"]:focus,
+.yatra-form-row input[type="url"]:focus,
+.yatra-form-row textarea:focus,
+.yatra-form-row select:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.2);
+}
+
+/* Buttons */
+.yatra-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #0073aa;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.yatra-btn:hover {
+    background: #005a87;
+    color: #fff;
+}
+
+.yatra-btn-secondary {
+    background: #6c757d;
+}
+
+.yatra-btn-secondary:hover {
+    background: #545b62;
+}
+
+.yatra-btn-success {
+    background: #28a745;
+}
+
+.yatra-btn-success:hover {
+    background: #1e7e34;
+}
+
+.yatra-btn-danger {
+    background: #dc3545;
+}
+
+.yatra-btn-danger:hover {
+    background: #c82333;
+}
+
+/* Status Badges */
+.yatra-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.yatra-status.active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.yatra-status.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.yatra-status.cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.yatra-status.completed {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Cards */
+.yatra-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.yatra-card-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.yatra-card-title {
+    margin: 0;
+    color: #333;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+/* Alerts */
+.yatra-alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+}
+
+.yatra-alert-success {
+    background: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.yatra-alert-error {
+    background: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.yatra-alert-warning {
+    background: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}
+
+.yatra-alert-info {
+    background: #d1ecf1;
+    border-color: #17a2b8;
+    color: #0c5460;
+}
+
+/* Loading States */
+.yatra-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0073aa;
+    border-radius: 50%;
+    animation: yatra-spin 1s linear infinite;
+}
+
+@keyframes yatra-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yatra-dashboard-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .yatra-dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .yatra-form-row input[type="text"],
+    .yatra-form-row input[type="email"],
+    .yatra-form-row input[type="number"],
+    .yatra-form-row input[type="url"],
+    .yatra-form-row textarea,
+    .yatra-form-row select {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+}
+
+/* Utility Classes */
+.yatra-text-center {
+    text-align: center;
+}
+
+.yatra-text-right {
+    text-align: right;
+}
+
+.yatra-mb-0 {
+    margin-bottom: 0;
+}
+
+.yatra-mt-20 {
+    margin-top: 20px;
+}
+
+.yatra-mb-20 {
+    margin-bottom: 20px;
+}
+
+.yatra-hidden {
+    display: none;
+}
+
+.yatra-visible {
+    display: block;
+} 

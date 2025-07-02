@@ -1,0 +1,3391 @@
+/* Trip Management Styles */
+
+/* Page Header */
+.yatra-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.yatra-page-header-left h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.875rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.yatra-page-header-left p {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+/* Stats Grid */
+.yatra-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.yatra-stat-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+}
+
+.yatra-stat-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.yatra-stat-icon {
+    font-size: 2rem;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border-radius: 0.5rem;
+}
+
+.yatra-stat-number {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.yatra-stat-label {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+/* Filters Bar */
+.yatra-filters-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+}
+
+.yatra-filters-left {
+    display: flex;
+    gap: 1rem;
+}
+
+.yatra-filters-right {
+    display: flex;
+    gap: 1rem;
+}
+
+.yatra-search-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.yatra-search-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.yatra-search-btn:hover {
+    background: #2563eb;
+}
+
+/* Table Styles */
+.yatra-table-container {
+    overflow-x: auto;
+}
+
+.yatra-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.yatra-table th {
+    background: #f8fafc;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.yatra-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.yatra-table tr:hover {
+    background: #f9fafb;
+}
+
+/* Trip Thumbnail */
+.yatra-trip-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+}
+
+.yatra-trip-placeholder {
+    width: 60px;
+    height: 60px;
+    background: #f1f5f9;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Trip Title */
+.yatra-trip-title strong {
+    display: block;
+    color: #1e293b;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.yatra-trip-slug {
+    color: #64748b;
+    font-size: 0.75rem;
+    font-family: monospace;
+}
+
+/* Trip Price */
+.yatra-trip-price {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.yatra-price {
+    font-weight: 600;
+    color: #059669;
+}
+
+.yatra-price-original {
+    text-decoration: line-through;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.yatra-price-sale {
+    font-weight: 600;
+    color: #dc2626;
+}
+
+.yatra-price-free {
+    color: #059669;
+    font-weight: 600;
+}
+
+/* Status Badges */
+.yatra-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.yatra-status-published {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.yatra-status-draft {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.yatra-status-completed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.yatra-status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Featured Badge */
+.yatra-featured-badge {
+    color: #f59e0b;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.yatra-not-featured {
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+/* Actions */
+.yatra-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.yatra-btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Empty State */
+.yatra-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.yatra-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.yatra-empty-state h3 {
+    margin: 0 0 0.5rem 0;
+    color: #374151;
+    font-size: 1.25rem;
+}
+
+.yatra-empty-state p {
+    margin: 0 0 1.5rem 0;
+    color: #6b7280;
+}
+
+/* Form Styles */
+.yatra-form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+}
+
+.yatra-form-section h3 {
+    margin: 0 0 1rem 0;
+    color: #1e293b;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.yatra-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.yatra-form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    margin-top: 2rem;
+}
+
+/* Trip View Styles */
+.yatra-trip-details {
+    display: grid;
+    gap: 2rem;
+}
+
+.yatra-trip-image img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+}
+
+.yatra-trip-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.yatra-trip-meta span {
+    padding: 0.5rem 1rem;
+    background: #f1f5f9;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.yatra-trip-summary {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    border-left: 4px solid #3b82f6;
+}
+
+.yatra-trip-description h3 {
+    margin: 0 0 1rem 0;
+    color: #1e293b;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.yatra-trip-content {
+    line-height: 1.6;
+    color: #374151;
+}
+
+.yatra-trip-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.yatra-detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 0.375rem;
+}
+
+.yatra-detail-item strong {
+    color: #374151;
+    font-weight: 600;
+}
+
+.yatra-trip-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yatra-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .yatra-filters-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+    
+    .yatra-filters-left {
+        flex-direction: column;
+    }
+    
+    .yatra-form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .yatra-trip-details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .yatra-trip-meta {
+        flex-direction: column;
+    }
+    
+    .yatra-actions {
+        flex-direction: column;
+    }
+}
+
+/* Itinerary Styles */
+.yatra-itinerary-container {
+    margin-top: 20px;
+}
+
+.yatra-itinerary-header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.yatra-itinerary-days {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.yatra-itinerary-day {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.yatra-itinerary-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.yatra-itinerary-day-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.yatra-itinerary-day-content {
+    padding: 20px;
+}
+
+.yatra-itinerary-day-content .yatra-form-row {
+    margin-bottom: 15px;
+}
+
+.yatra-itinerary-day-content .yatra-form-group {
+    margin-bottom: 15px;
+}
+
+.yatra-itinerary-day-content .yatra-form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Small button variant */
+.yatra-btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+}
+
+/* Danger button variant */
+.yatra-btn-danger {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.yatra-btn-danger:hover {
+    background: #c82333;
+    border-color: #bd2130;
+}
+
+/* Form description text */
+.form-desc {
+    font-size: 0.62em;
+    color: #64748b;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Enhanced form sections */
+.yatra-form-section {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.yatra-form-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+/* Responsive adjustments for itinerary */
+@media (max-width: 768px) {
+    .yatra-itinerary-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .yatra-itinerary-day-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .yatra-itinerary-day-content {
+        padding: 15px;
+    }
+    
+    .yatra-form-section {
+        padding: 20px;
+    }
+}
+
+/* Animation for adding/removing days */
+.yatra-itinerary-day {
+    transition: all 0.3s ease;
+}
+
+.yatra-itinerary-day:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Loading state for form submission */
+.yatra-form-submitting {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.yatra-form-submitting button {
+    cursor: not-allowed;
+}
+
+/* Enhanced textarea styling */
+.yatra-form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* Better select styling */
+.yatra-form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 8px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+    appearance: none;
+}
+
+/* Focus states */
+.yatra-form-input:focus,
+.yatra-form-textarea:focus,
+.yatra-form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+/* Placeholder styling */
+.yatra-form-input::placeholder,
+.yatra-form-textarea::placeholder {
+    color: #475569;
+    opacity: 1;
+}
+
+/* Success/error states */
+.yatra-form-input.is-valid,
+.yatra-form-textarea.is-valid,
+.yatra-form-select.is-valid {
+    border-color: #28a745;
+}
+
+.yatra-form-input.is-invalid,
+.yatra-form-textarea.is-invalid,
+.yatra-form-select.is-invalid {
+    border-color: #dc3545;
+}
+
+/* Form validation messages */
+.yatra-form-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+.yatra-form-feedback.is-valid {
+    color: #28a745;
+}
+
+.yatra-form-feedback.is-invalid {
+    color: #dc3545;
+}
+
+/* Trip View Styles */
+.yatra-trip-section {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.yatra-trip-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+.yatra-trip-content {
+    line-height: 1.6;
+    color: #495057;
+}
+
+/* Itinerary Display Styles */
+.yatra-itinerary-display {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.yatra-itinerary-day-display {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.yatra-itinerary-day-header-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.yatra-itinerary-day-header-display h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.yatra-itinerary-location {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.yatra-itinerary-day-content-display {
+    padding: 20px;
+}
+
+.yatra-itinerary-item {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.yatra-itinerary-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.yatra-itinerary-item strong {
+    color: #495057;
+    font-weight: 600;
+    display: inline-block;
+    min-width: 120px;
+}
+
+/* Services Grid */
+.yatra-services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.yatra-services-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.yatra-services-item h4 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.yatra-services-content {
+    line-height: 1.6;
+    color: #6c757d;
+}
+
+/* Requirements Grid */
+.yatra-requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.yatra-requirement-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+}
+
+.yatra-requirement-item strong {
+    color: #495057;
+    font-weight: 600;
+    min-width: 140px;
+}
+
+/* Badge Styles */
+.yatra-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yatra-badge-easy {
+    background: #d4edda;
+    color: #155724;
+}
+
+.yatra-badge-moderate {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.yatra-badge-challenging {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .yatra-services-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .yatra-requirements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .yatra-itinerary-day-header-display {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .yatra-itinerary-item strong {
+        min-width: auto;
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .yatra-requirement-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .yatra-requirement-item strong {
+        min-width: auto;
+    }
+}
+
+/* Enhanced trip details */
+.yatra-trip-details {
+    margin-top: 30px;
+}
+
+.yatra-trip-details .yatra-trip-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Gallery display */
+.yatra-trip-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.yatra-gallery-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.yatra-gallery-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.yatra-gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Trip actions */
+.yatra-trip-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+@media (max-width: 768px) {
+    .yatra-trip-actions {
+        flex-direction: column;
+    }
+    
+    .yatra-trip-actions .yatra-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Multi-Step Wizard Styles */
+.yatra-trip-wizard {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Step Navigation */
+.yatra-wizard-steps {
+    display: flex;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px 20px;
+    position: relative;
+}
+
+.yatra-wizard-steps::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50px;
+    right: 50px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.yatra-step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.yatra-step-item:hover {
+    transform: translateY(-2px);
+}
+
+.yatra-step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.yatra-step-item.active .yatra-step-number {
+    background: #fff;
+    color: #667eea;
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.yatra-step-item.completed .yatra-step-number {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.yatra-step-item.completed .yatra-step-number::after {
+    content: '✓';
+    font-size: 20px;
+}
+
+.yatra-step-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.yatra-step-item.active .yatra-step-label {
+    color: white;
+    font-weight: 600;
+}
+
+.yatra-step-item.completed .yatra-step-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Step Content */
+.yatra-step-content {
+    display: none;
+    padding: 40px;
+    min-height: 500px;
+}
+
+.yatra-step-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.yatra-step-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f8f9fa;
+}
+
+.yatra-step-header h3 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #495057;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.yatra-step-header p {
+    margin: 0;
+    font-size: 16px;
+    color: #6c757d;
+    line-height: 1.5;
+}
+
+/* Step Actions */
+.yatra-step-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid #f8f9fa;
+}
+
+.yatra-step-actions .yatra-btn {
+    min-width: 120px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Success button variant */
+.yatra-btn-success {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.yatra-btn-success:hover {
+    background: #218838;
+    border-color: #1e7e34;
+}
+
+/* Enhanced form sections for wizard */
+.yatra-trip-wizard .yatra-form-section {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.yatra-trip-wizard .yatra-form-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Progress indicator */
+.yatra-wizard-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: #e9ecef;
+    z-index: 1000;
+}
+
+.yatra-wizard-progress-bar {
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+/* Responsive wizard */
+@media (max-width: 768px) {
+    .yatra-wizard-steps {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .yatra-wizard-steps::before {
+        display: none;
+    }
+    
+    .yatra-step-item {
+        flex-direction: row;
+        gap: 15px;
+        text-align: left;
+    }
+    
+    .yatra-step-number {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+    
+    .yatra-step-label {
+        text-align: left;
+        font-size: 16px;
+    }
+    
+    .yatra-step-content {
+        padding: 20px;
+        min-height: auto;
+    }
+    
+    .yatra-step-header h3 {
+        font-size: 24px;
+    }
+    
+    .yatra-step-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .yatra-step-actions .yatra-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-trip-wizard {
+        border-radius: 0;
+        margin: 0;
+    }
+    
+    .yatra-wizard-steps {
+        padding: 15px;
+    }
+    
+    .yatra-step-content {
+        padding: 15px;
+    }
+    
+    .yatra-trip-wizard .yatra-form-section {
+        padding: 20px;
+    }
+}
+
+/* Loading states */
+.yatra-wizard-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.yatra-wizard-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.yatra-wizard-loading::before {
+    content: 'Loading...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+    font-weight: 600;
+    color: #667eea;
+}
+
+/* Step validation feedback */
+.yatra-step-validation {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    color: #721c24;
+}
+
+.yatra-step-validation h4 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.yatra-step-validation ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.yatra-step-validation li {
+    margin-bottom: 5px;
+}
+
+/* Success state */
+.yatra-step-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    color: #155724;
+    text-align: center;
+}
+
+.yatra-step-success::before {
+    content: '✓';
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Modern Trip Editor Styles */
+.trip-editor {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f1f5f9;
+    color: #334155;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.admin-header {
+    background: #1e293b;
+    color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.admin-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.admin-container {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 2rem 0;
+    display: block;
+    grid-template-columns: none;
+    gap: 0;
+}
+
+.main-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    background: white;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.content-tabs {
+    display: flex;
+    border-bottom: 1.5px solid #e5e7eb;
+    margin-bottom: 24px;
+    position: relative;
+    background: #fff;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    outline: none;
+    padding: 16px 32px;
+    font-size: 1rem;
+    color: #64748b;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.tab-button.active,
+.tab-button:hover,
+.tab-button:focus {
+    color: #2563eb;
+}
+
+/* Removed bottom border from active tab */
+
+.tab-content {
+    padding: 0;
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+     border-radius: 0.5rem;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-row.full {
+    grid-template-columns: 1fr;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+
+
+.form-label {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.form-label.required::after {
+    content: " *";
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.form-input, 
+.form-select, 
+.form-textarea {
+    padding: 0.875rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    color: #1e293b;
+    line-height: 1.5;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.form-input:hover, 
+.form-select:hover, 
+.form-textarea:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.form-input:focus, 
+.form-select:focus, 
+.form-textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    background: #ffffff;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+}
+
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 2.5rem;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* Modern Tag-based Meals Selector */
+.meals-tag-container {
+    position: relative;
+    z-index: 1100;
+}
+
+.meals-tag-input {
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    padding-right: 2.5rem; /* Extra padding for arrow */
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    z-index: 1101;
+}
+
+/* Position the arrow on the right side */
+.meals-tag-input svg {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: transform 0.2s ease;
+}
+
+.meals-tag-input.active svg {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.meals-tag-input:hover {
+    border-color: #9ca3af;
+}
+
+.meals-tag-input.active {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.meals-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.meal-tag {
+    font-size: 0.95rem;
+    padding: 0.25rem 0.75rem 0.25rem 0.75rem;
+    border: 1px solid #e0e7ef;
+    background: #3b82f6;
+    color: #fff;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    line-height: 1.2;
+}
+
+.meal-tag:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.meal-tag .remove-tag {
+    margin-left: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    position: relative;
+    z-index: 2;
+}
+
+.meal-tag .remove-tag svg {
+    width: 12px;
+    height: 12px;
+    display: block;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.meal-tag .remove-tag:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.meal-tag .remove-tag:active {
+    transform: scale(0.95);
+}
+
+.meals-dropdown {
+    z-index: 1200 !important;
+    font-size: 0.95rem;
+    min-width: 180px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin-top: 0.25rem;
+    background: #fff !important;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    max-height: none;
+    overflow-y: visible;
+    /* Ensure no unwanted background elements */
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-position: initial !important;
+    background-size: initial !important;
+    background-attachment: scroll !important;
+    background-clip: border-box !important;
+    background-origin: padding-box !important;
+    /* Reset all potential conflicting styles */
+    margin: 0 !important;
+    padding: 0 !important;
+    text-shadow: none !important;
+    text-decoration: none !important;
+    text-transform: none !important;
+    text-align: left !important;
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    transform: translateY(-10px) !important;
+    -webkit-transform: translateY(-10px) !important;
+    -moz-transform: translateY(-10px) !important;
+    -ms-transform: translateY(-10px) !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    -moz-filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.meals-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.meal-option {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    position: relative;
+    z-index: 1;
+    /* Reset all potential conflicting styles */
+    margin: 0 !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+    font-weight: normal !important;
+    line-height: normal !important;
+    text-align: left !important;
+    vertical-align: baseline !important;
+    white-space: normal !important;
+    word-wrap: normal !important;
+    overflow: visible !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+
+.meal-option:hover {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+    /* Ensure no other hover effects */
+    text-decoration: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.meal-option.selected {
+    background: #dbeafe !important;
+    color: #1d4ed8 !important;
+    /* Ensure no other selected effects */
+    text-decoration: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.meal-option svg {
+    color: #6b7280;
+    transition: color 0.15s ease;
+}
+
+.meal-option:hover svg,
+.meal-option.selected svg {
+    color: #3b82f6;
+}
+
+/* Additional overrides to prevent any background issues */
+.meal-option::before,
+.meal-option::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+}
+
+.meal-option * {
+    background: transparent !important;
+}
+
+.meal-option:hover::before,
+.meal-option:hover::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+}
+
+.meal-option:hover * {
+    background: transparent !important;
+}
+
+/* Override any WordPress admin button styles */
+.meals-dropdown .meal-option {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+.meals-dropdown .meal-option:hover {
+    background: #f3f4f6 !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+/* Nuclear option - override ALL possible WordPress admin styles */
+.wp-admin .meals-dropdown .meal-option,
+.wp-admin .meals-dropdown .meal-option:hover,
+.wp-admin .meals-dropdown .meal-option:focus,
+.wp-admin .meals-dropdown .meal-option:active,
+.wp-admin .meals-dropdown .meal-option.selected {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-position: initial !important;
+    background-size: initial !important;
+    background-attachment: scroll !important;
+    background-clip: border-box !important;
+    background-origin: padding-box !important;
+    border: none !important;
+    border-color: transparent !important;
+    border-style: none !important;
+    border-width: 0 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    outline: none !important;
+    text-decoration: none !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+    line-height: normal !important;
+    white-space: normal !important;
+    vertical-align: baseline !important;
+    overflow: visible !important;
+    clip: auto !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    border-radius: 0 !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -ms-transform: none !important;
+    transform: none !important;
+    -webkit-filter: none !important;
+    -moz-filter: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.wp-admin .meals-dropdown .meal-option:hover {
+    background: #f3f4f6 !important;
+    background-color: #f3f4f6 !important;
+}
+
+.wp-admin .meals-dropdown .meal-option.selected {
+    background: #dbeafe !important;
+    background-color: #dbeafe !important;
+    color: #1d4ed8 !important;
+}
+
+/* Additional comprehensive overrides for meal options */
+.meals-dropdown .meal-option,
+.meals-dropdown .meal-option:hover,
+.meals-dropdown .meal-option:focus,
+.meals-dropdown .meal-option:active,
+.meals-dropdown .meal-option.selected {
+    /* Reset all background properties */
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-position: initial !important;
+    background-size: initial !important;
+    background-attachment: scroll !important;
+    background-clip: border-box !important;
+    background-origin: padding-box !important;
+    
+    /* Reset all border properties */
+    border: none !important;
+    border-color: transparent !important;
+    border-style: none !important;
+    border-width: 0 !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    
+    /* Reset all box properties */
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    
+    /* Reset all text properties */
+    text-shadow: none !important;
+    text-decoration: none !important;
+    text-transform: none !important;
+    text-align: left !important;
+    
+    /* Reset all outline properties */
+    outline: none !important;
+    outline-offset: 0 !important;
+    
+    /* Reset all appearance properties */
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    
+    /* Reset all transform properties */
+    transform: none !important;
+    -webkit-transform: none !important;
+    -moz-transform: none !important;
+    -ms-transform: none !important;
+    
+    /* Reset all filter properties */
+    filter: none !important;
+    -webkit-filter: none !important;
+    -moz-filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    
+    /* Reset all border radius */
+    border-radius: 0 !important;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    
+    /* Reset all other properties */
+    margin: 0 !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    line-height: normal !important;
+    white-space: normal !important;
+    vertical-align: baseline !important;
+    overflow: visible !important;
+    clip: auto !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Specific hover state */
+.meals-dropdown .meal-option:hover {
+    background: #f3f4f6 !important;
+    background-color: #f3f4f6 !important;
+    color: #1f2937 !important;
+}
+
+/* Specific selected state */
+.meals-dropdown .meal-option.selected {
+    background: #dbeafe !important;
+    background-color: #dbeafe !important;
+    color: #1d4ed8 !important;
+}
+
+/* Override any potential list item styles */
+.meals-dropdown .meal-option[role="menuitem"],
+.meals-dropdown .meal-option[role="option"],
+.meals-dropdown .meal-option[role="button"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    outline: none !important;
+    text-decoration: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+.meals-dropdown .meal-option[role="menuitem"]:hover,
+.meals-dropdown .meal-option[role="option"]:hover,
+.meals-dropdown .meal-option[role="button"]:hover {
+    background: #f3f4f6 !important;
+    background-color: #f3f4f6 !important;
+}
+
+@keyframes tagSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Placeholder text when no meals selected */
+.meals-tags:empty::before {
+    content: "Select meals...";
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.form-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.375rem;
+    line-height: 1.4;
+    font-weight: 400;
+}
+
+/* Form validation states */
+.form-input.is-valid,
+.form-textarea.is-valid,
+.form-select.is-valid {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+}
+
+.form-input.is-invalid,
+.form-textarea.is-invalid,
+.form-select.is-invalid {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+}
+
+/* Placeholder styling */
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* Form section improvements */
+.form-section {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
+}
+
+.form-section:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+/* Form row improvements */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 0;
+}
+
+.form-row.full {
+    grid-template-columns: 1fr;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-section {
+        padding: 1.5rem;
+    }
+    
+    .form-input, 
+    .form-select, 
+    .form-textarea {
+        padding: 0.75rem;
+        font-size: 1rem; /* Better for mobile */
+    }
+}
+
+/* Legacy Itinerary Styles - Removed */
+
+/* Button Styles */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sidebar-panel {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 1.5rem;
+}
+
+.sidebar-title {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-draft {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-published {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-completed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.quick-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+}
+
+/* Pricing Grid */
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.price-type {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.price-type h4 {
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Media Upload */
+.image-upload {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.image-upload:hover {
+    border-color: #2563eb;
+    background: #f8fafc;
+}
+
+.image-upload.has-image {
+    border-style: solid;
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+/* Gallery Grid */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.gallery-item {
+    aspect-ratio: 1;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gallery-item:hover {
+    border-color: #2563eb;
+}
+
+/* Checkbox Styles */
+.form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.form-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #2563eb;
+}
+
+/* Toggle Arrow */
+.toggle-arrow {
+    transition: transform 0.3s ease;
+}
+
+.toggle-arrow.rotated {
+    transform: rotate(180deg);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .admin-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .tab-button {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .sidebar {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        padding: 1rem;
+    }
+    
+    .admin-header h1 {
+        font-size: 1.25rem;
+    }
+    
+    .content-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .tab-button {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .tab-content {
+        padding: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Form Validation */
+.form-input.is-invalid,
+.form-select.is-invalid,
+.form-textarea.is-invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input.is-valid,
+.form-select.is-valid,
+.form-textarea.is-valid {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-feedback {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.form-feedback.is-invalid {
+    color: #ef4444;
+}
+
+.form-feedback.is-valid {
+    color: #10b981;
+}
+
+/* --- Trip Editor Modern Enhancements --- */
+
+/* Validation Feedback */
+.form-input:invalid,
+.form-select:invalid,
+.form-textarea:invalid,
+.form-input.is-invalid,
+.form-select.is-invalid,
+.form-textarea.is-invalid {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+/* Card Shadows & Section Dividers */
+.yatra-content-card, .trip-editor .main-content {
+    box-shadow: 0 2px 16px 0 rgba(30,41,59,0.07);
+    border-radius: 12px;
+    background: #fff;
+    padding: 32px;
+    margin-bottom: 32px;
+}
+
+.form-section:not(:last-child) {
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+}
+
+/* Help Tooltip */
+.help-tooltip {
+    cursor: help;
+    color: #64748b;
+    border-bottom: 1px dotted #64748b;
+    font-size: 0.95em;
+    margin-left: 4px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 900px) {
+    .admin-container {
+        flex-direction: column;
+    }
+    .main-content, .sidebar {
+        width: 100%;
+        min-width: 0;
+    }
+    .content-tabs {
+        flex-wrap: wrap;
+        overflow-x: auto;
+    }
+    .form-row {
+        flex-direction: column;
+    }
+    .form-group {
+        width: 100%;
+    }
+}
+
+.vertical-tabs-layout {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.vertical-tabs {
+    min-width: 260px;
+    max-width: 260px;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-right: 2rem;
+    padding: 2rem 0.5rem 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: fit-content;
+    border-right: 1.5px solid #e5e7eb;
+    border-bottom: none;
+}
+
+.vertical-tabs .tab-button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 0.25rem;
+}
+
+.vertical-tabs .tab-button.active,
+.vertical-tabs .tab-button[aria-selected="true"] {
+    background: #3b82f6;
+    color: white;
+    box-shadow: 0 1px 3px 0 rgba(59, 130, 246, 0.3);
+}
+
+.vertical-tabs .tab-button:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.vertical-tabs .tab-button.active:hover,
+.vertical-tabs .tab-button[aria-selected="true"]:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.vertical-tabs .tab-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.vertical-tabs .tab-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+}
+
+.vertical-tabs .tab-text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Form Actions */
+.form-actions {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f1f5f9;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.yatra-btn {
+    padding: 0.875rem 1.75rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.yatra-btn-primary {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.yatra-btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px -1px rgba(37, 99, 235, 0.3);
+}
+
+.yatra-btn-secondary {
+    background: #f8fafc;
+    color: #475569;
+    border: 2px solid #e2e8f0;
+}
+
+.yatra-btn-secondary:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+/* Enhanced form feedback */
+.form-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border-left: 3px solid;
+}
+
+.form-feedback.is-valid {
+    color: #065f46;
+    background-color: #f0fdf4;
+    border-left-color: #10b981;
+}
+
+.form-feedback.is-invalid {
+    color: #991b1b;
+    background-color: #fef2f2;
+    border-left-color: #ef4444;
+}
+
+/* Loading states */
+.form-group.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.form-group.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #2563eb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Modern Itinerary Builder Styles */
+.itinerary-builder {
+    background: #fff;
+     border: none;
+}
+
+.itinerary-days {
+    margin-top: 1.5rem;
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.itinerary-day {
+    background: none;
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: none;
+    margin-bottom: 2.25rem;
+    padding: 0;
+    transition: box-shadow 0.18s;
+}
+
+.day-header {
+    background: none;
+    border: none;
+    border-radius: 0.75rem 0.75rem 0 0;
+    box-shadow: none;
+    padding: 0.75rem 0.5rem 0.75rem 0.25rem;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 0;
+}
+
+.day-header:hover {
+    background: #f8fafc;
+    box-shadow: none;
+}
+
+.day-content {
+    background: none;
+    border: none;
+    border-radius: 0 0 0.75rem 0.75rem;
+    box-shadow: none;
+    padding: 1.5rem 0.5rem 1.5rem 0.25rem;
+    margin-top: 0;
+    border-top: none;
+}
+
+.day-content.active {
+    background: #f8fafc;
+    box-shadow: 0 1px 4px rgba(16,30,54,0.03);
+    border-radius: 0 0 0.75rem 0.75rem;
+    border-top: none;
+}
+
+/* Remove card look from form-section inside itinerary */
+.itinerary-builder .form-section {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Remove card look from form-group inside itinerary */
+.itinerary-builder .form-group {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0 0 1.25rem 0;
+    margin: 0;
+}
+
+/* Remove card look from form-section-header */
+.itinerary-builder .form-section-header {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0 0 1.25rem 0;
+    margin: 0 0 1.25rem 0;
+}
+
+
+/* Remove any remaining card or border from .form-row */
+.itinerary-builder .form-row {
+    background: none;
+    border: none;
+    box-shadow: none;
+    margin: 0 0 1.25rem 0;
+    padding: 0;
+}
+
+.itinerary-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.itinerary-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+.itinerary-info h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.itinerary-info p {
+    margin: 0;
+    opacity: 0.95;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 500px;
+}
+
+.itinerary-days {
+    padding: 0;
+    max-height: none;
+    overflow: visible;
+}
+
+.itinerary-day {
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.3s ease;
+}
+
+
+.itinerary-day:hover {
+    background: #fafbfc;
+}
+
+/* Day Card Styles */
+.day-card {
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 18px;
+    min-height: 44px;
+    background: #f3f4f6;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 1rem;
+    font-weight: 500;
+    box-shadow: none;
+    transition: background 0.2s;
+}
+
+.day-header .day-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.day-header .day-number {
+    font-size: 0.98em;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 0;
+}
+
+.day-header .day-title {
+    font-size: 1em;
+    font-weight: 500;
+    color: #1e293b;
+    margin-bottom: 0;
+}
+
+.day-header .day-summary {
+    font-size: 0.95em;
+    color: #64748b;
+    margin-bottom: 0;
+}
+
+.day-header .day-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.day-header .action-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.15s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.day-header .action-btn:hover {
+    background: #e0e7ef;
+    color: #2563eb;
+}
+
+.day-header .toggle-arrow {
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.day-header .toggle-arrow.rotated {
+    transform: rotate(180deg);
+}
+
+.day-content {
+    display: none;
+    background: #ffffff;
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.06);
+    position: relative;
+    z-index: 0;
+}
+
+.day-content.active {
+    display: block;
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.day-form {
+    background: none;
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.form-section-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.form-section-header h5 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.form-section-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Enhanced Form Labels with Icons */
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.025em;
+}
+
+.form-label svg {
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+/* Empty State Styles */
+.itinerary-empty {
+    padding: 5rem 2rem;
+    text-align: center;
+    background: #fafbfc;
+}
+
+.empty-state {
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    margin-bottom: 2rem;
+    opacity: 0.4;
+}
+
+.empty-icon svg {
+    color: #64748b;
+}
+
+.empty-state h4 {
+    margin: 0 0 1.25rem 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.empty-state p {
+    margin: 0 0 2.5rem 0;
+    color: #64748b;
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+/* Section Icon */
+.section-icon {
+    opacity: 0.8;
+    margin-right: 0.75rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .itinerary-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+        padding: 2rem 1.5rem;
+    }
+    
+    .itinerary-info h4 {
+        font-size: 1.5rem;
+    }
+    
+    .day-header, .day-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .itinerary-empty {
+        padding: 3rem 1.5rem;
+    }
+    
+    .empty-state h4 {
+        font-size: 1.125rem;
+    }
+}
+
+/* Destinations Section Styles */
+.yatra-destinations-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.yatra-destination-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.yatra-destination-item:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.yatra-destination-item strong {
+    display: block;
+    color: #1e293b;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.yatra-destination-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.yatra-destination-tag {
+    background: #3b82f6;
+    color: white;
+    padding: 0.375rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.yatra-destination-tag:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.yatra-highlights-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.yatra-highlight-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.yatra-highlight-item:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.yatra-highlight-item svg {
+    flex-shrink: 0;
+    color: #10b981;
+    margin-top: 0.125rem;
+}
+
+.yatra-highlight-item span {
+    color: #374151;
+    line-height: 1.5;
+}
+
+/* Responsive Design for Destinations */
+@media (max-width: 768px) {
+    .yatra-destinations-grid {
+        gap: 1rem;
+    }
+    
+    .yatra-destination-item {
+        padding: 1rem;
+    }
+    
+    .yatra-destination-list {
+        gap: 0.375rem;
+    }
+    
+    .yatra-destination-tag {
+        font-size: 0.6875rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .yatra-highlight-item {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+    
+    .yatra-highlight-item svg {
+        width: 14px;
+        height: 14px;
+    }
+} 
+
+.drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    cursor: grab;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+}
+.drag-handle:active {
+    cursor: grabbing;
+    opacity: 1;
+}
+.itinerary-day {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 2px rgba(16,30,54,0.03);
+    transition: box-shadow 0.2s;
+}
+.itinerary-day.sortable-chosen {
+    box-shadow: 0 4px 16px rgba(59,130,246,0.10);
+    border-color: #3b82f6;
+    z-index: 2;
+}
+.day-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-radius: 0.5rem 0.5rem 0 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.itinerary-expand-collapse-links {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 0 1.5rem 1rem 0;
+    gap: 0.5rem;
+}
+
+.itinerary-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: text-decoration 0.15s;
+    padding: 0.15em 0.5em;
+    border-radius: 0.25em;
+}
+
+.itinerary-link:hover {
+    text-decoration: underline;
+    background: #f1f5fb;
+}
+
+.itinerary-link-sep {
+    color: #cbd5e1;
+    font-size: 1.1em;
+    user-select: none;
+}
+
+.itinerary-day {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #97bde3;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(16,30,54,0.06);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    overflow: hidden;
+}
+
+.itinerary-day.sortable-chosen {
+    box-shadow: 0 6px 24px rgba(59,130,246,0.13);
+    border-color: #3b82f6;
+    z-index: 2;
+}
+
+.day-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #97bde3;
+    background: #e0efff;
+    border-radius: 0.75rem 0.75rem 0 0;
+    cursor: pointer;
+    user-select: none;
+    min-height: 56px;
+}
+
+.day-header .drag-handle {
+    margin-right: 1.25rem;
+}
+
+.day-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+}
+
+.day-number {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 0.1em;
+}
+
+.day-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1e293b;
+    margin-bottom: 0.1em;
+}
+
+.day-summary {
+    font-size: 0.92rem;
+    color: #64748b;
+}
+
+.day-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Activities Integration Styles */
+.activities-list {
+    margin-bottom: 1rem;
+    min-height: 2rem;
+}
+
+.empty-activities {
+    color: #64748b;
+    font-style: italic;
+    padding: 0.5rem 0;
+}
+
+.activity-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s;
+}
+
+.activity-card:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.activity-title {
+    font-weight: 500;
+    color: #1e293b;
+    flex: 1;
+}
+
+.activity-time {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+}
+
+.remove-activity-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-left: 0.5rem;
+}
+
+.remove-activity-btn:hover {
+    background: #dc2626;
+}
+
+.add-activity-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.add-activity-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* Activity Selector Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-content h4 {
+    margin: 0 0 1.5rem 0;
+    color: #1e293b;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.activity-options {
+    margin-bottom: 1.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.activity-option {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #f8fafc;
+}
+
+.activity-option:hover {
+    background: #e0e7ff;
+    border-color: #3b82f6;
+    color: #1e40af;
+}
+
+.activity-option.selected {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+/* ... existing code ... */
+
+/* Activity Modal Styles */
+.activity-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0; right: 0; bottom: 0;
+    align-items: center;
+    justify-content: center;
+}
+.activity-modal-backdrop {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(30, 41, 59, 0.35);
+    z-index: 1;
+}
+.activity-modal-content {
+    position: relative;
+    z-index: 2;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 2rem 2.5rem 1.5rem 2.5rem;
+    min-width: 320px;
+    max-width: 95vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+.activity-modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2563eb;
+    text-align: left;
+}
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.activity-modal-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+.activity-modal-item:hover {
+    background: #f3f4f6;
+}
+.activity-modal-item input[type="checkbox"] {
+    accent-color: #2563eb;
+    width: 18px;
+    height: 18px;
+}
+.activity-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+.selected-activity {
+    background: #f3f4f6;
+    color: #1e293b;
+    border-radius: 6px;
+    padding: 0.25rem 0.75rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.98em;
+    display: inline-block;
+}
+
+.activity-modal {
+    border: 4px solid red !important;
+    background: rgba(255,0,0,0.1) !important;
+}
+.activity-modal-content {
+    border: 4px solid blue !important;
+    background: #fff !important;
+    color: #000 !important;
+}

@@ -1,26 +1,61 @@
-# Editors
-project.xml
-project.properties
-/nbproject/private/
-.buildpath
-.project
-.settings*
-.idea
-/svn-repository/
+# Composer
 /vendor/
-assets/lib/fullcalendar/examples/
+composer.lock
 
-# Grunt
+# Node modules
 /node_modules/
-/assets/admin/src/node_modules/
 package-lock.json
-# Sass
-.sass-cache/
 
-# OS X metadata
+# Build files
+/public/
+/dist/
+/build/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
 .DS_Store
-
-# Windows junk
 Thumbs.db
-yatra.zip
-yatra.tar
+
+# Logs
+*.log
+/logs/
+
+# Cache
+/cache/
+/temp/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Backup files
+*.bak
+*.backup
+
+# Test coverage
+/coverage/
+.phpunit.result.cache
+
+# WordPress specific
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp-content/backup-db/
+wp-content/backups/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/uploads/
+wp-content/mu-plugins/
+wp-content/wp-cache-config.php
+wp-content/plugins/hello.php
+
+# Plugin specific
+/storage/logs/
+/storage/cache/
+/storage/uploads/ 
