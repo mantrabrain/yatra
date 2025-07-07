@@ -133,4 +133,27 @@ class DestinationsController {
             'destinations' => $destinations
         ]);
     }
+
+    public function viewDestination($destination_id) {
+        if (!current_user_can('manage_options')) {
+            wp_die('Permission denied.');
+        }
+        
+        $destination = Destination::getById($destination_id);
+        
+        if (!$destination) {
+            wp_die('Destination not found.');
+        }
+        
+        // Convert object to array if needed
+        if (is_object($destination)) {
+            $destination = (array) $destination;
+        }
+        
+        // Get country name from code
+        $destination['country_name'] = Destination::getCountryName($destination['country']);
+        
+        // Include the view template
+        include plugin_dir_path(YATRA_PLUGIN_FILE) . 'resources/views/admin/destinations/view.php';
+    }
 } 

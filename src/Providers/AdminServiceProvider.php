@@ -473,12 +473,28 @@ class AdminServiceProvider extends ServiceProvider
 
     private function renderDestinations(): void
     {
-        // Load destinations data directly
-        $destinations = \Yatra\Models\Destination::getDestinationsForDisplay();
+        $action = $_GET['action'] ?? 'list';
         
-        \Yatra\Core\View::render('admin/destinations/destinations', [
-            'destinations' => $destinations
-        ]);
+        switch ($action) {
+            case 'view':
+                $destination_id = intval($_GET['id'] ?? 0);
+                if ($destination_id) {
+                    $destinationsController = new \Yatra\Admin\DestinationsController();
+                    $destinationsController->viewDestination($destination_id);
+                } else {
+                    wp_die('Invalid destination ID');
+                }
+                break;
+            case 'list':
+            default:
+                // Load destinations data directly
+                $destinations = \Yatra\Models\Destination::getDestinationsForDisplay();
+                
+                \Yatra\Core\View::render('admin/destinations/destinations', [
+                    'destinations' => $destinations
+                ]);
+                break;
+        }
     }
 
     private function renderActivities(): void

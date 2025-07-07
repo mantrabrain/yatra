@@ -98,20 +98,37 @@ $draft_destinations = count(array_filter($destinations, function($d) { return $d
                 <p>Manage your travel destinations and locations</p>
             </div>
             <div class="yatra-card-header-right">
-                <div class="yatra-search-box">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <input type="text" id="destination-search" placeholder="Search destinations..." class="yatra-search-input">
-                </div>
+                <form class="yatra-filters-bar" method="get" action="">
+                    <div class="yatra-status-filters">
+                        <button type="button" class="yatra-status-filter active" data-status="all">All</button>
+                        <button type="button" class="yatra-status-filter" data-status="active">Active</button>
+                        <button type="button" class="yatra-status-filter" data-status="inactive">Inactive</button>
+                        <button type="button" class="yatra-status-filter" data-status="draft">Draft</button>
+                    </div>
+                    <div class="yatra-search-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <input type="text" id="destination-search" placeholder="Search destinations..." class="yatra-search-input">
+                    </div>
+                </form>
             </div>
         </div>
-        
         <div class="yatra-card-body">
+            <div class="yatra-bulk-actions-bar">
+                <select id="bulk-action-select" class="yatra-bulk-select">
+                    <option value="">Bulk Actions</option>
+                    <option value="delete">Delete</option>
+                    <option value="activate">Activate</option>
+                    <option value="deactivate">Deactivate</option>
+                </select>
+                <button type="button" class="yatra-btn yatra-btn-secondary yatra-bulk-apply">Apply</button>
+            </div>
             <div class="yatra-table-container">
                 <table class="yatra-table">
                     <thead>
                         <tr>
+                            <th><input type="checkbox" id="select-all-destinations"></th>
                             <th>Destination</th>
                             <th>Location</th>
                             <th>Status</th>
@@ -122,7 +139,7 @@ $draft_destinations = count(array_filter($destinations, function($d) { return $d
                     <tbody id="destinations-tbody">
                         <?php if (empty($destinations)): ?>
                             <tr>
-                                <td colspan="5" class="yatra-empty-state">
+                                <td colspan="6" class="yatra-empty-state">
                                     <div class="empty-state">
                                         <div class="empty-icon">
                                             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -144,6 +161,7 @@ $draft_destinations = count(array_filter($destinations, function($d) { return $d
                         <?php else: ?>
                             <?php foreach ($destinations as $destination): ?>
                                 <tr data-id="<?php echo esc_attr($destination['id']); ?>">
+                                    <td><input type="checkbox" class="destination-checkbox" value="<?php echo esc_attr($destination['id']); ?>"></td>
                                     <td>
                                         <div class="yatra-destination-info">
                                             <div class="yatra-destination-image">
@@ -173,7 +191,7 @@ $draft_destinations = count(array_filter($destinations, function($d) { return $d
                                     <td>
                                         <div class="yatra-destination-location">
                                             <?php 
-                                            $country = esc_html($destination['country'] ?? '');
+                                            $country = esc_html($destination['country_name'] ?? $destination['country'] ?? '');
                                             $region = esc_html($destination['region'] ?? $destination['location'] ?? '');
                                             if ($country || $region): ?>
                                                 <div class="location-info">
@@ -199,6 +217,12 @@ $draft_destinations = count(array_filter($destinations, function($d) { return $d
                                     </td>
                                     <td>
                                         <div class="yatra-actions">
+                                            <button type="button" class="yatra-btn yatra-btn-sm yatra-btn-primary view-destination" data-id="<?php echo esc_attr($destination['id']); ?>" title="View Details">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                </svg>
+                                            </button>
                                             <button type="button" class="yatra-btn yatra-btn-sm yatra-btn-secondary edit-destination" data-id="<?php echo esc_attr($destination['id']); ?>" title="Edit Destination">
                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -332,11 +356,209 @@ $draft_destinations = count(array_filter($destinations, function($d) { return $d
                     <!-- Location Information Tab -->
                     <div class="yatra-tab-pane" id="tab-location">
                         <div class="yatra-form-row">
-                            <div class="yatra-form-group">
-                                <label for="destination-country">Country</label>
-                                <input type="text" id="destination-country" name="country" class="yatra-input">
-                                <div class="form-desc">The country where this destination is located (e.g., "Nepal", "India", "Bhutan")</div>
-                            </div>
+                                                            <div class="yatra-form-group">
+                                    <label for="destination-country">Country</label>
+                                    <select id="destination-country" name="country" class="yatra-input" required>
+                                        <option value="">Select a country</option>
+                                        <option value="AF">Afghanistan</option>
+                                        <option value="AL">Albania</option>
+                                        <option value="DZ">Algeria</option>
+                                        <option value="AD">Andorra</option>
+                                        <option value="AO">Angola</option>
+                                        <option value="AG">Antigua and Barbuda</option>
+                                        <option value="AR">Argentina</option>
+                                        <option value="AM">Armenia</option>
+                                        <option value="AU">Australia</option>
+                                        <option value="AT">Austria</option>
+                                        <option value="AZ">Azerbaijan</option>
+                                        <option value="BS">Bahamas</option>
+                                        <option value="BH">Bahrain</option>
+                                        <option value="BD">Bangladesh</option>
+                                        <option value="BB">Barbados</option>
+                                        <option value="BY">Belarus</option>
+                                        <option value="BE">Belgium</option>
+                                        <option value="BZ">Belize</option>
+                                        <option value="BJ">Benin</option>
+                                        <option value="BT">Bhutan</option>
+                                        <option value="BO">Bolivia</option>
+                                        <option value="BA">Bosnia and Herzegovina</option>
+                                        <option value="BW">Botswana</option>
+                                        <option value="BR">Brazil</option>
+                                        <option value="BN">Brunei</option>
+                                        <option value="BG">Bulgaria</option>
+                                        <option value="BF">Burkina Faso</option>
+                                        <option value="BI">Burundi</option>
+                                        <option value="CV">Cabo Verde</option>
+                                        <option value="KH">Cambodia</option>
+                                        <option value="CM">Cameroon</option>
+                                        <option value="CA">Canada</option>
+                                        <option value="CF">Central African Republic</option>
+                                        <option value="TD">Chad</option>
+                                        <option value="CL">Chile</option>
+                                        <option value="CN">China</option>
+                                        <option value="CO">Colombia</option>
+                                        <option value="KM">Comoros</option>
+                                        <option value="CG">Congo</option>
+                                        <option value="CR">Costa Rica</option>
+                                        <option value="HR">Croatia</option>
+                                        <option value="CU">Cuba</option>
+                                        <option value="CY">Cyprus</option>
+                                        <option value="CZ">Czech Republic</option>
+                                        <option value="CD">Democratic Republic of the Congo</option>
+                                        <option value="DK">Denmark</option>
+                                        <option value="DJ">Djibouti</option>
+                                        <option value="DM">Dominica</option>
+                                        <option value="DO">Dominican Republic</option>
+                                        <option value="TL">East Timor</option>
+                                        <option value="EC">Ecuador</option>
+                                        <option value="EG">Egypt</option>
+                                        <option value="SV">El Salvador</option>
+                                        <option value="GQ">Equatorial Guinea</option>
+                                        <option value="ER">Eritrea</option>
+                                        <option value="EE">Estonia</option>
+                                        <option value="SZ">Eswatini</option>
+                                        <option value="ET">Ethiopia</option>
+                                        <option value="FJ">Fiji</option>
+                                        <option value="FI">Finland</option>
+                                        <option value="FR">France</option>
+                                        <option value="GA">Gabon</option>
+                                        <option value="GM">Gambia</option>
+                                        <option value="GE">Georgia</option>
+                                        <option value="DE">Germany</option>
+                                        <option value="GH">Ghana</option>
+                                        <option value="GR">Greece</option>
+                                        <option value="GD">Grenada</option>
+                                        <option value="GT">Guatemala</option>
+                                        <option value="GN">Guinea</option>
+                                        <option value="GW">Guinea-Bissau</option>
+                                        <option value="GY">Guyana</option>
+                                        <option value="HT">Haiti</option>
+                                        <option value="HN">Honduras</option>
+                                        <option value="HU">Hungary</option>
+                                        <option value="IS">Iceland</option>
+                                        <option value="IN">India</option>
+                                        <option value="ID">Indonesia</option>
+                                        <option value="IR">Iran</option>
+                                        <option value="IQ">Iraq</option>
+                                        <option value="IE">Ireland</option>
+                                        <option value="IL">Israel</option>
+                                        <option value="IT">Italy</option>
+                                        <option value="CI">Ivory Coast</option>
+                                        <option value="JM">Jamaica</option>
+                                        <option value="JP">Japan</option>
+                                        <option value="JO">Jordan</option>
+                                        <option value="KZ">Kazakhstan</option>
+                                        <option value="KE">Kenya</option>
+                                        <option value="KI">Kiribati</option>
+                                        <option value="KW">Kuwait</option>
+                                        <option value="KG">Kyrgyzstan</option>
+                                        <option value="LA">Laos</option>
+                                        <option value="LV">Latvia</option>
+                                        <option value="LB">Lebanon</option>
+                                        <option value="LS">Lesotho</option>
+                                        <option value="LR">Liberia</option>
+                                        <option value="LY">Libya</option>
+                                        <option value="LI">Liechtenstein</option>
+                                        <option value="LT">Lithuania</option>
+                                        <option value="LU">Luxembourg</option>
+                                        <option value="MG">Madagascar</option>
+                                        <option value="MW">Malawi</option>
+                                        <option value="MY">Malaysia</option>
+                                        <option value="MV">Maldives</option>
+                                        <option value="ML">Mali</option>
+                                        <option value="MT">Malta</option>
+                                        <option value="MH">Marshall Islands</option>
+                                        <option value="MR">Mauritania</option>
+                                        <option value="MU">Mauritius</option>
+                                        <option value="MX">Mexico</option>
+                                        <option value="FM">Micronesia</option>
+                                        <option value="MD">Moldova</option>
+                                        <option value="MC">Monaco</option>
+                                        <option value="MN">Mongolia</option>
+                                        <option value="ME">Montenegro</option>
+                                        <option value="MA">Morocco</option>
+                                        <option value="MZ">Mozambique</option>
+                                        <option value="MM">Myanmar</option>
+                                        <option value="NA">Namibia</option>
+                                        <option value="NR">Nauru</option>
+                                        <option value="NP">Nepal</option>
+                                        <option value="NL">Netherlands</option>
+                                        <option value="NZ">New Zealand</option>
+                                        <option value="NI">Nicaragua</option>
+                                        <option value="NE">Niger</option>
+                                        <option value="NG">Nigeria</option>
+                                        <option value="KP">North Korea</option>
+                                        <option value="MK">North Macedonia</option>
+                                        <option value="NO">Norway</option>
+                                        <option value="OM">Oman</option>
+                                        <option value="PK">Pakistan</option>
+                                        <option value="PW">Palau</option>
+                                        <option value="PS">Palestine</option>
+                                        <option value="PA">Panama</option>
+                                        <option value="PG">Papua New Guinea</option>
+                                        <option value="PY">Paraguay</option>
+                                        <option value="PE">Peru</option>
+                                        <option value="PH">Philippines</option>
+                                        <option value="PL">Poland</option>
+                                        <option value="PT">Portugal</option>
+                                        <option value="QA">Qatar</option>
+                                        <option value="RO">Romania</option>
+                                        <option value="RU">Russia</option>
+                                        <option value="RW">Rwanda</option>
+                                        <option value="KN">Saint Kitts and Nevis</option>
+                                        <option value="LC">Saint Lucia</option>
+                                        <option value="VC">Saint Vincent and the Grenadines</option>
+                                        <option value="WS">Samoa</option>
+                                        <option value="SM">San Marino</option>
+                                        <option value="ST">Sao Tome and Principe</option>
+                                        <option value="SA">Saudi Arabia</option>
+                                        <option value="SN">Senegal</option>
+                                        <option value="RS">Serbia</option>
+                                        <option value="SC">Seychelles</option>
+                                        <option value="SL">Sierra Leone</option>
+                                        <option value="SG">Singapore</option>
+                                        <option value="SK">Slovakia</option>
+                                        <option value="SI">Slovenia</option>
+                                        <option value="SB">Solomon Islands</option>
+                                        <option value="SO">Somalia</option>
+                                        <option value="ZA">South Africa</option>
+                                        <option value="KR">South Korea</option>
+                                        <option value="SS">South Sudan</option>
+                                        <option value="ES">Spain</option>
+                                        <option value="LK">Sri Lanka</option>
+                                        <option value="SD">Sudan</option>
+                                        <option value="SR">Suriname</option>
+                                        <option value="SE">Sweden</option>
+                                        <option value="CH">Switzerland</option>
+                                        <option value="SY">Syria</option>
+                                        <option value="TW">Taiwan</option>
+                                        <option value="TJ">Tajikistan</option>
+                                        <option value="TZ">Tanzania</option>
+                                        <option value="TH">Thailand</option>
+                                        <option value="TG">Togo</option>
+                                        <option value="TO">Tonga</option>
+                                        <option value="TT">Trinidad and Tobago</option>
+                                        <option value="TN">Tunisia</option>
+                                        <option value="TR">Turkey</option>
+                                        <option value="TM">Turkmenistan</option>
+                                        <option value="TV">Tuvalu</option>
+                                        <option value="UG">Uganda</option>
+                                        <option value="UA">Ukraine</option>
+                                        <option value="AE">United Arab Emirates</option>
+                                        <option value="GB">United Kingdom</option>
+                                        <option value="US">United States</option>
+                                        <option value="UY">Uruguay</option>
+                                        <option value="UZ">Uzbekistan</option>
+                                        <option value="VU">Vanuatu</option>
+                                        <option value="VA">Vatican City</option>
+                                        <option value="VE">Venezuela</option>
+                                        <option value="VN">Vietnam</option>
+                                        <option value="YE">Yemen</option>
+                                        <option value="ZM">Zambia</option>
+                                        <option value="ZW">Zimbabwe</option>
+                                    </select>
+                                    <div class="form-desc">Select the country where this destination is located (using ISO 3166-1 alpha-2 country codes)</div>
+                                </div>
                             <div class="yatra-form-group">
                                 <label for="destination-region">Region</label>
                                 <input type="text" id="destination-region" name="region" class="yatra-input">
@@ -627,13 +849,36 @@ jQuery(document).ready(function($) {
         $('[data-id="' + targetId + '"]').remove();
     });
 
-    // Search functionality
-    $('#destination-search').on('input', function() {
-        const searchTerm = $(this).val().toLowerCase();
-        filterDestinations(searchTerm);
+    // Status filter functionality
+    $('.yatra-status-filter').on('click', function() {
+        $('.yatra-status-filter').removeClass('active');
+        $(this).addClass('active');
+        const status = $(this).data('status');
+        filterDestinations($('#destination-search').val().toLowerCase(), status);
     });
 
-    // Bind edit and delete events for existing rows
+    // Search functionality (update to work with status filter)
+    $('#destination-search').on('input', function() {
+        const searchTerm = $(this).val().toLowerCase();
+        const status = $('.yatra-status-filter.active').data('status');
+        filterDestinations(searchTerm, status);
+    });
+
+    // Filter function (search + status)
+    function filterDestinations(searchTerm = '', status = 'all') {
+        const filtered = destinations.filter(function(destination) {
+            const name = (destination.name || destination.title || '').toLowerCase();
+            const country = (destination.country || '').toLowerCase();
+            const region = (destination.region || destination.location || '').toLowerCase();
+            const description = (destination.short_description || destination.excerpt || '').toLowerCase();
+            const matchesSearch = name.includes(searchTerm) || country.includes(searchTerm) || region.includes(searchTerm) || description.includes(searchTerm);
+            const matchesStatus = (status === 'all') ? true : (destination.status === status);
+            return matchesSearch && matchesStatus;
+        });
+        renderDestinationsTable(filtered);
+    }
+
+    // Bind view, edit and delete events for existing rows
     $('.edit-destination').on('click', function() {
         const id = $(this).data('id');
         editDestination(id);
@@ -642,6 +887,11 @@ jQuery(document).ready(function($) {
     $('.delete-destination').on('click', function() {
         const id = $(this).data('id');
         deleteDestination(id);
+    });
+
+    $('.view-destination').on('click', function() {
+        const id = $(this).data('id');
+        viewDestination(id);
     });
 
     function renderDestinationsTable(destinationsToRender = destinations) {
@@ -712,6 +962,12 @@ jQuery(document).ready(function($) {
                     </td>
                     <td>
                         <div class="yatra-actions">
+                            <button type="button" class="yatra-btn yatra-btn-sm yatra-btn-primary view-destination" data-id="${destination.id}" title="View Details">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
                             <button type="button" class="yatra-btn yatra-btn-sm yatra-btn-secondary edit-destination" data-id="${destination.id}" title="Edit Destination">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -740,18 +996,19 @@ jQuery(document).ready(function($) {
             const id = $(this).data('id');
             deleteDestination(id);
         });
+
+        $('.view-destination').on('click', function() {
+            const id = $(this).data('id');
+            viewDestination(id);
+        });
     }
 
-    function filterDestinations(searchTerm) {
-        const filtered = destinations.filter(function(destination) {
-            const name = (destination.name || destination.title || '').toLowerCase();
-            const country = (destination.country || '').toLowerCase();
-            const region = (destination.region || destination.location || '').toLowerCase();
-            const description = (destination.short_description || destination.excerpt || '').toLowerCase();
-            return name.includes(searchTerm) || country.includes(searchTerm) || region.includes(searchTerm) || description.includes(searchTerm);
-        });
-
-        renderDestinationsTable(filtered);
+    function viewDestination(id) {
+        const destination = destinations.find(d => d.id == id);
+        if (destination) {
+            // Open destination details in a new window or modal
+            window.open('<?php echo admin_url('admin.php?page=yatra-app&subpage=destinations&action=view&id='); ?>' + id, '_blank');
+        }
     }
 
     function openDestinationModal(destination = null) {
@@ -780,7 +1037,7 @@ jQuery(document).ready(function($) {
             $('#destination-name').val(destination.name || destination.title);
             $('#destination-slug').val(destination.slug);
             $('#destination-status').val(destination.status);
-            $('#destination-country').val(destination.country);
+            $('#destination-country').val(destination.country || destination.country_code);
             $('#destination-region').val(destination.region || destination.location);
             $('#destination-short-description').val(destination.short_description || destination.excerpt);
             $('#destination-description').val(destination.description || destination.content);
@@ -1060,6 +1317,14 @@ jQuery(document).ready(function($) {
                     showMessage('Failed to delete destination', 'error');
                 }
             });
+        }
+    }
+
+    function viewDestination(id) {
+        const destination = destinations.find(d => d.id == id);
+        if (destination) {
+            // Open destination details in a new window or modal
+            window.open('<?php echo admin_url('admin.php?page=yatra-app&subpage=destinations&action=view&id='); ?>' + id, '_blank');
         }
     }
 
