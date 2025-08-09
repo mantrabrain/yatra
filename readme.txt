@@ -84,7 +84,6 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 * 🎯 [**Live Demo**](https://demo.wpyatra.com) - See Yatra in action
 * 💬 [**Community**](https://www.facebook.com/groups/yatrawordpressplugin) - Join our Facebook group
 * 🛒 [**Premium Extensions**](https://wpyatra.com/extensions/) - Advanced features
-* 🆘 [**Support**](https://wpyatra.com/support/) - Get help and support
 
 ### ⭐ **Create FREE Demo Site**
 [**Create FREE live demo testing site**](https://demo.tastewp.com/yatra-wordpress-plugin) to test Yatra travel booking solution
