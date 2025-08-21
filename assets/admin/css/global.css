@@ -131,76 +131,279 @@
     margin-bottom: 4px;
 }
 
+/* Yatra Header Design - Based on Actual HTML Structure */
 #yatra-header {
-    border-top: 5px solid #2f582b;
-    border-bottom: 1px solid #c3c4c7;
-    padding: 20px 0;
+    background: #ffffff;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 0;
+    margin: 0;
     margin-left: -20px;
-    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 #yatra-header-wrapper {
     display: flex;
-    justify-content: flex-start;
-    padding: 0 20px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Left Section */
+.yatra-header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Branding Section */
+#yatra-header-branding {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#yatra-header-branding .name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#yatra-header-branding .version {
+    background: #3b82f6;
+    color: white;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Page Title Section */
+.yatra-header-page-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f8fafc;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.yatra-header-page-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #1f2937;
+    margin: 0;
+    padding: 0;
+}
+
+.yatra-header-separator {
+    color: #9ca3af;
+    font-size: 16px;
+    font-weight: 300;
+    margin: 0 4px;
+}
+
+/* Button Container */
+.yatra-add-new-button-container {
+    display: flex;
     align-items: center;
 }
 
-body.post-type-tour #contextual-help-link-wrap, body.post-type-tour #screen-options-link-wrap,
-body[class*="post-type-yatra"] #contextual-help-link-wrap, body[class*="post-type-yatra"] #screen-options-link-wrap,
-body[class*="yatra_page"] #contextual-help-link-wrap, body[class*="yatra_page"] #screen-options-link-wrap {
-    top: 5px !important;
+/* Button Styling - Now in Proper Container */
+.page-title-action {
+    background: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3) !important;
+    display: inline-block !important;
+    line-height: 1.4 !important;
+}
+
+.page-title-action:hover {
+    background: #2563eb !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Screen Meta Adjustments */
+body.post-type-tour #contextual-help-link-wrap, 
+body.post-type-tour #screen-options-link-wrap,
+body[class*="post-type-yatra"] #contextual-help-link-wrap, 
+body[class*="post-type-yatra"] #screen-options-link-wrap,
+body[class*="yatra_page"] #contextual-help-link-wrap, 
+body[class*="yatra_page"] #screen-options-link-wrap {
+    top: 10px !important;
 }
 
 body.post-type-tour #screen-meta,
 body[class*="post-type-yatra"] #screen-meta,
 body[class*="yatra_page"] #screen-meta {
-    margin: 0 0 -1px -20px;
+    margin: 0 0 -1px 0;
 }
 
-#yatra-header-wrapper #yatra-header-branding {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
+/* Responsive Design */
+@media (max-width: 768px) {
+    #yatra-header-wrapper {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px 20px;
+    }
+    
+    .yatra-header-page-title-wrap {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    #yatra-header-branding .name {
+        font-size: 20px;
+    }
 }
 
-#yatra-header-wrapper #yatra-header-branding .name {
-    font-size: 25px;
-    font-weight: bold;
-    text-transform: uppercase;
+@media (max-width: 480px) {
+    #yatra-header-wrapper {
+        padding: 12px 15px;
+    }
+    
+    #yatra-header-branding .name {
+        font-size: 18px;
+    }
+    
+    .yatra-header-page-title {
+        font-size: 14px;
+    }
+    
+    .yatra-header-page-title-wrap .page-title-action {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+    }
 }
 
-#yatra-header-wrapper #yatra-header-branding .version {
-    background: #818181;
-    color: #fff;
-    padding: 2px 5px;
-    font-size: 12px;
+/* Yatra Admin Footer Design */
+#wpfooter {
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#wpfooter #footer-left {
+    padding: 15px 20px;
+    background: #f8fafc;
+    border-right: 1px solid #e5e7eb;
+    margin-left: 160px;
+}
+
+#wpfooter #footer-left p {
+    margin: 0;
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+#wpfooter #footer-left a {
+    color: #3b82f6;
+    text-decoration: none;
     font-weight: 500;
-    border-radius: 3px;
+    transition: color 0.2s ease;
 }
 
-#yatra-header-wrapper .yatra-header-page-title-wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.75em;
-    margin-top: -5px;
-    margin-right: auto;
-    padding-left: 7px;
-
+#wpfooter #footer-left a:hover {
+    color: #2563eb;
+    text-decoration: underline;
 }
 
-.yatra-header-page-title {
+#wpfooter #footer-left strong {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+#wpfooter #footer-upgrade {
+    padding: 15px 20px;
+    background: #f8fafc;
+    border-left: 1px solid #e5e7eb;
+}
+
+#wpfooter #footer-upgrade p {
+    margin: 0;
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+/* Star Rating Styling */
+#wpfooter .star-rating {
+    color: #f59e0b;
+    font-size: 14px;
+    letter-spacing: 2px;
+}
+
+#wpfooter .star-rating:hover {
+    color: #d97706;
+}
+
+/* Yatra Version Display */
+#wpfooter .yatra-version {
+    background: #3b82f6;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
     font-weight: 500;
-    font-size: 1em;
-    line-height: 1.3em;
-    display: inline;
+    margin-left: 5px;
 }
 
-#yatra-header-wrapper .yatra-header-separator {
-    margin-left: 10px;
-    font-size: 20px;
-    opacity: 0.25;
+/* WordPress Version Display */
+#wpfooter .wp-version {
+    background: #059669;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-left: 5px;
+}
+
+/* Footer Responsive Design */
+@media (max-width: 768px) {
+    #wpfooter #footer-left,
+    #wpfooter #footer-upgrade {
+        padding: 12px 15px;
+        text-align: center;
+    }
+    
+    #wpfooter #footer-left {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    #wpfooter #footer-upgrade {
+        border-left: none;
+    }
+}
+
+@media (max-width: 480px) {
+    #wpfooter #footer-left,
+    #wpfooter #footer-upgrade {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+    
+    #wpfooter .star-rating {
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
 }

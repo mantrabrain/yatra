@@ -93,11 +93,11 @@ class NoticeHooks
                     const yatraAddNew = $('.add-new-h2:visible');
 
                     if (coreAddNew.length) {
-                        coreAddNew.appendTo('.yatra-header-page-title-wrap').addClass('button').css('visibility', 'unset');
+                        coreAddNew.appendTo('.yatra-add-new-button-container').addClass('button').css('visibility', 'unset');
                     }
 
                     if (yatraAddNew.length) {
-                        yatraAddNew.appendTo('.yatra-header-page-title-wrap').addClass('button');
+                        yatraAddNew.appendTo('.yatra-add-new-button-container').addClass('button');
                     }
                 });
             </script>
@@ -108,9 +108,14 @@ class NoticeHooks
 
         <div id="yatra-header" class="yatra-header">
             <div id="yatra-header-wrapper">
-                <span id="yatra-header-branding"><span class="name"><?php echo esc_html__('Yatra', 'yatra'); ?></span>
-                    <span class="version"><?php echo esc_html(YATRA_VERSION) ?></span>
-                </span>
+                <div class="yatra-header-left">
+                    <span id="yatra-header-branding"><span class="name"><?php echo esc_html__('Yatra', 'yatra'); ?></span>
+                        <span class="version"><?php echo esc_html(YATRA_VERSION) ?></span>
+                    </span>
+                    <div class="yatra-add-new-button-container">
+                        <!-- Add New button will be moved here by JavaScript -->
+                    </div>
+                </div>
 
                 <?php if (!empty($page_title)) : ?>
                     <span class="yatra-header-page-title-wrap">

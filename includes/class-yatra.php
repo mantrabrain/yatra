@@ -301,7 +301,6 @@ final class Yatra
         include_once YATRA_ABSPATH . 'includes/classes/class-yatra-core-coupon.php';
         include_once YATRA_ABSPATH . 'includes/class-yatra-tour-availability-validation.php';
         include_once YATRA_ABSPATH . 'includes/settings/class-yatra-tour-settings.php';
-        include_once YATRA_ABSPATH . 'includes/payment-gateways/class-yatra-gateways-core.php';
         include_once YATRA_ABSPATH . 'includes/functions.php';
         include_once YATRA_ABSPATH . 'includes/yatra-hooks.php';
         include_once YATRA_ABSPATH . 'includes/yatra-template-functions.php';
@@ -351,6 +350,8 @@ final class Yatra
 
         // Set up localisation.
         $this->load_plugin_textdomain();
+
+        include_once YATRA_ABSPATH . 'includes/payment-gateways/class-yatra-gateways-core.php';
 
         if ($this->is_request('admin')) {
             $this->exporter = new Yatra_Core_Exporter();
