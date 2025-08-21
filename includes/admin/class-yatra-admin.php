@@ -205,15 +205,18 @@ return;
             'load_action' => array($this, 'settings_page_init')
         );
 
-        $submenu[] = array(
-            'parent_slug' => YATRA_ADMIN_MENU_SLUG,
-            'page_title' => esc_html__('Yatra Addons', 'yatra'),
-            'menu_title' => '<span style="color:#28d01d">' . esc_html__('Addons', 'yatra') . '</span>',
-            'capability' => 'manage_yatra',
-            'menu_slug' => 'yatra-addons',
-            'callback' => array($this, 'addon_page'),
-            'position' => 30,
-        );
+        // Show Free vs Pro page only for free users
+        if (count(yatra_get_premium_addons()) < 1) {
+            $submenu[] = array(
+                'parent_slug' => YATRA_ADMIN_MENU_SLUG,
+                'page_title' => esc_html__('Free vs Pro', 'yatra'),
+                'menu_title' => '<span style="color:#e27730">' . esc_html__('Free vs Pro', 'yatra') . '</span>',
+                'capability' => 'manage_yatra',
+                'menu_slug' => 'yatra-free-vs-pro',
+                'callback' => array($this, 'free_vs_pro_page'),
+                'position' => 30,
+            );
+        }
 
 
         if (count(yatra_get_premium_addons()) < 1) {
@@ -330,9 +333,9 @@ return;
 
     }
 
-    public function addon_page()
+    public function free_vs_pro_page()
     {
-        do_action('yatra_admin_addon_page_output');
+        yatra_load_admin_template('free-vs-pro');
     }
 
     public function availability_page_init()

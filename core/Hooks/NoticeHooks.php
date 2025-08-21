@@ -126,6 +126,15 @@ class NoticeHooks
                     </<?php echo esc_attr($element); ?>>
                     </span>
                 <?php endif; ?>
+
+                <?php if (count(yatra_get_premium_addons()) < 1) : ?>
+                    <div class="yatra-header-upgrade-notice">
+                        <a href="https://wpyatra.com/pricing/" target="_blank" class="yatra-upgrade-link">
+                            <span class="dashicons dashicons-star-filled"></span>
+                            <?php echo esc_html__('Upgrade to Pro', 'yatra'); ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
         <?php

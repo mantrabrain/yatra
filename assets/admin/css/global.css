@@ -230,11 +230,62 @@
     line-height: 1.4 !important;
 }
 
-.page-title-action:hover {
-    background: #2563eb !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4) !important;
-}
+            .page-title-action:hover {
+                background: #2563eb !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4) !important;
+            }
+
+            /* Header Upgrade Notice */
+            .yatra-header-upgrade-notice {
+                margin-left: auto;
+                display: flex;
+                align-items: center;
+            }
+
+            .yatra-upgrade-link {
+                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                color: white !important;
+                text-decoration: none !important;
+                padding: 6px 12px;
+                border-radius: 16px;
+                font-size: 11px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                outline: none;
+            }
+
+            .yatra-upgrade-link:hover {
+                background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+                color: white !important;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+            }
+
+            .yatra-upgrade-link:focus {
+                background: linear-gradient(135deg, #7c3aed, #6d28d9) !important;
+                color: white !important;
+                transform: translateY(-1px);
+                box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3), 0 4px 12px rgba(139, 92, 246, 0.4);
+                outline: none;
+            }
+
+            .yatra-upgrade-link:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 4px rgba(139, 92, 246, 0.4);
+            }
+
+            .yatra-upgrade-link .dashicons {
+                font-size: 12px;
+                width: 12px;
+                height: 12px;
+                line-height: 1;
+            }
 
 /* Screen Meta Adjustments */
 body.post-type-tour #contextual-help-link-wrap, 
@@ -405,4 +456,35 @@ body[class*="yatra_page"] #screen-meta {
         font-size: 12px;
         letter-spacing: 1px;
     }
+}
+
+
+
+/* Pro Plan Highlighting */
+.yatra-pro-plan .yatra-plan-header {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    position: relative;
+}
+
+.yatra-pro-plan .yatra-plan-header::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: 8px;
+    z-index: -1;
+}
+
+.yatra-pro-plan .yatra-plan-header h3,
+.yatra-pro-plan .yatra-plan-header .yatra-price,
+.yatra-pro-plan .yatra-plan-header .yatra-period {
+    color: white;
+}
+
+.yatra-pro-plan .yatra-plan-header .yatra-price {
+    color: #fbbf24;
 }

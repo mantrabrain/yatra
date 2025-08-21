@@ -90,6 +90,9 @@ if (!class_exists('Yatra_Admin_Assets')) {
 
             wp_register_style('yatra-booking-meta-css', YATRA_PLUGIN_URI . '/assets/admin/css/booking-meta.css', array(), YATRA_VERSION);
 
+            // Free vs Pro Page CSS
+            wp_register_style('yatra-free-vs-pro-css', YATRA_PLUGIN_URI . '/assets/admin/css/free-vs-pro.css', array(), YATRA_VERSION);
+
 
             // Other Register and Enqueue
             //Setting Page Scripts
@@ -152,6 +155,9 @@ if (!class_exists('Yatra_Admin_Assets')) {
                     $localization_array['tab_settings_remove_tab_item_yes_button_text'] = __('Yes, Confirm', 'yatra');
 
                     $localization_array['tab_settings_remove_tab_item_no_button_text'] = __('Cancel this process', 'yatra');
+                    break;
+                case "yatra_page_yatra-free-vs-pro":
+                    array_push($css_dependencies, 'yatra-free-vs-pro-css');
                     break;
                 case "edit-tour":
                     array_push($js_dependencies, 'yatra-tour-listing-script', 'yatra-tippy');
