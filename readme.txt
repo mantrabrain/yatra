@@ -4,7 +4,7 @@ Tags: travel-booking, tour-booking, travel-agency, tour-operator, travel-managem
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 2.2.11
+Stable tag: 2.2.12
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -272,6 +272,10 @@ Extend Yatra's functionality with premium add-ons:
 15. **Frontend Tour Tabs** - Tour information tabs
 16. **Shopping Cart** - Yatra cart page
 17. **Checkout Process** - Yatra checkout page
+
+== Changelog ==
+= 2.2.12 | 2025-08-21 =
+* ✅ Update -Free Vs Pro page and Dashboard UI
 
 == Changelog ==
 = 2.2.11 | 2025-08-09 =
