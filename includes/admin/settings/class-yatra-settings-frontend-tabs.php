@@ -27,6 +27,8 @@ class Yatra_Settings_Frontend_Tabs extends Yatra_Admin_Settings_Base
     {
         $this->id = 'frontend-tabs';
         $this->label = __('Tab Setting', 'yatra');
+        $this->description = __('Manage frontend tab display, available tabs, and tab configurations', 'yatra');
+        $this->icon = '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
 
         parent::__construct();
     }

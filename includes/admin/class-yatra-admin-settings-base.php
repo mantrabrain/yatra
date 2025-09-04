@@ -35,6 +35,20 @@ if (!class_exists('Yatra_Admin_Settings_Base', false)) :
         protected $label = '';
 
         /**
+         * Setting page description.
+         *
+         * @var string
+         */
+        protected $description = '';
+
+        /**
+         * Setting page icon (SVG).
+         *
+         * @var string
+         */
+        protected $icon = '';
+
+        /**
          * Constructor.
          */
         public function __construct()
@@ -68,6 +82,28 @@ if (!class_exists('Yatra_Admin_Settings_Base', false)) :
         }
 
         /**
+         * Get settings page description.
+         *
+         * @since 1.0.0
+         * @return string
+         */
+        public function get_description()
+        {
+            return $this->description;
+        }
+
+        /**
+         * Get settings page icon.
+         *
+         * @since 1.0.0
+         * @return string
+         */
+        public function get_icon()
+        {
+            return $this->icon;
+        }
+
+        /**
          * Add this page to settings.
          *
          * @param array $pages
@@ -76,7 +112,11 @@ if (!class_exists('Yatra_Admin_Settings_Base', false)) :
          */
         public function add_settings_page($pages)
         {
-            $pages[$this->id] = $this->label;
+            $pages[$this->id] = array(
+                'label' => $this->label,
+                'description' => $this->description,
+                'icon' => $this->icon
+            );
 
             return $pages;
         }

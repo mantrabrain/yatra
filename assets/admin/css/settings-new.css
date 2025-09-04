@@ -1,0 +1,456 @@
+/**
+ * Yatra New Settings CSS
+ * Modern admin interface styling
+ */
+
+.yatra-new-settings-wrap {
+    margin: 20px 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Header Styles */
+.yatra-new-settings-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 30px;
+    position: relative;
+}
+
+.yatra-new-settings-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.yatra-new-settings-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.yatra-new-settings-title .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+}
+
+.yatra-version-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+
+/* Container Layout */
+.yatra-new-settings-container {
+    display: flex;
+    min-height: 600px;
+}
+
+/* Left Sidebar */
+.yatra-new-settings-sidebar {
+    width: 280px;
+    background: #f8f9fa;
+    border-right: 1px solid #e9ecef;
+    padding: 0;
+}
+
+.yatra-new-settings-nav {
+    padding: 20px 0;
+}
+
+.yatra-new-settings-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    color: #495057;
+    text-decoration: none;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+    gap: 16px;
+}
+
+.yatra-new-settings-nav-item:hover {
+    background: #e9ecef;
+    color: #495057;
+    text-decoration: none;
+    border-left-color: #007cba;
+}
+
+.yatra-new-settings-nav-item.active {
+    background: #007cba;
+    color: #fff;
+    border-left-color: #005a87;
+}
+
+.yatra-new-settings-nav-item.active .dashicons {
+    color: #fff;
+}
+
+.yatra-new-settings-nav-item .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: #6c757d;
+}
+
+.yatra-new-settings-nav-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.yatra-new-settings-nav-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.yatra-new-settings-nav-description {
+    font-size: 12px;
+    opacity: 0.8;
+    line-height: 1.3;
+}
+
+/* Right Content Area */
+.yatra-new-settings-content {
+    flex: 1;
+    padding: 0;
+    background: #fff;
+}
+
+.yatra-new-settings-content-header {
+    background: #fff;
+    padding: 30px 40px 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.yatra-new-settings-content-title {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #212529;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.yatra-new-settings-content-title .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: #007cba;
+}
+
+.yatra-new-settings-content-description {
+    margin: 0;
+    color: #6c757d;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.yatra-new-settings-content-body {
+    padding: 30px 40px;
+}
+
+/* Settings Sections */
+.yatra-new-settings-section {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.yatra-new-settings-section-header {
+    background: #f8f9fa;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.yatra-new-settings-section-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.yatra-new-settings-section-header .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #007cba;
+}
+
+/* Settings Fields */
+.yatra-new-settings-field {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.yatra-new-settings-field:last-child {
+    border-bottom: none;
+}
+
+.yatra-new-settings-field label {
+    display: block;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.yatra-new-settings-field input[type="text"],
+.yatra-new-settings-field input[type="email"],
+.yatra-new-settings-field input[type="number"],
+.yatra-new-settings-field input[type="url"],
+.yatra-new-settings-field select,
+.yatra-new-settings-field textarea {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+    background: #fff;
+}
+
+.yatra-new-settings-field input[type="text"]:focus,
+.yatra-new-settings-field input[type="email"]:focus,
+.yatra-new-settings-field input[type="number"]:focus,
+.yatra-new-settings-field input[type="url"]:focus,
+.yatra-new-settings-field select:focus,
+.yatra-new-settings-field textarea:focus {
+    outline: none;
+    border-color: #007cba;
+    box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
+}
+
+.yatra-new-settings-field input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+.yatra-new-settings-field input[type="color"] {
+    width: 60px;
+    height: 40px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.yatra-new-settings-field .description {
+    margin: 8px 0 0 0;
+    color: #6c757d;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Action Buttons */
+.yatra-new-settings-actions {
+    background: #f8f9fa;
+    padding: 24px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.yatra-new-save-settings {
+    background: #007cba !important;
+    border-color: #007cba !important;
+    color: #fff !important;
+    padding: 12px 24px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.yatra-new-save-settings:hover {
+    background: #005a87 !important;
+    border-color: #005a87 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 124, 186, 0.3);
+}
+
+.yatra-new-reset-settings {
+    background: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #fff !important;
+    padding: 12px 24px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.yatra-new-reset-settings:hover {
+    background: #5a6268 !important;
+    border-color: #5a6268 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.yatra-new-settings-actions .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .yatra-new-settings-container {
+        flex-direction: column;
+    }
+    
+    .yatra-new-settings-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .yatra-new-settings-nav {
+        display: flex;
+        overflow-x: auto;
+        padding: 20px;
+        gap: 10px;
+    }
+    
+    .yatra-new-settings-nav-item {
+        min-width: 200px;
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .yatra-new-settings-header {
+        padding: 20px;
+    }
+    
+    .yatra-new-settings-header-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .yatra-new-settings-content-header,
+    .yatra-new-settings-content-body {
+        padding: 20px;
+    }
+    
+    .yatra-new-settings-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .yatra-new-settings-actions .button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Loading States */
+.yatra-new-settings-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.yatra-new-settings-loading .yatra-new-save-settings {
+    position: relative;
+}
+
+.yatra-new-settings-loading .yatra-new-save-settings::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success/Error Messages */
+.yatra-new-settings-message {
+    padding: 16px 24px;
+    margin: 20px 0;
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.yatra-new-settings-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.yatra-new-settings-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.yatra-new-settings-message .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Form Validation */
+.yatra-new-settings-field.error input,
+.yatra-new-settings-field.error select,
+.yatra-new-settings-field.error textarea {
+    border-color: #dc3545;
+}
+
+.yatra-new-settings-field.error .description {
+    color: #dc3545;
+}
+
+/* Custom Scrollbar for Sidebar */
+.yatra-new-settings-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.yatra-new-settings-sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.yatra-new-settings-sidebar::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.yatra-new-settings-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
