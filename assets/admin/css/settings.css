@@ -115,28 +115,104 @@
     color: rgba(255, 255, 255, 0.8);
 }
 
+/* Subtab Styling */
+.yatra-settings .subsubsub {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0 0 20px 0;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    list-style: none;
+    box-shadow: none;
+    border-bottom: 1px solid var(--ys-border);
+    width:100%;
+}
+
+.yatra-settings .subsubsub li {
+    margin: 0;
+    padding: 0;
+}
+
+.yatra-settings .subsubsub li a {
+    display: inline-block;
+    padding: 8px 10px;
+    margin: 0;
+    text-decoration: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 400;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: #90a8a3;
+    margin-right: 5px;
+    font-weight:600;
+}
+
+.yatra-settings .subsubsub li a:hover {
+    color: var(--ys-primary);
+    background: white;
+    border-color: var(--ys-border);
+}
+
+.yatra-settings .subsubsub li a.current {
+    background: white;
+    color: var(--ys-primary);
+    border-color: var(--ys-border);
+    border-bottom-color: white;
+    font-weight: 500;
+    position: relative;
+}
+
+.yatra-settings .subsubsub li a.current::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: white;
+}
+
+.yatra-settings .subsubsub li:not(:last-child)::after {
+    content: none;
+}
+
+/* SVG Icon Styling Fixes */
 .yatra-settings-nav-item .yatra-settings-nav-icon {
     width: 20px;
     height: 20px;
     color: var(--ys-muted);
     flex-shrink: 0;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--ys-accent);
+    border-radius: 6px;
+    padding: 8px;
 }
 
 .yatra-settings-nav-item .yatra-settings-nav-icon svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .yatra-settings-nav-item:hover .yatra-settings-nav-icon {
     color: var(--ys-primary);
+    background: rgba(59, 130, 246, 0.1);
+    transform: scale(1.05);
 }
 
 .yatra-settings-nav-item.active .yatra-settings-nav-icon {
     color: white;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
 }
 
 .yatra-settings-nav-content {
@@ -172,28 +248,27 @@
 
 /* Content Area */
 .yatra-settings-content {
-    background: var(--ys-surface);
-    padding: var(--ys-gap);
+    background: #f1f5f9;
+    padding: 24px;
     border-radius: var(--ys-radius);
-    box-shadow: var(--ys-shadow-card);
-    border: 1px solid var(--ys-border);
+    box-shadow: var(--ys-shadow);
+    overflow: hidden;
 }
 
 .yatra-settings-content-header {
-    margin-bottom: var(--ys-gap);
-    padding-bottom: 20px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--ys-border);
 }
 
 .yatra-settings-content-title {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin: 0 0 8px 0;
     font-size: 24px;
     font-weight: 600;
     color: var(--ys-text);
-    letter-spacing: -0.025em;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .yatra-settings-content-title .dashicons {
@@ -202,16 +277,15 @@
 }
 
 .yatra-settings-content-description {
-    margin: 0;
     color: var(--ys-muted);
-    font-size: 15px;
+    font-size: 14px;
+    margin: 0;
     line-height: 1.5;
-    font-weight: 400;
 }
 
 /* Content Body */
 .yatra-settings-content-body {
-    /* Preserve existing form styling */
+    padding: 0;
 }
 
 /* Settings Actions */
@@ -265,7 +339,6 @@
 .yatra-settings .form-table th {
     padding: 20px 0 20px 0;
     font-weight: 600;
-    color: var(--ys-text);
     border-bottom: 1px solid var(--ys-border);
     width: 220px;
     font-size: 14px;
@@ -283,8 +356,6 @@
 }
 
 .yatra-settings .form-table label {
-    font-weight: 500;
-    color: var(--ys-text);
     font-size: 14px;
     letter-spacing: 0.025em;
 }
@@ -319,10 +390,11 @@
 .yatra-settings .form-table .description {
     color: var(--ys-muted);
     font-size: 13px;
-    margin-top: 8px;
+    margin-top: 5px;
     line-height: 1.4;
     font-style: normal;
     font-weight: 400;
+    display:block;
 }
 
 /* Settings Sections */
