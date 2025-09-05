@@ -70,7 +70,7 @@
             var label_name = wrap.find('ul').attr('data-label-name');
             var visibility_name = wrap.find('ul').attr('data-visibility-name');
             var uuid = this.getUniqueID('text_');
-            var li = $('<li data-tab-type="' + uuid + '"/>');
+            var li = $('<li data-tab-type="' + uuid + '" class="ui-sortable-handle"/>');
             //name
             li.append('<div class="label"><span class="icon"></span><span class="text">Tab Label Goes Here</span></div><input class="yatra_frontend_tabs_available_options_label" name="' + this.replaceAll(label_name, uuid) + '" type="text" value="Tab Label"/>');
             //label
@@ -86,7 +86,7 @@
 
             li.append('<input name="' + this.replaceAll(type_name, uuid) + '" type="hidden" value="text"/>');
 
-            li.append('<span><button type="button" class="available-tab-remove-item">x</button></span>');
+            li.append('<button type="button" class="available-tab-remove-item">x</button>');
 
             wrap.find('ul').append(li);
 

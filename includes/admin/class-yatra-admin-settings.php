@@ -701,11 +701,11 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
                                     <span class="slider round" data-on="show" data-off="hide"></span>
                                     </label>
 									<input  type="hidden" name="<?php echo esc_attr( $value['id'] ); ?>[<?php echo esc_attr($rep_key); ?>][type]" value="<?php echo esc_attr($rep_val['type']) ?>"/>
-									<span>
+									
 									<?php if(!in_array($rep_val['type'], $all_tab_keys)){ ?>
 									<button type="button" class="available-tab-remove-item">x</button>
 									<?php }
-									echo '</span>';
+									//echo '</span>';
 									echo '</li>';
  								}
 								if(count($repeator_value)>0){

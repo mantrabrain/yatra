@@ -403,13 +403,9 @@
 }
 
 .yatra-settings .yatra-setting-tab-options ul {
-    background: var(--ys-accent);
-    padding: var(--ys-gap);
-    border: 1px solid var(--ys-border);
-    border-radius: var(--ys-radius);
-    text-align: center;
-    box-shadow: var(--ys-shadow);
-}
+     padding: var(--ys-gap);
+      text-align: center;
+ }
 
 .yatra-settings .yatra-setting-tab-options ul li {
     display: flex;
@@ -491,6 +487,11 @@
     justify-content: center;
     transition: all 0.2s ease;
     flex-shrink: 0;
+    position:absolute;
+    right:-10px;
+    top:-10px;
+    text-transform: uppercase;
+    font-weight:bold;
 }
 
 .yatra-settings .yatra-setting-tab-options ul li .available-tab-remove-item:hover {
@@ -679,4 +680,266 @@
 
 .yatra-settings .info {
     border-left-color: #3b82f6;
+}
+
+/* Frontend Tabs Section - Complete Redesign */
+.yatra-settings .form-table .single_select_page {
+    display: block;
+}
+
+.yatra-settings .form-table .single_select_page th,
+.yatra-settings .form-table .single_select_page td {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+.yatra-settings .form-table .single_select_page th {
+    margin-bottom: 16px;
+}
+
+.yatra-settings .form-table .single_select_page th label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ys-text);
+    margin: 0;
+}
+
+.yatra-settings .yatra-setting-tab-options {
+    background: white;
+    border: 1px solid var(--ys-border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: auto 1fr 1fr auto auto;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+    cursor: move;
+    position: relative;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle:hover {
+    border-color: var(--ys-primary);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+    background: white;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle:before {
+    content: "⋮⋮";
+    color: #94a3b8;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle:hover:before {
+    color: var(--ys-primary);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle:active {
+    cursor: grabbing;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 180px;
+    flex-shrink: 0;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .label .icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--ys-primary), #3b82f6);
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .label .text {
+    font-weight: 600;
+    color: var(--ys-text);
+    font-size: 15px;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle input[type="text"] {
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle input[type="text"]:focus {
+    outline: none;
+    border-color: var(--ys-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: #fefefe;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .yatra-switch-control {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .yatra-switch-control input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .yatra-switch-control .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: 0.3s;
+    border-radius: 32px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .yatra-switch-control .slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 3;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .yatra-switch-control input:checked + .slider {
+    background-color: var(--ys-primary);
+    box-shadow: inset 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .yatra-switch-control input:checked + .slider:before {
+    transform: translateX(48px);
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .yatra-switch-control .slider:after {
+    content: attr(data-off);
+    position: absolute;
+    top: 50%;
+    right: -6px;
+    transform: translateY(-50%);
+    font-size: 9px;
+    font-weight: 700;
+    color: #64748b;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    z-index: 1;
+}
+
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle .yatra-switch-control input:checked + .slider:after {
+    content: attr(data-on);
+    left: 0px;
+    right: auto;
+    color: white;
+    z-index: 2;
+}
+
+.yatra-settings .yatra-setting-tab-options #yatra-setting-tab-option-add-new-tab {
+    background: linear-gradient(135deg, var(--ys-primary), #3b82f6);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yatra-settings .yatra-setting-tab-options #yatra-setting-tab-option-add-new-tab:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.yatra-settings .yatra-setting-tab-options #yatra-setting-tab-option-add-new-tab:before {
+    content: "+";
+    font-size: 14px;
+    font-weight: bold;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+/* Responsive adjustments for frontend tabs */
+@media (max-width: 768px) {
+    .yatra-settings .yatra-setting-tab-options .ui-sortable-handle {
+        grid-template-columns: auto 1fr;
+        gap: 16px;
+    }
+    
+    .yatra-settings .yatra-setting-tab-options .ui-sortable-handle .label {
+        grid-column: 1 / -1;
+        margin-bottom: 8px;
+    }
+    
+    .yatra-settings .yatra-setting-tab-options .ui-sortable-handle input[type="text"] {
+        grid-column: 1 / -1;
+    }
 }
