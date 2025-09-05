@@ -57,7 +57,8 @@ self::show_messages();
                         $description = '';
                     }
                     
-                    echo '<a href="' . esc_html(admin_url('admin.php?page=yatra-settings&tab=' . esc_attr($slug))) . '" class="yatra-settings-nav-item ' . ($is_active ? 'active' : '') . '" role="tab" aria-selected="' . ($is_active ? 'true' : 'false') . '">';
+                    $premium_class = (isset($tab_data['premium']) && $tab_data['premium']) ? ' premium-tab' : '';
+                    echo '<a href="' . esc_html(admin_url('admin.php?page=yatra-settings&tab=' . esc_attr($slug))) . '" class="yatra-settings-nav-item' . $premium_class . ' ' . ($is_active ? 'active' : '') . '" data-tab="' . esc_attr($slug) . '" role="tab" aria-selected="' . ($is_active ? 'true' : 'false') . '">';
                     echo '<span class="yatra-settings-nav-icon">' . $icon . '</span>';
                     echo '<div class="yatra-settings-nav-content">';
                     echo '<span class="yatra-settings-nav-title">' . esc_html($label) . '</span>';

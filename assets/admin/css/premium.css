@@ -481,7 +481,7 @@
 
 .yatra-cta-content p {
     font-size: 18px;
-    color: rgba(255, 255, 255, 0.9);
+    color: #fff!important;
     margin: 0 0 var(--yatra-space-xl) 0;
 }
 

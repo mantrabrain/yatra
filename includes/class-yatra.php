@@ -333,7 +333,9 @@ final class Yatra
         $this->yatra_messages = new Yatra_Messages;
         $this->admin_notice = new Notices();
         Initialize::run();
+        if(count(yatra_get_premium_addons())<1){
         Premium::init();
+        }
 
 
         include_once YATRA_ABSPATH . 'includes/admin/admin-bar.php';

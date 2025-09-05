@@ -478,6 +478,11 @@ class Premium
             return true;
         }
 
+        // Yatra settings page
+        if (isset($_GET['page']) && $_GET['page'] === 'yatra-settings') {
+            return true;
+        }
+
         // Premium feature pages
         if (isset($_GET['page']) && in_array($_GET['page'], ['yatra-services', 'yatra-availability-conditions'])) {
             return true;

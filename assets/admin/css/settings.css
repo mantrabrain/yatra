@@ -683,8 +683,7 @@
 
 /* Accessibility Enhancements */
 .yatra-settings-nav-item:focus {
-    outline: 2px solid var(--ys-primary);
-    outline-offset: 2px;
+    box-shadow:none;
 }
 
 .yatra-settings-nav-item[aria-selected="true"] {
@@ -1003,4 +1002,118 @@
     .yatra-settings .yatra-setting-tab-options .ui-sortable-handle input[type="text"] {
         grid-column: 1 / -1;
     }
+}
+
+/* ========================================
+   PREMIUM SETTINGS TABS
+   ======================================== */
+
+.yatra-settings-nav-item.premium-tab {
+    position: relative;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border: 2px solid transparent;
+    border-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%) 1;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    transform: translateY(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom:5px;
+}
+
+.yatra-settings-nav-item.premium-tab:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+    z-index: 1;
+}
+
+.yatra-settings-nav-item.premium-tab:after {
+    content: "PRO";
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    line-height: 1;
+    z-index: 3;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    animation: premiumPulse 2s ease-in-out infinite;
+}
+
+@keyframes premiumPulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+    }
+}
+
+.yatra-settings-nav-item.premium-tab:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+}
+
+.yatra-settings-nav-item.premium-tab:hover:before {
+    opacity: 1;
+}
+
+.yatra-settings-nav-item.premium-tab.premium-redirecting {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+    border-color: #667eea;
+    transform: scale(0.95) translateY(-1px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.2s ease;
+}
+
+.yatra-settings-nav-item.premium-tab .yatra-settings-nav-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 1px 2px rgba(102, 126, 234, 0.3));
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+.yatra-settings-nav-item.premium-tab:hover .yatra-settings-nav-icon {
+    transform: scale(1.15) rotate(5deg);
+}
+
+.yatra-settings-nav-item.premium-tab .yatra-settings-nav-title {
+    font-weight: 700;
+    color: #4f46e5;
+    text-shadow: 0 1px 2px rgba(102, 126, 234, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.yatra-settings-nav-item.premium-tab .yatra-settings-nav-description {
+    color: #6b7280;
+    font-style: italic;
+    font-weight: 500;
+    position: relative;
+    z-index: 2;
+}
+
+/* Premium tab content positioning */
+.yatra-settings-nav-item.premium-tab .yatra-settings-nav-content {
+    position: relative;
+    z-index: 2;
 }

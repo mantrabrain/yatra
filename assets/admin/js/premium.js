@@ -536,6 +536,31 @@
             if (console && console.log) {
                 console.log(`%c${message}`, 'color: #4f46e5; font-weight: bold;');
             }
+        },
+
+        /**
+         * Initialize premium settings redirect
+         */
+        initPremiumSettingsRedirect() {
+            // Handle clicks on premium settings tabs
+            $('.yatra-settings-nav-item.premium-tab').on('click', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                const $item = $(this);
+                const originalText = $item.find('.yatra-settings-nav-title').text();
+                $item.find('.yatra-settings-nav-title').text('Redirecting...');
+                
+                // Add premium styling
+                $item.addClass('premium-redirecting');
+                
+                // Redirect to pricing page
+                setTimeout(() => {
+                    window.open('https://wpyatra.com/pricing/', '_blank');
+                    $item.find('.yatra-settings-nav-title').text(originalText);
+                    $item.removeClass('premium-redirecting');
+                }, 500);
+            });
         }
     };
 
