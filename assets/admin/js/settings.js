@@ -91,6 +91,7 @@
             wrap.find('ul').append(li);
 
             this.updateTabOrdering();
+            this.sortableSetting();
 
         },
         replaceAll(text, uuid) {
@@ -118,9 +119,46 @@
             }
         },
         sortableSetting: function () {
+            var _that = this;
+            
+            // Debug: Check if elements exist
+            console.log('UL elements found:', $('.yatra-setting-tab-options ul').length);
+            console.log('LI elements found:', $('.yatra-setting-tab-options ul li').length);
+            console.log('UI-sortable-handle elements found:', $('.yatra-setting-tab-options ul li.ui-sortable-handle').length);
+            
+            // Destroy existing sortable first if it exists
+            if ($('.yatra-setting-tab-options ul').hasClass('ui-sortable')) {
+                $('.yatra-setting-tab-options ul').sortable('destroy');
+            }
+            
+            // Try a simpler approach - make the entire li draggable
             $('.yatra-setting-tab-options ul').sortable({
-                update: function (event, ui) {
+                items: 'li',
+                cursor: 'move',
+                axis: 'y',
+                opacity: 0.8,
+                placeholder: 'ui-sortable-placeholder',
+                forcePlaceholderSize: true,
+                containment: 'parent',
+                scroll: false,
+                start: function (event, ui) {
+                    console.log('Sortable started');
+                    ui.placeholder.height(ui.item.height());
+                    ui.placeholder.css({
+                        'background': '#f1f5f9',
+                        'border': '2px dashed #3b82f6',
+                        'border-radius': '10px',
+                        'margin': '8px 0'
+                    });
                 },
+                stop: function (event, ui) {
+                    console.log('Sortable stopped');
+                    _that.updateTabOrdering();
+                },
+                update: function (event, ui) {
+                    console.log('Sortable updated');
+                    _that.updateTabOrdering();
+                }
             });
         }
 

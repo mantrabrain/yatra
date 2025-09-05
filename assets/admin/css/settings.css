@@ -723,6 +723,8 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow: hidden;
+    position: relative;
 }
 
 .yatra-settings .yatra-setting-tab-options .ui-sortable-handle {
@@ -761,6 +763,9 @@
     background: #f1f5f9;
     border-radius: 6px;
     transition: all 0.2s ease;
+    pointer-events: auto;
+    z-index: 10;
+    position: relative;
 }
 
 .yatra-settings .yatra-setting-tab-options .ui-sortable-handle:hover:before {
@@ -770,6 +775,23 @@
 
 .yatra-settings .yatra-setting-tab-options .ui-sortable-handle:active {
     cursor: grabbing;
+}
+
+/* Dragged item styling */
+.yatra-settings .yatra-setting-tab-options .ui-sortable-handle.ui-sortable-helper {
+    z-index: 1000;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: rotate(1deg);
+}
+
+/* Placeholder styling */
+.yatra-settings .yatra-setting-tab-options .ui-sortable-placeholder {
+    background: #f1f5f9 !important;
+    border: 2px dashed #3b82f6 !important;
+    border-radius: 10px !important;
+    margin: 8px 0 !important;
+    visibility: visible !important;
+    height: auto !important;
 }
 
 .yatra-settings .yatra-setting-tab-options .ui-sortable-handle .label {
