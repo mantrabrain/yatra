@@ -4,7 +4,7 @@ Tags: travel-booking, tour-booking, travel-agency, tour-operator, travel-website
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.0
-Stable tag: 2.2.13
+Stable tag: 2.3.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Donate link: https://wpyatra.com/donate/
@@ -279,6 +279,9 @@ Donate link: https://wpyatra.com/donate/
 
 == Changelog ==
 
+= 2.3.0 | 2025-09-05 =
+* 🐛 Fixed - Minor design issue
+* ✅ Added - Setting page design revamp
 = 2.2.13 | 2025-08-30 =
 * 🐛 Fixed - Minor compatibility check  and readme optimizations
 
