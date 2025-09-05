@@ -5,6 +5,7 @@ if (!defined('ABSPATH')) {
 } ?>
 
 <div class="wrap yatra-dashboard-modern">
+    <h2 style="display: none; margin:0; padding:0;">Dashboard</h2>
     <!-- Hero Section -->
     <div class="yatra-dashboard-hero">
         <div class="yatra-hero-content">

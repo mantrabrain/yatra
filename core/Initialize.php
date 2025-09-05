@@ -49,6 +49,9 @@ class Initialize
     public function compatibility_init()
     {
         Astra::init();
+        
+        // Initialize Pro Compatibility Checker
+        require_once YATRA_ABSPATH . 'core/ProCompatibility.php';
     }
 }
 

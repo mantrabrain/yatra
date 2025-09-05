@@ -31,7 +31,9 @@ function yatra_get_tab_description($tab_slug) {
 ?>
 <div class="wrap yatra-admin-setting-page-wrap yatra-settings">
 <?php 
+echo '<h2 style="display: none; margin:0; padding:0;">Settings</h2>';
 self::show_messages();
+
 ?>
     <div class="yatra-settings-container">
         
