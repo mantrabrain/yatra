@@ -154,8 +154,8 @@ class Yatra_Pro_Compatibility
         if ($yatra_pro_status['needs_installation']) {
             $message = sprintf(
                 _n(
-                    'The following plugin has been integrated into Yatra Pro 2.0.0: <strong>%s</strong>. Please install and activate Yatra Pro 2.0.0 to use these features.',
-                    'The following plugins have been integrated into Yatra Pro 2.0.0: <strong>%s</strong>. Please install and activate Yatra Pro 2.0.0 to use these features.',
+                    'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please install and activate Yatra Pro 2.0.0 to use these features. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
+                    'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please install and activate Yatra Pro 2.0.0 to use these features. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
                     $plugin_count,
                     'yatra'
                 ),
@@ -164,8 +164,8 @@ class Yatra_Pro_Compatibility
         } elseif ($yatra_pro_status['needs_activation']) {
             $message = sprintf(
                 _n(
-                    'The following plugin has been integrated into Yatra Pro 2.0.0: <strong>%s</strong>. Please activate Yatra Pro 2.0.0 to use these features.',
-                    'The following plugins have been integrated into Yatra Pro 2.0.0: <strong>%s</strong>. Please activate Yatra Pro 2.0.0 to use these features.',
+                    'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please activate Yatra Pro 2.0.0 to use these features. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
+                    'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please activate Yatra Pro 2.0.0 to use these features. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
                     $plugin_count,
                     'yatra'
                 ),
@@ -174,8 +174,8 @@ class Yatra_Pro_Compatibility
         } elseif ($yatra_pro_status['needs_upgrade']) {
             $message = sprintf(
                 _n(
-                    'The following plugin has been integrated into Yatra Pro 2.0.0: <strong>%s</strong>. Please upgrade Yatra Pro to version 2.0.0 or higher to use these features.',
-                    'The following plugins have been integrated into Yatra Pro 2.0.0: <strong>%s</strong>. Please upgrade Yatra Pro to version 2.0.0 or higher to use these features.',
+                    'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please upgrade Yatra Pro to version 2.0.0 or higher to use these features. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
+                    'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please upgrade Yatra Pro to version 2.0.0 or higher to use these features. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
                     $plugin_count,
                     'yatra'
                 ),
@@ -184,8 +184,8 @@ class Yatra_Pro_Compatibility
         } else {
             $message = sprintf(
                 _n(
-                    'The following plugin has been integrated into Yatra Pro 2.0.0: <strong>%s</strong>. Please make sure you have updated Yatra Pro to version 2.0.0, enable the related features, and deactivate this plugin.',
-                    'The following plugins have been integrated into Yatra Pro 2.0.0: <strong>%s</strong>. Please make sure you have updated Yatra Pro to version 2.0.0, enable the related features, and deactivate these plugins.',
+                    'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please make sure you have updated Yatra Pro to version 2.0.0, enable the related features, and deactivate this plugin. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
+                    'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please make sure you have updated Yatra Pro to version 2.0.0, enable the related features, and deactivate these plugins. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
                     $plugin_count,
                     'yatra'
                 ),
@@ -249,13 +249,13 @@ class Yatra_Pro_Compatibility
                             <span class="dashicons dashicons-info" style="margin-right: 6px; color: #f0b849;"></span>
                             <?php 
                             if ($yatra_pro_status['is_compatible']) {
-                                _e('This will automatically deactivate the old plugins and enable the corresponding features in Yatra Pro 2.0.0.', 'yatra');
+                                _e('This will automatically deactivate the old plugins and enable the corresponding features in Yatra Pro 2.0.0. Future updates for these plugins will only be available in Yatra Pro.', 'yatra');
                             } elseif ($yatra_pro_status['needs_installation']) {
-                                _e('Yatra Pro 2.0.0 is required to use these integrated features. Get Yatra Pro to unlock all premium functionality.', 'yatra');
+                                _e('Yatra Pro 2.0.0 is required to use these integrated features. Get Yatra Pro to unlock all premium functionality and receive future updates.', 'yatra');
                             } elseif ($yatra_pro_status['needs_activation']) {
-                                _e('Yatra Pro is installed but not activated. Activate it to use the integrated features.', 'yatra');
+                                _e('Yatra Pro is installed but not activated. Activate it to use the integrated features and receive future updates.', 'yatra');
                             } elseif ($yatra_pro_status['needs_upgrade']) {
-                                _e('Your Yatra Pro version is outdated. Upgrade to version 2.0.0 or higher to use these features.', 'yatra');
+                                _e('Your Yatra Pro version is outdated. Upgrade to version 2.0.0 or higher to use these features and receive future updates.', 'yatra');
                             }
                             ?>
                         </p>
