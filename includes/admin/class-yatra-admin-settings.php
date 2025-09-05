@@ -688,7 +688,7 @@ if ( ! class_exists( 'Yatra_Admin_Settings', false ) ) :
 
 									$rep_val['type']=$rep_val['type'] ?? $rep_key;
 									$rep_val['visibility']=isset($rep_val['visibility']) ?(boolean)$rep_val['visibility']: 0;
-                                    echo '<li data-tab-type="'.esc_attr($rep_key).'">';
+                                    echo '<li data-tab-type="'.esc_attr($rep_key).'" class="ui-sortable-handle">';
 									echo '<div class="label">';
                                     echo '<span class="icon '.esc_attr($rep_val['icon']).'"></span>';
                                     echo '<span class="text">'.esc_html($rep_val['label']).'</span>';
