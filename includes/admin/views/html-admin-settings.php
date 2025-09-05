@@ -18,17 +18,10 @@ if (!$tab_exists) {
 }
 
 // Helper function to get tab icon from the tabs array
-function get_tab_icon($tab_slug) {
-    global $tabs;
-    if (isset($tabs[$tab_slug]) && is_array($tabs[$tab_slug]) && isset($tabs[$tab_slug]['icon']) && !empty($tabs[$tab_slug]['icon'])) {
-        return $tabs[$tab_slug]['icon'];
-    }
-    // Fallback to default icon if no custom icon is set
-    return '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8 15a7 7 0 01-7-7h2a5 5 0 005 5v2zm0-13a7 7 0 017 7h-2a5 5 0 00-5-5V2z"/></svg>';
-}
+
 
 // Helper function to get tab description from the tabs array
-function get_tab_description($tab_slug) {
+function yatra_get_tab_description($tab_slug) {
     global $tabs;
     if (isset($tabs[$tab_slug]) && is_array($tabs[$tab_slug]) && isset($tabs[$tab_slug]['description'])) {
         return $tabs[$tab_slug]['description'];
@@ -37,7 +30,11 @@ function get_tab_description($tab_slug) {
 }
 ?>
 <div class="wrap yatra-admin-setting-page-wrap yatra-settings">
+<?php 
+self::show_messages();
+?>
     <div class="yatra-settings-container">
+        
         <div class="yatra-settings-sidebar">
             <div class="yatra-settings-sidebar-header">
                 <h2 class="yatra-settings-sidebar-title">Settings</h2>
@@ -45,14 +42,16 @@ function get_tab_description($tab_slug) {
             </div>
             <nav class="yatra-settings-nav">
                 <?php
+               
+                
                 foreach ($tabs as $slug => $tab_data) {
                     $is_active = ($current_tab === $slug);
-                    $icon = get_tab_icon($slug);
+                    $icon = $tab_data['icon']??'';
                     
                     // Handle both old format (string) and new format (array)
                     if (is_array($tab_data)) {
-                        $label = $tab_data['label'];
-                        $description = $tab_data['description'];
+                        $label = $tab_data['label']??'';
+                        $description = $tab_data['description']??'';
                     } else {
                         $label = $tab_data;
                         $description = '';
@@ -80,7 +79,7 @@ function get_tab_description($tab_slug) {
                     <?php echo esc_html($current_tab_label); ?>
                 </h2>
                 <?php 
-                $description = get_tab_description($current_tab);
+                $description = yatra_get_tab_description($current_tab);
                 if ($description) : ?>
                     <p class="yatra-settings-content-description"><?php echo esc_html($description); ?></p>
                 <?php endif; ?>
@@ -92,7 +91,7 @@ function get_tab_description($tab_slug) {
                     
                     <?php
                     do_action('yatra_sections_' . $current_tab);
-                    self::show_messages();
+                    
                     do_action('yatra_settings_' . $current_tab);
                     do_action('yatra_settings_tabs_' . $current_tab);
                     ?>

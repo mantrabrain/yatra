@@ -10,6 +10,7 @@ use Yatra\Core\Admin\Notices;
 use Yatra\Core\Admin\Tracking;
 use Yatra\Core\Helper;
 use Yatra\Core\Initialize;
+use Yatra\Core\Premium;
 use Yatra\Core\Session;
  use Yatra\Core\Tour\TourFactory;
 
@@ -332,6 +333,7 @@ final class Yatra
         $this->yatra_messages = new Yatra_Messages;
         $this->admin_notice = new Notices();
         Initialize::run();
+        Premium::init();
 
 
         include_once YATRA_ABSPATH . 'includes/admin/admin-bar.php';

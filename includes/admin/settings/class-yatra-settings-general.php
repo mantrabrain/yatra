@@ -28,7 +28,7 @@ class Yatra_Settings_General extends Yatra_Admin_Settings_Base
         $this->id = 'general';
         $this->label = __('General', 'yatra');
         $this->description = __('Configure general tour settings, pages, and basic options', 'yatra');
-        $this->icon = '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        $this->icon = '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm0 14a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm1-7a1 1 0 0 1-2 0V7a1 1 0 1 1 2 0v2h2a1 1 0 1 1 0 2h-2v2a1 1 0 1 1-2 0v-2H7a1 1 0 1 1 0-2h2V9z"/></svg>';
 
         parent::__construct();
     }

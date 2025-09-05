@@ -1,0 +1,385 @@
+/**
+ * Yatra Premium Features - Clean & Minimal Design
+ * Simple, elegant design focused on clarity and usability
+ */
+
+/* ========================================
+   CLEAN DESIGN VARIABLES
+   ======================================== */
+
+:root {
+    --yatra-primary: #0073aa;
+    --yatra-primary-hover: #005a87;
+    --yatra-text: #1e1e1e;
+    --yatra-text-light: #666;
+    --yatra-border: #ddd;
+    --yatra-bg-light: #f9f9f9;
+    --yatra-success: #46b450;
+    --yatra-radius: 4px;
+    --yatra-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ========================================
+   CLEAN PAGE LAYOUT
+   ======================================== */
+
+.yatra-clean-page {
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--yatra-text);
+}
+
+.yatra-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+
+.yatra-clean-hero {
+    padding: 60px 0;
+    background: var(--yatra-bg-light);
+    text-align: center;
+    border-bottom: 1px solid var(--yatra-border);
+}
+
+.yatra-hero-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.yatra-hero-icon {
+    margin-bottom: 24px;
+}
+
+.yatra-hero-icon .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--yatra-primary);
+}
+
+.yatra-clean-hero h1 {
+    font-size: 32px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: var(--yatra-text);
+}
+
+.yatra-clean-hero p {
+    font-size: 16px;
+    color: var(--yatra-text-light);
+    margin: 0 0 32px 0;
+}
+
+.yatra-hero-cta {
+    margin-top: 32px;
+}
+
+.yatra-clean-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--yatra-primary);
+    color: #fff;
+    text-decoration: none;
+    border-radius: var(--yatra-radius);
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.yatra-clean-button:hover {
+    background: var(--yatra-primary-hover);
+    color: #fff;
+}
+
+.yatra-clean-button.large {
+    padding: 16px 32px;
+    font-size: 16px;
+}
+
+/* ========================================
+   BENEFITS SECTION
+   ======================================== */
+
+.yatra-clean-benefits {
+    padding: 50px 0;
+    background: #fff;
+}
+
+.yatra-clean-benefits h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 32px 0;
+    color: var(--yatra-text);
+}
+
+.yatra-benefits-list {
+    display: grid;
+    gap: 16px;
+    max-width: 600px;
+}
+
+.yatra-benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+}
+
+.yatra-benefit-item svg {
+    flex-shrink: 0;
+    color: var(--yatra-success);
+}
+
+.yatra-benefit-item span {
+    color: var(--yatra-text);
+}
+
+/* ========================================
+   FEATURES SECTION
+   ======================================== */
+
+.yatra-clean-features {
+    padding: 50px 0;
+    background: var(--yatra-bg-light);
+    border-top: 1px solid var(--yatra-border);
+}
+
+.yatra-clean-features h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 40px 0;
+    color: var(--yatra-text);
+    text-align: center;
+}
+
+.yatra-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.yatra-feature-card {
+    background: #fff;
+    padding: 24px;
+    border: 1px solid var(--yatra-border);
+    border-radius: var(--yatra-radius);
+    position: relative;
+    transition: box-shadow 0.2s ease;
+}
+
+.yatra-feature-card:hover {
+    box-shadow: var(--yatra-shadow);
+}
+
+.yatra-feature-card.current {
+    border-color: var(--yatra-primary);
+}
+
+.yatra-feature-icon {
+    margin-bottom: 16px;
+}
+
+.yatra-feature-icon .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: var(--yatra-primary);
+}
+
+.yatra-feature-content h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--yatra-text);
+}
+
+.yatra-feature-content p {
+    font-size: 14px;
+    color: var(--yatra-text-light);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.yatra-current-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 4px 8px;
+    background: var(--yatra-primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: var(--yatra-radius);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================
+   CTA SECTION
+   ======================================== */
+
+.yatra-clean-cta {
+    padding: 60px 0;
+    background: #fff;
+    text-align: center;
+    border-top: 1px solid var(--yatra-border);
+}
+
+.yatra-cta-content h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: var(--yatra-text);
+}
+
+.yatra-cta-content p {
+    font-size: 16px;
+    color: var(--yatra-text-light);
+    margin: 0 0 32px 0;
+}
+
+/* ========================================
+   CLEAN METABOX
+   ======================================== */
+
+.yatra-clean-metabox {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: var(--yatra-radius);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.yatra-metabox-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: var(--yatra-bg-light);
+    border-bottom: 1px solid var(--yatra-border);
+}
+
+.yatra-metabox-icon svg {
+    color: var(--yatra-primary);
+    margin-top: 2px;
+}
+
+.yatra-metabox-title h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--yatra-text);
+}
+
+.yatra-metabox-title p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--yatra-text-light);
+    line-height: 1.4;
+}
+
+.yatra-metabox-features {
+    padding: 16px;
+}
+
+.yatra-metabox-features .yatra-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    font-size: 13px;
+    color: var(--yatra-text);
+}
+
+.yatra-metabox-features .yatra-feature-item .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--yatra-primary);
+}
+
+.yatra-metabox-cta {
+    padding: 16px;
+    background: var(--yatra-bg-light);
+    border-top: 1px solid var(--yatra-border);
+    text-align: center;
+}
+
+.yatra-metabox-button {
+    display: inline-block;
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--yatra-primary);
+    color: #fff;
+    text-decoration: none;
+    border-radius: var(--yatra-radius);
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.yatra-metabox-button:hover {
+    background: var(--yatra-primary-hover);
+    color: #fff;
+}
+
+.yatra-metabox-note {
+    margin: 8px 0 0 0;
+    font-size: 11px;
+    color: var(--yatra-text-light);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+    .yatra-container {
+        padding: 0 16px;
+    }
+    
+    .yatra-clean-hero {
+        padding: 40px 0;
+    }
+    
+    .yatra-clean-hero h1 {
+        font-size: 24px;
+    }
+    
+    .yatra-clean-benefits,
+    .yatra-clean-features,
+    .yatra-clean-cta {
+        padding: 40px 0;
+    }
+    
+    .yatra-features-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+/* ========================================
+   FOCUS STATES (ACCESSIBILITY)
+   ======================================== */
+
+.yatra-clean-button:focus,
+.yatra-metabox-button:focus {
+    outline: 2px solid var(--yatra-primary);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    .yatra-clean-page,
+    .yatra-clean-metabox {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}
