@@ -547,6 +547,9 @@
         if ($('.yatra-saas-page, .yatra-premium-features-metabox').length) {
             YatraSaaS.init();
         }
+        
+        // Handle premium settings tabs redirect
+        YatraSaaS.initPremiumSettingsRedirect();
     });
 
     // Expose to global scope for external access

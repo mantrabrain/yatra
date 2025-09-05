@@ -1,336 +1,854 @@
 /**
- * Yatra Premium Features - Clean & Minimal Design
- * Simple, elegant design focused on clarity and usability
+ * Yatra Premium Features - Modern SaaS Design
+ * Premium, conversion-focused design with gradients and animations
  */
 
 /* ========================================
-   CLEAN DESIGN VARIABLES
+   MODERN SAAS DESIGN VARIABLES
    ======================================== */
 
 :root {
-    --yatra-primary: #0073aa;
-    --yatra-primary-hover: #005a87;
-    --yatra-text: #1e1e1e;
-    --yatra-text-light: #666;
-    --yatra-border: #ddd;
-    --yatra-bg-light: #f9f9f9;
-    --yatra-success: #46b450;
-    --yatra-radius: 4px;
-    --yatra-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    /* Primary Colors */
+    --yatra-primary: #4f46e5;
+    --yatra-primary-hover: #4338ca;
+    --yatra-primary-light: #6366f1;
+    --yatra-primary-dark: #3730a3;
+    
+    /* Gradient Colors */
+    --yatra-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --yatra-gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --yatra-gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --yatra-gradient-premium: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    
+    /* Text Colors */
+    --yatra-text: #1f2937;
+    --yatra-text-light: #6b7280;
+    --yatra-text-muted: #9ca3af;
+    
+    /* Background Colors */
+    --yatra-bg: #ffffff;
+    --yatra-bg-light: #f8fafc;
+    --yatra-bg-dark: #1f2937;
+    --yatra-bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    /* Border & Shadow */
+    --yatra-border: #e5e7eb;
+    --yatra-border-light: #f3f4f6;
+    --yatra-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --yatra-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --yatra-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Success & Status */
+    --yatra-success: #10b981;
+    --yatra-warning: #f59e0b;
+    --yatra-error: #ef4444;
+    
+    /* Border Radius */
+    --yatra-radius: 8px;
+    --yatra-radius-lg: 12px;
+    --yatra-radius-xl: 16px;
+    
+    /* Spacing */
+    --yatra-space-xs: 4px;
+    --yatra-space-sm: 8px;
+    --yatra-space-md: 16px;
+    --yatra-space-lg: 24px;
+    --yatra-space-xl: 32px;
+    --yatra-space-2xl: 48px;
 }
 
 /* ========================================
-   CLEAN PAGE LAYOUT
+   MODERN SAAS PAGE LAYOUT
    ======================================== */
 
-.yatra-clean-page {
-    background: #fff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+.yatra-saas-page {
+    background: var(--yatra-bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     line-height: 1.6;
     color: var(--yatra-text);
+    overflow-x: hidden;
 }
 
 .yatra-container {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 var(--yatra-space-lg);
 }
 
 /* ========================================
-   HERO SECTION
+   HERO SECTION WITH PREMIUM DESIGN
    ======================================== */
 
-.yatra-clean-hero {
-    padding: 60px 0;
-    background: var(--yatra-bg-light);
+.yatra-saas-hero {
+    position: relative;
+    padding: var(--yatra-space-xl) 0;
+    background: var(--yatra-bg-gradient);
     text-align: center;
-    border-bottom: 1px solid var(--yatra-border);
+    overflow: hidden;
+}
+
+.yatra-hero-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="2"/></g></svg>') repeat;
+    opacity: 0.3;
+    animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
 }
 
 .yatra-hero-content {
-    max-width: 600px;
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
     margin: 0 auto;
 }
 
+.yatra-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-sm) var(--yatra-space-md);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: var(--yatra-space-lg);
+}
+
 .yatra-hero-icon {
-    margin-bottom: 24px;
+    margin-bottom: var(--yatra-space-lg);
 }
 
-.yatra-hero-icon .dashicons {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: var(--yatra-primary);
+.yatra-icon-wrapper {
+    position: relative;
+    display: inline-block;
 }
 
-.yatra-clean-hero h1 {
-    font-size: 32px;
-    font-weight: 600;
-    margin: 0 0 16px 0;
-    color: var(--yatra-text);
+.yatra-icon-wrapper .dashicons {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: white;
+    position: relative;
+    z-index: 2;
 }
 
-.yatra-clean-hero p {
-    font-size: 16px;
-    color: var(--yatra-text-light);
-    margin: 0 0 32px 0;
+.yatra-icon-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.3; }
+}
+
+.yatra-saas-hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 var(--yatra-space-md) 0;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.yatra-saas-hero p {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 var(--yatra-space-lg) 0;
+    font-weight: 400;
+}
+
+.yatra-hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--yatra-space-lg);
+    margin-bottom: var(--yatra-space-lg);
+}
+
+.yatra-stat {
+    text-align: center;
+    color: white;
+}
+
+.yatra-stat-number {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: var(--yatra-space-xs);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.yatra-stat-label {
+    font-size: 14px;
+    opacity: 0.8;
+    font-weight: 500;
 }
 
 .yatra-hero-cta {
-    margin-top: 32px;
+    margin-top: var(--yatra-space-lg);
 }
 
-.yatra-clean-button {
-    display: inline-block;
-    padding: 12px 24px;
-    background: var(--yatra-primary);
-    color: #fff;
+.yatra-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-md) var(--yatra-space-xl);
+    background: white;
+    color: var(--yatra-primary);
     text-decoration: none;
-    border-radius: var(--yatra-radius);
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-}
-
-.yatra-clean-button:hover {
-    background: var(--yatra-primary-hover);
-    color: #fff;
-}
-
-.yatra-clean-button.large {
-    padding: 16px 32px;
+    border-radius: var(--yatra-radius-lg);
+    font-weight: 600;
     font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: var(--yatra-shadow-lg);
+    border: none;
+    cursor: pointer;
+}
+
+.yatra-cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--yatra-shadow-xl);
+    color: var(--yatra-primary);
+}
+
+.yatra-cta-primary.large {
+    padding: var(--yatra-space-lg) var(--yatra-space-2xl);
+    font-size: 18px;
+}
+
+.yatra-cta-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--yatra-space-sm);
+    margin-top: var(--yatra-space-md);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
 }
 
 /* ========================================
    BENEFITS SECTION
    ======================================== */
 
-.yatra-clean-benefits {
-    padding: 50px 0;
-    background: #fff;
-}
-
-.yatra-clean-benefits h2 {
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0 0 32px 0;
-    color: var(--yatra-text);
-}
-
-.yatra-benefits-list {
-    display: grid;
-    gap: 16px;
-    max-width: 600px;
-}
-
-.yatra-benefit-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 15px;
-}
-
-.yatra-benefit-item svg {
-    flex-shrink: 0;
-    color: var(--yatra-success);
-}
-
-.yatra-benefit-item span {
-    color: var(--yatra-text);
-}
-
-/* ========================================
-   FEATURES SECTION
-   ======================================== */
-
-.yatra-clean-features {
-    padding: 50px 0;
+.yatra-saas-benefits {
+    padding: var(--yatra-space-2xl) 0;
     background: var(--yatra-bg-light);
-    border-top: 1px solid var(--yatra-border);
 }
 
-.yatra-clean-features h2 {
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0 0 40px 0;
-    color: var(--yatra-text);
+.yatra-section-header {
     text-align: center;
+    margin-bottom: var(--yatra-space-2xl);
 }
 
-.yatra-features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-}
-
-.yatra-feature-card {
-    background: #fff;
-    padding: 24px;
-    border: 1px solid var(--yatra-border);
-    border-radius: var(--yatra-radius);
-    position: relative;
-    transition: box-shadow 0.2s ease;
-}
-
-.yatra-feature-card:hover {
-    box-shadow: var(--yatra-shadow);
-}
-
-.yatra-feature-card.current {
-    border-color: var(--yatra-primary);
-}
-
-.yatra-feature-icon {
-    margin-bottom: 16px;
-}
-
-.yatra-feature-icon .dashicons {
-    font-size: 32px;
-    width: 32px;
-    height: 32px;
-    color: var(--yatra-primary);
-}
-
-.yatra-feature-content h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 8px 0;
+.yatra-section-header h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0 0 var(--yatra-space-md) 0;
     color: var(--yatra-text);
 }
 
-.yatra-feature-content p {
-    font-size: 14px;
+.yatra-section-header p {
+    font-size: 18px;
     color: var(--yatra-text-light);
     margin: 0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.yatra-benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--yatra-space-lg);
+}
+
+.yatra-benefit-card {
+    background: var(--yatra-bg);
+    padding: var(--yatra-space-lg);
+    border-radius: var(--yatra-radius-lg);
+    box-shadow: var(--yatra-shadow);
+    border: 1px solid var(--yatra-border-light);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--yatra-space-md);
+}
+
+.yatra-benefit-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--yatra-shadow-lg);
+}
+
+.yatra-benefit-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background: var(--yatra-gradient-success);
+    border-radius: var(--yatra-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.yatra-benefit-content h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--yatra-text);
     line-height: 1.5;
 }
 
-.yatra-current-badge {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    padding: 4px 8px;
-    background: var(--yatra-primary);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 500;
-    border-radius: var(--yatra-radius);
+/* ========================================
+   SHOWCASE SECTION
+   ======================================== */
+
+.yatra-saas-showcase {
+    padding: var(--yatra-space-2xl) 0;
+    background: var(--yatra-bg);
+}
+
+.yatra-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--yatra-space-lg);
+}
+
+.yatra-showcase-card {
+    background: var(--yatra-bg);
+    border: 1px solid var(--yatra-border);
+    border-radius: var(--yatra-radius-lg);
+    padding: var(--yatra-space-lg);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.yatra-showcase-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--yatra-shadow-xl);
+}
+
+.yatra-showcase-card.featured {
+    border: 2px solid var(--yatra-primary);
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+.yatra-showcase-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--yatra-space-md);
+}
+
+.yatra-showcase-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--yatra-gradient-primary);
+    border-radius: var(--yatra-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.yatra-showcase-icon .dashicons {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+}
+
+.yatra-featured-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-xs);
+    padding: var(--yatra-space-xs) var(--yatra-space-sm);
+    background: var(--yatra-gradient-premium);
+    color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.yatra-showcase-content h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 var(--yatra-space-sm) 0;
+    color: var(--yatra-text);
+}
+
+.yatra-showcase-content p {
+    font-size: 14px;
+    color: var(--yatra-text-light);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.yatra-showcase-footer {
+    margin-top: var(--yatra-space-md);
+    padding-top: var(--yatra-space-md);
+    border-top: 1px solid var(--yatra-border-light);
+}
+
+.yatra-feature-status {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+}
+
+.yatra-status-current {
+    color: var(--yatra-success);
+    font-size: 12px;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.yatra-status-available {
+    color: var(--yatra-text-light);
+    font-size: 12px;
+    font-weight: 500;
 }
 
 /* ========================================
    CTA SECTION
    ======================================== */
 
-.yatra-clean-cta {
-    padding: 60px 0;
-    background: #fff;
+.yatra-saas-cta {
+    position: relative;
+    padding: var(--yatra-space-2xl) 0;
+    background: var(--yatra-bg-gradient);
     text-align: center;
-    border-top: 1px solid var(--yatra-border);
+    overflow: hidden;
+}
+
+.yatra-cta-bg-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><path d="M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z"/></g></svg>') repeat;
+    opacity: 0.2;
+    animation: float 15s ease-in-out infinite reverse;
+}
+
+.yatra-cta-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.yatra-cta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-sm) var(--yatra-space-md);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: var(--yatra-space-lg);
 }
 
 .yatra-cta-content h2 {
-    font-size: 28px;
-    font-weight: 600;
-    margin: 0 0 16px 0;
-    color: var(--yatra-text);
+    font-size: 40px;
+    font-weight: 700;
+    margin: 0 0 var(--yatra-space-md) 0;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .yatra-cta-content p {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 var(--yatra-space-xl) 0;
+}
+
+.yatra-cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--yatra-space-md);
+    margin-bottom: var(--yatra-space-xl);
+}
+
+.yatra-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-md) var(--yatra-space-xl);
+    background: transparent;
+    color: white;
+    text-decoration: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--yatra-radius-lg);
+    font-weight: 600;
     font-size: 16px;
-    color: var(--yatra-text-light);
-    margin: 0 0 32px 0;
+    transition: all 0.3s ease;
+}
+
+.yatra-cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+.yatra-cta-guarantees {
+    display: flex;
+    justify-content: center;
+    gap: var(--yatra-space-xl);
+    flex-wrap: wrap;
+}
+
+.yatra-guarantee {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    font-weight: 500;
 }
 
 /* ========================================
-   CLEAN METABOX
+   COMPACT PREMIUM METABOX
    ======================================== */
 
-.yatra-clean-metabox {
-    background: #fff;
-    border: 1px solid #c3c4c7;
+.yatra-premium-metabox-compact {
+    background: var(--yatra-bg);
+    border: 1px solid var(--yatra-border);
     border-radius: var(--yatra-radius);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    box-shadow: var(--yatra-shadow);
 }
 
 .yatra-metabox-header {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 16px;
-    background: var(--yatra-bg-light);
-    border-bottom: 1px solid var(--yatra-border);
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-md);
+    background: var(--yatra-gradient-primary);
+    color: white;
 }
 
 .yatra-metabox-icon svg {
-    color: var(--yatra-primary);
-    margin-top: 2px;
+    color: white;
+    flex-shrink: 0;
 }
 
-.yatra-metabox-title h4 {
-    margin: 0 0 4px 0;
+.yatra-metabox-header h4 {
+    margin: 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--yatra-text);
+    color: white;
 }
 
-.yatra-metabox-title p {
-    margin: 0;
-    font-size: 12px;
-    color: var(--yatra-text-light);
-    line-height: 1.4;
+.yatra-metabox-features-list {
+    padding: var(--yatra-space-md);
 }
 
-.yatra-metabox-features {
-    padding: 16px;
-}
-
-.yatra-metabox-features .yatra-feature-item {
+.yatra-feature-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 0;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-sm) 0;
     font-size: 13px;
     color: var(--yatra-text);
+    border-bottom: 1px solid var(--yatra-border-light);
 }
 
-.yatra-metabox-features .yatra-feature-item .dashicons {
+.yatra-feature-item:last-child {
+    border-bottom: none;
+}
+
+.yatra-feature-item .dashicons {
     font-size: 16px;
     width: 16px;
     height: 16px;
     color: var(--yatra-primary);
+    flex-shrink: 0;
+}
+
+.yatra-feature-item span:last-child {
+    font-weight: 500;
 }
 
 .yatra-metabox-cta {
-    padding: 16px;
+    padding: 12px;
     background: var(--yatra-bg-light);
-    border-top: 1px solid var(--yatra-border);
+    border-top: 1px solid var(--yatra-border-light);
     text-align: center;
 }
 
-.yatra-metabox-button {
-    display: inline-block;
+.yatra-upgrade-button {
+    display: block;
     width: 100%;
-    padding: 12px 16px;
-    background: var(--yatra-primary);
-    color: #fff;
+    padding: 8px 12px;
+    background: var(--yatra-gradient-primary);
+    color: white;
     text-decoration: none;
     border-radius: var(--yatra-radius);
-    font-size: 13px;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.yatra-metabox-button:hover {
-    background: var(--yatra-primary-hover);
-    color: #fff;
+.yatra-upgrade-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--yatra-shadow);
+    color: white;
 }
 
-.yatra-metabox-note {
-    margin: 8px 0 0 0;
-    font-size: 11px;
+/* ========================================
+   PREMIUM SETTINGS PAGE
+   ======================================== */
+
+.yatra-premium-settings-page {
+    background: var(--yatra-bg);
+    border-radius: var(--yatra-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--yatra-shadow);
+    margin: 20px 0;
+}
+
+.yatra-premium-settings-header {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-md);
+    padding: var(--yatra-space-lg);
+    background: var(--yatra-gradient-primary);
+    color: white;
+}
+
+.yatra-premium-icon {
+    flex-shrink: 0;
+}
+
+.yatra-premium-icon .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: white;
+}
+
+.yatra-premium-content {
+    flex: 1;
+}
+
+.yatra-premium-content h2 {
+    margin: 0 0 var(--yatra-space-xs) 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+}
+
+.yatra-premium-content p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+}
+
+.yatra-premium-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-xs);
+    padding: var(--yatra-space-xs) var(--yatra-space-sm);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yatra-premium-settings-content {
+    padding: var(--yatra-space-lg);
+}
+
+.yatra-premium-card {
+    background: var(--yatra-bg-light);
+    border: 1px solid var(--yatra-border);
+    border-radius: var(--yatra-radius);
+    margin-bottom: var(--yatra-space-lg);
+    overflow: hidden;
+}
+
+.yatra-premium-card-header {
+    padding: var(--yatra-space-md);
+    background: var(--yatra-bg);
+    border-bottom: 1px solid var(--yatra-border);
+}
+
+.yatra-premium-card-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--yatra-text);
+}
+
+.yatra-premium-benefits {
+    padding: var(--yatra-space-md);
+}
+
+.yatra-premium-benefits .yatra-benefit-item {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-sm) 0;
+    font-size: 14px;
+    color: var(--yatra-text);
+}
+
+.yatra-premium-benefits .yatra-benefit-item svg {
+    color: var(--yatra-success);
+    flex-shrink: 0;
+}
+
+.yatra-premium-cta {
+    background: var(--yatra-bg-light);
+    border: 1px solid var(--yatra-border);
+    border-radius: var(--yatra-radius);
+    padding: var(--yatra-space-lg);
+    text-align: center;
+}
+
+.yatra-cta-content h3 {
+    margin: 0 0 var(--yatra-space-sm) 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--yatra-text);
+}
+
+.yatra-cta-content p {
+    margin: 0 0 var(--yatra-space-md) 0;
+    font-size: 14px;
     color: var(--yatra-text-light);
+}
+
+.yatra-cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--yatra-space-md);
+    margin-bottom: var(--yatra-space-md);
+}
+
+.yatra-cta-buttons .yatra-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-sm) var(--yatra-space-lg);
+    background: var(--yatra-gradient-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--yatra-radius);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.yatra-cta-buttons .yatra-cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--yatra-shadow-lg);
+    color: white;
+}
+
+.yatra-cta-buttons .yatra-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-sm) var(--yatra-space-lg);
+    background: transparent;
+    color: var(--yatra-primary);
+    text-decoration: none;
+    border: 2px solid var(--yatra-primary);
+    border-radius: var(--yatra-radius);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.yatra-cta-buttons .yatra-cta-secondary:hover {
+    background: var(--yatra-primary);
+    color: white;
+}
+
+.yatra-cta-guarantees {
+    display: flex;
+    justify-content: center;
+    gap: var(--yatra-space-lg);
+    font-size: 12px;
+    color: var(--yatra-text-light);
+}
+
+.yatra-cta-guarantees span {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-xs);
+}
+
+.yatra-cta-guarantees span:before {
+    content: "✓";
+    color: var(--yatra-success);
+    font-weight: bold;
+}
+
+/* ========================================
+   ANIMATIONS & AOS
+   ======================================== */
+
+[data-aos] {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+[data-aos].aos-animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+[data-aos="fade-up"] {
+    transform: translateY(30px);
+}
+
+[data-aos="fade-up"].aos-animate {
+    transform: translateY(0);
+}
+
+[data-aos="zoom-in"] {
+    transform: scale(0.8);
+}
+
+[data-aos="zoom-in"].aos-animate {
+    transform: scale(1);
 }
 
 /* ========================================
@@ -339,26 +857,67 @@
 
 @media (max-width: 768px) {
     .yatra-container {
-        padding: 0 16px;
+        padding: 0 var(--yatra-space-md);
     }
     
-    .yatra-clean-hero {
-        padding: 40px 0;
+    .yatra-saas-hero {
+        padding: var(--yatra-space-lg) 0;
     }
     
-    .yatra-clean-hero h1 {
+    .yatra-saas-hero h1 {
+        font-size: 28px;
+    }
+    
+    .yatra-saas-hero p {
+        font-size: 16px;
+    }
+    
+    .yatra-hero-stats {
+        flex-direction: column;
+        gap: var(--yatra-space-md);
+    }
+    
+    .yatra-benefits-grid,
+    .yatra-showcase-grid {
+        grid-template-columns: 1fr;
+        gap: var(--yatra-space-md);
+    }
+    
+    .yatra-cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .yatra-cta-guarantees {
+        flex-direction: column;
+        gap: var(--yatra-space-sm);
+    }
+    
+    .yatra-section-header h2 {
+        font-size: 28px;
+    }
+    
+    .yatra-cta-content h2 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-saas-hero h1 {
+        font-size: 22px;
+    }
+    
+    .yatra-section-header h2 {
         font-size: 24px;
     }
     
-    .yatra-clean-benefits,
-    .yatra-clean-features,
-    .yatra-clean-cta {
-        padding: 40px 0;
+    .yatra-cta-content h2 {
+        font-size: 24px;
     }
     
-    .yatra-features-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+    .yatra-benefit-card,
+    .yatra-showcase-card {
+        padding: var(--yatra-space-md);
     }
 }
 
@@ -366,10 +925,206 @@
    FOCUS STATES (ACCESSIBILITY)
    ======================================== */
 
-.yatra-clean-button:focus,
-.yatra-metabox-button:focus {
+.yatra-cta-primary:focus,
+.yatra-cta-secondary:focus,
+.yatra-metabox-button:focus,
+.yatra-feature-card:focus {
     outline: 2px solid var(--yatra-primary);
     outline-offset: 2px;
+}
+
+/* ========================================
+   PREMIUM SETTINGS PAGE
+   ======================================== */
+
+.yatra-premium-settings-page {
+    background: var(--yatra-bg);
+    border-radius: var(--yatra-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--yatra-shadow);
+    margin: 20px 0;
+}
+
+.yatra-premium-settings-header {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-md);
+    padding: var(--yatra-space-lg);
+    background: var(--yatra-gradient-primary);
+    color: white;
+}
+
+.yatra-premium-icon {
+    flex-shrink: 0;
+}
+
+.yatra-premium-icon .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: white;
+}
+
+.yatra-premium-content {
+    flex: 1;
+}
+
+.yatra-premium-content h2 {
+    margin: 0 0 var(--yatra-space-xs) 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+}
+
+.yatra-premium-content p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+}
+
+.yatra-premium-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-xs);
+    padding: var(--yatra-space-xs) var(--yatra-space-sm);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yatra-premium-settings-content {
+    padding: var(--yatra-space-lg);
+}
+
+.yatra-premium-card {
+    background: var(--yatra-bg-light);
+    border: 1px solid var(--yatra-border);
+    border-radius: var(--yatra-radius);
+    margin-bottom: var(--yatra-space-lg);
+    overflow: hidden;
+}
+
+.yatra-premium-card-header {
+    padding: var(--yatra-space-md);
+    background: var(--yatra-bg);
+    border-bottom: 1px solid var(--yatra-border);
+}
+
+.yatra-premium-card-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--yatra-text);
+}
+
+.yatra-premium-benefits {
+    padding: var(--yatra-space-md);
+}
+
+.yatra-premium-benefits .yatra-benefit-item {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-sm) 0;
+    font-size: 14px;
+    color: var(--yatra-text);
+}
+
+.yatra-premium-benefits .yatra-benefit-item svg {
+    color: var(--yatra-success);
+    flex-shrink: 0;
+}
+
+.yatra-premium-cta {
+    background: var(--yatra-bg-light);
+    border: 1px solid var(--yatra-border);
+    border-radius: var(--yatra-radius);
+    padding: var(--yatra-space-lg);
+    text-align: center;
+}
+
+.yatra-cta-content h3 {
+    margin: 0 0 var(--yatra-space-sm) 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--yatra-text);
+}
+
+.yatra-cta-content p {
+    margin: 0 0 var(--yatra-space-md) 0;
+    font-size: 14px;
+    color: var(--yatra-text-light);
+}
+
+.yatra-cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--yatra-space-md);
+    margin-bottom: var(--yatra-space-md);
+}
+
+.yatra-cta-buttons .yatra-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-sm) var(--yatra-space-lg);
+    background: var(--yatra-gradient-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--yatra-radius);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.yatra-cta-buttons .yatra-cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--yatra-shadow-lg);
+    color: white;
+}
+
+.yatra-cta-buttons .yatra-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--yatra-space-sm);
+    padding: var(--yatra-space-sm) var(--yatra-space-lg);
+    background: transparent;
+    color: var(--yatra-primary);
+    text-decoration: none;
+    border: 2px solid var(--yatra-primary);
+    border-radius: var(--yatra-radius);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.yatra-cta-buttons .yatra-cta-secondary:hover {
+    background: var(--yatra-primary);
+    color: white;
+}
+
+.yatra-cta-guarantees {
+    display: flex;
+    justify-content: center;
+    gap: var(--yatra-space-lg);
+    font-size: 12px;
+    color: var(--yatra-text-light);
+}
+
+.yatra-cta-guarantees span {
+    display: flex;
+    align-items: center;
+    gap: var(--yatra-space-xs);
+}
+
+.yatra-cta-guarantees span:before {
+    content: "✓";
+    color: var(--yatra-success);
+    font-weight: bold;
 }
 
 /* ========================================
@@ -377,9 +1132,16 @@
    ======================================== */
 
 @media print {
-    .yatra-clean-page,
-    .yatra-clean-metabox {
+    .yatra-saas-page,
+    .yatra-premium-features-metabox {
         box-shadow: none;
         border: 1px solid #000;
+    }
+    
+    .yatra-cta-primary,
+    .yatra-cta-secondary,
+    .yatra-metabox-button {
+        background: #000 !important;
+        color: #fff !important;
     }
 }
