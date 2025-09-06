@@ -237,9 +237,14 @@ class Yatra_Pro_Compatibility
                                 <span><?php echo esc_js(__('Activate Yatra Pro', 'yatra')); ?></span>
                             </button>
                         <?php elseif ($yatra_pro_status['needs_upgrade']): ?>
-                            <a href="<?php echo admin_url('plugins.php'); ?>" class="button button-primary" style="background: linear-gradient(135deg, #0073aa 0%, #005a87 100%); border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 115, 170, 0.3); transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                                <span class="dashicons dashicons-update" style="font-size: 16px; line-height: 1;"></span>
-                                <span><?php _e('Upgrade Yatra Pro', 'yatra'); ?></span>
+                            <a href="<?php echo admin_url('admin.php?page=yatra-license'); ?>" class="button button-primary" style="background: linear-gradient(135deg, #0073aa 0%, #005a87 100%); border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 115, 170, 0.3); transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                <span class="dashicons dashicons-admin-network" style="font-size: 16px; line-height: 1;"></span>
+                                <span><?php _e('Manage License', 'yatra'); ?></span>
+                            </a>
+                            
+                            <a href="https://store.mantrabrain.com/account" target="_blank" class="button button-secondary" style="background: linear-gradient(135deg, #f0f0f1 0%, #e8e8e9 100%); border: 1px solid #c3c4c7; border-radius: 6px; padding: 10px 16px; font-weight: 600; color: #50575e; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px;">
+                                <span class="dashicons dashicons-download" style="font-size: 16px; line-height: 1;"></span>
+                                <span><?php _e('Download Latest', 'yatra'); ?></span>
                             </a>
                         <?php endif; ?>
                         
@@ -260,7 +265,7 @@ class Yatra_Pro_Compatibility
                             } elseif ($yatra_pro_status['needs_activation']) {
                                 _e('Yatra Pro is installed but not activated. Activate it to use the integrated features and receive future updates.', 'yatra');
                             } elseif ($yatra_pro_status['needs_upgrade']) {
-                                _e('Your Yatra Pro version is outdated. Upgrade to version 2.0.0 or higher to use these features and receive future updates.', 'yatra');
+                                _e('Your Yatra Pro version is outdated. Manage your license to upgrade to version 2.0.0 or higher, or download the latest version from your account to use these features and receive future updates.', 'yatra');
                             }
                             ?>
                         </p>
@@ -277,6 +282,22 @@ class Yatra_Pro_Compatibility
                             <li><?php _e('Download the Yatra Pro plugin file from your account', 'yatra'); ?></li>
                             <li><?php _e('Go to WordPress Admin → Plugins → Add New → Upload Plugin', 'yatra'); ?></li>
                             <li><?php _e('Upload and activate the Yatra Pro plugin', 'yatra'); ?></li>
+                            <li><?php _e('Return here and click "Enable Feature & Deactivate" to migrate your old plugins', 'yatra'); ?></li>
+                        </ol>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <?php if ($yatra_pro_status['needs_upgrade']): ?>
+                    <div style="margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; border: 1px solid #dee2e6;">
+                        <h4 style="margin: 0 0 10px 0; color: #495057; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <span class="dashicons dashicons-admin-network" style="color: #0073aa;"></span>
+                            <?php _e('Upgrade Instructions:', 'yatra'); ?>
+                        </h4>
+                        <ol style="margin: 0; padding-left: 20px; color: #6c757d; font-size: 13px; line-height: 1.6;">
+                            <li><?php _e('Click "Manage License" to access your license settings', 'yatra'); ?></li>
+                            <li><?php _e('Check your license status and update if needed', 'yatra'); ?></li>
+                            <li><?php _e('Click "Download Latest" to get the newest version from your account', 'yatra'); ?></li>
+                            <li><?php _e('Upload and activate the updated Yatra Pro plugin', 'yatra'); ?></li>
                             <li><?php _e('Return here and click "Enable Feature & Deactivate" to migrate your old plugins', 'yatra'); ?></li>
                         </ol>
                     </div>
