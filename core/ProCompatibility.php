@@ -154,8 +154,8 @@ class Yatra_Pro_Compatibility
         if ($yatra_pro_status['needs_installation']) {
             $message = sprintf(
                 _n(
-                    'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please install and activate Yatra Pro 2.0.0 to use these features. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
-                    'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. Please install and activate Yatra Pro 2.0.0 to use these features. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
+                    'The following plugin has been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. To use these features, you need to install Yatra Pro 2.0.0. <em>Note: Updates for this plugin will only be available in Yatra Pro from now onwards.</em>',
+                    'The following plugins have been integrated into Yatra Pro 2.0.0 and onwards: <strong>%s</strong>. To use these features, you need to install Yatra Pro 2.0.0. <em>Note: Updates for these plugins will only be available in Yatra Pro from now onwards.</em>',
                     $plugin_count,
                     'yatra'
                 ),
@@ -222,9 +222,14 @@ class Yatra_Pro_Compatibility
                                 <span><?php _e('Go to Features', 'yatra'); ?></span>
                             </button>
                         <?php elseif ($yatra_pro_status['needs_installation']): ?>
-                            <a href="https://wpyatra.com/pricing/" target="_blank" class="button button-primary" style="background: linear-gradient(135deg, #0073aa 0%, #005a87 100%); border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 115, 170, 0.3); transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                            <a href="https://store.mantrabrain.com/account" target="_blank" class="button button-primary" style="background: linear-gradient(135deg, #0073aa 0%, #005a87 100%); border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 115, 170, 0.3); transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                                 <span class="dashicons dashicons-download" style="font-size: 16px; line-height: 1;"></span>
-                                <span><?php _e('Get Yatra Pro', 'yatra'); ?></span>
+                                <span><?php _e('Download Yatra Pro', 'yatra'); ?></span>
+                            </a>
+                            
+                            <a href="https://wpyatra.com/pricing/" target="_blank" class="button button-secondary" style="background: linear-gradient(135deg, #f0f0f1 0%, #e8e8e9 100%); border: 1px solid #c3c4c7; border-radius: 6px; padding: 10px 16px; font-weight: 600; color: #50575e; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px;">
+                                <span class="dashicons dashicons-cart" style="font-size: 16px; line-height: 1;"></span>
+                                <span><?php _e('Purchase License', 'yatra'); ?></span>
                             </a>
                         <?php elseif ($yatra_pro_status['needs_activation']): ?>
                             <button type="button" class="button button-primary yatra-activate-pro-btn" data-nonce="<?php echo wp_create_nonce('yatra_activate_pro'); ?>" style="background: linear-gradient(135deg, #0073aa 0%, #005a87 100%); border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 115, 170, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px;">
@@ -251,7 +256,7 @@ class Yatra_Pro_Compatibility
                             if ($yatra_pro_status['is_compatible']) {
                                 _e('This will automatically deactivate the old plugins and enable the corresponding features in Yatra Pro 2.0.0. Future updates for these plugins will only be available in Yatra Pro.', 'yatra');
                             } elseif ($yatra_pro_status['needs_installation']) {
-                                _e('Yatra Pro 2.0.0 is required to use these integrated features. Get Yatra Pro to unlock all premium functionality and receive future updates.', 'yatra');
+                                _e('Yatra Pro 2.0.0 is required to use these integrated features. Download Yatra Pro from your account at store.mantrabrain.com/account or purchase a license to unlock all premium functionality and receive future updates.', 'yatra');
                             } elseif ($yatra_pro_status['needs_activation']) {
                                 _e('Yatra Pro is installed but not activated. Activate it to use the integrated features and receive future updates.', 'yatra');
                             } elseif ($yatra_pro_status['needs_upgrade']) {
@@ -260,6 +265,22 @@ class Yatra_Pro_Compatibility
                             ?>
                         </p>
                     </div>
+                    
+                    <?php if ($yatra_pro_status['needs_installation']): ?>
+                    <div style="margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; border: 1px solid #dee2e6;">
+                        <h4 style="margin: 0 0 10px 0; color: #495057; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <span class="dashicons dashicons-admin-tools" style="color: #0073aa;"></span>
+                            <?php _e('Installation Instructions:', 'yatra'); ?>
+                        </h4>
+                        <ol style="margin: 0; padding-left: 20px; color: #6c757d; font-size: 13px; line-height: 1.6;">
+                            <li><?php _e('Click "Download Yatra Pro" to go to your account page', 'yatra'); ?></li>
+                            <li><?php _e('Download the Yatra Pro plugin file from your account', 'yatra'); ?></li>
+                            <li><?php _e('Go to WordPress Admin → Plugins → Add New → Upload Plugin', 'yatra'); ?></li>
+                            <li><?php _e('Upload and activate the Yatra Pro plugin', 'yatra'); ?></li>
+                            <li><?php _e('Return here and click "Enable Feature & Deactivate" to migrate your old plugins', 'yatra'); ?></li>
+                        </ol>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
             
