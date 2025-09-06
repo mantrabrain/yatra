@@ -234,7 +234,7 @@ class Yatra_Pro_Compatibility
                         <?php elseif ($yatra_pro_status['needs_activation']): ?>
                             <button type="button" class="button button-primary yatra-activate-pro-btn" data-nonce="<?php echo wp_create_nonce('yatra_activate_pro'); ?>" style="background: linear-gradient(135deg, #0073aa 0%, #005a87 100%); border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 115, 170, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px;">
                                 <span class="dashicons dashicons-yes" style="font-size: 16px; line-height: 1;"></span>
-                                <span><?php _e('Activate Yatra Pro', 'yatra'); ?></span>
+                                <span><?php echo esc_js(__('Activate Yatra Pro', 'yatra')); ?></span>
                             </button>
                         <?php elseif ($yatra_pro_status['needs_upgrade']): ?>
                             <a href="<?php echo admin_url('plugins.php'); ?>" class="button button-primary" style="background: linear-gradient(135deg, #0073aa 0%, #005a87 100%); border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 115, 170, 0.3); transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
@@ -368,150 +368,186 @@ class Yatra_Pro_Compatibility
     public function enqueue_scripts()
     {
         if (!$this->are_all_old_plugins_deactivated()) {
-            ?>
-            <script type="text/javascript">
-            jQuery(document).ready(function($) {
-                // Handle Enable Feature & Deactivate button
-                $('.yatra-enable-feature-btn').on('click', function(e) {
-                    e.preventDefault();
-                    
-                    var $btn = $(this);
-                    var $status = $('.yatra-compatibility-status');
-                    var $message = $('.yatra-status-message');
-                    var nonce = $btn.data('nonce');
-                    
-                    // Disable button and show loading
-                    $btn.prop('disabled', true);
-                    $btn.find('.dashicons').removeClass('dashicons-yes-alt').addClass('dashicons-update').css('animation', 'spin 1s linear infinite');
-                    $btn.find('span:not(.dashicons)').text('<?php _e('Processing...', 'yatra'); ?>');
-                    
-                    // Show status area
-                    $status.show();
-                    $message.html('<span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span> <?php _e('Deactivating plugins and enabling features...', 'yatra'); ?>');
-                    
-                    $.ajax({
-                        url: ajaxurl,
-                        type: 'POST',
-                        data: {
-                            action: 'yatra_enable_feature_and_deactivate',
-                            nonce: nonce
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                $message.html('<span class="dashicons dashicons-yes" style="color: #46b450;"></span> ' + response.data.message);
-                                
-                                // Reload page after 2 seconds
-                                setTimeout(function() {
-                                    window.location.reload();
-                                }, 2000);
-                            } else {
-                                $message.html('<span class="dashicons dashicons-warning" style="color: #dc3232;"></span> ' + response.data.message);
+            $this->inline_scripts();
+        }
+    }
+    
+    /**
+     * Output inline scripts
+     */
+    private function inline_scripts()
+    {
+        $processing_text = esc_js(__('Processing...', 'yatra'));
+        $deactivating_text = esc_js(__('Deactivating plugins and enabling features...', 'yatra'));
+        $enable_text = esc_js(__('Enable Feature & Deactivate', 'yatra'));
+        $error_text = esc_js(__('An error occurred. Please try again.', 'yatra'));
+        $activating_text = esc_js(__('Activating...', 'yatra'));
+        $activating_pro_text = esc_js(__('Activating Yatra Pro...', 'yatra'));
+        $activate_pro_text = esc_js(__('Activate Yatra Pro', 'yatra'));
+        
+        ?>
+        <script type="text/javascript">
+        /* Yatra Pro Compatibility Script */
+        (function() {
+            'use strict';
+            
+            function initYatraCompatibility() {
+                if (typeof jQuery === 'undefined') {
+                    setTimeout(initYatraCompatibility, 100);
+                    return;
+                }
+                
+                jQuery(document).ready(function($) {
+                    // Handle Enable Feature & Deactivate button
+                    $('.yatra-enable-feature-btn').on('click', function(e) {
+                        e.preventDefault();
+                        
+                        var $btn = $(this);
+                        var $status = $('.yatra-compatibility-status');
+                        var $message = $('.yatra-status-message');
+                        var nonce = $btn.data('nonce');
+                        
+                        // Disable button and show loading
+                        $btn.prop('disabled', true);
+                        $btn.find('.dashicons').removeClass('dashicons-yes-alt').addClass('dashicons-update').css('animation', 'spin 1s linear infinite');
+                        $btn.find('span:not(.dashicons)').text('<?php echo $processing_text; ?>');
+                        
+                        // Show status area
+                        $status.show();
+                        $message.html('<span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span> <?php echo $deactivating_text; ?>');
+                        
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'yatra_enable_feature_and_deactivate',
+                                nonce: nonce
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    $message.html('<span class="dashicons dashicons-yes" style="color: #46b450;"></span> ' + response.data.message);
+                                    
+                                    // Reload page after 2 seconds
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 2000);
+                                } else {
+                                    $message.html('<span class="dashicons dashicons-warning" style="color: #dc3232;"></span> ' + response.data.message);
+                                    $btn.prop('disabled', false);
+                                    $btn.find('.dashicons').removeClass('dashicons-update').addClass('dashicons-yes-alt').css('animation', '');
+                                    $btn.find('span:not(.dashicons)').text('<?php echo $enable_text; ?>');
+                                }
+                            },
+                            error: function() {
+                                $message.html('<span class="dashicons dashicons-warning" style="color: #dc3232;"></span> <?php echo $error_text; ?>');
                                 $btn.prop('disabled', false);
                                 $btn.find('.dashicons').removeClass('dashicons-update').addClass('dashicons-yes-alt').css('animation', '');
-                                $btn.find('span:not(.dashicons)').text('<?php _e('Enable Feature & Deactivate', 'yatra'); ?>');
+                                $btn.find('span:not(.dashicons)').text('<?php echo $enable_text; ?>');
                             }
-                        },
-                        error: function() {
-                            $message.html('<span class="dashicons dashicons-warning" style="color: #dc3232;"></span> <?php _e('An error occurred. Please try again.', 'yatra'); ?>');
-                            $btn.prop('disabled', false);
-                            $btn.find('.dashicons').removeClass('dashicons-update').addClass('dashicons-yes-alt').css('animation', '');
-                            $btn.find('span:not(.dashicons)').text('<?php _e('Enable Feature & Deactivate', 'yatra'); ?>');
-                        }
+                        });
                     });
-                });
-                
-                // Handle Go to Features button
-                $('.yatra-go-to-features-btn').on('click', function(e) {
-                    e.preventDefault();
                     
-                    var $btn = $(this);
-                    var nonce = $btn.data('nonce');
-                    
-                    // Disable button and show loading
-                    $btn.prop('disabled', true);
-                    $btn.find('.dashicons').removeClass('dashicons-admin-generic').addClass('dashicons-update').css('animation', 'spin 1s linear infinite');
-                    
-                    $.ajax({
-                        url: ajaxurl,
-                        type: 'POST',
-                        data: {
-                            action: 'yatra_go_to_features',
-                            nonce: nonce
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                window.location.href = response.data.redirect_url;
-                            } else {
-                                alert(response.data.message);
+                    // Handle Go to Features button
+                    $('.yatra-go-to-features-btn').on('click', function(e) {
+                        e.preventDefault();
+                        
+                        var $btn = $(this);
+                        var nonce = $btn.data('nonce');
+                        
+                        // Disable button and show loading
+                        $btn.prop('disabled', true);
+                        $btn.find('.dashicons').removeClass('dashicons-admin-generic').addClass('dashicons-update').css('animation', 'spin 1s linear infinite');
+                        
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'yatra_go_to_features',
+                                nonce: nonce
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    window.location.href = response.data.redirect_url;
+                                } else {
+                                    alert(response.data.message);
+                                    $btn.prop('disabled', false);
+                                    $btn.find('.dashicons').removeClass('dashicons-update').addClass('dashicons-admin-generic').css('animation', '');
+                                }
+                            },
+                            error: function() {
+                                alert('<?php echo $error_text; ?>');
                                 $btn.prop('disabled', false);
                                 $btn.find('.dashicons').removeClass('dashicons-update').addClass('dashicons-admin-generic').css('animation', '');
                             }
-                        },
-                        error: function() {
-                            alert('<?php _e('An error occurred. Please try again.', 'yatra'); ?>');
-                            $btn.prop('disabled', false);
-                            $btn.find('.dashicons').removeClass('dashicons-update').addClass('dashicons-admin-generic').css('animation', '');
-                        }
+                        });
                     });
-                });
-                
-                // Handle Activate Yatra Pro button
-                $('.yatra-activate-pro-btn').on('click', function(e) {
-                    e.preventDefault();
                     
-                    var $btn = $(this);
-                    var $status = $('.yatra-compatibility-status');
-                    var $message = $('.yatra-status-message');
-                    var nonce = $btn.data('nonce');
-                    
-                    // Disable button and show loading
-                    $btn.prop('disabled', true);
-                    $btn.find('.dashicons').removeClass('dashicons-yes').addClass('dashicons-update').css('animation', 'spin 1s linear infinite');
-                    $btn.find('span:not(.dashicons)').text('<?php _e('Activating...', 'yatra'); ?>');
-                    
-                    // Show status area
-                    $status.show();
-                    $message.html('<span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span> <?php _e('Activating Yatra Pro...', 'yatra'); ?>');
-                    
-                    $.ajax({
-                        url: ajaxurl,
-                        type: 'POST',
-                        data: {
-                            action: 'yatra_activate_pro',
-                            nonce: nonce
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                $message.html('<span class="dashicons dashicons-yes" style="color: #46b450;"></span> ' + response.data.message);
-                                
-                                // Reload page after 2 seconds
-                                setTimeout(function() {
-                                    window.location.reload();
-                                }, 2000);
-                            } else {
-                                $message.html('<span class="dashicons dashicons-warning" style="color: #dc3232;"></span> ' + response.data.message);
+                    // Handle Activate Yatra Pro button
+                    $('.yatra-activate-pro-btn').on('click', function(e) {
+                        e.preventDefault();
+                        
+                        var $btn = $(this);
+                        var $status = $('.yatra-compatibility-status');
+                        var $message = $('.yatra-status-message');
+                        var nonce = $btn.data('nonce');
+                        
+                        // Disable button and show loading
+                        $btn.prop('disabled', true);
+                        $btn.find('.dashicons').removeClass('dashicons-yes').addClass('dashicons-update').css('animation', 'spin 1s linear infinite');
+                        $btn.find('span:not(.dashicons)').text('<?php echo $activating_text; ?>');
+                        
+                        // Show status area
+                        $status.show();
+                        $message.html('<span class="dashicons dashicons-update" style="animation: spin 1s linear infinite;"></span> <?php echo $activating_pro_text; ?>');
+                        
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'yatra_activate_pro',
+                                nonce: nonce
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    $message.html('<span class="dashicons dashicons-yes" style="color: #46b450;"></span> ' + response.data.message);
+                                    
+                                    // Reload page after 2 seconds
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 2000);
+                                } else {
+                                    $message.html('<span class="dashicons dashicons-warning" style="color: #dc3232;"></span> ' + response.data.message);
+                                    $btn.prop('disabled', false);
+                                    $btn.find('.dashicons').removeClass('dashicons-update').addClass('dashicons-yes').css('animation', '');
+                                    $btn.find('span:not(.dashicons)').text('<?php echo $activate_pro_text; ?>');
+                                }
+                            },
+                            error: function() {
+                                $message.html('<span class="dashicons dashicons-warning" style="color: #dc3232;"></span> <?php echo $error_text; ?>');
                                 $btn.prop('disabled', false);
                                 $btn.find('.dashicons').removeClass('dashicons-update').addClass('dashicons-yes').css('animation', '');
-                                $btn.find('span:not(.dashicons)').text('<?php _e('Activate Yatra Pro', 'yatra'); ?>');
+                                $btn.find('span:not(.dashicons)').text('<?php echo $activate_pro_text; ?>');
                             }
-                        },
-                        error: function() {
-                            $message.html('<span class="dashicons dashicons-warning" style="color: #dc3232;"></span> <?php _e('An error occurred. Please try again.', 'yatra'); ?>');
-                            $btn.prop('disabled', false);
-                            $btn.find('.dashicons').removeClass('dashicons-update').addClass('dashicons-yes').css('animation', '');
-                            $btn.find('span:not(.dashicons)').text('<?php _e('Activate Yatra Pro', 'yatra'); ?>');
-                        }
+                        });
                     });
+                    
+                    // CSS for spin animation
+                    var style = document.createElement('style');
+                    style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+                    document.head.appendChild(style);
                 });
-            });
+            }
             
-            // CSS for spin animation
-            var style = document.createElement('style');
-            style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
-            document.head.appendChild(style);
-            </script>
-            <?php
-        }
+            // Initialize when DOM is ready
+            document.addEventListener('DOMContentLoaded', initYatraCompatibility);
+            
+            // Also try to initialize immediately in case DOM is already ready
+            if (document.readyState !== 'loading') {
+                initYatraCompatibility();
+            }
+        })();
+        </script>
+        <?php
     }
 
     /**
