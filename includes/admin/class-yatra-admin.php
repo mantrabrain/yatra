@@ -359,7 +359,6 @@ return;
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-form-handler.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-tour-enquiries.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-export-import.php';
-        include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-license-manager.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-assets.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-post-types.php';
         include_once YATRA_ABSPATH . 'includes/admin/class-yatra-admin-permalinks.php';
