@@ -353,9 +353,36 @@ if (!function_exists('yatra_user_can_modify_booking')) {
 }
 if (!function_exists('yatra_get_premium_addons')) {
 
-    function yatra_get_premium_addons()
-    {
-        return apply_filters('yatra_premium_addons', array());
+    function yatra_get_premium_addons() {
+        $active_plugins   = apply_filters( 'active_plugins', get_option( 'active_plugins', [] ) );
+       
+        $network_plugins  = array_keys( get_site_option( 'active_sitewide_plugins', [] ) );
+        $all_active       = array_merge( $active_plugins, $network_plugins );
+    
+        $plugins_to_check = [
+            'yatra-pro/yatra-pro.php',
+            'yatra-2checkout/yatra-2checkout.php',
+            'yatra-authorizenet/yatra-authorizenet.php',
+            'yatra-availability-conditions/yatra-availability-conditions.php',
+            'yatra-google-calendar/yatra-google-calendar.php',
+            'yatra-partial-payment/yatra-partial-payment.php',
+            'yatra-razorpay/yatra-razorpay.php',
+            'yatra-review/yatra-review.php',
+            'yatra-services/yatra-services.php',
+            'yatra-square/yatra-square.php',
+            'yatra-stripe/yatra-stripe.php',
+            'yatra-downloads/yatra-downloads.php',
+        ];
+        
+    
+        $active_results = [];
+        foreach ( $plugins_to_check as $plugin ) {
+            if(in_array( $plugin, $all_active, true )){
+                array_push($active_results, $plugin);
+            }
+        }
+    
+        return $active_results;
     }
 }
 if(!function_exists('yatra_block_support_styles')){

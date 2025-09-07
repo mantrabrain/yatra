@@ -333,8 +333,8 @@ final class Yatra
         $this->yatra_messages = new Yatra_Messages;
         $this->admin_notice = new Notices();
         Initialize::run();
-        if(count(yatra_get_premium_addons())<1){
-        Premium::init();
+        if(count(value: yatra_get_premium_addons())<1){
+            Premium::init();
         }
 
 
