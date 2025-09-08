@@ -237,7 +237,7 @@ class Yatra_Pro_Compatibility
                                 <span><?php echo esc_js(__('Activate Yatra Pro', 'yatra')); ?></span>
                             </button>
                         <?php elseif ($yatra_pro_status['needs_upgrade']): ?>
-                            <a href="<?php echo admin_url('admin.php?page=yatra-license'); ?>" class="button button-primary" style="background: linear-gradient(135deg, #0073aa 0%, #005a87 100%); border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 115, 170, 0.3); transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                            <a href="https://store.mantrabrain.com/account" target="_blank" class="button button-primary" style="background: linear-gradient(135deg, #0073aa 0%, #005a87 100%); border: none; border-radius: 6px; padding: 10px 16px; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 115, 170, 0.3); transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                                 <span class="dashicons dashicons-admin-network" style="font-size: 16px; line-height: 1;"></span>
                                 <span><?php _e('Manage License', 'yatra'); ?></span>
                             </a>
