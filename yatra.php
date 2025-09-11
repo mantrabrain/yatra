@@ -22,7 +22,7 @@ if (!defined('YATRA_FILE')) {
 
 // Define YATRA_VERSION.
 if (!defined('YATRA_VERSION')) {
-    define('YATRA_VERSION', '2.3.0');
+    define('YATRA_VERSION', rand());
 }
 
 // Define YATRA_PLUGIN_URI.
