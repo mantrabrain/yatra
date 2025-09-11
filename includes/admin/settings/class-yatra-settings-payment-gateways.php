@@ -26,7 +26,7 @@ class Yatra_Settings_Payment_Gateways extends Yatra_Admin_Settings_Base
     public function __construct()
     {
         $this->id = 'payment-gateways';
-        $this->label = __('Payment', 'yatra');
+        $this->label = __('Payments', 'yatra');
         $this->description = __('Set up payment methods, test mode, and gateway configurations', 'yatra');
         $this->icon = '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 0 0-2 2v1h16V6a2 2 0 0 0-2-2H4zM18 9H2v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM4 13a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1zm5-1a1 1 0 1 0 0 2h1a1 1 0 1 0 0-2H9z"/></svg>';
 
