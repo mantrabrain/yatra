@@ -179,13 +179,16 @@ class Yatra_Form_Handler
 
             if ($redirect) {
 
-                $success_redirect_page_id = get_option('yatra_thankyou_page');
+                if (!yatra()->yatra_error->has_errors()) {
 
-                $page_permalink = get_permalink($success_redirect_page_id);
+                    $success_redirect_page_id = get_option('yatra_thankyou_page');
 
-                wp_safe_redirect($page_permalink);
+                    $page_permalink = get_permalink($success_redirect_page_id);
 
-                exit;
+                    wp_safe_redirect($page_permalink);
+
+                    exit;
+                }
 
             } else {
                 return ['booking_id' => $booking_id, 'payment_id' => $payment_id];
