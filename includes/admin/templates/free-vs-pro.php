@@ -10,8 +10,8 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
 ?>
-
 <div class="wrap yatra-free-vs-pro">
+<h2 style="display:none"></h2>
     <div class="yatra-free-vs-pro-header">
         <h1><?php echo esc_html__('Free vs Pro Comparison', 'yatra'); ?></h1>
         <p><?php echo esc_html__('Compare the features available in Yatra Free vs Yatra Pro to make the best choice for your travel business.', 'yatra'); ?></p>
