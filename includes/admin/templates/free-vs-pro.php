@@ -331,7 +331,7 @@ if (!defined('ABSPATH')) {
             </div>
             <div class="yatra-plan-column yatra-pro-plan">
                 <div class="yatra-plan-action">
-                    <a href="https://mantrabrain.com/checkout?edd_action=add_to_cart&download_id=36139&edd_options[price_id]=1" target="_blank" class="button button-primary yatra-upgrade-button">
+                    <a href="https://mantrabrain.com/checkout?edd_action=add_to_cart&download_id=37070&edd_options[price_id]=2" target="_blank" class="button button-primary yatra-upgrade-button">
                         <?php echo esc_html__('Upgrade to Pro', 'yatra'); ?>
                     </a>
                     <p class="yatra-upgrade-note"><?php echo esc_html__('7-day money-back guarantee', 'yatra'); ?></p>
