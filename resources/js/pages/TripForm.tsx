@@ -33,7 +33,10 @@ import {
   Tag,
   GripVertical,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Bed,
+  Car,
+  Activity
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -46,18 +49,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../co
 import { HelpText } from '../components/ui/help-text';
 
 type SectionId = 
-  | 'overview' 
-  | 'location'
-  | 'pricing' 
-  | 'itinerary' 
-  | 'included' 
-  | 'booking' 
-  | 'availability'
-  | 'gallery' 
-  | 'faqs' 
-  | 'seo' 
-  | 'frontend-tabs'
-  | 'advanced';
+  | 'overview'           // 1. Basic info, highlights, rich content, classification
+  | 'location'          // 2. Location & geography (destination, coordinates, landmarks)
+  | 'duration'          // 3. Duration & schedule (trip type, days, availability, seasonal)
+  | 'activity'          // 4. Activity types & category (activity types, difficulty, category hierarchy)
+  | 'accommodation'     // 5. Accommodation details
+  | 'transportation'    // 6. Transportation details
+  | 'pricing'           // 7. Pricing & payment
+  | 'itinerary'         // 8. Itinerary builder
+  | 'included'          // 9. What's included/excluded
+  | 'booking'           // 10. Booking requirements & settings
+  | 'gallery'           // 11. Photo gallery
+  | 'faqs'              // 12. FAQs
+  | 'frontend-tabs'     // 13. Frontend tabs management
+  | 'seo'               // 14. SEO settings
+  | 'advanced';         // 15. Status & lifecycle management
 
 interface Section {
   id: SectionId;
@@ -560,14 +566,36 @@ const TripForm: React.FC = () => {
     }
   }, [tripData, isEditMode]);
 
-  // Define sections
+  // Define sections - Organized in logical workflow order
   const essentialsSections: Section[] = [
+    // Step 1: Basic Information
     { id: 'overview', label: __('Trip Overview', 'Trip Overview'), icon: FileText, required: true, completed: !!(formData.title && formData.description) },
-    { id: 'location', label: __('Location & Duration', 'Location & Duration'), icon: MapPin, required: true, completed: !!(formData.destination && formData.duration_days) },
+    
+    // Step 2: Location & Geography
+    { id: 'location', label: __('Location & Geography', 'Location & Geography'), icon: MapPin, required: true, completed: !!(formData.destination) },
+    
+    // Step 3: Duration & Schedule
+    { id: 'duration', label: __('Duration & Schedule', 'Duration & Schedule'), icon: Calendar, required: true, completed: !!(formData.duration_days && formData.trip_type) },
+    
+    // Step 4: Activity & Category
+    { id: 'activity', label: __('Activity & Category', 'Activity & Category'), icon: Activity, required: false, completed: !!(formData.trip_category || formData.activity_types.length > 0) },
+    
+    // Step 5: Accommodation
+    { id: 'accommodation', label: __('Accommodation', 'Accommodation'), icon: Bed, required: false, completed: !!(formData.accommodation_type) },
+    
+    // Step 6: Transportation
+    { id: 'transportation', label: __('Transportation', 'Transportation'), icon: Car, required: false, completed: formData.transportation_included || !!(formData.pickup_location || formData.transportation_details) },
+    
+    // Step 7: Pricing
     { id: 'pricing', label: __('Pricing & Payment', 'Pricing & Payment'), icon: DollarSign, required: true, completed: formData.pricing_type === 'regular' ? !!(formData.original_price && parseFloat(formData.original_price) > 0) : formData.price_types.some(pt => pt.original_price && parseFloat(pt.original_price) > 0) },
-    // Availability is now managed separately - removed from essentials
+    
+    // Step 8: Itinerary
     { id: 'itinerary', label: __('Itinerary Builder', 'Itinerary Builder'), icon: Calendar, required: true, completed: false },
+    
+    // Step 9: Included/Excluded
     { id: 'included', label: __('What\'s Included', 'What\'s Included'), icon: CheckSquare, required: true, completed: formData.included_items.length > 0 },
+    
+    // Step 10: Booking Requirements
     { id: 'booking', label: __('Booking Settings', 'Booking Settings'), icon: Mail, required: true, completed: !!(formData.min_travelers && formData.max_travelers) },
   ];
 
@@ -576,6 +604,7 @@ const TripForm: React.FC = () => {
     { id: 'faqs', label: __('FAQs', 'FAQs'), icon: HelpCircle, required: false, completed: formData.faqs.length > 0 },
     { id: 'frontend-tabs', label: __('Frontend Tabs', 'Frontend Tabs'), icon: Settings, required: false, completed: formData.frontend_tabs.some(tab => tab.enabled) },
     { id: 'seo', label: __('SEO Settings', 'SEO Settings'), icon: Search, required: false, completed: !!(formData.meta_title && formData.meta_description) },
+    { id: 'advanced', label: __('Status & Lifecycle', 'Status & Lifecycle'), icon: Settings, required: false, completed: formData.status !== 'draft' },
   ];
 
   // Calculate completion percentage
@@ -1759,18 +1788,26 @@ const TripForm: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <MapPin className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Location & Duration', 'Location & Duration')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Location & Geography', 'Location & Geography')}</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Specify where your trip takes place and how long it lasts', 'Specify where your trip takes place and how long it lasts')}
+              {__('Specify where your trip takes place, including destinations, coordinates, and key landmarks', 'Specify where your trip takes place, including destinations, coordinates, and key landmarks')}
             </p>
 
             <div className="space-y-4">
-              {/* Trip Type Selection */}
+              {/* Destination */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  {__('Trip Type', 'Trip Type')} <span className="text-red-500">*</span>
+                <label htmlFor="destination" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Destination', 'Destination')} <span className="text-red-500">*</span>
                 </label>
+                <Input
+                  id="destination"
+                  type="text"
+                  value={formData.destination}
+                  onChange={(e) => handleFieldChange('destination', e.target.value)}
+                  placeholder={__('e.g., Bali, Indonesia', 'e.g., Bali, Indonesia')}
+                />
+              </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
                     formData.trip_type === 'single_day'
@@ -1857,20 +1894,6 @@ const TripForm: React.FC = () => {
                     )}
                   </label>
                 </div>
-              </div>
-
-              {/* Destination */}
-              <div>
-                <label htmlFor="destination" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  {__('Destination', 'Destination')} <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  id="destination"
-                  type="text"
-                  value={formData.destination}
-                  onChange={(e) => handleFieldChange('destination', e.target.value)}
-                  placeholder={__('e.g., Bali, Indonesia', 'e.g., Bali, Indonesia')}
-                />
               </div>
 
               {/* Starting & Ending Locations */}
