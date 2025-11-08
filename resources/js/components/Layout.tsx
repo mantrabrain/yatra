@@ -18,7 +18,8 @@ import {
   Map,
   FileText,
   Tag,
-  Route
+  Route,
+  BadgePercent
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -93,6 +94,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'itinerary', label: 'Itinerary', icon: FileText },
       ]
     },
+    { subpage: 'discounts', label: 'Discount', icon: BadgePercent },
     { subpage: 'bookings', label: 'Bookings', icon: Calendar },
     { subpage: 'customers', label: 'Customers', icon: Users },
     { subpage: 'reviews', label: 'Reviews', icon: Star },

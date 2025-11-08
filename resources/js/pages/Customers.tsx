@@ -25,6 +25,7 @@ interface Customer {
   city: string;
   total_bookings: number;
   total_spent: number;
+  total_payments: number;
   status: string;
   registered_at: string;
   last_booking_date?: string;
@@ -82,6 +83,7 @@ const Customers: React.FC = () => {
           city: 'New York',
           total_bookings: 3,
           total_spent: 6250,
+          total_payments: 5,
           status: 'active',
           registered_at: getDate(120),
           last_booking_date: getDate(5),
@@ -95,6 +97,7 @@ const Customers: React.FC = () => {
           city: 'Toronto',
           total_bookings: 2,
           total_spent: 1960,
+          total_payments: 3,
           status: 'active',
           registered_at: getDate(90),
           last_booking_date: getDate(3),
@@ -108,6 +111,7 @@ const Customers: React.FC = () => {
           city: 'Beijing',
           total_bookings: 1,
           total_spent: 3000,
+          total_payments: 2,
           status: 'active',
           registered_at: getDate(60),
           last_booking_date: getDate(10),
@@ -121,6 +125,7 @@ const Customers: React.FC = () => {
           city: 'London',
           total_bookings: 2,
           total_spent: 3300,
+          total_payments: 4,
           status: 'active',
           registered_at: getDate(45),
           last_booking_date: getDate(15),
@@ -134,6 +139,7 @@ const Customers: React.FC = () => {
           city: 'Sydney',
           total_bookings: 1,
           total_spent: 920,
+          total_payments: 1,
           status: 'active',
           registered_at: getDate(30),
           last_booking_date: getDate(2),
@@ -147,6 +153,7 @@ const Customers: React.FC = () => {
           city: 'Los Angeles',
           total_bookings: 1,
           total_spent: 4050,
+          total_payments: 2,
           status: 'inactive',
           registered_at: getDate(180),
           last_booking_date: getDate(150),
@@ -160,6 +167,7 @@ const Customers: React.FC = () => {
           city: 'Chicago',
           total_bookings: 1,
           total_spent: 2500,
+          total_payments: 1,
           status: 'active',
           registered_at: getDate(20),
           last_booking_date: getDate(12),
@@ -173,6 +181,7 @@ const Customers: React.FC = () => {
           city: 'Madrid',
           total_bookings: 1,
           total_spent: 850,
+          total_payments: 1,
           status: 'active',
           registered_at: getDate(15),
           last_booking_date: getDate(20),
@@ -219,6 +228,10 @@ const Customers: React.FC = () => {
           case 'total_spent':
             aValue = a.total_spent;
             bValue = b.total_spent;
+            break;
+          case 'total_payments':
+            aValue = a.total_payments;
+            bValue = b.total_payments;
             break;
           case 'status':
             aValue = a.status;
@@ -406,6 +419,7 @@ const Customers: React.FC = () => {
               <option value="country">{__('Country', 'Country')}</option>
               <option value="total_bookings">{__('Bookings', 'Bookings')}</option>
               <option value="total_spent">{__('Total Spent', 'Total Spent')}</option>
+              <option value="total_payments">{__('Payments', 'Payments')}</option>
               <option value="status">{__('Status', 'Status')}</option>
             </Select>
 
@@ -505,6 +519,15 @@ const Customers: React.FC = () => {
                         )}
                         <TableHead>
                           <button
+                            onClick={() => handleSort('total_payments')}
+                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
+                          >
+                            {__('Payments', 'Payments')}
+                            {getSortIcon('total_payments')}
+                          </button>
+                        </TableHead>
+                        <TableHead>
+                          <button
                             onClick={() => handleSort('status')}
                             className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
                           >
@@ -562,6 +585,9 @@ const Customers: React.FC = () => {
                               {formatPrice(customer.total_spent)}
                             </TableCell>
                           )}
+                          <TableCell className="text-gray-600 dark:text-gray-400">
+                            {customer.total_payments}
+                          </TableCell>
                           <TableCell>
                             {getStatusBadge(customer.status)}
                           </TableCell>

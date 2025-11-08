@@ -24,6 +24,8 @@ import Items from './pages/Items';
 import ItemForm from './pages/ItemForm';
 import Itinerary from './pages/Itinerary';
 import ItineraryForm from './pages/ItineraryForm';
+import Discounts from './pages/Discounts';
+import DiscountForm from './pages/DiscountForm';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -145,6 +147,12 @@ const App: React.FC = () => {
           default:
             return <ItemTypes />;
         }
+      case 'discounts':
+        // Check if we're creating or editing a discount
+        if (action === 'create' || action === 'edit') {
+          return <DiscountForm />;
+        }
+        return <Discounts />;
       case 'reports':
         return <Reports />;
       case 'settings':
