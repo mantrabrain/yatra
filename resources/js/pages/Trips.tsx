@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Package } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -17,6 +17,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/badge';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Edit, Trash2, Eye } from 'lucide-react';
+import { HelpText } from '../components/ui/help-text';
+import { Alert } from '../components/ui/alert';
 
 interface Trip {
   id: number;
@@ -280,7 +282,8 @@ const Trips: React.FC = () => {
   };
 
   const handleDelete = (trip: Trip) => {
-    if (confirm(__('Are you sure you want to delete this trip?', 'Are you sure you want to delete this trip?'))) {
+    const confirmMessage = __('Are you sure you want to delete "{title}"? This action cannot be undone and will remove all associated bookings.', 'Are you sure you want to delete "{title}"? This action cannot be undone and will remove all associated bookings.').replace('{title}', trip.title);
+    if (confirm(confirmMessage)) {
       deleteMutation.mutate(trip.id);
     }
   };
@@ -325,7 +328,7 @@ const Trips: React.FC = () => {
     <div className="space-y-3">
       <PageHeader
         title={__('All Trips', 'All Trips')}
-        description={__('Manage your travel packages and tours', 'Manage your travel packages and tours')}
+        description={__('Manage your travel packages and tours. Create, edit, and organize all your trips in one place.', 'Manage your travel packages and tours. Create, edit, and organize all your trips in one place.')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreateTrip} className="flex items-center gap-2">
@@ -338,16 +341,22 @@ const Trips: React.FC = () => {
       {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
         <CardContent className="p-3">
+          <div className="mb-2">
+            <HelpText 
+              text={__('Use the search box to find trips by name. Use filters to show only active, draft, or inactive trips. Click column headers to sort.', 'Use the search box to find trips by name. Use filters to show only active, draft, or inactive trips. Click column headers to sort.')}
+            />
+          </div>
           <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
             {/* Search */}
             <div className="flex-1 relative">
               <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder={__('Search trips...', 'Search trips...')}
+                placeholder={__('Search by trip name...', 'Search by trip name...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 h-9"
+                title={__('Type to search for trips by name', 'Type to search for trips by name')}
               />
             </div>
 
@@ -409,22 +418,47 @@ const Trips: React.FC = () => {
 
         {/* Table */}
         {error ? (
-          <Card>
-            <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading trips', 'Error loading trips')}
-            </CardContent>
-          </Card>
+          <Alert variant="error" title={__('Error Loading Trips', 'Error Loading Trips')}>
+            {__('We couldn\'t load your trips. Please refresh the page or try again later.', 'We couldn\'t load your trips. Please refresh the page or try again later.')}
+          </Alert>
         ) : (
           <>
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('Loading trips...', 'Loading trips...')}
+                  <div className="p-12 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {__('Loading your trips...', 'Loading your trips...')}
+                      </p>
+                    </div>
                   </div>
                 ) : trips.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('No trips found', 'No trips found')}
+                  <div className="p-12 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                        <Package className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                          {searchTerm || statusFilter !== 'all' 
+                            ? __('No trips match your search', 'No trips match your search')
+                            : __('No trips yet', 'No trips yet')}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                          {searchTerm || statusFilter !== 'all'
+                            ? __('Try adjusting your search or filters to see more results.', 'Try adjusting your search or filters to see more results.')
+                            : __('Get started by creating your first travel package. Click the button above to add a new trip.', 'Get started by creating your first travel package. Click the button above to add a new trip.')}
+                        </p>
+                        {(!searchTerm && statusFilter === 'all') && (
+                          <Button onClick={handleCreateTrip} className="flex items-center gap-2 mx-auto">
+                            <Plus className="w-4 h-4" />
+                            {__('Create Your First Trip', 'Create Your First Trip')}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <Table>
@@ -469,7 +503,9 @@ const Trips: React.FC = () => {
                             {getSortIcon('date')}
                           </button>
                         </TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+                        <TableHead className="text-right w-[120px]">
+                          <span className="sr-only">{__('Actions', 'Actions')}</span>
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -514,6 +550,7 @@ const Trips: React.FC = () => {
                                   size="icon"
                                   onClick={() => handleView(trip)}
                                   className="h-8 w-8"
+                                  title={__('View trip details', 'View trip details')}
                                   aria-label={__('View trip', 'View trip')}
                                 >
                                   <Eye className="w-4 h-4" />
@@ -526,6 +563,7 @@ const Trips: React.FC = () => {
                                   size="icon"
                                   onClick={() => handleEdit(trip)}
                                   className="h-8 w-8"
+                                  title={__('Edit this trip', 'Edit this trip')}
                                   aria-label={__('Edit trip', 'Edit trip')}
                                 >
                                   <Edit className="w-4 h-4" />
@@ -538,6 +576,7 @@ const Trips: React.FC = () => {
                                   size="icon"
                                   onClick={() => handleDelete(trip)}
                                   className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                  title={__('Delete this trip (cannot be undone)', 'Delete this trip (cannot be undone)')}
                                   aria-label={__('Delete trip', 'Delete trip')}
                                 >
                                   <Trash2 className="w-4 h-4" />

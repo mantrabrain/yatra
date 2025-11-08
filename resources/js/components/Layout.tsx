@@ -15,7 +15,10 @@ import {
   ChevronRight,
   List,
   Activity,
-  Map
+  Map,
+  FileText,
+  Tag,
+  Route
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -54,9 +57,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   // Track expanded submenus
   const [expandedMenus, setExpandedMenus] = useState<string[]>(() => {
-    // Auto-expand trips menu if we're on a trips page
-    if (currentSubpage === 'trips') {
-      return ['trips'];
+    // Auto-expand trips or itinerary menu if we're on those pages
+    if (currentSubpage === 'trips' || currentSubpage === 'itinerary') {
+      return [currentSubpage];
     }
     return [];
   });
@@ -78,6 +81,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'all', label: 'All Trips', icon: List },
         { tab: 'activities', label: 'Activities', icon: Activity },
         { tab: 'destinations', label: 'Destinations', icon: Map },
+      ]
+    },
+    { 
+      subpage: 'itinerary', 
+      label: 'Itinerary', 
+      icon: FileText,
+      submenu: [
+        { tab: 'item-types', label: 'Item Types', icon: Tag },
+        { tab: 'items', label: 'Items', icon: Route },
+        { tab: 'itinerary', label: 'Itinerary', icon: FileText },
       ]
     },
     { subpage: 'bookings', label: 'Bookings', icon: Calendar },

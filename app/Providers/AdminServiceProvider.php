@@ -79,6 +79,10 @@ class AdminServiceProvider extends ServiceProvider
         wp_deregister_script('image-edit');
         wp_deregister_script('svg-painter');
 
+        // Remove WordPress core form CSS
+        wp_dequeue_style('forms');
+        wp_deregister_style('forms');
+
         // Enqueue compiled React app
         $app_css = YATRA_PLUGIN_PATH . 'public/css/app.css';
         $app_js = YATRA_PLUGIN_PATH . 'public/js/app.js';

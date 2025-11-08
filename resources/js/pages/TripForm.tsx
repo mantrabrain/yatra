@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Info } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 // import { apiClient } from '../lib/api';
@@ -15,6 +15,8 @@ import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { HelpText } from '../components/ui/help-text';
+import { Alert } from '../components/ui/alert';
 
 interface TripFormData {
   title: string;
@@ -229,57 +231,80 @@ const TripForm: React.FC = () => {
                   {/* Title */}
                   <div>
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Title', 'Title')} <span className="text-red-500">*</span>
+                      {__('Trip Title', 'Trip Title')} <span className="text-red-500">*</span>
                     </label>
+                    <HelpText 
+                      text={__('Enter a clear, descriptive name for your trip. This will be displayed to customers on your website.', 'Enter a clear, descriptive name for your trip. This will be displayed to customers on your website.')}
+                      className="mb-2"
+                    />
                     <Input
                       id="title"
                       type="text"
                       value={formData.title}
                       onChange={(e) => handleTitleChange(e.target.value)}
-                      placeholder={__('Enter trip title', 'Enter trip title')}
+                      placeholder={__('e.g., Everest Base Camp Trek', 'e.g., Everest Base Camp Trek')}
                       className={errors.title ? 'border-red-500' : ''}
                       required
                     />
                     {errors.title && (
-                      <p className="mt-1 text-sm text-red-500">{errors.title}</p>
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <Info className="w-4 h-4" />
+                        {errors.title}
+                      </p>
                     )}
                   </div>
 
                   {/* Slug */}
                   <div>
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Slug', 'Slug')} <span className="text-red-500">*</span>
+                      {__('URL Slug', 'URL Slug')} <span className="text-red-500">*</span>
                     </label>
+                    <HelpText 
+                      text={__('This creates the web address for your trip page. It\'s automatically generated from the title, but you can edit it. Use only lowercase letters, numbers, and hyphens.', 'This creates the web address for your trip page. It\'s automatically generated from the title, but you can edit it. Use only lowercase letters, numbers, and hyphens.')}
+                      className="mb-2"
+                    />
                     <Input
                       id="slug"
                       type="text"
                       value={formData.slug}
                       onChange={(e) => handleSlugChange(e.target.value)}
-                      placeholder={__('trip-slug', 'trip-slug')}
+                      placeholder={__('everest-base-camp-trek', 'everest-base-camp-trek')}
                       className={errors.slug ? 'border-red-500' : ''}
                       required
                     />
                     {errors.slug && (
-                      <p className="mt-1 text-sm text-red-500">{errors.slug}</p>
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <Info className="w-4 h-4" />
+                        {errors.slug}
+                      </p>
                     )}
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {__('URL-friendly version of the title. Lowercase letters, numbers, and hyphens only.', 'URL-friendly version of the title. Lowercase letters, numbers, and hyphens only.')}
-                    </p>
+                    {!errors.slug && formData.slug && (
+                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        {__('URL will be:', 'URL will be:')} <span className="font-mono text-blue-600 dark:text-blue-400">/trips/{formData.slug}</span>
+                      </p>
+                    )}
                   </div>
 
                   {/* Description */}
                   <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'Description')}
+                      {__('Trip Description', 'Trip Description')}
                     </label>
+                    <HelpText 
+                      text={__('Describe your trip in detail. Include highlights, itinerary, what\'s included, and what makes it special. This helps customers understand and choose your trip.', 'Describe your trip in detail. Include highlights, itinerary, what\'s included, and what makes it special. This helps customers understand and choose your trip.')}
+                      className="mb-2"
+                    />
                     <textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('Enter trip description', 'Enter trip description')}
-                      rows={6}
+                      placeholder={__('Write a detailed description of your trip... Include highlights, itinerary, inclusions, and what makes it special.', 'Write a detailed description of your trip... Include highlights, itinerary, inclusions, and what makes it special.')}
+                      rows={8}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
+                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      {formData.description.length} {__('characters', 'characters')}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -296,10 +321,14 @@ const TripForm: React.FC = () => {
                   {/* Price */}
                   <div>
                     <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Price', 'Price')} (USD)
+                      {__('Price per Person', 'Price per Person')} (USD)
                     </label>
+                    <HelpText 
+                      text={__('Enter the price for one person. This is the base price customers will see. You can add additional pricing options later.', 'Enter the price for one person. This is the base price customers will see. You can add additional pricing options later.')}
+                      className="mb-2"
+                    />
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
                       <Input
                         id="price"
                         type="number"
@@ -312,24 +341,36 @@ const TripForm: React.FC = () => {
                       />
                     </div>
                     {errors.price && (
-                      <p className="mt-1 text-sm text-red-500">{errors.price}</p>
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <Info className="w-4 h-4" />
+                        {errors.price}
+                      </p>
+                    )}
+                    {!errors.price && formData.price && (
+                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        {__('Customers will see:', 'Customers will see:')} <span className="font-semibold text-gray-900 dark:text-white">${parseFloat(formData.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> {__('per person', 'per person')}
+                      </p>
                     )}
                   </div>
 
                   {/* Status */}
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Status', 'Status')}
+                      {__('Trip Status', 'Trip Status')}
                     </label>
+                    <HelpText 
+                      text={__('Draft: Not visible to customers. Active: Visible and bookable. Inactive: Hidden from customers.', 'Draft: Not visible to customers. Active: Visible and bookable. Inactive: Hidden from customers.')}
+                      className="mb-2"
+                    />
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                       className="h-9"
                     >
-                      <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="active">{__('Active', 'Active')}</option>
-                      <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                      <option value="draft">{__('Draft', 'Draft')} - {__('Not published', 'Not published')}</option>
+                      <option value="active">{__('Active', 'Active')} - {__('Visible to customers', 'Visible to customers')}</option>
+                      <option value="inactive">{__('Inactive', 'Inactive')} - {__('Hidden from customers', 'Hidden from customers')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -340,9 +381,14 @@ const TripForm: React.FC = () => {
                 <CardContent className="p-3">
                   <div className="space-y-2">
                     {errors.submit && (
-                      <div className="p-2 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 rounded-md">
+                      <Alert variant="error" title={__('Error', 'Error')}>
                         {errors.submit}
-                      </div>
+                      </Alert>
+                    )}
+                    {!isEditMode && (
+                      <Alert variant="info" className="mb-2">
+                        <strong>{__('Tip:', 'Tip:')}</strong> {__('You can save as Draft first, then activate when ready. Customers won\'t see Draft trips.', 'You can save as Draft first, then activate when ready. Customers won\'t see Draft trips.')}
+                      </Alert>
                     )}
                     <div className="flex gap-2">
                       <Button

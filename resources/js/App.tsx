@@ -18,6 +18,12 @@ import ReviewForm from './pages/ReviewForm';
 import ViewReview from './pages/ViewReview';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import ItemTypes from './pages/ItemTypes';
+import ItemTypeForm from './pages/ItemTypeForm';
+import Items from './pages/Items';
+import ItemForm from './pages/ItemForm';
+import Itinerary from './pages/Itinerary';
+import ItineraryForm from './pages/ItineraryForm';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -115,6 +121,30 @@ const App: React.FC = () => {
           return <ReviewForm />;
         }
         return <Reviews />;
+      case 'itinerary':
+        // Handle itinerary tabs
+        switch (tab.toLowerCase()) {
+          case 'item-types':
+            // Check if we're creating or editing an item type
+            if (action === 'create' || action === 'edit') {
+              return <ItemTypeForm />;
+            }
+            return <ItemTypes />;
+          case 'items':
+            // Check if we're creating or editing an item
+            if (action === 'create' || action === 'edit') {
+              return <ItemForm />;
+            }
+            return <Items />;
+          case 'itinerary':
+            // Check if we're creating or editing an itinerary entry
+            if (action === 'create' || action === 'edit') {
+              return <ItineraryForm />;
+            }
+            return <Itinerary />;
+          default:
+            return <ItemTypes />;
+        }
       case 'reports':
         return <Reports />;
       case 'settings':

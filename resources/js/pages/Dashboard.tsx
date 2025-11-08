@@ -11,7 +11,8 @@ import {
   DollarSign, 
   Users, 
   Plane,
-  TrendingUp
+  TrendingUp,
+  Info
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -284,6 +285,23 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-3">
+      {/* Welcome Message */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                {__('Welcome to Yatra Dashboard', 'Welcome to Yatra Dashboard')}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                {__('Here\'s an overview of your travel booking business. Use the cards below to see key metrics, upcoming trips, and recent activity.', 'Here\'s an overview of your travel booking business. Use the cards below to see key metrics, upcoming trips, and recent activity.')}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Key Metrics - Top Row - Always Show 4 Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard
