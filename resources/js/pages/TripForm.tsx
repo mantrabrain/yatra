@@ -95,6 +95,11 @@ interface TripFormData {
   highlights: string[];
   trip_details: string;
   short_description: string;
+  what_makes_special: string; // What Makes This Trip Special
+  trip_story: string; // Trip Story/Narrative
+  video_url: string; // Video Embed URL
+  virtual_tour_url: string; // 360° Virtual Tour URL
+  testimonials: string[]; // Testimonials Integration
   
   // Location & Geography
   destination: string;
@@ -104,6 +109,7 @@ interface TripFormData {
   regions: string[];
   latitude: string;
   longitude: string;
+  landmarks: string[]; // Geographic Tags - Landmarks
   
   // Duration & Schedule
   trip_type: 'single_day' | 'multi_day';
@@ -113,12 +119,18 @@ interface TripFormData {
   available_to: string;
   booking_window_days: string;
   seasonal_availability: string;
+  best_season: string; // Best season indicator
+  peak_season: string; // Peak season indicator
+  off_season: string; // Off-season indicator
   
   // Activity & Category
   activity_types: string[];
   difficulty_level: string;
   trip_category: string;
+  trip_category_parent: string; // Parent category for hierarchy
+  trip_category_sub: string; // Sub-category
   tags: string[];
+  featured_priority: 'none' | 'featured' | 'popular' | 'new' | 'limited'; // Featured Priority
   
   // Accommodation
   accommodation_type: string;
@@ -173,8 +185,14 @@ interface TripFormData {
   // Availability
   availability_dates: AvailabilityDate[];
   
-  // Status
-  status: 'draft' | 'published';
+  // Status & Lifecycle
+  status: 'draft' | 'review' | 'approved' | 'published' | 'archived';
+  scheduled_publish_date: string; // Scheduled Publishing
+  scheduled_unpublish_date: string; // Scheduled Unpublishing
+  version: number; // Version Control
+  seasonal_auto_enable: boolean; // Auto-enable/disable based on dates
+  seasonal_enable_date: string; // Date to auto-enable
+  seasonal_disable_date: string; // Date to auto-disable
   
   // SEO
   meta_title: string;
@@ -209,7 +227,7 @@ const TripForm: React.FC = () => {
   const { can } = usePermissions();
   
   const [currentSection, setCurrentSection] = useState<SectionId>('overview');
-  const [currentTab, setCurrentTab] = useState<'basic' | 'highlights' | 'details'>('basic');
+  const [currentTab, setCurrentTab] = useState<'basic' | 'highlights' | 'details' | 'rich-content' | 'classification'>('basic');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [showCategorySelector, setShowCategorySelector] = useState(false);
@@ -227,6 +245,11 @@ const TripForm: React.FC = () => {
     highlights: [],
     trip_details: '',
     short_description: '',
+    what_makes_special: '',
+    trip_story: '',
+    video_url: '',
+    virtual_tour_url: '',
+    testimonials: [],
     destination: '',
     starting_location: '',
     ending_location: '',
@@ -234,6 +257,7 @@ const TripForm: React.FC = () => {
     regions: [],
     latitude: '',
     longitude: '',
+    landmarks: [],
     trip_type: 'multi_day',
     duration_days: '',
     duration_nights: '',
@@ -241,10 +265,16 @@ const TripForm: React.FC = () => {
     available_to: '',
     booking_window_days: '',
     seasonal_availability: '',
+    best_season: '',
+    peak_season: '',
+    off_season: '',
     activity_types: [],
     difficulty_level: '',
     trip_category: '',
+    trip_category_parent: '',
+    trip_category_sub: '',
     tags: [],
+    featured_priority: 'none',
     accommodation_type: '',
     meal_plan: '',
     accommodation_details: '',
@@ -288,6 +318,12 @@ const TripForm: React.FC = () => {
     ],
     availability_dates: [],
     status: 'draft',
+    scheduled_publish_date: '',
+    scheduled_unpublish_date: '',
+    version: 1,
+    seasonal_auto_enable: false,
+    seasonal_enable_date: '',
+    seasonal_disable_date: '',
     meta_title: '',
     meta_description: '',
     meta_keywords: '',
@@ -345,13 +381,19 @@ const TripForm: React.FC = () => {
         short_description: 'Escape to paradise with our 7-day Bali beach retreat.',
         highlights: ['Pristine beaches', 'Ancient temples', 'Spa treatments', 'Rich culture'],
         trip_details: 'Detailed trip information...',
+        what_makes_special: 'This trip offers a perfect blend of relaxation and cultural immersion, with private beach access and exclusive temple visits.',
+        trip_story: 'Imagine waking up to the sound of waves, spending your days exploring ancient temples, and ending each evening with a traditional Balinese spa treatment. This is more than a vacation—it\'s a journey into the heart of Bali\'s rich culture and stunning natural beauty.',
+        video_url: '',
+        virtual_tour_url: '',
+        testimonials: ['Amazing experience!', 'Best trip ever!'],
         destination: 'Bali, Indonesia',
         starting_location: 'Denpasar Airport',
         ending_location: 'Ubud Hotel',
         countries: ['Indonesia'],
         regions: ['Bali'],
-        latitude: '',
-        longitude: '',
+        latitude: '-8.3405',
+        longitude: '115.0920',
+        landmarks: ['Tanah Lot Temple', 'Ubud Monkey Forest', 'Tegallalang Rice Terrace'],
         trip_type: 'multi_day',
         duration_days: '7',
         duration_nights: '6',
@@ -359,10 +401,16 @@ const TripForm: React.FC = () => {
         available_to: '',
         booking_window_days: '30',
         seasonal_availability: '',
+        best_season: 'April to October',
+        peak_season: 'July to August',
+        off_season: 'November to March',
         activity_types: [],
-        difficulty_level: '',
-        trip_category: '',
-        tags: [],
+        difficulty_level: 'beginner',
+        trip_category: 'beach',
+        trip_category_parent: 'beach',
+        trip_category_sub: 'relaxation',
+        tags: ['family-friendly', 'beach', 'relaxation'],
+        featured_priority: 'featured',
         accommodation_type: '',
         meal_plan: '',
         accommodation_details: '',
@@ -401,6 +449,12 @@ const TripForm: React.FC = () => {
         featured_image: '',
         faqs: [],
         status: 'draft',
+        scheduled_publish_date: '',
+        scheduled_unpublish_date: '',
+        version: 1,
+        seasonal_auto_enable: false,
+        seasonal_enable_date: '',
+        seasonal_disable_date: '',
         meta_title: '',
         meta_description: '',
         meta_keywords: '',
@@ -419,6 +473,11 @@ const TripForm: React.FC = () => {
         highlights: tripData.highlights || [],
         trip_details: tripData.trip_details || '',
         short_description: tripData.short_description || '',
+        what_makes_special: (tripData as any).what_makes_special || '',
+        trip_story: (tripData as any).trip_story || '',
+        video_url: (tripData as any).video_url || '',
+        virtual_tour_url: (tripData as any).virtual_tour_url || '',
+        testimonials: (tripData as any).testimonials || [],
         destination: tripData.destination || '',
         starting_location: tripData.starting_location || '',
         ending_location: tripData.ending_location || '',
@@ -426,6 +485,7 @@ const TripForm: React.FC = () => {
         regions: tripData.regions || [],
         latitude: tripData.latitude || '',
         longitude: tripData.longitude || '',
+        landmarks: (tripData as any).landmarks || [],
         trip_type: (tripData.trip_type || (tripData.duration_days && parseInt(tripData.duration_days?.toString() || '0') === 1 ? 'single_day' : 'multi_day')) as 'single_day' | 'multi_day',
         duration_days: tripData.duration_days?.toString() || '',
         duration_nights: tripData.duration_nights?.toString() || '',
@@ -433,10 +493,16 @@ const TripForm: React.FC = () => {
         available_to: tripData.available_to || '',
         booking_window_days: tripData.booking_window_days?.toString() || '',
         seasonal_availability: tripData.seasonal_availability || '',
+        best_season: (tripData as any).best_season || '',
+        peak_season: (tripData as any).peak_season || '',
+        off_season: (tripData as any).off_season || '',
         activity_types: tripData.activity_types || [],
         difficulty_level: tripData.difficulty_level || '',
         trip_category: tripData.trip_category || '',
+        trip_category_parent: (tripData as any).trip_category_parent || '',
+        trip_category_sub: (tripData as any).trip_category_sub || '',
         tags: tripData.tags || [],
+        featured_priority: (tripData as any).featured_priority || 'none',
         accommodation_type: tripData.accommodation_type || '',
         meal_plan: tripData.meal_plan || '',
         accommodation_details: tripData.accommodation_details || '',
@@ -479,7 +545,13 @@ const TripForm: React.FC = () => {
           { id: 'faqs', label: 'FAQs', enabled: true, order: 6, content_type: 'faqs' },
         ],
         availability_dates: (tripData as any).availability_dates || [],
-        status: (tripData.status || 'draft') as 'draft' | 'published',
+        status: ((tripData as any).status || 'draft') as 'draft' | 'review' | 'approved' | 'published' | 'archived',
+        scheduled_publish_date: (tripData as any).scheduled_publish_date || '',
+        scheduled_unpublish_date: (tripData as any).scheduled_unpublish_date || '',
+        version: (tripData as any).version || 1,
+        seasonal_auto_enable: (tripData as any).seasonal_auto_enable || false,
+        seasonal_enable_date: (tripData as any).seasonal_enable_date || '',
+        seasonal_disable_date: (tripData as any).seasonal_disable_date || '',
         meta_title: tripData.meta_title || '',
         meta_description: tripData.meta_description || '',
         meta_keywords: tripData.meta_keywords || '',
@@ -945,6 +1017,11 @@ const TripForm: React.FC = () => {
         short_description: data.short_description.trim(),
         highlights: data.highlights,
         trip_details: data.trip_details.trim(),
+        what_makes_special: data.what_makes_special.trim(),
+        trip_story: data.trip_story.trim(),
+        video_url: data.video_url.trim(),
+        virtual_tour_url: data.virtual_tour_url.trim(),
+        testimonials: data.testimonials || [],
         destination: data.destination.trim(),
         starting_location: data.starting_location.trim(),
         ending_location: data.ending_location.trim(),
@@ -952,16 +1029,24 @@ const TripForm: React.FC = () => {
         regions: data.regions || [],
         latitude: data.latitude ? parseFloat(data.latitude) : null,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
+        landmarks: data.landmarks || [],
+        trip_type: data.trip_type,
         duration_days: data.duration_days ? parseInt(data.duration_days) : null,
         duration_nights: data.duration_nights ? parseInt(data.duration_nights) : null,
         available_from: data.available_from || null,
         available_to: data.available_to || null,
         booking_window_days: data.booking_window_days ? parseInt(data.booking_window_days) : null,
         seasonal_availability: data.seasonal_availability || '',
+        best_season: data.best_season.trim(),
+        peak_season: data.peak_season.trim(),
+        off_season: data.off_season.trim(),
         activity_types: data.activity_types || [],
         difficulty_level: data.difficulty_level || '',
         trip_category: data.trip_category || '',
+        trip_category_parent: data.trip_category_parent || '',
+        trip_category_sub: data.trip_category_sub || '',
         tags: data.tags || [],
+        featured_priority: data.featured_priority,
         accommodation_type: data.accommodation_type || '',
         meal_plan: data.meal_plan || '',
         accommodation_details: data.accommodation_details.trim(),
@@ -1020,6 +1105,12 @@ const TripForm: React.FC = () => {
           to_location: avail.to_location || null,
         })),
         status: data.status || 'draft',
+        scheduled_publish_date: data.scheduled_publish_date || null,
+        scheduled_unpublish_date: data.scheduled_unpublish_date || null,
+        version: data.version || 1,
+        seasonal_auto_enable: data.seasonal_auto_enable || false,
+        seasonal_enable_date: data.seasonal_enable_date || null,
+        seasonal_disable_date: data.seasonal_disable_date || null,
         meta_title: data.meta_title || '',
         meta_description: data.meta_description || '',
         meta_keywords: data.meta_keywords || '',
@@ -1143,6 +1234,28 @@ const TripForm: React.FC = () => {
                   }`}
                 >
                   {__('Trip Details', 'Trip Details')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('rich-content')}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    currentTab === 'rich-content'
+                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {__('Rich Content', 'Rich Content')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('classification')}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    currentTab === 'classification'
+                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {__('Classification', 'Classification')}
                 </button>
               </div>
             </div>
@@ -1349,6 +1462,295 @@ const TripForm: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {currentTab === 'rich-content' && (
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{__('What Makes This Trip Special', 'What Makes This Trip Special')}</CardTitle>
+                    <CardDescription>
+                      {__('Highlight the unique selling points and what sets this trip apart from others', 'Highlight the unique selling points and what sets this trip apart from others')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <textarea
+                      value={formData.what_makes_special}
+                      onChange={(e) => handleFieldChange('what_makes_special', e.target.value)}
+                      placeholder={__('Describe what makes this trip unique and special...', 'Describe what makes this trip unique and special...')}
+                      rows={5}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{__('Trip Story / Narrative', 'Trip Story / Narrative')}</CardTitle>
+                    <CardDescription>
+                      {__('Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally', 'Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <textarea
+                      value={formData.trip_story}
+                      onChange={(e) => handleFieldChange('trip_story', e.target.value)}
+                      placeholder={__('Write an engaging narrative about this trip...', 'Write an engaging narrative about this trip...')}
+                      rows={8}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{__('Video & Virtual Tour', 'Video & Virtual Tour')}</CardTitle>
+                    <CardDescription>
+                      {__('Add video content to showcase your trip visually', 'Add video content to showcase your trip visually')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Video URL', 'Video URL')} (YouTube/Vimeo)
+                      </label>
+                      <HelpText
+                        text={__('Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page.', 'Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page.')}
+                        className="mb-2"
+                      />
+                      <Input
+                        type="url"
+                        value={formData.video_url}
+                        onChange={(e) => handleFieldChange('video_url', e.target.value)}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        className="font-mono text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('360° Virtual Tour URL', '360° Virtual Tour URL')}
+                      </label>
+                      <HelpText
+                        text={__('Add a link to an interactive 360° virtual tour if available', 'Add a link to an interactive 360° virtual tour if available')}
+                        className="mb-2"
+                      />
+                      <Input
+                        type="url"
+                        value={formData.virtual_tour_url}
+                        onChange={(e) => handleFieldChange('virtual_tour_url', e.target.value)}
+                        placeholder="https://..."
+                        className="font-mono text-xs"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{__('Testimonials', 'Testimonials')}</CardTitle>
+                    <CardDescription>
+                      {__('Add customer testimonials or reviews to build trust', 'Add customer testimonials or reviews to build trust')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {formData.testimonials.length > 0 ? (
+                      <div className="space-y-2">
+                        {formData.testimonials.map((testimonial, index) => (
+                          <div key={index} className="flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <span className="flex-1 text-sm text-gray-900 dark:text-white">{testimonial}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                const newTestimonials = [...formData.testimonials];
+                                newTestimonials.splice(index, 1);
+                                handleFieldChange('testimonials', newTestimonials);
+                              }}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                        <FileText className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                          {__('No testimonials added yet', 'No testimonials added yet')}
+                        </p>
+                      </div>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        const text = prompt(__('Enter testimonial text:', 'Enter testimonial text:'));
+                        if (text && text.trim()) {
+                          handleFieldChange('testimonials', [...formData.testimonials, text.trim()]);
+                        }
+                      }}
+                      className="w-full"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      {__('Add Testimonial', 'Add Testimonial')}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {currentTab === 'classification' && (
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{__('Trip Category Hierarchy', 'Trip Category Hierarchy')}</CardTitle>
+                    <CardDescription>
+                      {__('Organize your trip with a hierarchical category structure', 'Organize your trip with a hierarchical category structure')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Parent Category', 'Parent Category')}
+                      </label>
+                      <Select
+                        value={formData.trip_category_parent}
+                        onChange={(e) => handleFieldChange('trip_category_parent', e.target.value)}
+                      >
+                        <option value="">{__('-- Select Parent Category --', '-- Select Parent Category --')}</option>
+                        <option value="adventure">{__('Adventure', 'Adventure')}</option>
+                        <option value="cultural">{__('Cultural', 'Cultural')}</option>
+                        <option value="beach">{__('Beach', 'Beach')}</option>
+                        <option value="wildlife">{__('Wildlife', 'Wildlife')}</option>
+                        <option value="wellness">{__('Wellness', 'Wellness')}</option>
+                        <option value="family">{__('Family', 'Family')}</option>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Sub-Category', 'Sub-Category')}
+                      </label>
+                      <Select
+                        value={formData.trip_category_sub}
+                        onChange={(e) => handleFieldChange('trip_category_sub', e.target.value)}
+                      >
+                        <option value="">{__('-- Select Sub-Category --', '-- Select Sub-Category --')}</option>
+                        {formData.trip_category_parent === 'adventure' && (
+                          <>
+                            <option value="trekking">{__('Trekking', 'Trekking')}</option>
+                            <option value="mountaineering">{__('Mountaineering', 'Mountaineering')}</option>
+                            <option value="rafting">{__('Rafting', 'Rafting')}</option>
+                            <option value="paragliding">{__('Paragliding', 'Paragliding')}</option>
+                          </>
+                        )}
+                        {formData.trip_category_parent === 'cultural' && (
+                          <>
+                            <option value="heritage">{__('Heritage Tours', 'Heritage Tours')}</option>
+                            <option value="festivals">{__('Festivals', 'Festivals')}</option>
+                            <option value="cooking">{__('Cooking Classes', 'Cooking Classes')}</option>
+                          </>
+                        )}
+                        {formData.trip_category_parent === 'beach' && (
+                          <>
+                            <option value="relaxation">{__('Relaxation', 'Relaxation')}</option>
+                            <option value="water-sports">{__('Water Sports', 'Water Sports')}</option>
+                          </>
+                        )}
+                        {formData.trip_category_parent === 'wildlife' && (
+                          <>
+                            <option value="safari">{__('Safari', 'Safari')}</option>
+                            <option value="bird-watching">{__('Bird Watching', 'Bird Watching')}</option>
+                          </>
+                        )}
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Primary Category', 'Primary Category')}
+                      </label>
+                      <Select
+                        value={formData.trip_category}
+                        onChange={(e) => handleFieldChange('trip_category', e.target.value)}
+                      >
+                        <option value="">{__('-- Select Category --', '-- Select Category --')}</option>
+                        <option value="adventure">{__('Adventure', 'Adventure')}</option>
+                        <option value="cultural">{__('Cultural', 'Cultural')}</option>
+                        <option value="beach">{__('Beach', 'Beach')}</option>
+                        <option value="wildlife">{__('Wildlife', 'Wildlife')}</option>
+                        <option value="wellness">{__('Wellness', 'Wellness')}</option>
+                        <option value="family">{__('Family', 'Family')}</option>
+                      </Select>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{__('Seasonal Classification', 'Seasonal Classification')}</CardTitle>
+                    <CardDescription>
+                      {__('Define when this trip is best, peak, or off-season', 'Define when this trip is best, peak, or off-season')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Best Season', 'Best Season')}
+                      </label>
+                      <Input
+                        type="text"
+                        value={formData.best_season}
+                        onChange={(e) => handleFieldChange('best_season', e.target.value)}
+                        placeholder={__('e.g., March to May, September to November', 'e.g., March to May, September to November')}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Peak Season', 'Peak Season')}
+                      </label>
+                      <Input
+                        type="text"
+                        value={formData.peak_season}
+                        onChange={(e) => handleFieldChange('peak_season', e.target.value)}
+                        placeholder={__('e.g., December to February', 'e.g., December to February')}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Off-Season', 'Off-Season')}
+                      </label>
+                      <Input
+                        type="text"
+                        value={formData.off_season}
+                        onChange={(e) => handleFieldChange('off_season', e.target.value)}
+                        placeholder={__('e.g., June to August', 'e.g., June to August')}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{__('Featured Priority', 'Featured Priority')}</CardTitle>
+                    <CardDescription>
+                      {__('Set special flags to highlight this trip', 'Set special flags to highlight this trip')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Select
+                      value={formData.featured_priority}
+                      onChange={(e) => handleFieldChange('featured_priority', e.target.value as TripFormData['featured_priority'])}
+                    >
+                      <option value="none">{__('None', 'None')}</option>
+                      <option value="featured">{__('Featured', 'Featured')}</option>
+                      <option value="popular">{__('Popular', 'Popular')}</option>
+                      <option value="new">{__('New', 'New')}</option>
+                      <option value="limited">{__('Limited Edition', 'Limited Edition')}</option>
+                    </Select>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         );
 
@@ -1497,6 +1899,97 @@ const TripForm: React.FC = () => {
                     placeholder={__('e.g., Ubud Hotel', 'e.g., Ubud Hotel')}
                   />
                 </div>
+              </div>
+
+              {/* GPS Coordinates */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="latitude" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Latitude', 'Latitude')}
+                  </label>
+                  <Input
+                    id="latitude"
+                    type="text"
+                    value={formData.latitude}
+                    onChange={(e) => handleFieldChange('latitude', e.target.value)}
+                    placeholder={__('e.g., -8.3405', 'e.g., -8.3405')}
+                  />
+                  <HelpText
+                    text={__('GPS latitude coordinate for map integration', 'GPS latitude coordinate for map integration')}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="longitude" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Longitude', 'Longitude')}
+                  </label>
+                  <Input
+                    id="longitude"
+                    type="text"
+                    value={formData.longitude}
+                    onChange={(e) => handleFieldChange('longitude', e.target.value)}
+                    placeholder={__('e.g., 115.0920', 'e.g., 115.0920')}
+                  />
+                  <HelpText
+                    text={__('GPS longitude coordinate for map integration', 'GPS longitude coordinate for map integration')}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
+
+              {/* Landmarks */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Key Landmarks / Points of Interest', 'Key Landmarks / Points of Interest')}
+                </label>
+                <HelpText
+                  text={__('Add notable landmarks or points of interest visited during this trip', 'Add notable landmarks or points of interest visited during this trip')}
+                  className="mb-2"
+                />
+                {formData.landmarks.length > 0 ? (
+                  <div className="space-y-2 mb-2">
+                    {formData.landmarks.map((landmark, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                        <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span className="flex-1 text-sm text-gray-900 dark:text-white">{landmark}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const newLandmarks = [...formData.landmarks];
+                            newLandmarks.splice(index, 1);
+                            handleFieldChange('landmarks', newLandmarks);
+                          }}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center mb-2">
+                    <MapPin className="w-6 h-6 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {__('No landmarks added yet', 'No landmarks added yet')}
+                    </p>
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const text = prompt(__('Enter landmark name:', 'Enter landmark name:'));
+                    if (text && text.trim()) {
+                      handleFieldChange('landmarks', [...formData.landmarks, text.trim()]);
+                    }
+                  }}
+                  className="w-full"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  {__('Add Landmark', 'Add Landmark')}
+                </Button>
               </div>
 
               {/* Duration */}
@@ -3006,19 +3499,155 @@ const TripForm: React.FC = () => {
 
       case 'advanced':
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center gap-2 mb-4">
               <Settings className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Advanced Settings', 'Advanced Settings')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Status & Lifecycle Management', 'Status & Lifecycle Management')}</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Advanced configuration options for your trip', 'Advanced configuration options for your trip')}
+              {__('Manage trip status, publishing schedule, and lifecycle', 'Manage trip status, publishing schedule, and lifecycle')}
             </p>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('Advanced settings will be available in a future update.', 'Advanced settings will be available in a future update.')}
-              </p>
-            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{__('Trip Status', 'Trip Status')}</CardTitle>
+                <CardDescription>
+                  {__('Control the current state and visibility of your trip', 'Control the current state and visibility of your trip')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Status', 'Status')} <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    value={formData.status}
+                    onChange={(e) => handleFieldChange('status', e.target.value as TripFormData['status'])}
+                  >
+                    <option value="draft">{__('Draft', 'Draft')}</option>
+                    <option value="review">{__('Review', 'Review')}</option>
+                    <option value="approved">{__('Approved', 'Approved')}</option>
+                    <option value="published">{__('Published', 'Published')}</option>
+                    <option value="archived">{__('Archived', 'Archived')}</option>
+                  </Select>
+                  <HelpText
+                    text={__('Draft: Work in progress | Review: Pending approval | Approved: Ready to publish | Published: Live on site | Archived: Hidden from public', 'Draft: Work in progress | Review: Pending approval | Approved: Ready to publish | Published: Live on site | Archived: Hidden from public')}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Version', 'Version')}
+                  </label>
+                  <Input
+                    type="number"
+                    value={formData.version}
+                    onChange={(e) => handleFieldChange('version', parseInt(e.target.value) || 1)}
+                    min="1"
+                    readOnly
+                    className="bg-gray-50 dark:bg-gray-800"
+                  />
+                  <HelpText
+                    text={__('Version number is automatically incremented when changes are saved', 'Version number is automatically incremented when changes are saved')}
+                    className="mt-2"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{__('Scheduled Publishing', 'Scheduled Publishing')}</CardTitle>
+                <CardDescription>
+                  {__('Automatically publish or unpublish your trip on specific dates', 'Automatically publish or unpublish your trip on specific dates')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Schedule Publish Date', 'Schedule Publish Date')}
+                  </label>
+                  <Input
+                    type="datetime-local"
+                    value={formData.scheduled_publish_date}
+                    onChange={(e) => handleFieldChange('scheduled_publish_date', e.target.value)}
+                  />
+                  <HelpText
+                    text={__('Trip will be automatically published on this date and time', 'Trip will be automatically published on this date and time')}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Schedule Unpublish Date', 'Schedule Unpublish Date')}
+                  </label>
+                  <Input
+                    type="datetime-local"
+                    value={formData.scheduled_unpublish_date}
+                    onChange={(e) => handleFieldChange('scheduled_unpublish_date', e.target.value)}
+                  />
+                  <HelpText
+                    text={__('Trip will be automatically unpublished (archived) on this date and time', 'Trip will be automatically unpublished (archived) on this date and time')}
+                    className="mt-2"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{__('Seasonal Auto-Enable/Disable', 'Seasonal Auto-Enable/Disable')}</CardTitle>
+                <CardDescription>
+                  {__('Automatically enable or disable trip availability based on seasonal dates', 'Automatically enable or disable trip availability based on seasonal dates')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="seasonal_auto_enable"
+                    checked={formData.seasonal_auto_enable}
+                    onChange={(e) => handleFieldChange('seasonal_auto_enable', e.target.checked)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="seasonal_auto_enable" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {__('Enable seasonal auto-management', 'Enable seasonal auto-management')}
+                  </label>
+                </div>
+                {formData.seasonal_auto_enable && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Auto-Enable Date', 'Auto-Enable Date')}
+                      </label>
+                      <Input
+                        type="date"
+                        value={formData.seasonal_enable_date}
+                        onChange={(e) => handleFieldChange('seasonal_enable_date', e.target.value)}
+                      />
+                      <HelpText
+                        text={__('Trip will become available for booking on this date', 'Trip will become available for booking on this date')}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Auto-Disable Date', 'Auto-Disable Date')}
+                      </label>
+                      <Input
+                        type="date"
+                        value={formData.seasonal_disable_date}
+                        onChange={(e) => handleFieldChange('seasonal_disable_date', e.target.value)}
+                      />
+                      <HelpText
+                        text={__('Trip will become unavailable for booking on this date', 'Trip will become unavailable for booking on this date')}
+                        className="mt-2"
+                      />
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </div>
         );
 
@@ -3047,8 +3676,25 @@ const TripForm: React.FC = () => {
         <div className="flex-1 text-center">
           <h1 className="text-base font-semibold text-gray-900 dark:text-white">{formData.title || __('New Trip', 'New Trip')}</h1>
           <div className="flex items-center justify-center gap-2 mt-1">
-            <Badge variant="outline" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600">
-              {formData.status === 'draft' ? __('Draft', 'Draft') : __('Published', 'Published')}
+            <Badge 
+              variant="outline" 
+              className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 ${
+                formData.status === 'published' 
+                  ? 'text-green-700 dark:text-green-400 border-green-300 dark:border-green-800'
+                  : formData.status === 'review'
+                  ? 'text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800'
+                  : formData.status === 'approved'
+                  ? 'text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-800'
+                  : formData.status === 'archived'
+                  ? 'text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-600'
+                  : 'text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              {formData.status === 'draft' ? __('Draft', 'Draft') 
+                : formData.status === 'review' ? __('Review', 'Review')
+                : formData.status === 'approved' ? __('Approved', 'Approved')
+                : formData.status === 'published' ? __('Published', 'Published')
+                : __('Archived', 'Archived')}
             </Badge>
             {lastSaved && (
               <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
