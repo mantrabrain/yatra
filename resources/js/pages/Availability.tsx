@@ -15,7 +15,15 @@ import {
   Trash2, 
   MapPin,
   Users,
-  AlertCircle
+  AlertCircle,
+  List,
+  Calendar,
+  RefreshCw,
+  Bell,
+  Ban,
+  Clock,
+  Eye,
+  Settings
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
@@ -27,6 +35,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/badge';
 import { Alert } from '../components/ui/alert';
 import { useNavigate } from '../hooks/useNavigate';
+import { AvailabilityCalendar } from '../components/availability/AvailabilityCalendar';
 
 interface Trip {
   id: number;
@@ -45,13 +54,21 @@ interface AvailabilityDate {
   departure_time?: string;
   arrival_date: string;
   arrival_time?: string;
-  seats_remaining: string;
+  total_seats: number; // Total capacity
+  booked_seats: number; // Currently booked
+  available_seats: number; // Calculated: total_seats - booked_seats
+  waitlist_count: number; // Number of people on waitlist
+  seats_remaining: string; // Legacy field for display
   original_price: string;
   discounted_price: string;
   discount_percentage: string;
-  status: 'available' | 'sold_out' | 'limited' | 'closed';
+  status: 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked';
   from_location?: string;
   to_location?: string;
+  is_blocked?: boolean; // Blocked for maintenance/holidays
+  block_reason?: string; // Reason for blocking
+  alert_threshold?: number; // Alert when seats drop below this
+  last_synced_at?: string; // Last real-time sync timestamp
   created_at?: string;
   updated_at?: string;
 }
@@ -63,10 +80,20 @@ const Availability: React.FC = () => {
   // Trip selection
   const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
   
+  // View mode: 'list' or 'calendar'
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [monthFilter, setMonthFilter] = useState<string>('all');
+  
+  // Real-time sync
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
+  
+  // Inventory alerts visibility
+  const [showAlerts, setShowAlerts] = useState(true);
   
   // Pagination
   const [page, setPage] = useState(1);
@@ -125,6 +152,14 @@ const Availability: React.FC = () => {
           const discountedPrice = i % 3 === 0 ? originalPrice * 0.9 : originalPrice;
           const discount = i % 3 === 0 ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100) : 0;
           
+          // Calculate inventory data
+          const totalSeats = 20;
+          const bookedSeats = i % 4 === 0 ? 15 : i % 4 === 1 ? 5 : i % 4 === 2 ? 18 : 20;
+          const availableSeats = totalSeats - bookedSeats;
+          const waitlistCount = bookedSeats >= totalSeats ? (i % 3) + 1 : 0;
+          const isBlocked = i === 11; // Last one is blocked
+          const status = isBlocked ? 'blocked' : (i % 4 === 0 ? 'limited' : i % 4 === 1 ? 'available' : i % 4 === 2 ? 'sold_out' : 'closed');
+          
           dates.push({
             id: `avail_${i + 1}`,
             trip_id: selectedTripId,
@@ -132,11 +167,19 @@ const Availability: React.FC = () => {
             departure_time: timeSlots[i].dep,
             arrival_date: baseDate,
             arrival_time: timeSlots[i].arr,
-            seats_remaining: i % 4 === 0 ? '5' : i % 4 === 1 ? '10+' : i % 4 === 2 ? '2' : '0',
+            total_seats: totalSeats,
+            booked_seats: bookedSeats,
+            available_seats: availableSeats,
+            waitlist_count: waitlistCount,
+            seats_remaining: availableSeats > 10 ? '10+' : availableSeats.toString(),
             original_price: originalPrice.toString(),
             discounted_price: discountedPrice.toString(),
             discount_percentage: discount.toString(),
-            status: i % 4 === 0 ? 'limited' : i % 4 === 1 ? 'available' : i % 4 === 2 ? 'sold_out' : 'closed',
+            status: status as any,
+            is_blocked: isBlocked,
+            block_reason: isBlocked ? 'Maintenance' : undefined,
+            alert_threshold: 5,
+            last_synced_at: new Date().toISOString(),
             from_location: selectedTrip?.starting_location || '',
             to_location: selectedTrip?.ending_location || '',
           });
@@ -155,16 +198,32 @@ const Availability: React.FC = () => {
           const discountedPrice = i % 3 === 0 ? originalPrice * 0.9 : originalPrice;
           const discount = i % 3 === 0 ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100) : 0;
           
+          // Calculate inventory data
+          const totalSeats = 15;
+          const bookedSeats = i % 4 === 0 ? 10 : i % 4 === 1 ? 3 : i % 4 === 2 ? 13 : 15;
+          const availableSeats = totalSeats - bookedSeats;
+          const waitlistCount = bookedSeats >= totalSeats ? (i % 2) + 2 : 0;
+          const isBlocked = i === 5; // One date is blocked
+          const status = isBlocked ? 'blocked' : (i % 4 === 0 ? 'limited' : i % 4 === 1 ? 'available' : i % 4 === 2 ? 'sold_out' : 'closed');
+          
           dates.push({
             id: `avail_${i + 1}`,
             trip_id: selectedTripId,
             departure_date: departureDate.toISOString().split('T')[0],
             arrival_date: arrivalDate.toISOString().split('T')[0],
-            seats_remaining: i % 4 === 0 ? '5' : i % 4 === 1 ? '10+' : i % 4 === 2 ? '2' : '0',
+            total_seats: totalSeats,
+            booked_seats: bookedSeats,
+            available_seats: availableSeats,
+            waitlist_count: waitlistCount,
+            seats_remaining: availableSeats > 10 ? '10+' : availableSeats.toString(),
             original_price: originalPrice.toString(),
             discounted_price: discountedPrice.toString(),
             discount_percentage: discount.toString(),
-            status: i % 4 === 0 ? 'limited' : i % 4 === 1 ? 'available' : i % 4 === 2 ? 'sold_out' : 'closed',
+            status: status as any,
+            is_blocked: isBlocked,
+            block_reason: isBlocked ? 'Holiday' : undefined,
+            alert_threshold: 5,
+            last_synced_at: new Date().toISOString(),
             from_location: selectedTrip?.starting_location || '',
             to_location: selectedTrip?.ending_location || '',
           });
@@ -220,7 +279,10 @@ const Availability: React.FC = () => {
   };
 
   // Get status badge variant
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, isBlocked?: boolean) => {
+    if (isBlocked) {
+      return <Badge className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Blocked', 'Blocked')}</Badge>;
+    }
     switch (status) {
       case 'available':
         return <Badge variant="success" className="text-xs">{__('Available', 'Available')}</Badge>;
@@ -230,8 +292,26 @@ const Availability: React.FC = () => {
         return <Badge variant="error" className="text-xs">{__('Sold Out', 'Sold Out')}</Badge>;
       case 'closed':
         return <Badge variant="outline" className="text-xs">{__('Closed', 'Closed')}</Badge>;
+      case 'blocked':
+        return <Badge className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Blocked', 'Blocked')}</Badge>;
       default:
         return <Badge variant="outline" className="text-xs">{status}</Badge>;
+    }
+  };
+
+  // Real-time sync function
+  const handleSync = async () => {
+    setIsSyncing(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // return await apiClient.post(`/yatra/v1/trips/${selectedTripId}/availability/sync`);
+      queryClient.invalidateQueries({ queryKey: ['availability'] });
+      setLastSyncTime(new Date());
+    } catch (error) {
+      console.error('Sync failed:', error);
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -288,6 +368,28 @@ const Availability: React.FC = () => {
     return Array.from(months).sort();
   }, [availabilityData, selectedTrip]);
 
+  // Calculate inventory alerts (after filteredDates is defined)
+  const inventoryAlerts = useMemo(() => {
+    if (!filteredDates || filteredDates.length === 0) return [];
+    return filteredDates.filter(date => {
+      if (date.is_blocked) return false;
+      const threshold = date.alert_threshold || 5;
+      return date.available_seats <= threshold && date.available_seats > 0;
+    });
+  }, [filteredDates]);
+
+  // Get waitlist entries
+  const waitlistEntries = useMemo(() => {
+    if (!filteredDates || filteredDates.length === 0) return [];
+    return filteredDates.filter(date => date.waitlist_count > 0);
+  }, [filteredDates]);
+
+  // Get blocked dates
+  const blockedDates = useMemo(() => {
+    if (!filteredDates || filteredDates.length === 0) return [];
+    return filteredDates.filter(date => date.is_blocked);
+  }, [filteredDates]);
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -295,12 +397,49 @@ const Availability: React.FC = () => {
         description={__('Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.', 'Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.')}
         actions={
           selectedTripId ? (
-            <Button
-                    onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create', trip_id: selectedTripId.toString() })}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              {__('Add Availability Date', 'Add Availability Date')}
-            </Button>
+            <div className="flex items-center gap-2">
+              {/* View Toggle */}
+              <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="rounded-none border-0"
+                >
+                  <List className="w-4 h-4 mr-1" />
+                  {__('List', 'List')}
+                </Button>
+                <Button
+                  variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('calendar')}
+                  className="rounded-none border-0"
+                >
+                  <Calendar className="w-4 h-4 mr-1" />
+                  {__('Calendar', 'Calendar')}
+                </Button>
+              </div>
+              
+              {/* Sync Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSync}
+                disabled={isSyncing}
+                title={lastSyncTime ? `Last synced: ${lastSyncTime.toLocaleTimeString()}` : __('Sync availability', 'Sync availability')}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+                {__('Sync', 'Sync')}
+              </Button>
+              
+              {/* Add Availability Button */}
+              <Button
+                onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create', trip_id: selectedTripId.toString() })}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                {__('Add Availability Date', 'Add Availability Date')}
+              </Button>
+            </div>
           ) : null
         }
       />
@@ -357,6 +496,156 @@ const Availability: React.FC = () => {
         </CardContent>
       </Card>
 
+      {selectedTripId && (
+        <>
+          {/* Inventory Alerts */}
+          {showAlerts && inventoryAlerts.length > 0 && (
+            <Alert variant="warning" className="border-yellow-300 bg-yellow-50 dark:bg-yellow-900/10">
+              <div className="flex items-start justify-between w-full">
+                <div className="flex items-start gap-3 flex-1">
+                  <Bell className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-semibold text-yellow-900 dark:text-yellow-200">
+                        {__('Inventory Alerts', 'Inventory Alerts')}
+                      </h4>
+                      <Badge className="bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200">
+                        {inventoryAlerts.length}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-yellow-800 dark:text-yellow-300 mb-2">
+                      {__('The following dates have low availability (below threshold)', 'The following dates have low availability (below threshold)')}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {inventoryAlerts.slice(0, 5).map((alert) => (
+                        <Button
+                          key={alert.id}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: alert.id })}
+                          className="text-xs border-yellow-300 text-yellow-800 hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-300"
+                        >
+                          {formatDate(alert.departure_date)}
+                          {alert.departure_time && ` ${formatTime(alert.departure_time)}`}
+                          <span className="ml-1 font-semibold">({alert.available_seats} {__('seats', 'seats')})</span>
+                        </Button>
+                      ))}
+                      {inventoryAlerts.length > 5 && (
+                        <span className="text-xs text-yellow-700 dark:text-yellow-400 self-center">
+                          +{inventoryAlerts.length - 5} {__('more', 'more')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAlerts(false)}
+                  className="text-yellow-600 hover:text-yellow-700 dark:text-yellow-400"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </Alert>
+          )}
+
+          {/* Waitlist Summary */}
+          {waitlistEntries.length > 0 && (
+            <Card className="border-blue-200 bg-blue-50 dark:bg-blue-900/10 dark:border-blue-800">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <CardTitle className="text-base">{__('Waitlist', 'Waitlist')}</CardTitle>
+                    <Badge className="bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200">
+                      {waitlistEntries.reduce((sum, entry) => sum + entry.waitlist_count, 0)} {__('people', 'people')}
+                    </Badge>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'waitlist', trip_id: selectedTripId.toString() })}
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    {__('View All', 'View All')}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {waitlistEntries.slice(0, 3).map((entry) => (
+                    <div key={entry.id} className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-center gap-3">
+                        <CalendarDays className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {formatDate(entry.departure_date)}
+                            {entry.departure_time && ` ${formatTime(entry.departure_time)}`}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {entry.booked_seats}/{entry.total_seats} {__('booked', 'booked')}
+                          </div>
+                        </div>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                        {entry.waitlist_count} {__('on waitlist', 'on waitlist')}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Blocked Dates Summary */}
+          {blockedDates.length > 0 && (
+            <Card className="border-red-200 bg-red-50 dark:bg-red-900/10 dark:border-red-800">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Ban className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    <CardTitle className="text-base">{__('Blocked Dates', 'Blocked Dates')}</CardTitle>
+                    <Badge className="bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200">
+                      {blockedDates.length}
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {blockedDates.slice(0, 3).map((entry) => (
+                    <div key={entry.id} className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-red-200 dark:border-red-800">
+                      <div className="flex items-center gap-3">
+                        <Ban className="w-4 h-4 text-red-600 dark:text-red-400" />
+                        <div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {formatDate(entry.departure_date)}
+                            {entry.departure_time && ` ${formatTime(entry.departure_time)}`}
+                          </div>
+                          {entry.block_reason && (
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {__('Reason', 'Reason')}: {entry.block_reason}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: entry.id })}
+                      >
+                        <Settings className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      )}
+
       {selectedTripId ? (
         <>
           {/* Filters */}
@@ -391,6 +680,7 @@ const Availability: React.FC = () => {
                     <option value="limited">{__('Limited', 'Limited')}</option>
                     <option value="sold_out">{__('Sold Out', 'Sold Out')}</option>
                     <option value="closed">{__('Closed', 'Closed')}</option>
+                    <option value="blocked">{__('Blocked', 'Blocked')}</option>
                   </Select>
                 </div>
                 {selectedTrip?.trip_type !== 'single_day' && (
@@ -474,6 +764,17 @@ const Availability: React.FC = () => {
                     {__('Add First Availability Date', 'Add First Availability Date')}
                   </Button>
                 </div>
+              ) : viewMode === 'calendar' ? (
+                <div className="p-4">
+                  <AvailabilityCalendar
+                    dates={filteredDates}
+                    tripType={selectedTrip?.trip_type}
+                    currency={selectedTrip?.currency || 'USD'}
+                    onDateClick={(date) => {
+                      navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: date.id });
+                    }}
+                  />
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
@@ -482,7 +783,10 @@ const Availability: React.FC = () => {
                         <TableHead>{selectedTrip?.trip_type === 'single_day' ? __('Departure Time', 'Departure Time') : __('Departure', 'Departure')}</TableHead>
                         <TableHead>{selectedTrip?.trip_type === 'single_day' ? __('Arrival Time', 'Arrival Time') : __('Arrival', 'Arrival')}</TableHead>
                         <TableHead>{__('From/To', 'From/To')}</TableHead>
-                        <TableHead>{__('Seats', 'Seats')}</TableHead>
+                        <TableHead className="text-center">{__('Capacity', 'Capacity')}</TableHead>
+                        <TableHead className="text-center">{__('Booked', 'Booked')}</TableHead>
+                        <TableHead className="text-center">{__('Available', 'Available')}</TableHead>
+                        <TableHead className="text-center">{__('Waitlist', 'Waitlist')}</TableHead>
                         <TableHead>{__('Price', 'Price')}</TableHead>
                         <TableHead>{__('Status', 'Status')}</TableHead>
                         <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
@@ -525,11 +829,46 @@ const Availability: React.FC = () => {
                               <span>{date.to_location || selectedTrip?.ending_location}</span>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1">
-                              <Users className="w-4 h-4 text-gray-400" />
-                              <span className="text-sm">{date.seats_remaining || '0'}</span>
+                          <TableCell className="text-center">
+                            <div className="flex flex-col items-center">
+                              <span className="text-sm font-medium text-gray-900 dark:text-white">{date.total_seats || 0}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">{__('total', 'total')}</span>
                             </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex flex-col items-center">
+                              <span className="text-sm font-medium text-orange-600 dark:text-orange-400">{date.booked_seats || 0}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">{__('booked', 'booked')}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex flex-col items-center">
+                              <span className={`text-sm font-semibold ${
+                                date.available_seats === 0 
+                                  ? 'text-red-600 dark:text-red-400' 
+                                  : date.available_seats <= (date.alert_threshold || 5)
+                                  ? 'text-yellow-600 dark:text-yellow-400'
+                                  : 'text-green-600 dark:text-green-400'
+                              }`}>
+                                {date.available_seats || 0}
+                              </span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">{__('available', 'available')}</span>
+                              {date.available_seats <= (date.alert_threshold || 5) && date.available_seats > 0 && (
+                                <Bell className="w-3 h-3 text-yellow-500 mt-0.5" />
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {date.waitlist_count > 0 ? (
+                              <div className="flex flex-col items-center">
+                                <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 text-xs">
+                                  {date.waitlist_count}
+                                </Badge>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">{__('people', 'people')}</span>
+                              </div>
+                            ) : (
+                              <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
+                            )}
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-col gap-1">
@@ -557,7 +896,20 @@ const Availability: React.FC = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            {getStatusBadge(date.status)}
+                            <div className="flex flex-col gap-1">
+                              {getStatusBadge(date.status, date.is_blocked)}
+                              {date.is_blocked && date.block_reason && (
+                                <span className="text-xs text-gray-500 dark:text-gray-400 italic">
+                                  {date.block_reason}
+                                </span>
+                              )}
+                              {date.last_synced_at && (
+                                <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+                                  <Clock className="w-3 h-3" />
+                                  <span>{new Date(date.last_synced_at).toLocaleTimeString()}</span>
+                                </div>
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">

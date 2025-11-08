@@ -39,12 +39,17 @@ interface AvailabilityFormData {
   departure_time: string;
   arrival_date: string;
   arrival_time: string;
-  seats_remaining: string;
+  total_seats: string; // Total capacity
+  booked_seats: string; // Currently booked (read-only in edit mode)
+  seats_remaining: string; // Legacy field
   pricing_type: 'regular' | 'traveler_based';
   original_price: string;
   discounted_price: string;
   price_types: PriceType[];
-  status: 'available' | 'sold_out' | 'limited' | 'closed';
+  status: 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked';
+  is_blocked: boolean; // Blocked for maintenance/holidays
+  block_reason: string; // Reason for blocking
+  alert_threshold: string; // Alert when seats drop below this
   from_location: string;
   to_location: string;
 }
@@ -64,12 +69,17 @@ const AvailabilityForm: React.FC = () => {
     departure_time: '',
     arrival_date: '',
     arrival_time: '',
+    total_seats: '',
+    booked_seats: '0',
     seats_remaining: '',
     pricing_type: 'regular',
     original_price: '',
     discounted_price: '',
     price_types: [],
     status: 'available',
+    is_blocked: false,
+    block_reason: '',
+    alert_threshold: '5',
     from_location: '',
     to_location: '',
   });
@@ -141,6 +151,8 @@ const AvailabilityForm: React.FC = () => {
         departure_time: '08:00',
         arrival_date: '2026-03-31',
         arrival_time: '18:00',
+        total_seats: 15,
+        booked_seats: 5,
         seats_remaining: '10+',
         pricing_type: 'traveler_based',
         original_price: '2525',
@@ -149,6 +161,9 @@ const AvailabilityForm: React.FC = () => {
           { category_id: 1, original_price: '2525', discounted_price: '2335' },
         ],
         status: 'available',
+        is_blocked: false,
+        block_reason: '',
+        alert_threshold: 5,
         from_location: 'Rome',
         to_location: 'Rome',
       };
@@ -174,19 +189,24 @@ const AvailabilityForm: React.FC = () => {
         departure_time: availabilityData.departure_time || '',
         arrival_date: availabilityData.arrival_date || '',
         arrival_time: availabilityData.arrival_time || '',
+        total_seats: availabilityData.total_seats?.toString() || '',
+        booked_seats: availabilityData.booked_seats?.toString() || '0',
         seats_remaining: availabilityData.seats_remaining || '',
         pricing_type: (availabilityData.pricing_type || (availabilityData.price_types && availabilityData.price_types.length > 0 ? 'traveler_based' : 'regular')) as 'regular' | 'traveler_based',
         original_price: availabilityData.original_price || '',
         discounted_price: availabilityData.discounted_price || '',
         price_types: availabilityData.price_types || [],
-        status: (availabilityData.status || 'available') as 'available' | 'sold_out' | 'limited' | 'closed',
+        status: (availabilityData.status || (availabilityData.is_blocked ? 'blocked' : 'available')) as 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked',
+        is_blocked: availabilityData.is_blocked || false,
+        block_reason: availabilityData.block_reason || '',
+        alert_threshold: availabilityData.alert_threshold?.toString() || '5',
         from_location: availabilityData.from_location || tripData?.starting_location || '',
         to_location: availabilityData.to_location || tripData?.ending_location || '',
       });
     }
   }, [availabilityData, tripData]);
 
-  const handleFieldChange = (field: keyof AvailabilityFormData, value: string) => {
+  const handleFieldChange = (field: keyof AvailabilityFormData, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value,
@@ -276,6 +296,19 @@ const AvailabilityForm: React.FC = () => {
       }
     }
 
+    // Validate inventory
+    if (!formData.total_seats || parseInt(formData.total_seats) <= 0) {
+      newErrors.total_seats = __('Total capacity is required and must be greater than 0', 'Total capacity is required and must be greater than 0');
+    }
+    
+    if (isEditMode && formData.booked_seats) {
+      const total = parseInt(formData.total_seats) || 0;
+      const booked = parseInt(formData.booked_seats) || 0;
+      if (booked > total) {
+        newErrors.booked_seats = __('Booked seats cannot exceed total capacity', 'Booked seats cannot exceed total capacity');
+      }
+    }
+
     // Validate pricing based on pricing type
     if (formData.pricing_type === 'regular') {
       if (!formData.original_price || parseFloat(formData.original_price) <= 0) {
@@ -315,6 +348,8 @@ const AvailabilityForm: React.FC = () => {
         departure_time: tripData?.trip_type === 'single_day' ? data.departure_time : null,
         arrival_date: data.arrival_date,
         arrival_time: tripData?.trip_type === 'single_day' ? data.arrival_time : null,
+        total_seats: data.total_seats ? parseInt(data.total_seats) : null,
+        booked_seats: isEditMode && data.booked_seats ? parseInt(data.booked_seats) : 0,
         seats_remaining: data.seats_remaining || null,
         pricing_type: data.pricing_type,
         original_price: data.pricing_type === 'regular' ? (data.original_price ? parseFloat(data.original_price) : null) : null,
@@ -324,7 +359,10 @@ const AvailabilityForm: React.FC = () => {
           original_price: pt.original_price ? parseFloat(pt.original_price) : 0,
           discounted_price: pt.discounted_price ? parseFloat(pt.discounted_price) : null,
         })) : [],
-        status: data.status,
+        status: data.is_blocked ? 'blocked' : data.status,
+        is_blocked: data.is_blocked || false,
+        block_reason: data.is_blocked ? (data.block_reason || null) : null,
+        alert_threshold: data.alert_threshold ? parseInt(data.alert_threshold) : 5,
         from_location: data.from_location || null,
         to_location: data.to_location || null,
       };
@@ -903,22 +941,112 @@ const AvailabilityForm: React.FC = () => {
               </div>
             )}
 
-            {/* Seats Remaining */}
-            <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  {__('Seats Remaining', 'Seats Remaining')}
-                </label>
-                <Input
-                  type="text"
-                  value={formData.seats_remaining}
-                  onChange={(e) => handleFieldChange('seats_remaining', e.target.value)}
-                  placeholder="10+"
-                />
-                <HelpText
-                  text={__('Enter number or "10+" for 10 or more', 'Enter number or "10+" for 10 or more')}
-                  className="mt-1"
-                />
+            {/* Inventory Management */}
+            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+                {__('Inventory Management', 'Inventory Management')}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Total Capacity', 'Total Capacity')} <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={formData.total_seats}
+                    onChange={(e) => handleFieldChange('total_seats', e.target.value)}
+                    placeholder="20"
+                    className={errors.total_seats ? 'border-red-500' : ''}
+                  />
+                  {errors.total_seats && (
+                    <p className="mt-1 text-xs text-red-600">{errors.total_seats}</p>
+                  )}
+                  <HelpText
+                    text={__('Maximum number of seats available for this date', 'Maximum number of seats available for this date')}
+                    className="mt-1"
+                  />
+                </div>
+                {isEditMode && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Booked Seats', 'Booked Seats')}
+                    </label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.booked_seats}
+                      readOnly
+                      className="bg-gray-50 dark:bg-gray-800 cursor-not-allowed"
+                    />
+                    <HelpText
+                      text={__('Currently booked seats (read-only)', 'Currently booked seats (read-only)')}
+                      className="mt-1"
+                    />
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Alert Threshold', 'Alert Threshold')}
+                  </label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={formData.alert_threshold}
+                    onChange={(e) => handleFieldChange('alert_threshold', e.target.value)}
+                    placeholder="5"
+                  />
+                  <HelpText
+                    text={__('Alert when available seats drop below this number', 'Alert when available seats drop below this number')}
+                    className="mt-1"
+                  />
+                </div>
               </div>
+            </div>
+
+            {/* Block Date */}
+            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {__('Block Date', 'Block Date')}
+                </h3>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_blocked}
+                    onChange={(e) => {
+                      handleFieldChange('is_blocked', e.target.checked);
+                      if (e.target.checked) {
+                        handleFieldChange('status', 'blocked');
+                      } else {
+                        handleFieldChange('status', 'available');
+                      }
+                    }}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    {__('Block this date from bookings', 'Block this date from bookings')}
+                  </span>
+                </label>
+              </div>
+              {formData.is_blocked && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Block Reason', 'Block Reason')}
+                  </label>
+                  <Input
+                    type="text"
+                    value={formData.block_reason}
+                    onChange={(e) => handleFieldChange('block_reason', e.target.value)}
+                    placeholder={__('e.g., Maintenance, Holiday, Special Event', 'e.g., Maintenance, Holiday, Special Event')}
+                  />
+                  <HelpText
+                    text={__('Reason for blocking this date (optional but recommended)', 'Reason for blocking this date (optional but recommended)')}
+                    className="mt-1"
+                  />
+                </div>
+              )}
+            </div>
 
             {/* Status */}
             <div className="mt-4">
@@ -927,13 +1055,28 @@ const AvailabilityForm: React.FC = () => {
               </label>
               <Select
                 value={formData.status}
-                onChange={(e) => handleFieldChange('status', e.target.value)}
+                onChange={(e) => {
+                  handleFieldChange('status', e.target.value);
+                  if (e.target.value === 'blocked') {
+                    handleFieldChange('is_blocked', true);
+                  } else if (formData.is_blocked && e.target.value !== 'blocked') {
+                    handleFieldChange('is_blocked', false);
+                  }
+                }}
+                disabled={formData.is_blocked}
               >
                 <option value="available">{__('Available', 'Available')}</option>
                 <option value="limited">{__('Limited', 'Limited')}</option>
                 <option value="sold_out">{__('Sold Out', 'Sold Out')}</option>
                 <option value="closed">{__('Closed', 'Closed')}</option>
+                <option value="blocked">{__('Blocked', 'Blocked')}</option>
               </Select>
+              {formData.is_blocked && (
+                <HelpText
+                  text={__('Status is automatically set to "Blocked" when date is blocked', 'Status is automatically set to "Blocked" when date is blocked')}
+                  className="mt-1"
+                />
+              )}
             </div>
           </CardContent>
         </Card>
