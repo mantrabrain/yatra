@@ -95,7 +95,7 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-gray-900 dark:text-white truncate">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {booking.trip_title}
                       </h4>
                       <Badge className={`text-xs ${getStatusColor(booking.status)}`}>

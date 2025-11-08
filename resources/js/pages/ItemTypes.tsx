@@ -325,7 +325,7 @@ const ItemTypes: React.FC = () => {
                       <Package className="w-8 h-8 text-gray-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
                         {__('No item types yet', 'No item types yet')}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -396,7 +396,7 @@ const ItemTypes: React.FC = () => {
                               />
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900 dark:text-white">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">
                                 {type.name}
                               </div>
                               <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">

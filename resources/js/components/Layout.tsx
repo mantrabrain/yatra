@@ -168,7 +168,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <>
                       <button
                         onClick={() => toggleMenu(item.subpage)}
-                        className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-colors ${
+                        className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
                           active || isExpanded
                             ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
                             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -210,7 +210,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   ) : (
                     <a
                       href={getUrl(item.subpage)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
                         active
                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -229,7 +229,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <a 
               href={window.yatraAdmin?.siteUrl ? `${window.yatraAdmin.siteUrl}/wp-admin/` : '/wp-admin/'} 
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <span>← Back to WordPress</span>
             </a>

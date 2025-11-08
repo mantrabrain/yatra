@@ -441,7 +441,7 @@ const Trips: React.FC = () => {
                         <Package className="w-8 h-8 text-gray-400" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
                           {searchTerm || statusFilter !== 'all' 
                             ? __('No trips match your search', 'No trips match your search')
                             : __('No trips yet', 'No trips yet')}

@@ -379,7 +379,7 @@ const Itinerary: React.FC = () => {
                   <Calendar className="w-8 h-8 text-gray-400" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
                     {__('No itinerary days yet', 'No itinerary days yet')}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -419,7 +419,7 @@ const Itinerary: React.FC = () => {
                           {__('Day', 'Day')} {dayGroup.day}
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900 dark:text-white">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                             {dayGroup.day_title 
                               ? `${__('Day', 'Day')} ${dayGroup.day}: ${dayGroup.day_title}`
                               : `${__('Day', 'Day')} ${dayGroup.day}`
@@ -567,7 +567,7 @@ const Itinerary: React.FC = () => {
                                       </div>
                                     </Badge>
                                   </div>
-                                  <div className="font-medium text-gray-900 dark:text-white mb-1">
+                                  <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
                                     {entry.title}
                                   </div>
                                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">

@@ -89,7 +89,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-gray-900 dark:text-white">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white">
                         {payment.trip_title}
                       </h4>
                       {payment.days_overdue && payment.days_overdue > 0 && (
@@ -108,7 +108,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <p className="text-base font-semibold text-gray-900 dark:text-white">
                       {formatCurrency(payment.amount)}
                     </p>
                     {payment.payment_method && (

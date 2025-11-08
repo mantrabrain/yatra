@@ -308,7 +308,7 @@ const Items: React.FC = () => {
                       <Tag className="w-8 h-8 text-gray-400" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
                         {__('No items yet', 'No items yet')}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -371,7 +371,7 @@ const Items: React.FC = () => {
                     {items.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>
-                          <div className="font-medium text-gray-900 dark:text-white">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {item.name}
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
