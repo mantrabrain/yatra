@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Yatra - Travel Booking & Management
  * Plugin URI: https://yatra.com
- * Description: Professional travel booking and management system for WordPress
+ * Description: Professional travel booking and management system for WordPress with modern React admin interface
  * Version: 2.0.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
@@ -32,27 +32,6 @@ define('YATRA_VERSION', '2.0.0');
 define('YATRA_MIN_PHP_VERSION', '8.0');
 define('YATRA_MIN_WP_VERSION', '6.0');
 
-// Check minimum requirements
-if (!yatra_check_requirements()) {
-    return;
-}
-
-// Load autoloader
-require_once YATRA_PLUGIN_PATH . 'src/autoload.php';
-
-// Bootstrap the plugin
-try {
-    $yatra = new \Yatra\Bootstrap();
-    $yatra->init();
-} catch (Throwable $e) {
-    wp_die(
-        sprintf(
-            esc_html__('Yatra plugin failed to initialize: %s', 'yatra'),
-            esc_html($e->getMessage())
-        )
-    );
-}
-
 /**
  * Check if the minimum requirements are met
  */
@@ -64,7 +43,7 @@ function yatra_check_requirements(): bool {
     // Check PHP version
     if (version_compare(PHP_VERSION, YATRA_MIN_PHP_VERSION, '<')) {
         $errors[] = sprintf(
-            __('PHP version %s or higher is required. You are running version %s.', 'yatra'),
+            'PHP version %s or higher is required. You are running version %s.',
             YATRA_MIN_PHP_VERSION,
             PHP_VERSION
         );
@@ -73,7 +52,7 @@ function yatra_check_requirements(): bool {
     // Check WordPress version
     if (version_compare($wp_version, YATRA_MIN_WP_VERSION, '<')) {
         $errors[] = sprintf(
-            __('WordPress version %s or higher is required. You are running version %s.', 'yatra'),
+            'WordPress version %s or higher is required. You are running version %s.',
             YATRA_MIN_WP_VERSION,
             $wp_version
         );
@@ -84,7 +63,7 @@ function yatra_check_requirements(): bool {
     foreach ($required_extensions as $extension) {
         if (!extension_loaded($extension)) {
             $errors[] = sprintf(
-                __('The PHP extension %s is required but not installed.', 'yatra'),
+                'The PHP extension %s is required but not installed.',
                 $extension
             );
         }
@@ -93,7 +72,7 @@ function yatra_check_requirements(): bool {
     if (!empty($errors)) {
         add_action('admin_notices', function() use ($errors) {
             echo '<div class="notice notice-error"><p>';
-            echo '<strong>' . esc_html__('Yatra Plugin Error:', 'yatra') . '</strong><br>';
+            echo '<strong>Yatra Plugin Error:</strong><br>';
             foreach ($errors as $error) {
                 echo esc_html($error) . '<br>';
             }
@@ -105,26 +84,39 @@ function yatra_check_requirements(): bool {
     return true;
 }
 
-/**
- * Plugin activation hook
- */
-register_activation_hook(__FILE__, function() {
+// Check minimum requirements
     if (!yatra_check_requirements()) {
-        deactivate_plugins(plugin_basename(__FILE__));
-        wp_die(__('Yatra plugin could not be activated due to unmet requirements.', 'yatra'));
+    return;
+}
+
+// Load Composer autoloader
+$autoloader = YATRA_PLUGIN_PATH . 'vendor/autoload.php';
+if (!file_exists($autoloader)) {
+    wp_die(
+        'Yatra plugin requires Composer dependencies. Please run "composer install" in the plugin directory.',
+        'Yatra Plugin Error',
+        ['back_link' => true]
+    );
+    }
+require_once $autoloader;
+
+// Bootstrap the plugin
+try {
+    if (!class_exists('Yatra\Bootstrap')) {
+        throw new \Exception('Bootstrap class not found. Please run "composer install" to generate autoloader.');
     }
     
-    \Yatra\Core\Installer::activate();
-});
+    $yatra = new \Yatra\Bootstrap();
+    $yatra->init();
+} catch (Throwable $e) {
+    // Use plain strings instead of translation functions to avoid early loading
+    wp_die(
+        sprintf(
+            'Yatra plugin failed to initialize: %s',
+            esc_html($e->getMessage())
+        ),
+        'Yatra Plugin Error',
+        ['back_link' => true]
+    );
+}
 
-/**
- * Plugin deactivation hook
- */
-register_deactivation_hook(__FILE__, function() {
-    \Yatra\Core\Installer::deactivate();
-});
-
-/**
- * Plugin uninstall hook
- */
-register_uninstall_hook(__FILE__, [\Yatra\Core\Installer::class, 'uninstall']); 

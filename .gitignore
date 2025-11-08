@@ -1,61 +1,34 @@
-# Composer
+# Dependencies
 /vendor/
-composer.lock
-
-# Node modules
 /node_modules/
-package-lock.json
 
-# Build files
-/public/
-/dist/
-/build/
+# Build outputs
+/public/js/
+/public/css/
+/public/assets/
 
-# IDE files
-.vscode/
+# IDE
 .idea/
+.vscode/
 *.swp
 *.swo
+*~
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
 # Logs
 *.log
-/logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Cache
-/cache/
-/temp/
-
-# Environment files
+# Environment
 .env
 .env.local
-.env.production
 
-# Backup files
-*.bak
-*.backup
+# Build
+dist/
+build/
 
-# Test coverage
-/coverage/
-.phpunit.result.cache
-
-# WordPress specific
-wp-config.php
-wp-content/uploads/
-wp-content/cache/
-wp-content/backup-db/
-wp-content/backups/
-wp-content/blogs.dir/
-wp-content/upgrade/
-wp-content/uploads/
-wp-content/mu-plugins/
-wp-content/wp-cache-config.php
-wp-content/plugins/hello.php
-
-# Plugin specific
-/storage/logs/
-/storage/cache/
-/storage/uploads/ 

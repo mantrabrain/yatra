@@ -1,91 +1,147 @@
-# Yatra - WordPress Travel Booking Plugin
+# Yatra - Travel Booking & Management WordPress Plugin
 
-A comprehensive WordPress plugin for travel websites that enables trip and travel booking functionality. Built with modern PHP practices and a scalable architecture.
+A modern WordPress plugin built with Laravel-style architecture and React + TypeScript admin interface.
 
-## Features
+## 🏗️ Architecture
 
-### Core Features (Phase 1)
-- **Trip Management**: Create and manage trips with detailed information
-- **Destination Management**: Organize trips by destinations with rich metadata
-- **Booking System**: Real-time availability checking and booking management
-- **Payment Integration**: Support for multiple payment gateways
-- **Admin Dashboard**: Comprehensive admin interface with statistics and reports
-- **Custom Post Types**: WordPress-native trip and destination post types
-- **Shortcodes**: Easy integration with any theme using shortcodes
+This plugin follows Laravel-style separation of concerns:
 
-## Requirements
+- **Controllers**: Handle REST API requests
+- **Repositories**: Abstract database operations
+- **Services**: Business logic layer
+- **Models**: Data entities
+- **Providers**: Service registration and bootstrapping
 
-- **PHP**: 8.0 or higher
-- **WordPress**: 6.0 or higher
-- **MySQL**: 5.7 or higher
-- **Required Extensions**: curl, json, mbstring
+## 📁 Folder Structure
 
-## Installation
-
-1. Upload the `yatra` folder to `/wp-content/plugins/`
-2. Activate the plugin through the WordPress admin panel
-3. The plugin will automatically create necessary database tables
-
-## Quick Start
-
-### 1. Create Your First Trip
-1. Go to **Yatra > Trips** in the admin panel
-2. Click **Add New Trip**
-3. Fill in trip details and publish
-
-### 2. Display Trips on Your Website
-Use shortcodes to display trips on any page:
-
-```php
-// Display all trips
-[yatra_trips]
-
-// Display a specific trip
-[yatra_trip id="123"]
-
-// Display search form
-[yatra_search_form]
+```
+yatra/
+├── app/
+│   ├── Controllers/          # REST API controllers
+│   ├── Models/               # Data models
+│   ├── Repositories/         # Database abstraction
+│   ├── Services/             # Business logic
+│   ├── Providers/            # Service providers
+│   └── Core/                 # Core classes (Container, etc.)
+├── resources/
+│   └── js/                   # React + TypeScript source
+│       ├── pages/            # Admin pages
+│       ├── components/       # React components
+│       └── lib/             # Utilities
+├── routes/
+│   └── api.php              # REST API route definitions
+├── templates/
+│   └── admin.php            # Admin page wrapper
+└── public/                  # Compiled assets (generated)
 ```
 
-### 3. Configure Settings
-Go to **Yatra > Settings** to configure currency, payment gateways, and other options.
+## 🚀 Setup
 
-## Shortcodes Reference
+### 1. Install PHP Dependencies
 
-### `[yatra_trips]`
-Display a list of trips with optional filters.
+```bash
+composer install
+```
 
-**Parameters:**
-- `limit` (int): Number of trips to display (default: 12)
-- `destination` (string): Filter by destination slug
-- `type` (string): Filter by trip type
+### 2. Install Node Dependencies
 
-### `[yatra_trip]`
-Display a single trip.
+```bash
+npm install
+```
 
-**Parameters:**
-- `id` (int): Trip ID (required)
+### 3. Development
 
-### `[yatra_search_form]`
-Display the trip search form.
+Start the Vite dev server:
 
-### `[yatra_booking_form]`
-Display the booking form for a specific trip.
+```bash
+npm run dev
+```
 
-**Parameters:**
-- `trip_id` (int): Trip ID (required)
+The React app will be available at `http://localhost:3000` and will hot-reload on changes.
 
-## Support
+### 4. Production Build
 
-For support and documentation:
-- **Documentation**: [https://yatra.com/docs](https://yatra.com/docs)
-- **Support Forum**: [https://yatra.com/support](https://yatra.com/support)
-- **Email**: support@yatra.com
+Build the React app for production:
 
-## License
+```bash
+npm run build
+```
 
-This plugin is licensed under the GPL v2 or later.
+This compiles TypeScript and bundles assets to the `public/` directory.
 
-## Credits
+## 📝 Usage
 
-Developed by the Yatra Development Team. 
+### Accessing the Admin Interface
+
+1. Navigate to **WordPress Admin → Yatra**
+2. The React admin interface will load
+
+### REST API Endpoints
+
+All endpoints are under `/wp-json/yatra/v1/`:
+
+- `GET /trips` - List all trips
+- `GET /trips/{id}` - Get single trip
+- `POST /trips` - Create trip
+- `PUT /trips/{id}` - Update trip
+- `DELETE /trips/{id}` - Delete trip
+
+### Creating New Modules
+
+1. Create Model in `app/Models/`
+2. Create Repository in `app/Repositories/`
+3. Create Service in `app/Services/`
+4. Create Controller in `app/Controllers/`
+5. Register routes in `routes/api.php`
+6. Create React page in `resources/js/pages/`
+
+## 🛠️ Development
+
+### PHP Coding Standards
+
+- Follow WordPress PHP Coding Standards
+- Use PSR-4 autoloading
+- Type hints for all methods
+- Strict types enabled
+
+### React/TypeScript Standards
+
+- Use TypeScript for all components
+- Follow React best practices
+- Use ShadCN UI components
+- Tailwind CSS for styling
+
+## 📦 Dependencies
+
+### PHP
+- PHP 8.0+
+- WordPress 6.0+
+- Composer for autoloading
+
+### JavaScript
+- React 18
+- TypeScript
+- Vite
+- React Router
+- React Query
+- Tailwind CSS
+- ShadCN UI components
+
+## 🔧 Configuration
+
+Plugin constants are defined in `yatra.php`:
+- `YATRA_PLUGIN_PATH` - Plugin directory path
+- `YATRA_PLUGIN_URL` - Plugin URL
+- `YATRA_VERSION` - Plugin version
+
+## 📚 Documentation
+
+- [WordPress Plugin Handbook](https://developer.wordpress.org/plugins/)
+- [React Documentation](https://react.dev/)
+- [Vite Documentation](https://vitejs.dev/)
+- [ShadCN UI](https://ui.shadcn.com/)
+
+## 📄 License
+
+GPL v2 or later
+
