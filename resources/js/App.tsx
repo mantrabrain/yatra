@@ -29,6 +29,12 @@ import DiscountForm from './pages/DiscountForm';
 import Payments from './pages/Payments';
 import PaymentForm from './pages/PaymentForm';
 import ViewPayment from './pages/ViewPayment';
+import TravelerCategories from './pages/TravelerCategories';
+import TravelerCategoryForm from './pages/TravelerCategoryForm';
+import Availability from './pages/Availability';
+import AvailabilityForm from './pages/AvailabilityForm';
+import Enquiries from './pages/Enquiries';
+import ViewEnquiry from './pages/ViewEnquiry';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -91,6 +97,12 @@ const App: React.FC = () => {
               return <DestinationForm />;
             }
             return <Destinations />;
+          case 'availability':
+            // Check if we're creating or editing an availability date
+            if (action === 'create' || action === 'edit') {
+              return <AvailabilityForm />;
+            }
+            return <Availability />;
           case 'all':
           default:
             // Check if we're creating or editing a trip
@@ -117,6 +129,15 @@ const App: React.FC = () => {
           return <CustomerForm />;
         }
         return <Customers />;
+      case 'enquiries':
+        // Check if we're viewing or editing an enquiry
+        if (action === 'view') {
+          return <ViewEnquiry />;
+        }
+        if (action === 'edit') {
+          return <ViewEnquiry />;
+        }
+        return <Enquiries />;
       case 'reviews':
         // Check if we're viewing, creating, or editing a review
         if (action === 'view') {
@@ -165,6 +186,12 @@ const App: React.FC = () => {
           return <PaymentForm />;
         }
         return <Payments />;
+      case 'traveler-categories':
+        // Check if we're creating or editing a traveler category
+        if (action === 'create' || action === 'edit') {
+          return <TravelerCategoryForm />;
+        }
+        return <TravelerCategories />;
       case 'reports':
         return <Reports />;
       case 'settings':

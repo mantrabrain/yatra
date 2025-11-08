@@ -1,41 +1,298 @@
 /**
- * Trip Form Page
- * Add/Edit Trip form with clean, minimal SaaS-style design
+ * Trip Form Page - Wizard Style
+ * Multi-step form for creating/editing trips with sidebar navigation
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Info } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Save, 
+  Loader2, 
+  Info, 
+  Eye, 
+  Sparkles,
+  Compass,
+  Box,
+  Calendar,
+  CheckSquare,
+  Mail,
+  BarChart3,
+  Image,
+  HelpCircle,
+  Search,
+  Settings,
+  CheckCircle2,
+  FileText,
+  DollarSign,
+  AlertCircle,
+  Plus,
+  X,
+  Upload,
+  MapPin,
+  Tag,
+  GripVertical,
+  ChevronUp,
+  ChevronDown
+} from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
-// import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { HelpText } from '../components/ui/help-text';
 import { Alert } from '../components/ui/alert';
+import { Badge } from '../components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { HelpText } from '../components/ui/help-text';
+
+type SectionId = 
+  | 'overview' 
+  | 'location'
+  | 'pricing' 
+  | 'itinerary' 
+  | 'included' 
+  | 'booking' 
+  | 'availability'
+  | 'gallery' 
+  | 'faqs' 
+  | 'seo' 
+  | 'frontend-tabs'
+  | 'advanced';
+
+interface Section {
+  id: SectionId;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  required: boolean;
+  completed: boolean;
+}
+
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
+interface TravelerCategory {
+  id: number;
+  label: string;
+  description: string;
+  age_min?: number;
+  age_max?: number;
+  status: 'active' | 'inactive';
+}
+
+interface PriceType {
+  category_id: number;
+  original_price: string;
+  discounted_price: string;
+}
 
 interface TripFormData {
+  // Overview
   title: string;
   slug: string;
   description: string;
-  price: string;
-  status: string;
+  highlights: string[];
+  trip_details: string;
+  short_description: string;
+  
+  // Location & Geography
+  destination: string;
+  starting_location: string;
+  ending_location: string;
+  countries: string[];
+  regions: string[];
+  latitude: string;
+  longitude: string;
+  
+  // Duration & Schedule
+  trip_type: 'single_day' | 'multi_day';
+  duration_days: string;
+  duration_nights: string;
+  available_from: string;
+  available_to: string;
+  booking_window_days: string;
+  seasonal_availability: string;
+  
+  // Activity & Category
+  activity_types: string[];
+  difficulty_level: string;
+  trip_category: string;
+  tags: string[];
+  
+  // Accommodation
+  accommodation_type: string;
+  meal_plan: string;
+  accommodation_details: string;
+  
+  // Transportation
+  transportation_included: boolean;
+  pickup_location: string;
+  dropoff_location: string;
+  transportation_details: string;
+  
+  // Pricing
+  pricing_type: 'regular' | 'traveler_based';
+  original_price: string;
+  discounted_price: string;
+  price_types: PriceType[];
+  sale_price: string;
+  currency: string;
+  deposit_amount: string;
+  deposit_percentage: string;
+  payment_terms: string;
+  group_pricing_enabled: boolean;
+  group_size_min: string;
+  group_discount_percentage: string;
+  
+  // Booking
+  max_travelers: string;
+  min_travelers: string;
+  booking_deadline: string;
+  cancellation_policy: string;
+  age_min: string;
+  age_max: string;
+  physical_requirements: string;
+  visa_requirements: string;
+  vaccination_requirements: string;
+  
+  // Included/Excluded
+  included_items: string[];
+  excluded_items: string[];
+  
+  // Gallery
+  gallery_images: string[];
+  featured_image: string;
+  
+  // FAQs
+  faqs: FAQ[];
+  
+  // Frontend Tabs
+  frontend_tabs: FrontendTab[];
+  
+  // Availability
+  availability_dates: AvailabilityDate[];
+  
+  // Status
+  status: 'draft' | 'published';
+  
+  // SEO
+  meta_title: string;
+  meta_description: string;
+  meta_keywords: string;
+}
+
+interface FrontendTab {
+  id: string;
+  label: string;
+  enabled: boolean;
+  order: number;
+  content_type: 'general' | 'pricing' | 'itinerary' | 'included_excluded' | 'gallery' | 'faqs' | 'reviews' | 'custom';
+  custom_content?: string;
+}
+
+interface AvailabilityDate {
+  id: string;
+  departure_date: string;
+  arrival_date: string;
+  seats_remaining: string;
+  original_price: string;
+  discounted_price: string;
+  discount_percentage: string;
+  status: 'available' | 'sold_out' | 'limited' | 'closed';
+  from_location?: string;
+  to_location?: string;
 }
 
 const TripForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  
+  const [currentSection, setCurrentSection] = useState<SectionId>('overview');
+  const [currentTab, setCurrentTab] = useState<'basic' | 'highlights' | 'details'>('basic');
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [showCategorySelector, setShowCategorySelector] = useState(false);
+  
+  // Modal states for adding items
+  const [showHighlightModal, setShowHighlightModal] = useState(false);
+  const [showIncludedModal, setShowIncludedModal] = useState(false);
+  const [showExcludedModal, setShowExcludedModal] = useState(false);
+  const [modalInput, setModalInput] = useState({ text: '', question: '', answer: '' });
+  
   const [formData, setFormData] = useState<TripFormData>({
     title: '',
     slug: '',
     description: '',
-    price: '',
+    highlights: [],
+    trip_details: '',
+    short_description: '',
+    destination: '',
+    starting_location: '',
+    ending_location: '',
+    countries: [],
+    regions: [],
+    latitude: '',
+    longitude: '',
+    trip_type: 'multi_day',
+    duration_days: '',
+    duration_nights: '',
+    available_from: '',
+    available_to: '',
+    booking_window_days: '',
+    seasonal_availability: '',
+    activity_types: [],
+    difficulty_level: '',
+    trip_category: '',
+    tags: [],
+    accommodation_type: '',
+    meal_plan: '',
+    accommodation_details: '',
+    transportation_included: false,
+    pickup_location: '',
+    dropoff_location: '',
+    transportation_details: '',
+    pricing_type: 'regular',
+    original_price: '',
+    discounted_price: '',
+    price_types: [],
+    sale_price: '',
+    currency: 'USD',
+    deposit_amount: '',
+    deposit_percentage: '',
+    payment_terms: '',
+    group_pricing_enabled: false,
+    group_size_min: '',
+    group_discount_percentage: '',
+    max_travelers: '',
+    min_travelers: '1',
+    booking_deadline: '',
+    cancellation_policy: '',
+    age_min: '',
+    age_max: '',
+    physical_requirements: '',
+    visa_requirements: '',
+    vaccination_requirements: '',
+    included_items: [],
+    excluded_items: [],
+    gallery_images: [],
+    featured_image: '',
+    faqs: [],
+    frontend_tabs: [
+      { id: 'general', label: 'General', enabled: true, order: 1, content_type: 'general' },
+      { id: 'pricing', label: 'Pricing', enabled: true, order: 2, content_type: 'pricing' },
+      { id: 'itinerary', label: 'Itinerary', enabled: true, order: 3, content_type: 'itinerary' },
+      { id: 'included_excluded', label: 'Included/Excluded', enabled: true, order: 4, content_type: 'included_excluded' },
+      { id: 'gallery', label: 'Gallery', enabled: true, order: 5, content_type: 'gallery' },
+      { id: 'faqs', label: 'FAQs', enabled: true, order: 6, content_type: 'faqs' },
+    ],
+    availability_dates: [],
     status: 'draft',
+    meta_title: '',
+    meta_description: '',
+    meta_keywords: '',
   });
+  
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -52,20 +309,101 @@ const TripForm: React.FC = () => {
 
   const isEditMode = action === 'edit' && tripId !== null;
 
+  // Fetch traveler categories
+  const { data: travelerCategories = [], isLoading: isLoadingCategories } = useQuery<TravelerCategory[]>({
+    queryKey: ['traveler-categories'],
+    queryFn: async () => {
+      // Simulate API call - replace with actual API
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return [
+        { id: 1, label: 'Adult', description: 'Standard adult pricing', age_min: 18, age_max: undefined, status: 'active' as const },
+        { id: 2, label: 'Child', description: 'Pricing for children', age_min: 5, age_max: 17, status: 'active' as const },
+        { id: 3, label: 'Infant', description: 'Pricing for infants', age_min: 0, age_max: 4, status: 'active' as const },
+        { id: 4, label: 'Senior', description: 'Senior citizen pricing', age_min: 60, age_max: undefined, status: 'active' as const },
+        { id: 5, label: 'Student', description: 'Student pricing', age_min: undefined, age_max: undefined, status: 'active' as const },
+      ];
+    },
+  });
+
+  // Get only active categories
+  const activeCategories = useMemo(() => {
+    return travelerCategories.filter(cat => cat.status === 'active');
+  }, [travelerCategories]);
+
   // Fetch trip data if editing
   const { data: tripData, isLoading: isLoadingTrip } = useQuery({
     queryKey: ['trip', tripId],
     queryFn: async () => {
       if (!tripId) return null;
       // return await apiClient.get(`/trips/${tripId}`);
-      // Dummy data for now
+      // Dummy data
       return {
         id: tripId,
-        title: 'Sample Trip',
-        slug: 'sample-trip',
-        description: 'This is a sample trip description.',
-        price: 1000,
-        status: 'active',
+        title: 'Bali Beach Retreat - 7 Days',
+        slug: 'bali-beach-retreat-7-days',
+        description: 'Escape to paradise with our 7-day Bali beach retreat. Relax on pristine beaches, explore ancient temples, enjoy spa treatments, and experience the island\'s rich culture.',
+        short_description: 'Escape to paradise with our 7-day Bali beach retreat.',
+        highlights: ['Pristine beaches', 'Ancient temples', 'Spa treatments', 'Rich culture'],
+        trip_details: 'Detailed trip information...',
+        destination: 'Bali, Indonesia',
+        starting_location: 'Denpasar Airport',
+        ending_location: 'Ubud Hotel',
+        countries: ['Indonesia'],
+        regions: ['Bali'],
+        latitude: '',
+        longitude: '',
+        trip_type: 'multi_day',
+        duration_days: '7',
+        duration_nights: '6',
+        available_from: '',
+        available_to: '',
+        booking_window_days: '30',
+        seasonal_availability: '',
+        activity_types: [],
+        difficulty_level: '',
+        trip_category: '',
+        tags: [],
+        accommodation_type: '',
+        meal_plan: '',
+        accommodation_details: '',
+        transportation_included: true,
+        pickup_location: '',
+        dropoff_location: '',
+        transportation_details: '',
+        pricing_type: 'traveler_based',
+        original_price: '',
+        discounted_price: '',
+        price_types: [
+          { category_id: 1, original_price: '1250', discounted_price: '' },
+          { category_id: 2, original_price: '625', discounted_price: '' },
+          { category_id: 3, original_price: '0', discounted_price: '' },
+        ],
+        sale_price: '',
+        currency: 'USD',
+        deposit_amount: '',
+        deposit_percentage: '',
+        payment_terms: '',
+        group_pricing_enabled: false,
+        group_size_min: '',
+        group_discount_percentage: '',
+        max_travelers: '12',
+        min_travelers: '2',
+        booking_deadline: '',
+        cancellation_policy: 'Full refund 30 days before departure',
+        age_min: '',
+        age_max: '',
+        physical_requirements: '',
+        visa_requirements: '',
+        vaccination_requirements: '',
+        included_items: ['Accommodation', 'Breakfast', 'Airport transfers'],
+        excluded_items: ['Flights', 'Travel insurance'],
+        gallery_images: [],
+        featured_image: '',
+        faqs: [],
+        status: 'draft',
+        meta_title: '',
+        meta_description: '',
+        meta_keywords: '',
       };
     },
     enabled: isEditMode && can('yatra_view_trips'),
@@ -78,11 +416,102 @@ const TripForm: React.FC = () => {
         title: tripData.title || '',
         slug: tripData.slug || '',
         description: tripData.description || '',
-        price: tripData.price?.toString() || '',
-        status: tripData.status || 'draft',
+        highlights: tripData.highlights || [],
+        trip_details: tripData.trip_details || '',
+        short_description: tripData.short_description || '',
+        destination: tripData.destination || '',
+        starting_location: tripData.starting_location || '',
+        ending_location: tripData.ending_location || '',
+        countries: tripData.countries || [],
+        regions: tripData.regions || [],
+        latitude: tripData.latitude || '',
+        longitude: tripData.longitude || '',
+        trip_type: (tripData.trip_type || (tripData.duration_days && parseInt(tripData.duration_days?.toString() || '0') === 1 ? 'single_day' : 'multi_day')) as 'single_day' | 'multi_day',
+        duration_days: tripData.duration_days?.toString() || '',
+        duration_nights: tripData.duration_nights?.toString() || '',
+        available_from: tripData.available_from || '',
+        available_to: tripData.available_to || '',
+        booking_window_days: tripData.booking_window_days?.toString() || '',
+        seasonal_availability: tripData.seasonal_availability || '',
+        activity_types: tripData.activity_types || [],
+        difficulty_level: tripData.difficulty_level || '',
+        trip_category: tripData.trip_category || '',
+        tags: tripData.tags || [],
+        accommodation_type: tripData.accommodation_type || '',
+        meal_plan: tripData.meal_plan || '',
+        accommodation_details: tripData.accommodation_details || '',
+        transportation_included: tripData.transportation_included || false,
+        pickup_location: tripData.pickup_location || '',
+        dropoff_location: tripData.dropoff_location || '',
+        transportation_details: tripData.transportation_details || '',
+        pricing_type: (tripData.pricing_type || (tripData.price_types && tripData.price_types.length > 0 ? 'traveler_based' : 'regular')) as 'regular' | 'traveler_based',
+        original_price: tripData.original_price?.toString() || '',
+        discounted_price: tripData.discounted_price?.toString() || '',
+        price_types: tripData.price_types || [],
+        sale_price: tripData.sale_price?.toString() || '',
+        currency: tripData.currency || 'USD',
+        deposit_amount: tripData.deposit_amount?.toString() || '',
+        deposit_percentage: tripData.deposit_percentage?.toString() || '',
+        payment_terms: tripData.payment_terms || '',
+        group_pricing_enabled: tripData.group_pricing_enabled || false,
+        group_size_min: tripData.group_size_min?.toString() || '',
+        group_discount_percentage: tripData.group_discount_percentage?.toString() || '',
+        max_travelers: tripData.max_travelers?.toString() || '',
+        min_travelers: tripData.min_travelers?.toString() || '1',
+        booking_deadline: tripData.booking_deadline || '',
+        cancellation_policy: tripData.cancellation_policy || '',
+        age_min: tripData.age_min?.toString() || '',
+        age_max: tripData.age_max?.toString() || '',
+        physical_requirements: tripData.physical_requirements || '',
+        visa_requirements: tripData.visa_requirements || '',
+        vaccination_requirements: tripData.vaccination_requirements || '',
+        included_items: tripData.included_items || [],
+        excluded_items: tripData.excluded_items || [],
+        gallery_images: tripData.gallery_images || [],
+        featured_image: tripData.featured_image || '',
+        faqs: tripData.faqs || [],
+        frontend_tabs: (tripData as any).frontend_tabs || [
+          { id: 'general', label: 'General', enabled: true, order: 1, content_type: 'general' },
+          { id: 'pricing', label: 'Pricing', enabled: true, order: 2, content_type: 'pricing' },
+          { id: 'itinerary', label: 'Itinerary', enabled: true, order: 3, content_type: 'itinerary' },
+          { id: 'included_excluded', label: 'Included/Excluded', enabled: true, order: 4, content_type: 'included_excluded' },
+          { id: 'gallery', label: 'Gallery', enabled: true, order: 5, content_type: 'gallery' },
+          { id: 'faqs', label: 'FAQs', enabled: true, order: 6, content_type: 'faqs' },
+        ],
+        availability_dates: (tripData as any).availability_dates || [],
+        status: (tripData.status || 'draft') as 'draft' | 'published',
+        meta_title: tripData.meta_title || '',
+        meta_description: tripData.meta_description || '',
+        meta_keywords: tripData.meta_keywords || '',
       });
+      setLastSaved(new Date());
     }
   }, [tripData, isEditMode]);
+
+  // Define sections
+  const essentialsSections: Section[] = [
+    { id: 'overview', label: __('Trip Overview', 'Trip Overview'), icon: FileText, required: true, completed: !!(formData.title && formData.description) },
+    { id: 'location', label: __('Location & Duration', 'Location & Duration'), icon: MapPin, required: true, completed: !!(formData.destination && formData.duration_days) },
+    { id: 'pricing', label: __('Pricing & Payment', 'Pricing & Payment'), icon: DollarSign, required: true, completed: formData.pricing_type === 'regular' ? !!(formData.original_price && parseFloat(formData.original_price) > 0) : formData.price_types.some(pt => pt.original_price && parseFloat(pt.original_price) > 0) },
+    // Availability is now managed separately - removed from essentials
+    { id: 'itinerary', label: __('Itinerary Builder', 'Itinerary Builder'), icon: Calendar, required: true, completed: false },
+    { id: 'included', label: __('What\'s Included', 'What\'s Included'), icon: CheckSquare, required: true, completed: formData.included_items.length > 0 },
+    { id: 'booking', label: __('Booking Settings', 'Booking Settings'), icon: Mail, required: true, completed: !!(formData.min_travelers && formData.max_travelers) },
+  ];
+
+  const marketingSections: Section[] = [
+    { id: 'gallery', label: __('Photo Gallery', 'Photo Gallery'), icon: Image, required: false, completed: formData.gallery_images.length > 0 },
+    { id: 'faqs', label: __('FAQs', 'FAQs'), icon: HelpCircle, required: false, completed: formData.faqs.length > 0 },
+    { id: 'frontend-tabs', label: __('Frontend Tabs', 'Frontend Tabs'), icon: Settings, required: false, completed: formData.frontend_tabs.some(tab => tab.enabled) },
+    { id: 'seo', label: __('SEO Settings', 'SEO Settings'), icon: Search, required: false, completed: !!(formData.meta_title && formData.meta_description) },
+  ];
+
+  // Calculate completion percentage
+  const completedSections = [...essentialsSections, ...marketingSections].filter(s => s.completed).length;
+  const totalRequiredSections = essentialsSections.filter(s => s.required).length;
+  const completionPercentage = totalRequiredSections > 0 
+    ? Math.round((completedSections / totalRequiredSections) * 100) 
+    : 0;
 
   // Auto-generate slug from title
   const generateSlug = (title: string): string => {
@@ -103,19 +532,340 @@ const TripForm: React.FC = () => {
     if (errors.title) {
       setErrors(prev => ({ ...prev, title: '' }));
     }
+    autoSave();
   };
 
-  const handleSlugChange = (value: string) => {
-    setFormData(prev => ({ ...prev, slug: value }));
-    if (errors.slug) {
-      setErrors(prev => ({ ...prev, slug: '' }));
-    }
-  };
-
-  const handleFieldChange = (field: keyof TripFormData, value: string) => {
+  const handleFieldChange = (field: keyof TripFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+    autoSave();
+  };
+
+  const handleHighlightAdd = () => {
+    setShowHighlightModal(true);
+    setModalInput({ text: '', question: '', answer: '' });
+  };
+
+  const handleHighlightSave = () => {
+    if (modalInput.text && modalInput.text.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        highlights: [...prev.highlights, modalInput.text.trim()],
+      }));
+      setShowHighlightModal(false);
+      setModalInput({ text: '', question: '', answer: '' });
+      autoSave();
+    }
+  };
+
+  const handleHighlightRemove = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      highlights: prev.highlights.filter((_, i) => i !== index),
+    }));
+    autoSave();
+  };
+
+  const handleIncludedAdd = () => {
+    setShowIncludedModal(true);
+    setModalInput({ text: '', question: '', answer: '' });
+  };
+
+  const handleIncludedSave = () => {
+    if (modalInput.text && modalInput.text.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        included_items: [...prev.included_items, modalInput.text.trim()],
+      }));
+      setShowIncludedModal(false);
+      setModalInput({ text: '', question: '', answer: '' });
+      autoSave();
+    }
+  };
+
+  const handleIncludedRemove = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      included_items: prev.included_items.filter((_, i) => i !== index),
+    }));
+    autoSave();
+  };
+
+  const handleExcludedAdd = () => {
+    setShowExcludedModal(true);
+    setModalInput({ text: '', question: '', answer: '' });
+  };
+
+  const handleExcludedSave = () => {
+    if (modalInput.text && modalInput.text.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        excluded_items: [...prev.excluded_items, modalInput.text.trim()],
+      }));
+      setShowExcludedModal(false);
+      setModalInput({ text: '', question: '', answer: '' });
+      autoSave();
+    }
+  };
+
+  const handleExcludedRemove = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      excluded_items: prev.excluded_items.filter((_, i) => i !== index),
+    }));
+    autoSave();
+  };
+
+  const handleFAQAdd = () => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: [...prev.faqs, { question: '', answer: '' }],
+    }));
+    autoSave();
+  };
+
+  const handleFAQRemove = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: prev.faqs.filter((_, i) => i !== index),
+    }));
+    autoSave();
+  };
+
+  const handleFAQChange = (index: number, field: 'question' | 'answer', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      faqs: prev.faqs.map((faq, i) => i === index ? { ...faq, [field]: value } : faq),
+    }));
+    autoSave();
+  };
+
+  const handleGalleryAdd = () => {
+    // In a real implementation, this would open a media library
+    const imageUrl = prompt(__('Enter image URL or upload image', 'Enter image URL or upload image'));
+    if (imageUrl && imageUrl.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        gallery_images: [...prev.gallery_images, imageUrl.trim()],
+      }));
+      autoSave();
+    }
+  };
+
+  const handleGalleryRemove = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      gallery_images: prev.gallery_images.filter((_, i) => i !== index),
+    }));
+    autoSave();
+  };
+
+  const handlePriceTypeAdd = (categoryId: number) => {
+    // Check if category already exists
+    if (formData.price_types.some(pt => pt.category_id === categoryId)) {
+      return;
+    }
+    setFormData(prev => ({
+      ...prev,
+      price_types: [...prev.price_types, { category_id: categoryId, original_price: '', discounted_price: '' }],
+    }));
+    autoSave();
+  };
+
+  const handlePriceTypeRemove = (categoryId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      price_types: prev.price_types.filter(pt => pt.category_id !== categoryId),
+    }));
+    autoSave();
+  };
+
+  const handlePriceTypeChange = (categoryId: number, field: 'original_price' | 'discounted_price', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      price_types: prev.price_types.map(pt => 
+        pt.category_id === categoryId ? { ...pt, [field]: value } : pt
+      ),
+    }));
+    autoSave();
+  };
+
+  // Frontend Tabs Handlers
+  const handleTabToggle = (tabId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      frontend_tabs: prev.frontend_tabs.map(tab =>
+        tab.id === tabId ? { ...tab, enabled: !tab.enabled } : tab
+      ),
+    }));
+    autoSave();
+  };
+
+  const handleTabLabelChange = (tabId: string, label: string) => {
+    setFormData(prev => ({
+      ...prev,
+      frontend_tabs: prev.frontend_tabs.map(tab =>
+        tab.id === tabId ? { ...tab, label } : tab
+      ),
+    }));
+    autoSave();
+  };
+
+  const handleTabMove = (tabId: string, direction: 'up' | 'down') => {
+    setFormData(prev => {
+      const tabs = [...prev.frontend_tabs];
+      const index = tabs.findIndex(t => t.id === tabId);
+      if (index === -1) return prev;
+
+      const newIndex = direction === 'up' ? index - 1 : index + 1;
+      if (newIndex < 0 || newIndex >= tabs.length) return prev;
+
+      [tabs[index], tabs[newIndex]] = [tabs[newIndex], tabs[index]];
+      // Update order
+      tabs.forEach((tab, i) => {
+        tab.order = i + 1;
+      });
+
+      return { ...prev, frontend_tabs: tabs };
+    });
+    autoSave();
+  };
+
+  const handleTabRemove = (tabId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      frontend_tabs: prev.frontend_tabs
+        .filter(tab => tab.id !== tabId)
+        .map((tab, i) => ({ ...tab, order: i + 1 })),
+    }));
+    autoSave();
+  };
+
+  const handleTabAdd = () => {
+    const newTabId = `custom_${Date.now()}`;
+    const maxOrder = Math.max(...formData.frontend_tabs.map(t => t.order), 0);
+    setFormData(prev => ({
+      ...prev,
+      frontend_tabs: [
+        ...prev.frontend_tabs,
+        {
+          id: newTabId,
+          label: __('New Tab', 'New Tab'),
+          enabled: true,
+          order: maxOrder + 1,
+          content_type: 'custom',
+          custom_content: '',
+        },
+      ],
+    }));
+    autoSave();
+  };
+
+  const handleTabContentTypeChange = (tabId: string, contentType: FrontendTab['content_type']) => {
+    setFormData(prev => ({
+      ...prev,
+      frontend_tabs: prev.frontend_tabs.map(tab =>
+        tab.id === tabId ? { ...tab, content_type: contentType } : tab
+      ),
+    }));
+    autoSave();
+  };
+
+  const handleTabCustomContentChange = (tabId: string, content: string) => {
+    setFormData(prev => ({
+      ...prev,
+      frontend_tabs: prev.frontend_tabs.map(tab =>
+        tab.id === tabId ? { ...tab, custom_content: content } : tab
+      ),
+    }));
+    autoSave();
+  };
+
+  // Availability Handlers
+  const handleAvailabilityAdd = () => {
+    const newId = `avail_${Date.now()}`;
+    setFormData(prev => ({
+      ...prev,
+      availability_dates: [
+        ...prev.availability_dates,
+        {
+          id: newId,
+          departure_date: '',
+          arrival_date: '',
+          seats_remaining: '',
+          original_price: '',
+          discounted_price: '',
+          discount_percentage: '',
+          status: 'available',
+          from_location: prev.starting_location || '',
+          to_location: prev.ending_location || '',
+        },
+      ],
+    }));
+    autoSave();
+  };
+
+  const handleAvailabilityRemove = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      availability_dates: prev.availability_dates.filter(avail => avail.id !== id),
+    }));
+    autoSave();
+  };
+
+  const handleAvailabilityChange = (id: string, field: keyof AvailabilityDate, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      availability_dates: prev.availability_dates.map(avail =>
+        avail.id === id ? { ...avail, [field]: value } : avail
+      ),
+    }));
+    autoSave();
+  };
+
+  const calculateDiscountPercentage = (original: string, discounted: string): string => {
+    if (!original || !discounted) return '';
+    const orig = parseFloat(original);
+    const disc = parseFloat(discounted);
+    if (isNaN(orig) || isNaN(disc) || orig <= 0 || disc >= orig) return '';
+    return Math.round(((orig - disc) / orig) * 100).toString();
+  };
+
+  const handleAvailabilityPriceChange = (id: string, field: 'original_price' | 'discounted_price', value: string) => {
+    const avail = formData.availability_dates.find(a => a.id === id);
+    if (!avail) return;
+
+    const updatedAvail = { ...avail, [field]: value };
+    
+    // Auto-calculate discount percentage if both prices are set
+    if (field === 'discounted_price' && updatedAvail.original_price && value) {
+      const discount = calculateDiscountPercentage(updatedAvail.original_price, value);
+      updatedAvail.discount_percentage = discount;
+    } else if (field === 'original_price' && updatedAvail.discounted_price && value) {
+      const discount = calculateDiscountPercentage(value, updatedAvail.discounted_price);
+      updatedAvail.discount_percentage = discount;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      availability_dates: prev.availability_dates.map(a =>
+        a.id === id ? updatedAvail : a
+      ),
+    }));
+    autoSave();
+  };
+
+  // Auto-save functionality
+  const autoSave = () => {
+    if (isEditMode) {
+      setIsAutoSaving(true);
+      // Simulate auto-save
+      setTimeout(() => {
+        setLastSaved(new Date());
+        setIsAutoSaving(false);
+      }, 1000);
     }
   };
 
@@ -132,25 +882,147 @@ const TripForm: React.FC = () => {
       newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
     }
 
-    if (formData.price && isNaN(parseFloat(formData.price))) {
-      newErrors.price = __('Price must be a valid number', 'Price must be a valid number');
-    } else if (formData.price && parseFloat(formData.price) < 0) {
-      newErrors.price = __('Price cannot be negative', 'Price cannot be negative');
+    if (!formData.description.trim()) {
+      newErrors.description = __('Description is required', 'Description is required');
+    }
+
+    if (!formData.duration_days || parseInt(formData.duration_days) < 1) {
+      newErrors.duration_days = __('Duration must be at least 1 day', 'Duration must be at least 1 day');
+    }
+
+    if (formData.duration_nights) {
+      const nights = parseInt(formData.duration_nights);
+      if (isNaN(nights) || nights < 0) {
+        newErrors.duration_nights = __('Nights cannot be negative. Use 0 for day trips.', 'Nights cannot be negative. Use 0 for day trips.');
+      } else if (formData.duration_days) {
+        const days = parseInt(formData.duration_days);
+        if (days === 1 && nights > 0) {
+          newErrors.duration_nights = __('Single day trips should have 0 nights', 'Single day trips should have 0 nights');
+        } else if (days > 1 && nights >= days) {
+          newErrors.duration_nights = __('Nights should be less than days (typically days - 1)', 'Nights should be less than days (typically days - 1)');
+        }
+      }
+    }
+
+    // Validate pricing based on pricing type
+    if (formData.pricing_type === 'regular') {
+      if (!formData.original_price || parseFloat(formData.original_price) <= 0) {
+        newErrors.original_price = __('Original price is required and must be greater than 0', 'Original price is required and must be greater than 0');
+      }
+      if (formData.discounted_price && parseFloat(formData.discounted_price) >= parseFloat(formData.original_price)) {
+        newErrors.discounted_price = __('Discounted price must be less than original price', 'Discounted price must be less than original price');
+      }
+    } else {
+      // Validate price types
+      if (formData.price_types.length === 0) {
+        newErrors.price_types = __('At least one traveler category pricing is required', 'At least one traveler category pricing is required');
+      } else {
+        formData.price_types.forEach((priceType, index) => {
+          if (!priceType.original_price || isNaN(parseFloat(priceType.original_price)) || parseFloat(priceType.original_price) < 0) {
+            newErrors[`price_type_${index}_original`] = __('Original price must be a valid number', 'Original price must be a valid number');
+          }
+          if (priceType.discounted_price && (isNaN(parseFloat(priceType.discounted_price)) || parseFloat(priceType.discounted_price) < 0)) {
+            newErrors[`price_type_${index}_discounted`] = __('Discounted price must be a valid number', 'Discounted price must be a valid number');
+          }
+          if (priceType.discounted_price && priceType.original_price && parseFloat(priceType.discounted_price) >= parseFloat(priceType.original_price)) {
+            newErrors[`price_type_${index}_discounted`] = __('Discounted price must be less than original price', 'Discounted price must be less than original price');
+          }
+        });
+      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Create/Update mutation
+  // Save mutation
   const saveMutation = useMutation({
-    mutationFn: async (data: TripFormData) => {
+    mutationFn: async (data: TripFormData & { status?: 'draft' | 'published' }) => {
       const payload = {
         title: data.title.trim(),
         slug: data.slug.trim(),
         description: data.description.trim(),
-        price: data.price ? parseFloat(data.price) : 0,
-        status: data.status,
+        short_description: data.short_description.trim(),
+        highlights: data.highlights,
+        trip_details: data.trip_details.trim(),
+        destination: data.destination.trim(),
+        starting_location: data.starting_location.trim(),
+        ending_location: data.ending_location.trim(),
+        countries: data.countries || [],
+        regions: data.regions || [],
+        latitude: data.latitude ? parseFloat(data.latitude) : null,
+        longitude: data.longitude ? parseFloat(data.longitude) : null,
+        duration_days: data.duration_days ? parseInt(data.duration_days) : null,
+        duration_nights: data.duration_nights ? parseInt(data.duration_nights) : null,
+        available_from: data.available_from || null,
+        available_to: data.available_to || null,
+        booking_window_days: data.booking_window_days ? parseInt(data.booking_window_days) : null,
+        seasonal_availability: data.seasonal_availability || '',
+        activity_types: data.activity_types || [],
+        difficulty_level: data.difficulty_level || '',
+        trip_category: data.trip_category || '',
+        tags: data.tags || [],
+        accommodation_type: data.accommodation_type || '',
+        meal_plan: data.meal_plan || '',
+        accommodation_details: data.accommodation_details.trim(),
+        transportation_included: data.transportation_included || false,
+        pickup_location: data.pickup_location.trim(),
+        dropoff_location: data.dropoff_location.trim(),
+        transportation_details: data.transportation_details.trim(),
+        pricing_type: data.pricing_type,
+        original_price: data.pricing_type === 'regular' ? (data.original_price ? parseFloat(data.original_price) : null) : null,
+        discounted_price: data.pricing_type === 'regular' ? (data.discounted_price ? parseFloat(data.discounted_price) : null) : null,
+        price_types: data.pricing_type === 'traveler_based' ? data.price_types.map(pt => ({
+          category_id: pt.category_id,
+          original_price: pt.original_price ? parseFloat(pt.original_price) : 0,
+          discounted_price: pt.discounted_price ? parseFloat(pt.discounted_price) : null,
+        })) : [],
+        sale_price: data.sale_price ? parseFloat(data.sale_price) : null,
+        currency: data.currency,
+        deposit_amount: data.deposit_amount ? parseFloat(data.deposit_amount) : null,
+        deposit_percentage: data.deposit_percentage ? parseFloat(data.deposit_percentage) : null,
+        payment_terms: data.payment_terms.trim(),
+        group_pricing_enabled: data.group_pricing_enabled || false,
+        group_size_min: data.group_size_min ? parseInt(data.group_size_min) : null,
+        group_discount_percentage: data.group_discount_percentage ? parseFloat(data.group_discount_percentage) : null,
+        max_travelers: data.max_travelers ? parseInt(data.max_travelers) : null,
+        min_travelers: data.min_travelers ? parseInt(data.min_travelers) : 1,
+        booking_deadline: data.booking_deadline || null,
+        cancellation_policy: data.cancellation_policy || '',
+        age_min: data.age_min ? parseInt(data.age_min) : null,
+        age_max: data.age_max ? parseInt(data.age_max) : null,
+        physical_requirements: data.physical_requirements.trim(),
+        visa_requirements: data.visa_requirements.trim(),
+        vaccination_requirements: data.vaccination_requirements.trim(),
+        included_items: data.included_items || [],
+        excluded_items: data.excluded_items || [],
+        gallery_images: data.gallery_images || [],
+        featured_image: data.featured_image || '',
+        faqs: data.faqs || [],
+        frontend_tabs: data.frontend_tabs.map(tab => ({
+          id: tab.id,
+          label: tab.label,
+          enabled: tab.enabled,
+          order: tab.order,
+          content_type: tab.content_type,
+          custom_content: tab.custom_content || null,
+        })),
+        availability_dates: data.availability_dates.map(avail => ({
+          id: avail.id,
+          departure_date: avail.departure_date || null,
+          arrival_date: avail.arrival_date || null,
+          seats_remaining: avail.seats_remaining || null,
+          original_price: avail.original_price ? parseFloat(avail.original_price) : null,
+          discounted_price: avail.discounted_price ? parseFloat(avail.discounted_price) : null,
+          discount_percentage: avail.discount_percentage ? parseFloat(avail.discount_percentage) : null,
+          status: avail.status || 'available',
+          from_location: avail.from_location || null,
+          to_location: avail.to_location || null,
+        })),
+        status: data.status || 'draft',
+        meta_title: data.meta_title || '',
+        meta_description: data.meta_description || '',
+        meta_keywords: data.meta_keywords || '',
       };
 
       if (isEditMode && tripId) {
@@ -163,32 +1035,55 @@ const TripForm: React.FC = () => {
         return { success: true, id: Math.floor(Math.random() * 1000) };
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
-      // Redirect to trips list
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=all`;
+      setLastSaved(new Date());
+      setIsSubmitting(false);
+      
+      if (variables.status === 'published') {
+        // Redirect to trips list after publishing
+        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=all`;
+      }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the trip', 'An error occurred while saving the trip');
+      const errorMessage = error?.message || __('An error occurred while saving', 'An error occurred while saving');
       setErrors({ submit: errorMessage });
       setIsSubmitting(false);
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSaveDraft = async () => {
     if (!validateForm()) {
       return;
     }
-
     setIsSubmitting(true);
-    setErrors({});
-    saveMutation.mutate(formData);
+    saveMutation.mutate({ ...formData, status: 'draft' });
+  };
+
+  const handlePublish = async () => {
+    if (!validateForm()) {
+      return;
+    }
+    setIsSubmitting(true);
+    saveMutation.mutate({ ...formData, status: 'published' });
+  };
+
+  const handlePreview = () => {
+    // Open preview in new window
+    const previewUrl = `${window.yatraAdmin?.siteUrl || ''}/trips/${formData.slug || 'preview'}`;
+    window.open(previewUrl, '_blank');
   };
 
   const handleCancel = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=all`;
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
   };
 
   if (isEditMode && isLoadingTrip) {
@@ -200,41 +1095,77 @@ const TripForm: React.FC = () => {
     );
   }
 
-  return (
-    <div className="space-y-3">
-      <PageHeader
-        title={isEditMode ? __('Edit Trip', 'Edit Trip') : __('Add New Trip', 'Add New Trip')}
-        description={isEditMode ? __('Update trip information', 'Update trip information') : __('Create a new travel package or tour', 'Create a new travel package or tour')}
-        actions={
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
-          </Button>
-        }
-      />
+  const renderSectionContent = () => {
+    switch (currentSection) {
+      case 'overview':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <FileText className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Trip Overview', 'Trip Overview')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Basic information, highlights, and trip details', 'Basic information, highlights, and trip details')}
+            </p>
 
-      <ConditionalRender capability={isEditMode ? 'yatra_edit_trips' : 'yatra_edit_trips'}>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-            {/* Main Form Fields */}
-            <div className="lg:col-span-2 space-y-3">
-              {/* Basic Information */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'Basic Information')}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {/* Title */}
-                  <div>
+            {/* Tabs */}
+            <div className="border-b border-gray-200 dark:border-gray-700 mb-4">
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('basic')}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    currentTab === 'basic'
+                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {__('Basic Info', 'Basic Info')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('highlights')}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    currentTab === 'highlights'
+                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {__('Highlights', 'Highlights')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('details')}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    currentTab === 'details'
+                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {__('Trip Details', 'Trip Details')}
+                </button>
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            {currentTab === 'basic' && (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{__('Essential Details', 'Essential Details')}</h3>
+                    <Info className="w-4 h-4 text-gray-400" />
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
+                    {__('The main information about your trip that appears in listings and search results', 'The main information about your trip that appears in listings and search results')}
+                  </p>
+
+                  {/* Tour Title */}
+                  <div className="mb-4">
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Trip Title', 'Trip Title')} <span className="text-red-500">*</span>
                     </label>
-                    <HelpText 
-                      text={__('Enter a clear, descriptive name for your trip. This will be displayed to customers on your website.', 'Enter a clear, descriptive name for your trip. This will be displayed to customers on your website.')}
+                    <HelpText
+                      text={__('Choose a clear, descriptive title that includes the destination and duration. This appears in search results and listings.', 'Choose a clear, descriptive title that includes the destination and duration. This appears in search results and listings.')}
                       className="mb-2"
                     />
                     <Input
@@ -242,191 +1173,2187 @@ const TripForm: React.FC = () => {
                       type="text"
                       value={formData.title}
                       onChange={(e) => handleTitleChange(e.target.value)}
-                      placeholder={__('e.g., Everest Base Camp Trek', 'e.g., Everest Base Camp Trek')}
+                      placeholder={__('e.g., Bali Beach Retreat - 7 Days', 'e.g., Bali Beach Retreat - 7 Days')}
                       className={errors.title ? 'border-red-500' : ''}
                       required
                     />
-                    {errors.title && (
+                    {errors.title ? (
                       <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
+                        <AlertCircle className="w-4 h-4" />
                         {errors.title}
+                      </p>
+                    ) : formData.title && (
+                      <p className="mt-1.5 text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4" />
+                        {__('Looking good!', 'Looking good!')}
                       </p>
                     )}
                   </div>
 
-                  {/* Slug */}
-                  <div>
+                  {/* URL Slug */}
+                  <div className="mb-4">
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('URL Slug', 'URL Slug')} <span className="text-red-500">*</span>
+                      {__('URL Slug', 'URL Slug')}
                     </label>
-                    <HelpText 
-                      text={__('This creates the web address for your trip page. It\'s automatically generated from the title, but you can edit it. Use only lowercase letters, numbers, and hyphens.', 'This creates the web address for your trip page. It\'s automatically generated from the title, but you can edit it. Use only lowercase letters, numbers, and hyphens.')}
+                    <HelpText
+                      text={__('The URL-friendly version of your title. Auto-generated from title, but you can customize it. Only lowercase letters, numbers, and hyphens allowed.', 'The URL-friendly version of your title. Auto-generated from title, but you can customize it. Only lowercase letters, numbers, and hyphens allowed.')}
                       className="mb-2"
                     />
                     <Input
                       id="slug"
                       type="text"
                       value={formData.slug}
-                      onChange={(e) => handleSlugChange(e.target.value)}
-                      placeholder={__('everest-base-camp-trek', 'everest-base-camp-trek')}
+                      onChange={(e) => handleFieldChange('slug', e.target.value)}
+                      placeholder={__('bali-beach-retreat-7-days', 'bali-beach-retreat-7-days')}
                       className={errors.slug ? 'border-red-500' : ''}
-                      required
                     />
                     {errors.slug && (
                       <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
+                        <AlertCircle className="w-4 h-4" />
                         {errors.slug}
                       </p>
                     )}
-                    {!errors.slug && formData.slug && (
-                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                        {__('URL will be:', 'URL will be:')} <span className="font-mono text-blue-600 dark:text-blue-400">/trips/{formData.slug}</span>
-                      </p>
+                    {formData.slug && !errors.slug && (
+                      <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-gray-600 dark:text-gray-400 border border-blue-200 dark:border-blue-800">
+                        <span className="font-medium">🌐 {__('Your trip URL:', 'Your trip URL:')} </span>
+                        <span className="font-mono text-blue-600 dark:text-blue-400">
+                          yoursite.com/trips/{formData.slug}
+                        </span>
+                      </div>
                     )}
                   </div>
 
-                  {/* Description */}
-                  <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Trip Description', 'Trip Description')}
+                  {/* Short Description */}
+                  <div className="mb-4">
+                    <label htmlFor="short_description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Short Description', 'Short Description')}
                     </label>
-                    <HelpText 
-                      text={__('Describe your trip in detail. Include highlights, itinerary, what\'s included, and what makes it special. This helps customers understand and choose your trip.', 'Describe your trip in detail. Include highlights, itinerary, what\'s included, and what makes it special. This helps customers understand and choose your trip.')}
+                    <HelpText
+                      text={__('A brief summary (100-150 characters) that appears in listings and search results. Make it compelling to encourage clicks.', 'A brief summary (100-150 characters) that appears in listings and search results. Make it compelling to encourage clicks.')}
+                      className="mb-2"
+                    />
+                    <textarea
+                      id="short_description"
+                      value={formData.short_description}
+                      onChange={(e) => handleFieldChange('short_description', e.target.value)}
+                      placeholder={__('Escape to paradise with our 7-day Bali beach retreat... Or: Experience the best of Bali in one day...', 'Escape to paradise with our 7-day Bali beach retreat... Or: Experience the best of Bali in one day...')}
+                      rows={2}
+                      maxLength={200}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                    <div className="mt-1.5 flex items-center justify-between">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {formData.short_description.length} / 200 {__('characters', 'characters')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Tour Description */}
+                  <div className="mb-4">
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Trip Description', 'Trip Description')} <span className="text-red-500">*</span>
+                    </label>
+                    <HelpText
+                      text={__('The main description of your trip. Be detailed and engaging. Include what makes your trip special, what travelers will experience, and key information. Aim for 150-500 characters for best results.', 'The main description of your trip. Be detailed and engaging. Include what makes your trip special, what travelers will experience, and key information. Aim for 150-500 characters for best results.')}
                       className="mb-2"
                     />
                     <textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('Write a detailed description of your trip... Include highlights, itinerary, inclusions, and what makes it special.', 'Write a detailed description of your trip... Include highlights, itinerary, inclusions, and what makes it special.')}
-                      rows={8}
+                      placeholder={__('Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...', 'Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...')}
+                      rows={6}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
-                    <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                      {formData.description.length} {__('characters', 'characters')}
-                    </p>
+                    <div className="mt-1.5 flex items-center justify-between">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {formData.description.length} {__('characters', 'characters')}
+                      </span>
+                      {formData.description.length >= 150 && formData.description.length <= 500 && (
+                        <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          {__('Great length!', 'Great length!')}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
+            )}
 
-            {/* Sidebar */}
-            <div className="space-y-3">
-              {/* Pricing & Status */}
+            {currentTab === 'highlights' && (
               <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Pricing & Status', 'Pricing & Status')}</CardTitle>
+                <CardHeader>
+                  <CardTitle>{__('Trip Highlights', 'Trip Highlights')}</CardTitle>
+                  <CardDescription>
+                    {__('Add key highlights that make your trip special. These will be displayed prominently on your trip page.', 'Add key highlights that make your trip special. These will be displayed prominently on your trip page.')}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Price */}
-                  <div>
-                    <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Price per Person', 'Price per Person')} (USD)
-                    </label>
-                    <HelpText 
-                      text={__('Enter the price for one person. This is the base price customers will see. You can add additional pricing options later.', 'Enter the price for one person. This is the base price customers will see. You can add additional pricing options later.')}
-                      className="mb-2"
-                    />
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">$</span>
-                      <Input
-                        id="price"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.price}
-                        onChange={(e) => handleFieldChange('price', e.target.value)}
-                        placeholder="0.00"
-                        className={`pl-7 ${errors.price ? 'border-red-500' : ''}`}
-                      />
+                  {formData.highlights.length > 0 ? (
+                    <div className="space-y-2">
+                      {formData.highlights.map((highlight, index) => (
+                        <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                          <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                          <span className="flex-1 text-sm text-gray-900 dark:text-white">{highlight}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleHighlightRemove(index)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
                     </div>
-                    {errors.price && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
-                        {errors.price}
+                  ) : (
+                    <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                      <Sparkles className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        {__('No highlights added yet', 'No highlights added yet')}
                       </p>
-                    )}
-                    {!errors.price && formData.price && (
-                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                        {__('Customers will see:', 'Customers will see:')} <span className="font-semibold text-gray-900 dark:text-white">${parseFloat(formData.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> {__('per person', 'per person')}
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
+                        {__('Add key selling points like "Private guide", "All meals included", or "Skip-the-line tickets"', 'Add key selling points like "Private guide", "All meals included", or "Skip-the-line tickets"')}
                       </p>
-                    )}
-                  </div>
-
-                  {/* Status */}
-                  <div>
-                    <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Trip Status', 'Trip Status')}
-                    </label>
-                    <HelpText 
-                      text={__('Draft: Not visible to customers. Active: Visible and bookable. Inactive: Hidden from customers.', 'Draft: Not visible to customers. Active: Visible and bookable. Inactive: Hidden from customers.')}
-                      className="mb-2"
-                    />
-                    <Select
-                      id="status"
-                      value={formData.status}
-                      onChange={(e) => handleFieldChange('status', e.target.value)}
-                      className="h-9"
-                    >
-                      <option value="draft">{__('Draft', 'Draft')} - {__('Not published', 'Not published')}</option>
-                      <option value="active">{__('Active', 'Active')} - {__('Visible to customers', 'Visible to customers')}</option>
-                      <option value="inactive">{__('Inactive', 'Inactive')} - {__('Hidden from customers', 'Hidden from customers')}</option>
-                    </Select>
-                  </div>
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleHighlightAdd}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {__('Add Highlight', 'Add Highlight')}
+                  </Button>
                 </CardContent>
               </Card>
+            )}
 
-              {/* Submit Actions */}
-              <Card>
-                <CardContent className="p-3">
-                  <div className="space-y-2">
-                    {errors.submit && (
-                      <Alert variant="error" title={__('Error', 'Error')}>
-                        {errors.submit}
-                      </Alert>
+            {currentTab === 'details' && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{__('Trip Details', 'Trip Details')}</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
+                    {__('Provide detailed information about your trip', 'Provide detailed information about your trip')}
+                  </p>
+                  <textarea
+                    value={formData.trip_details}
+                    onChange={(e) => handleFieldChange('trip_details', e.target.value)}
+                    placeholder={__('Enter detailed trip information...', 'Enter detailed trip information...')}
+                    rows={10}
+                    className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'location':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <MapPin className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Location & Duration', 'Location & Duration')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Specify where your trip takes place and how long it lasts', 'Specify where your trip takes place and how long it lasts')}
+            </p>
+
+            <div className="space-y-4">
+              {/* Trip Type Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  {__('Trip Type', 'Trip Type')} <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                    formData.trip_type === 'single_day'
+                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="trip_type"
+                      value="single_day"
+                      checked={formData.trip_type === 'single_day'}
+                      onChange={(e) => {
+                        handleFieldChange('trip_type', e.target.value);
+                        if (e.target.value === 'single_day') {
+                          setFormData(prev => ({
+                            ...prev,
+                            duration_days: '1',
+                            duration_nights: '0',
+                          }));
+                        }
+                      }}
+                      className="sr-only"
+                    />
+                    <div className="flex flex-1">
+                      <div className="flex flex-col">
+                        <span className={`block text-sm font-medium ${
+                          formData.trip_type === 'single_day'
+                            ? 'text-blue-900 dark:text-blue-300'
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
+                          {__('Single Day Trip', 'Single Day Trip')}
+                        </span>
+                        <span className={`mt-1 flex items-center text-sm ${
+                          formData.trip_type === 'single_day'
+                            ? 'text-blue-700 dark:text-blue-400'
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {__('Trip completed within one day (no overnight stay)', 'Trip completed within one day (no overnight stay)')}
+                        </span>
+                      </div>
+                    </div>
+                    {formData.trip_type === 'single_day' && (
+                      <div className="absolute top-4 right-4">
+                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                      </div>
                     )}
-                    {!isEditMode && (
-                      <Alert variant="info" className="mb-2">
-                        <strong>{__('Tip:', 'Tip:')}</strong> {__('You can save as Draft first, then activate when ready. Customers won\'t see Draft trips.', 'You can save as Draft first, then activate when ready. Customers won\'t see Draft trips.')}
-                      </Alert>
+                  </label>
+
+                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                    formData.trip_type === 'multi_day'
+                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="trip_type"
+                      value="multi_day"
+                      checked={formData.trip_type === 'multi_day'}
+                      onChange={(e) => handleFieldChange('trip_type', e.target.value)}
+                      className="sr-only"
+                    />
+                    <div className="flex flex-1">
+                      <div className="flex flex-col">
+                        <span className={`block text-sm font-medium ${
+                          formData.trip_type === 'multi_day'
+                            ? 'text-blue-900 dark:text-blue-300'
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
+                          {__('Multi-Day Trip', 'Multi-Day Trip')}
+                        </span>
+                        <span className={`mt-1 flex items-center text-sm ${
+                          formData.trip_type === 'multi_day'
+                            ? 'text-blue-700 dark:text-blue-400'
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {__('Trip spans multiple days with overnight stays', 'Trip spans multiple days with overnight stays')}
+                        </span>
+                      </div>
+                    </div>
+                    {formData.trip_type === 'multi_day' && (
+                      <div className="absolute top-4 right-4">
+                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                      </div>
                     )}
-                    <div className="flex gap-2">
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="flex-1 flex items-center justify-center gap-2"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Trip', 'Update Trip') : __('Create Trip', 'Create Trip')}
-                          </>
-                        )}
-                      </Button>
+                  </label>
+                </div>
+              </div>
+
+              {/* Destination */}
+              <div>
+                <label htmlFor="destination" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Destination', 'Destination')} <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  id="destination"
+                  type="text"
+                  value={formData.destination}
+                  onChange={(e) => handleFieldChange('destination', e.target.value)}
+                  placeholder={__('e.g., Bali, Indonesia', 'e.g., Bali, Indonesia')}
+                />
+              </div>
+
+              {/* Starting & Ending Locations */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="starting_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Starting Location', 'Starting Location')}
+                  </label>
+                  <Input
+                    id="starting_location"
+                    type="text"
+                    value={formData.starting_location}
+                    onChange={(e) => handleFieldChange('starting_location', e.target.value)}
+                    placeholder={__('e.g., Denpasar Airport', 'e.g., Denpasar Airport')}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="ending_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Ending Location', 'Ending Location')}
+                  </label>
+                  <Input
+                    id="ending_location"
+                    type="text"
+                    value={formData.ending_location}
+                    onChange={(e) => handleFieldChange('ending_location', e.target.value)}
+                    placeholder={__('e.g., Ubud Hotel', 'e.g., Ubud Hotel')}
+                  />
+                </div>
+              </div>
+
+              {/* Duration */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="duration_days" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Duration (Days)', 'Duration (Days)')} <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    id="duration_days"
+                    type="number"
+                    min="1"
+                    value={formData.duration_days}
+                    onChange={(e) => {
+                      const days = e.target.value;
+                      handleFieldChange('duration_days', days);
+                      // Auto-set nights based on trip type
+                      if (formData.trip_type === 'single_day') {
+                        setFormData(prev => ({ ...prev, duration_nights: '0' }));
+                      } else if (days && parseInt(days) > 1) {
+                        // For multi-day, typically nights = days - 1
+                        const nights = Math.max(0, parseInt(days) - 1).toString();
+                        setFormData(prev => ({ ...prev, duration_nights: nights }));
+                      }
+                    }}
+                    placeholder={formData.trip_type === 'single_day' ? '1' : __('e.g., 7', 'e.g., 7')}
+                    className={errors.duration_days ? 'border-red-500' : ''}
+                    disabled={formData.trip_type === 'single_day'}
+                  />
+                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    {formData.trip_type === 'single_day' 
+                      ? __('Single day trips are always 1 day', 'Single day trips are always 1 day')
+                      : __('Enter the number of days for your trip', 'Enter the number of days for your trip')
+                    }
+                  </p>
+                  {errors.duration_days && (
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.duration_days}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="duration_nights" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Duration (Nights)', 'Duration (Nights)')}
+                  </label>
+                  <Input
+                    id="duration_nights"
+                    type="number"
+                    min="0"
+                    value={formData.duration_nights}
+                    onChange={(e) => handleFieldChange('duration_nights', e.target.value)}
+                    placeholder={formData.trip_type === 'single_day' ? '0' : __('e.g., 6', 'e.g., 6')}
+                    className={errors.duration_nights ? 'border-red-500' : ''}
+                    disabled={formData.trip_type === 'single_day'}
+                  />
+                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    {formData.trip_type === 'single_day'
+                      ? __('Single day trips have 0 nights (no overnight stay)', 'Single day trips have 0 nights (no overnight stay)')
+                      : __('Enter the number of nights (typically days - 1)', 'Enter the number of nights (typically days - 1)')
+                    }
+                  </p>
+                  {errors.duration_nights && (
+                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.duration_nights}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Availability Dates */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="available_from" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Available From', 'Available From')}
+                  </label>
+                  <Input
+                    id="available_from"
+                    type="date"
+                    value={formData.available_from}
+                    onChange={(e) => handleFieldChange('available_from', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="available_to" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Available To', 'Available To')}
+                  </label>
+                  <Input
+                    id="available_to"
+                    type="date"
+                    value={formData.available_to}
+                    onChange={(e) => handleFieldChange('available_to', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Booking Window */}
+              <div>
+                <label htmlFor="booking_window_days" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Booking Window (Days in Advance)', 'Booking Window (Days in Advance)')}
+                </label>
+                <Input
+                  id="booking_window_days"
+                  type="number"
+                  min="0"
+                  value={formData.booking_window_days}
+                  onChange={(e) => handleFieldChange('booking_window_days', e.target.value)}
+                  placeholder={__('e.g., 30', 'e.g., 30')}
+                />
+                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  {__('Minimum days in advance customers can book', 'Minimum days in advance customers can book')}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'pricing':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <DollarSign className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Pricing & Payment', 'Pricing & Payment')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Set pricing for different traveler types and payment options', 'Set pricing for different traveler types and payment options')}
+            </p>
+
+            <div className="space-y-4">
+              {/* Currency */}
+              <div>
+                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Currency', 'Currency')}
+                </label>
+                <Select
+                  id="currency"
+                  value={formData.currency}
+                  onChange={(e) => handleFieldChange('currency', e.target.value)}
+                >
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - British Pound</option>
+                  <option value="INR">INR - Indian Rupee</option>
+                  <option value="AUD">AUD - Australian Dollar</option>
+                </Select>
+              </div>
+
+              {/* Pricing Type Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  {__('Pricing Type', 'Pricing Type')} <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                    formData.pricing_type === 'regular'
+                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="pricing_type"
+                      value="regular"
+                      checked={formData.pricing_type === 'regular'}
+                      onChange={(e) => handleFieldChange('pricing_type', e.target.value)}
+                      className="sr-only"
+                    />
+                    <div className="flex flex-1">
+                      <div className="flex flex-col">
+                        <span className={`block text-sm font-medium ${
+                          formData.pricing_type === 'regular'
+                            ? 'text-blue-900 dark:text-blue-300'
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
+                          {__('Regular Pricing', 'Regular Pricing')}
+                        </span>
+                        <span className={`mt-1 flex items-center text-sm ${
+                          formData.pricing_type === 'regular'
+                            ? 'text-blue-700 dark:text-blue-400'
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {__('Set a single price for all travelers', 'Set a single price for all travelers')}
+                        </span>
+                      </div>
+                    </div>
+                    {formData.pricing_type === 'regular' && (
+                      <div className="absolute top-4 right-4">
+                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                      </div>
+                    )}
+                  </label>
+
+                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                    formData.pricing_type === 'traveler_based'
+                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="pricing_type"
+                      value="traveler_based"
+                      checked={formData.pricing_type === 'traveler_based'}
+                      onChange={(e) => handleFieldChange('pricing_type', e.target.value)}
+                      className="sr-only"
+                    />
+                    <div className="flex flex-1">
+                      <div className="flex flex-col">
+                        <span className={`block text-sm font-medium ${
+                          formData.pricing_type === 'traveler_based'
+                            ? 'text-blue-900 dark:text-blue-300'
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
+                          {__('Traveler-Based Pricing', 'Traveler-Based Pricing')}
+                        </span>
+                        <span className={`mt-1 flex items-center text-sm ${
+                          formData.pricing_type === 'traveler_based'
+                            ? 'text-blue-700 dark:text-blue-400'
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {__('Set different prices for each traveler category', 'Set different prices for each traveler category')}
+                        </span>
+                      </div>
+                    </div>
+                    {formData.pricing_type === 'traveler_based' && (
+                      <div className="absolute top-4 right-4">
+                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              {/* Regular Pricing */}
+              {formData.pricing_type === 'regular' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                          {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                        </span>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.original_price}
+                          onChange={(e) => handleFieldChange('original_price', e.target.value)}
+                          placeholder="0.00"
+                          className={`pl-7 ${errors.original_price ? 'border-red-500' : ''}`}
+                        />
+                      </div>
+                      {errors.original_price && (
+                        <p className="mt-1 text-xs text-red-600">{errors.original_price}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Discounted Price', 'Discounted Price')} ({__('Optional', 'Optional')})
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                          {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                        </span>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.discounted_price}
+                          onChange={(e) => handleFieldChange('discounted_price', e.target.value)}
+                          placeholder="0.00"
+                          className={`pl-7 ${errors.discounted_price ? 'border-red-500' : ''}`}
+                        />
+                      </div>
+                      {errors.discounted_price && (
+                        <p className="mt-1 text-xs text-red-600">{errors.discounted_price}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Traveler Category Pricing */}
+              {formData.pricing_type === 'traveler_based' && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-red-500">*</span>
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'Add pricing for traveler categories. Categories are managed in Traveler Categories page.')}
+                </p>
+                {isLoadingCategories ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                  </div>
+                ) : activeCategories.length === 0 ? (
+                  <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg text-center">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      {__('No active traveler categories found.', 'No active traveler categories found.')}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => window.location.href = '?subpage=traveler-categories&action=create'}
+                      className="flex items-center gap-2 mx-auto"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {__('Create Category', 'Create Category')}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Add Pricing Button */}
+                    <div className="relative">
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={handleCancel}
-                        disabled={isSubmitting}
+                        onClick={() => setShowCategorySelector(!showCategorySelector)}
+                        className="flex items-center gap-2"
+                        disabled={activeCategories.filter(cat => !formData.price_types.some(pt => pt.category_id === cat.id)).length === 0}
                       >
-                        {__('Cancel', 'Cancel')}
+                        <Plus className="w-4 h-4" />
+                        {__('Add Pricing', 'Add Pricing')}
                       </Button>
+                      
+                      {/* Category Selection Dropdown */}
+                      {showCategorySelector && (
+                        <>
+                          <div 
+                            className="fixed inset-0 z-10" 
+                            onClick={() => setShowCategorySelector(false)}
+                          />
+                          <div className="absolute top-full left-0 mt-2 w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
+                            <div className="p-2">
+                              <div className="text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1">
+                                {__('Select a category to add pricing', 'Select a category to add pricing')}
+                              </div>
+                              {activeCategories
+                                .filter(cat => !formData.price_types.some(pt => pt.category_id === cat.id))
+                                .length === 0 ? (
+                                <div className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                  {__('All categories have pricing added', 'All categories have pricing added')}
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  {activeCategories
+                                    .filter(cat => !formData.price_types.some(pt => pt.category_id === cat.id))
+                                    .map(category => {
+                                      const ageRange = category.age_min !== undefined || category.age_max !== undefined
+                                        ? category.age_min !== undefined && category.age_max !== undefined
+                                          ? `${category.age_min}-${category.age_max} ${__('years', 'years')}`
+                                          : category.age_min !== undefined
+                                          ? `${category.age_min}+ ${__('years', 'years')}`
+                                          : category.age_max !== undefined
+                                          ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
+                                          : ''
+                                        : null;
+
+                                      return (
+                                        <button
+                                          key={category.id}
+                                          type="button"
+                                          onClick={() => {
+                                            handlePriceTypeAdd(category.id);
+                                            setShowCategorySelector(false);
+                                          }}
+                                          className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        >
+                                          <div className="font-medium text-sm text-gray-900 dark:text-white">
+                                            {category.label}
+                                            {ageRange && (
+                                              <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                ({ageRange})
+                                              </span>
+                                            )}
+                                          </div>
+                                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            {category.description}
+                                          </div>
+                                        </button>
+                                      );
+                                    })}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Added Pricing List */}
+                    {formData.price_types.length > 0 && (
+                      <div className="space-y-3">
+                        {formData.price_types.map((priceType, index) => {
+                          const category = activeCategories.find(cat => cat.id === priceType.category_id);
+                          if (!category) return null;
+
+                          return (
+                            <div key={priceType.category_id} className="p-4 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                                  {category.label}
+                                  {(category.age_min !== undefined || category.age_max !== undefined) && (
+                                    <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                                      (
+                                      {category.age_min !== undefined && category.age_max !== undefined
+                                        ? `${category.age_min}-${category.age_max} ${__('years', 'years')}`
+                                        : category.age_min !== undefined
+                                        ? `${category.age_min}+ ${__('years', 'years')}`
+                                        : category.age_max !== undefined
+                                        ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
+                                        : ''}
+                                      )
+                                    </span>
+                                  )}
+                                </h4>
+                              </div>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">
+                                {category.description}
+                              </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handlePriceTypeRemove(category.id)}
+                                  className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                  title={__('Remove Pricing', 'Remove Pricing')}
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
+                                  </label>
+                                  <div className="relative">
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                                      {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                                    </span>
+                                    <Input
+                                      type="number"
+                                      step="0.01"
+                                      min="0"
+                                      value={priceType.original_price}
+                                      onChange={(e) => handlePriceTypeChange(category.id, 'original_price', e.target.value)}
+                                      placeholder="0.00"
+                                      className={`pl-7 ${errors[`price_type_${index}_original`] ? 'border-red-500' : ''}`}
+                                    />
+                                  </div>
+                                  {errors[`price_type_${index}_original`] && (
+                                    <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                      {errors[`price_type_${index}_original`]}
+                                    </p>
+                                  )}
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    {__('Discounted Price', 'Discounted Price')} ({__('Optional', 'Optional')})
+                                  </label>
+                                  <div className="relative">
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                                      {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                                    </span>
+                                    <Input
+                                      type="number"
+                                      step="0.01"
+                                      min="0"
+                                      value={priceType.discounted_price}
+                                      onChange={(e) => handlePriceTypeChange(category.id, 'discounted_price', e.target.value)}
+                                      placeholder="0.00"
+                                      className={`pl-7 ${errors[`price_type_${index}_discounted`] ? 'border-red-500' : ''}`}
+                                    />
+                                  </div>
+                                  {errors[`price_type_${index}_discounted`] && (
+                                    <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                      {errors[`price_type_${index}_discounted`]}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Empty State */}
+                    {formData.price_types.length === 0 && (
+                      <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                        <Tag className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {__('No pricing added yet. Select a category above to add pricing.', 'No pricing added yet. Select a category above to add pricing.')}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {errors.price_types && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.price_types}
+                  </p>
+                )}
+              </div>
+              )}
+
+              {/* Sale Price */}
+              <div>
+                <label htmlFor="sale_price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Sale Price', 'Sale Price')} ({__('Optional', 'Optional')})
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  {__('Apply a sale price discount to all price types', 'Apply a sale price discount to all price types')}
+                </p>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}</span>
+                  <Input
+                    id="sale_price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.sale_price}
+                    onChange={(e) => handleFieldChange('sale_price', e.target.value)}
+                    placeholder="0.00"
+                    className="pl-7"
+                  />
+                </div>
+              </div>
+
+              {/* Deposit */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Deposit & Payment Terms', 'Deposit & Payment Terms')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="deposit_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Deposit Amount', 'Deposit Amount')}
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}</span>
+                      <Input
+                        id="deposit_amount"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.deposit_amount}
+                        onChange={(e) => handleFieldChange('deposit_amount', e.target.value)}
+                        placeholder="0.00"
+                        className="pl-7"
+                      />
                     </div>
                   </div>
+                  <div>
+                    <label htmlFor="deposit_percentage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Deposit Percentage', 'Deposit Percentage')}
+                    </label>
+                    <div className="relative">
+                      <Input
+                        id="deposit_percentage"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="100"
+                        value={formData.deposit_percentage}
+                        onChange={(e) => handleFieldChange('deposit_percentage', e.target.value)}
+                        placeholder="0"
+                        className="pr-7"
+                      />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label htmlFor="payment_terms" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Payment Terms', 'Payment Terms')}
+                  </label>
+                  <textarea
+                    id="payment_terms"
+                    value={formData.payment_terms}
+                    onChange={(e) => handleFieldChange('payment_terms', e.target.value)}
+                    placeholder={__('e.g., 50% deposit required at booking, balance due 30 days before departure', 'e.g., 50% deposit required at booking, balance due 30 days before departure')}
+                    rows={2}
+                    className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Group Pricing */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="mb-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.group_pricing_enabled}
+                      onChange={(e) => handleFieldChange('group_pricing_enabled', e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {__('Enable Group Pricing', 'Enable Group Pricing')}
+                    </span>
+                  </label>
+                </div>
+                {formData.group_pricing_enabled && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="group_size_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Minimum Group Size', 'Minimum Group Size')}
+                      </label>
+                      <Input
+                        id="group_size_min"
+                        type="number"
+                        min="2"
+                        value={formData.group_size_min}
+                        onChange={(e) => handleFieldChange('group_size_min', e.target.value)}
+                        placeholder="5"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="group_discount_percentage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Group Discount (%)', 'Group Discount (%)')}
+                      </label>
+                      <div className="relative">
+                        <Input
+                          id="group_discount_percentage"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max="100"
+                          value={formData.group_discount_percentage}
+                          onChange={(e) => handleFieldChange('group_discount_percentage', e.target.value)}
+                          placeholder="10"
+                          className="pr-7"
+                        />
+                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'booking':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Mail className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Settings & Requirements', 'Booking Settings & Requirements')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Configure booking limits, deadlines, and traveler requirements', 'Configure booking limits, deadlines, and traveler requirements')}
+            </p>
+
+            <div className="space-y-6">
+              {/* Group Size */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Group Size', 'Group Size')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="min_travelers" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Minimum Travelers', 'Minimum Travelers')} <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="min_travelers"
+                      type="number"
+                      min="1"
+                      value={formData.min_travelers}
+                      onChange={(e) => handleFieldChange('min_travelers', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="max_travelers" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Maximum Travelers', 'Maximum Travelers')} <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="max_travelers"
+                      type="number"
+                      min="1"
+                      value={formData.max_travelers}
+                      onChange={(e) => handleFieldChange('max_travelers', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Age Restrictions */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Age Restrictions', 'Age Restrictions')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="age_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Minimum Age', 'Minimum Age')}
+                    </label>
+                    <Input
+                      id="age_min"
+                      type="number"
+                      min="0"
+                      value={formData.age_min}
+                      onChange={(e) => handleFieldChange('age_min', e.target.value)}
+                      placeholder={__('e.g., 18', 'e.g., 18')}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="age_max" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Maximum Age', 'Maximum Age')}
+                    </label>
+                    <Input
+                      id="age_max"
+                      type="number"
+                      min="0"
+                      value={formData.age_max}
+                      onChange={(e) => handleFieldChange('age_max', e.target.value)}
+                      placeholder={__('e.g., 65', 'e.g., 65')}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Booking Deadlines */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Booking Deadlines', 'Booking Deadlines')}</h3>
+                <div>
+                  <label htmlFor="booking_deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Booking Deadline', 'Booking Deadline')}
+                  </label>
+                  <Input
+                    id="booking_deadline"
+                    type="date"
+                    value={formData.booking_deadline}
+                    onChange={(e) => handleFieldChange('booking_deadline', e.target.value)}
+                  />
+                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    {__('Last date customers can book this trip', 'Last date customers can book this trip')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Requirements */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Travel Requirements', 'Travel Requirements')}</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="physical_requirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Physical Requirements', 'Physical Requirements')}
+                    </label>
+                    <textarea
+                      id="physical_requirements"
+                      value={formData.physical_requirements}
+                      onChange={(e) => handleFieldChange('physical_requirements', e.target.value)}
+                      placeholder={__('e.g., Moderate fitness level required, ability to walk 5km per day', 'e.g., Moderate fitness level required, ability to walk 5km per day')}
+                      rows={2}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="visa_requirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Visa Requirements', 'Visa Requirements')}
+                    </label>
+                    <textarea
+                      id="visa_requirements"
+                      value={formData.visa_requirements}
+                      onChange={(e) => handleFieldChange('visa_requirements', e.target.value)}
+                      placeholder={__('e.g., Valid passport required, visa on arrival available for most nationalities', 'e.g., Valid passport required, visa on arrival available for most nationalities')}
+                      rows={2}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="vaccination_requirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Vaccination Requirements', 'Vaccination Requirements')}
+                    </label>
+                    <textarea
+                      id="vaccination_requirements"
+                      value={formData.vaccination_requirements}
+                      onChange={(e) => handleFieldChange('vaccination_requirements', e.target.value)}
+                      placeholder={__('e.g., Yellow fever vaccination required for entry', 'e.g., Yellow fever vaccination required for entry')}
+                      rows={2}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Cancellation Policy */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Cancellation Policy', 'Cancellation Policy')}</h3>
+                <div>
+                  <label htmlFor="cancellation_policy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Cancellation Policy Details', 'Cancellation Policy Details')}
+                  </label>
+                  <textarea
+                    id="cancellation_policy"
+                    value={formData.cancellation_policy}
+                    onChange={(e) => handleFieldChange('cancellation_policy', e.target.value)}
+                    placeholder={__('e.g., Full refund 30 days before departure, 50% refund 15-29 days before, no refund within 14 days', 'e.g., Full refund 30 days before departure, 50% refund 15-29 days before, no refund within 14 days')}
+                    rows={3}
+                    className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'availability':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Availability & Dates', 'Availability & Dates')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Manage departure dates, pricing, and seat availability for your trip. Each date can have different pricing and availability.', 'Manage departure dates, pricing, and seat availability for your trip. Each date can have different pricing and availability.')}
+            </p>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{__('Available Dates', 'Available Dates')}</CardTitle>
+                <CardDescription>
+                  {__('Add specific departure dates with pricing and seat availability. Customers will see these dates when booking.', 'Add specific departure dates with pricing and seat availability. Customers will see these dates when booking.')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {formData.availability_dates.length > 0 ? (
+                    formData.availability_dates.map((avail) => (
+                      <div
+                        key={avail.id}
+                        className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                          {/* Departure Date */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                              {__('Departure Date', 'Departure Date')} <span className="text-red-500">*</span>
+                            </label>
+                            <Input
+                              type="date"
+                              value={avail.departure_date}
+                              onChange={(e) => handleAvailabilityChange(avail.id, 'departure_date', e.target.value)}
+                              className="text-sm"
+                            />
+                          </div>
+
+                          {/* Arrival Date */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                              {__('Arrival Date', 'Arrival Date')} <span className="text-red-500">*</span>
+                            </label>
+                            <Input
+                              type="date"
+                              value={avail.arrival_date}
+                              onChange={(e) => handleAvailabilityChange(avail.id, 'arrival_date', e.target.value)}
+                              className="text-sm"
+                            />
+                          </div>
+
+                          {/* Seats Remaining */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                              {__('Seats Remaining', 'Seats Remaining')}
+                            </label>
+                            <Input
+                              type="text"
+                              value={avail.seats_remaining}
+                              onChange={(e) => handleAvailabilityChange(avail.id, 'seats_remaining', e.target.value)}
+                              placeholder="10+"
+                              className="text-sm"
+                            />
+                            <HelpText
+                              text={__('Enter number or "10+" for 10 or more', 'Enter number or "10+" for 10 or more')}
+                              className="mt-1"
+                            />
+                          </div>
+
+                          {/* Status */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                              {__('Status', 'Status')}
+                            </label>
+                            <Select
+                              value={avail.status}
+                              onChange={(e) => handleAvailabilityChange(avail.id, 'status', e.target.value)}
+                              className="text-sm"
+                            >
+                              <option value="available">{__('Available', 'Available')}</option>
+                              <option value="limited">{__('Limited', 'Limited')}</option>
+                              <option value="sold_out">{__('Sold Out', 'Sold Out')}</option>
+                              <option value="closed">{__('Closed', 'Closed')}</option>
+                            </Select>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                          {/* Original Price */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                              {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                                {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                              </span>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={avail.original_price}
+                                onChange={(e) => handleAvailabilityPriceChange(avail.id, 'original_price', e.target.value)}
+                                placeholder="0.00"
+                                className="pl-7 text-sm"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Discounted Price */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                              {__('Discounted Price', 'Discounted Price')} ({__('Optional', 'Optional')})
+                            </label>
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                                {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                              </span>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={avail.discounted_price}
+                                onChange={(e) => handleAvailabilityPriceChange(avail.id, 'discounted_price', e.target.value)}
+                                placeholder="0.00"
+                                className="pl-7 text-sm"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Discount Percentage */}
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                              {__('Discount %', 'Discount %')}
+                            </label>
+                            <div className="relative">
+                              <Input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={avail.discount_percentage}
+                                onChange={(e) => handleAvailabilityChange(avail.id, 'discount_percentage', e.target.value)}
+                                placeholder="0"
+                                className="pr-7 text-sm"
+                                disabled
+                              />
+                              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">%</span>
+                            </div>
+                            {avail.discount_percentage && parseFloat(avail.discount_percentage) > 0 && (
+                              <Badge variant="error" className="mt-2 text-xs">
+                                {avail.discount_percentage}% {__('OFF TODAY', 'OFF TODAY')}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* From/To Locations */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                              {__('From Location', 'From Location')}
+                            </label>
+                            <Input
+                              type="text"
+                              value={avail.from_location || ''}
+                              onChange={(e) => handleAvailabilityChange(avail.id, 'from_location', e.target.value)}
+                              placeholder={formData.starting_location || __('e.g., Rome', 'e.g., Rome')}
+                              className="text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                              {__('To Location', 'To Location')}
+                            </label>
+                            <Input
+                              type="text"
+                              value={avail.to_location || ''}
+                              onChange={(e) => handleAvailabilityChange(avail.id, 'to_location', e.target.value)}
+                              placeholder={formData.ending_location || __('e.g., Rome', 'e.g., Rome')}
+                              className="text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Remove Button */}
+                        <div className="flex justify-end">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleAvailabilityRemove(avail.id)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <X className="w-4 h-4 mr-2" />
+                            {__('Remove', 'Remove')}
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                      <Calendar className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        {__('No availability dates added yet', 'No availability dates added yet')}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
+                        {__('Add specific departure dates with pricing and seat availability for your trip', 'Add specific departure dates with pricing and seat availability for your trip')}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAvailabilityAdd}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {__('Add Availability Date', 'Add Availability Date')}
+                  </Button>
+                  <HelpText
+                    text={__('Add multiple departure dates with different pricing. Discount percentage is automatically calculated when you enter both original and discounted prices.', 'Add multiple departure dates with different pricing. Discount percentage is automatically calculated when you enter both original and discounted prices.')}
+                    className="mt-2"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 'itinerary':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Itinerary Builder', 'Itinerary Builder')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Build your trip itinerary day by day. You can add detailed itinerary entries later.', 'Build your trip itinerary day by day. You can add detailed itinerary entries later.')}
+            </p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">
+                    {__('Itinerary Management', 'Itinerary Management')}
+                  </p>
+                  <p className="text-sm text-blue-800 dark:text-blue-400">
+                    {__('To add detailed itinerary entries, go to the Itinerary page from the main menu after saving this trip.', 'To add detailed itinerary entries, go to the Itinerary page from the main menu after saving this trip.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'included':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <CheckSquare className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('What\'s Included & Excluded', 'What\'s Included & Excluded')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('List what is included and excluded in your trip package', 'List what is included and excluded in your trip package')}
+            </p>
+
+            <div className="space-y-6">
+              {/* Included Items */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{__('Included Items', 'Included Items')}</CardTitle>
+                  <CardDescription>
+                    {__('List everything that is included in the trip price. This helps set clear expectations and adds value.', 'List everything that is included in the trip price. This helps set clear expectations and adds value.')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {formData.included_items.length > 0 ? (
+                    <div className="space-y-2">
+                      {formData.included_items.map((item, index) => (
+                        <div key={index} className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                          <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                          <span className="flex-1 text-sm text-gray-900 dark:text-white">{item}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleIncludedRemove(index)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                      <CheckCircle2 className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        {__('No included items added yet', 'No included items added yet')}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                        {__('Examples: Accommodation, Meals, Transportation, Guide, Entrance fees', 'Examples: Accommodation, Meals, Transportation, Guide, Entrance fees')}
+                      </p>
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleIncludedAdd}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {__('Add Included Item', 'Add Included Item')}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Excluded Items */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{__('Excluded Items', 'Excluded Items')}</CardTitle>
+                  <CardDescription>
+                    {__('List what is NOT included. This prevents misunderstandings and helps customers plan their budget.', 'List what is NOT included. This prevents misunderstandings and helps customers plan their budget.')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {formData.excluded_items.length > 0 ? (
+                    <div className="space-y-2">
+                      {formData.excluded_items.map((item, index) => (
+                        <div key={index} className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                          <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0" />
+                          <span className="flex-1 text-sm text-gray-900 dark:text-white">{item}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleExcludedRemove(index)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                      <X className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        {__('No excluded items added yet', 'No excluded items added yet')}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                        {__('Examples: Flights, Travel insurance, Personal expenses, Tips', 'Examples: Flights, Travel insurance, Personal expenses, Tips')}
+                      </p>
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleExcludedAdd}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {__('Add Excluded Item', 'Add Excluded Item')}
+                  </Button>
                 </CardContent>
               </Card>
             </div>
           </div>
-        </form>
-      </ConditionalRender>
+        );
+
+      case 'gallery':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Image className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Photo Gallery', 'Photo Gallery')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Upload images to showcase your trip. These will be displayed on the trip page.', 'Upload images to showcase your trip. These will be displayed on the trip page.')}
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+              {formData.gallery_images.map((image, index) => (
+                <div key={index} className="relative group">
+                  <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src={image} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleGalleryRemove(index)}
+                    className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={handleGalleryAdd}
+                className="aspect-video border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+              >
+                <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">{__('Add Image', 'Add Image')}</span>
+              </button>
+            </div>
+          </div>
+        );
+
+      case 'faqs':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <HelpCircle className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Frequently Asked Questions', 'Frequently Asked Questions')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Add common questions and answers about your trip', 'Add common questions and answers about your trip')}
+            </p>
+            <div className="space-y-4">
+              {formData.faqs.map((faq, index) => (
+                <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+                      {__('FAQ', 'FAQ')} {index + 1}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => handleFAQRemove(index)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Question', 'Question')}
+                      </label>
+                      <Input
+                        type="text"
+                        value={faq.question}
+                        onChange={(e) => handleFAQChange(index, 'question', e.target.value)}
+                        placeholder={__('Enter question...', 'Enter question...')}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Answer', 'Answer')}
+                      </label>
+                      <textarea
+                        value={faq.answer}
+                        onChange={(e) => handleFAQChange(index, 'answer', e.target.value)}
+                        placeholder={__('Enter answer...', 'Enter answer...')}
+                        rows={3}
+                        className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleFAQAdd}
+                className="w-full"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                {__('Add FAQ', 'Add FAQ')}
+              </Button>
+            </div>
+          </div>
+        );
+
+      case 'frontend-tabs':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Settings className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Frontend Tabs Management', 'Frontend Tabs Management')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them.', 'Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them.')}
+            </p>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{__('Available Tabs', 'Available Tabs')}</CardTitle>
+                <CardDescription>
+                  {__('Configure the tabs that will appear on your trip single page. Use up/down arrows to reorder, toggle to enable/disable, and customize labels. Add custom tabs for additional content.', 'Configure the tabs that will appear on your trip single page. Use up/down arrows to reorder, toggle to enable/disable, and customize labels. Add custom tabs for additional content.')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {formData.frontend_tabs
+                    .sort((a, b) => a.order - b.order)
+                    .map((tab, index) => (
+                      <div
+                        key={tab.id}
+                        className={`p-4 rounded-lg border ${
+                          tab.enabled
+                            ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                            : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          <GripVertical className="w-5 h-5 text-gray-400" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Input
+                                type="text"
+                                value={tab.label}
+                                onChange={(e) => handleTabLabelChange(tab.id, e.target.value)}
+                                className="text-sm font-medium flex-1"
+                                disabled={!tab.enabled}
+                                placeholder={__('Tab Label', 'Tab Label')}
+                              />
+                              <Badge variant="outline" className="text-xs">
+                                {tab.content_type}
+                              </Badge>
+                            </div>
+                            {tab.content_type === 'custom' && (
+                              <div className="mt-2">
+                                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                  {__('Custom Content', 'Custom Content')}
+                                </label>
+                                <textarea
+                                  value={tab.custom_content || ''}
+                                  onChange={(e) => handleTabCustomContentChange(tab.id, e.target.value)}
+                                  rows={3}
+                                  disabled={!tab.enabled}
+                                  placeholder={__('Enter custom content for this tab...', 'Enter custom content for this tab...')}
+                                  className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                                />
+                              </div>
+                            )}
+                            {tab.content_type !== 'custom' && (
+                              <div className="mt-2">
+                                <Select
+                                  value={tab.content_type}
+                                  onChange={(e) => handleTabContentTypeChange(tab.id, e.target.value as FrontendTab['content_type'])}
+                                  disabled={!tab.enabled}
+                                  className="text-xs"
+                                >
+                                  <option value="general">{__('General', 'General')}</option>
+                                  <option value="pricing">{__('Pricing', 'Pricing')}</option>
+                                  <option value="itinerary">{__('Itinerary', 'Itinerary')}</option>
+                                  <option value="included_excluded">{__('Included/Excluded', 'Included/Excluded')}</option>
+                                  <option value="gallery">{__('Gallery', 'Gallery')}</option>
+                                  <option value="faqs">{__('FAQs', 'FAQs')}</option>
+                                  <option value="reviews">{__('Reviews', 'Reviews')}</option>
+                                  <option value="custom">{__('Custom Content', 'Custom Content')}</option>
+                                </Select>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleTabMove(tab.id, 'up')}
+                              disabled={index === 0}
+                              className="h-8 w-8 p-0"
+                              title={__('Move up', 'Move up')}
+                            >
+                              <ChevronUp className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleTabMove(tab.id, 'down')}
+                              disabled={index === formData.frontend_tabs.length - 1}
+                              className="h-8 w-8 p-0"
+                              title={__('Move down', 'Move down')}
+                            >
+                              <ChevronDown className="w-4 h-4" />
+                            </Button>
+                            {tab.content_type === 'custom' && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleTabRemove(tab.id)}
+                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                title={__('Delete tab', 'Delete tab')}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={tab.enabled}
+                                onChange={() => handleTabToggle(tab.id)}
+                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                              />
+                              <span className="text-sm text-gray-700 dark:text-gray-300">
+                                {tab.enabled ? __('Enabled', 'Enabled') : __('Disabled', 'Disabled')}
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleTabAdd}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {__('Add Custom Tab', 'Add Custom Tab')}
+                  </Button>
+                  <HelpText
+                    text={__('Add a custom tab with your own content. This is useful for additional information like "Terms & Conditions", "Travel Tips", or any other custom content.', 'Add a custom tab with your own content. This is useful for additional information like "Terms & Conditions", "Travel Tips", or any other custom content.')}
+                    className="mt-2"
+                  />
+                </div>
+                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-start gap-2">
+                    <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div className="text-xs text-blue-800 dark:text-blue-300">
+                      <p className="font-medium mb-1">{__('Tab Content Types:', 'Tab Content Types:')}</p>
+                      <ul className="list-disc list-inside space-y-0.5">
+                        <li><strong>General:</strong> {__('Shows trip description, highlights, and basic information', 'Shows trip description, highlights, and basic information')}</li>
+                        <li><strong>Pricing:</strong> {__('Displays pricing information for different traveler categories', 'Displays pricing information for different traveler categories')}</li>
+                        <li><strong>Itinerary:</strong> {__('Shows day-by-day itinerary details', 'Shows day-by-day itinerary details')}</li>
+                        <li><strong>Included/Excluded:</strong> {__('Lists what is included and excluded in the trip', 'Lists what is included and excluded in the trip')}</li>
+                        <li><strong>Gallery:</strong> {__('Displays trip photos and images', 'Displays trip photos and images')}</li>
+                        <li><strong>FAQs:</strong> {__('Shows frequently asked questions and answers', 'Shows frequently asked questions and answers')}</li>
+                        <li><strong>Reviews:</strong> {__('Displays customer reviews and ratings', 'Displays customer reviews and ratings')}</li>
+                        <li><strong>Custom:</strong> {__('Custom content tab - you can add any HTML/content you want', 'Custom content tab - you can add any HTML/content you want')}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 'seo':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Search className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('SEO Settings', 'SEO Settings')}</h2>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="meta_title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Meta Title', 'Meta Title')}
+                </label>
+                <Input
+                  id="meta_title"
+                  type="text"
+                  value={formData.meta_title}
+                  onChange={(e) => handleFieldChange('meta_title', e.target.value)}
+                  placeholder={formData.title || __('Trip Title', 'Trip Title')}
+                />
+              </div>
+              <div>
+                <label htmlFor="meta_description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Meta Description', 'Meta Description')}
+                </label>
+                <textarea
+                  id="meta_description"
+                  value={formData.meta_description}
+                  onChange={(e) => handleFieldChange('meta_description', e.target.value)}
+                  rows={3}
+                  className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                />
+              </div>
+              <div>
+                <label htmlFor="meta_keywords" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Meta Keywords', 'Meta Keywords')}
+                </label>
+                <Input
+                  id="meta_keywords"
+                  type="text"
+                  value={formData.meta_keywords}
+                  onChange={(e) => handleFieldChange('meta_keywords', e.target.value)}
+                  placeholder={__('e.g., bali, beach, retreat, vacation', 'e.g., bali, beach, retreat, vacation')}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'advanced':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Settings className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Advanced Settings', 'Advanced Settings')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Advanced configuration options for your trip', 'Advanced configuration options for your trip')}
+            </p>
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {__('Advanced settings will be available in a future update.', 'Advanced settings will be available in a future update.')}
+              </p>
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="text-center py-8 text-gray-500">
+            {__('Section content coming soon...', 'Section content coming soon...')}
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="h-screen flex flex-col bg-white dark:bg-gray-900">
+      {/* Header */}
+      <div className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
+        <Button
+          variant="ghost"
+          onClick={handleCancel}
+          className="text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {__('Back', 'Back')}
+        </Button>
+        
+        <div className="flex-1 text-center">
+          <h1 className="text-base font-semibold text-gray-900 dark:text-white">{formData.title || __('New Trip', 'New Trip')}</h1>
+          <div className="flex items-center justify-center gap-2 mt-1">
+            <Badge variant="outline" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600">
+              {formData.status === 'draft' ? __('Draft', 'Draft') : __('Published', 'Published')}
+            </Badge>
+            {lastSaved && (
+              <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                {__('Saved', 'Saved')} {formatTime(lastSaved)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={handlePreview}
+            className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+            disabled={!formData.slug}
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            {__('Preview', 'Preview')}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleSaveDraft}
+            disabled={isSubmitting || isAutoSaving}
+            className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            {isAutoSaving ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 mr-2" />
+            )}
+            {__('Save Draft', 'Save Draft')}
+          </Button>
+          <Button
+            onClick={handlePublish}
+            disabled={isSubmitting || isAutoSaving}
+            className="bg-blue-600 hover:bg-blue-700 text-white border-0"
+          >
+            {isSubmitting ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4 mr-2" />
+            )}
+            {__('Publish Trip', 'Publish Trip')}
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <div className="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
+          <div className="p-4 space-y-6">
+            {/* Tour Progress */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Compass className="w-4 h-4 text-gray-500" />
+                <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                  {__('Trip Progress', 'Trip Progress')}
+                </h3>
+              </div>
+              <div className="mb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {__('Completion', 'Completion')} {completionPercentage}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${completionPercentage}%` }}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {totalRequiredSections - completedSections === 0
+                  ? __('All required sections completed!', 'All required sections completed!')
+                  : __('Complete', 'Complete')} {totalRequiredSections - completedSections} {__('more sections to publish', 'more sections to publish')}
+              </p>
+            </div>
+
+            {/* Essentials */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Box className="w-4 h-4 text-gray-500" />
+                <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                  {__('ESSENTIALS', 'ESSENTIALS')}
+                </h3>
+              </div>
+              <div className="space-y-1">
+                {essentialsSections.map((section) => {
+                  const Icon = section.icon;
+                  return (
+                    <button
+                      key={section.id}
+                      type="button"
+                      onClick={() => setCurrentSection(section.id)}
+                      className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded text-sm transition-colors ${
+                        currentSection === section.id
+                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon className="w-4 h-4" />
+                        <span>{section.label}</span>
+                      </div>
+                      {section.completed && (
+                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Marketing */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <BarChart3 className="w-4 h-4 text-gray-500" />
+                <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                  {__('MARKETING', 'MARKETING')}
+                </h3>
+              </div>
+              <div className="space-y-1">
+                {marketingSections.map((section) => {
+                  const Icon = section.icon;
+                  return (
+                    <button
+                      key={section.id}
+                      type="button"
+                      onClick={() => setCurrentSection(section.id)}
+                      className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded text-sm transition-colors ${
+                        currentSection === section.id
+                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon className="w-4 h-4" />
+                        <span>{section.label}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {!section.required && (
+                          <span className="text-xs text-gray-400">{__('Optional', 'Optional')}</span>
+                        )}
+                        {section.completed && (
+                          <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Advanced */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Settings className="w-4 h-4 text-gray-500" />
+                <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                  {__('ADVANCED', 'ADVANCED')}
+                </h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
+          <div className="p-6 max-w-4xl">
+            {errors.submit && (
+              <Alert variant="error" className="mb-4">
+                {errors.submit}
+              </Alert>
+            )}
+            {renderSectionContent()}
+          </div>
+        </div>
+      </div>
+
+      {/* Modals */}
+      {/* Highlight Modal */}
+      {showHighlightModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowHighlightModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Highlight', 'Add Highlight')}</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Highlight Text', 'Highlight Text')} <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="text"
+                  value={modalInput.text}
+                  onChange={(e) => setModalInput({ ...modalInput, text: e.target.value })}
+                  placeholder={__('e.g., Private guide included', 'e.g., Private guide included')}
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleHighlightSave();
+                    }
+                  }}
+                />
+                <HelpText
+                  text={__('Keep it short and impactful. Examples: "All meals included", "Skip-the-line tickets", "Free airport transfer"', 'Keep it short and impactful. Examples: "All meals included", "Skip-the-line tickets", "Free airport transfer"')}
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowHighlightModal(false)}>
+                  {__('Cancel', 'Cancel')}
+                </Button>
+                <Button onClick={handleHighlightSave} disabled={!modalInput.text.trim()}>
+                  {__('Add', 'Add')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Included Item Modal */}
+      {showIncludedModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowIncludedModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Included Item', 'Add Included Item')}</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Item', 'Item')} <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="text"
+                  value={modalInput.text}
+                  onChange={(e) => setModalInput({ ...modalInput, text: e.target.value })}
+                  placeholder={__('e.g., Accommodation, Meals, Transportation', 'e.g., Accommodation, Meals, Transportation')}
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleIncludedSave();
+                    }
+                  }}
+                />
+                <HelpText
+                  text={__('List what is included in the trip price. Be specific: "3-star hotel", "Breakfast and dinner", "Airport pickup"', 'List what is included in the trip price. Be specific: "3-star hotel", "Breakfast and dinner", "Airport pickup"')}
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowIncludedModal(false)}>
+                  {__('Cancel', 'Cancel')}
+                </Button>
+                <Button onClick={handleIncludedSave} disabled={!modalInput.text.trim()}>
+                  {__('Add', 'Add')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Excluded Item Modal */}
+      {showExcludedModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowExcludedModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Excluded Item', 'Add Excluded Item')}</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Item', 'Item')} <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="text"
+                  value={modalInput.text}
+                  onChange={(e) => setModalInput({ ...modalInput, text: e.target.value })}
+                  placeholder={__('e.g., Flights, Travel insurance, Personal expenses', 'e.g., Flights, Travel insurance, Personal expenses')}
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleExcludedSave();
+                    }
+                  }}
+                />
+                <HelpText
+                  text={__('List what is NOT included. This helps set clear expectations. Examples: "International flights", "Travel insurance", "Tips and gratuities"', 'List what is NOT included. This helps set clear expectations. Examples: "International flights", "Travel insurance", "Tips and gratuities"')}
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowExcludedModal(false)}>
+                  {__('Cancel', 'Cancel')}
+                </Button>
+                <Button onClick={handleExcludedSave} disabled={!modalInput.text.trim()}>
+                  {__('Add', 'Add')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default TripForm;
-

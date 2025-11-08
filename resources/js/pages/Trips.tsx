@@ -29,6 +29,7 @@ interface Trip {
   created_at: string;
   bookings_count?: number;
   featured?: boolean;
+  trip_type?: 'single_day' | 'multi_day';
 }
 
 const Trips: React.FC = () => {
@@ -83,6 +84,7 @@ const Trips: React.FC = () => {
           created_at: getDate(30),
           bookings_count: 45,
           featured: true,
+          trip_type: 'multi_day',
         },
         {
           id: 2,
@@ -93,6 +95,7 @@ const Trips: React.FC = () => {
           created_at: getDate(25),
           bookings_count: 32,
           featured: false,
+          trip_type: 'multi_day',
         },
         {
           id: 3,
@@ -103,6 +106,7 @@ const Trips: React.FC = () => {
           created_at: getDate(20),
           bookings_count: 28,
           featured: false,
+          trip_type: 'multi_day',
         },
         {
           id: 4,
@@ -113,6 +117,7 @@ const Trips: React.FC = () => {
           created_at: getDate(15),
           bookings_count: 18,
           featured: true,
+          trip_type: 'multi_day',
         },
         {
           id: 5,
@@ -123,6 +128,7 @@ const Trips: React.FC = () => {
           created_at: getDate(10),
           bookings_count: 0,
           featured: false,
+          trip_type: 'multi_day',
         },
         {
           id: 6,
@@ -133,6 +139,7 @@ const Trips: React.FC = () => {
           created_at: getDate(8),
           bookings_count: 15,
           featured: false,
+          trip_type: 'multi_day',
         },
         {
           id: 7,
@@ -143,6 +150,7 @@ const Trips: React.FC = () => {
           created_at: getDate(5),
           bookings_count: 22,
           featured: true,
+          trip_type: 'multi_day',
         },
         {
           id: 8,
@@ -153,6 +161,18 @@ const Trips: React.FC = () => {
           created_at: getDate(3),
           bookings_count: 8,
           featured: false,
+          trip_type: 'multi_day',
+        },
+        {
+          id: 9,
+          title: 'Kathmandu City Tour',
+          slug: 'kathmandu-city-tour',
+          price: 150,
+          status: 'active',
+          created_at: getDate(2),
+          bookings_count: 12,
+          featured: false,
+          trip_type: 'single_day',
         },
       ];
 
@@ -274,6 +294,32 @@ const Trips: React.FC = () => {
       <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`}>
         {statusInfo.label}
       </span>
+    );
+  };
+
+  const getTripTypeBadge = (tripType?: 'single_day' | 'multi_day') => {
+    if (!tripType) return null;
+    
+    const typeMap: Record<string, { className: string; label: string }> = {
+      'single_day': {
+        className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400',
+        label: __('Single Day', 'Single Day'),
+      },
+      'multi_day': {
+        className: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400',
+        label: __('Multi-Day', 'Multi-Day'),
+      },
+    };
+
+    const typeInfo = typeMap[tripType] || {
+      className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+      label: tripType,
+    };
+
+    return (
+      <Badge className={`text-xs ${typeInfo.className}`}>
+        {typeInfo.label}
+      </Badge>
     );
   };
 
@@ -491,6 +537,15 @@ const Trips: React.FC = () => {
                             {getSortIcon('status')}
                           </button>
                         </TableHead>
+                        <TableHead>
+                          <button
+                            onClick={() => handleSort('trip_type')}
+                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
+                          >
+                            {__('Trip Type', 'Trip Type')}
+                            {getSortIcon('trip_type')}
+                          </button>
+                        </TableHead>
                         {isPro && (
                           <TableHead>{__('Bookings', 'Bookings')}</TableHead>
                         )}
@@ -533,6 +588,9 @@ const Trips: React.FC = () => {
                           </TableCell>
                           <TableCell>
                             {getStatusBadge(trip.status)}
+                          </TableCell>
+                          <TableCell>
+                            {getTripTypeBadge(trip.trip_type)}
                           </TableCell>
                           {isPro && (
                             <TableCell className="text-gray-600 dark:text-gray-400">

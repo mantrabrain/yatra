@@ -1,11 +1,11 @@
 /**
- * Customers Page
- * Clean, minimal SaaS-style customers management page
+ * Enquiries Page
+ * Clean, minimal SaaS-style enquiries management page
  */
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MapPin } from 'lucide-react';
+import { Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MessageSquare, MapPin } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -15,31 +15,34 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { Badge } from '../components/ui/badge';
+import { useNavigate } from '../hooks/useNavigate';
 
-interface Customer {
+interface Enquiry {
   id: number;
   name: string;
   email: string;
   phone: string;
-  country: string;
-  city: string;
-  total_bookings: number;
-  total_spent: number;
-  total_payments: number;
-  total_payment_amount: number;
-  status: string;
-  registered_at: string;
-  last_booking_date?: string;
+  trip_title?: string;
+  trip_id?: number;
+  message: string;
+  number_of_travelers?: number;
+  preferred_travel_date?: string;
+  status: 'new' | 'responded' | 'closed' | 'converted';
+  created_at: string;
+  responded_at?: string;
+  response_notes?: string;
 }
 
-const Customers: React.FC = () => {
+const Enquiries: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('registered_at');
+  const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
-  const { can, isPro } = usePermissions();
+  const { can } = usePermissions();
+  const { navigate } = useNavigate();
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -61,11 +64,11 @@ const Customers: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
-  // Fetch customers with dummy data
+  // Fetch enquiries with dummy data
   const { data, isLoading, error } = useQuery({
-    queryKey: ['customers', queryParams],
+    queryKey: ['enquiries', queryParams],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/customers', { params: queryParams });
+      // return await apiClient.get('/yatra/v1/enquiries', { params: queryParams });
       // Dummy data
       const today = new Date();
       const getDate = (days: number) => {
@@ -74,142 +77,134 @@ const Customers: React.FC = () => {
         return date.toISOString().split('T')[0];
       };
 
-      const allCustomers: Customer[] = [
+      const allEnquiries: Enquiry[] = [
         {
           id: 1,
           name: 'John Smith',
           email: 'john.smith@example.com',
           phone: '+1 234-567-8900',
-          country: 'United States',
-          city: 'New York',
-          total_bookings: 3,
-          total_spent: 6250,
-          total_payments: 5,
-          total_payment_amount: 6250,
-          status: 'active',
-          registered_at: getDate(120),
-          last_booking_date: getDate(5),
+          trip_title: 'Everest Base Camp Trek',
+          trip_id: 1,
+          message: 'I am interested in booking the Everest Base Camp Trek for 2 people. Can you provide more details about the itinerary and pricing?',
+          number_of_travelers: 2,
+          preferred_travel_date: '2026-04-15',
+          status: 'new',
+          created_at: getDate(2),
         },
         {
           id: 2,
           name: 'Sarah Johnson',
           email: 'sarah.j@example.com',
           phone: '+1 345-678-9012',
-          country: 'Canada',
-          city: 'Toronto',
-          total_bookings: 2,
-          total_spent: 1960,
-          total_payments: 3,
-          total_payment_amount: 1960,
-          status: 'active',
-          registered_at: getDate(90),
-          last_booking_date: getDate(3),
+          trip_title: 'Annapurna Circuit Trek',
+          trip_id: 2,
+          message: 'Looking for information about the Annapurna Circuit Trek. What is the best time to visit?',
+          number_of_travelers: 1,
+          preferred_travel_date: '2026-05-20',
+          status: 'responded',
+          created_at: getDate(5),
+          responded_at: getDate(4),
+          response_notes: 'Sent detailed information about the trek and best seasons.',
         },
         {
           id: 3,
           name: 'Michael Chen',
           email: 'm.chen@example.com',
           phone: '+86 138-0013-8000',
-          country: 'China',
-          city: 'Beijing',
-          total_bookings: 1,
-          total_spent: 3000,
-          total_payments: 2,
-          total_payment_amount: 3000,
-          status: 'active',
-          registered_at: getDate(60),
-          last_booking_date: getDate(10),
+          trip_title: 'Kathmandu City Tour',
+          trip_id: 9,
+          message: 'I would like to book a single day city tour. What are the available dates?',
+          number_of_travelers: 4,
+          preferred_travel_date: '2026-03-10',
+          status: 'converted',
+          created_at: getDate(10),
+          responded_at: getDate(9),
+          response_notes: 'Customer booked the tour.',
         },
         {
           id: 4,
           name: 'Emma Williams',
           email: 'emma.w@example.com',
           phone: '+44 20-7946-0958',
-          country: 'United Kingdom',
-          city: 'London',
-          total_bookings: 2,
-          total_spent: 3300,
-          total_payments: 4,
-          total_payment_amount: 3300,
-          status: 'active',
-          registered_at: getDate(45),
-          last_booking_date: getDate(15),
+          trip_title: 'Langtang Valley Trek',
+          trip_id: 3,
+          message: 'Interested in Langtang Valley Trek for a group of 6 people. Need custom itinerary.',
+          number_of_travelers: 6,
+          preferred_travel_date: '2026-06-01',
+          status: 'new',
+          created_at: getDate(1),
         },
         {
           id: 5,
           name: 'David Brown',
           email: 'd.brown@example.com',
           phone: '+61 2-9374-4000',
-          country: 'Australia',
-          city: 'Sydney',
-          total_bookings: 1,
-          total_spent: 920,
-          total_payments: 1,
-          total_payment_amount: 920,
-          status: 'active',
-          registered_at: getDate(30),
-          last_booking_date: getDate(2),
+          message: 'General inquiry about Nepal travel packages. Looking for recommendations.',
+          number_of_travelers: 2,
+          preferred_travel_date: '2026-07-15',
+          status: 'responded',
+          created_at: getDate(8),
+          responded_at: getDate(7),
+          response_notes: 'Recommended several packages based on preferences.',
         },
         {
           id: 6,
           name: 'Lisa Anderson',
           email: 'lisa.a@example.com',
           phone: '+1 456-789-0123',
-          country: 'United States',
-          city: 'Los Angeles',
-          total_bookings: 1,
-          total_spent: 4050,
-          total_payments: 2,
-          total_payment_amount: 4050,
-          status: 'inactive',
-          registered_at: getDate(180),
-          last_booking_date: getDate(150),
+          trip_title: 'Chitwan National Park Safari',
+          trip_id: 4,
+          message: 'Want to know about the Chitwan Safari package. What animals can we see?',
+          number_of_travelers: 3,
+          preferred_travel_date: '2026-04-20',
+          status: 'closed',
+          created_at: getDate(15),
+          responded_at: getDate(14),
+          response_notes: 'Customer decided to book with another company.',
         },
         {
           id: 7,
           name: 'Robert Taylor',
           email: 'r.taylor@example.com',
           phone: '+1 567-890-1234',
-          country: 'United States',
-          city: 'Chicago',
-          total_bookings: 1,
-          total_spent: 2500,
-          total_payments: 1,
-          total_payment_amount: 2500,
-          status: 'active',
-          registered_at: getDate(20),
-          last_booking_date: getDate(12),
+          trip_title: 'Manaslu Circuit Trek',
+          trip_id: 5,
+          message: 'Interested in Manaslu Circuit Trek. Need permit information and pricing.',
+          number_of_travelers: 2,
+          preferred_travel_date: '2026-05-10',
+          status: 'new',
+          created_at: getDate(0),
         },
         {
           id: 8,
           name: 'Maria Garcia',
           email: 'maria.g@example.com',
           phone: '+34 91-123-4567',
-          country: 'Spain',
-          city: 'Madrid',
-          total_bookings: 1,
-          total_spent: 850,
-          total_payments: 1,
-          total_payment_amount: 850,
-          status: 'active',
-          registered_at: getDate(15),
-          last_booking_date: getDate(20),
+          trip_title: 'Upper Mustang Trek',
+          trip_id: 6,
+          message: 'Looking for Upper Mustang Trek details. What is included in the package?',
+          number_of_travelers: 1,
+          preferred_travel_date: '2026-08-01',
+          status: 'responded',
+          created_at: getDate(3),
+          responded_at: getDate(2),
+          response_notes: 'Sent complete package details and inclusions.',
         },
       ];
 
       // Apply filters
-      let filtered = allCustomers;
+      let filtered = allEnquiries;
       if (searchTerm) {
-        filtered = filtered.filter(customer =>
-          customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          customer.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          customer.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          customer.city.toLowerCase().includes(searchTerm.toLowerCase())
+        filtered = filtered.filter(enquiry =>
+          enquiry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          enquiry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          enquiry.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          enquiry.trip_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          enquiry.message.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
       if (statusFilter !== 'all') {
-        filtered = filtered.filter(customer => customer.status === statusFilter);
+        filtered = filtered.filter(enquiry => enquiry.status === statusFilter);
       }
 
       // Apply sorting
@@ -226,33 +221,21 @@ const Customers: React.FC = () => {
             aValue = a.email.toLowerCase();
             bValue = b.email.toLowerCase();
             break;
-          case 'country':
-            aValue = a.country.toLowerCase();
-            bValue = b.country.toLowerCase();
-            break;
-          case 'total_bookings':
-            aValue = a.total_bookings;
-            bValue = b.total_bookings;
-            break;
-          case 'total_spent':
-            aValue = a.total_spent;
-            bValue = b.total_spent;
-            break;
-          case 'total_payments':
-            aValue = a.total_payment_amount;
-            bValue = b.total_payment_amount;
+          case 'trip_title':
+            aValue = a.trip_title?.toLowerCase() || '';
+            bValue = b.trip_title?.toLowerCase() || '';
             break;
           case 'status':
             aValue = a.status;
             bValue = b.status;
             break;
-          case 'registered_at':
-            aValue = new Date(a.registered_at).getTime();
-            bValue = new Date(b.registered_at).getTime();
+          case 'created_at':
+            aValue = new Date(a.created_at).getTime();
+            bValue = new Date(b.created_at).getTime();
             break;
           default:
-            aValue = new Date(a.registered_at).getTime();
-            bValue = new Date(b.registered_at).getTime();
+            aValue = new Date(a.created_at).getTime();
+            bValue = new Date(b.created_at).getTime();
         }
 
         if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
@@ -278,15 +261,15 @@ const Customers: React.FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (_id: number) => {
-      // return await apiClient.delete(`/yatra/v1/customers/${_id}`);
+      // return await apiClient.delete(`/yatra/v1/enquiries/${_id}`);
       return { success: true };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['enquiries'] });
     },
   });
 
-  const customers = data?.data || [];
+  const enquiries = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
 
@@ -298,22 +281,23 @@ const Customers: React.FC = () => {
     });
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
-  };
-
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
-      'active': {
-        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Active', 'Active'),
+      'new': {
+        className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
+        label: __('New', 'New'),
       },
-      'inactive': {
+      'responded': {
+        className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
+        label: __('Responded', 'Responded'),
+      },
+      'converted': {
+        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
+        label: __('Converted', 'Converted'),
+      },
+      'closed': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Inactive', 'Inactive'),
+        label: __('Closed', 'Closed'),
       },
     };
 
@@ -323,36 +307,24 @@ const Customers: React.FC = () => {
     };
 
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`}>
+      <Badge className={`text-xs ${statusInfo.className}`}>
         {statusInfo.label}
-      </span>
+      </Badge>
     );
   };
 
-  const handleEdit = (customer: Customer) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customer.id}`;
+  const handleView = (enquiry: Enquiry) => {
+    navigate({ subpage: 'enquiries', action: 'view', id: enquiry.id });
   };
 
-  const handleDelete = (customer: Customer) => {
-    if (confirm(__('Are you sure you want to delete this customer?', 'Are you sure you want to delete this customer?'))) {
-      deleteMutation.mutate(customer.id);
+  const handleEdit = (enquiry: Enquiry) => {
+    navigate({ subpage: 'enquiries', action: 'edit', id: enquiry.id });
+  };
+
+  const handleDelete = (enquiry: Enquiry) => {
+    if (confirm(__('Are you sure you want to delete this enquiry?', 'Are you sure you want to delete this enquiry?'))) {
+      deleteMutation.mutate(enquiry.id);
     }
-  };
-
-  const handleView = (customer: Customer) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers&action=view&id=${customer.id}`;
-  };
-
-  const handleCreateCustomer = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers&action=create`;
-  };
-
-  const handleResetFilters = () => {
-    setSearchTerm('');
-    setStatusFilter('all');
-    setSortBy('registered_at');
-    setSortOrder('desc');
-    setPage(1);
   };
 
   const handleSort = (field: string) => {
@@ -373,20 +345,21 @@ const Customers: React.FC = () => {
       : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
   };
 
-  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'registered_at' || sortOrder !== 'desc';
+  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'created_at' || sortOrder !== 'desc';
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('all');
+    setSortBy('created_at');
+    setSortOrder('desc');
+    setPage(1);
+  };
 
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Customers', 'Customers')}
-        description={__('Manage your customer database', 'Manage your customer database')}
-        actionCapability="yatra_edit_bookings"
-        actions={
-          <Button onClick={handleCreateCustomer} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            {__('Add New Customer', 'Add New Customer')}
-          </Button>
-        }
+        title={__('Enquiries', 'Enquiries')}
+        description={__('Manage customer enquiries and inquiries', 'Manage customer enquiries and inquiries')}
       />
 
       {/* Filters, Search, and Sorting - Always Visible */}
@@ -398,7 +371,7 @@ const Customers: React.FC = () => {
               <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder={__('Search customers...', 'Search customers...')}
+                placeholder={__('Search enquiries...', 'Search enquiries...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 h-9"
@@ -412,8 +385,10 @@ const Customers: React.FC = () => {
               className="w-full md:w-40 h-9"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="active">{__('Active', 'Active')}</option>
-              <option value="inactive">{__('Inactive', 'Inactive')}</option>
+              <option value="new">{__('New', 'New')}</option>
+              <option value="responded">{__('Responded', 'Responded')}</option>
+              <option value="converted">{__('Converted', 'Converted')}</option>
+              <option value="closed">{__('Closed', 'Closed')}</option>
             </Select>
 
             {/* Sort By */}
@@ -422,13 +397,10 @@ const Customers: React.FC = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full md:w-40 h-9"
             >
-              <option value="registered_at">{__('Registration Date', 'Registration Date')}</option>
+              <option value="created_at">{__('Date', 'Date')}</option>
               <option value="name">{__('Name', 'Name')}</option>
               <option value="email">{__('Email', 'Email')}</option>
-              <option value="country">{__('Country', 'Country')}</option>
-              <option value="total_bookings">{__('Bookings', 'Bookings')}</option>
-              <option value="total_spent">{__('Total Spent', 'Total Spent')}</option>
-              <option value="total_payments">{__('Payments', 'Payments')}</option>
+              <option value="trip_title">{__('Trip', 'Trip')}</option>
               <option value="status">{__('Status', 'Status')}</option>
             </Select>
 
@@ -467,7 +439,7 @@ const Customers: React.FC = () => {
         {error ? (
           <Card>
             <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading customers', 'Error loading customers')}
+              {__('Error loading enquiries', 'Error loading enquiries')}
             </CardContent>
           </Card>
         ) : (
@@ -476,17 +448,17 @@ const Customers: React.FC = () => {
               <CardContent className="p-0">
                 {isLoading ? (
                   <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('Loading customers...', 'Loading customers...')}
+                    {__('Loading enquiries...', 'Loading enquiries...')}
                   </div>
-                ) : customers.length === 0 ? (
+                ) : enquiries.length === 0 ? (
                   <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('No customers found', 'No customers found')}
+                    {__('No enquiries found', 'No enquiries found')}
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[250px]">
+                        <TableHead className="w-[200px]">
                           <button
                             onClick={() => handleSort('name')}
                             className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -497,43 +469,21 @@ const Customers: React.FC = () => {
                         </TableHead>
                         <TableHead>
                           <button
-                            onClick={() => handleSort('country')}
+                            onClick={() => handleSort('trip_title')}
                             className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
                           >
-                            {__('Location', 'Location')}
-                            {getSortIcon('country')}
+                            {__('Trip', 'Trip')}
+                            {getSortIcon('trip_title')}
                           </button>
                         </TableHead>
-                        {isPro && (
-                          <TableHead>
-                            <button
-                              onClick={() => handleSort('total_bookings')}
-                              className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                              {__('Bookings', 'Bookings')}
-                              {getSortIcon('total_bookings')}
-                            </button>
-                          </TableHead>
-                        )}
-                        {isPro && (
-                          <TableHead>
-                            <button
-                              onClick={() => handleSort('total_spent')}
-                              className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                              {__('Total Spent', 'Total Spent')}
-                              {getSortIcon('total_spent')}
-                            </button>
-                          </TableHead>
-                        )}
+                        <TableHead className="w-[300px]">
+                          {__('Message', 'Message')}
+                        </TableHead>
                         <TableHead>
-                          <button
-                            onClick={() => handleSort('total_payments')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Payments', 'Payments')}
-                            {getSortIcon('total_payments')}
-                          </button>
+                          {__('Travelers', 'Travelers')}
+                        </TableHead>
+                        <TableHead>
+                          {__('Preferred Date', 'Preferred Date')}
                         </TableHead>
                         <TableHead>
                           <button
@@ -546,62 +496,69 @@ const Customers: React.FC = () => {
                         </TableHead>
                         <TableHead>
                           <button
-                            onClick={() => handleSort('registered_at')}
+                            onClick={() => handleSort('created_at')}
                             className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
                           >
-                            {__('Registered', 'Registered')}
-                            {getSortIcon('registered_at')}
+                            {__('Date', 'Date')}
+                            {getSortIcon('created_at')}
                           </button>
                         </TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+                        <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {customers.map((customer) => (
-                        <TableRow key={customer.id}>
+                      {enquiries.map((enquiry) => (
+                        <TableRow key={enquiry.id}>
                           <TableCell>
                             <div>
-                              <div className="font-medium text-gray-900 dark:text-white">
-                                {customer.name}
+                              <div className="font-medium text-gray-900 dark:text-white text-sm">
+                                {enquiry.name}
                               </div>
                               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5">
                                 <div className="flex items-center gap-1">
                                   <Mail className="w-3 h-3" />
-                                  {customer.email}
+                                  {enquiry.email}
                                 </div>
-                                {customer.phone && (
+                                {enquiry.phone && (
                                   <div className="flex items-center gap-1">
                                     <Phone className="w-3 h-3" />
-                                    {customer.phone}
+                                    {enquiry.phone}
                                   </div>
                                 )}
                               </div>
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                              <MapPin className="w-3.5 h-3.5" />
-                              <span>{customer.city}, {customer.country}</span>
-                            </div>
-                          </TableCell>
-                          {isPro && (
-                            <TableCell className="text-gray-600 dark:text-gray-400">
-                              {customer.total_bookings}
-                            </TableCell>
-                          )}
-                          {isPro && (
-                            <TableCell className="font-medium">
-                              {formatPrice(customer.total_spent)}
-                            </TableCell>
-                          )}
-                          <TableCell className="font-medium">
-                            {formatPrice(customer.total_payment_amount)}
+                            {enquiry.trip_title ? (
+                              <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                                <MapPin className="w-3.5 h-3.5" />
+                                <span>{enquiry.trip_title}</span>
+                              </div>
+                            ) : (
+                              <span className="text-sm text-gray-400 dark:text-gray-500 italic">
+                                {__('General Inquiry', 'General Inquiry')}
+                              </span>
+                            )}
                           </TableCell>
                           <TableCell>
-                            {getStatusBadge(customer.status)}
+                            <div className="flex items-start gap-2">
+                              <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                {enquiry.message}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
+                            {enquiry.number_of_travelers || '-'}
                           </TableCell>
                           <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            {formatDate(customer.registered_at)}
+                            {enquiry.preferred_travel_date ? formatDate(enquiry.preferred_travel_date) : '-'}
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(enquiry.status)}
+                          </TableCell>
+                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
+                            {formatDate(enquiry.created_at)}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">
@@ -609,9 +566,9 @@ const Customers: React.FC = () => {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleView(customer)}
+                                  onClick={() => handleView(enquiry)}
                                   className="h-8 w-8"
-                                  aria-label={__('View customer', 'View customer')}
+                                  aria-label={__('View enquiry', 'View enquiry')}
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Button>
@@ -621,9 +578,9 @@ const Customers: React.FC = () => {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleEdit(customer)}
+                                  onClick={() => handleEdit(enquiry)}
                                   className="h-8 w-8"
-                                  aria-label={__('Edit customer', 'Edit customer')}
+                                  aria-label={__('Edit enquiry', 'Edit enquiry')}
                                 >
                                   <Edit className="w-4 h-4" />
                                 </Button>
@@ -633,9 +590,9 @@ const Customers: React.FC = () => {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleDelete(customer)}
+                                  onClick={() => handleDelete(enquiry)}
                                   className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                  aria-label={__('Delete customer', 'Delete customer')}
+                                  aria-label={__('Delete enquiry', 'Delete enquiry')}
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </Button>
@@ -656,7 +613,7 @@ const Customers: React.FC = () => {
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('customers', 'customers')}
+                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('enquiries', 'enquiries')}
                     </div>
                     <div className="flex gap-2">
                       <Button
@@ -689,5 +646,5 @@ const Customers: React.FC = () => {
   );
 };
 
-export default Customers;
+export default Enquiries;
 

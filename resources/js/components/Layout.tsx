@@ -20,7 +20,10 @@ import {
   Tag,
   Route,
   BadgePercent,
-  CreditCard
+  CreditCard,
+  UserCircle,
+  CalendarDays,
+  MessageSquare
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -46,25 +49,81 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   }, [darkMode]);
   
+  // Track URL changes to update menu state
+  const [urlKey, setUrlKey] = useState(0);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setUrlKey(prev => prev + 1);
+    };
+
+    // Listen for popstate (back/forward button)
+    window.addEventListener('popstate', handleLocationChange);
+    
+    // Also check periodically (fallback for direct navigation)
+    const interval = setInterval(() => {
+      const currentSearch = window.location.search;
+      if (currentSearch !== (window as any).__lastSearch) {
+        (window as any).__lastSearch = currentSearch;
+        handleLocationChange();
+      }
+    }, 100);
+
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      clearInterval(interval);
+    };
+  }, []);
+  
   // Get current subpage and tab from URL
   const currentSubpage = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('subpage') || 'dashboard';
-  }, []);
+  }, [urlKey]);
 
   const currentTab = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('tab') || 'all';
-  }, []);
+  }, [urlKey]);
 
-  // Track expanded submenus
+  // Track expanded submenus - initialize based on current subpage
   const [expandedMenus, setExpandedMenus] = useState<string[]>(() => {
-    // Auto-expand trips or itinerary menu if we're on those pages
-    if (currentSubpage === 'trips' || currentSubpage === 'itinerary') {
-      return [currentSubpage];
+    const params = new URLSearchParams(window.location.search);
+    const subpage = params.get('subpage') || 'dashboard';
+    const menus: string[] = [];
+    
+    if (subpage === 'trips') {
+      menus.push('trips');
     }
-    return [];
+    
+    if (subpage === 'itinerary') {
+      menus.push('itinerary');
+    }
+    
+    return menus;
   });
+
+  // Auto-expand menu when on submenu pages
+  useEffect(() => {
+    const menusToExpand: string[] = [];
+    
+    if (currentSubpage === 'trips') {
+      menusToExpand.push('trips');
+    }
+    
+    if (currentSubpage === 'itinerary') {
+      menusToExpand.push('itinerary');
+    }
+    
+    setExpandedMenus(prev => {
+      // Only update if the menus to expand are different
+      const newMenus = [...new Set([...prev, ...menusToExpand])];
+      if (newMenus.length !== prev.length || !newMenus.every(m => prev.includes(m))) {
+        return newMenus;
+      }
+      return prev;
+    });
+  }, [currentSubpage, urlKey]);
 
   // Get base admin URL
   const baseUrl = useMemo(() => {
@@ -83,8 +142,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'all', label: 'All Trips', icon: List },
         { tab: 'activities', label: 'Activities', icon: Activity },
         { tab: 'destinations', label: 'Destinations', icon: Map },
+        { tab: 'availability', label: 'Availability', icon: CalendarDays },
       ]
     },
+    { subpage: 'traveler-categories', label: 'Traveler Categories', icon: UserCircle },
     { 
       subpage: 'itinerary', 
       label: 'Itinerary', 
@@ -99,6 +160,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { subpage: 'payments', label: 'Payments', icon: CreditCard },
     { subpage: 'bookings', label: 'Bookings', icon: Calendar },
     { subpage: 'customers', label: 'Customers', icon: Users },
+    { subpage: 'enquiries', label: 'Enquiries', icon: MessageSquare },
     { subpage: 'reviews', label: 'Reviews', icon: Star },
     { subpage: 'reports', label: 'Reports', icon: BarChart3 },
     { subpage: 'settings', label: 'Settings', icon: Settings },
