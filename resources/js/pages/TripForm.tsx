@@ -6,7 +6,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
-  ArrowLeft, 
   Save, 
   Loader2, 
   Info, 
@@ -580,22 +579,16 @@ const TripForm: React.FC = () => {
     // Step 4: Activity & Category
     { id: 'activity', label: __('Activity & Category', 'Activity & Category'), icon: Activity, required: false, completed: !!(formData.trip_category || formData.activity_types.length > 0) },
     
-    // Step 5: Accommodation
-    { id: 'accommodation', label: __('Accommodation', 'Accommodation'), icon: Bed, required: false, completed: !!(formData.accommodation_type) },
-    
-    // Step 6: Transportation
-    { id: 'transportation', label: __('Transportation', 'Transportation'), icon: Car, required: false, completed: formData.transportation_included || !!(formData.pickup_location || formData.transportation_details) },
-    
-    // Step 7: Pricing
+    // Step 5: Pricing
     { id: 'pricing', label: __('Pricing & Payment', 'Pricing & Payment'), icon: DollarSign, required: true, completed: formData.pricing_type === 'regular' ? !!(formData.original_price && parseFloat(formData.original_price) > 0) : formData.price_types.some(pt => pt.original_price && parseFloat(pt.original_price) > 0) },
     
-    // Step 8: Itinerary
+    // Step 6: Itinerary (Accommodation & Transportation managed here per day)
     { id: 'itinerary', label: __('Itinerary Builder', 'Itinerary Builder'), icon: Calendar, required: true, completed: false },
     
-    // Step 9: Included/Excluded
+    // Step 7: Included/Excluded
     { id: 'included', label: __('What\'s Included', 'What\'s Included'), icon: CheckSquare, required: true, completed: formData.included_items.length > 0 },
     
-    // Step 10: Booking Requirements
+    // Step 8: Booking Requirements
     { id: 'booking', label: __('Booking Settings', 'Booking Settings'), icon: Mail, required: true, completed: !!(formData.min_travelers && formData.max_travelers) },
   ];
 
@@ -604,7 +597,6 @@ const TripForm: React.FC = () => {
     { id: 'faqs', label: __('FAQs', 'FAQs'), icon: HelpCircle, required: false, completed: formData.faqs.length > 0 },
     { id: 'frontend-tabs', label: __('Frontend Tabs', 'Frontend Tabs'), icon: Settings, required: false, completed: formData.frontend_tabs.some(tab => tab.enabled) },
     { id: 'seo', label: __('SEO Settings', 'SEO Settings'), icon: Search, required: false, completed: !!(formData.meta_title && formData.meta_description) },
-    { id: 'advanced', label: __('Status & Lifecycle', 'Status & Lifecycle'), icon: Settings, required: false, completed: formData.status !== 'draft' },
   ];
 
   // Calculate completion percentage
@@ -884,80 +876,6 @@ const TripForm: React.FC = () => {
     autoSave();
   };
 
-  // Availability Handlers
-  const handleAvailabilityAdd = () => {
-    const newId = `avail_${Date.now()}`;
-    setFormData(prev => ({
-      ...prev,
-      availability_dates: [
-        ...prev.availability_dates,
-        {
-          id: newId,
-          departure_date: '',
-          arrival_date: '',
-          seats_remaining: '',
-          original_price: '',
-          discounted_price: '',
-          discount_percentage: '',
-          status: 'available',
-          from_location: prev.starting_location || '',
-          to_location: prev.ending_location || '',
-        },
-      ],
-    }));
-    autoSave();
-  };
-
-  const handleAvailabilityRemove = (id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      availability_dates: prev.availability_dates.filter(avail => avail.id !== id),
-    }));
-    autoSave();
-  };
-
-  const handleAvailabilityChange = (id: string, field: keyof AvailabilityDate, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      availability_dates: prev.availability_dates.map(avail =>
-        avail.id === id ? { ...avail, [field]: value } : avail
-      ),
-    }));
-    autoSave();
-  };
-
-  const calculateDiscountPercentage = (original: string, discounted: string): string => {
-    if (!original || !discounted) return '';
-    const orig = parseFloat(original);
-    const disc = parseFloat(discounted);
-    if (isNaN(orig) || isNaN(disc) || orig <= 0 || disc >= orig) return '';
-    return Math.round(((orig - disc) / orig) * 100).toString();
-  };
-
-  const handleAvailabilityPriceChange = (id: string, field: 'original_price' | 'discounted_price', value: string) => {
-    const avail = formData.availability_dates.find(a => a.id === id);
-    if (!avail) return;
-
-    const updatedAvail = { ...avail, [field]: value };
-    
-    // Auto-calculate discount percentage if both prices are set
-    if (field === 'discounted_price' && updatedAvail.original_price && value) {
-      const discount = calculateDiscountPercentage(updatedAvail.original_price, value);
-      updatedAvail.discount_percentage = discount;
-    } else if (field === 'original_price' && updatedAvail.discounted_price && value) {
-      const discount = calculateDiscountPercentage(value, updatedAvail.discounted_price);
-      updatedAvail.discount_percentage = discount;
-    }
-
-    setFormData(prev => ({
-      ...prev,
-      availability_dates: prev.availability_dates.map(a =>
-        a.id === id ? updatedAvail : a
-      ),
-    }));
-    autoSave();
-  };
-
   // Auto-save functionality
   const autoSave = () => {
     if (isEditMode) {
@@ -1192,10 +1110,6 @@ const TripForm: React.FC = () => {
     // Open preview in new window
     const previewUrl = `${window.yatraAdmin?.siteUrl || ''}/trips/${formData.slug || 'preview'}`;
     window.open(previewUrl, '_blank');
-  };
-
-  const handleCancel = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=all`;
   };
 
   const formatTime = (date: Date) => {
@@ -1808,93 +1722,6 @@ const TripForm: React.FC = () => {
                   placeholder={__('e.g., Bali, Indonesia', 'e.g., Bali, Indonesia')}
                 />
               </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                    formData.trip_type === 'single_day'
-                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
-                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="trip_type"
-                      value="single_day"
-                      checked={formData.trip_type === 'single_day'}
-                      onChange={(e) => {
-                        handleFieldChange('trip_type', e.target.value);
-                        if (e.target.value === 'single_day') {
-                          setFormData(prev => ({
-                            ...prev,
-                            duration_days: '1',
-                            duration_nights: '0',
-                          }));
-                        }
-                      }}
-                      className="sr-only"
-                    />
-                    <div className="flex flex-1">
-                      <div className="flex flex-col">
-                        <span className={`block text-sm font-medium ${
-                          formData.trip_type === 'single_day'
-                            ? 'text-blue-900 dark:text-blue-300'
-                            : 'text-gray-900 dark:text-white'
-                        }`}>
-                          {__('Single Day Trip', 'Single Day Trip')}
-                        </span>
-                        <span className={`mt-1 flex items-center text-sm ${
-                          formData.trip_type === 'single_day'
-                            ? 'text-blue-700 dark:text-blue-400'
-                            : 'text-gray-500 dark:text-gray-400'
-                        }`}>
-                          {__('Trip completed within one day (no overnight stay)', 'Trip completed within one day (no overnight stay)')}
-                        </span>
-                      </div>
-                    </div>
-                    {formData.trip_type === 'single_day' && (
-                      <div className="absolute top-4 right-4">
-                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
-                      </div>
-                    )}
-                  </label>
-
-                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                    formData.trip_type === 'multi_day'
-                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
-                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="trip_type"
-                      value="multi_day"
-                      checked={formData.trip_type === 'multi_day'}
-                      onChange={(e) => handleFieldChange('trip_type', e.target.value)}
-                      className="sr-only"
-                    />
-                    <div className="flex flex-1">
-                      <div className="flex flex-col">
-                        <span className={`block text-sm font-medium ${
-                          formData.trip_type === 'multi_day'
-                            ? 'text-blue-900 dark:text-blue-300'
-                            : 'text-gray-900 dark:text-white'
-                        }`}>
-                          {__('Multi-Day Trip', 'Multi-Day Trip')}
-                        </span>
-                        <span className={`mt-1 flex items-center text-sm ${
-                          formData.trip_type === 'multi_day'
-                            ? 'text-blue-700 dark:text-blue-400'
-                            : 'text-gray-500 dark:text-gray-400'
-                        }`}>
-                          {__('Trip spans multiple days with overnight stays', 'Trip spans multiple days with overnight stays')}
-                        </span>
-                      </div>
-                    </div>
-                    {formData.trip_type === 'multi_day' && (
-                      <div className="absolute top-4 right-4">
-                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
-                      </div>
-                    )}
-                  </label>
-                </div>
-              </div>
 
               {/* Starting & Ending Locations */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2014,8 +1841,116 @@ const TripForm: React.FC = () => {
                   {__('Add Landmark', 'Add Landmark')}
                 </Button>
               </div>
+            </div>
+          </div>
+        );
 
-              {/* Duration */}
+      case 'duration':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Duration & Schedule', 'Duration & Schedule')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Define trip duration, type, and availability schedule', 'Define trip duration, type, and availability schedule')}
+            </p>
+
+            <div className="space-y-4">
+              {/* Trip Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  {__('Trip Type', 'Trip Type')} <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                    formData.trip_type === 'single_day'
+                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="trip_type"
+                      value="single_day"
+                      checked={formData.trip_type === 'single_day'}
+                      onChange={(e) => {
+                        handleFieldChange('trip_type', e.target.value);
+                        if (e.target.value === 'single_day') {
+                          setFormData(prev => ({
+                            ...prev,
+                            duration_days: '1',
+                            duration_nights: '0',
+                          }));
+                        }
+                      }}
+                      className="sr-only"
+                    />
+                    <div className="flex flex-1">
+                      <div className="flex flex-col">
+                        <span className={`block text-sm font-medium ${
+                          formData.trip_type === 'single_day'
+                            ? 'text-blue-900 dark:text-blue-300'
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
+                          {__('Single Day Trip', 'Single Day Trip')}
+                        </span>
+                        <span className={`mt-1 flex items-center text-sm ${
+                          formData.trip_type === 'single_day'
+                            ? 'text-blue-700 dark:text-blue-400'
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {__('Trip completed within one day (no overnight stay)', 'Trip completed within one day (no overnight stay)')}
+                        </span>
+                      </div>
+                    </div>
+                    {formData.trip_type === 'single_day' && (
+                      <div className="absolute top-4 right-4">
+                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                      </div>
+                    )}
+                  </label>
+
+                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                    formData.trip_type === 'multi_day'
+                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="trip_type"
+                      value="multi_day"
+                      checked={formData.trip_type === 'multi_day'}
+                      onChange={(e) => handleFieldChange('trip_type', e.target.value)}
+                      className="sr-only"
+                    />
+                    <div className="flex flex-1">
+                      <div className="flex flex-col">
+                        <span className={`block text-sm font-medium ${
+                          formData.trip_type === 'multi_day'
+                            ? 'text-blue-900 dark:text-blue-300'
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
+                          {__('Multi-Day Trip', 'Multi-Day Trip')}
+                        </span>
+                        <span className={`mt-1 flex items-center text-sm ${
+                          formData.trip_type === 'multi_day'
+                            ? 'text-blue-700 dark:text-blue-400'
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {__('Trip spans multiple days with overnight stays', 'Trip spans multiple days with overnight stays')}
+                        </span>
+                      </div>
+                    </div>
+                    {formData.trip_type === 'multi_day' && (
+                      <div className="absolute top-4 right-4">
+                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              {/* Duration Days & Nights */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="duration_days" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -2096,6 +2031,10 @@ const TripForm: React.FC = () => {
                     value={formData.available_from}
                     onChange={(e) => handleFieldChange('available_from', e.target.value)}
                   />
+                  <HelpText
+                    text={__('Earliest date this trip becomes available for booking', 'Earliest date this trip becomes available for booking')}
+                    className="mt-2"
+                  />
                 </div>
                 <div>
                   <label htmlFor="available_to" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -2106,6 +2045,10 @@ const TripForm: React.FC = () => {
                     type="date"
                     value={formData.available_to}
                     onChange={(e) => handleFieldChange('available_to', e.target.value)}
+                  />
+                  <HelpText
+                    text={__('Latest date this trip is available for booking', 'Latest date this trip is available for booking')}
+                    className="mt-2"
                   />
                 </div>
               </div>
@@ -2123,10 +2066,380 @@ const TripForm: React.FC = () => {
                   onChange={(e) => handleFieldChange('booking_window_days', e.target.value)}
                   placeholder={__('e.g., 30', 'e.g., 30')}
                 />
-                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                  {__('Minimum days in advance customers can book', 'Minimum days in advance customers can book')}
-                </p>
+                <HelpText
+                  text={__('Minimum days in advance customers can book this trip', 'Minimum days in advance customers can book this trip')}
+                  className="mt-2"
+                />
               </div>
+
+              {/* Seasonal Availability */}
+              <div>
+                <label htmlFor="seasonal_availability" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Seasonal Availability Notes', 'Seasonal Availability Notes')}
+                </label>
+                <Input
+                  id="seasonal_availability"
+                  type="text"
+                  value={formData.seasonal_availability}
+                  onChange={(e) => handleFieldChange('seasonal_availability', e.target.value)}
+                  placeholder={__('e.g., Available year-round except monsoon season', 'e.g., Available year-round except monsoon season')}
+                />
+                <HelpText
+                  text={__('General notes about when this trip is typically available', 'General notes about when this trip is typically available')}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'activity':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Activity className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Activity & Category', 'Activity & Category')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Classify your trip by activity types, difficulty level, and categories', 'Classify your trip by activity types, difficulty level, and categories')}
+            </p>
+
+            <div className="space-y-4">
+              {/* Trip Category */}
+              <div>
+                <label htmlFor="trip_category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Trip Category', 'Trip Category')}
+                </label>
+                <Select
+                  id="trip_category"
+                  value={formData.trip_category}
+                  onChange={(e) => handleFieldChange('trip_category', e.target.value)}
+                >
+                  <option value="">{__('Select a category', 'Select a category')}</option>
+                  <option value="adventure">Adventure</option>
+                  <option value="beach">Beach</option>
+                  <option value="cultural">Cultural</option>
+                  <option value="nature">Nature</option>
+                  <option value="wildlife">Wildlife</option>
+                  <option value="wellness">Wellness</option>
+                  <option value="family">Family</option>
+                  <option value="luxury">Luxury</option>
+                </Select>
+              </div>
+
+              {/* Category Hierarchy */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="trip_category_parent" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__('Parent Category', 'Parent Category')}
+                  </label>
+                  <Select
+                    id="trip_category_parent"
+                    value={formData.trip_category_parent}
+                    onChange={(e) => handleFieldChange('trip_category_parent', e.target.value)}
+                  >
+                    <option value="">{__('None', 'None')}</option>
+                    <option value="adventure">Adventure</option>
+                    <option value="beach">Beach</option>
+                    <option value="cultural">Cultural</option>
+                    <option value="nature">Nature</option>
+                  </Select>
+                  <HelpText
+                    text={__('Main category for hierarchical organization', 'Main category for hierarchical organization')}
+                    className="mt-2"
+                  />
+                </div>
+                {formData.trip_category_parent && (
+                  <div>
+                    <label htmlFor="trip_category_sub" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Sub-Category', 'Sub-Category')}
+                    </label>
+                    <Select
+                      id="trip_category_sub"
+                      value={formData.trip_category_sub}
+                      onChange={(e) => handleFieldChange('trip_category_sub', e.target.value)}
+                    >
+                      <option value="">{__('Select sub-category', 'Select sub-category')}</option>
+                      {formData.trip_category_parent === 'adventure' && (
+                        <>
+                          <option value="hiking">Hiking</option>
+                          <option value="trekking">Trekking</option>
+                          <option value="climbing">Climbing</option>
+                          <option value="water-sports">Water Sports</option>
+                        </>
+                      )}
+                      {formData.trip_category_parent === 'beach' && (
+                        <>
+                          <option value="relaxation">Relaxation</option>
+                          <option value="snorkeling">Snorkeling</option>
+                          <option value="diving">Diving</option>
+                        </>
+                      )}
+                    </Select>
+                  </div>
+                )}
+              </div>
+
+              {/* Difficulty Level */}
+              <div>
+                <label htmlFor="difficulty_level" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Difficulty Level', 'Difficulty Level')}
+                </label>
+                <Select
+                  id="difficulty_level"
+                  value={formData.difficulty_level}
+                  onChange={(e) => handleFieldChange('difficulty_level', e.target.value)}
+                >
+                  <option value="">{__('Select difficulty', 'Select difficulty')}</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                  <option value="expert">Expert</option>
+                </Select>
+                <HelpText
+                  text={__('Physical difficulty level required for this trip', 'Physical difficulty level required for this trip')}
+                  className="mt-2"
+                />
+              </div>
+
+              {/* Activity Types */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Activity Types', 'Activity Types')}
+                </label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {['Hiking', 'Swimming', 'Sightseeing', 'Photography', 'Wildlife Viewing', 'Cultural Tours', 'Adventure Sports', 'Relaxation'].map((activity) => (
+                    <label key={activity} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.activity_types.includes(activity.toLowerCase())}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              activity_types: [...prev.activity_types, activity.toLowerCase()],
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              activity_types: prev.activity_types.filter(a => a !== activity.toLowerCase()),
+                            }));
+                          }
+                          autoSave();
+                        }}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{activity}</span>
+                    </label>
+                  ))}
+                </div>
+                <HelpText
+                  text={__('Select all activities included in this trip', 'Select all activities included in this trip')}
+                  className="mt-2"
+                />
+              </div>
+
+              {/* Featured Priority */}
+              <div>
+                <label htmlFor="featured_priority" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Featured Priority', 'Featured Priority')}
+                </label>
+                <Select
+                  id="featured_priority"
+                  value={formData.featured_priority}
+                  onChange={(e) => handleFieldChange('featured_priority', e.target.value as TripFormData['featured_priority'])}
+                >
+                  <option value="none">{__('None', 'None')}</option>
+                  <option value="featured">{__('Featured', 'Featured')}</option>
+                  <option value="popular">{__('Popular', 'Popular')}</option>
+                  <option value="new">{__('New', 'New')}</option>
+                  <option value="limited">{__('Limited Time', 'Limited Time')}</option>
+                </Select>
+                <HelpText
+                  text={__('Special designation for frontend display and promotion', 'Special designation for frontend display and promotion')}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'accommodation':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Bed className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Accommodation', 'Accommodation')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Specify accommodation details for your trip', 'Specify accommodation details for your trip')}
+            </p>
+
+            <div className="space-y-4">
+              {/* Accommodation Type */}
+              <div>
+                <label htmlFor="accommodation_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Accommodation Type', 'Accommodation Type')}
+                </label>
+                <Select
+                  id="accommodation_type"
+                  value={formData.accommodation_type}
+                  onChange={(e) => handleFieldChange('accommodation_type', e.target.value)}
+                >
+                  <option value="">{__('Select accommodation type', 'Select accommodation type')}</option>
+                  <option value="hotel">Hotel</option>
+                  <option value="resort">Resort</option>
+                  <option value="lodge">Lodge</option>
+                  <option value="camping">Camping</option>
+                  <option value="homestay">Homestay</option>
+                  <option value="villa">Villa</option>
+                  <option value="hostel">Hostel</option>
+                  <option value="not-included">Not Included</option>
+                </Select>
+                <HelpText
+                  text={__('Type of accommodation provided during the trip', 'Type of accommodation provided during the trip')}
+                  className="mt-2"
+                />
+              </div>
+
+              {/* Meal Plan */}
+              <div>
+                <label htmlFor="meal_plan" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Meal Plan', 'Meal Plan')}
+                </label>
+                <Select
+                  id="meal_plan"
+                  value={formData.meal_plan}
+                  onChange={(e) => handleFieldChange('meal_plan', e.target.value)}
+                >
+                  <option value="">{__('Select meal plan', 'Select meal plan')}</option>
+                  <option value="breakfast-only">Breakfast Only</option>
+                  <option value="half-board">Half Board (Breakfast + Dinner)</option>
+                  <option value="full-board">Full Board (All Meals)</option>
+                  <option value="all-inclusive">All Inclusive</option>
+                  <option value="self-catering">Self Catering</option>
+                  <option value="not-included">Not Included</option>
+                </Select>
+                <HelpText
+                  text={__('Meal plan included with accommodation', 'Meal plan included with accommodation')}
+                  className="mt-2"
+                />
+              </div>
+
+              {/* Accommodation Details */}
+              <div>
+                <label htmlFor="accommodation_details" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Accommodation Details', 'Accommodation Details')}
+                </label>
+                <textarea
+                  id="accommodation_details"
+                  rows={4}
+                  value={formData.accommodation_details}
+                  onChange={(e) => handleFieldChange('accommodation_details', e.target.value)}
+                  placeholder={__('Describe the accommodation, room types, amenities, etc.', 'Describe the accommodation, room types, amenities, etc.')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                />
+                <HelpText
+                  text={__('Additional details about accommodation quality, location, amenities', 'Additional details about accommodation quality, location, amenities')}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'transportation':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Car className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Transportation', 'Transportation')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Configure transportation options for your trip', 'Configure transportation options for your trip')}
+            </p>
+
+            <div className="space-y-4">
+              {/* Transportation Included */}
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.transportation_included}
+                    onChange={(e) => {
+                      handleFieldChange('transportation_included', e.target.checked);
+                      autoSave();
+                    }}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {__('Transportation Included', 'Transportation Included')}
+                  </span>
+                </label>
+                <HelpText
+                  text={__('Check if transportation is included in the trip package', 'Check if transportation is included in the trip package')}
+                  className="mt-2"
+                />
+              </div>
+
+              {formData.transportation_included && (
+                <>
+                  {/* Pickup Location */}
+                  <div>
+                    <label htmlFor="pickup_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Pickup Location', 'Pickup Location')}
+                    </label>
+                    <Input
+                      id="pickup_location"
+                      type="text"
+                      value={formData.pickup_location}
+                      onChange={(e) => handleFieldChange('pickup_location', e.target.value)}
+                      placeholder={__('e.g., Airport, Hotel Lobby, City Center', 'e.g., Airport, Hotel Lobby, City Center')}
+                    />
+                    <HelpText
+                      text={__('Where travelers will be picked up', 'Where travelers will be picked up')}
+                      className="mt-2"
+                    />
+                  </div>
+
+                  {/* Dropoff Location */}
+                  <div>
+                    <label htmlFor="dropoff_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Dropoff Location', 'Dropoff Location')}
+                    </label>
+                    <Input
+                      id="dropoff_location"
+                      type="text"
+                      value={formData.dropoff_location}
+                      onChange={(e) => handleFieldChange('dropoff_location', e.target.value)}
+                      placeholder={__('e.g., Airport, Hotel Lobby, City Center', 'e.g., Airport, Hotel Lobby, City Center')}
+                    />
+                    <HelpText
+                      text={__('Where travelers will be dropped off', 'Where travelers will be dropped off')}
+                      className="mt-2"
+                    />
+                  </div>
+
+                  {/* Transportation Details */}
+                  <div>
+                    <label htmlFor="transportation_details" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Transportation Details', 'Transportation Details')}
+                    </label>
+                    <textarea
+                      id="transportation_details"
+                      rows={4}
+                      value={formData.transportation_details}
+                      onChange={(e) => handleFieldChange('transportation_details', e.target.value)}
+                      placeholder={__('Describe transportation mode, vehicle type, capacity, etc.', 'Describe transportation mode, vehicle type, capacity, etc.')}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                    />
+                    <HelpText
+                      text={__('Details about transportation vehicles, modes, and arrangements', 'Details about transportation vehicles, modes, and arrangements')}
+                      className="mt-2"
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         );
@@ -2824,240 +3137,6 @@ const TripForm: React.FC = () => {
           </div>
         );
 
-      case 'availability':
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Calendar className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Availability & Dates', 'Availability & Dates')}</h2>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Manage departure dates, pricing, and seat availability for your trip. Each date can have different pricing and availability.', 'Manage departure dates, pricing, and seat availability for your trip. Each date can have different pricing and availability.')}
-            </p>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>{__('Available Dates', 'Available Dates')}</CardTitle>
-                <CardDescription>
-                  {__('Add specific departure dates with pricing and seat availability. Customers will see these dates when booking.', 'Add specific departure dates with pricing and seat availability. Customers will see these dates when booking.')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {formData.availability_dates.length > 0 ? (
-                    formData.availability_dates.map((avail) => (
-                      <div
-                        key={avail.id}
-                        className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
-                      >
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                          {/* Departure Date */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                              {__('Departure Date', 'Departure Date')} <span className="text-red-500">*</span>
-                            </label>
-                            <Input
-                              type="date"
-                              value={avail.departure_date}
-                              onChange={(e) => handleAvailabilityChange(avail.id, 'departure_date', e.target.value)}
-                              className="text-sm"
-                            />
-                          </div>
-
-                          {/* Arrival Date */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                              {__('Arrival Date', 'Arrival Date')} <span className="text-red-500">*</span>
-                            </label>
-                            <Input
-                              type="date"
-                              value={avail.arrival_date}
-                              onChange={(e) => handleAvailabilityChange(avail.id, 'arrival_date', e.target.value)}
-                              className="text-sm"
-                            />
-                          </div>
-
-                          {/* Seats Remaining */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                              {__('Seats Remaining', 'Seats Remaining')}
-                            </label>
-                            <Input
-                              type="text"
-                              value={avail.seats_remaining}
-                              onChange={(e) => handleAvailabilityChange(avail.id, 'seats_remaining', e.target.value)}
-                              placeholder="10+"
-                              className="text-sm"
-                            />
-                            <HelpText
-                              text={__('Enter number or "10+" for 10 or more', 'Enter number or "10+" for 10 or more')}
-                              className="mt-1"
-                            />
-                          </div>
-
-                          {/* Status */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                              {__('Status', 'Status')}
-                            </label>
-                            <Select
-                              value={avail.status}
-                              onChange={(e) => handleAvailabilityChange(avail.id, 'status', e.target.value)}
-                              className="text-sm"
-                            >
-                              <option value="available">{__('Available', 'Available')}</option>
-                              <option value="limited">{__('Limited', 'Limited')}</option>
-                              <option value="sold_out">{__('Sold Out', 'Sold Out')}</option>
-                              <option value="closed">{__('Closed', 'Closed')}</option>
-                            </Select>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                          {/* Original Price */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                              {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
-                            </label>
-                            <div className="relative">
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
-                              </span>
-                              <Input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                value={avail.original_price}
-                                onChange={(e) => handleAvailabilityPriceChange(avail.id, 'original_price', e.target.value)}
-                                placeholder="0.00"
-                                className="pl-7 text-sm"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Discounted Price */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                              {__('Discounted Price', 'Discounted Price')} ({__('Optional', 'Optional')})
-                            </label>
-                            <div className="relative">
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
-                              </span>
-                              <Input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                value={avail.discounted_price}
-                                onChange={(e) => handleAvailabilityPriceChange(avail.id, 'discounted_price', e.target.value)}
-                                placeholder="0.00"
-                                className="pl-7 text-sm"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Discount Percentage */}
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                              {__('Discount %', 'Discount %')}
-                            </label>
-                            <div className="relative">
-                              <Input
-                                type="number"
-                                min="0"
-                                max="100"
-                                value={avail.discount_percentage}
-                                onChange={(e) => handleAvailabilityChange(avail.id, 'discount_percentage', e.target.value)}
-                                placeholder="0"
-                                className="pr-7 text-sm"
-                                disabled
-                              />
-                              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">%</span>
-                            </div>
-                            {avail.discount_percentage && parseFloat(avail.discount_percentage) > 0 && (
-                              <Badge variant="error" className="mt-2 text-xs">
-                                {avail.discount_percentage}% {__('OFF TODAY', 'OFF TODAY')}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* From/To Locations */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                              {__('From Location', 'From Location')}
-                            </label>
-                            <Input
-                              type="text"
-                              value={avail.from_location || ''}
-                              onChange={(e) => handleAvailabilityChange(avail.id, 'from_location', e.target.value)}
-                              placeholder={formData.starting_location || __('e.g., Rome', 'e.g., Rome')}
-                              className="text-sm"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                              {__('To Location', 'To Location')}
-                            </label>
-                            <Input
-                              type="text"
-                              value={avail.to_location || ''}
-                              onChange={(e) => handleAvailabilityChange(avail.id, 'to_location', e.target.value)}
-                              placeholder={formData.ending_location || __('e.g., Rome', 'e.g., Rome')}
-                              className="text-sm"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Remove Button */}
-                        <div className="flex justify-end">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleAvailabilityRemove(avail.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <X className="w-4 h-4 mr-2" />
-                            {__('Remove', 'Remove')}
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-8 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
-                      <Calendar className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        {__('No availability dates added yet', 'No availability dates added yet')}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-                        {__('Add specific departure dates with pricing and seat availability for your trip', 'Add specific departure dates with pricing and seat availability for your trip')}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleAvailabilityAdd}
-                    className="w-full"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Availability Date', 'Add Availability Date')}
-                  </Button>
-                  <HelpText
-                    text={__('Add multiple departure dates with different pricing. Discount percentage is automatically calculated when you enter both original and discounted prices.', 'Add multiple departure dates with different pricing. Discount percentage is automatically calculated when you enter both original and discounted prices.')}
-                    className="mt-2"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
-
       case 'itinerary':
         return (
           <div className="space-y-4">
@@ -3066,7 +3145,7 @@ const TripForm: React.FC = () => {
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Itinerary Builder', 'Itinerary Builder')}</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Build your trip itinerary day by day. You can add detailed itinerary entries later.', 'Build your trip itinerary day by day. You can add detailed itinerary entries later.')}
+              {__('Build your trip itinerary day by day. Accommodation and transportation details are managed per day in the itinerary entries.', 'Build your trip itinerary day by day. Accommodation and transportation details are managed per day in the itinerary entries.')}
             </p>
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <div className="flex items-start gap-3">
@@ -3076,7 +3155,7 @@ const TripForm: React.FC = () => {
                     {__('Itinerary Management', 'Itinerary Management')}
                   </p>
                   <p className="text-sm text-blue-800 dark:text-blue-400">
-                    {__('To add detailed itinerary entries, go to the Itinerary page from the main menu after saving this trip.', 'To add detailed itinerary entries, go to the Itinerary page from the main menu after saving this trip.')}
+                    {__('To add detailed itinerary entries with accommodation and transportation per day, go to the Itinerary page from the main menu after saving this trip.', 'To add detailed itinerary entries with accommodation and transportation per day, go to the Itinerary page from the main menu after saving this trip.')}
                   </p>
                 </div>
               </div>
@@ -3687,14 +3766,30 @@ const TripForm: React.FC = () => {
     <div className="h-screen flex flex-col bg-white dark:bg-gray-900">
       {/* Header */}
       <div className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          onClick={handleCancel}
-          className="text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {__('Back', 'Back')}
-        </Button>
+        {/* Trip Progress */}
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-md bg-blue-50 dark:bg-blue-900/20 flex-shrink-0">
+              <Compass className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                  {completionPercentage}%
+                </span>
+                <span className="text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                  {completedSections}/{totalRequiredSections}
+                </span>
+              </div>
+              <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden mt-1">
+                <div
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-1.5 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${completionPercentage}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
         
         <div className="flex-1 text-center">
           <h1 className="text-base font-semibold text-gray-900 dark:text-white">{formData.title || __('New Trip', 'New Trip')}</h1>
@@ -3766,66 +3861,45 @@ const TripForm: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden p-0">
         {/* Sidebar */}
-        <div className="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
-          <div className="p-4 space-y-6">
-            {/* Tour Progress */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Compass className="w-4 h-4 text-gray-500" />
-                <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-                  {__('Trip Progress', 'Trip Progress')}
-                </h3>
-              </div>
-              <div className="mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
-                    {__('Completion', 'Completion')} {completionPercentage}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${completionPercentage}%` }}
-                  />
-                </div>
-              </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
-                {totalRequiredSections - completedSections === 0
-                  ? __('All required sections completed!', 'All required sections completed!')
-                  : __('Complete', 'Complete')} {totalRequiredSections - completedSections} {__('more sections to publish', 'more sections to publish')}
-              </p>
-            </div>
-
+        <div className="w-80 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto overflow-x-hidden flex-shrink-0">
+          <div className="p-5 space-y-6">
             {/* Essentials */}
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Box className="w-4 h-4 text-gray-500" />
-                <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <div className="flex items-center gap-2 mb-3 px-1">
+                <Box className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                   {__('ESSENTIALS', 'ESSENTIALS')}
                 </h3>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {essentialsSections.map((section) => {
                   const Icon = section.icon;
+                  const isActive = currentSection === section.id;
                   return (
                     <button
                       key={section.id}
                       type="button"
                       onClick={() => setCurrentSection(section.id)}
-                      className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded text-sm transition-colors ${
-                        currentSection === section.id
-                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-all duration-200 text-left group border ${
+                        isActive
+                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm border-blue-200 dark:border-blue-800'
+                          : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <Icon className="w-4 h-4" />
-                        <span>{section.label}</span>
-                      </div>
+                      <Icon className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                        isActive 
+                          ? 'text-blue-600 dark:text-blue-400' 
+                          : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
+                      }`} />
+                      <span className="flex-1 min-w-0 break-words leading-snug">{section.label}</span>
                       {section.completed && (
-                        <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        <CheckCircle2 className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                          isActive 
+                            ? 'text-blue-600 dark:text-blue-400' 
+                            : 'text-green-500 dark:text-green-400'
+                        }`} />
                       )}
                     </button>
                   );
@@ -3835,36 +3909,45 @@ const TripForm: React.FC = () => {
 
             {/* Marketing */}
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <BarChart3 className="w-4 h-4 text-gray-500" />
-                <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <div className="flex items-center gap-2 mb-3 px-1">
+                <BarChart3 className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                   {__('MARKETING', 'MARKETING')}
                 </h3>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {marketingSections.map((section) => {
                   const Icon = section.icon;
+                  const isActive = currentSection === section.id;
                   return (
                     <button
                       key={section.id}
                       type="button"
                       onClick={() => setCurrentSection(section.id)}
-                      className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded text-sm transition-colors ${
-                        currentSection === section.id
-                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-all duration-200 text-left group border ${
+                        isActive
+                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm border-blue-200 dark:border-blue-800'
+                          : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <Icon className="w-4 h-4" />
-                        <span>{section.label}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
+                      <Icon className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                        isActive 
+                          ? 'text-blue-600 dark:text-blue-400' 
+                          : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
+                      }`} />
+                      <span className="flex-1 min-w-0 break-words leading-snug">{section.label}</span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         {!section.required && (
-                          <span className="text-xs text-gray-400">{__('Optional', 'Optional')}</span>
+                          <span className="text-[9px] font-normal text-gray-400 dark:text-gray-500 uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800">
+                            {__('Opt', 'Opt')}
+                          </span>
                         )}
                         {section.completed && (
-                          <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          <CheckCircle2 className={`w-4 h-4 transition-colors ${
+                            isActive 
+                              ? 'text-blue-600 dark:text-blue-400' 
+                              : 'text-green-500 dark:text-green-400'
+                          }`} />
                         )}
                       </div>
                     </button>
@@ -3875,11 +3958,36 @@ const TripForm: React.FC = () => {
 
             {/* Advanced */}
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Settings className="w-4 h-4 text-gray-500" />
-                <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <div className="flex items-center gap-2 mb-3 px-1">
+                <Settings className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                   {__('ADVANCED', 'ADVANCED')}
                 </h3>
+              </div>
+              <div className="space-y-0.5">
+                <button
+                  type="button"
+                  onClick={() => setCurrentSection('advanced')}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-all duration-200 text-left group border ${
+                    currentSection === 'advanced'
+                      ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm border-blue-200 dark:border-blue-800'
+                      : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100'
+                  }`}
+                >
+                  <Settings className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                    currentSection === 'advanced' 
+                      ? 'text-blue-600 dark:text-blue-400' 
+                      : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
+                  }`} />
+                  <span className="flex-1 min-w-0 break-words leading-snug">{__('Status & Lifecycle', 'Status & Lifecycle')}</span>
+                  {formData.status !== 'draft' && (
+                    <CheckCircle2 className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                      currentSection === 'advanced' 
+                        ? 'text-blue-600 dark:text-blue-400' 
+                        : 'text-green-500 dark:text-green-400'
+                    }`} />
+                  )}
+                </button>
               </div>
             </div>
           </div>

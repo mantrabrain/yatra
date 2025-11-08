@@ -86,6 +86,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return params.get('tab') || 'all';
   }, [urlKey]);
 
+  const currentAction = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('action');
+  }, [urlKey]);
+
+  // Check if we're on the trip form page
+  const isTripFormPage = useMemo(() => {
+    return currentSubpage === 'trips' && 
+           (currentTab === 'all' || !currentTab) && 
+           (currentAction === 'create' || currentAction === 'edit');
+  }, [currentSubpage, currentTab, currentAction, urlKey]);
+
   // Track expanded submenus - initialize based on current subpage
   const [expandedMenus, setExpandedMenus] = useState<string[]>(() => {
     const params = new URLSearchParams(window.location.search);
@@ -309,6 +321,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="flex items-center justify-between w-full">
               <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
                 {(() => {
+                  // Show specific text for trip form page
+                  if (isTripFormPage) {
+                    return currentAction === 'create' ? 'Create Trip' : 'Edit Trip';
+                  }
+                  
                   const activeItem = menuItems.find(item => isActive(item.subpage));
                   if (activeItem?.submenu && currentTab) {
                     const activeSubItem = activeItem.submenu.find(sub => sub.tab === currentTab);
@@ -349,7 +366,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </header>
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-6">
+          <main className={`flex-1 ${isTripFormPage ? 'p-0 overflow-hidden' : 'p-6 overflow-y-auto'}`}>
             {children}
           </main>
         </div>
