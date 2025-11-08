@@ -26,6 +26,9 @@ import Itinerary from './pages/Itinerary';
 import ItineraryForm from './pages/ItineraryForm';
 import Discounts from './pages/Discounts';
 import DiscountForm from './pages/DiscountForm';
+import Payments from './pages/Payments';
+import PaymentForm from './pages/PaymentForm';
+import ViewPayment from './pages/ViewPayment';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -153,6 +156,15 @@ const App: React.FC = () => {
           return <DiscountForm />;
         }
         return <Discounts />;
+      case 'payments':
+        // Check if we're viewing, creating, or editing a payment
+        if (action === 'view') {
+          return <ViewPayment />;
+        }
+        if (action === 'create' || action === 'edit') {
+          return <PaymentForm />;
+        }
+        return <Payments />;
       case 'reports':
         return <Reports />;
       case 'settings':

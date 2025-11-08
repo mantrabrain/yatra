@@ -19,7 +19,8 @@ import {
   FileText,
   Tag,
   Route,
-  BadgePercent
+  BadgePercent,
+  CreditCard
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -95,6 +96,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       ]
     },
     { subpage: 'discounts', label: 'Discount', icon: BadgePercent },
+    { subpage: 'payments', label: 'Payments', icon: CreditCard },
     { subpage: 'bookings', label: 'Bookings', icon: Calendar },
     { subpage: 'customers', label: 'Customers', icon: Users },
     { subpage: 'reviews', label: 'Reviews', icon: Star },
