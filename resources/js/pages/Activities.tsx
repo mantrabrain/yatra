@@ -542,7 +542,6 @@ const Activities: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[60px]">{__('Icon', 'Icon')}</TableHead>
                         <TableHead className="w-[250px]">{__('Activity', 'Activity')}</TableHead>
                         <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
                         <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
@@ -558,10 +557,8 @@ const Activities: React.FC = () => {
                       {[...Array(5)].map((_, index) => (
                         <TableRow key={`skeleton-${index}`}>
                           <TableCell>
-                            <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
                             <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                               <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                             </div>
                           </TableCell>
@@ -602,7 +599,6 @@ const Activities: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[60px]">{__('Icon', 'Icon')}</TableHead>
                         <TableHead className="w-[250px]">{__('Activity', 'Activity')}</TableHead>
                         <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
                         <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
@@ -616,7 +612,7 @@ const Activities: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                       <TableRow>
-                        <TableCell colSpan={isPro ? 8 : 7} className="h-64">
+                        <TableCell colSpan={isPro ? 7 : 6} className="h-64">
                           <div className="flex flex-col items-center justify-center h-full text-center py-12">
                             <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
                               <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -659,7 +655,6 @@ const Activities: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[60px]">{__('Icon', 'Icon')}</TableHead>
                         <TableHead className="w-[250px]">
                           <button
                             onClick={() => handleSort('name')}
@@ -699,10 +694,8 @@ const Activities: React.FC = () => {
                       {activities.map((activity: Activity) => (
                         <TableRow key={activity.id}>
                           <TableCell>
-                            {renderIcon(activity.icon)}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
+                              {renderIcon(activity.icon)}
                               <div>
                                 <div className="font-medium text-gray-900 dark:text-white">
                                   {activity.name}
@@ -744,18 +737,6 @@ const Activities: React.FC = () => {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">
-                              <ConditionalRender capability="yatra_view_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleView(activity)}
-                                  className="h-8 w-8"
-                                  aria-label={__('View activity', 'View activity')}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-
                               <ConditionalRender capability="yatra_edit_trips">
                                 <Button
                                   variant="ghost"
