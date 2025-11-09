@@ -46,6 +46,7 @@ import { Alert } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { HelpText } from '../components/ui/help-text';
+import { ItinerarySection } from '../components/trip-form/sections/ItinerarySection';
 
 type SectionId = 
   | 'overview'           // 1. Basic info, highlights, rich content, classification
@@ -177,6 +178,9 @@ interface TripFormData {
   included_items: string[];
   excluded_items: string[];
   
+  // Itinerary
+  itinerary_days: ItineraryDay[];
+  
   // Gallery
   gallery_images: string[];
   featured_image: string;
@@ -225,6 +229,40 @@ interface AvailabilityDate {
   status: 'available' | 'sold_out' | 'limited' | 'closed';
   from_location?: string;
   to_location?: string;
+}
+
+interface ItineraryEntry {
+  id: string;
+  day: number;
+  day_title?: string;
+  // Use IDs to match ItineraryForm structure
+  item_type_id: string; // ID of the item type (Activity, Meal, Accommodation, Transportation, Rest)
+  item_id: string; // ID of the specific item (Hiking, Breakfast, Hotel, etc.)
+  // Keep legacy fields for backward compatibility
+  item_type?: 'Meal' | 'Activity' | 'Accommodation' | 'Transportation';
+  item_name?: string;
+  item_icon?: string;
+  // Entry details
+  title: string;
+  description: string;
+  location?: string;
+  duration?: string;
+  start_time: string;
+  end_time: string;
+  time_type: 'exact' | 'approximate' | 'all_day' | 'flexible';
+  cost?: string;
+  cost_per_person: boolean;
+  notes?: string;
+  included_items: string[];
+  excluded_items: string[];
+  images: string[];
+  status?: 'active' | 'inactive';
+}
+
+interface ItineraryDay {
+  day: number;
+  day_title?: string;
+  entries: ItineraryEntry[];
 }
 
 const TripForm: React.FC = () => {
@@ -310,6 +348,7 @@ const TripForm: React.FC = () => {
     vaccination_requirements: '',
     included_items: [],
     excluded_items: [],
+    itinerary_days: [],
     gallery_images: [],
     featured_image: '',
     faqs: [],
@@ -538,6 +577,7 @@ const TripForm: React.FC = () => {
         vaccination_requirements: tripData.vaccination_requirements || '',
         included_items: tripData.included_items || [],
         excluded_items: tripData.excluded_items || [],
+        itinerary_days: (tripData as any).itinerary_days || [],
         gallery_images: tripData.gallery_images || [],
         featured_image: tripData.featured_image || '',
         faqs: tripData.faqs || [],
@@ -876,6 +916,147 @@ const TripForm: React.FC = () => {
     autoSave();
   };
 
+  // Itinerary handlers
+  const handleItineraryDayAdd = () => {
+    const maxDay = formData.itinerary_days.length > 0 
+      ? Math.max(...formData.itinerary_days.map(d => d.day))
+      : 0;
+    const newDay: ItineraryDay = {
+      day: maxDay + 1,
+      day_title: '',
+      entries: [],
+    };
+    setFormData(prev => ({
+      ...prev,
+      itinerary_days: [...prev.itinerary_days, newDay],
+    }));
+    autoSave();
+  };
+
+  const handleItineraryDayRemove = (day: number) => {
+    setFormData(prev => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days
+        .filter(d => d.day !== day)
+        .map((d, idx) => ({ ...d, day: idx + 1 })),
+    }));
+    autoSave();
+  };
+
+  const handleItineraryDayTitleChange = (day: number, title: string) => {
+    setFormData(prev => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days.map(d =>
+        d.day === day ? { ...d, day_title: title } : d
+      ),
+    }));
+    autoSave();
+  };
+
+  const handleItineraryEntryAdd = (day: number) => {
+    const newEntry: ItineraryEntry = {
+      id: `entry_${Date.now()}`,
+      day,
+      item_type_id: '1', // Default to Activity (matching ItineraryForm structure)
+      item_id: '', // Will be selected by user
+      item_type: 'Activity', // Legacy field for backward compatibility
+      item_name: 'Activity',
+      item_icon: 'footprints',
+      title: '',
+      description: '',
+      start_time: '08:00',
+      end_time: '17:00',
+      time_type: 'exact',
+      cost: '',
+      cost_per_person: true,
+      notes: '',
+      included_items: [],
+      excluded_items: [],
+      images: [],
+      status: 'active',
+    };
+    setFormData(prev => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days.map(d =>
+        d.day === day ? { ...d, entries: [...d.entries, newEntry] } : d
+      ),
+    }));
+    autoSave();
+  };
+
+  const handleItineraryEntryRemove = (day: number, entryId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days.map(d =>
+        d.day === day ? { ...d, entries: d.entries.filter(e => e.id !== entryId) } : d
+      ),
+    }));
+    autoSave();
+  };
+
+  const handleItineraryEntryChange = (day: number, entryId: string, field: keyof ItineraryEntry, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      itinerary_days: prev.itinerary_days.map(d =>
+        d.day === day ? {
+          ...d,
+          entries: d.entries.map(e =>
+            e.id === entryId ? { ...e, [field]: value } : e
+          ),
+        } : d
+      ),
+    }));
+    autoSave();
+  };
+
+  const handleItineraryEntryMove = (day: number, entryId: string, direction: 'up' | 'down') => {
+    setFormData(prev => {
+      const dayData = prev.itinerary_days.find(d => d.day === day);
+      if (!dayData) return prev;
+      
+      const entries = [...dayData.entries];
+      const index = entries.findIndex(e => e.id === entryId);
+      if (index === -1) return prev;
+      
+      if (direction === 'up' && index > 0) {
+        [entries[index - 1], entries[index]] = [entries[index], entries[index - 1]];
+      } else if (direction === 'down' && index < entries.length - 1) {
+        [entries[index], entries[index + 1]] = [entries[index + 1], entries[index]];
+      }
+      
+      return {
+        ...prev,
+        itinerary_days: prev.itinerary_days.map(d =>
+          d.day === day ? { ...d, entries } : d
+        ),
+      };
+    });
+    autoSave();
+  };
+
+  const handleItineraryEntryDuplicate = (day: number, entryId: string) => {
+    setFormData(prev => {
+      const dayData = prev.itinerary_days.find(d => d.day === day);
+      if (!dayData) return prev;
+      
+      const entry = dayData.entries.find(e => e.id === entryId);
+      if (!entry) return prev;
+      
+      const newEntry: ItineraryEntry = {
+        ...entry,
+        id: `entry_${Date.now()}`,
+      };
+      
+      return {
+        ...prev,
+        itinerary_days: prev.itinerary_days.map(d =>
+          d.day === day ? { ...d, entries: [...d.entries, newEntry] } : d
+        ),
+      };
+    });
+    autoSave();
+  };
+
   // Auto-save functionality
   const autoSave = () => {
     if (isEditMode) {
@@ -1028,6 +1209,7 @@ const TripForm: React.FC = () => {
         vaccination_requirements: data.vaccination_requirements.trim(),
         included_items: data.included_items || [],
         excluded_items: data.excluded_items || [],
+        itinerary_days: data.itinerary_days || [],
         gallery_images: data.gallery_images || [],
         featured_image: data.featured_image || '',
         faqs: data.faqs || [],
@@ -3139,28 +3321,20 @@ const TripForm: React.FC = () => {
 
       case 'itinerary':
         return (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Calendar className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Itinerary Builder', 'Itinerary Builder')}</h2>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Build your trip itinerary day by day. Accommodation and transportation details are managed per day in the itinerary entries.', 'Build your trip itinerary day by day. Accommodation and transportation details are managed per day in the itinerary entries.')}
-            </p>
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">
-                    {__('Itinerary Management', 'Itinerary Management')}
-                  </p>
-                  <p className="text-sm text-blue-800 dark:text-blue-400">
-                    {__('To add detailed itinerary entries with accommodation and transportation per day, go to the Itinerary page from the main menu after saving this trip.', 'To add detailed itinerary entries with accommodation and transportation per day, go to the Itinerary page from the main menu after saving this trip.')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ItinerarySection
+            formData={formData}
+            errors={errors}
+            handleFieldChange={handleFieldChange}
+            handleItineraryDayAdd={handleItineraryDayAdd}
+            handleItineraryDayRemove={handleItineraryDayRemove}
+            handleItineraryDayTitleChange={handleItineraryDayTitleChange}
+            handleItineraryEntryAdd={handleItineraryEntryAdd}
+            handleItineraryEntryRemove={handleItineraryEntryRemove}
+            handleItineraryEntryChange={handleItineraryEntryChange}
+            handleItineraryEntryMove={handleItineraryEntryMove}
+            handleItineraryEntryDuplicate={handleItineraryEntryDuplicate}
+            autoSave={autoSave}
+          />
         );
 
       case 'included':

@@ -28,7 +28,6 @@ interface PageHeaderProps {
  * />
  */
 export const PageHeader: React.FC<PageHeaderProps> = ({
-  title,
   description,
   actions,
   actionCapability,
