@@ -60,9 +60,12 @@ abstract class BaseController
 
     /**
      * Check permissions
+     * Override in child classes for specific capability checks
      */
-    public function check_permission(): bool
+    public function check_permission(?WP_REST_Request $request = null): bool
     {
+        // Default: require manage_options capability
+        // Child classes should override this for specific capabilities
         return current_user_can('manage_options');
     }
 

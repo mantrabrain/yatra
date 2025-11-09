@@ -5,34 +5,45 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Edit2, X } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
+import { generateSlug } from '../lib/slug';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
 
 interface ActivityFormData {
   name: string;
   slug: string;
   description: string;
+  icon: {
+    type: 'icon' | 'image';
+    value: string;
+  } | null;
   status: string;
 }
 
 const ActivityForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<ActivityFormData>({
     name: '',
     slug: '',
     description: '',
+    icon: null,
     status: 'draft',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSlugEditable, setIsSlugEditable] = useState(false);
 
   // Get action and id from URL
   const action = useMemo(() => {
@@ -52,15 +63,13 @@ const ActivityForm: React.FC = () => {
     queryKey: ['activity', activityId],
     queryFn: async () => {
       if (!activityId) return null;
-      // return await apiClient.get(`/activities/${activityId}`);
-      // Dummy data for now
-      return {
-        id: activityId,
-        name: 'Sample Activity',
-        slug: 'sample-activity',
-        description: 'This is a sample activity description.',
-        status: 'active',
-      };
+      try {
+        const response = await apiClient.get(`/activities/${activityId}`);
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load activity', 'Failed to load activity'), 'error');
+        throw error;
+      }
     },
     enabled: isEditMode && can('yatra_view_trips'),
   });
@@ -72,40 +81,52 @@ const ActivityForm: React.FC = () => {
         name: activityData.name || '',
         slug: activityData.slug || '',
         description: activityData.description || '',
+        icon: (activityData.icon as IconPickerValue) || null,
         status: activityData.status || 'draft',
       });
     }
   }, [activityData, isEditMode]);
 
-  // Auto-generate slug from name
-  const generateSlug = (name: string): string => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
   const handleNameChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      name: value,
-      slug: prev.slug || generateSlug(value),
-    }));
+    // Auto-generate slug from name (only if slug is not manually edited)
+    if (!isSlugEditable) {
+      const newSlug = generateSlug(value);
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+        slug: newSlug, // Always auto-generate slug from name
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+      }));
+    }
     if (errors.name) {
       setErrors(prev => ({ ...prev, name: '' }));
     }
   };
 
   const handleSlugChange = (value: string) => {
-    setFormData(prev => ({ ...prev, slug: value }));
-    if (errors.slug) {
-      setErrors(prev => ({ ...prev, slug: '' }));
+    // Only allow manual slug editing if edit mode is enabled
+    if (isSlugEditable) {
+      setFormData(prev => ({ ...prev, slug: value }));
+      if (errors.slug) {
+        setErrors(prev => ({ ...prev, slug: '' }));
+      }
     }
   };
 
-  const handleFieldChange = (field: keyof ActivityFormData, value: string) => {
+  const handleToggleSlugEdit = () => {
+    if (isSlugEditable) {
+      // If disabling edit, regenerate slug from name
+      const newSlug = generateSlug(formData.name);
+      setFormData(prev => ({ ...prev, slug: newSlug }));
+    }
+    setIsSlugEditable(!isSlugEditable);
+  };
+
+  const handleFieldChange = (field: keyof ActivityFormData, value: string | IconPickerValue | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -132,31 +153,42 @@ const ActivityForm: React.FC = () => {
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: ActivityFormData) => {
-      const payload = {
+      const payload: any = {
         name: data.name.trim(),
         slug: data.slug.trim(),
         description: data.description.trim(),
+        icon: data.icon,
         status: data.status,
       };
 
+      // If slug was manually edited, add flag to preserve it
+      if (isEditMode && isSlugEditable) {
+        payload.preserve_slug = true;
+      }
+
       if (isEditMode && activityId) {
-        // return await apiClient.put(`/activities/${activityId}`, payload);
-        console.log('Updating activity:', activityId, payload);
-        return { success: true, id: activityId };
+        return await apiClient.put(`/activities/${activityId}`, payload);
       } else {
-        // return await apiClient.post('/activities', payload);
-        console.log('Creating activity:', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+        return await apiClient.post('/activities', payload);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activities'] });
-      // Redirect to activities list
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities`;
+      queryClient.invalidateQueries({ queryKey: ['activity', activityId] });
+      showToast(
+        isEditMode 
+          ? __('Activity updated successfully', 'Activity updated successfully')
+          : __('Activity created successfully', 'Activity created successfully'),
+        'success'
+      );
+      // Redirect to activities list after a short delay
+      setTimeout(() => {
+        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities`;
+      }, 1000);
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the activity', 'An error occurred while saving the activity');
-      setErrors({ submit: errorMessage });
+      showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
   });
@@ -165,6 +197,7 @@ const ActivityForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
+      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
       return;
     }
 
@@ -238,20 +271,38 @@ const ActivityForm: React.FC = () => {
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Slug', 'Slug')} <span className="text-red-500">*</span>
                     </label>
-                    <Input
-                      id="slug"
-                      type="text"
-                      value={formData.slug}
-                      onChange={(e) => handleSlugChange(e.target.value)}
-                      placeholder={__('activity-slug', 'activity-slug')}
-                      className={errors.slug ? 'border-red-500' : ''}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="slug"
+                        type="text"
+                        value={formData.slug}
+                        onChange={(e) => handleSlugChange(e.target.value)}
+                        placeholder={__('activity-slug', 'activity-slug')}
+                        className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
+                        disabled={!isSlugEditable}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={handleToggleSlugEdit}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
+                        aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                      >
+                        {isSlugEditable ? (
+                          <X className="w-4 h-4" />
+                        ) : (
+                          <Edit2 className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
                     {errors.slug && (
                       <p className="mt-1 text-sm text-red-500">{errors.slug}</p>
                     )}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {__('URL-friendly version of the name. Lowercase letters, numbers, and hyphens only.', 'URL-friendly version of the name. Lowercase letters, numbers, and hyphens only.')}
+                      {isSlugEditable 
+                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
+                        : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')
+                      }
                     </p>
                   </div>
 
@@ -267,6 +318,19 @@ const ActivityForm: React.FC = () => {
                       placeholder={__('Enter activity description', 'Enter activity description')}
                       rows={6}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </div>
+
+                  {/* Icon/Image Picker */}
+                  <div>
+                    <IconPicker
+                      value={formData.icon}
+                      onChange={(value) => handleFieldChange('icon', value)}
+                      label={__('Activity Icon or Image', 'Activity Icon or Image')}
+                      helpText={__('Select an icon from the library or upload a custom image for this activity.', 'Select an icon from the library or upload a custom image for this activity.')}
+                      allowImageUpload={true}
+                      allowIconSelection={true}
+                      size="md"
                     />
                   </div>
                 </CardContent>
@@ -292,8 +356,8 @@ const ActivityForm: React.FC = () => {
                       className="h-9"
                     >
                       <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="active">{__('Active', 'Active')}</option>
-                      <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                      <option value="publish">{__('Publish', 'Publish')}</option>
+                      <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -303,11 +367,6 @@ const ActivityForm: React.FC = () => {
               <Card>
                 <CardContent className="p-3">
                   <div className="space-y-2">
-                    {errors.submit && (
-                      <div className="p-2 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 rounded-md">
-                        {errors.submit}
-                      </div>
-                    )}
                     <div className="flex gap-2">
                       <Button
                         type="submit"

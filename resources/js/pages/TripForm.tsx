@@ -4169,7 +4169,7 @@ const TripForm: React.FC = () => {
 
         {/* Main Content */}
         <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
-          <div className="p-6 max-w-4xl">
+          <div className="p-6 pb-24 max-w-4xl">
             {errors.submit && (
               <Alert variant="error" className="mb-4">
                 {errors.submit}

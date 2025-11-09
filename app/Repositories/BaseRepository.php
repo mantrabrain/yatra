@@ -126,7 +126,9 @@ abstract class BaseRepository
 
         if (isset($args['where'])) {
             foreach ($args['where'] as $key => $value) {
-                $conditions[] = $this->wpdb->prepare("{$key} = %s", $value);
+                // Sanitize column name to prevent SQL injection
+                $key = preg_replace('/[^a-zA-Z0-9_]/', '', $key);
+                $conditions[] = $this->wpdb->prepare("`{$key}` = %s", $value);
             }
         }
 
@@ -139,7 +141,23 @@ abstract class BaseRepository
     protected function buildOrderClause(array $args): string
     {
         $order_by = $args['order_by'] ?? 'id';
-        $order = $args['order'] ?? 'DESC';
+        $order = strtoupper($args['order'] ?? 'DESC');
+
+        // Map common order_by aliases to actual column names
+        $column_map = [
+            'name' => 'name',
+            'title' => 'title',
+            'status' => 'status',
+            'date' => 'created_at',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+        ];
+
+        $order_by = $column_map[$order_by] ?? $order_by;
+
+        // Sanitize order_by to prevent SQL injection
+        $order_by = preg_replace('/[^a-zA-Z0-9_]/', '', $order_by);
+        $order = in_array($order, ['ASC', 'DESC'], true) ? $order : 'DESC';
 
         return "ORDER BY {$order_by} {$order}";
     }
@@ -166,11 +184,30 @@ abstract class BaseRepository
         $sanitized = [];
 
         foreach ($data as $key => $value) {
-            if (is_string($value)) {
-                $sanitized[$key] = sanitize_text_field($value);
-            } elseif (is_numeric($value)) {
+            // Skip internal fields that are handled separately
+            if (in_array($key, ['created_at', 'updated_at'], true)) {
                 $sanitized[$key] = $value;
+                continue;
+            }
+
+            if (is_string($value)) {
+                // Use appropriate sanitization based on field type
+                if ($key === 'description') {
+                    $sanitized[$key] = sanitize_textarea_field($value);
+                } elseif (in_array($key, ['created_by', 'updated_by', 'id'], true)) {
+                    $sanitized[$key] = absint($value);
+                } else {
+                $sanitized[$key] = sanitize_text_field($value);
+                }
+            } elseif (is_numeric($value)) {
+                // Ensure integers are properly cast
+                if (in_array($key, ['created_by', 'updated_by', 'id'], true)) {
+                    $sanitized[$key] = absint($value);
+                } else {
+                $sanitized[$key] = $value;
+                }
             } elseif (is_array($value)) {
+                // Arrays should already be serialized by service layer
                 $sanitized[$key] = maybe_serialize($value);
             } else {
                 $sanitized[$key] = $value;

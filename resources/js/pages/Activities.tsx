@@ -8,6 +8,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -15,16 +17,25 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { Edit, Trash2 } from 'lucide-react';
+import { IconSelector } from '../components/ui/icon-selector';
+import type { IconPickerValue } from '../components/ui/icon-picker';
 
 interface Activity {
   id: number;
   name: string;
   slug: string;
   description: string;
+  icon?: IconPickerValue | null;
   status: string;
   trips_count?: number;
   created_at: string;
+  updated_at: string;
+  created_by: number; // user_id
+  updated_by: number; // user_id
+  created_by_name?: string; // Optional: user name from API
+  updated_by_name?: string; // Optional: user name from API
 }
 
 const Activities: React.FC = () => {
@@ -33,8 +44,13 @@ const Activities: React.FC = () => {
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; activity: Activity | null }>({
+    isOpen: false,
+    activity: null,
+  });
   const queryClient = useQueryClient();
   const { can, isPro } = usePermissions();
+  const { showToast } = useToast();
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -56,17 +72,31 @@ const Activities: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
-  // Fetch activities with dummy data
+  // Fetch activities from API
   const { data, isLoading, error } = useQuery({
     queryKey: ['activities', queryParams],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/activities', { params: queryParams });
-      // Dummy data
+      try {
+        const response = await apiClient.get('/activities', { params: queryParams });
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load activities', 'Failed to load activities'), 'error');
+        throw error;
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
+  // OLD CODE - REMOVED DUMMY DATA
+  /* const { data, isLoading, error } = useQuery({
+    queryKey: ['activities', queryParams],
+    queryFn: async () => {
+      // Dummy data for development
       const today = new Date();
       const getDate = (days: number) => {
         const date = new Date(today);
         date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0];
+        return date.toISOString();
       };
 
       const allActivities: Activity[] = [
@@ -75,36 +105,56 @@ const Activities: React.FC = () => {
           name: 'Trekking',
           slug: 'trekking',
           description: 'Mountain trekking and hiking adventures',
-          status: 'active',
+          status: 'publish',
           trips_count: 12,
           created_at: getDate(30),
+          updated_at: getDate(25),
+          created_by: 1,
+          updated_by: 1,
+          created_by_name: 'Admin User',
+          updated_by_name: 'Admin User',
         },
         {
           id: 2,
           name: 'Cultural Tours',
           slug: 'cultural-tours',
           description: 'Explore local culture and traditions',
-          status: 'active',
+          status: 'publish',
           trips_count: 8,
           created_at: getDate(25),
+          updated_at: getDate(20),
+          created_by: 1,
+          updated_by: 2,
+          created_by_name: 'Admin User',
+          updated_by_name: 'Editor User',
         },
         {
           id: 3,
           name: 'Wildlife Safari',
           slug: 'wildlife-safari',
           description: 'Wildlife watching and safari experiences',
-          status: 'active',
+          status: 'publish',
           trips_count: 6,
           created_at: getDate(20),
+          updated_at: getDate(18),
+          created_by: 2,
+          updated_by: 2,
+          created_by_name: 'Editor User',
+          updated_by_name: 'Editor User',
         },
         {
           id: 4,
           name: 'Adventure Sports',
           slug: 'adventure-sports',
           description: 'Paragliding, rafting, and extreme sports',
-          status: 'active',
+          status: 'publish',
           trips_count: 10,
           created_at: getDate(15),
+          updated_at: getDate(10),
+          created_by: 1,
+          updated_by: 1,
+          created_by_name: 'Admin User',
+          updated_by_name: 'Admin User',
         },
         {
           id: 5,
@@ -114,33 +164,53 @@ const Activities: React.FC = () => {
           status: 'draft',
           trips_count: 3,
           created_at: getDate(10),
+          updated_at: getDate(8),
+          created_by: 2,
+          updated_by: 2,
+          created_by_name: 'Editor User',
+          updated_by_name: 'Editor User',
         },
         {
           id: 6,
           name: 'Yoga & Meditation',
           slug: 'yoga-meditation',
           description: 'Wellness and spiritual retreats',
-          status: 'active',
+          status: 'publish',
           trips_count: 5,
           created_at: getDate(8),
+          updated_at: getDate(5),
+          created_by: 1,
+          updated_by: 1,
+          created_by_name: 'Admin User',
+          updated_by_name: 'Admin User',
         },
         {
           id: 7,
           name: 'Beach Activities',
           slug: 'beach-activities',
           description: 'Water sports and beach activities',
-          status: 'active',
+          status: 'publish',
           trips_count: 7,
           created_at: getDate(5),
+          updated_at: getDate(3),
+          created_by: 2,
+          updated_by: 1,
+          created_by_name: 'Editor User',
+          updated_by_name: 'Admin User',
         },
         {
           id: 8,
           name: 'City Tours',
           slug: 'city-tours',
           description: 'Urban exploration and city sightseeing',
-          status: 'inactive',
+          status: 'trash',
           trips_count: 4,
           created_at: getDate(3),
+          updated_at: getDate(1),
+          created_by: 1,
+          updated_by: 1,
+          created_by_name: 'Admin User',
+          updated_by_name: 'Admin User',
         },
       ];
 
@@ -171,8 +241,13 @@ const Activities: React.FC = () => {
             bValue = b.status;
             break;
           case 'date':
+          case 'created_at':
             aValue = new Date(a.created_at).getTime();
             bValue = new Date(b.created_at).getTime();
+            break;
+          case 'updated_at':
+            aValue = new Date(a.updated_at).getTime();
+            bValue = new Date(b.updated_at).getTime();
             break;
           default:
             aValue = a.name.toLowerCase();
@@ -197,16 +272,20 @@ const Activities: React.FC = () => {
       };
     },
     enabled: can('yatra_view_trips'),
-  });
+  }); */
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (_id: number) => {
-      // return await apiClient.delete(`/yatra/v1/activities/${_id}`);
-      return { success: true };
+    mutationFn: async (id: number) => {
+      return await apiClient.delete(`/activities/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activities'] });
+      showToast(__('Activity deleted successfully', 'Activity deleted successfully'), 'success');
+      setDeleteConfirm({ isOpen: false, activity: null });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete activity', 'Failed to delete activity'), 'error');
     },
   });
 
@@ -215,26 +294,34 @@ const Activities: React.FC = () => {
   const totalPages = Math.ceil(total / 10);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    if (!dateString) return __('N/A', 'N/A');
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
     });
+    } catch (e) {
+      return dateString;
+    }
   };
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
-      'active': {
+      'publish': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Active', 'Active'),
+        label: __('Publish', 'Publish'),
       },
       'draft': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
         label: __('Draft', 'Draft'),
       },
-      'inactive': {
+      'trash': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Inactive', 'Inactive'),
+        label: __('Trash', 'Trash'),
       },
     };
 
@@ -250,18 +337,60 @@ const Activities: React.FC = () => {
     );
   };
 
+  const formatUser = (userId: number, userName?: string) => {
+    if (userName) {
+      return userName;
+    }
+    return `User #${userId}`;
+  };
+
+  const renderIcon = (icon: IconPickerValue | null | undefined) => {
+    if (!icon) {
+      return (
+        <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
+        </div>
+      );
+    }
+
+    if (icon.type === 'image') {
+      return (
+        <img
+          src={icon.value}
+          alt=""
+          className="w-8 h-8 rounded object-cover"
+          onError={(e) => {
+            // Fallback if image fails to load
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            if (target.parentElement) {
+              target.parentElement.innerHTML = '<div class="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><span class="text-xs text-gray-400 dark:text-gray-500">—</span></div>';
+            }
+          }}
+        />
+      );
+    }
+
+    // Icon type
+    return (
+      <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+        <IconSelector iconName={icon.value} className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+      </div>
+    );
+  };
+
   const handleEdit = (activity: Activity) => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=edit&id=${activity.id}`;
   };
 
   const handleDelete = (activity: Activity) => {
-    if (confirm(__('Are you sure you want to delete this activity?', 'Are you sure you want to delete this activity?'))) {
-      deleteMutation.mutate(activity.id);
-    }
+    setDeleteConfirm({ isOpen: true, activity });
   };
 
-  const handleView = (activity: Activity) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=view&id=${activity.id}`;
+  const confirmDelete = () => {
+    if (deleteConfirm.activity) {
+      deleteMutation.mutate(deleteConfirm.activity.id);
+    }
   };
 
   const handleCreateActivity = () => {
@@ -298,6 +427,22 @@ const Activities: React.FC = () => {
 
   return (
     <div className="space-y-3">
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, activity: null })}
+        onConfirm={confirmDelete}
+        title={__('Delete Activity', 'Delete Activity')}
+        message={deleteConfirm.activity 
+          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'Are you sure you want to delete "{name}"? This action cannot be undone.').replace('{name}', deleteConfirm.activity.name)
+          : __('Are you sure you want to delete this activity? This action cannot be undone.', 'Are you sure you want to delete this activity? This action cannot be undone.')
+        }
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
+
       <PageHeader
         title={__('Activities', 'Activities')}
         description={__('Manage your travel activities and experiences', 'Manage your travel activities and experiences')}
@@ -333,9 +478,9 @@ const Activities: React.FC = () => {
               className="w-full md:w-40 h-9"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="active">{__('Active', 'Active')}</option>
               <option value="draft">{__('Draft', 'Draft')}</option>
-              <option value="inactive">{__('Inactive', 'Inactive')}</option>
+              <option value="publish">{__('Publish', 'Publish')}</option>
+              <option value="trash">{__('Trash', 'Trash')}</option>
             </Select>
 
             {/* Sort By */}
@@ -346,7 +491,8 @@ const Activities: React.FC = () => {
             >
               <option value="name">{__('Name', 'Name')}</option>
               <option value="status">{__('Status', 'Status')}</option>
-              <option value="date">{__('Date', 'Date')}</option>
+              <option value="created_at">{__('Created At', 'Created At')}</option>
+              <option value="updated_at">{__('Updated At', 'Updated At')}</option>
             </Select>
 
             {/* Sort Order */}
@@ -393,18 +539,128 @@ const Activities: React.FC = () => {
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('Loading activities...', 'Loading activities...')}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[60px]">{__('Icon', 'Icon')}</TableHead>
+                        <TableHead className="w-[250px]">{__('Activity', 'Activity')}</TableHead>
+                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
+                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
+                        {isPro && (
+                          <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
+                        )}
+                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...Array(5)].map((_, index) => (
+                        <TableRow key={`skeleton-${index}`}>
+                          <TableCell>
+                            <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          {isPro && (
+                            <TableCell>
+                              <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </TableCell>
+                          )}
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 ) : activities.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('No activities found', 'No activities found')}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[60px]">{__('Icon', 'Icon')}</TableHead>
+                        <TableHead className="w-[250px]">{__('Activity', 'Activity')}</TableHead>
+                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
+                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
+                        {isPro && (
+                          <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
+                        )}
+                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell colSpan={isPro ? 8 : 7} className="h-64">
+                          <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                              <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                              {__('No activities found', 'No activities found')}
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
+                              {hasFilters 
+                                ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                                : __('Get started by creating your first activity.', 'Get started by creating your first activity.')
+                              }
+                            </p>
+                            {hasFilters ? (
+                              <Button
+                                variant="outline"
+                                onClick={handleResetFilters}
+                                className="flex items-center gap-2"
+                              >
+                                <X className="w-4 h-4" />
+                                {__('Clear Filters', 'Clear Filters')}
+                              </Button>
+                            ) : (
+                              can('yatra_edit_trips') && (
+                                <Button
+                                  onClick={handleCreateActivity}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  {__('Create Activity', 'Create Activity')}
+                                </Button>
+                              )
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[300px]">
+                        <TableHead className="w-[60px]">{__('Icon', 'Icon')}</TableHead>
+                        <TableHead className="w-[250px]">
                           <button
                             onClick={() => handleSort('name')}
                             className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -413,8 +669,8 @@ const Activities: React.FC = () => {
                             {getSortIcon('name')}
                           </button>
                         </TableHead>
-                        <TableHead>{__('Description', 'Description')}</TableHead>
-                        <TableHead>
+                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
+                        <TableHead className="w-[100px]">
                           <button
                             onClick={() => handleSort('status')}
                             className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -424,23 +680,27 @@ const Activities: React.FC = () => {
                           </button>
                         </TableHead>
                         {isPro && (
-                          <TableHead>{__('Trips', 'Trips')}</TableHead>
+                          <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
                         )}
-                        <TableHead>
+                        <TableHead className="w-[150px]">
                           <button
-                            onClick={() => handleSort('date')}
+                            onClick={() => handleSort('created_at')}
                             className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
                           >
-                            {__('Created', 'Created')}
-                            {getSortIcon('date')}
+                            {__('Date', 'Date')}
+                            {getSortIcon('created_at')}
                           </button>
                         </TableHead>
+                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
                         <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {activities.map((activity) => (
+                      {activities.map((activity: Activity) => (
                         <TableRow key={activity.id}>
+                          <TableCell>
+                            {renderIcon(activity.icon)}
+                          </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <div>
@@ -454,7 +714,9 @@ const Activities: React.FC = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                            {activity.description}
+                            <div className="line-clamp-2">
+                              {activity.description || __('No description', 'No description')}
+                            </div>
                           </TableCell>
                           <TableCell>
                             {getStatusBadge(activity.status)}
@@ -465,7 +727,20 @@ const Activities: React.FC = () => {
                             </TableCell>
                           )}
                           <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            {formatDate(activity.created_at)}
+                            <div>
+                              <div>{formatDate(activity.created_at)}</div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                {__('Updated', 'Updated')}: {formatDate(activity.updated_at)}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
+                            <div>
+                              <div>{formatUser(activity.created_by, activity.created_by_name)}</div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                {__('Updated by', 'Updated by')}: {formatUser(activity.updated_by, activity.updated_by_name)}
+                              </div>
+                            </div>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">

@@ -86,8 +86,39 @@ class Bootstrap
      */
     private function initializeCore(): void
     {
-        // Initialize database connection if needed
-        // Can be added here when database service is created
+        // Check and create database tables if they don't exist
+        $this->ensureDatabaseTables();
+    }
+
+    /**
+     * Ensure database tables exist
+     */
+    private function ensureDatabaseTables(): void
+    {
+        global $wpdb;
+        
+        // Check if activities table exists
+        $table_activities = $wpdb->prefix . 'yatra_activities';
+        $activities_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_activities
+        )) === $table_activities;
+
+        // Check if trips table exists
+        $table_trips = $wpdb->prefix . 'yatra_trips';
+        $trips_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_trips
+        )) === $table_trips;
+
+        // If any table doesn't exist, create all tables
+        if (!$activities_exists || !$trips_exists) {
+            Database::createTables();
+            
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Yatra: Database tables created automatically');
+            }
+        }
     }
 
     /**

@@ -21,8 +21,8 @@ class AdminServiceProvider extends ServiceProvider
         // Register admin menu
         add_action('admin_menu', [$this, 'registerAdminMenu']);
 
-        // Enqueue admin assets
-        add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);
+        // Enqueue admin assets - use priority 5 to run before other plugins
+        add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets'], 5);
         
         // Remove admin wrapper for our page
         add_action('admin_init', [$this, 'removeAdminWrapper']);
@@ -66,18 +66,33 @@ class AdminServiceProvider extends ServiceProvider
             return;
         }
 
-        // Prevent WordPress from loading media scripts on our custom page
-        wp_dequeue_script('media-upload');
-        wp_dequeue_script('media-views');
-        wp_dequeue_script('media-audiovideo');
-        wp_dequeue_script('image-edit');
+        // Prevent problematic scripts that cause initialization errors
+        // These scripts try to access wp.media.view before it's initialized
         wp_dequeue_script('svg-painter');
-        
-        wp_deregister_script('media-upload');
-        wp_deregister_script('media-views');
-        wp_deregister_script('media-audiovideo');
-        wp_deregister_script('image-edit');
         wp_deregister_script('svg-painter');
+        wp_dequeue_script('image-edit');
+        wp_deregister_script('image-edit');
+        
+        // Enqueue WordPress media library for image uploads
+        // This enqueues: jquery, underscore, media-models, wp-plupload, jquery-ui-sortable, 
+        // media-views, media-editor, media-audiovideo, etc.
+        wp_enqueue_media();
+        
+        // Ensure wp-mediaelement is loaded (required by media-views for removeAllPlayers)
+        wp_enqueue_script('wp-mediaelement');
+        
+        // Ensure media-audiovideo is loaded (defines wp.media.mixin.removeAllPlayers)
+        // This must load before media-views tries to use it
+        // Note: media-audiovideo depends on media-editor, so we keep media-editor loaded
+        wp_enqueue_script('media-audiovideo');
+        
+        // Keep media-editor loaded - it's required by media-audiovideo
+        // The initialization errors were caused by svg-painter and image-edit, not media-editor
+        
+        // Ensure all required dependencies are loaded
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('underscore');
+        wp_enqueue_script('backbone');
 
         // Remove WordPress core form CSS
         wp_dequeue_style('forms');
@@ -99,13 +114,32 @@ class AdminServiceProvider extends ServiceProvider
 
         if (file_exists($app_js)) {
             $js_version = YATRA_VERSION . '.' . filemtime($app_js);
+            // Enqueue our script with media library as dependency
+            // Note: wp_enqueue_media() registers these scripts: media-models, media-views, etc.
+            // We need to ensure they load before our React app
             wp_enqueue_script(
                 'yatra-admin',
                 YATRA_PLUGIN_URL . 'public/js/app.js',
-                [],
+                ['jquery', 'underscore', 'backbone', 'media-models', 'wp-mediaelement', 'media-editor', 'media-audiovideo', 'media-views'], // Dependencies to ensure media library loads first
                 $js_version,
                 true
             );
+            
+            // Add inline script to preserve wp.media reference before it gets overwritten
+            // This runs after media scripts load but before React app
+            wp_add_inline_script('yatra-admin', '
+                (function() {
+                    // Preserve wp.media reference in a safe location
+                    if (typeof wp !== "undefined" && typeof wp.media === "function") {
+                        window.yatraWpMedia = wp.media;
+                    }
+                    
+                    // Also ensure wp object exists
+                    if (typeof wp === "undefined") {
+                        window.wp = {};
+                    }
+                })();
+            ', 'before');
 
             // Get current user
             $current_user = wp_get_current_user();
@@ -238,7 +272,7 @@ class AdminServiceProvider extends ServiceProvider
             
             // Localize script with API data, permissions, and translations
             wp_localize_script('yatra-admin', 'yatraAdmin', [
-                'apiUrl' => rest_url('yatra/v1/'),
+                'apiUrl' => rest_url('yatra/v1'),
                 'nonce' => wp_create_nonce('wp_rest'),
                 'currentUser' => $current_user->ID,
                 'siteUrl' => home_url(),
@@ -251,6 +285,7 @@ class AdminServiceProvider extends ServiceProvider
             ]);
         }
     }
+
 
     /**
      * Render admin page

@@ -1,0 +1,501 @@
+/**
+ * Icon Picker Component
+ * Reusable component for selecting SVG icons or uploading custom images
+ * Supports both Lucide React icons and custom image uploads
+ */
+
+import React, { useState, useCallback } from 'react';
+import {
+  Activity,
+  UtensilsCrossed,
+  Building2,
+  Bus,
+  Moon,
+  Package,
+  Target,
+  Camera,
+  Mountain,
+  Waves,
+  Palette,
+  Plane,
+  Car,
+  Hotel,
+  Coffee,
+  Bed,
+  MapPin,
+  Footprints,
+  Eye,
+  Clock,
+  Calendar,
+  Image as ImageIcon,
+  Music,
+  Gamepad2,
+  BookOpen,
+  ShoppingBag,
+  Heart,
+  Star,
+  Zap,
+  Flame,
+  Upload,
+  X,
+  Search,
+  Image as ImageLucide,
+  Sparkles,
+  Check,
+} from 'lucide-react';
+import { __ } from '../../lib/i18n';
+import { Button } from './button';
+import { Input } from './input';
+import { Card, CardContent } from './card';
+import { Badge } from './badge';
+import { useWordPressMedia } from '../../hooks/useWordPressMedia';
+
+export type IconName = 
+  | 'activity'
+  | 'utensils'
+  | 'building'
+  | 'bus'
+  | 'moon'
+  | 'package'
+  | 'target'
+  | 'camera'
+  | 'mountain'
+  | 'waves'
+  | 'palette'
+  | 'plane'
+  | 'car'
+  | 'hotel'
+  | 'coffee'
+  | 'bed'
+  | 'map-pin'
+  | 'footprints'
+  | 'eye'
+  | 'clock'
+  | 'calendar'
+  | 'image'
+  | 'music'
+  | 'gamepad'
+  | 'book'
+  | 'shopping'
+  | 'heart'
+  | 'star'
+  | 'zap'
+  | 'flame';
+
+interface IconOption {
+  name: IconName;
+  label: string;
+  component: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  category: 'activity' | 'travel' | 'food' | 'accommodation' | 'transport' | 'general';
+}
+
+const iconOptions: IconOption[] = [
+  { name: 'activity', label: 'Activity', component: Activity, category: 'activity' },
+  { name: 'footprints', label: 'Hiking', component: Footprints, category: 'activity' },
+  { name: 'mountain', label: 'Mountain', component: Mountain, category: 'activity' },
+  { name: 'waves', label: 'Water Sports', component: Waves, category: 'activity' },
+  { name: 'camera', label: 'Photography', component: Camera, category: 'activity' },
+  { name: 'eye', label: 'Sightseeing', component: Eye, category: 'activity' },
+  { name: 'target', label: 'Target', component: Target, category: 'activity' },
+  { name: 'zap', label: 'Energy', component: Zap, category: 'activity' },
+  { name: 'flame', label: 'Adventure', component: Flame, category: 'activity' },
+  { name: 'utensils', label: 'Meal', component: UtensilsCrossed, category: 'food' },
+  { name: 'coffee', label: 'Coffee', component: Coffee, category: 'food' },
+  { name: 'hotel', label: 'Hotel', component: Hotel, category: 'accommodation' },
+  { name: 'bed', label: 'Bed', component: Bed, category: 'accommodation' },
+  { name: 'building', label: 'Building', component: Building2, category: 'accommodation' },
+  { name: 'bus', label: 'Bus', component: Bus, category: 'transport' },
+  { name: 'plane', label: 'Plane', component: Plane, category: 'transport' },
+  { name: 'car', label: 'Car', component: Car, category: 'transport' },
+  { name: 'map-pin', label: 'Location', component: MapPin, category: 'travel' },
+  { name: 'calendar', label: 'Calendar', component: Calendar, category: 'travel' },
+  { name: 'clock', label: 'Time', component: Clock, category: 'travel' },
+  { name: 'moon', label: 'Rest', component: Moon, category: 'general' },
+  { name: 'package', label: 'Package', component: Package, category: 'general' },
+  { name: 'palette', label: 'Palette', component: Palette, category: 'general' },
+  { name: 'image', label: 'Image', component: ImageIcon, category: 'general' },
+  { name: 'music', label: 'Music', component: Music, category: 'general' },
+  { name: 'gamepad', label: 'Entertainment', component: Gamepad2, category: 'general' },
+  { name: 'book', label: 'Education', component: BookOpen, category: 'general' },
+  { name: 'shopping', label: 'Shopping', component: ShoppingBag, category: 'general' },
+  { name: 'heart', label: 'Wellness', component: Heart, category: 'general' },
+  { name: 'star', label: 'Featured', component: Star, category: 'general' },
+];
+
+const categoryLabels: Record<string, string> = {
+  activity: 'Activities',
+  travel: 'Travel',
+  food: 'Food & Dining',
+  accommodation: 'Accommodation',
+  transport: 'Transportation',
+  general: 'General',
+};
+
+export type IconPickerValue = {
+  type: 'icon' | 'image';
+  value: string; // icon name for type 'icon', image URL for type 'image'
+};
+
+interface IconPickerProps {
+  value?: IconPickerValue | null;
+  onChange: (value: IconPickerValue | null) => void;
+  label?: string;
+  helpText?: string;
+  error?: string;
+  required?: boolean;
+  allowImageUpload?: boolean;
+  allowIconSelection?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export const IconPicker: React.FC<IconPickerProps> = ({
+  value,
+  onChange,
+  label,
+  helpText,
+  error,
+  required = false,
+  allowImageUpload = true,
+  allowIconSelection = true,
+  size = 'md',
+  className = '',
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'icons' | 'upload'>('icons');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [imagePreview, setImagePreview] = useState<string | null>(value?.type === 'image' ? value.value : null);
+  
+  // WordPress media library hook
+  const { openMediaLibrary } = useWordPressMedia({
+    title: __('Select or Upload Image', 'Select or Upload Image'),
+    buttonText: __('Use this image', 'Use this image'),
+    multiple: false,
+    library: { type: 'image' },
+  });
+
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
+  };
+
+  const iconSizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-6 h-6',
+    lg: 'w-8 h-8',
+  };
+
+  // Filter icons by search and category
+  const filteredIcons = iconOptions.filter(icon => {
+    const matchesSearch = icon.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         icon.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || icon.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Get unique categories
+  const categories = ['all', ...Array.from(new Set(iconOptions.map(icon => icon.category)))];
+
+  const handleIconSelect = (iconName: IconName) => {
+    onChange({ type: 'icon', value: iconName });
+    setIsOpen(false);
+    setSearchTerm('');
+  };
+
+  const handleWordPressMediaSelect = useCallback(() => {
+    openMediaLibrary((attachment) => {
+      if (attachment && !Array.isArray(attachment)) {
+        const imageUrl = attachment.url;
+        setImagePreview(imageUrl);
+        onChange({ type: 'image', value: imageUrl });
+        setIsOpen(false);
+      }
+    });
+  }, [openMediaLibrary, onChange]);
+
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    onChange(null);
+  };
+
+  const handleImageUrlChange = (url: string) => {
+    if (url.trim()) {
+      setImagePreview(url);
+      onChange({ type: 'image', value: url.trim() });
+    } else {
+      handleRemoveImage();
+    }
+  };
+
+  const getCurrentIcon = () => {
+    if (!value || value.type !== 'icon') return null;
+    const icon = iconOptions.find(opt => opt.name === value.value);
+    return icon?.component || null;
+  };
+
+  const CurrentIcon = getCurrentIcon();
+
+  return (
+    <div className={`space-y-2 ${className}`}>
+      {label && (
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+      )}
+      
+      {helpText && (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{helpText}</p>
+      )}
+
+      {/* Current Selection Display */}
+      <div className="flex items-center gap-3">
+        <div className={`${sizeClasses[size]} rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-50 dark:bg-gray-800 overflow-hidden`}>
+          {value?.type === 'image' && imagePreview ? (
+            <img 
+              src={imagePreview} 
+              alt="Selected" 
+              className="w-full h-full object-cover"
+            />
+          ) : value?.type === 'icon' && CurrentIcon ? (
+            <CurrentIcon className={`${iconSizeClasses[size]} text-gray-700 dark:text-gray-300`} />
+          ) : (
+            <ImageLucide className={`${iconSizeClasses[size]} text-gray-400`} />
+          )}
+        </div>
+
+        <div className="flex-1">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-full justify-start"
+          >
+            {value?.type === 'icon' 
+              ? `${__('Icon', 'Icon')}: ${iconOptions.find(i => i.name === value.value)?.label || value.value}`
+              : value?.type === 'image'
+              ? __('Custom Image', 'Custom Image')
+              : __('Select Icon or Upload Image', 'Select Icon or Upload Image')}
+          </Button>
+        </div>
+
+        {value && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              onChange(null);
+              setImagePreview(null);
+            }}
+            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
+
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+      )}
+
+      {/* Icon Picker Modal */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setIsOpen(false)}>
+          <Card 
+            className="w-full max-w-2xl max-h-[80vh] bg-white dark:bg-gray-800 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardContent className="p-0">
+              {/* Tabs */}
+              <div className="flex border-b border-gray-200 dark:border-gray-700">
+                {allowIconSelection && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('icons')}
+                    className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                      activeTab === 'icons'
+                        ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Sparkles className="w-4 h-4 inline mr-2" />
+                    {__('Icons', 'Icons')}
+                  </button>
+                )}
+                {allowImageUpload && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('upload')}
+                    className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                      activeTab === 'upload'
+                        ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Upload className="w-4 h-4 inline mr-2" />
+                    {__('Upload Image', 'Upload Image')}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-4 max-h-[60vh] overflow-y-auto">
+                {activeTab === 'icons' && allowIconSelection && (
+                  <div className="space-y-4">
+                    {/* Search */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Input
+                        type="text"
+                        placeholder={__('Search icons...', 'Search icons...')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-9"
+                      />
+                    </div>
+
+                    {/* Category Filter */}
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map(category => (
+                        <Badge
+                          key={category}
+                          variant={selectedCategory === category ? 'info' : 'outline'}
+                          className="cursor-pointer"
+                          onClick={() => setSelectedCategory(category)}
+                        >
+                          {category === 'all' ? __('All', 'All') : categoryLabels[category] || category}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    {/* Icons Grid */}
+                    <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3">
+                      {filteredIcons.map(icon => {
+                        const IconComponent = icon.component;
+                        const isSelected = value?.type === 'icon' && value.value === icon.name;
+                        return (
+                          <button
+                            key={icon.name}
+                            type="button"
+                            onClick={() => handleIconSelect(icon.name)}
+                            className={`relative p-3 rounded-lg border-2 transition-all hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 ${
+                              isSelected
+                                ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
+                                : 'border-gray-200 dark:border-gray-700'
+                            }`}
+                            title={icon.label}
+                          >
+                            <IconComponent className="w-6 h-6 text-gray-700 dark:text-gray-300 mx-auto" />
+                            {isSelected && (
+                              <div className="absolute top-1 right-1 bg-blue-600 rounded-full p-0.5">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {filteredIcons.length === 0 && (
+                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        {__('No icons found', 'No icons found')}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'upload' && allowImageUpload && (
+                  <div className="space-y-4">
+                    {/* WordPress Media Library Upload */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {__('Upload Image', 'Upload Image')}
+                      </label>
+                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleWordPressMediaSelect}
+                          className="w-full flex flex-col items-center gap-2 py-6"
+                        >
+                          <Upload className="w-8 h-8 text-gray-400" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {__('Click to open WordPress Media Library', 'Click to open WordPress Media Library')}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-500">
+                            {__('Select from library or upload new image', 'Select from library or upload new image')}
+                          </span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Image URL Input (Fallback) */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {__('Or Enter Image URL', 'Or Enter Image URL')}
+                      </label>
+                      <Input
+                        type="url"
+                        placeholder={__('https://example.com/image.png', 'https://example.com/image.png')}
+                        value={value?.type === 'image' ? value.value : ''}
+                        onChange={(e) => handleImageUrlChange(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Image Preview */}
+                    {imagePreview && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {__('Preview', 'Preview')}
+                        </label>
+                        <div className="relative inline-block">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="max-w-full max-h-48 rounded-lg border border-gray-300 dark:border-gray-600"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleRemoveImage}
+                            className="absolute top-2 right-2 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-gray-200 dark:border-gray-700 p-4 flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {__('Close', 'Close')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default IconPicker;
+

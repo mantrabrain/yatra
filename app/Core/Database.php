@@ -36,8 +36,30 @@ class Database
             KEY `status` (`status`)
         ) {$charset_collate};";
 
+        // Activities table
+        $table_activities = $wpdb->prefix . 'yatra_activities';
+        
+        $sql_activities = "CREATE TABLE IF NOT EXISTS `{$table_activities}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `name` varchar(255) NOT NULL,
+            `slug` varchar(255) NOT NULL,
+            `description` text,
+            `icon` text,
+            `status` varchar(20) DEFAULT 'draft',
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `created_by` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+            `updated_by` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `slug` (`slug`),
+            KEY `status` (`status`),
+            KEY `created_by` (`created_by`),
+            KEY `updated_by` (`updated_by`)
+        ) {$charset_collate};";
+
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql_trips);
+        dbDelta($sql_activities);
     }
 
     /**
@@ -49,6 +71,7 @@ class Database
 
         $tables = [
             $wpdb->prefix . 'yatra_trips',
+            $wpdb->prefix . 'yatra_activities',
         ];
 
         foreach ($tables as $table) {
