@@ -317,12 +317,9 @@ const Itinerary: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
-            {__('Day-by-Day Schedule', 'Day-by-Day Schedule')}
-          </h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {__('Build your complete itinerary with activities, meals, and accommodations', 'Build your complete itinerary with activities, meals, and accommodations')}
           </p>
         </div>

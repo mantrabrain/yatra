@@ -315,7 +315,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className={`flex-1 flex flex-col ${isTripFormPage ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           {/* Top Bar */}
           <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 flex items-center">
             <div className="flex items-center justify-between w-full">
@@ -366,7 +366,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </header>
 
           {/* Page Content */}
-          <main className={`flex-1 ${isTripFormPage ? 'p-0 overflow-hidden' : 'p-6 overflow-y-auto'}`}>
+          <main className={`flex-1 ${isTripFormPage ? 'p-0 h-full min-h-0' : 'p-6 overflow-y-auto'}`}>
             {children}
           </main>
         </div>

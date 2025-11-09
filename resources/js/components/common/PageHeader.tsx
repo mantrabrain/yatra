@@ -9,7 +9,7 @@ import { __ } from '../../lib/i18n';
 import { ConditionalRender } from '../ui/conditional-render';
 
 interface PageHeaderProps {
-  title: string;
+  title?: string; // Optional - title is now shown in top bar
   description?: string;
   actions?: React.ReactNode;
   actionCapability?: string;
@@ -37,9 +37,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   return (
     <div className="flex items-center justify-between mb-8">
       <div>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">{title}</h2>
         {description && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{description}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
         )}
       </div>
       
