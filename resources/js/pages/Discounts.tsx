@@ -135,10 +135,6 @@ const Discounts: React.FC = () => {
     }
   };
 
-  const formatUser = (userId: number, userName?: string) => {
-    if (userName) return userName;
-    return userId ? `User #${userId}` : __('Unknown', 'Unknown');
-  };
 
   const confirmDelete = () => {
     if (deleteConfirm.discount) {
@@ -353,9 +349,7 @@ const Discounts: React.FC = () => {
                         <TableHead>{__('Usage', 'Usage')}</TableHead>
                         <TableHead>{__('Expiry Date', 'Expiry Date')}</TableHead>
                         <TableHead>{__('Status', 'Status')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
+                        <TableHead className="text-right w-[180px]">{__('Actions', 'Actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -379,18 +373,6 @@ const Discounts: React.FC = () => {
                           <TableCell>
                             <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                           </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">
                               <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -412,14 +394,12 @@ const Discounts: React.FC = () => {
                         <TableHead>{__('Usage', 'Usage')}</TableHead>
                         <TableHead>{__('Expiry Date', 'Expiry Date')}</TableHead>
                         <TableHead>{__('Status', 'Status')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
+                        <TableHead className="text-right w-[180px]">{__('Actions', 'Actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       <TableRow>
-                        <TableCell colSpan={9} className="h-64">
+                        <TableCell colSpan={7} className="h-64">
                           <div className="flex flex-col items-center justify-center h-full text-center py-12">
                             <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
                               <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -516,17 +496,7 @@ const Discounts: React.FC = () => {
                             {getSortIcon('status')}
                           </button>
                         </TableHead>
-                        <TableHead className="w-[150px]">
-                          <button
-                            onClick={() => handleSort('created_at')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Date', 'Date')}
-                            {getSortIcon('created_at')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
+                        <TableHead className="text-right w-[180px]">{__('Actions', 'Actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -577,22 +547,6 @@ const Discounts: React.FC = () => {
                           </TableCell>
                           <TableCell>
                             {getStatusBadge(discount.status)}
-                          </TableCell>
-                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            <div>
-                              <div>{formatDate(discount.created_at)}</div>
-                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                {__('Updated', 'Updated')}: {formatDate(discount.updated_at)}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                            <div>
-                              <div>{formatUser(discount.created_by, discount.created_by_name)}</div>
-                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                {__('Updated by', 'Updated by')}: {formatUser(discount.updated_by, discount.updated_by_name)}
-                              </div>
-                            </div>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">
