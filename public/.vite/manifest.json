@@ -1,9 +1,24 @@
 {
+  "_query-vendor-B9I7ekuz.js": {
+    "file": "js/query-vendor-B9I7ekuz.js",
+    "name": "query-vendor",
+    "imports": [
+      "_react-vendor-DtX1tuCI.js"
+    ]
+  },
+  "_react-vendor-DtX1tuCI.js": {
+    "file": "js/react-vendor-DtX1tuCI.js",
+    "name": "react-vendor"
+  },
   "resources/js/main.tsx": {
     "file": "js/app.js",
     "name": "app",
     "src": "resources/js/main.tsx",
     "isEntry": true,
+    "imports": [
+      "_query-vendor-B9I7ekuz.js",
+      "_react-vendor-DtX1tuCI.js"
+    ],
     "css": [
       "css/app.css"
     ]

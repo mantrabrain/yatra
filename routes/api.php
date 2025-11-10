@@ -22,14 +22,17 @@ use Yatra\Controllers\TravelerCategoryController;
 use Yatra\Controllers\ItemTypeController;
 use Yatra\Controllers\ItemController;
 use Yatra\Controllers\DiscountController;
+use Yatra\Controllers\SettingsController;
 
 // Register Trip routes
 if (class_exists('Yatra\Controllers\TripController')) {
     try {
-$trip_controller = new TripController();
-$trip_controller->register_routes();
+        $trip_controller = new TripController();
+        $trip_controller->register_routes();
     } catch (\Exception $e) {
-        error_log('Yatra: Failed to register Trip routes: ' . $e->getMessage());
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Trip routes: ' . $e->getMessage());
+        }
     }
 }
 
@@ -48,8 +51,10 @@ if (class_exists('Yatra\Controllers\ActivityController')) {
             error_log('Yatra: Activity routes registered: ' . print_r(array_keys($activity_routes), true));
         }
     } catch (\Exception $e) {
-        error_log('Yatra: Failed to register Activity routes: ' . $e->getMessage());
-        error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Activity routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
     }
 }
 
@@ -68,8 +73,10 @@ if (class_exists('Yatra\Controllers\DestinationController')) {
             error_log('Yatra: Destination routes registered: ' . print_r(array_keys($destination_routes), true));
         }
     } catch (\Exception $e) {
-        error_log('Yatra: Failed to register Destination routes: ' . $e->getMessage());
-        error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Destination routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
     }
 }
 
@@ -88,8 +95,10 @@ if (class_exists('Yatra\Controllers\TravelerCategoryController')) {
             error_log('Yatra: Traveler Category routes registered: ' . print_r(array_keys($traveler_category_routes), true));
         }
     } catch (\Exception $e) {
-        error_log('Yatra: Failed to register Traveler Category routes: ' . $e->getMessage());
-        error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Traveler Category routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
     }
 }
 
@@ -108,8 +117,10 @@ if (class_exists('Yatra\Controllers\ItemTypeController')) {
             error_log('Yatra: Item Type routes registered: ' . print_r(array_keys($item_type_routes), true));
         }
     } catch (\Exception $e) {
-        error_log('Yatra: Failed to register Item Type routes: ' . $e->getMessage());
-        error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Item Type routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
     }
 }
 
@@ -128,8 +139,10 @@ if (class_exists('Yatra\Controllers\ItemController')) {
             error_log('Yatra: Item routes registered: ' . print_r(array_keys($item_routes), true));
         }
     } catch (\Exception $e) {
-        error_log('Yatra: Failed to register Item routes: ' . $e->getMessage());
-        error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Item routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
     }
 }
 
@@ -148,10 +161,32 @@ if (class_exists('Yatra\Controllers\DiscountController')) {
             error_log('Yatra: Discount routes registered: ' . print_r(array_keys($discount_routes), true));
         }
     } catch (\Exception $e) {
-        error_log('Yatra: Failed to register Discount routes: ' . $e->getMessage());
-        error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Discount routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
     }
 }
 
-// Add more route registrations here as you create new controllers
+// Register Settings routes
+if (class_exists('Yatra\Controllers\SettingsController')) {
+    try {
+        $settings_controller = new SettingsController();
+        $settings_controller->register_routes();
+        
+        // Debug: Verify route was registered
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $settings_routes = array_filter($routes, function($key) {
+                return strpos($key, '/settings') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Settings routes registered: ' . print_r(array_keys($settings_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Settings routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
 

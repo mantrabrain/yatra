@@ -4,7 +4,7 @@
  * Left sidebar navigation + Right side form fields with detailed configurations
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Settings as SettingsIcon,
@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -194,17 +196,50 @@ interface SettingsData {
 const Settings: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
-  const [activeSection, setActiveSection] = useState<SettingsSection>('general');
+  const { showToast } = useToast();
+  
+  // Get active section from localStorage or default to 'general'
+  const getInitialActiveSection = (): SettingsSection => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('yatra_settings_active_section');
+      if (saved && ['general', 'booking', 'payment', 'email', 'trip', 'customer', 'review', 'tax', 'currency', 'notification', 'integration', 'advanced'].includes(saved)) {
+        return saved as SettingsSection;
+      }
+    }
+    return 'general';
+  };
+
+  const [activeSection, setActiveSection] = useState<SettingsSection>(getInitialActiveSection());
+  // Temporary viewing section that changes on tab click, but only becomes activeSection on save
+  const [viewingSection, setViewingSection] = useState<SettingsSection>(getInitialActiveSection());
   const [isSaving, setIsSaving] = useState(false);
   const [expandedGateways, setExpandedGateways] = useState<Record<string, boolean>>({});
+
+  // Initialize viewingSection from activeSection on mount
+  useEffect(() => {
+    setViewingSection(activeSection);
+  }, [activeSection]);
 
   // Fetch settings
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
     queryFn: async () => {
-      // return await apiClient.get('/settings');
-      // Dummy data with all fields
-      return {
+      try {
+        const response = await apiClient.get('/settings');
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load settings', 'Failed to load settings'), 'error');
+        throw error;
+      }
+    },
+    enabled: can('manage_yatra'),
+    // Fallback to default values if API fails
+    retry: 1,
+    retryDelay: 1000,
+  });
+
+  // Default settings fallback
+  const defaultSettings: SettingsData = {
         company_name: 'Yatra Travel Agency',
         company_email: 'info@yatra.com',
         company_phone: '+1-234-567-8900',
@@ -348,17 +383,17 @@ const Settings: React.FC = () => {
         api_rate_limit: 100,
         session_timeout: 3600,
       } as SettingsData;
-    },
-    enabled: can('manage_yatra'),
-  });
 
   const [formData, setFormData] = useState<SettingsData | null>(null);
 
   React.useEffect(() => {
     if (settings) {
       setFormData(settings);
+    } else if (!isLoading) {
+      // Use default settings if API fails or returns empty
+      setFormData(defaultSettings);
     }
-  }, [settings]);
+  }, [settings, isLoading]);
 
   const handleFieldChange = (field: keyof SettingsData, value: any) => {
     if (formData) {
@@ -387,25 +422,41 @@ const Settings: React.FC = () => {
 
   const saveMutation = useMutation({
     mutationFn: async (data: SettingsData) => {
-      // return await apiClient.put('/settings', data);
-      console.log('Saving settings:', data);
-      return { success: true };
+      try {
+        return await apiClient.put('/settings', data);
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to save settings', 'Failed to save settings'), 'error');
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] });
+      showToast(__('Settings saved successfully', 'Settings saved successfully'), 'success');
       setIsSaving(false);
-      alert(__('Settings saved successfully', 'Settings saved successfully'));
     },
-    onError: () => {
+    onError: (error: any) => {
       setIsSaving(false);
-      alert(__('Error saving settings', 'Error saving settings'));
+      const errorMessage = error?.message || __('Error saving settings', 'Error saving settings');
+      showToast(errorMessage, 'error');
     },
   });
 
   const handleSave = () => {
     if (formData) {
       setIsSaving(true);
-      saveMutation.mutate(formData);
+      saveMutation.mutate(formData, {
+        onSuccess: () => {
+          // Update activeSection to the current viewingSection when save is successful
+          setActiveSection(viewingSection);
+          // Save to localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('yatra_settings_active_section', viewingSection);
+          }
+        },
+        onSettled: () => {
+          setIsSaving(false);
+        },
+      });
     }
   };
 
@@ -463,7 +514,7 @@ const Settings: React.FC = () => {
   const renderSettingsContent = () => {
     if (!formData) return null;
 
-    switch (activeSection) {
+    switch (viewingSection) {
       case 'general':
         return (
           <div className="space-y-6">
@@ -2212,9 +2263,66 @@ const Settings: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading settings...', 'Loading settings...')}</span>
+      <div className="space-y-3">
+        {/* Page Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+          <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+          {/* Left Sidebar Skeleton */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardContent className="p-0">
+                <nav className="space-y-1 p-2">
+                  {[...Array(12)].map((_, index) => (
+                    <div
+                      key={`skeleton-nav-${index}`}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md"
+                    >
+                      <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                      <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    </div>
+                  ))}
+                </nav>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Content Skeleton */}
+          <div className="lg:col-span-3">
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+              </CardHeader>
+              <CardContent className="pb-4 space-y-4">
+                {/* Form Fields Skeleton */}
+                {[...Array(6)].map((_, index) => (
+                  <div key={`skeleton-field-${index}`} className="space-y-2">
+                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                ))}
+                {/* Grid fields skeleton */}
+                <div className="grid grid-cols-2 gap-4">
+                  {[...Array(4)].map((_, index) => (
+                    <div key={`skeleton-grid-${index}`} className="space-y-2">
+                      <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                      <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -2254,13 +2362,13 @@ const Settings: React.FC = () => {
                 <nav className="space-y-1 p-2">
                   {settingsSections.map((section) => {
                     const Icon = section.icon;
-                    const isActive = activeSection === section.id;
+                    const isViewing = viewingSection === section.id;
                     return (
                       <button
                         key={section.id}
-                        onClick={() => setActiveSection(section.id)}
+                        onClick={() => setViewingSection(section.id)}
                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                          isActive
+                          isViewing
                             ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
                             : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                         }`}
@@ -2281,7 +2389,7 @@ const Settings: React.FC = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   {(() => {
-                    const section = settingsSections.find(s => s.id === activeSection);
+                    const section = settingsSections.find(s => s.id === viewingSection);
                     const Icon = section?.icon || SettingsIcon;
                     return (
                       <>

@@ -106,5 +106,40 @@ abstract class BaseController
     {
         return new WP_Error('yatra_error', $message, array_merge(['status' => $status], $data));
     }
+
+    /**
+     * Convert attachment ID to URL in icon field
+     * Handles IconPickerValue format: { type: 'icon'|'image', value: string }
+     * For images, converts attachment ID to URL
+     */
+    protected function convert_icon_attachment_id_to_url($icon): mixed
+    {
+        if (empty($icon)) {
+            return $icon;
+        }
+
+        // If it's a string (old format), return as is
+        if (is_string($icon)) {
+            return $icon;
+        }
+
+        // If it's an array/object with type and value
+        if (is_array($icon) && isset($icon['type']) && isset($icon['value'])) {
+            // If it's an image type and value is numeric (attachment ID), convert to URL
+            if ($icon['type'] === 'image' && is_numeric($icon['value'])) {
+                $attachment_id = (int) $icon['value'];
+                $image_url = wp_get_attachment_image_url($attachment_id, 'full');
+                if ($image_url) {
+                    $icon['value'] = $image_url;
+                }
+            }
+            // If it's already a URL (backward compatibility), keep it
+            elseif ($icon['type'] === 'image' && (strpos($icon['value'], 'http://') === 0 || strpos($icon['value'], 'https://') === 0)) {
+                // Already a URL, keep it
+            }
+        }
+
+        return $icon;
+    }
 }
 

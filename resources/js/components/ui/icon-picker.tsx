@@ -4,7 +4,7 @@
  * Supports both Lucide React icons and custom image uploads
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Activity,
   UtensilsCrossed,
@@ -133,7 +133,7 @@ const categoryLabels: Record<string, string> = {
 
 export type IconPickerValue = {
   type: 'icon' | 'image';
-  value: string; // icon name for type 'icon', image URL for type 'image'
+  value: string; // icon name for type 'icon', attachment ID for type 'image'
 };
 
 interface IconPickerProps {
@@ -165,7 +165,35 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   const [activeTab, setActiveTab] = useState<'icons' | 'upload'>('icons');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [imagePreview, setImagePreview] = useState<string | null>(value?.type === 'image' ? value.value : null);
+  
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    value?.type === 'image' ? (value.value.startsWith('http') ? value.value : null) : null
+  );
+  
+  // Update preview when value changes and fetch URL if it's an attachment ID
+  useEffect(() => {
+    if (value?.type === 'image') {
+      // If it's already a URL, use it directly
+      if (value.value.startsWith('http://') || value.value.startsWith('https://')) {
+        setImagePreview(value.value);
+      } else if (/^\d+$/.test(value.value) && window.yatraAdmin?.apiUrl) {
+        // It's an attachment ID, fetch the URL from WordPress REST API
+        const apiUrl = window.yatraAdmin.apiUrl.replace('/yatra/v1', '');
+        fetch(`${apiUrl}/wp/v2/media/${value.value}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.source_url) {
+              setImagePreview(data.source_url);
+            }
+          })
+          .catch(() => {
+            // Keep null if fetch fails
+          });
+      }
+    } else {
+      setImagePreview(null);
+    }
+  }, [value]);
   
   // WordPress media library hook
   const { openMediaLibrary } = useWordPressMedia({
@@ -207,9 +235,10 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   const handleWordPressMediaSelect = useCallback(() => {
     openMediaLibrary((attachment) => {
       if (attachment && !Array.isArray(attachment)) {
-        const imageUrl = attachment.url;
-        setImagePreview(imageUrl);
-        onChange({ type: 'image', value: imageUrl });
+        // Store attachment ID instead of URL
+        const attachmentId = String(attachment.id);
+        setImagePreview(attachment.url); // Use URL for preview
+        onChange({ type: 'image', value: attachmentId });
         setIsOpen(false);
       }
     });

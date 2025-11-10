@@ -24,8 +24,26 @@ class AdminServiceProvider extends ServiceProvider
         // Enqueue admin assets - use priority 5 to run before other plugins
         add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets'], 5);
         
+        // Add module type to script tag
+        add_filter('script_loader_tag', [$this, 'addModuleTypeToScript'], 10, 2);
+        
         // Remove admin wrapper for our page
         add_action('admin_init', [$this, 'removeAdminWrapper']);
+    }
+    
+    /**
+     * Add type="module" attribute to yatra-admin script
+     */
+    public function addModuleTypeToScript(string $tag, string $handle): string
+    {
+        if ($handle === 'yatra-admin') {
+            // Check if type="module" is already present
+            if (strpos($tag, 'type="module"') === false && strpos($tag, "type='module'") === false) {
+                // Replace the script tag to add type="module"
+                $tag = str_replace('<script ', '<script type="module" ', $tag);
+            }
+        }
+        return $tag;
     }
     
     /**

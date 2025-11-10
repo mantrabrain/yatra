@@ -12,6 +12,13 @@ export default defineConfig({
   build: {
     outDir: 'public',
     emptyOutDir: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
     rollupOptions: {
       input: {
         app: path.resolve(__dirname, 'resources/js/main.tsx'),
@@ -25,9 +32,15 @@ export default defineConfig({
           }
           return 'assets/[name]-[hash][extname]';
         },
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'query-vendor': ['@tanstack/react-query'],
+        },
       },
     },
     manifest: true,
+    sourcemap: false,
+    chunkSizeWarningLimit: 1000,
   },
   server: {
     port: 3000,

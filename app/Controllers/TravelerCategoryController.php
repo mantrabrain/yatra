@@ -245,6 +245,11 @@ class TravelerCategoryController extends BaseController
                 if (isset($prepared['icon']) && is_string($prepared['icon'])) {
                     $prepared['icon'] = maybe_unserialize($prepared['icon']);
                 }
+                
+                // Convert attachment ID to URL for images
+                if (isset($prepared['icon'])) {
+                    $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
+                }
 
                 // Add user names (escaped for output)
                 if (!empty($prepared['created_by'])) {
@@ -289,6 +294,11 @@ class TravelerCategoryController extends BaseController
             // Unserialize icon if needed
             if (isset($prepared['icon']) && is_string($prepared['icon'])) {
                 $prepared['icon'] = maybe_unserialize($prepared['icon']);
+            }
+            
+            // Convert attachment ID to URL for images
+            if (isset($prepared['icon'])) {
+                $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
             }
 
             // Add user names (escaped for output)
