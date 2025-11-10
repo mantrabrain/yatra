@@ -4035,10 +4035,10 @@ const TripForm: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden p-0">
+      <div className="flex flex-1 min-h-0 p-0">
         {/* Sidebar */}
-        <div className="w-80 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto overflow-x-hidden flex-shrink-0">
-          <div className="p-5 space-y-6">
+        <div className="w-80 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto overflow-x-hidden flex-shrink-0 min-h-0">
+          <div className="p-5 pb-8 space-y-6">
             {/* Essentials */}
             <div>
               <div className="flex items-center gap-2 mb-3 px-1">
@@ -4131,7 +4131,7 @@ const TripForm: React.FC = () => {
             </div>
 
             {/* Advanced */}
-            <div>
+            <div className="pb-12">
               <div className="flex items-center gap-2 mb-3 px-1">
                 <Settings className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                 <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
