@@ -1,0 +1,315 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yatra\Services;
+
+use Yatra\Repositories\TravelerCategoryRepository;
+use Yatra\Helpers\SlugHelper;
+
+/**
+ * Traveler Category Service
+ * Contains business logic for traveler categories
+ */
+class TravelerCategoryService extends BaseService
+{
+    /**
+     * @var TravelerCategoryRepository
+     */
+    private TravelerCategoryRepository $repository;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->repository = new TravelerCategoryRepository();
+    }
+
+    /**
+     * Get repository
+     */
+    protected function getRepository(): TravelerCategoryRepository
+    {
+        return $this->repository;
+    }
+
+    /**
+     * Validate traveler category data
+     */
+    protected function validate(array $data, ?int $id = null): void
+    {
+        if (empty($data['label'])) {
+            throw new \InvalidArgumentException('Category label is required');
+        }
+
+        // Slug will be auto-generated from label, so we don't need to validate it here
+        // The SlugHelper will ensure uniqueness
+
+        // Validate status
+        $allowed_statuses = ['draft', 'publish', 'trash'];
+        if (isset($data['status']) && !in_array($data['status'], $allowed_statuses, true)) {
+            throw new \InvalidArgumentException('Invalid status. Must be one of: ' . implode(', ', $allowed_statuses));
+        }
+
+        // Validate age range
+        if (isset($data['age_min']) && $data['age_min'] !== '' && $data['age_min'] !== null) {
+            $age_min = (int) $data['age_min'];
+            if ($age_min < 0) {
+                throw new \InvalidArgumentException('Minimum age cannot be negative');
+            }
+        }
+
+        if (isset($data['age_max']) && $data['age_max'] !== '' && $data['age_max'] !== null) {
+            $age_max = (int) $data['age_max'];
+            if ($age_max < 0) {
+                throw new \InvalidArgumentException('Maximum age cannot be negative');
+            }
+        }
+
+        // Validate age range logic
+        if (isset($data['age_min']) && isset($data['age_max']) 
+            && $data['age_min'] !== '' && $data['age_max'] !== '' 
+            && $data['age_min'] !== null && $data['age_max'] !== null) {
+            $age_min = (int) $data['age_min'];
+            $age_max = (int) $data['age_max'];
+            if ($age_min >= $age_max) {
+                throw new \InvalidArgumentException('Maximum age must be greater than minimum age');
+            }
+        }
+    }
+
+    /**
+     * Process before create
+     */
+    protected function processBeforeCreate(array $data): array
+    {
+        // Sanitize label
+        if (isset($data['label'])) {
+            $data['label'] = sanitize_text_field($data['label']);
+        }
+
+        // Always auto-generate slug from label (backend ensures uniqueness)
+        if (!empty($data['label'])) {
+            $data['slug'] = SlugHelper::generateUniqueFromDatabase(
+                $data['label'],
+                'yatra_traveler_categories',
+                'slug'
+            );
+        } elseif (isset($data['slug'])) {
+            // If label is empty but slug is provided, sanitize it
+            $data['slug'] = SlugHelper::generate($data['slug']);
+        }
+
+        // Sanitize description
+        if (isset($data['description'])) {
+            $data['description'] = sanitize_textarea_field($data['description']);
+        }
+
+        // Sanitize status
+        if (isset($data['status'])) {
+            $allowed_statuses = ['draft', 'publish', 'trash'];
+            $data['status'] = in_array($data['status'], $allowed_statuses, true) 
+                ? $data['status'] 
+                : 'draft';
+        } else {
+            $data['status'] = 'draft';
+        }
+
+        // Handle age_min
+        if (isset($data['age_min'])) {
+            if ($data['age_min'] === '' || $data['age_min'] === null) {
+                $data['age_min'] = null;
+            } else {
+                $data['age_min'] = absint($data['age_min']);
+            }
+        }
+
+        // Handle age_max
+        if (isset($data['age_max'])) {
+            if ($data['age_max'] === '' || $data['age_max'] === null) {
+                $data['age_max'] = null;
+            } else {
+                $data['age_max'] = absint($data['age_max']);
+            }
+        }
+
+        // Set created_by and updated_by to current user
+        $current_user_id = get_current_user_id();
+        $data['created_by'] = absint($current_user_id);
+        $data['updated_by'] = absint($current_user_id);
+
+        // Sanitize and serialize icon if it's an array
+        if (isset($data['icon'])) {
+            if (is_array($data['icon'])) {
+                // Sanitize icon array
+                $icon = [
+                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
+                        ? $data['icon']['type']
+                        : 'icon',
+                    'value' => isset($data['icon']['value']) 
+                        ? sanitize_text_field($data['icon']['value'])
+                        : '',
+                ];
+                $data['icon'] = maybe_serialize($icon);
+            } elseif (is_string($data['icon'])) {
+                // If it's already a string, sanitize it
+                $data['icon'] = sanitize_text_field($data['icon']);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Process before update
+     */
+    protected function processBeforeUpdate(int $id, array $data): array
+    {
+        // Sanitize label
+        if (isset($data['label'])) {
+            $data['label'] = sanitize_text_field($data['label']);
+        }
+
+        // Handle slug: preserve manually edited slug, otherwise auto-generate from label
+        $preserveSlug = isset($data['preserve_slug']) && $data['preserve_slug'] === true;
+        unset($data['preserve_slug']); // Remove flag from data array
+
+        if ($preserveSlug && isset($data['slug']) && !empty($data['slug'])) {
+            // Slug was manually edited - preserve it but ensure uniqueness
+            $data['slug'] = SlugHelper::generateUniqueFromDatabase(
+                $data['slug'],
+                'yatra_traveler_categories',
+                'slug',
+                $id // Exclude current record when checking uniqueness
+            );
+        } elseif (!empty($data['label'])) {
+            // Auto-generate slug from label if label is provided and slug not manually edited
+            $data['slug'] = SlugHelper::generateUniqueFromDatabase(
+                $data['label'],
+                'yatra_traveler_categories',
+                'slug',
+                $id // Exclude current record when checking uniqueness
+            );
+        } elseif (isset($data['slug'])) {
+            // If label is not provided but slug is, sanitize the slug
+            $data['slug'] = SlugHelper::generate($data['slug']);
+        }
+
+        // Sanitize description
+        if (isset($data['description'])) {
+            $data['description'] = sanitize_textarea_field($data['description']);
+        }
+
+        // Sanitize status
+        if (isset($data['status'])) {
+            $allowed_statuses = ['draft', 'publish', 'trash'];
+            $data['status'] = in_array($data['status'], $allowed_statuses, true) 
+                ? $data['status'] 
+                : 'draft';
+        }
+
+        // Handle age_min
+        if (isset($data['age_min'])) {
+            if ($data['age_min'] === '' || $data['age_min'] === null) {
+                $data['age_min'] = null;
+            } else {
+                $data['age_min'] = absint($data['age_min']);
+            }
+        }
+
+        // Handle age_max
+        if (isset($data['age_max'])) {
+            if ($data['age_max'] === '' || $data['age_max'] === null) {
+                $data['age_max'] = null;
+            } else {
+                $data['age_max'] = absint($data['age_max']);
+            }
+        }
+
+        // Set updated_by to current user
+        $data['updated_by'] = absint(get_current_user_id());
+
+        // Sanitize and serialize icon if it's an array
+        if (isset($data['icon'])) {
+            if (is_array($data['icon'])) {
+                // Sanitize icon array
+                $icon = [
+                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
+                        ? $data['icon']['type']
+                        : 'icon',
+                    'value' => isset($data['icon']['value']) 
+                        ? sanitize_text_field($data['icon']['value'])
+                        : '',
+                ];
+                $data['icon'] = maybe_serialize($icon);
+            } elseif (is_string($data['icon'])) {
+                // If it's already a string, sanitize it
+                $data['icon'] = sanitize_text_field($data['icon']);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get all items with search and filters
+     */
+    public function getAll(array $args = []): array
+    {
+        // Sanitize and handle search
+        if (!empty($args['search'])) {
+            $search = sanitize_text_field($args['search']);
+            return $this->repository->search($search, $args);
+        }
+
+        // Sanitize and handle status filter
+        if (!empty($args['status']) && $args['status'] !== 'all') {
+            $allowed_statuses = ['draft', 'publish', 'trash'];
+            $status = in_array($args['status'], $allowed_statuses, true) 
+                ? $args['status'] 
+                : null;
+            if ($status) {
+                $args['where']['status'] = $status;
+            }
+        }
+
+        return $this->repository->all($args);
+    }
+
+    /**
+     * Get published categories
+     */
+    public function getPublished(array $args = []): array
+    {
+        $args['where']['status'] = 'publish';
+        return $this->repository->all($args);
+    }
+
+    /**
+     * Count items
+     */
+    public function count(array $args = []): int
+    {
+        // Sanitize and handle search
+        if (!empty($args['search'])) {
+            $search = sanitize_text_field($args['search']);
+            $items = $this->repository->search($search, $args);
+            return count($items);
+        }
+
+        // Sanitize and handle status filter
+        if (!empty($args['status']) && $args['status'] !== 'all') {
+            $allowed_statuses = ['draft', 'publish', 'trash'];
+            $status = in_array($args['status'], $allowed_statuses, true) 
+                ? $args['status'] 
+                : null;
+            if ($status) {
+                $args['where']['status'] = $status;
+            }
+        }
+
+        return $this->repository->count($args);
+    }
+}
+

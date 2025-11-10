@@ -5,36 +5,45 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Edit2, X } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
+import { generateSlug } from '../lib/slug';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
 
 interface DestinationFormData {
   name: string;
   slug: string;
   description: string;
-  country: string;
+  icon: {
+    type: 'icon' | 'image';
+    value: string;
+  } | null;
   status: string;
 }
 
 const DestinationForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<DestinationFormData>({
     name: '',
     slug: '',
     description: '',
-    country: '',
+    icon: null,
     status: 'draft',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSlugEditable, setIsSlugEditable] = useState(false);
 
   // Get action and id from URL
   const action = useMemo(() => {
@@ -54,16 +63,13 @@ const DestinationForm: React.FC = () => {
     queryKey: ['destination', destinationId],
     queryFn: async () => {
       if (!destinationId) return null;
-      // return await apiClient.get(`/destinations/${destinationId}`);
-      // Dummy data for now
-      return {
-        id: destinationId,
-        name: 'Sample Destination',
-        slug: 'sample-destination',
-        description: 'This is a sample destination description.',
-        country: 'Nepal',
-        status: 'active',
-      };
+      try {
+        const response = await apiClient.get(`/destinations/${destinationId}`);
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load destination', 'Failed to load destination'), 'error');
+        throw error;
+      }
     },
     enabled: isEditMode && can('yatra_view_trips'),
   });
@@ -75,41 +81,52 @@ const DestinationForm: React.FC = () => {
         name: destinationData.name || '',
         slug: destinationData.slug || '',
         description: destinationData.description || '',
-        country: destinationData.country || '',
+        icon: (destinationData.icon as IconPickerValue) || null,
         status: destinationData.status || 'draft',
       });
     }
   }, [destinationData, isEditMode]);
 
-  // Auto-generate slug from name
-  const generateSlug = (name: string): string => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
   const handleNameChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      name: value,
-      slug: prev.slug || generateSlug(value),
-    }));
+    // Auto-generate slug from name (only if slug is not manually edited)
+    if (!isSlugEditable) {
+      const newSlug = generateSlug(value);
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+        slug: newSlug, // Always auto-generate slug from name
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+      }));
+    }
     if (errors.name) {
       setErrors(prev => ({ ...prev, name: '' }));
     }
   };
 
   const handleSlugChange = (value: string) => {
-    setFormData(prev => ({ ...prev, slug: value }));
-    if (errors.slug) {
-      setErrors(prev => ({ ...prev, slug: '' }));
+    // Only allow manual slug editing if edit mode is enabled
+    if (isSlugEditable) {
+      setFormData(prev => ({ ...prev, slug: value }));
+      if (errors.slug) {
+        setErrors(prev => ({ ...prev, slug: '' }));
+      }
     }
   };
 
-  const handleFieldChange = (field: keyof DestinationFormData, value: string) => {
+  const handleToggleSlugEdit = () => {
+    if (isSlugEditable) {
+      // If disabling edit, regenerate slug from name
+      const newSlug = generateSlug(formData.name);
+      setFormData(prev => ({ ...prev, slug: newSlug }));
+    }
+    setIsSlugEditable(!isSlugEditable);
+  };
+
+  const handleFieldChange = (field: keyof DestinationFormData, value: string | IconPickerValue | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -129,10 +146,6 @@ const DestinationForm: React.FC = () => {
       newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
     }
 
-    if (!formData.country.trim()) {
-      newErrors.country = __('Country is required', 'Country is required');
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -140,32 +153,42 @@ const DestinationForm: React.FC = () => {
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: DestinationFormData) => {
-      const payload = {
+      const payload: any = {
         name: data.name.trim(),
         slug: data.slug.trim(),
         description: data.description.trim(),
-        country: data.country.trim(),
+        icon: data.icon,
         status: data.status,
       };
 
+      // If slug was manually edited, add flag to preserve it
+      if (isEditMode && isSlugEditable) {
+        payload.preserve_slug = true;
+      }
+
       if (isEditMode && destinationId) {
-        // return await apiClient.put(`/destinations/${destinationId}`, payload);
-        console.log('Updating destination:', destinationId, payload);
-        return { success: true, id: destinationId };
+        return await apiClient.put(`/destinations/${destinationId}`, payload);
       } else {
-        // return await apiClient.post('/destinations', payload);
-        console.log('Creating destination:', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+        return await apiClient.post('/destinations', payload);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['destinations'] });
-      // Redirect to destinations list
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations`;
+      queryClient.invalidateQueries({ queryKey: ['destination', destinationId] });
+      showToast(
+        isEditMode 
+          ? __('Destination updated successfully', 'Destination updated successfully')
+          : __('Destination created successfully', 'Destination created successfully'),
+        'success'
+      );
+      // Redirect to destinations list after a short delay
+      setTimeout(() => {
+        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations`;
+      }, 1000);
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the destination', 'An error occurred while saving the destination');
-      setErrors({ submit: errorMessage });
+      showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
   });
@@ -174,6 +197,7 @@ const DestinationForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
+      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
       return;
     }
 
@@ -247,40 +271,39 @@ const DestinationForm: React.FC = () => {
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Slug', 'Slug')} <span className="text-red-500">*</span>
                     </label>
-                    <Input
-                      id="slug"
-                      type="text"
-                      value={formData.slug}
-                      onChange={(e) => handleSlugChange(e.target.value)}
-                      placeholder={__('destination-slug', 'destination-slug')}
-                      className={errors.slug ? 'border-red-500' : ''}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="slug"
+                        type="text"
+                        value={formData.slug}
+                        onChange={(e) => handleSlugChange(e.target.value)}
+                        placeholder={__('destination-slug', 'destination-slug')}
+                        className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
+                        disabled={!isSlugEditable}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={handleToggleSlugEdit}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
+                        aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                      >
+                        {isSlugEditable ? (
+                          <X className="w-4 h-4" />
+                        ) : (
+                          <Edit2 className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
                     {errors.slug && (
                       <p className="mt-1 text-sm text-red-500">{errors.slug}</p>
                     )}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {__('URL-friendly version of the name. Lowercase letters, numbers, and hyphens only.', 'URL-friendly version of the name. Lowercase letters, numbers, and hyphens only.')}
+                      {isSlugEditable 
+                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
+                        : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')
+                      }
                     </p>
-                  </div>
-
-                  {/* Country */}
-                  <div>
-                    <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Country', 'Country')} <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      id="country"
-                      type="text"
-                      value={formData.country}
-                      onChange={(e) => handleFieldChange('country', e.target.value)}
-                      placeholder={__('Enter country name', 'Enter country name')}
-                      className={errors.country ? 'border-red-500' : ''}
-                      required
-                    />
-                    {errors.country && (
-                      <p className="mt-1 text-sm text-red-500">{errors.country}</p>
-                    )}
                   </div>
 
                   {/* Description */}
@@ -295,6 +318,19 @@ const DestinationForm: React.FC = () => {
                       placeholder={__('Enter destination description', 'Enter destination description')}
                       rows={6}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </div>
+
+                  {/* Icon/Image Picker */}
+                  <div>
+                    <IconPicker
+                      value={formData.icon}
+                      onChange={(value) => handleFieldChange('icon', value)}
+                      label={__('Destination Icon or Image', 'Destination Icon or Image')}
+                      helpText={__('Select an icon from the library or upload a custom image for this destination.', 'Select an icon from the library or upload a custom image for this destination.')}
+                      allowImageUpload={true}
+                      allowIconSelection={true}
+                      size="md"
                     />
                   </div>
                 </CardContent>
@@ -320,8 +356,8 @@ const DestinationForm: React.FC = () => {
                       className="h-9"
                     >
                       <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="active">{__('Active', 'Active')}</option>
-                      <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                      <option value="publish">{__('Publish', 'Publish')}</option>
+                      <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -331,11 +367,6 @@ const DestinationForm: React.FC = () => {
               <Card>
                 <CardContent className="p-3">
                   <div className="space-y-2">
-                    {errors.submit && (
-                      <div className="p-2 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 rounded-md">
-                        {errors.submit}
-                      </div>
-                    )}
                     <div className="flex gap-2">
                       <Button
                         type="submit"
@@ -375,4 +406,3 @@ const DestinationForm: React.FC = () => {
 };
 
 export default DestinationForm;
-

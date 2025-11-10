@@ -5,24 +5,28 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Info } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Edit2, X } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
+import { generateSlug } from '../lib/slug';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
-import { HelpText } from '../components/ui/help-text';
-import { Alert } from '../components/ui/alert';
-import { availableIcons, IconSelector } from '../components/ui/icon-selector';
+import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
 
 interface ItemTypeFormData {
   name: string;
   slug: string;
   description: string;
-  icon: string;
+  icon: {
+    type: 'icon' | 'image';
+    value: string;
+  } | null;
   color: string;
   status: string;
 }
@@ -30,16 +34,18 @@ interface ItemTypeFormData {
 const ItemTypeForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<ItemTypeFormData>({
     name: '',
     slug: '',
     description: '',
-    icon: 'package',
+    icon: null,
     color: 'blue',
-    status: 'active',
+    status: 'draft',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSlugEditable, setIsSlugEditable] = useState(false);
 
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -57,53 +63,82 @@ const ItemTypeForm: React.FC = () => {
     queryKey: ['item-type', typeId],
     queryFn: async () => {
       if (!typeId) return null;
-      return {
-        id: typeId,
-        name: 'Activity',
-        slug: 'activity',
-        description: 'Physical activities',
-        icon: 'activity',
-        color: 'blue',
-        status: 'active',
-      };
+      try {
+        const response = await apiClient.get(`/item-types/${typeId}`);
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load item type', 'Failed to load item type'), 'error');
+        throw error;
+      }
     },
     enabled: isEditMode && can('yatra_view_trips'),
   });
 
   useEffect(() => {
     if (typeData && isEditMode) {
+      // Handle icon - could be string (old format) or IconPickerValue (new format)
+      let iconValue: IconPickerValue | null = null;
+      if (typeData.icon) {
+        if (typeof typeData.icon === 'string') {
+          // Old format: just icon name string
+          iconValue = { type: 'icon', value: typeData.icon };
+        } else if (typeof typeData.icon === 'object' && typeData.icon !== null) {
+          // New format: IconPickerValue object
+          iconValue = typeData.icon as IconPickerValue;
+        }
+      }
+
       setFormData({
         name: typeData.name || '',
         slug: typeData.slug || '',
         description: typeData.description || '',
-        icon: typeData.icon || '📦',
+        icon: iconValue,
         color: typeData.color || 'blue',
-        status: typeData.status || 'active',
+        status: typeData.status || 'draft',
       });
     }
   }, [typeData, isEditMode]);
 
-  const generateSlug = (name: string): string => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
   const handleNameChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      name: value,
-      slug: prev.slug || generateSlug(value),
-    }));
+    // Auto-generate slug from name (only if slug is not manually edited)
+    if (!isSlugEditable) {
+      const newSlug = generateSlug(value);
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+        slug: newSlug,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+      }));
+    }
     if (errors.name) {
       setErrors(prev => ({ ...prev, name: '' }));
     }
   };
 
-  const handleFieldChange = (field: keyof ItemTypeFormData, value: string) => {
+  const handleSlugChange = (value: string) => {
+    // Only allow manual slug editing if edit mode is enabled
+    if (isSlugEditable) {
+      setFormData(prev => ({ ...prev, slug: value }));
+      if (errors.slug) {
+        setErrors(prev => ({ ...prev, slug: '' }));
+      }
+    }
+  };
+
+  const handleToggleSlugEdit = () => {
+    if (isSlugEditable) {
+      // If disabling edit, regenerate slug from name
+      const newSlug = generateSlug(formData.name);
+      setFormData(prev => ({ ...prev, slug: newSlug }));
+    }
+    setIsSlugEditable(!isSlugEditable);
+  };
+
+  const handleFieldChange = (field: keyof ItemTypeFormData, value: string | IconPickerValue | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -129,7 +164,7 @@ const ItemTypeForm: React.FC = () => {
 
   const saveMutation = useMutation({
     mutationFn: async (data: ItemTypeFormData) => {
-      const payload = {
+      const payload: any = {
         name: data.name.trim(),
         slug: data.slug.trim(),
         description: data.description.trim(),
@@ -138,21 +173,33 @@ const ItemTypeForm: React.FC = () => {
         status: data.status,
       };
 
+      // If slug was manually edited, add flag to preserve it
+      if (isEditMode && isSlugEditable) {
+        payload.preserve_slug = true;
+      }
+
       if (isEditMode && typeId) {
-        console.log('Updating item type:', typeId, payload);
-        return { success: true, id: typeId };
+        return await apiClient.put(`/item-types/${typeId}`, payload);
       } else {
-        console.log('Creating item type:', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+        return await apiClient.post('/item-types', payload);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['item-types'] });
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types`;
+      queryClient.invalidateQueries({ queryKey: ['item-type', typeId] });
+      showToast(
+        isEditMode 
+          ? __('Item type updated successfully', 'Item type updated successfully')
+          : __('Item type created successfully', 'Item type created successfully'),
+        'success'
+      );
+      setTimeout(() => {
+        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types`;
+      }, 1000);
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving', 'An error occurred while saving');
-      setErrors({ submit: errorMessage });
+      const errorMessage = error?.message || __('An error occurred while saving the item type', 'An error occurred while saving the item type');
+      showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
   });
@@ -161,6 +208,7 @@ const ItemTypeForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
+      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
       return;
     }
 
@@ -222,10 +270,6 @@ const ItemTypeForm: React.FC = () => {
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Type Name', 'Type Name')} <span className="text-red-500">*</span>
                     </label>
-                    <HelpText 
-                      text={__('Enter a name for this item type. Examples: Activity, Meal, Accommodation, Transportation.', 'Enter a name for this item type. Examples: Activity, Meal, Accommodation, Transportation.')}
-                      className="mb-2"
-                    />
                     <Input
                       id="name"
                       type="text"
@@ -236,46 +280,57 @@ const ItemTypeForm: React.FC = () => {
                       required
                     />
                     {errors.name && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">
                         {errors.name}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('URL Slug', 'URL Slug')} <span className="text-red-500">*</span>
-                    </label>
-                    <HelpText 
-                      text={__('URL-friendly version of the name. Automatically generated but can be edited.', 'URL-friendly version of the name. Automatically generated but can be edited.')}
-                      className="mb-2"
-                    />
-                    <Input
-                      id="slug"
-                      type="text"
-                      value={formData.slug}
-                      onChange={(e) => handleFieldChange('slug', e.target.value)}
-                      placeholder={__('activity', 'activity')}
-                      className={errors.slug ? 'border-red-500' : ''}
-                      required
-                    />
-                    {errors.slug && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
-                        {errors.slug}
+                    <div>
+                      <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Slug', 'Slug')} <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Input
+                          id="slug"
+                          type="text"
+                          value={formData.slug}
+                          onChange={(e) => handleSlugChange(e.target.value)}
+                          placeholder={__('item-type-slug', 'item-type-slug')}
+                          className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
+                          disabled={!isSlugEditable}
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={handleToggleSlugEdit}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
+                          aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                        >
+                          {isSlugEditable ? (
+                            <X className="w-4 h-4" />
+                          ) : (
+                            <Edit2 className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                      {errors.slug && (
+                        <p className="mt-1 text-sm text-red-500">{errors.slug}</p>
+                      )}
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {isSlugEditable
+                          ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
+                          : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')
+                        }
                       </p>
-                    )}
+                    </div>
                   </div>
 
                   <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Description', 'Description')}
                     </label>
-                    <HelpText 
-                      text={__('Brief description of what this item type represents. This helps users understand the category.', 'Brief description of what this item type represents. This helps users understand the category.')}
-                      className="mb-2"
-                    />
                     <textarea
                       id="description"
                       value={formData.description}
@@ -296,57 +351,21 @@ const ItemTypeForm: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label htmlFor="icon" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Icon', 'Icon')}
-                    </label>
-                    <HelpText 
-                      text={__('Choose an icon to represent this item type visually. Icons help users quickly identify different types.', 'Choose an icon to represent this item type visually. Icons help users quickly identify different types.')}
-                      className="mb-2"
+                    <IconPicker
+                      value={formData.icon}
+                      onChange={(value) => handleFieldChange('icon', value)}
+                      label={__('Icon', 'Icon')}
+                      helpText={__('Choose an icon to represent this item type visually. Icons help users quickly identify different types. You can also upload a custom image.', 'Choose an icon to represent this item type visually. Icons help users quickly identify different types. You can also upload a custom image.')}
+                      allowImageUpload={true}
+                      allowIconSelection={true}
+                      size="md"
                     />
-                    <div className="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto p-1 border border-gray-200 dark:border-gray-700 rounded-md">
-                      {availableIcons.map((iconOption) => {
-                        const IconComponent = iconOption.component;
-                        return (
-                          <button
-                            key={iconOption.name}
-                            type="button"
-                            onClick={() => handleFieldChange('icon', iconOption.name)}
-                            className={`p-2 rounded-md border-2 transition-colors flex items-center justify-center ${
-                              formData.icon === iconOption.name
-                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                            }`}
-                            title={iconOption.label}
-                          >
-                            <IconComponent className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-md">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">{__('Selected:', 'Selected:')}</span>
-                        {formData.icon && (
-                          <div className="flex items-center gap-2">
-                            <IconSelector 
-                              iconName={formData.icon as any} 
-                              className="w-4 h-4 text-gray-700 dark:text-gray-300"
-                            />
-                            <span className="text-xs font-mono text-gray-600 dark:text-gray-400">{formData.icon}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
                   </div>
 
                   <div>
                     <label htmlFor="color" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Color', 'Color')}
                     </label>
-                    <HelpText 
-                      text={__('Choose a color theme for this item type. Used for visual organization.', 'Choose a color theme for this item type. Used for visual organization.')}
-                      className="mb-2"
-                    />
                     <Select
                       id="color"
                       value={formData.color}
@@ -364,17 +383,15 @@ const ItemTypeForm: React.FC = () => {
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Status', 'Status')}
                     </label>
-                    <HelpText 
-                      text={__('Active types can be used in itineraries. Inactive types are hidden but not deleted.', 'Active types can be used in itineraries. Inactive types are hidden but not deleted.')}
-                      className="mb-2"
-                    />
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
+                      className="h-9"
                     >
-                      <option value="active">{__('Active', 'Active')}</option>
-                      <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                      <option value="draft">{__('Draft', 'Draft')}</option>
+                      <option value="publish">{__('Publish', 'Publish')}</option>
+                      <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -383,16 +400,6 @@ const ItemTypeForm: React.FC = () => {
               <Card>
                 <CardContent className="p-3">
                   <div className="space-y-2">
-                    {errors.submit && (
-                      <Alert variant="error" title={__('Error', 'Error')}>
-                        {errors.submit}
-                      </Alert>
-                    )}
-                    {!isEditMode && (
-                      <Alert variant="info" className="mb-2">
-                        <strong>{__('Tip:', 'Tip:')}</strong> {__('After creating the type, you can add specific items (subtypes) under it.', 'After creating the type, you can add specific items (subtypes) under it.')}
-                      </Alert>
-                    )}
                     <div className="flex gap-2">
                       <Button
                         type="submit"

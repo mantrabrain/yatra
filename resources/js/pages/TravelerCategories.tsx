@@ -1,146 +1,234 @@
+/**
+ * Traveler Categories Page
+ * Clean, minimal SaaS-style traveler categories management page
+ */
+
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Edit, Trash2, Tag, Loader2 } from 'lucide-react';
+import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { PageHeader } from '../components/common/PageHeader';
+import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { Badge } from '../components/ui/badge';
-import { useNavigate } from '../hooks/useNavigate';
+import { ConditionalRender } from '../components/ui/conditional-render';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { Edit, Trash2 } from 'lucide-react';
+import { IconSelector } from '../components/ui/icon-selector';
+import type { IconPickerValue } from '../components/ui/icon-picker';
 
 interface TravelerCategory {
   id: number;
   label: string;
+  slug: string;
   description: string;
-  age_min?: number;
-  age_max?: number;
-  status: 'active' | 'inactive';
+  age_min?: number | null;
+  age_max?: number | null;
+  icon?: IconPickerValue | null;
+  status: 'draft' | 'publish' | 'trash';
   created_at: string;
   updated_at: string;
+  created_by: number; // user_id
+  updated_by: number; // user_id
+  created_by_name?: string; // Optional: user name from API
+  updated_by_name?: string; // Optional: user name from API
 }
 
 const TravelerCategories: React.FC = () => {
-  const { navigate } = useNavigate();
-  const queryClient = useQueryClient();
-  
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [sortBy, setSortBy] = useState<'label' | 'status' | 'created_at'>('label');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('label');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [page, setPage] = useState(1);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; category: TravelerCategory | null }>({
+    isOpen: false,
+    category: null,
+  });
+  const queryClient = useQueryClient();
+  const { can } = usePermissions();
+  const { showToast } = useToast();
 
-  // Dummy data - replace with actual API call
-  const { data: categories = [], isLoading } = useQuery<TravelerCategory[]>({
-    queryKey: ['traveler-categories'],
+  // Build query params
+  const queryParams = useMemo(() => {
+    const params: Record<string, any> = {
+      page,
+      per_page: 10,
+      orderby: sortBy,
+      order: sortOrder,
+    };
+
+    if (searchTerm) {
+      params.search = searchTerm;
+    }
+
+    if (statusFilter !== 'all') {
+      params.status = statusFilter;
+    }
+
+    return params;
+  }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+
+  // Fetch categories from API
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['traveler-categories', queryParams],
     queryFn: async () => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return [
-        {
-          id: 1,
-          label: 'Adult',
-          description: 'Standard adult pricing for travelers aged 18 and above',
-          age_min: 18,
-          age_max: undefined,
-          status: 'active',
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z',
-        },
-        {
-          id: 2,
-          label: 'Child',
-          description: 'Pricing for children aged 5-17 years',
-          age_min: 5,
-          age_max: 17,
-          status: 'active',
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z',
-        },
-        {
-          id: 3,
-          label: 'Infant',
-          description: 'Pricing for infants under 5 years old',
-          age_min: 0,
-          age_max: 4,
-          status: 'active',
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z',
-        },
-        {
-          id: 4,
-          label: 'Senior',
-          description: 'Special pricing for senior citizens aged 60 and above',
-          age_min: 60,
-          age_max: undefined,
-          status: 'active',
-          created_at: '2024-01-16T10:00:00Z',
-          updated_at: '2024-01-16T10:00:00Z',
-        },
-        {
-          id: 5,
-          label: 'Student',
-          description: 'Discounted pricing for students with valid ID',
-          age_min: undefined,
-          age_max: undefined,
-          status: 'active',
-          created_at: '2024-01-17T10:00:00Z',
-          updated_at: '2024-01-17T10:00:00Z',
-        },
-      ];
+      try {
+        const response = await apiClient.get('/traveler-categories', { params: queryParams });
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load traveler categories', 'Failed to load traveler categories'), 'error');
+        throw error;
+      }
     },
+    enabled: can('yatra_view_trips'),
   });
 
+  // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (_id: number) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return { success: true };
+    mutationFn: async (id: number) => {
+      return await apiClient.delete(`/traveler-categories/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['traveler-categories'] });
+      showToast(__('Traveler category deleted successfully', 'Traveler category deleted successfully'), 'success');
+      setDeleteConfirm({ isOpen: false, category: null });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete traveler category', 'Failed to delete traveler category'), 'error');
     },
   });
 
-  const filteredAndSortedCategories = useMemo(() => {
-    let filtered = categories.filter(category => {
-      const matchesSearch = category.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           category.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || category.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
+  const categories = data?.data || [];
+  const total = data?.total || 0;
+  const totalPages = Math.ceil(total / 10);
 
-    filtered.sort((a, b) => {
-      let aValue: string | number;
-      let bValue: string | number;
+  const formatDate = (dateString: string) => {
+    if (!dateString) return __('N/A', 'N/A');
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
 
-      switch (sortBy) {
-        case 'label':
-          aValue = a.label.toLowerCase();
-          bValue = b.label.toLowerCase();
-          break;
-        case 'status':
-          aValue = a.status;
-          bValue = b.status;
-          break;
-        case 'created_at':
-          aValue = new Date(a.created_at).getTime();
-          bValue = new Date(b.created_at).getTime();
-          break;
-        default:
-          return 0;
-      }
+  const getStatusBadge = (status: string) => {
+    const statusMap: Record<string, { className: string; label: string }> = {
+      'publish': {
+        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
+        label: __('Publish', 'Publish'),
+      },
+      'draft': {
+        className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+        label: __('Draft', 'Draft'),
+      },
+      'trash': {
+        className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
+        label: __('Trash', 'Trash'),
+      },
+    };
 
-      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
+    const statusInfo = statusMap[status] || {
+      className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+      label: status,
+    };
 
-    return filtered;
-  }, [categories, searchTerm, statusFilter, sortBy, sortOrder]);
+    return (
+      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`}>
+        {statusInfo.label}
+      </span>
+    );
+  };
 
-  const handleSort = (field: 'label' | 'status' | 'created_at') => {
+  const formatUser = (userId: number, userName?: string) => {
+    if (userName) {
+      return userName;
+    }
+    return `User #${userId}`;
+  };
+
+  const formatAgeRange = (ageMin?: number | null, ageMax?: number | null) => {
+    if (ageMin !== null && ageMin !== undefined && ageMax !== null && ageMax !== undefined) {
+      return `${ageMin}-${ageMax} ${__('years', 'years')}`;
+    } else if (ageMin !== null && ageMin !== undefined) {
+      return `${ageMin}+ ${__('years', 'years')}`;
+    } else if (ageMax !== null && ageMax !== undefined) {
+      return `${__('Under', 'Under')} ${ageMax} ${__('years', 'years')}`;
+    }
+    return __('No age restriction', 'No age restriction');
+  };
+
+  const renderIcon = (icon: IconPickerValue | null | undefined) => {
+    if (!icon) {
+      return (
+        <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
+        </div>
+      );
+    }
+
+    if (icon.type === 'image') {
+      return (
+        <img
+          src={icon.value}
+          alt=""
+          className="w-8 h-8 rounded object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            if (target.parentElement) {
+              target.parentElement.innerHTML = '<div class="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><span class="text-xs text-gray-400 dark:text-gray-500">—</span></div>';
+            }
+          }}
+        />
+      );
+    }
+
+    return (
+      <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+        <IconSelector iconName={icon.value} className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+      </div>
+    );
+  };
+
+  const handleEdit = (category: TravelerCategory) => {
+    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=traveler-categories&action=edit&id=${category.id}`;
+  };
+
+  const handleDelete = (category: TravelerCategory) => {
+    setDeleteConfirm({ isOpen: true, category });
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirm.category) {
+      deleteMutation.mutate(deleteConfirm.category.id);
+    }
+  };
+
+  const handleCreateCategory = () => {
+    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=traveler-categories&action=create`;
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('all');
+    setSortBy('label');
+    setSortOrder('asc');
+    setPage(1);
+  };
+
+  const handleSort = (field: string) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -149,272 +237,388 @@ const TravelerCategories: React.FC = () => {
     }
   };
 
-  const getSortIcon = (field: 'label' | 'status' | 'created_at') => {
-    if (sortBy !== field) return null;
-    return sortOrder === 'asc' ? ' ↑' : ' ↓';
-  };
-
-  const handleDelete = (id: number, label: string) => {
-    if (window.confirm(__('Are you sure you want to delete the category "{{label}}"?', `Are you sure you want to delete the category "${label}"?`))) {
-      deleteMutation.mutate(id);
+  const getSortIcon = (field: string) => {
+    if (sortBy !== field) {
+      return <ArrowUpDown className="w-3.5 h-3.5 ml-1 text-gray-400" />;
     }
+    return sortOrder === 'asc' 
+      ? <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
+      : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
   };
 
-
-  // Skeleton loader component
-  const SkeletonRow = () => (
-    <TableRow>
-      <TableCell>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-          <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-      </TableCell>
-      <TableCell>
-        <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-      </TableCell>
-      <TableCell>
-        <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-      </TableCell>
-      <TableCell>
-        <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex items-center justify-end gap-1">
-          <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-          <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-        </div>
-      </TableCell>
-    </TableRow>
-  );
+  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'label' || sortOrder !== 'asc';
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, category: null })}
+        onConfirm={confirmDelete}
+        title={__('Delete Traveler Category', 'Delete Traveler Category')}
+        message={deleteConfirm.category 
+          ? __('Are you sure you want to delete "{label}"? This action cannot be undone.', 'Are you sure you want to delete "{label}"? This action cannot be undone.').replace('{label}', deleteConfirm.category.label)
+          : __('Are you sure you want to delete this traveler category? This action cannot be undone.', 'Are you sure you want to delete this traveler category? This action cannot be undone.')
+        }
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
+
       <PageHeader
         title={__('Traveler Categories', 'Traveler Categories')}
         description={__('Manage pricing categories for different types of travelers', 'Manage pricing categories for different types of travelers')}
+        actionCapability="yatra_edit_trips"
         actions={
-          <Button
-            onClick={() => navigate({ subpage: 'traveler-categories', action: 'create' })}
-            className="flex items-center gap-2"
-          >
+          <Button onClick={handleCreateCategory} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Add Category', 'Add Category')}
+            {__('Add New Category', 'Add New Category')}
           </Button>
         }
       />
 
-      {/* Filters and Search */}
+      {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-3">
+        <CardContent className="p-3">
+          <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
+            {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
                 placeholder={__('Search categories...', 'Search categories...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
+                className="pl-9 h-9"
               />
             </div>
+
+            {/* Status Filter */}
             <Select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-              className="w-full md:w-48"
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full md:w-40 h-9"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="active">{__('Active', 'Active')}</option>
-              <option value="inactive">{__('Inactive', 'Inactive')}</option>
+              <option value="draft">{__('Draft', 'Draft')}</option>
+              <option value="publish">{__('Publish', 'Publish')}</option>
+              <option value="trash">{__('Trash', 'Trash')}</option>
             </Select>
+
+            {/* Sort By */}
             <Select
-              value={`${sortBy}-${sortOrder}`}
-              onChange={(e) => {
-                const [field, order] = e.target.value.split('-');
-                setSortBy(field as 'label' | 'status' | 'created_at');
-                setSortOrder(order as 'asc' | 'desc');
-              }}
-              className="w-full md:w-48"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full md:w-40 h-9"
             >
-              <option value="label-asc">{__('Label (A-Z)', 'Label (A-Z)')}</option>
-              <option value="label-desc">{__('Label (Z-A)', 'Label (Z-A)')}</option>
-              <option value="status-asc">{__('Status (A-Z)', 'Status (A-Z)')}</option>
-              <option value="status-desc">{__('Status (Z-A)', 'Status (Z-A)')}</option>
-              <option value="created_at-desc">{__('Newest First', 'Newest First')}</option>
-              <option value="created_at-asc">{__('Oldest First', 'Oldest First')}</option>
+              <option value="label">{__('Label', 'Label')}</option>
+              <option value="status">{__('Status', 'Status')}</option>
+              <option value="created_at">{__('Created At', 'Created At')}</option>
+              <option value="updated_at">{__('Updated At', 'Updated At')}</option>
             </Select>
+
+            {/* Sort Order */}
+            <Button
+              variant="outline"
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="h-9 px-3 flex items-center gap-1.5"
+              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
+            >
+              {sortOrder === 'asc' ? (
+                <ArrowUp className="w-4 h-4" />
+              ) : (
+                <ArrowDown className="w-4 h-4" />
+              )}
+              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
+            </Button>
+
+            {/* Reset Button */}
+            {hasFilters && (
+              <Button
+                variant="outline"
+                onClick={handleResetFilters}
+                className="flex items-center gap-2 h-9"
+              >
+                <X className="w-4 h-4" />
+                {__('Reset', 'Reset')}
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Categories Table */}
-      <Card>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{__('Category', 'Category')}</TableHead>
-                  <TableHead>{__('Description', 'Description')}</TableHead>
-                  <TableHead>{__('Age Range', 'Age Range')}</TableHead>
-                  <TableHead>{__('Status', 'Status')}</TableHead>
-                  <TableHead>{__('Created', 'Created')}</TableHead>
-                  <TableHead className="text-right">{__('Actions', 'Actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <SkeletonRow key={i} />
-                ))}
-              </TableBody>
-            </Table>
-          ) : filteredAndSortedCategories.length === 0 ? (
-            <div className="p-12 text-center">
-              <Tag className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-                {searchTerm || statusFilter !== 'all'
-                  ? __('No categories match your search', 'No categories match your search')
-                  : __('No categories yet', 'No categories yet')}
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                {searchTerm || statusFilter !== 'all'
-                  ? __('Try adjusting your filters', 'Try adjusting your filters')
-                  : __('Get started by creating your first traveler category', 'Get started by creating your first traveler category')}
-              </p>
-              {!searchTerm && statusFilter === 'all' && (
-                <Button
-                  onClick={() => navigate({ subpage: 'traveler-categories', action: 'create' })}
-                  className="flex items-center gap-2 mx-auto"
-                >
-                  <Plus className="w-4 h-4" />
-                  {__('Add Category', 'Add Category')}
-                </Button>
-              )}
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>
-                    <button
-                      onClick={() => handleSort('label')}
-                      className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                    >
-                      {__('Category', 'Category')}
-                      {getSortIcon('label')}
-                    </button>
-                  </TableHead>
-                  <TableHead>{__('Description', 'Description')}</TableHead>
-                  <TableHead>{__('Age Range', 'Age Range')}</TableHead>
-                  <TableHead>
-                    <button
-                      onClick={() => handleSort('status')}
-                      className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                    >
-                      {__('Status', 'Status')}
-                      {getSortIcon('status')}
-                    </button>
-                  </TableHead>
-                  <TableHead>
-                    <button
-                      onClick={() => handleSort('created_at')}
-                      className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                    >
-                      {__('Created', 'Created')}
-                      {getSortIcon('created_at')}
-                    </button>
-                  </TableHead>
-                  <TableHead className="text-right">{__('Actions', 'Actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAndSortedCategories.map((category) => (
-                  <TableRow key={category.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-gray-400" />
-                        <span className="font-medium text-gray-900 dark:text-white text-sm">
-                          {category.label}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {category.description}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      {category.age_min !== undefined || category.age_max !== undefined ? (
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {category.age_min !== undefined && category.age_max !== undefined
-                            ? `${category.age_min}-${category.age_max} ${__('years', 'years')}`
-                            : category.age_min !== undefined
-                            ? `${category.age_min}+ ${__('years', 'years')}`
-                            : category.age_max !== undefined
-                            ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
-                            : '-'}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-gray-400 dark:text-gray-500 italic">
-                          {__('No age restriction', 'No age restriction')}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={category.status === 'active' ? 'success' : 'error'}
-                        className="text-xs"
+      <ConditionalRender capability="yatra_view_trips">
+        {/* Table */}
+        {error ? (
+          <Card>
+            <CardContent className="p-8 text-center text-red-500">
+              {__('Error loading traveler categories', 'Error loading traveler categories')}
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            <Card>
+              <CardContent className="p-0">
+                {isLoading ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[250px]">{__('Category', 'Category')}</TableHead>
+                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
+                        <TableHead className="w-[120px]">{__('Age Range', 'Age Range')}</TableHead>
+                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...Array(5)].map((_, index) => (
+                        <TableRow key={`skeleton-${index}`}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : categories.length === 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[250px]">{__('Category', 'Category')}</TableHead>
+                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
+                        <TableHead className="w-[120px]">{__('Age Range', 'Age Range')}</TableHead>
+                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell colSpan={7} className="h-64">
+                          <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                              <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                              {__('No traveler categories found', 'No traveler categories found')}
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
+                              {hasFilters 
+                                ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                                : __('Get started by creating your first traveler category.', 'Get started by creating your first traveler category.')
+                              }
+                            </p>
+                            {hasFilters ? (
+                              <Button
+                                variant="outline"
+                                onClick={handleResetFilters}
+                                className="flex items-center gap-2"
+                              >
+                                <X className="w-4 h-4" />
+                                {__('Clear Filters', 'Clear Filters')}
+                              </Button>
+                            ) : (
+                              can('yatra_edit_trips') && (
+                                <Button
+                                  onClick={handleCreateCategory}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  {__('Create Category', 'Create Category')}
+                                </Button>
+                              )
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[250px]">
+                          <button
+                            onClick={() => handleSort('label')}
+                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
+                          >
+                            {__('Category', 'Category')}
+                            {getSortIcon('label')}
+                          </button>
+                        </TableHead>
+                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
+                        <TableHead className="w-[120px]">{__('Age Range', 'Age Range')}</TableHead>
+                        <TableHead className="w-[100px]">
+                          <button
+                            onClick={() => handleSort('status')}
+                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
+                          >
+                            {__('Status', 'Status')}
+                            {getSortIcon('status')}
+                          </button>
+                        </TableHead>
+                        <TableHead className="w-[150px]">
+                          <button
+                            onClick={() => handleSort('created_at')}
+                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
+                          >
+                            {__('Date', 'Date')}
+                            {getSortIcon('created_at')}
+                          </button>
+                        </TableHead>
+                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {categories.map((category: TravelerCategory) => (
+                        <TableRow key={category.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              {renderIcon(category.icon)}
+                              <div>
+                                <div className="font-medium text-gray-900 dark:text-white">
+                                  {category.label}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                  {category.slug}
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
+                            <div className="line-clamp-2">
+                              {category.description || __('No description', 'No description')}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
+                            {formatAgeRange(category.age_min, category.age_max)}
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(category.status)}
+                          </TableCell>
+                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
+                            <div>
+                              <div>{formatDate(category.created_at)}</div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                {__('Updated', 'Updated')}: {formatDate(category.updated_at)}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
+                            <div>
+                              <div>{formatUser(category.created_by, category.created_by_name)}</div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                {__('Updated by', 'Updated by')}: {formatUser(category.updated_by, category.updated_by_name)}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <ConditionalRender capability="yatra_edit_trips">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleEdit(category)}
+                                  className="h-8 w-8"
+                                  aria-label={__('Edit category', 'Edit category')}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                              </ConditionalRender>
+
+                              <ConditionalRender capability="yatra_delete_trips">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleDelete(category)}
+                                  className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                  aria-label={__('Delete category', 'Delete category')}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </ConditionalRender>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Pagination - Always Visible */}
+            {total > 0 && (
+              <Card>
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('categories', 'categories')}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        className="h-8"
                       >
-                        {category.status === 'active' ? __('Active', 'Active') : __('Inactive', 'Inactive')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {new Date(category.created_at).toLocaleDateString()}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => navigate({ subpage: 'traveler-categories', action: 'edit', id: category.id })}
-                          className="h-8 w-8"
-                          title={__('Edit Category', 'Edit Category')}
-                          aria-label={__('Edit category', 'Edit category')}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(category.id, category.label)}
-                          className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                          disabled={deleteMutation.isPending}
-                          title={__('Delete Category', 'Delete Category')}
-                          aria-label={__('Delete category', 'Delete category')}
-                        >
-                          {deleteMutation.isPending ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-4 h-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                        {__('Previous', 'Previous')}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page >= totalPages}
+                        className="h-8"
+                      >
+                        {__('Next', 'Next')}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
+      </ConditionalRender>
     </div>
   );
 };
 
 export default TravelerCategories;
-

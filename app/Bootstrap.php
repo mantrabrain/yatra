@@ -111,8 +111,43 @@ class Bootstrap
             $table_trips
         )) === $table_trips;
 
+        // Check if destinations table exists
+        $table_destinations = $wpdb->prefix . 'yatra_destinations';
+        $destinations_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_destinations
+        )) === $table_destinations;
+
+        // Check if traveler categories table exists
+        $table_traveler_categories = $wpdb->prefix . 'yatra_traveler_categories';
+        $traveler_categories_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_traveler_categories
+        )) === $table_traveler_categories;
+
+        // Check if item types table exists
+        $table_item_types = $wpdb->prefix . 'yatra_item_types';
+        $item_types_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_item_types
+        )) === $table_item_types;
+
+        // Check if items table exists
+        $table_items = $wpdb->prefix . 'yatra_items';
+        $items_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_items
+        )) === $table_items;
+
+        // Check if discounts table exists
+        $table_discounts = $wpdb->prefix . 'yatra_discounts';
+        $discounts_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_discounts
+        )) === $table_discounts;
+
         // If any table doesn't exist, create all tables
-        if (!$activities_exists || !$trips_exists) {
+        if (!$activities_exists || !$trips_exists || !$destinations_exists || !$traveler_categories_exists || !$item_types_exists || !$items_exists || !$discounts_exists) {
             Database::createTables();
             
             if (defined('WP_DEBUG') && WP_DEBUG) {

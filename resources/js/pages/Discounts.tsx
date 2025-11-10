@@ -8,6 +8,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Copy, Tag, Users } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -16,6 +18,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Badge } from '../components/ui/badge';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 
 interface Discount {
   id: number;
@@ -29,7 +32,7 @@ interface Discount {
   usage_count: number;
   valid_from?: string;
   expiry_date?: string;
-  status: 'active' | 'inactive' | 'expired';
+  status: 'draft' | 'publish' | 'trash';
   applicable_to: 'all' | 'specific_trips';
   trip_ids?: number[];
   min_amount?: number;
@@ -40,6 +43,10 @@ interface Discount {
   group_discount_amount?: number;
   created_at: string;
   updated_at: string;
+  created_by: number; // user_id
+  updated_by: number; // user_id
+  created_by_name?: string; // Optional: user name from API
+  updated_by_name?: string; // Optional: user name from API
 }
 
 const Discounts: React.FC = () => {
@@ -49,8 +56,10 @@ const Discounts: React.FC = () => {
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; discount: Discount | null }>({ isOpen: false, discount: null });
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -76,201 +85,33 @@ const Discounts: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, typeFilter, sortBy, sortOrder, page]);
 
-  // Fetch discounts with dummy data
+  // Fetch discounts from API
   const { data, isLoading, error } = useQuery({
     queryKey: ['discounts', queryParams],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/discounts', { params: queryParams });
-      // Dummy data
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() + days);
-        return date.toISOString().split('T')[0];
-      };
-
-      const allDiscounts: Discount[] = [
-        {
-          id: 1,
-          code: 'SUMMER2024',
-          description: 'Summer discount for all trips',
-          type: 'percentage',
-          amount: 15,
-          max_discount_amount: 500,
-          usage_limit: 100,
-          usage_limit_per_customer: 1,
-          usage_count: 45,
-          valid_from: getDate(-30),
-          expiry_date: getDate(30),
-          status: 'active',
-          applicable_to: 'all',
-          min_amount: 100,
-          first_time_customer_only: false,
-          is_group_discount: true,
-          min_group_size: 5,
-          group_discount_type: 'percentage',
-          group_discount_amount: 10,
-          created_at: getDate(-60),
-          updated_at: getDate(-5),
-        },
-        {
-          id: 2,
-          code: 'WELCOME10',
-          description: 'Welcome discount for new customers',
-          type: 'fixed',
-          amount: 50,
-          usage_limit: 500,
-          usage_count: 234,
-          expiry_date: getDate(90),
-          status: 'active',
-          applicable_to: 'all',
-          min_amount: 200,
-          created_at: getDate(-120),
-          updated_at: getDate(-10),
-        },
-        {
-          id: 3,
-          code: 'EARLYBIRD',
-          description: 'Early bird discount for specific premium trips',
-          type: 'percentage',
-          amount: 20,
-          usage_limit: 50,
-          usage_count: 50,
-          expiry_date: getDate(-5),
-          status: 'expired',
-          applicable_to: 'specific_trips',
-          trip_ids: [1, 2, 3],
-          min_amount: 500,
-          created_at: getDate(-180),
-          updated_at: getDate(-5),
-        },
-        {
-          id: 4,
-          code: 'STUDENT15',
-          description: 'Student discount for all trips',
-          type: 'percentage',
-          amount: 15,
-          usage_limit: 200,
-          usage_count: 89,
-          status: 'active',
-          applicable_to: 'all',
-          min_amount: 150,
-          created_at: getDate(-45),
-          updated_at: getDate(-2),
-        },
-        {
-          id: 5,
-          code: 'FLAT25',
-          description: 'Flat discount for all bookings',
-          type: 'fixed',
-          amount: 25,
-          usage_limit: 1000,
-          usage_count: 567,
-          expiry_date: getDate(15),
-          status: 'active',
-          applicable_to: 'all',
-          created_at: getDate(-30),
-          updated_at: getDate(-1),
-        },
-        {
-          id: 6,
-          code: 'VIP30',
-          description: 'VIP discount for premium trips only',
-          type: 'percentage',
-          amount: 30,
-          usage_limit: 10,
-          usage_count: 10,
-          expiry_date: getDate(60),
-          status: 'inactive',
-          applicable_to: 'specific_trips',
-          trip_ids: [5, 6],
-          min_amount: 1000,
-          created_at: getDate(-90),
-          updated_at: getDate(-20),
-        },
-      ];
-
-      // Apply filters
-      let filtered = allDiscounts;
-      if (searchTerm) {
-        filtered = filtered.filter(discount =>
-          discount.code.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+      try {
+        const response = await apiClient.get('/discounts', { params: queryParams });
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load discounts', 'Failed to load discounts'), 'error');
+        throw error;
       }
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(discount => discount.status === statusFilter);
-      }
-      if (typeFilter !== 'all') {
-        filtered = filtered.filter(discount => discount.type === typeFilter);
-      }
-
-      // Apply sorting
-      filtered = [...filtered].sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
-
-        switch (sortBy) {
-          case 'code':
-            aValue = a.code.toLowerCase();
-            bValue = b.code.toLowerCase();
-            break;
-          case 'type':
-            aValue = a.type;
-            bValue = b.type;
-            break;
-          case 'amount':
-            aValue = a.amount;
-            bValue = b.amount;
-            break;
-          case 'usage_count':
-            aValue = a.usage_count;
-            bValue = b.usage_count;
-            break;
-          case 'status':
-            aValue = a.status;
-            bValue = b.status;
-            break;
-          case 'expiry_date':
-            aValue = a.expiry_date ? new Date(a.expiry_date).getTime() : 0;
-            bValue = b.expiry_date ? new Date(b.expiry_date).getTime() : 0;
-            break;
-          case 'created_at':
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-            break;
-          default:
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-        }
-
-        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
-      });
-
-      // Apply pagination
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
-
-      return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10,
-      };
     },
     enabled: can('yatra_view_bookings'),
   });
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (_id: number) => {
-      // return await apiClient.delete(`/yatra/v1/discounts/${_id}`);
-      return { success: true };
+    mutationFn: async (id: number) => {
+      return await apiClient.delete(`/discounts/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['discounts'] });
+      showToast(__('Discount deleted successfully', 'Discount deleted successfully'), 'success');
+      setDeleteConfirm({ isOpen: false, discount: null });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete discount', 'Failed to delete discount'), 'error');
     },
   });
 
@@ -279,26 +120,45 @@ const Discounts: React.FC = () => {
   const totalPages = Math.ceil(total / 10);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    if (!dateString) return __('N/A', 'N/A');
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (e) {
+      return __('Invalid date', 'Invalid date');
+    }
+  };
+
+  const formatUser = (userId: number, userName?: string) => {
+    if (userName) return userName;
+    return userId ? `User #${userId}` : __('Unknown', 'Unknown');
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirm.discount) {
+      deleteMutation.mutate(deleteConfirm.discount.id);
+    }
   };
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
-      'active': {
+      'publish': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Active', 'Active'),
+        label: __('Publish', 'Publish'),
       },
-      'inactive': {
+      'draft': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Inactive', 'Inactive'),
+        label: __('Draft', 'Draft'),
       },
-      'expired': {
+      'trash': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Expired', 'Expired'),
+        label: __('Trash', 'Trash'),
       },
     };
 
@@ -326,9 +186,7 @@ const Discounts: React.FC = () => {
   };
 
   const handleDelete = (discount: Discount) => {
-    if (confirm(__('Are you sure you want to delete this discount coupon?', 'Are you sure you want to delete this discount coupon?'))) {
-      deleteMutation.mutate(discount.id);
-    }
+    setDeleteConfirm({ isOpen: true, discount });
   };
 
   const handleDuplicate = (discount: Discount) => {
@@ -370,16 +228,24 @@ const Discounts: React.FC = () => {
 
   return (
     <div className="space-y-3">
+      <ConfirmationDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, discount: null })}
+        onConfirm={confirmDelete}
+        title={__('Delete Discount', 'Delete Discount')}
+        message={deleteConfirm.discount 
+          ? __('Are you sure you want to delete discount code "{code}"? This action cannot be undone.', 'Are you sure you want to delete discount code "{code}"? This action cannot be undone.').replace('{code}', deleteConfirm.discount.code)
+          : __('Are you sure you want to delete this discount? This action cannot be undone.', 'Are you sure you want to delete this discount? This action cannot be undone.')
+        }
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
+
       <PageHeader
         title={__('Discount Coupons', 'Discount Coupons')}
         description={__('Create and manage discount coupons for your trips', 'Create and manage discount coupons for your trips')}
-        actionCapability="yatra_edit_bookings"
-        actions={
-          <Button onClick={handleCreateDiscount} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            {__('Add New Coupon', 'Add New Coupon')}
-          </Button>
-        }
       />
 
       {/* Filters, Search, and Sorting - Always Visible */}
@@ -467,7 +333,6 @@ const Discounts: React.FC = () => {
       </Card>
 
       <ConditionalRender capability="yatra_view_bookings">
-        {/* Table */}
         {error ? (
           <Card>
             <CardContent className="p-8 text-center text-red-500">
@@ -479,13 +344,120 @@ const Discounts: React.FC = () => {
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('Loading discounts...', 'Loading discounts...')}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[200px]">{__('Coupon Code', 'Coupon Code')}</TableHead>
+                        <TableHead>{__('Type', 'Type')}</TableHead>
+                        <TableHead>{__('Discount', 'Discount')}</TableHead>
+                        <TableHead>{__('Usage', 'Usage')}</TableHead>
+                        <TableHead>{__('Expiry Date', 'Expiry Date')}</TableHead>
+                        <TableHead>{__('Status', 'Status')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...Array(5)].map((_, index) => (
+                        <TableRow key={`skeleton-${index}`}>
+                          <TableCell>
+                            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 ) : discounts.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('No discount coupons found', 'No discount coupons found')}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[200px]">{__('Coupon Code', 'Coupon Code')}</TableHead>
+                        <TableHead>{__('Type', 'Type')}</TableHead>
+                        <TableHead>{__('Discount', 'Discount')}</TableHead>
+                        <TableHead>{__('Usage', 'Usage')}</TableHead>
+                        <TableHead>{__('Expiry Date', 'Expiry Date')}</TableHead>
+                        <TableHead>{__('Status', 'Status')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
+                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell colSpan={9} className="h-64">
+                          <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                              <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                              {__('No discounts found', 'No discounts found')}
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
+                              {hasFilters
+                                ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                                : __('Get started by creating your first discount coupon.', 'Get started by creating your first discount coupon.')
+                              }
+                            </p>
+                            {hasFilters ? (
+                              <Button
+                                variant="outline"
+                                onClick={handleResetFilters}
+                                className="flex items-center gap-2"
+                              >
+                                <X className="w-4 h-4" />
+                                {__('Clear Filters', 'Clear Filters')}
+                              </Button>
+                            ) : (
+                              can('yatra_edit_bookings') && (
+                                <Button
+                                  onClick={handleCreateDiscount}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                  {__('Create Discount', 'Create Discount')}
+                                </Button>
+                              )
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
                 ) : (
                   <Table>
                     <TableHeader>
@@ -544,11 +516,21 @@ const Discounts: React.FC = () => {
                             {getSortIcon('status')}
                           </button>
                         </TableHead>
+                        <TableHead className="w-[150px]">
+                          <button
+                            onClick={() => handleSort('created_at')}
+                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
+                          >
+                            {__('Date', 'Date')}
+                            {getSortIcon('created_at')}
+                          </button>
+                        </TableHead>
+                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
                         <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {discounts.map((discount) => (
+                      {discounts.map((discount: Discount) => (
                         <TableRow key={discount.id}>
                           <TableCell>
                             <div>
@@ -585,14 +567,32 @@ const Discounts: React.FC = () => {
                           <TableCell className="font-medium text-gray-900 dark:text-white">
                             {formatDiscount(discount)}
                           </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400">
-                            {discount.usage_count} / {discount.usage_limit === 0 ? '∞' : discount.usage_limit}
+                          <TableCell className="text-center">
+                            <Badge variant="outline" className="font-medium">
+                              {discount.usage_count} / {discount.usage_limit === 0 ? '∞' : discount.usage_limit}
+                            </Badge>
                           </TableCell>
                           <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
                             {discount.expiry_date ? formatDate(discount.expiry_date) : __('No expiry', 'No expiry')}
                           </TableCell>
                           <TableCell>
                             {getStatusBadge(discount.status)}
+                          </TableCell>
+                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
+                            <div>
+                              <div>{formatDate(discount.created_at)}</div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                {__('Updated', 'Updated')}: {formatDate(discount.updated_at)}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
+                            <div>
+                              <div>{formatUser(discount.created_by, discount.created_by_name)}</div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                {__('Updated by', 'Updated by')}: {formatUser(discount.updated_by, discount.updated_by_name)}
+                              </div>
+                            </div>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">

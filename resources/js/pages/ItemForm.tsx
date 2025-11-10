@@ -5,17 +5,19 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Info } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Edit2, X } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
+import { generateSlug } from '../lib/slug';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { SearchableSelect } from '../components/ui/searchable-select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
-import { HelpText } from '../components/ui/help-text';
-import { Alert } from '../components/ui/alert';
 
 interface ItemFormData {
   name: string;
@@ -28,15 +30,17 @@ interface ItemFormData {
 const ItemForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<ItemFormData>({
     name: '',
     slug: '',
     description: '',
     type_id: '',
-    status: 'active',
+    status: 'draft',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSlugEditable, setIsSlugEditable] = useState(false);
 
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -50,32 +54,37 @@ const ItemForm: React.FC = () => {
 
   const isEditMode = action === 'edit' && itemId !== null;
 
-  // Fetch item types
+  // Fetch item types - only published ones are usable
   const { data: typesData } = useQuery({
-    queryKey: ['item-types-simple'],
+    queryKey: ['item-types-published'],
     queryFn: async () => {
-      return [
-        { id: 1, name: 'Activity', icon: 'activity' },
-        { id: 2, name: 'Meal', icon: 'utensils' },
-        { id: 3, name: 'Accommodation', icon: 'hotel' },
-        { id: 4, name: 'Transportation', icon: 'bus' },
-        { id: 5, name: 'Rest', icon: 'moon' },
-      ];
+      try {
+        const response = await apiClient.get('/item-types', { 
+          params: { 
+            per_page: 100,
+            status: 'publish' // Only get published item types
+          } 
+        });
+        return response.data || [];
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load item types', 'Failed to load item types'), 'error');
+        return [];
+      }
     },
+    enabled: can('yatra_view_trips'),
   });
 
   const { data: itemData, isLoading: isLoadingItem } = useQuery({
     queryKey: ['item', itemId],
     queryFn: async () => {
       if (!itemId) return null;
-      return {
-        id: itemId,
-        name: 'Hiking',
-        slug: 'hiking',
-        description: 'Mountain hiking',
-        type_id: 1,
-        status: 'active',
-      };
+      try {
+        const response = await apiClient.get(`/items/${itemId}`);
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load item', 'Failed to load item'), 'error');
+        throw error;
+      }
     },
     enabled: isEditMode && can('yatra_view_trips'),
   });
@@ -87,29 +96,48 @@ const ItemForm: React.FC = () => {
         slug: itemData.slug || '',
         description: itemData.description || '',
         type_id: itemData.type_id?.toString() || '',
-        status: itemData.status || 'active',
+        status: itemData.status || 'draft',
       });
     }
   }, [itemData, isEditMode]);
 
-  const generateSlug = (name: string): string => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
   const handleNameChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      name: value,
-      slug: prev.slug || generateSlug(value),
-    }));
+    // Auto-generate slug from name (only if slug is not manually edited)
+    if (!isSlugEditable) {
+      const newSlug = generateSlug(value);
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+        slug: newSlug,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        name: value,
+      }));
+    }
     if (errors.name) {
       setErrors(prev => ({ ...prev, name: '' }));
     }
+  };
+
+  const handleSlugChange = (value: string) => {
+    // Only allow manual slug editing if edit mode is enabled
+    if (isSlugEditable) {
+      setFormData(prev => ({ ...prev, slug: value }));
+      if (errors.slug) {
+        setErrors(prev => ({ ...prev, slug: '' }));
+      }
+    }
+  };
+
+  const handleToggleSlugEdit = () => {
+    if (isSlugEditable) {
+      // If disabling edit, regenerate slug from name
+      const newSlug = generateSlug(formData.name);
+      setFormData(prev => ({ ...prev, slug: newSlug }));
+    }
+    setIsSlugEditable(!isSlugEditable);
   };
 
   const handleFieldChange = (field: keyof ItemFormData, value: string) => {
@@ -142,7 +170,7 @@ const ItemForm: React.FC = () => {
 
   const saveMutation = useMutation({
     mutationFn: async (data: ItemFormData) => {
-      const payload = {
+      const payload: any = {
         name: data.name.trim(),
         slug: data.slug.trim(),
         description: data.description.trim(),
@@ -150,21 +178,33 @@ const ItemForm: React.FC = () => {
         status: data.status,
       };
 
+      // If slug was manually edited, add flag to preserve it
+      if (isEditMode && isSlugEditable) {
+        payload.preserve_slug = true;
+      }
+
       if (isEditMode && itemId) {
-        console.log('Updating item:', itemId, payload);
-        return { success: true, id: itemId };
+        return await apiClient.put(`/items/${itemId}`, payload);
       } else {
-        console.log('Creating item:', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+        return await apiClient.post('/items', payload);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['items'] });
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=items`;
+      queryClient.invalidateQueries({ queryKey: ['item', itemId] });
+      showToast(
+        isEditMode 
+          ? __('Item updated successfully', 'Item updated successfully')
+          : __('Item created successfully', 'Item created successfully'),
+        'success'
+      );
+      setTimeout(() => {
+        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=items`;
+      }, 1000);
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving', 'An error occurred while saving');
-      setErrors({ submit: errorMessage });
+      const errorMessage = error?.message || __('An error occurred while saving the item', 'An error occurred while saving the item');
+      showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
   });
@@ -173,6 +213,7 @@ const ItemForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
+      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
       return;
     }
 
@@ -226,29 +267,21 @@ const ItemForm: React.FC = () => {
                     <label htmlFor="type_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Item Type', 'Item Type')} <span className="text-red-500">*</span>
                     </label>
-                    <HelpText 
-                      text={__('Select the item type this item belongs to. Examples: Activity, Meal, Accommodation.', 'Select the item type this item belongs to. Examples: Activity, Meal, Accommodation.')}
-                      className="mb-2"
-                    />
-                    <Select
-                      id="type_id"
+                    <SearchableSelect
                       value={formData.type_id}
-                      onChange={(e) => handleFieldChange('type_id', e.target.value)}
+                      onChange={(value) => handleFieldChange('type_id', value)}
+                      options={types.map((type: any) => ({
+                        value: type.id.toString(),
+                        label: type.name,
+                        icon: type.icon,
+                      }))}
+                      placeholder={__('Select a type...', 'Select a type...')}
+                      searchPlaceholder={__('Search item types...', 'Search item types...')}
                       className={errors.type_id ? 'border-red-500' : ''}
-                      required
-                    >
-                      <option value="">{__('Select a type...', 'Select a type...')}</option>
-                      {types.map((type: any) => (
-                        <option key={type.id} value={type.id}>
-                          {type.name}
-                        </option>
-                      ))}
-                    </Select>
+                      error={!!errors.type_id}
+                    />
                     {errors.type_id && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
-                        {errors.type_id}
-                      </p>
+                      <p className="mt-1 text-sm text-red-500">{errors.type_id}</p>
                     )}
                   </div>
 
@@ -256,10 +289,6 @@ const ItemForm: React.FC = () => {
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Item Name', 'Item Name')} <span className="text-red-500">*</span>
                     </label>
-                    <HelpText 
-                      text={__('Enter the specific item name. Examples: Hiking, Lunch, Bus, Hotel.', 'Enter the specific item name. Examples: Hiking, Lunch, Bus, Hotel.')}
-                      className="mb-2"
-                    />
                     <Input
                       id="name"
                       type="text"
@@ -270,46 +299,53 @@ const ItemForm: React.FC = () => {
                       required
                     />
                     {errors.name && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
-                        {errors.name}
-                      </p>
+                      <p className="mt-1 text-sm text-red-500">{errors.name}</p>
                     )}
                   </div>
 
                   <div>
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('URL Slug', 'URL Slug')} <span className="text-red-500">*</span>
+                      {__('Slug', 'Slug')} <span className="text-red-500">*</span>
                     </label>
-                    <HelpText 
-                      text={__('URL-friendly version. Automatically generated but can be edited.', 'URL-friendly version. Automatically generated but can be edited.')}
-                      className="mb-2"
-                    />
-                    <Input
-                      id="slug"
-                      type="text"
-                      value={formData.slug}
-                      onChange={(e) => handleFieldChange('slug', e.target.value)}
-                      placeholder={__('hiking', 'hiking')}
-                      className={errors.slug ? 'border-red-500' : ''}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="slug"
+                        type="text"
+                        value={formData.slug}
+                        onChange={(e) => handleSlugChange(e.target.value)}
+                        placeholder={__('item-slug', 'item-slug')}
+                        className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
+                        disabled={!isSlugEditable}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={handleToggleSlugEdit}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
+                        aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                      >
+                        {isSlugEditable ? (
+                          <X className="w-4 h-4" />
+                        ) : (
+                          <Edit2 className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
                     {errors.slug && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
-                        {errors.slug}
-                      </p>
+                      <p className="mt-1 text-sm text-red-500">{errors.slug}</p>
                     )}
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      {isSlugEditable
+                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
+                        : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')
+                      }
+                    </p>
                   </div>
 
                   <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Description', 'Description')}
                     </label>
-                    <HelpText 
-                      text={__('Brief description of what this item represents.', 'Brief description of what this item represents.')}
-                      className="mb-2"
-                    />
                     <textarea
                       id="description"
                       value={formData.description}
@@ -333,17 +369,15 @@ const ItemForm: React.FC = () => {
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Item Status', 'Item Status')}
                     </label>
-                    <HelpText 
-                      text={__('Active items can be used in itineraries. Inactive items are hidden.', 'Active items can be used in itineraries. Inactive items are hidden.')}
-                      className="mb-2"
-                    />
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
+                      className="h-9"
                     >
-                      <option value="active">{__('Active', 'Active')}</option>
-                      <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                      <option value="draft">{__('Draft', 'Draft')}</option>
+                      <option value="publish">{__('Publish', 'Publish')}</option>
+                      <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -352,11 +386,6 @@ const ItemForm: React.FC = () => {
               <Card>
                 <CardContent className="p-3">
                   <div className="space-y-2">
-                    {errors.submit && (
-                      <Alert variant="error" title={__('Error', 'Error')}>
-                        {errors.submit}
-                      </Alert>
-                    )}
                     <div className="flex gap-2">
                       <Button
                         type="submit"
@@ -396,4 +425,3 @@ const ItemForm: React.FC = () => {
 };
 
 export default ItemForm;
-

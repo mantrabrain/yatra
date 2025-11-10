@@ -8,6 +8,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2, Info } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -15,7 +17,6 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { HelpText } from '../components/ui/help-text';
-import { Alert } from '../components/ui/alert';
 
 interface DiscountFormData {
   code: string;
@@ -27,7 +28,7 @@ interface DiscountFormData {
   usage_limit_per_customer: string; // Usage limit per customer
   valid_from: string; // Start date
   expiry_date: string; // End date
-  status: 'active' | 'inactive';
+  status: 'draft' | 'publish' | 'trash';
   applicable_to: 'all' | 'specific_trips';
   trip_ids: number[];
   min_amount: string; // Minimum booking amount
@@ -41,6 +42,7 @@ interface DiscountFormData {
 const DiscountForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<DiscountFormData>({
     code: '',
     description: '',
@@ -51,7 +53,7 @@ const DiscountForm: React.FC = () => {
     usage_limit_per_customer: '0',
     valid_from: '',
     expiry_date: '',
-    status: 'active',
+    status: 'draft',
     applicable_to: 'all',
     trip_ids: [],
     min_amount: '',
@@ -89,30 +91,13 @@ const DiscountForm: React.FC = () => {
     queryFn: async () => {
       const id = discountId || duplicateId;
       if (!id) return null;
-      // return await apiClient.get(`/yatra/v1/discounts/${id}`);
-      // Dummy data
-      return {
-        id: id,
-        code: 'SUMMER2024',
-        description: 'Summer discount for all trips',
-        type: 'percentage',
-        amount: 15,
-        max_discount_amount: 500,
-        usage_limit: 100,
-        usage_limit_per_customer: 1,
-        usage_count: 45,
-        valid_from: '2024-06-01',
-        expiry_date: '2024-12-31',
-        status: 'active',
-        applicable_to: 'all',
-        trip_ids: [],
-        min_amount: 100,
-        first_time_customer_only: false,
-        is_group_discount: true,
-        min_group_size: 5,
-        group_discount_type: 'percentage',
-        group_discount_amount: 10,
-      };
+      try {
+        const response = await apiClient.get(`/discounts/${id}`);
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load discount', 'Failed to load discount'), 'error');
+        throw error;
+      }
     },
     enabled: (isEditMode || isDuplicateMode) && can('yatra_view_bookings'),
   });
@@ -130,7 +115,7 @@ const DiscountForm: React.FC = () => {
         usage_limit_per_customer: discountData.usage_limit_per_customer?.toString() || '0',
         valid_from: discountData.valid_from || '',
         expiry_date: discountData.expiry_date || '',
-        status: (isDuplicateMode ? 'active' : (discountData.status || 'active')) as 'active' | 'inactive',
+        status: (isDuplicateMode ? 'draft' : (discountData.status || 'draft')) as 'draft' | 'publish' | 'trash',
         applicable_to: (discountData.applicable_to || 'all') as 'all' | 'specific_trips',
         trip_ids: discountData.trip_ids || [],
         min_amount: discountData.min_amount?.toString() || '',
@@ -255,47 +240,51 @@ const DiscountForm: React.FC = () => {
 
   // Create/Update mutation
   const saveMutation = useMutation({
-    mutationFn: async (_data: DiscountFormData) => {
+    mutationFn: async (data: DiscountFormData) => {
+      const payload: any = {
+        code: data.code.trim().toUpperCase(),
+        description: data.description.trim(),
+        type: data.type,
+        amount: parseFloat(data.amount),
+        max_discount_amount: data.max_discount_amount ? parseFloat(data.max_discount_amount) : null,
+        usage_limit: parseInt(data.usage_limit) || 0,
+        usage_limit_per_customer: parseInt(data.usage_limit_per_customer) || 0,
+        valid_from: data.valid_from || null,
+        expiry_date: data.expiry_date || null,
+        status: data.status,
+        applicable_to: data.applicable_to,
+        trip_ids: data.applicable_to === 'specific_trips' ? data.trip_ids : [],
+        min_amount: data.min_amount ? parseFloat(data.min_amount) : null,
+        first_time_customer_only: data.first_time_customer_only,
+        is_group_discount: data.is_group_discount,
+        min_group_size: data.is_group_discount && data.min_group_size ? parseInt(data.min_group_size) : null,
+        group_discount_type: data.is_group_discount ? data.group_discount_type : null,
+        group_discount_amount: data.is_group_discount && data.group_discount_amount ? parseFloat(data.group_discount_amount) : null,
+      };
+
       if (isEditMode && discountId) {
-        // const payload = {
-        //   code: data.code.trim().toUpperCase(),
-        //   description: data.description.trim(),
-        //   type: data.type,
-        //   amount: parseFloat(data.amount),
-        //   usage_limit: parseInt(data.usage_limit) || 0,
-        //   expiry_date: data.expiry_date || null,
-        //   status: data.status,
-        //   applicable_to: data.applicable_to,
-        //   trip_ids: data.applicable_to === 'specific_trips' ? data.trip_ids : [],
-        //   min_amount: data.min_amount ? parseFloat(data.min_amount) : null,
-        // };
-        // return await apiClient.put(`/yatra/v1/discounts/${discountId}`, payload);
-        return { success: true, id: discountId };
+        return await apiClient.put(`/discounts/${discountId}`, payload);
       } else {
-        // const payload = {
-        //   code: data.code.trim().toUpperCase(),
-        //   description: data.description.trim(),
-        //   type: data.type,
-        //   amount: parseFloat(data.amount),
-        //   usage_limit: parseInt(data.usage_limit) || 0,
-        //   expiry_date: data.expiry_date || null,
-        //   status: data.status,
-        //   applicable_to: data.applicable_to,
-        //   trip_ids: data.applicable_to === 'specific_trips' ? data.trip_ids : [],
-        //   min_amount: data.min_amount ? parseFloat(data.min_amount) : null,
-        // };
-        // return await apiClient.post('/yatra/v1/discounts', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+        return await apiClient.post('/discounts', payload);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['discounts'] });
-      // Redirect to discounts list
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=discounts`;
+      queryClient.invalidateQueries({ queryKey: ['discount', discountId || duplicateId] });
+      showToast(
+        isEditMode 
+          ? __('Discount updated successfully', 'Discount updated successfully')
+          : __('Discount created successfully', 'Discount created successfully'),
+        'success'
+      );
+      setTimeout(() => {
+        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=discounts`;
+      }, 1000);
     },
     onError: (error: any) => {
-      console.error('Error saving discount:', error);
-      setErrors({ submit: error.message || __('Failed to save discount coupon', 'Failed to save discount coupon') });
+      const errorMessage = error?.message || __('An error occurred while saving the discount', 'An error occurred while saving the discount');
+      showToast(errorMessage, 'error');
+      setIsSubmitting(false);
     },
   });
 
@@ -825,13 +814,14 @@ const DiscountForm: React.FC = () => {
                 <CardContent className="space-y-3">
                   <Select
                     value={formData.status}
-                    onChange={(e) => handleFieldChange('status', e.target.value as 'active' | 'inactive')}
+                    onChange={(e) => handleFieldChange('status', e.target.value as 'draft' | 'publish' | 'trash')}
                   >
-                    <option value="active">{__('Active', 'Active')}</option>
-                    <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                    <option value="draft">{__('Draft', 'Draft')}</option>
+                    <option value="publish">{__('Publish', 'Publish')}</option>
+                    <option value="trash">{__('Trash', 'Trash')}</option>
                   </Select>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {__('Only active coupons can be used by customers.', 'Only active coupons can be used by customers.')}
+                    {__('Only published coupons can be used by customers.', 'Only published coupons can be used by customers.')}
                   </p>
                 </CardContent>
               </Card>
@@ -858,42 +848,47 @@ const DiscountForm: React.FC = () => {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Submit Actions */}
+              <Card>
+                <CardContent className="p-3">
+                  <div className="space-y-2">
+                    {errors.submit && (
+                      <div className="p-2 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 rounded-md">
+                        {errors.submit}
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            {__('Saving...', 'Saving...')}
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-4 h-4" />
+                            {isEditMode ? __('Update Coupon', 'Update Coupon') : __('Create Coupon', 'Create Coupon')}
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleBack}
+                        disabled={isSubmitting}
+                      >
+                        {__('Cancel', 'Cancel')}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </div>
-
-          {/* Submit Button */}
-          {errors.submit && (
-            <Alert variant="error" className="mt-3">
-              {errors.submit}
-            </Alert>
-          )}
-
-          <div className="flex items-center justify-end gap-3 mt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleBack}
-              disabled={isSubmitting}
-            >
-              {__('Cancel', 'Cancel')}
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex items-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {__('Saving...', 'Saving...')}
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  {isEditMode ? __('Update Coupon', 'Update Coupon') : __('Create Coupon', 'Create Coupon')}
-                </>
-              )}
-            </Button>
           </div>
         </form>
       </ConditionalRender>

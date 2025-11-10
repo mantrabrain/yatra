@@ -25,6 +25,7 @@ import {
   CalendarDays,
   MessageSquare
 } from 'lucide-react';
+import { __ } from '../lib/i18n';
 
 interface LayoutProps {
   children: React.ReactNode;

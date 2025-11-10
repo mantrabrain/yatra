@@ -17,6 +17,7 @@ import { ConditionalRender } from '../components/ui/conditional-render';
 import { HelpText } from '../components/ui/help-text';
 import { Alert } from '../components/ui/alert';
 import { ItineraryEntryFields } from '../components/trip-form/shared/ItineraryEntryFields';
+import { apiClient } from '../lib/api';
 
 interface ItineraryFormData {
   trip_id: string;
@@ -137,42 +138,47 @@ const ItineraryForm: React.FC = () => {
     },
   });
 
-  // Fetch item types
+  // Fetch item types - only published ones are usable
   const { data: typesData } = useQuery({
-    queryKey: ['item-types-simple'],
+    queryKey: ['item-types-published'],
     queryFn: async () => {
-      return [
-        { id: 1, name: 'Activity', icon: 'activity' },
-        { id: 2, name: 'Meal', icon: 'utensils' },
-        { id: 3, name: 'Accommodation', icon: 'hotel' },
-        { id: 4, name: 'Transportation', icon: 'bus' },
-        { id: 5, name: 'Rest', icon: 'moon' },
-      ];
+      try {
+        const response = await apiClient.get('/item-types', { 
+          params: { 
+            per_page: 100,
+            status: 'publish' // Only get published item types
+          } 
+        });
+        return response.data || [];
+      } catch (error: any) {
+        console.error('Failed to load item types:', error);
+        return [];
+      }
     },
+    enabled: can('yatra_view_trips'),
   });
 
-  // Fetch items based on selected type
+  // Fetch items based on selected type - only published ones are usable
   const { data: itemsData } = useQuery({
     queryKey: ['items-by-type', formData.item_type_id],
     queryFn: async () => {
       if (!formData.item_type_id) return [];
       
-      const allItems: any[] = [
-        { id: 1, name: 'Hiking', type_id: 1 },
-        { id: 2, name: 'Sightseeing', type_id: 1 },
-        { id: 3, name: 'Breakfast', type_id: 2 },
-        { id: 4, name: 'Lunch', type_id: 2 },
-        { id: 5, name: 'Dinner', type_id: 2 },
-        { id: 6, name: 'Hotel', type_id: 3 },
-        { id: 7, name: 'Lodge', type_id: 3 },
-        { id: 8, name: 'Bus', type_id: 4 },
-        { id: 9, name: 'Flight', type_id: 4 },
-        { id: 10, name: 'Free Time', type_id: 5 },
-      ];
-
-      return allItems.filter(item => item.type_id === parseInt(formData.item_type_id));
+      try {
+        const response = await apiClient.get('/items', { 
+          params: { 
+            per_page: 100,
+            type_id: formData.item_type_id,
+            status: 'publish' // Only get published items
+          } 
+        });
+        return response.data || [];
+      } catch (error: any) {
+        console.error('Failed to load items:', error);
+        return [];
+      }
     },
-    enabled: !!formData.item_type_id,
+    enabled: !!formData.item_type_id && can('yatra_view_trips'),
   });
 
   // Auto-select item from URL param
