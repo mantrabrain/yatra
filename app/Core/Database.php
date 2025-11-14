@@ -182,6 +182,23 @@ class Database
             KEY `updated_by` (`updated_by`)
         ) {$charset_collate};";
 
+        // Trip Revisions table
+        $table_trip_revisions = $wpdb->prefix . 'yatra_trip_revisions';
+        
+        $sql_trip_revisions = "CREATE TABLE IF NOT EXISTS `{$table_trip_revisions}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `trip_id` bigint(20) UNSIGNED NOT NULL,
+            `version` int(11) NOT NULL DEFAULT 1,
+            `data` longtext NOT NULL,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `created_by` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+            PRIMARY KEY (`id`),
+            KEY `trip_id` (`trip_id`),
+            KEY `version` (`version`),
+            KEY `created_at` (`created_at`),
+            KEY `created_by` (`created_by`)
+        ) {$charset_collate};";
+
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql_trips);
         dbDelta($sql_activities);
@@ -190,6 +207,7 @@ class Database
         dbDelta($sql_item_types);
         dbDelta($sql_items);
         dbDelta($sql_discounts);
+        dbDelta($sql_trip_revisions);
     }
 
     /**
@@ -207,6 +225,7 @@ class Database
             $wpdb->prefix . 'yatra_item_types',
             $wpdb->prefix . 'yatra_items',
             $wpdb->prefix . 'yatra_discounts',
+            $wpdb->prefix . 'yatra_trip_revisions',
         ];
 
         foreach ($tables as $table) {

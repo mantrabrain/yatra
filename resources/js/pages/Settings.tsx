@@ -34,7 +34,7 @@ import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { Label } from '../components/ui/label';
 import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 
 type SettingsSection = 
@@ -2403,6 +2403,25 @@ const Settings: React.FC = () => {
               <CardContent className="pb-4">
                 {renderSettingsContent()}
               </CardContent>
+              <CardFooter className="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-700/50">
+                <Button
+                  onClick={handleSave}
+                  disabled={isSaving || !formData}
+                  className="flex items-center gap-2"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {__('Saving...', 'Saving...')}
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      {__('Save Settings', 'Save Settings')}
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
             </Card>
           </div>
         </div>

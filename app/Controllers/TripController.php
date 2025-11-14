@@ -8,6 +8,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use Yatra\Services\TripService;
+use Yatra\Repositories\TripRevisionRepository;
 
 /**
  * Trip REST API Controller
@@ -62,6 +63,23 @@ class TripController extends BaseController
             [
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'delete_item'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
+        // Revisions endpoints
+        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/revisions', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_revisions'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
+        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/revisions/(?P<revision_id>[\d]+)', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_revision'],
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
@@ -174,6 +192,81 @@ class TripController extends BaseController
             return $this->success_response([
                 'message' => 'Trip deleted successfully',
             ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get revisions for a trip
+     */
+    public function get_revisions(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $id = (int) $request->get_param('id');
+            $revisionRepository = new TripRevisionRepository();
+            
+            $args = [
+                'order_by' => 'version',
+                'order' => 'DESC',
+            ];
+            
+            $revisions = $revisionRepository->findByTripId($id, $args);
+            
+            $prepared = array_map(function ($revision) {
+                $user = get_userdata($revision->created_by);
+                return [
+                    'id' => (int) $revision->id,
+                    'trip_id' => (int) $revision->trip_id,
+                    'version' => (int) $revision->version,
+                    'created_at' => $revision->created_at,
+                    'created_by' => (int) $revision->created_by,
+                    'created_by_name' => $user ? $user->display_name : __('Unknown', 'yatra'),
+                ];
+            }, $revisions);
+
+            return $this->success_response($prepared);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get single revision
+     */
+    public function get_revision(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $id = (int) $request->get_param('id');
+            $revisionId = (int) $request->get_param('revision_id');
+            $revisionRepository = new TripRevisionRepository();
+            
+            $revision = $revisionRepository->findRevision($revisionId);
+            
+            if (!$revision) {
+                return $this->error_response('Revision not found', 404);
+            }
+
+            if ((int) $revision->trip_id !== $id) {
+                return $this->error_response('Revision does not belong to this trip', 400);
+            }
+
+            // Unserialize the data
+            $data = maybe_unserialize($revision->data);
+            
+            $user = get_userdata($revision->created_by);
+            
+            $prepared = [
+                'id' => (int) $revision->id,
+                'trip_id' => (int) $revision->trip_id,
+                'version' => (int) $revision->version,
+                'data' => $data,
+                'created_at' => $revision->created_at,
+                'created_by' => (int) $revision->created_by,
+                'created_by_name' => $user ? $user->display_name : __('Unknown', 'yatra'),
+            ];
+
+            return $this->success_response($prepared);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }

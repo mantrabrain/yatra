@@ -35,7 +35,8 @@ import {
   ChevronDown,
   Bed,
   Car,
-  Activity
+  Activity,
+  History
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -47,6 +48,8 @@ import { Badge } from '../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { HelpText } from '../components/ui/help-text';
 import { ItinerarySection } from '../components/trip-form/sections/ItinerarySection';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { useToast } from '../components/ui/toast';
 
 type SectionId = 
   | 'overview'           // 1. Basic info, highlights, rich content, classification
@@ -268,6 +271,7 @@ interface ItineraryDay {
 const TripForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   
   const [currentSection, setCurrentSection] = useState<SectionId>('overview');
   const [currentTab, setCurrentTab] = useState<'basic' | 'highlights' | 'details' | 'rich-content' | 'classification'>('basic');
@@ -280,6 +284,18 @@ const TripForm: React.FC = () => {
   const [showIncludedModal, setShowIncludedModal] = useState(false);
   const [showExcludedModal, setShowExcludedModal] = useState(false);
   const [modalInput, setModalInput] = useState({ text: '', question: '', answer: '' });
+  
+  // Revision states
+  const [showRevisionsDialog, setShowRevisionsDialog] = useState(false);
+  const [selectedRevisionId, setSelectedRevisionId] = useState<number | null>(null);
+  const [showRevisionConfirm, setShowRevisionConfirm] = useState(false);
+  
+  // Static/dummy revisions data for UI only
+  const dummyRevisions = [
+    { id: 1, version: 3, created_by_name: 'Admin User', created_at: new Date().toISOString() },
+    { id: 2, version: 2, created_by_name: 'Admin User', created_at: new Date(Date.now() - 86400000).toISOString() },
+    { id: 3, version: 1, created_by_name: 'Admin User', created_at: new Date(Date.now() - 172800000).toISOString() },
+  ];
   
   const [formData, setFormData] = useState<TripFormData>({
     title: '',
@@ -1288,10 +1304,29 @@ const TripForm: React.FC = () => {
     saveMutation.mutate({ ...formData, status: 'published' });
   };
 
+  // Using static revisions data for UI only
+  const revisions = dummyRevisions;
+  const isLoadingRevisions = false;
+
   const handlePreview = () => {
     // Open preview in new window
     const previewUrl = `${window.yatraAdmin?.siteUrl || ''}/trips/${formData.slug || 'preview'}`;
     window.open(previewUrl, '_blank');
+  };
+
+  const handleRevisionClick = (revisionId: number) => {
+    setSelectedRevisionId(revisionId);
+    setShowRevisionConfirm(true);
+  };
+
+  const handleRevisionConfirm = () => {
+    // UI only - no actual functionality
+    if (selectedRevisionId) {
+      showToast(__('Revision feature is coming soon', 'Revision feature is coming soon'), 'info');
+    }
+    setShowRevisionConfirm(false);
+    setShowRevisionsDialog(false);
+    setSelectedRevisionId(null);
   };
 
   const formatTime = (date: Date) => {
@@ -3998,6 +4033,16 @@ const TripForm: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          {isEditMode && (
+            <Button
+              variant="outline"
+              onClick={() => setShowRevisionsDialog(true)}
+              className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              <History className="w-4 h-4 mr-2" />
+              {__('Revisions', 'Revisions')}
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={handlePreview}
@@ -4303,6 +4348,94 @@ const TripForm: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Revisions Dialog */}
+      {showRevisionsDialog && (
+        <div
+          className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => setShowRevisionsDialog(false)}
+        >
+          <Card className="w-full max-w-2xl max-h-[80vh] mx-4 shadow-xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <CardHeader className="pb-3 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <History className="w-5 h-5" />
+                  {__('Trip Revisions', 'Trip Revisions')}
+                </CardTitle>
+                <button
+                  onClick={() => setShowRevisionsDialog(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  aria-label={__('Close', 'Close')}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-y-auto pb-4">
+              {isLoadingRevisions ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                  <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading revisions...', 'Loading revisions...')}</span>
+                </div>
+              ) : revisions.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  {__('No revisions found', 'No revisions found')}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {revisions.map((revision) => (
+                    <div
+                      key={revision.id}
+                      className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                      onClick={() => handleRevisionClick(revision.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline">v{revision.version}</Badge>
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {__('Revision', 'Revision')} {revision.version}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {__('Created by', 'Created by')} {revision.created_by_name} • {new Date(revision.created_at).toLocaleString()}
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRevisionClick(revision.id);
+                          }}
+                        >
+                          {__('Use This Revision', 'Use This Revision')}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Revision Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showRevisionConfirm}
+        onClose={() => {
+          setShowRevisionConfirm(false);
+          setSelectedRevisionId(null);
+        }}
+        onConfirm={handleRevisionConfirm}
+        title={__('Use This Revision?', 'Use This Revision?')}
+        message={__('Do you want to use this revision? This will replace all current form data with the revision data.', 'Do you want to use this revision? This will replace all current form data with the revision data.')}
+        confirmText={__('Yes, Use This Revision', 'Yes, Use This Revision')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="info"
+        isLoading={false}
+      />
     </div>
   );
 };

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Repositories\TripRepository;
+use Yatra\Repositories\TripRevisionRepository;
 
 /**
  * Trip Service
@@ -18,11 +19,17 @@ class TripService extends BaseService
     private TripRepository $repository;
 
     /**
+     * @var TripRevisionRepository
+     */
+    private TripRevisionRepository $revisionRepository;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->repository = new TripRepository();
+        $this->revisionRepository = new TripRevisionRepository();
     }
 
     /**
@@ -66,6 +73,40 @@ class TripService extends BaseService
         // Set default status
         if (empty($data['status'])) {
             $data['status'] = 'draft';
+        }
+
+        return $data;
+    }
+
+    /**
+     * Process before update - save revision
+     */
+    protected function processBeforeUpdate(int $id, array $data): array
+    {
+        // Get current trip data before update
+        $currentTrip = $this->repository->find($id);
+        
+        if ($currentTrip) {
+            // Get latest version number
+            $latestVersion = $this->revisionRepository->getLatestVersion($id);
+            $newVersion = $latestVersion + 1;
+            
+            // Get current user ID
+            $currentUserId = get_current_user_id();
+            
+            // Serialize current trip data (convert object to array and serialize)
+            $tripDataArray = (array) $currentTrip;
+            $serializedData = maybe_serialize($tripDataArray);
+            
+            // Save revision
+            try {
+                $this->revisionRepository->createRevision($id, $newVersion, $serializedData, $currentUserId);
+            } catch (\Exception $e) {
+                // Log error but don't fail the update
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('Yatra: Failed to save revision: ' . $e->getMessage());
+                }
+            }
         }
 
         return $data;
