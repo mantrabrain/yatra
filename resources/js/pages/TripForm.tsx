@@ -8,7 +8,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Save, 
   Loader2, 
-  Info, 
   Eye, 
   Sparkles,
   Compass,
@@ -33,10 +32,12 @@ import {
   GripVertical,
   ChevronUp,
   ChevronDown,
-  Bed,
-  Car,
-  Activity,
-  History
+  ChevronLeft,
+  ChevronRight,
+  History,
+  Lightbulb,
+  Copy,
+  BookOpen
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -52,21 +53,18 @@ import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { useToast } from '../components/ui/toast';
 
 type SectionId = 
-  | 'overview'           // 1. Basic info, highlights, rich content, classification
-  | 'location'          // 2. Location & geography (destination, coordinates, landmarks)
-  | 'duration'          // 3. Duration & schedule (trip type, days, availability, seasonal)
-  | 'activity'          // 4. Activity types & category (activity types, difficulty, category hierarchy)
-  | 'accommodation'     // 5. Accommodation details
-  | 'transportation'    // 6. Transportation details
-  | 'pricing'           // 7. Pricing & payment
-  | 'itinerary'         // 8. Itinerary builder
-  | 'included'          // 9. What's included/excluded
-  | 'booking'           // 10. Booking requirements & settings
-  | 'gallery'           // 11. Photo gallery
-  | 'faqs'              // 12. FAQs
-  | 'frontend-tabs'     // 13. Frontend tabs management
-  | 'seo'               // 14. SEO settings
-  | 'advanced';         // 15. Status & lifecycle management
+  | 'basic'             // 1. Basic Information (title, description, highlights, featured image)
+  | 'location'          // 2. Location & Geography
+  | 'duration'          // 3. Duration & Schedule
+  | 'pricing'           // 4. Pricing & Payment
+  | 'itinerary'         // 5. Itinerary Builder (includes accommodation & transportation per day)
+  | 'included'          // 6. What's Included/Excluded
+  | 'booking'           // 7. Booking Requirements
+  | 'media'             // 8. Media & Content (gallery, video, story, testimonials)
+  | 'categorization'    // 9. Categorization & Tags (category, activities, difficulty, tags)
+  | 'faqs'              // 10. FAQs
+  | 'seo'               // 11. SEO Settings
+  | 'advanced';         // 12. Advanced Settings (status, scheduling, frontend tabs)
 
 interface Section {
   id: SectionId;
@@ -273,8 +271,7 @@ const TripForm: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
   
-  const [currentSection, setCurrentSection] = useState<SectionId>('overview');
-  const [currentTab, setCurrentTab] = useState<'basic' | 'highlights' | 'details' | 'rich-content' | 'classification'>('basic');
+  const [currentSection, setCurrentSection] = useState<SectionId>('basic');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [showCategorySelector, setShowCategorySelector] = useState(false);
@@ -289,6 +286,10 @@ const TripForm: React.FC = () => {
   const [showRevisionsDialog, setShowRevisionsDialog] = useState(false);
   const [selectedRevisionId, setSelectedRevisionId] = useState<number | null>(null);
   const [showRevisionConfirm, setShowRevisionConfirm] = useState(false);
+  
+  // UI Enhancement states
+  const [simpleMode, setSimpleMode] = useState(false); // Quick Start mode
+  const [showSlugPreview, setShowSlugPreview] = useState(true);
   
   // Static/dummy revisions data for UI only
   const dummyRevisions = [
@@ -621,10 +622,10 @@ const TripForm: React.FC = () => {
     }
   }, [tripData, isEditMode]);
 
-  // Define sections - Organized in logical workflow order
+  // Define sections - Organized in logical workflow order (First Things First)
   const essentialsSections: Section[] = [
-    // Step 1: Basic Information
-    { id: 'overview', label: __('Trip Overview', 'Trip Overview'), icon: FileText, required: true, completed: !!(formData.title && formData.description) },
+    // Step 1: Basic Information (Simplified - no tabs)
+    { id: 'basic', label: __('Basic Information', 'Basic Information'), icon: FileText, required: true, completed: !!(formData.title && formData.description && formData.featured_image) },
     
     // Step 2: Location & Geography
     { id: 'location', label: __('Location & Geography', 'Location & Geography'), icon: MapPin, required: true, completed: !!(formData.destination) },
@@ -632,26 +633,23 @@ const TripForm: React.FC = () => {
     // Step 3: Duration & Schedule
     { id: 'duration', label: __('Duration & Schedule', 'Duration & Schedule'), icon: Calendar, required: true, completed: !!(formData.duration_days && formData.trip_type) },
     
-    // Step 4: Activity & Category
-    { id: 'activity', label: __('Activity & Category', 'Activity & Category'), icon: Activity, required: false, completed: !!(formData.trip_category || formData.activity_types.length > 0) },
-    
-    // Step 5: Pricing
+    // Step 4: Pricing & Payment
     { id: 'pricing', label: __('Pricing & Payment', 'Pricing & Payment'), icon: DollarSign, required: true, completed: formData.pricing_type === 'regular' ? !!(formData.original_price && parseFloat(formData.original_price) > 0) : formData.price_types.some(pt => pt.original_price && parseFloat(pt.original_price) > 0) },
     
-    // Step 6: Itinerary (Accommodation & Transportation managed here per day)
-    { id: 'itinerary', label: __('Itinerary Builder', 'Itinerary Builder'), icon: Calendar, required: true, completed: false },
+    // Step 5: Itinerary Builder (includes accommodation & transportation per day)
+    { id: 'itinerary', label: __('Itinerary Builder', 'Itinerary Builder'), icon: Calendar, required: true, completed: formData.itinerary_days.length > 0 },
     
-    // Step 7: Included/Excluded
+    // Step 6: What's Included/Excluded
     { id: 'included', label: __('What\'s Included', 'What\'s Included'), icon: CheckSquare, required: true, completed: formData.included_items.length > 0 },
     
-    // Step 8: Booking Requirements
-    { id: 'booking', label: __('Booking Settings', 'Booking Settings'), icon: Mail, required: true, completed: !!(formData.min_travelers && formData.max_travelers) },
+    // Step 7: Booking Requirements
+    { id: 'booking', label: __('Booking Requirements', 'Booking Requirements'), icon: Mail, required: true, completed: !!(formData.min_travelers && formData.max_travelers) },
   ];
 
   const marketingSections: Section[] = [
-    { id: 'gallery', label: __('Photo Gallery', 'Photo Gallery'), icon: Image, required: false, completed: formData.gallery_images.length > 0 },
+    { id: 'media', label: __('Media & Content', 'Media & Content'), icon: Image, required: false, completed: formData.gallery_images.length > 0 || !!formData.video_url },
+    { id: 'categorization', label: __('Categorization & Tags', 'Categorization & Tags'), icon: Tag, required: false, completed: !!(formData.trip_category || formData.activity_types.length > 0 || formData.tags.length > 0) },
     { id: 'faqs', label: __('FAQs', 'FAQs'), icon: HelpCircle, required: false, completed: formData.faqs.length > 0 },
-    { id: 'frontend-tabs', label: __('Frontend Tabs', 'Frontend Tabs'), icon: Settings, required: false, completed: formData.frontend_tabs.some(tab => tab.enabled) },
     { id: 'seo', label: __('SEO Settings', 'SEO Settings'), icon: Search, required: false, completed: !!(formData.meta_title && formData.meta_description) },
   ];
 
@@ -661,6 +659,45 @@ const TripForm: React.FC = () => {
   const completionPercentage = totalRequiredSections > 0 
     ? Math.round((completedSections / totalRequiredSections) * 100) 
     : 0;
+
+  // Get current step number and total steps for navigation
+  const allSections = [...essentialsSections, ...marketingSections, { id: 'advanced' as SectionId, label: __('Advanced', 'Advanced'), icon: Settings, required: false, completed: false }];
+  const currentStepIndex = allSections.findIndex(s => s.id === currentSection);
+  const currentStepNumber = currentStepIndex >= 0 ? currentStepIndex + 1 : 1;
+  const totalSteps = allSections.length;
+
+  // Navigation helpers
+  const goToNextSection = () => {
+    if (currentStepIndex < allSections.length - 1) {
+      setCurrentSection(allSections[currentStepIndex + 1].id);
+    }
+  };
+
+  const goToPreviousSection = () => {
+    if (currentStepIndex > 0) {
+      setCurrentSection(allSections[currentStepIndex - 1].id);
+    }
+  };
+
+  // Smart defaults - Auto-calculate nights from days
+  useEffect(() => {
+    if (formData.duration_days && formData.trip_type === 'multi_day' && !formData.duration_nights) {
+      const days = parseInt(formData.duration_days);
+      if (days > 0 && !isNaN(days)) {
+        setFormData(prev => ({ ...prev, duration_nights: String(Math.max(0, days - 1)) }));
+      }
+    }
+  }, [formData.duration_days, formData.trip_type]);
+
+  // Auto-calculate days from nights
+  useEffect(() => {
+    if (formData.duration_nights && formData.trip_type === 'multi_day' && !formData.duration_days) {
+      const nights = parseInt(formData.duration_nights);
+      if (nights > 0 && !isNaN(nights)) {
+        setFormData(prev => ({ ...prev, duration_days: String(nights + 1) }));
+      }
+    }
+  }, [formData.duration_nights, formData.trip_type]);
 
   // Auto-generate slug from title
   const generateSlug = (title: string): string => {
@@ -1348,95 +1385,43 @@ const TripForm: React.FC = () => {
 
   const renderSectionContent = () => {
     switch (currentSection) {
-      case 'overview':
+      case 'basic':
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center gap-2 mb-4">
               <FileText className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Trip Overview', 'Trip Overview')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Basic Information', 'Basic Information')}</h2>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Basic information, highlights, and trip details', 'Basic information, highlights, and trip details')}
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              {__('Essential information about your trip that appears in listings and search results', 'Essential information about your trip that appears in listings and search results')}
             </p>
 
-            {/* Tabs */}
-            <div className="border-b border-gray-200 dark:border-gray-700 mb-4">
-              <div className="flex gap-1">
-                <button
-                  type="button"
-                  onClick={() => setCurrentTab('basic')}
-                  className={`px-4 py-2 text-sm font-medium transition-colors ${
-                    currentTab === 'basic'
-                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {__('Basic Info', 'Basic Info')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentTab('highlights')}
-                  className={`px-4 py-2 text-sm font-medium transition-colors ${
-                    currentTab === 'highlights'
-                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {__('Highlights', 'Highlights')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentTab('details')}
-                  className={`px-4 py-2 text-sm font-medium transition-colors ${
-                    currentTab === 'details'
-                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {__('Trip Details', 'Trip Details')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentTab('rich-content')}
-                  className={`px-4 py-2 text-sm font-medium transition-colors ${
-                    currentTab === 'rich-content'
-                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {__('Rich Content', 'Rich Content')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentTab('classification')}
-                  className={`px-4 py-2 text-sm font-medium transition-colors ${
-                    currentTab === 'classification'
-                      ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {__('Classification', 'Classification')}
-                </button>
-              </div>
-            </div>
-
-            {/* Tab Content */}
-            {currentTab === 'basic' && (
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{__('Essential Details', 'Essential Details')}</h3>
-                    <Info className="w-4 h-4 text-gray-400" />
-                  </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
-                    {__('The main information about your trip that appears in listings and search results', 'The main information about your trip that appears in listings and search results')}
-                  </p>
+            {/* Essential Fields - Single View (No Tabs) */}
+            <div className="space-y-6">
 
                   {/* Tour Title */}
                   <div className="mb-4">
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Trip Title', 'Trip Title')} <span className="text-red-500">*</span>
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        {__('Trip Title', 'Trip Title')} <span className="text-red-500">*</span>
+                        <button
+                          type="button"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          title={__('A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results.', 'A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results.')}
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </label>
+                      <span className={`text-xs font-medium ${
+                        formData.title.length > 60 
+                          ? 'text-red-600 dark:text-red-400' 
+                          : formData.title.length >= 50 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-gray-500 dark:text-gray-400'
+                      }`}>
+                        {formData.title.length}/60
+                      </span>
+                    </div>
                     <HelpText
                       text={__('Choose a clear, descriptive title that includes the destination and duration. This appears in search results and listings.', 'Choose a clear, descriptive title that includes the destination and duration. This appears in search results and listings.')}
                       className="mb-2"
@@ -1447,7 +1432,8 @@ const TripForm: React.FC = () => {
                       value={formData.title}
                       onChange={(e) => handleTitleChange(e.target.value)}
                       placeholder={__('e.g., Bali Beach Retreat - 7 Days', 'e.g., Bali Beach Retreat - 7 Days')}
-                      className={errors.title ? 'border-red-500' : ''}
+                      maxLength={100}
+                      className={`${errors.title ? 'border-red-500' : formData.title && formData.title.length <= 60 ? 'border-green-500' : ''} transition-colors`}
                       required
                     />
                     {errors.title ? (
@@ -1455,19 +1441,37 @@ const TripForm: React.FC = () => {
                         <AlertCircle className="w-4 h-4" />
                         {errors.title}
                       </p>
-                    ) : formData.title && (
-                      <p className="mt-1.5 text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
-                        <CheckCircle2 className="w-4 h-4" />
-                        {__('Looking good!', 'Looking good!')}
+                    ) : formData.title && formData.title.length > 60 && (
+                      <p className="mt-1.5 text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {__('Title is longer than recommended for SEO (60 characters)', 'Title is longer than recommended for SEO (60 characters)')}
                       </p>
                     )}
                   </div>
 
                   {/* URL Slug */}
                   <div className="mb-4">
-                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('URL Slug', 'URL Slug')}
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        {__('URL Slug', 'URL Slug')}
+                        <button
+                          type="button"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          title={__('The URL-friendly version of your title. This is what appears in the trip URL.', 'The URL-friendly version of your title. This is what appears in the trip URL.')}
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </label>
+                      {showSlugPreview && formData.slug && (
+                        <button
+                          type="button"
+                          onClick={() => setShowSlugPreview(false)}
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          {__('Hide', 'Hide')}
+                        </button>
+                      )}
+                    </div>
                     <HelpText
                       text={__('The URL-friendly version of your title. Auto-generated from title, but you can customize it. Only lowercase letters, numbers, and hyphens allowed.', 'The URL-friendly version of your title. Auto-generated from title, but you can customize it. Only lowercase letters, numbers, and hyphens allowed.')}
                       className="mb-2"
@@ -1478,7 +1482,7 @@ const TripForm: React.FC = () => {
                       value={formData.slug}
                       onChange={(e) => handleFieldChange('slug', e.target.value)}
                       placeholder={__('bali-beach-retreat-7-days', 'bali-beach-retreat-7-days')}
-                      className={errors.slug ? 'border-red-500' : ''}
+                      className={`font-mono text-sm ${errors.slug ? 'border-red-500' : ''}`}
                     />
                     {errors.slug && (
                       <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -1486,21 +1490,64 @@ const TripForm: React.FC = () => {
                         {errors.slug}
                       </p>
                     )}
-                    {formData.slug && !errors.slug && (
-                      <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-gray-600 dark:text-gray-400 border border-blue-200 dark:border-blue-800">
-                        <span className="font-medium">🌐 {__('Your trip URL:', 'Your trip URL:')} </span>
-                        <span className="font-mono text-blue-600 dark:text-blue-400">
-                          yoursite.com/trips/{formData.slug}
-                        </span>
+                    {showSlugPreview && formData.slug && !errors.slug && (
+                      <div className="mt-2 p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-gray-600 dark:text-gray-400 border border-blue-200 dark:border-blue-800 flex items-center justify-between">
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">{__('Preview URL:', 'Preview URL:')} </span>
+                          <span className="font-mono text-blue-600 dark:text-blue-400">
+                            {(window as any).yatraAdmin?.siteUrl || 'yoursite.com'}/trips/{formData.slug}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const url = `${(window as any).yatraAdmin?.siteUrl || 'yoursite.com'}/trips/${formData.slug}`;
+                            navigator.clipboard.writeText(url);
+                            showToast(__('URL copied to clipboard', 'URL copied to clipboard'), 'success');
+                          }}
+                          className="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1"
+                          title={__('Copy URL', 'Copy URL')}
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                        </button>
                       </div>
+                    )}
+                    {!showSlugPreview && formData.slug && (
+                      <button
+                        type="button"
+                        onClick={() => setShowSlugPreview(true)}
+                        className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        {__('Show URL Preview', 'Show URL Preview')}
+                      </button>
                     )}
                   </div>
 
                   {/* Short Description */}
                   <div className="mb-4">
-                    <label htmlFor="short_description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Short Description', 'Short Description')}
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label htmlFor="short_description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        {__('Short Description', 'Short Description')}
+                        <button
+                          type="button"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          title={__('A brief summary that appears in listings. Recommended: 100-150 characters for best results.', 'A brief summary that appears in listings. Recommended: 100-150 characters for best results.')}
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </label>
+                      <span className={`text-xs font-medium ${
+                        formData.short_description.length > 200 
+                          ? 'text-red-600 dark:text-red-400' 
+                          : formData.short_description.length >= 100 && formData.short_description.length <= 150
+                          ? 'text-green-600 dark:text-green-400' 
+                          : formData.short_description.length > 0
+                          ? 'text-yellow-600 dark:text-yellow-400'
+                          : 'text-gray-500 dark:text-gray-400'
+                      }`}>
+                        {formData.short_description.length}/200
+                      </span>
+                    </div>
                     <HelpText
                       text={__('A brief summary (100-150 characters) that appears in listings and search results. Make it compelling to encourage clicks.', 'A brief summary (100-150 characters) that appears in listings and search results. Make it compelling to encourage clicks.')}
                       className="mb-2"
@@ -1509,16 +1556,23 @@ const TripForm: React.FC = () => {
                       id="short_description"
                       value={formData.short_description}
                       onChange={(e) => handleFieldChange('short_description', e.target.value)}
-                      placeholder={__('Escape to paradise with our 7-day Bali beach retreat... Or: Experience the best of Bali in one day...', 'Escape to paradise with our 7-day Bali beach retreat... Or: Experience the best of Bali in one day...')}
+                      placeholder={__('Escape to paradise with our 7-day Bali beach retreat...', 'Escape to paradise with our 7-day Bali beach retreat...')}
                       rows={2}
                       maxLength={200}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      className={`flex w-full rounded-md border px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none transition-colors ${
+                        formData.short_description.length >= 100 && formData.short_description.length <= 150
+                          ? 'border-green-500 dark:border-green-600 bg-white dark:bg-gray-800 dark:border-gray-600'
+                          : formData.short_description.length > 200
+                          ? 'border-red-500 dark:border-red-600 bg-white dark:bg-gray-800 dark:border-gray-600'
+                          : 'border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600'
+                      }`}
                     />
-                    <div className="mt-1.5 flex items-center justify-between">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {formData.short_description.length} / 200 {__('characters', 'characters')}
-                      </span>
-                    </div>
+                    {formData.short_description.length > 0 && formData.short_description.length < 100 && (
+                      <p className="mt-1.5 text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {__('Consider adding more details (recommended: 100-150 characters)', 'Consider adding more details (recommended: 100-150 characters)')}
+                      </p>
+                    )}
                   </div>
 
                   {/* Tour Description */}
@@ -1550,367 +1604,114 @@ const TripForm: React.FC = () => {
                       )}
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
 
-            {currentTab === 'highlights' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>{__('Trip Highlights', 'Trip Highlights')}</CardTitle>
-                  <CardDescription>
-                    {__('Add key highlights that make your trip special. These will be displayed prominently on your trip page.', 'Add key highlights that make your trip special. These will be displayed prominently on your trip page.')}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {formData.highlights.length > 0 ? (
-                    <div className="space-y-2">
-                      {formData.highlights.map((highlight, index) => (
-                        <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                          <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                          <span className="flex-1 text-sm text-gray-900 dark:text-white">{highlight}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleHighlightRemove(index)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
+                  {/* Featured Image */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-1.5">
+                      {__('Featured Image', 'Featured Image')} <span className="text-red-500">*</span>
+                      <button
+                        type="button"
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        title={__('The main image that represents your trip. This appears in listings and as the hero image on the trip page.', 'The main image that represents your trip. This appears in listings and as the hero image on the trip page.')}
+                      >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </button>
+                    </label>
+                    <HelpText
+                      text={__('Upload a high-quality image that best represents your trip. Recommended size: 1200x800px', 'Upload a high-quality image that best represents your trip. Recommended size: 1200x800px')}
+                      className="mb-2"
+                    />
+                    {formData.featured_image ? (
+                      <div className="relative group">
+                        <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+                          <img src={formData.featured_image} alt={__('Featured Image', 'Featured Image')} className="w-full h-full object-cover" />
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
-                      <Sparkles className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        {__('No highlights added yet', 'No highlights added yet')}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-                        {__('Add key selling points like "Private guide", "All meals included", or "Skip-the-line tickets"', 'Add key selling points like "Private guide", "All meals included", or "Skip-the-line tickets"')}
-                      </p>
-                    </div>
-                  )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleHighlightAdd}
-                    className="w-full"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Highlight', 'Add Highlight')}
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {currentTab === 'details' && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{__('Trip Details', 'Trip Details')}</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
-                    {__('Provide detailed information about your trip', 'Provide detailed information about your trip')}
-                  </p>
-                  <textarea
-                    value={formData.trip_details}
-                    onChange={(e) => handleFieldChange('trip_details', e.target.value)}
-                    placeholder={__('Enter detailed trip information...', 'Enter detailed trip information...')}
-                    rows={10}
-                    className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                  />
-                </div>
-              </div>
-            )}
-
-            {currentTab === 'rich-content' && (
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{__('What Makes This Trip Special', 'What Makes This Trip Special')}</CardTitle>
-                    <CardDescription>
-                      {__('Highlight the unique selling points and what sets this trip apart from others', 'Highlight the unique selling points and what sets this trip apart from others')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <textarea
-                      value={formData.what_makes_special}
-                      onChange={(e) => handleFieldChange('what_makes_special', e.target.value)}
-                      placeholder={__('Describe what makes this trip unique and special...', 'Describe what makes this trip unique and special...')}
-                      rows={5}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                    />
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{__('Trip Story / Narrative', 'Trip Story / Narrative')}</CardTitle>
-                    <CardDescription>
-                      {__('Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally', 'Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <textarea
-                      value={formData.trip_story}
-                      onChange={(e) => handleFieldChange('trip_story', e.target.value)}
-                      placeholder={__('Write an engaging narrative about this trip...', 'Write an engaging narrative about this trip...')}
-                      rows={8}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                    />
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{__('Video & Virtual Tour', 'Video & Virtual Tour')}</CardTitle>
-                    <CardDescription>
-                      {__('Add video content to showcase your trip visually', 'Add video content to showcase your trip visually')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Video URL', 'Video URL')} (YouTube/Vimeo)
-                      </label>
-                      <HelpText
-                        text={__('Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page.', 'Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page.')}
-                        className="mb-2"
-                      />
-                      <Input
-                        type="url"
-                        value={formData.video_url}
-                        onChange={(e) => handleFieldChange('video_url', e.target.value)}
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        className="font-mono text-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('360° Virtual Tour URL', '360° Virtual Tour URL')}
-                      </label>
-                      <HelpText
-                        text={__('Add a link to an interactive 360° virtual tour if available', 'Add a link to an interactive 360° virtual tour if available')}
-                        className="mb-2"
-                      />
-                      <Input
-                        type="url"
-                        value={formData.virtual_tour_url}
-                        onChange={(e) => handleFieldChange('virtual_tour_url', e.target.value)}
-                        placeholder="https://..."
-                        className="font-mono text-xs"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{__('Testimonials', 'Testimonials')}</CardTitle>
-                    <CardDescription>
-                      {__('Add customer testimonials or reviews to build trust', 'Add customer testimonials or reviews to build trust')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {formData.testimonials.length > 0 ? (
-                      <div className="space-y-2">
-                        {formData.testimonials.map((testimonial, index) => (
-                          <div key={index} className="flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                            <span className="flex-1 text-sm text-gray-900 dark:text-white">{testimonial}</span>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                const newTestimonials = [...formData.testimonials];
-                                newTestimonials.splice(index, 1);
-                                handleFieldChange('testimonials', newTestimonials);
-                              }}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ))}
+                        <button
+                          type="button"
+                          onClick={() => handleFieldChange('featured_image', '')}
+                          className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          title={__('Remove image', 'Remove image')}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
                       </div>
                     ) : (
-                      <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
-                        <FileText className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                          {__('No testimonials added yet', 'No testimonials added yet')}
-                        </p>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // Use WordPress media library
+                          if (window.wp && window.wp.media) {
+                            const mediaUploader = window.wp.media({
+                              title: __('Select Featured Image', 'Select Featured Image'),
+                              button: { text: __('Use this image', 'Use this image') },
+                              multiple: false
+                            });
+                            mediaUploader.on('select', () => {
+                              const attachment = mediaUploader.state().get('selection').first().toJSON();
+                              handleFieldChange('featured_image', attachment.url);
+                            });
+                            mediaUploader.open();
+                          }
+                        }}
+                        className="w-full aspect-video border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                      >
+                        <Upload className="w-10 h-10 text-gray-400 mb-2" />
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{__('Upload Featured Image', 'Upload Featured Image')}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-500 mt-1">{__('Recommended: 1200x800px', 'Recommended: 1200x800px')}</span>
+                      </button>
                     )}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        const text = prompt(__('Enter testimonial text:', 'Enter testimonial text:'));
-                        if (text && text.trim()) {
-                          handleFieldChange('testimonials', [...formData.testimonials, text.trim()]);
-                        }
-                      }}
-                      className="w-full"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      {__('Add Testimonial', 'Add Testimonial')}
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                  </div>
 
-            {currentTab === 'classification' && (
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{__('Trip Category Hierarchy', 'Trip Category Hierarchy')}</CardTitle>
-                    <CardDescription>
-                      {__('Organize your trip with a hierarchical category structure', 'Organize your trip with a hierarchical category structure')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Parent Category', 'Parent Category')}
-                      </label>
-                      <Select
-                        value={formData.trip_category_parent}
-                        onChange={(e) => handleFieldChange('trip_category_parent', e.target.value)}
+                  {/* Trip Highlights */}
+                  <Card className="mt-6">
+                    <CardHeader>
+                      <CardTitle>{__('Trip Highlights', 'Trip Highlights')}</CardTitle>
+                      <CardDescription>
+                        {__('Add key highlights that make your trip special. These will be displayed prominently on your trip page.', 'Add key highlights that make your trip special. These will be displayed prominently on your trip page.')}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {formData.highlights.length > 0 ? (
+                        <div className="space-y-2">
+                          {formData.highlights.map((highlight, index) => (
+                            <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                              <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                              <span className="flex-1 text-sm text-gray-900 dark:text-white">{highlight}</span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleHighlightRemove(index)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                          <Sparkles className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            {__('No highlights added yet', 'No highlights added yet')}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
+                            {__('Add key selling points like "Private guide", "All meals included", or "Skip-the-line tickets"', 'Add key selling points like "Private guide", "All meals included", or "Skip-the-line tickets"')}
+                          </p>
+                        </div>
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleHighlightAdd}
+                        className="w-full"
                       >
-                        <option value="">{__('-- Select Parent Category --', '-- Select Parent Category --')}</option>
-                        <option value="adventure">{__('Adventure', 'Adventure')}</option>
-                        <option value="cultural">{__('Cultural', 'Cultural')}</option>
-                        <option value="beach">{__('Beach', 'Beach')}</option>
-                        <option value="wildlife">{__('Wildlife', 'Wildlife')}</option>
-                        <option value="wellness">{__('Wellness', 'Wellness')}</option>
-                        <option value="family">{__('Family', 'Family')}</option>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Sub-Category', 'Sub-Category')}
-                      </label>
-                      <Select
-                        value={formData.trip_category_sub}
-                        onChange={(e) => handleFieldChange('trip_category_sub', e.target.value)}
-                      >
-                        <option value="">{__('-- Select Sub-Category --', '-- Select Sub-Category --')}</option>
-                        {formData.trip_category_parent === 'adventure' && (
-                          <>
-                            <option value="trekking">{__('Trekking', 'Trekking')}</option>
-                            <option value="mountaineering">{__('Mountaineering', 'Mountaineering')}</option>
-                            <option value="rafting">{__('Rafting', 'Rafting')}</option>
-                            <option value="paragliding">{__('Paragliding', 'Paragliding')}</option>
-                          </>
-                        )}
-                        {formData.trip_category_parent === 'cultural' && (
-                          <>
-                            <option value="heritage">{__('Heritage Tours', 'Heritage Tours')}</option>
-                            <option value="festivals">{__('Festivals', 'Festivals')}</option>
-                            <option value="cooking">{__('Cooking Classes', 'Cooking Classes')}</option>
-                          </>
-                        )}
-                        {formData.trip_category_parent === 'beach' && (
-                          <>
-                            <option value="relaxation">{__('Relaxation', 'Relaxation')}</option>
-                            <option value="water-sports">{__('Water Sports', 'Water Sports')}</option>
-                          </>
-                        )}
-                        {formData.trip_category_parent === 'wildlife' && (
-                          <>
-                            <option value="safari">{__('Safari', 'Safari')}</option>
-                            <option value="bird-watching">{__('Bird Watching', 'Bird Watching')}</option>
-                          </>
-                        )}
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Primary Category', 'Primary Category')}
-                      </label>
-                      <Select
-                        value={formData.trip_category}
-                        onChange={(e) => handleFieldChange('trip_category', e.target.value)}
-                      >
-                        <option value="">{__('-- Select Category --', '-- Select Category --')}</option>
-                        <option value="adventure">{__('Adventure', 'Adventure')}</option>
-                        <option value="cultural">{__('Cultural', 'Cultural')}</option>
-                        <option value="beach">{__('Beach', 'Beach')}</option>
-                        <option value="wildlife">{__('Wildlife', 'Wildlife')}</option>
-                        <option value="wellness">{__('Wellness', 'Wellness')}</option>
-                        <option value="family">{__('Family', 'Family')}</option>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{__('Seasonal Classification', 'Seasonal Classification')}</CardTitle>
-                    <CardDescription>
-                      {__('Define when this trip is best, peak, or off-season', 'Define when this trip is best, peak, or off-season')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Best Season', 'Best Season')}
-                      </label>
-                      <Input
-                        type="text"
-                        value={formData.best_season}
-                        onChange={(e) => handleFieldChange('best_season', e.target.value)}
-                        placeholder={__('e.g., March to May, September to November', 'e.g., March to May, September to November')}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Peak Season', 'Peak Season')}
-                      </label>
-                      <Input
-                        type="text"
-                        value={formData.peak_season}
-                        onChange={(e) => handleFieldChange('peak_season', e.target.value)}
-                        placeholder={__('e.g., December to February', 'e.g., December to February')}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Off-Season', 'Off-Season')}
-                      </label>
-                      <Input
-                        type="text"
-                        value={formData.off_season}
-                        onChange={(e) => handleFieldChange('off_season', e.target.value)}
-                        placeholder={__('e.g., June to August', 'e.g., June to August')}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{__('Featured Priority', 'Featured Priority')}</CardTitle>
-                    <CardDescription>
-                      {__('Set special flags to highlight this trip', 'Set special flags to highlight this trip')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Select
-                      value={formData.featured_priority}
-                      onChange={(e) => handleFieldChange('featured_priority', e.target.value as TripFormData['featured_priority'])}
-                    >
-                      <option value="none">{__('None', 'None')}</option>
-                      <option value="featured">{__('Featured', 'Featured')}</option>
-                      <option value="popular">{__('Popular', 'Popular')}</option>
-                      <option value="new">{__('New', 'New')}</option>
-                      <option value="limited">{__('Limited Edition', 'Limited Edition')}</option>
-                    </Select>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+                        <Plus className="w-4 h-4 mr-2" />
+                        {__('Add Highlight', 'Add Highlight')}
+                      </Button>
+                    </CardContent>
+                  </Card>
+            </div>
           </div>
         );
 
@@ -2310,15 +2111,15 @@ const TripForm: React.FC = () => {
           </div>
         );
 
-      case 'activity':
+      case 'categorization':
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <Activity className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Activity & Category', 'Activity & Category')}</h2>
+              <Tag className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Categorization & Tags', 'Categorization & Tags')}</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Classify your trip by activity types, difficulty level, and categories', 'Classify your trip by activity types, difficulty level, and categories')}
+              {__('Organize and classify your trip for better discoverability and filtering', 'Organize and classify your trip for better discoverability and filtering')}
             </p>
 
             <div className="space-y-4">
@@ -2481,182 +2282,196 @@ const TripForm: React.FC = () => {
           </div>
         );
 
-      case 'accommodation':
+      case 'media':
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center gap-2 mb-4">
-              <Bed className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Accommodation', 'Accommodation')}</h2>
+              <Image className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Media & Content', 'Media & Content')}</h2>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Specify accommodation details for your trip', 'Specify accommodation details for your trip')}
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              {__('Add visual content, videos, stories, and testimonials to showcase your trip', 'Add visual content, videos, stories, and testimonials to showcase your trip')}
             </p>
 
-            <div className="space-y-4">
-              {/* Accommodation Type */}
-              <div>
-                <label htmlFor="accommodation_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  {__('Accommodation Type', 'Accommodation Type')}
-                </label>
-                <Select
-                  id="accommodation_type"
-                  value={formData.accommodation_type}
-                  onChange={(e) => handleFieldChange('accommodation_type', e.target.value)}
-                >
-                  <option value="">{__('Select accommodation type', 'Select accommodation type')}</option>
-                  <option value="hotel">Hotel</option>
-                  <option value="resort">Resort</option>
-                  <option value="lodge">Lodge</option>
-                  <option value="camping">Camping</option>
-                  <option value="homestay">Homestay</option>
-                  <option value="villa">Villa</option>
-                  <option value="hostel">Hostel</option>
-                  <option value="not-included">Not Included</option>
-                </Select>
-                <HelpText
-                  text={__('Type of accommodation provided during the trip', 'Type of accommodation provided during the trip')}
-                  className="mt-2"
-                />
-              </div>
+            <div className="space-y-6">
+              {/* Photo Gallery */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{__('Photo Gallery', 'Photo Gallery')}</CardTitle>
+                  <CardDescription>
+                    {__('Upload images to showcase your trip. These will be displayed on the trip page.', 'Upload images to showcase your trip. These will be displayed on the trip page.')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    {formData.gallery_images.map((image, index) => (
+                      <div key={index} className="relative group">
+                        <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
+                          <img src={image} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleGalleryRemove(index)}
+                          className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={handleGalleryAdd}
+                      className="aspect-video border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                    >
+                      <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{__('Add Image', 'Add Image')}</span>
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
 
-              {/* Meal Plan */}
-              <div>
-                <label htmlFor="meal_plan" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  {__('Meal Plan', 'Meal Plan')}
-                </label>
-                <Select
-                  id="meal_plan"
-                  value={formData.meal_plan}
-                  onChange={(e) => handleFieldChange('meal_plan', e.target.value)}
-                >
-                  <option value="">{__('Select meal plan', 'Select meal plan')}</option>
-                  <option value="breakfast-only">Breakfast Only</option>
-                  <option value="half-board">Half Board (Breakfast + Dinner)</option>
-                  <option value="full-board">Full Board (All Meals)</option>
-                  <option value="all-inclusive">All Inclusive</option>
-                  <option value="self-catering">Self Catering</option>
-                  <option value="not-included">Not Included</option>
-                </Select>
-                <HelpText
-                  text={__('Meal plan included with accommodation', 'Meal plan included with accommodation')}
-                  className="mt-2"
-                />
-              </div>
-
-              {/* Accommodation Details */}
-              <div>
-                <label htmlFor="accommodation_details" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  {__('Accommodation Details', 'Accommodation Details')}
-                </label>
-                <textarea
-                  id="accommodation_details"
-                  rows={4}
-                  value={formData.accommodation_details}
-                  onChange={(e) => handleFieldChange('accommodation_details', e.target.value)}
-                  placeholder={__('Describe the accommodation, room types, amenities, etc.', 'Describe the accommodation, room types, amenities, etc.')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-                />
-                <HelpText
-                  text={__('Additional details about accommodation quality, location, amenities', 'Additional details about accommodation quality, location, amenities')}
-                  className="mt-2"
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'transportation':
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Car className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Transportation', 'Transportation')}</h2>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Configure transportation options for your trip', 'Configure transportation options for your trip')}
-            </p>
-
-            <div className="space-y-4">
-              {/* Transportation Included */}
-              <div>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.transportation_included}
-                    onChange={(e) => {
-                      handleFieldChange('transportation_included', e.target.checked);
-                      autoSave();
-                    }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {__('Transportation Included', 'Transportation Included')}
-                  </span>
-                </label>
-                <HelpText
-                  text={__('Check if transportation is included in the trip package', 'Check if transportation is included in the trip package')}
-                  className="mt-2"
-                />
-              </div>
-
-              {formData.transportation_included && (
-                <>
-                  {/* Pickup Location */}
+              {/* Video & Virtual Tour */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{__('Video & Virtual Tour', 'Video & Virtual Tour')}</CardTitle>
+                  <CardDescription>
+                    {__('Add video content to showcase your trip visually', 'Add video content to showcase your trip visually')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div>
-                    <label htmlFor="pickup_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Pickup Location', 'Pickup Location')}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Video URL', 'Video URL')} (YouTube/Vimeo)
                     </label>
-                    <Input
-                      id="pickup_location"
-                      type="text"
-                      value={formData.pickup_location}
-                      onChange={(e) => handleFieldChange('pickup_location', e.target.value)}
-                      placeholder={__('e.g., Airport, Hotel Lobby, City Center', 'e.g., Airport, Hotel Lobby, City Center')}
-                    />
                     <HelpText
-                      text={__('Where travelers will be picked up', 'Where travelers will be picked up')}
-                      className="mt-2"
+                      text={__('Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page.', 'Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page.')}
+                      className="mb-2"
+                    />
+                    <Input
+                      type="url"
+                      value={formData.video_url}
+                      onChange={(e) => handleFieldChange('video_url', e.target.value)}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      className="font-mono text-xs"
                     />
                   </div>
-
-                  {/* Dropoff Location */}
                   <div>
-                    <label htmlFor="dropoff_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Dropoff Location', 'Dropoff Location')}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('360° Virtual Tour URL', '360° Virtual Tour URL')}
                     </label>
-                    <Input
-                      id="dropoff_location"
-                      type="text"
-                      value={formData.dropoff_location}
-                      onChange={(e) => handleFieldChange('dropoff_location', e.target.value)}
-                      placeholder={__('e.g., Airport, Hotel Lobby, City Center', 'e.g., Airport, Hotel Lobby, City Center')}
-                    />
                     <HelpText
-                      text={__('Where travelers will be dropped off', 'Where travelers will be dropped off')}
-                      className="mt-2"
+                      text={__('Add a link to an interactive 360° virtual tour if available', 'Add a link to an interactive 360° virtual tour if available')}
+                      className="mb-2"
+                    />
+                    <Input
+                      type="url"
+                      value={formData.virtual_tour_url}
+                      onChange={(e) => handleFieldChange('virtual_tour_url', e.target.value)}
+                      placeholder="https://..."
+                      className="font-mono text-xs"
                     />
                   </div>
+                </CardContent>
+              </Card>
 
-                  {/* Transportation Details */}
+              {/* Trip Story & What Makes Special */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{__('Trip Story & Special Features', 'Trip Story & Special Features')}</CardTitle>
+                  <CardDescription>
+                    {__('Tell an engaging story and highlight what makes this trip unique', 'Tell an engaging story and highlight what makes this trip unique')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div>
-                    <label htmlFor="transportation_details" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Transportation Details', 'Transportation Details')}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('What Makes This Trip Special', 'What Makes This Trip Special')}
                     </label>
+                    <HelpText
+                      text={__('Highlight the unique selling points and what sets this trip apart from others', 'Highlight the unique selling points and what sets this trip apart from others')}
+                      className="mb-2"
+                    />
                     <textarea
-                      id="transportation_details"
-                      rows={4}
-                      value={formData.transportation_details}
-                      onChange={(e) => handleFieldChange('transportation_details', e.target.value)}
-                      placeholder={__('Describe transportation mode, vehicle type, capacity, etc.', 'Describe transportation mode, vehicle type, capacity, etc.')}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-                    />
-                    <HelpText
-                      text={__('Details about transportation vehicles, modes, and arrangements', 'Details about transportation vehicles, modes, and arrangements')}
-                      className="mt-2"
+                      value={formData.what_makes_special}
+                      onChange={(e) => handleFieldChange('what_makes_special', e.target.value)}
+                      placeholder={__('Describe what makes this trip unique and special...', 'Describe what makes this trip unique and special...')}
+                      rows={5}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
                   </div>
-                </>
-              )}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Trip Story / Narrative', 'Trip Story / Narrative')}
+                    </label>
+                    <HelpText
+                      text={__('Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally', 'Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally')}
+                      className="mb-2"
+                    />
+                    <textarea
+                      value={formData.trip_story}
+                      onChange={(e) => handleFieldChange('trip_story', e.target.value)}
+                      placeholder={__('Write an engaging narrative about this trip...', 'Write an engaging narrative about this trip...')}
+                      rows={8}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Testimonials */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{__('Testimonials', 'Testimonials')}</CardTitle>
+                  <CardDescription>
+                    {__('Add customer testimonials or reviews to build trust', 'Add customer testimonials or reviews to build trust')}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {formData.testimonials.length > 0 ? (
+                    <div className="space-y-2">
+                      {formData.testimonials.map((testimonial, index) => (
+                        <div key={index} className="flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                          <span className="flex-1 text-sm text-gray-900 dark:text-white">{testimonial}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              const newTestimonials = [...formData.testimonials];
+                              newTestimonials.splice(index, 1);
+                              handleFieldChange('testimonials', newTestimonials);
+                            }}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                      <FileText className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        {__('No testimonials added yet', 'No testimonials added yet')}
+                      </p>
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const text = prompt(__('Enter testimonial text:', 'Enter testimonial text:'));
+                      if (text && text.trim()) {
+                        handleFieldChange('testimonials', [...formData.testimonials, text.trim()]);
+                      }
+                    }}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {__('Add Testimonial', 'Add Testimonial')}
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         );
@@ -3487,43 +3302,6 @@ const TripForm: React.FC = () => {
           </div>
         );
 
-      case 'gallery':
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Image className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Photo Gallery', 'Photo Gallery')}</h2>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Upload images to showcase your trip. These will be displayed on the trip page.', 'Upload images to showcase your trip. These will be displayed on the trip page.')}
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-              {formData.gallery_images.map((image, index) => (
-                <div key={index} className="relative group">
-                  <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
-                    <img src={image} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleGalleryRemove(index)}
-                    className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={handleGalleryAdd}
-                className="aspect-video border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
-              >
-                <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">{__('Add Image', 'Add Image')}</span>
-              </button>
-            </div>
-          </div>
-        );
-
       case 'faqs':
         return (
           <div className="space-y-4">
@@ -3589,176 +3367,7 @@ const TripForm: React.FC = () => {
           </div>
         );
 
-      case 'frontend-tabs':
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Settings className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Frontend Tabs Management', 'Frontend Tabs Management')}</h2>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them.', 'Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them.')}
-            </p>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>{__('Available Tabs', 'Available Tabs')}</CardTitle>
-                <CardDescription>
-                  {__('Configure the tabs that will appear on your trip single page. Use up/down arrows to reorder, toggle to enable/disable, and customize labels. Add custom tabs for additional content.', 'Configure the tabs that will appear on your trip single page. Use up/down arrows to reorder, toggle to enable/disable, and customize labels. Add custom tabs for additional content.')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {formData.frontend_tabs
-                    .sort((a, b) => a.order - b.order)
-                    .map((tab, index) => (
-                      <div
-                        key={tab.id}
-                        className={`p-4 rounded-lg border ${
-                          tab.enabled
-                            ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                            : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 mb-3">
-                          <GripVertical className="w-5 h-5 text-gray-400" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Input
-                                type="text"
-                                value={tab.label}
-                                onChange={(e) => handleTabLabelChange(tab.id, e.target.value)}
-                                className="text-sm font-medium flex-1"
-                                disabled={!tab.enabled}
-                                placeholder={__('Tab Label', 'Tab Label')}
-                              />
-                              <Badge variant="outline" className="text-xs">
-                                {tab.content_type}
-                              </Badge>
-                            </div>
-                            {tab.content_type === 'custom' && (
-                              <div className="mt-2">
-                                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                  {__('Custom Content', 'Custom Content')}
-                                </label>
-                                <textarea
-                                  value={tab.custom_content || ''}
-                                  onChange={(e) => handleTabCustomContentChange(tab.id, e.target.value)}
-                                  rows={3}
-                                  disabled={!tab.enabled}
-                                  placeholder={__('Enter custom content for this tab...', 'Enter custom content for this tab...')}
-                                  className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                                />
-                              </div>
-                            )}
-                            {tab.content_type !== 'custom' && (
-                              <div className="mt-2">
-                                <Select
-                                  value={tab.content_type}
-                                  onChange={(e) => handleTabContentTypeChange(tab.id, e.target.value as FrontendTab['content_type'])}
-                                  disabled={!tab.enabled}
-                                  className="text-xs"
-                                >
-                                  <option value="general">{__('General', 'General')}</option>
-                                  <option value="pricing">{__('Pricing', 'Pricing')}</option>
-                                  <option value="itinerary">{__('Itinerary', 'Itinerary')}</option>
-                                  <option value="included_excluded">{__('Included/Excluded', 'Included/Excluded')}</option>
-                                  <option value="gallery">{__('Gallery', 'Gallery')}</option>
-                                  <option value="faqs">{__('FAQs', 'FAQs')}</option>
-                                  <option value="reviews">{__('Reviews', 'Reviews')}</option>
-                                  <option value="custom">{__('Custom Content', 'Custom Content')}</option>
-                                </Select>
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleTabMove(tab.id, 'up')}
-                              disabled={index === 0}
-                              className="h-8 w-8 p-0"
-                              title={__('Move up', 'Move up')}
-                            >
-                              <ChevronUp className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleTabMove(tab.id, 'down')}
-                              disabled={index === formData.frontend_tabs.length - 1}
-                              className="h-8 w-8 p-0"
-                              title={__('Move down', 'Move down')}
-                            >
-                              <ChevronDown className="w-4 h-4" />
-                            </Button>
-                            {tab.content_type === 'custom' && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleTabRemove(tab.id)}
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                title={__('Delete tab', 'Delete tab')}
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            )}
-                            <label className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={tab.enabled}
-                                onChange={() => handleTabToggle(tab.id)}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                              />
-                              <span className="text-sm text-gray-700 dark:text-gray-300">
-                                {tab.enabled ? __('Enabled', 'Enabled') : __('Disabled', 'Disabled')}
-                              </span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleTabAdd}
-                    className="w-full"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Custom Tab', 'Add Custom Tab')}
-                  </Button>
-                  <HelpText
-                    text={__('Add a custom tab with your own content. This is useful for additional information like "Terms & Conditions", "Travel Tips", or any other custom content.', 'Add a custom tab with your own content. This is useful for additional information like "Terms & Conditions", "Travel Tips", or any other custom content.')}
-                    className="mt-2"
-                  />
-                </div>
-                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <div className="flex items-start gap-2">
-                    <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                    <div className="text-xs text-blue-800 dark:text-blue-300">
-                      <p className="font-medium mb-1">{__('Tab Content Types:', 'Tab Content Types:')}</p>
-                      <ul className="list-disc list-inside space-y-0.5">
-                        <li><strong>General:</strong> {__('Shows trip description, highlights, and basic information', 'Shows trip description, highlights, and basic information')}</li>
-                        <li><strong>Pricing:</strong> {__('Displays pricing information for different traveler categories', 'Displays pricing information for different traveler categories')}</li>
-                        <li><strong>Itinerary:</strong> {__('Shows day-by-day itinerary details', 'Shows day-by-day itinerary details')}</li>
-                        <li><strong>Included/Excluded:</strong> {__('Lists what is included and excluded in the trip', 'Lists what is included and excluded in the trip')}</li>
-                        <li><strong>Gallery:</strong> {__('Displays trip photos and images', 'Displays trip photos and images')}</li>
-                        <li><strong>FAQs:</strong> {__('Shows frequently asked questions and answers', 'Shows frequently asked questions and answers')}</li>
-                        <li><strong>Reviews:</strong> {__('Displays customer reviews and ratings', 'Displays customer reviews and ratings')}</li>
-                        <li><strong>Custom:</strong> {__('Custom content tab - you can add any HTML/content you want', 'Custom content tab - you can add any HTML/content you want')}</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
+      // Removed: case 'frontend-tabs' - now part of 'advanced' case
 
       case 'seo':
         return (
@@ -3959,6 +3568,143 @@ const TripForm: React.FC = () => {
                 )}
               </CardContent>
             </Card>
+
+            {/* Frontend Tabs Management */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{__('Frontend Tabs Management', 'Frontend Tabs Management')}</CardTitle>
+                <CardDescription>
+                  {__('Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them.', 'Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them.')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {formData.frontend_tabs
+                    .sort((a, b) => a.order - b.order)
+                    .map((tab, index) => (
+                      <div
+                        key={tab.id}
+                        className={`p-4 rounded-lg border ${
+                          tab.enabled
+                            ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                            : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          <GripVertical className="w-5 h-5 text-gray-400" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Input
+                                type="text"
+                                value={tab.label}
+                                onChange={(e) => handleTabLabelChange(tab.id, e.target.value)}
+                                className="text-sm font-medium flex-1"
+                                disabled={!tab.enabled}
+                                placeholder={__('Tab Label', 'Tab Label')}
+                              />
+                              <Badge variant="outline" className="text-xs">
+                                {tab.content_type}
+                              </Badge>
+                            </div>
+                            {tab.content_type === 'custom' && (
+                              <div className="mt-2">
+                                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                  {__('Custom Content', 'Custom Content')}
+                                </label>
+                                <textarea
+                                  value={tab.custom_content || ''}
+                                  onChange={(e) => handleTabCustomContentChange(tab.id, e.target.value)}
+                                  rows={3}
+                                  disabled={!tab.enabled}
+                                  placeholder={__('Enter custom content for this tab...', 'Enter custom content for this tab...')}
+                                  className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                                />
+                              </div>
+                            )}
+                            {tab.content_type !== 'custom' && (
+                              <div className="mt-2">
+                                <Select
+                                  value={tab.content_type}
+                                  onChange={(e) => handleTabContentTypeChange(tab.id, e.target.value as FrontendTab['content_type'])}
+                                  disabled={!tab.enabled}
+                                  className="text-xs"
+                                >
+                                  <option value="general">{__('General', 'General')}</option>
+                                  <option value="pricing">{__('Pricing', 'Pricing')}</option>
+                                  <option value="itinerary">{__('Itinerary', 'Itinerary')}</option>
+                                  <option value="included_excluded">{__('Included/Excluded', 'Included/Excluded')}</option>
+                                  <option value="gallery">{__('Gallery', 'Gallery')}</option>
+                                  <option value="faqs">{__('FAQs', 'FAQs')}</option>
+                                  <option value="reviews">{__('Reviews', 'Reviews')}</option>
+                                  <option value="custom">{__('Custom Content', 'Custom Content')}</option>
+                                </Select>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleTabMove(tab.id, 'up')}
+                              disabled={index === 0}
+                              className="h-8 w-8 p-0"
+                              title={__('Move up', 'Move up')}
+                            >
+                              <ChevronUp className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleTabMove(tab.id, 'down')}
+                              disabled={index === formData.frontend_tabs.length - 1}
+                              className="h-8 w-8 p-0"
+                              title={__('Move down', 'Move down')}
+                            >
+                              <ChevronDown className="w-4 h-4" />
+                            </Button>
+                            {tab.content_type === 'custom' && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleTabRemove(tab.id)}
+                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                title={__('Delete tab', 'Delete tab')}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={tab.enabled}
+                                onChange={() => handleTabToggle(tab.id)}
+                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                              />
+                              <span className="text-sm text-gray-700 dark:text-gray-300">
+                                {tab.enabled ? __('Enabled', 'Enabled') : __('Disabled', 'Disabled')}
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleTabAdd}
+                    className="w-full"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {__('Add Custom Tab', 'Add Custom Tab')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         );
 
@@ -3973,9 +3719,58 @@ const TripForm: React.FC = () => {
 
   return (
     <div className="h-screen flex flex-col bg-white dark:bg-gray-900">
+      {/* Top Progress Bar with Step Navigation */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2.5">
+        <div className="flex items-center justify-between gap-4">
+          {/* Previous Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={goToPreviousSection}
+            disabled={currentStepIndex === 0}
+            className="flex items-center gap-1.5 text-xs"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            {__('Previous', 'Previous')}
+          </Button>
+
+          {/* Progress Indicator */}
+          <div className="flex-1 flex flex-col items-center gap-1.5 min-w-0">
+            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+              <span className="font-medium text-gray-900 dark:text-white">
+                {__('Step', 'Step')} {currentStepNumber} {__('of', 'of')} {totalSteps}
+              </span>
+              <span className="text-gray-400 dark:text-gray-500">•</span>
+              <span>{completionPercentage}% {__('Complete', 'Complete')}</span>
+            </div>
+            <div className="w-full max-w-md bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${completionPercentage}%` }}
+              />
+            </div>
+            <div className="text-[10px] text-gray-500 dark:text-gray-400">
+              {allSections[currentStepIndex]?.label || __('Overview', 'Overview')}
+            </div>
+          </div>
+
+          {/* Next Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={goToNextSection}
+            disabled={currentStepIndex >= allSections.length - 1}
+            className="flex items-center gap-1.5 text-xs"
+          >
+            {__('Next', 'Next')}
+            <ChevronRight className="w-3.5 h-3.5" />
+          </Button>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
-        {/* Trip Progress */}
+        {/* Trip Progress & Quick Actions */}
         <div className="flex items-center gap-4 min-w-0">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-md bg-blue-50 dark:bg-blue-900/20 flex-shrink-0">
@@ -3987,7 +3782,7 @@ const TripForm: React.FC = () => {
                   {completionPercentage}%
                 </span>
                 <span className="text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                  {completedSections}/{totalRequiredSections}
+                  {completedSections}/{totalRequiredSections} {__('sections', 'sections')}
                 </span>
               </div>
               <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden mt-1">
@@ -3998,6 +3793,35 @@ const TripForm: React.FC = () => {
               </div>
             </div>
           </div>
+          
+          {/* Quick Start Mode Toggle */}
+          {!isEditMode && (
+            <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-gray-50 dark:bg-gray-700/50">
+              <button
+                onClick={() => setSimpleMode(!simpleMode)}
+                className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                title={simpleMode ? __('Switch to Advanced Mode', 'Switch to Advanced Mode') : __('Switch to Simple Mode', 'Switch to Simple Mode')}
+              >
+                <Lightbulb className={`w-3.5 h-3.5 ${simpleMode ? 'text-yellow-500' : ''}`} />
+                <span>{simpleMode ? __('Simple', 'Simple') : __('Advanced', 'Advanced')}</span>
+              </button>
+            </div>
+          )}
+          
+          {/* Guided Tour Button (First Time Users) */}
+          {!isEditMode && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                showToast(__('Guided tour feature coming soon!', 'Guided tour feature coming soon!'), 'info');
+              }}
+              className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+            >
+              <BookOpen className="w-3.5 h-3.5 mr-1" />
+              {__('Take a Tour', 'Take a Tour')}
+            </Button>
+          )}
         </div>
         
         <div className="flex-1 text-center">
