@@ -78,6 +78,11 @@ export interface ItineraryDay {
   entries: ItineraryEntry[];
 }
 
+export interface TripAmenityItem {
+  title: string;
+  description: string;
+}
+
 export interface TripFormData {
   // Overview
   title: string;
@@ -93,7 +98,7 @@ export interface TripFormData {
   testimonials: string[];
   
   // Location & Geography
-  destination: string;
+  destinations: number[]; // Array of destination IDs
   starting_location: string;
   ending_location: string;
   countries: string[];
@@ -103,7 +108,7 @@ export interface TripFormData {
   landmarks: string[];
   
   // Duration & Schedule
-  trip_type: 'single_day' | 'multi_day';
+  trip_type: 'single_day' | 'multi_day' | 'flexible';
   duration_days: string;
   duration_nights: string;
   available_from: string;
@@ -115,7 +120,7 @@ export interface TripFormData {
   off_season: string;
   
   // Activity & Category
-  activity_types: string[];
+  activity_types: number[]; // Array of activity IDs (changed from string[])
   difficulty_level: string;
   trip_category: string;
   trip_category_parent: string;
@@ -160,8 +165,8 @@ export interface TripFormData {
   vaccination_requirements: string;
   
   // Included/Excluded
-  included_items: string[];
-  excluded_items: string[];
+  included_items: TripAmenityItem[];
+  excluded_items: TripAmenityItem[];
   
   // Itinerary
   itinerary_days: ItineraryDay[];
@@ -180,7 +185,7 @@ export interface TripFormData {
   availability_dates: AvailabilityDate[];
   
   // Status & Lifecycle
-  status: 'draft' | 'review' | 'approved' | 'published' | 'archived';
+  status: 'draft' | 'review' | 'approved' | 'published' | 'archived' | 'suspended';
   scheduled_publish_date: string;
   scheduled_unpublish_date: string;
   version: number;

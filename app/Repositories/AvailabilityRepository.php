@@ -1,0 +1,251 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yatra\Repositories;
+
+use Yatra\Models\Availability;
+
+/**
+ * Availability Repository
+ * Handles database operations for trip availability dates
+ */
+class AvailabilityRepository extends BaseRepository
+{
+    /**
+     * Get table name
+     */
+    protected function getTableName(): string
+    {
+        return $this->wpdb->prefix . 'yatra_trip_availability_dates';
+    }
+
+    /**
+     * Find by ID
+     */
+    public function find(int $id, bool $includeDeleted = false): ?\stdClass
+    {
+        $result = parent::find($id, $includeDeleted);
+        return $result ? (object) Availability::fromArray((array) $result)->toArray() : null;
+    }
+
+    /**
+     * Find by ID and return Availability model
+     */
+    public function findModel(int $id): ?Availability
+    {
+        $result = parent::find($id);
+        return $result ? Availability::fromArray((array) $result) : null;
+    }
+
+    /**
+     * Find all by trip ID
+     */
+    public function findByTripId(int $tripId, array $filters = []): array
+    {
+        $table = esc_sql($this->table);
+        $where = ['trip_id = %d'];
+        $params = [$tripId];
+        
+        // Status filter
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $where[] = 'status = %s';
+            $params[] = $filters['status'];
+        }
+        
+        // Month filter
+        if (!empty($filters['month']) && $filters['month'] !== 'all') {
+            $where[] = 'YEAR(departure_date) = %d AND MONTH(departure_date) = %d';
+            [$year, $month] = explode('-', $filters['month']);
+            $params[] = (int) $year;
+            $params[] = (int) $month;
+        }
+        
+        // Search filter
+        if (!empty($filters['search'])) {
+            $where[] = '(departure_date LIKE %s OR arrival_date LIKE %s OR from_location LIKE %s OR to_location LIKE %s)';
+            $search = '%' . $this->wpdb->esc_like($filters['search']) . '%';
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
+        }
+        
+        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
+        $query .= " ORDER BY departure_date ASC, departure_time ASC";
+        
+        if (!empty($filters['per_page'])) {
+            $perPage = (int) $filters['per_page'];
+            $page = max(1, (int) ($filters['page'] ?? 1));
+            $offset = ($page - 1) * $perPage;
+            $query .= " LIMIT %d OFFSET %d";
+            $params[] = $perPage;
+            $params[] = $offset;
+        }
+        
+        $results = $this->wpdb->get_results(
+            $this->wpdb->prepare($query, $params),
+            ARRAY_A
+        );
+        
+        return array_map(function ($row) {
+            return Availability::fromArray($row);
+        }, $results ?: []);
+    }
+
+    /**
+     * Count by trip ID
+     */
+    public function countByTripId(int $tripId, array $filters = []): int
+    {
+        $table = esc_sql($this->table);
+        $where = ['trip_id = %d'];
+        $params = [$tripId];
+        
+        // Status filter
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $where[] = 'status = %s';
+            $params[] = $filters['status'];
+        }
+        
+        // Month filter
+        if (!empty($filters['month']) && $filters['month'] !== 'all') {
+            $where[] = 'YEAR(departure_date) = %d AND MONTH(departure_date) = %d';
+            [$year, $month] = explode('-', $filters['month']);
+            $params[] = (int) $year;
+            $params[] = (int) $month;
+        }
+        
+        // Search filter
+        if (!empty($filters['search'])) {
+            $where[] = '(departure_date LIKE %s OR arrival_date LIKE %s OR from_location LIKE %s OR to_location LIKE %s)';
+            $search = '%' . $this->wpdb->esc_like($filters['search']) . '%';
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
+        }
+        
+        $query = "SELECT COUNT(*) FROM `{$table}` WHERE " . implode(' AND ', $where);
+        
+        return (int) $this->wpdb->get_var($this->wpdb->prepare($query, $params));
+    }
+
+    /**
+     * Create availability date
+     */
+    public function create(array $data): int
+    {
+        $table = esc_sql($this->table);
+        
+        $insertData = [
+            'trip_id' => (int) ($data['trip_id'] ?? 0),
+            'departure_date' => sanitize_text_field($data['departure_date'] ?? ''),
+            'arrival_date' => !empty($data['arrival_date']) ? sanitize_text_field($data['arrival_date']) : null,
+            'return_date' => !empty($data['return_date']) ? sanitize_text_field($data['return_date']) : null,
+            'departure_time' => !empty($data['departure_time']) ? sanitize_text_field($data['departure_time']) : null,
+            'arrival_time' => !empty($data['arrival_time']) ? sanitize_text_field($data['arrival_time']) : null,
+            'seats_total' => (int) ($data['seats_total'] ?? 0),
+            'seats_available' => (int) ($data['seats_available'] ?? ($data['seats_total'] ?? 0)),
+            'seats_reserved' => (int) ($data['seats_reserved'] ?? 0),
+            'seats_waitlist' => (int) ($data['seats_waitlist'] ?? 0),
+            'original_price' => !empty($data['original_price']) ? (float) $data['original_price'] : null,
+            'discounted_price' => !empty($data['discounted_price']) ? (float) $data['discounted_price'] : null,
+            'discount_percentage' => !empty($data['discount_percentage']) ? (float) $data['discount_percentage'] : null,
+            'status' => sanitize_text_field($data['status'] ?? 'available'),
+            'from_location' => !empty($data['from_location']) ? sanitize_text_field($data['from_location']) : null,
+            'to_location' => !empty($data['to_location']) ? sanitize_text_field($data['to_location']) : null,
+            'special_notes' => !empty($data['special_notes']) ? sanitize_textarea_field($data['special_notes']) : null,
+            'cutoff_date' => !empty($data['cutoff_date']) ? sanitize_text_field($data['cutoff_date']) : null,
+            'cutoff_hours' => (int) ($data['cutoff_hours'] ?? 24),
+        ];
+        
+        // Calculate discount percentage if not provided
+        if (!empty($insertData['original_price']) && !empty($insertData['discounted_price']) && empty($data['discount_percentage'])) {
+            $insertData['discount_percentage'] = round((($insertData['original_price'] - $insertData['discounted_price']) / $insertData['original_price']) * 100, 2);
+        }
+        
+        $this->wpdb->insert($table, $insertData, [
+            '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d',
+            '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%d'
+        ]);
+        
+        return $this->wpdb->insert_id;
+    }
+
+    /**
+     * Update availability date
+     */
+    public function update(int $id, array $data): bool
+    {
+        $table = esc_sql($this->table);
+        
+        $updateData = [];
+        
+        if (isset($data['trip_id'])) $updateData['trip_id'] = (int) $data['trip_id'];
+        if (isset($data['departure_date'])) $updateData['departure_date'] = sanitize_text_field($data['departure_date']);
+        if (isset($data['arrival_date'])) $updateData['arrival_date'] = !empty($data['arrival_date']) ? sanitize_text_field($data['arrival_date']) : null;
+        if (isset($data['return_date'])) $updateData['return_date'] = !empty($data['return_date']) ? sanitize_text_field($data['return_date']) : null;
+        if (isset($data['departure_time'])) $updateData['departure_time'] = !empty($data['departure_time']) ? sanitize_text_field($data['departure_time']) : null;
+        if (isset($data['arrival_time'])) $updateData['arrival_time'] = !empty($data['arrival_time']) ? sanitize_text_field($data['arrival_time']) : null;
+        if (isset($data['seats_total'])) $updateData['seats_total'] = (int) $data['seats_total'];
+        if (isset($data['seats_available'])) $updateData['seats_available'] = (int) $data['seats_available'];
+        if (isset($data['seats_reserved'])) $updateData['seats_reserved'] = (int) $data['seats_reserved'];
+        if (isset($data['seats_waitlist'])) $updateData['seats_waitlist'] = (int) $data['seats_waitlist'];
+        if (isset($data['original_price'])) $updateData['original_price'] = !empty($data['original_price']) ? (float) $data['original_price'] : null;
+        if (isset($data['discounted_price'])) $updateData['discounted_price'] = !empty($data['discounted_price']) ? (float) $data['discounted_price'] : null;
+        if (isset($data['discount_percentage'])) $updateData['discount_percentage'] = !empty($data['discount_percentage']) ? (float) $data['discount_percentage'] : null;
+        if (isset($data['status'])) $updateData['status'] = sanitize_text_field($data['status']);
+        if (isset($data['from_location'])) $updateData['from_location'] = !empty($data['from_location']) ? sanitize_text_field($data['from_location']) : null;
+        if (isset($data['to_location'])) $updateData['to_location'] = !empty($data['to_location']) ? sanitize_text_field($data['to_location']) : null;
+        if (isset($data['special_notes'])) $updateData['special_notes'] = !empty($data['special_notes']) ? sanitize_textarea_field($data['special_notes']) : null;
+        if (isset($data['cutoff_date'])) $updateData['cutoff_date'] = !empty($data['cutoff_date']) ? sanitize_text_field($data['cutoff_date']) : null;
+        if (isset($data['cutoff_hours'])) $updateData['cutoff_hours'] = (int) $data['cutoff_hours'];
+        
+        // Calculate discount percentage if not provided
+        if (!empty($updateData['original_price']) && !empty($updateData['discounted_price']) && empty($updateData['discount_percentage'])) {
+            $updateData['discount_percentage'] = round((($updateData['original_price'] - $updateData['discounted_price']) / $updateData['original_price']) * 100, 2);
+        }
+        
+        if (empty($updateData)) {
+            return false;
+        }
+        
+        $formats = [];
+        foreach ($updateData as $value) {
+            if (is_int($value)) {
+                $formats[] = '%d';
+            } elseif (is_float($value)) {
+                $formats[] = '%f';
+            } else {
+                $formats[] = '%s';
+            }
+        }
+        
+        return (bool) $this->wpdb->update(
+            $table,
+            $updateData,
+            ['id' => $id],
+            $formats,
+            ['%d']
+        );
+    }
+
+    /**
+     * Delete availability date
+     */
+    public function delete(int $id): bool
+    {
+        $table = esc_sql($this->table);
+        return (bool) $this->wpdb->delete($table, ['id' => $id], ['%d']);
+    }
+
+    /**
+     * Check if table supports soft delete
+     */
+    protected function hasSoftDelete(): bool
+    {
+        return false; // Availability table doesn't have soft delete
+    }
+}
+

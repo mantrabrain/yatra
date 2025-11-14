@@ -19,17 +19,21 @@ import { ConditionalRender } from '../components/ui/conditional-render';
 import { Edit, Trash2, Eye } from 'lucide-react';
 import { HelpText } from '../components/ui/help-text';
 import { Alert } from '../components/ui/alert';
+import { apiClient } from '../lib/api';
 
 interface Trip {
   id: number;
   title: string;
   slug: string;
-  price: number;
+  original_price?: number;
+  discounted_price?: number;
+  sale_price?: number;
   status: string;
   created_at: string;
   bookings_count?: number;
   featured?: boolean;
-  trip_type?: 'single_day' | 'multi_day';
+  trip_type?: 'single_day' | 'multi_day' | 'flexible';
+  featured_priority?: string;
 }
 
 const Trips: React.FC = () => {
@@ -61,185 +65,20 @@ const Trips: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
-  // Fetch trips with dummy data
+  // Fetch trips from API
   const { data, isLoading, error } = useQuery({
     queryKey: ['trips', queryParams],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/trips', { params: queryParams });
-      // Dummy data
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0];
-      };
-
-      const allTrips: Trip[] = [
-        {
-          id: 1,
-          title: 'Everest Base Camp Trek',
-          slug: 'everest-base-camp-trek',
-          price: 1250,
-          status: 'active',
-          created_at: getDate(30),
-          bookings_count: 45,
-          featured: true,
-          trip_type: 'multi_day',
-        },
-        {
-          id: 2,
-          title: 'Annapurna Circuit Adventure',
-          slug: 'annapurna-circuit-adventure',
-          price: 980,
-          status: 'active',
-          created_at: getDate(25),
-          bookings_count: 32,
-          featured: false,
-          trip_type: 'multi_day',
-        },
-        {
-          id: 3,
-          title: 'Golden Triangle Tour',
-          slug: 'golden-triangle-tour',
-          price: 750,
-          status: 'active',
-          created_at: getDate(20),
-          bookings_count: 28,
-          featured: false,
-          trip_type: 'multi_day',
-        },
-        {
-          id: 4,
-          title: 'Bhutan Cultural Journey',
-          slug: 'bhutan-cultural-journey',
-          price: 1100,
-          status: 'active',
-          created_at: getDate(15),
-          bookings_count: 18,
-          featured: true,
-          trip_type: 'multi_day',
-        },
-        {
-          id: 5,
-          title: 'Tibet Spiritual Tour',
-          slug: 'tibet-spiritual-tour',
-          price: 850,
-          status: 'draft',
-          created_at: getDate(10),
-          bookings_count: 0,
-          featured: false,
-          trip_type: 'multi_day',
-        },
-        {
-          id: 6,
-          title: 'Langtang Valley Trek',
-          slug: 'langtang-valley-trek',
-          price: 920,
-          status: 'active',
-          created_at: getDate(8),
-          bookings_count: 15,
-          featured: false,
-          trip_type: 'multi_day',
-        },
-        {
-          id: 7,
-          title: 'Manaslu Circuit Trek',
-          slug: 'manaslu-circuit-trek',
-          price: 1350,
-          status: 'active',
-          created_at: getDate(5),
-          bookings_count: 22,
-          featured: true,
-          trip_type: 'multi_day',
-        },
-        {
-          id: 8,
-          title: 'Upper Mustang Trek',
-          slug: 'upper-mustang-trek',
-          price: 1450,
-          status: 'inactive',
-          created_at: getDate(3),
-          bookings_count: 8,
-          featured: false,
-          trip_type: 'multi_day',
-        },
-        {
-          id: 9,
-          title: 'Kathmandu City Tour',
-          slug: 'kathmandu-city-tour',
-          price: 150,
-          status: 'active',
-          created_at: getDate(2),
-          bookings_count: 12,
-          featured: false,
-          trip_type: 'single_day',
-        },
-      ];
-
-      // Apply filters
-      let filtered = allTrips;
-      if (searchTerm) {
-        filtered = filtered.filter(trip =>
-          trip.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          trip.slug.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(trip => trip.status === statusFilter);
-      }
-
-      // Apply sorting
-      filtered = [...filtered].sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
-
-        switch (sortBy) {
-          case 'title':
-            aValue = a.title.toLowerCase();
-            bValue = b.title.toLowerCase();
-            break;
-          case 'price':
-            aValue = a.price;
-            bValue = b.price;
-            break;
-          case 'date':
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-            break;
-          case 'status':
-            aValue = a.status;
-            bValue = b.status;
-            break;
-          default:
-            aValue = a.title.toLowerCase();
-            bValue = b.title.toLowerCase();
-        }
-
-        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
-      });
-
-      // Apply pagination
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
-
-      return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10,
-      };
+      const response = await apiClient.get('/trips', { params: queryParams });
+      return response;
     },
     enabled: can('yatra_view_trips'),
   });
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (_id: number) => {
-      // return await apiClient.delete(`/yatra/v1/trips/${_id}`);
-      return { success: true };
+    mutationFn: async (id: number) => {
+      return await apiClient.delete(`/trips/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
@@ -258,7 +97,9 @@ const Trips: React.FC = () => {
     });
   };
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (trip: Trip) => {
+    // Use sale_price if available, otherwise discounted_price, otherwise original_price
+    const price = trip.sale_price || trip.discounted_price || trip.original_price || 0;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -267,21 +108,29 @@ const Trips: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
-      'active': {
+      'published': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Active', 'Active'),
+        label: __('Published', 'Published'),
       },
       'draft': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
         label: __('Draft', 'Draft'),
       },
-      'inactive': {
+      'archived': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Inactive', 'Inactive'),
+        label: __('Archived', 'Archived'),
       },
-      'pending': {
+      'review': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Pending', 'Pending'),
+        label: __('Review', 'Review'),
+      },
+      'approved': {
+        className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
+        label: __('Approved', 'Approved'),
+      },
+      'suspended': {
+        className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
+        label: __('Suspended', 'Suspended'),
       },
     };
 
@@ -297,7 +146,7 @@ const Trips: React.FC = () => {
     );
   };
 
-  const getTripTypeBadge = (tripType?: 'single_day' | 'multi_day') => {
+  const getTripTypeBadge = (tripType?: 'single_day' | 'multi_day' | 'flexible') => {
     if (!tripType) return null;
     
     const typeMap: Record<string, { className: string; label: string }> = {
@@ -308,6 +157,10 @@ const Trips: React.FC = () => {
       'multi_day': {
         className: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400',
         label: __('Multi-Day', 'Multi-Day'),
+      },
+      'flexible': {
+        className: 'bg-teal-100 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400',
+        label: __('Flexible', 'Flexible'),
       },
     };
 
@@ -386,75 +239,86 @@ const Trips: React.FC = () => {
 
       {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
-        <CardContent className="p-3">
-          <div className="mb-2">
+        <CardContent className="p-4">
+          <div className="mb-3">
             <HelpText 
-              text={__('Use the search box to find trips by name. Use filters to show only active, draft, or inactive trips. Click column headers to sort.', 'Use the search box to find trips by name. Use filters to show only active, draft, or inactive trips. Click column headers to sort.')}
+              text={__('Use the search box to find trips by name. Use filters to show only published, draft, or other status trips. Click column headers to sort.', 'Use the search box to find trips by name. Use filters to show only published, draft, or other status trips. Click column headers to sort.')}
             />
           </div>
-          <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
+          <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center w-full">
             {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className="flex-1 min-w-0 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               <Input
                 type="text"
                 placeholder={__('Search by trip name...', 'Search by trip name...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-10 h-10 w-full"
                 title={__('Type to search for trips by name', 'Type to search for trips by name')}
               />
             </div>
 
             {/* Status Filter */}
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
-            >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="active">{__('Active', 'Active')}</option>
-              <option value="draft">{__('Draft', 'Draft')}</option>
-              <option value="inactive">{__('Inactive', 'Inactive')}</option>
-            </Select>
+            <div className="w-full lg:w-auto lg:min-w-[160px]">
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full h-10"
+              >
+                <option value="all">{__('All Status', 'All Status')}</option>
+                <option value="published">{__('Published', 'Published')}</option>
+                <option value="draft">{__('Draft', 'Draft')}</option>
+                <option value="review">{__('Review', 'Review')}</option>
+                <option value="approved">{__('Approved', 'Approved')}</option>
+                <option value="archived">{__('Archived', 'Archived')}</option>
+                <option value="suspended">{__('Suspended', 'Suspended')}</option>
+              </Select>
+            </div>
 
             {/* Sort By */}
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40 h-9"
-            >
-              <option value="title">{__('Title', 'Title')}</option>
-              <option value="price">{__('Price', 'Price')}</option>
-              <option value="date">{__('Date', 'Date')}</option>
-              <option value="status">{__('Status', 'Status')}</option>
-            </Select>
+            <div className="w-full lg:w-auto lg:min-w-[140px]">
+              <Select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full h-10"
+              >
+                <option value="title">{__('Title', 'Title')}</option>
+                <option value="price">{__('Price', 'Price')}</option>
+                <option value="date">{__('Date', 'Date')}</option>
+                <option value="status">{__('Status', 'Status')}</option>
+              </Select>
+            </div>
 
             {/* Sort Order */}
-            <Button
-              variant="outline"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-9 px-3 flex items-center gap-1.5"
-              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
-            >
-              {sortOrder === 'asc' ? (
-                <ArrowUp className="w-4 h-4" />
-              ) : (
-                <ArrowDown className="w-4 h-4" />
-              )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
-            </Button>
+            <div className="w-full lg:w-auto lg:flex-shrink-0">
+              <Button
+                variant="outline"
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="h-10 px-4 flex items-center gap-2 w-full lg:w-auto"
+                title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
+              >
+                {sortOrder === 'asc' ? (
+                  <ArrowUp className="w-4 h-4" />
+                ) : (
+                  <ArrowDown className="w-4 h-4" />
+                )}
+                <span className="text-sm whitespace-nowrap">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
+              </Button>
+            </div>
 
             {/* Reset Button */}
             {hasFilters && (
-              <Button
-                variant="outline"
-                onClick={handleResetFilters}
-                className="flex items-center gap-2 h-9"
-              >
-                <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
-              </Button>
+              <div className="w-full lg:w-auto lg:flex-shrink-0">
+                <Button
+                  variant="outline"
+                  onClick={handleResetFilters}
+                  className="flex items-center gap-2 h-10 w-full lg:w-auto"
+                >
+                  <X className="w-4 h-4" />
+                  <span className="text-sm">{__('Reset', 'Reset')}</span>
+                </Button>
+              </div>
             )}
           </div>
         </CardContent>
@@ -472,13 +336,75 @@ const Trips: React.FC = () => {
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-12 text-center">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {__('Loading your trips...', 'Loading your trips...')}
-                      </p>
-                    </div>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[300px]">
+                            {__('Trip', 'Trip')}
+                          </TableHead>
+                          <TableHead>
+                            {__('Price', 'Price')}
+                          </TableHead>
+                          <TableHead>
+                            {__('Status', 'Status')}
+                          </TableHead>
+                          <TableHead>
+                            {__('Trip Type', 'Trip Type')}
+                          </TableHead>
+                          {isPro && (
+                            <TableHead>{__('Bookings', 'Bookings')}</TableHead>
+                          )}
+                          <TableHead>
+                            {__('Created', 'Created')}
+                          </TableHead>
+                          <TableHead className="text-right w-[120px]">
+                            <span className="sr-only">{__('Actions', 'Actions')}</span>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {[...Array(10)].map((_, index) => (
+                          <TableRow key={`skeleton-${index}`}>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1">
+                                  <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                                  <div className="h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                                </div>
+                                {index % 3 === 0 && (
+                                  <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </TableCell>
+                            <TableCell>
+                              <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                            </TableCell>
+                            <TableCell>
+                              <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                            </TableCell>
+                            {isPro && (
+                              <TableCell>
+                                <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              </TableCell>
+                            )}
+                            <TableCell>
+                              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                                <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                                <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
                 ) : trips.length === 0 ? (
                   <div className="p-12 text-center">
@@ -507,8 +433,9 @@ const Trips: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <Table>
-                    <TableHeader>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
                       <TableRow>
                         <TableHead className="w-[300px]">
                           <button
@@ -564,7 +491,7 @@ const Trips: React.FC = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {trips.map((trip) => (
+                      {trips.map((trip: Trip) => (
                         <TableRow key={trip.id}>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -576,15 +503,20 @@ const Trips: React.FC = () => {
                                   {trip.slug}
                                 </div>
                               </div>
-                              {trip.featured && isPro && (
+                              {(trip.featured_priority && trip.featured_priority !== 'none' && isPro) && (
                                 <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-                                  {__('Featured', 'Featured')}
+                                  {trip.featured_priority === 'featured' ? __('Featured', 'Featured') :
+                                   trip.featured_priority === 'popular' ? __('Popular', 'Popular') :
+                                   trip.featured_priority === 'new' ? __('New', 'New') :
+                                   trip.featured_priority === 'limited' ? __('Limited', 'Limited') :
+                                   trip.featured_priority === 'bestseller' ? __('Bestseller', 'Bestseller') :
+                                   trip.featured_priority}
                                 </Badge>
                               )}
                             </div>
                           </TableCell>
                           <TableCell className="font-medium">
-                            {formatPrice(trip.price)}
+                            {formatPrice(trip)}
                           </TableCell>
                           <TableCell>
                             {getStatusBadge(trip.status)}
@@ -646,6 +578,7 @@ const Trips: React.FC = () => {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -653,18 +586,18 @@ const Trips: React.FC = () => {
             {/* Pagination - Always Visible */}
             {total > 0 && (
               <Card>
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
                       {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('trips', 'trips')}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setPage(p => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="h-8"
+                        className="h-9 px-4 min-w-[100px]"
                       >
                         {__('Previous', 'Previous')}
                       </Button>
@@ -673,7 +606,7 @@ const Trips: React.FC = () => {
                         size="sm"
                         onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                         disabled={page >= totalPages}
-                        className="h-8"
+                        className="h-9 px-4 min-w-[100px]"
                       >
                         {__('Next', 'Next')}
                       </Button>

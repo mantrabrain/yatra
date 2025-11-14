@@ -448,86 +448,96 @@ const Bookings: React.FC = () => {
 
       {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
-        <CardContent className="p-3">
-          <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
+        <CardContent className="p-4">
+          <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center w-full">
             {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className="flex-1 min-w-0 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               <Input
                 type="text"
                 placeholder={__('Search bookings...', 'Search bookings...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-10 h-10 w-full"
               />
             </div>
 
             {/* Booking Status Filter */}
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
-            >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="confirmed">{__('Confirmed', 'Confirmed')}</option>
-              <option value="pending">{__('Pending', 'Pending')}</option>
-              <option value="cancelled">{__('Cancelled', 'Cancelled')}</option>
-              <option value="completed">{__('Completed', 'Completed')}</option>
-            </Select>
+            <div className="w-full lg:w-auto lg:min-w-[160px]">
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full h-10"
+              >
+                <option value="all">{__('All Status', 'All Status')}</option>
+                <option value="confirmed">{__('Confirmed', 'Confirmed')}</option>
+                <option value="pending">{__('Pending', 'Pending')}</option>
+                <option value="cancelled">{__('Cancelled', 'Cancelled')}</option>
+                <option value="completed">{__('Completed', 'Completed')}</option>
+              </Select>
+            </div>
 
             {/* Payment Status Filter */}
-            <Select
-              value={paymentFilter}
-              onChange={(e) => setPaymentFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
-            >
-              <option value="all">{__('All Payments', 'All Payments')}</option>
-              <option value="paid">{__('Paid', 'Paid')}</option>
-              <option value="pending">{__('Pending', 'Pending')}</option>
-              <option value="partial">{__('Partial', 'Partial')}</option>
-              <option value="refunded">{__('Refunded', 'Refunded')}</option>
-            </Select>
+            <div className="w-full lg:w-auto lg:min-w-[160px]">
+              <Select
+                value={paymentFilter}
+                onChange={(e) => setPaymentFilter(e.target.value)}
+                className="w-full h-10"
+              >
+                <option value="all">{__('All Payments', 'All Payments')}</option>
+                <option value="paid">{__('Paid', 'Paid')}</option>
+                <option value="pending">{__('Pending', 'Pending')}</option>
+                <option value="partial">{__('Partial', 'Partial')}</option>
+                <option value="refunded">{__('Refunded', 'Refunded')}</option>
+              </Select>
+            </div>
 
             {/* Sort By */}
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40 h-9"
-            >
-              <option value="booking_date">{__('Booking Date', 'Booking Date')}</option>
-              <option value="travel_date">{__('Travel Date', 'Travel Date')}</option>
-              <option value="booking_number">{__('Booking Number', 'Booking Number')}</option>
-              <option value="customer_name">{__('Customer', 'Customer')}</option>
-              <option value="trip_title">{__('Trip', 'Trip')}</option>
-              <option value="total_amount">{__('Amount', 'Amount')}</option>
-              <option value="booking_status">{__('Status', 'Status')}</option>
-            </Select>
+            <div className="w-full lg:w-auto lg:min-w-[160px]">
+              <Select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full h-10"
+              >
+                <option value="booking_date">{__('Booking Date', 'Booking Date')}</option>
+                <option value="travel_date">{__('Travel Date', 'Travel Date')}</option>
+                <option value="booking_number">{__('Booking Number', 'Booking Number')}</option>
+                <option value="customer_name">{__('Customer', 'Customer')}</option>
+                <option value="trip_title">{__('Trip', 'Trip')}</option>
+                <option value="total_amount">{__('Amount', 'Amount')}</option>
+                <option value="booking_status">{__('Status', 'Status')}</option>
+              </Select>
+            </div>
 
             {/* Sort Order */}
-            <Button
-              variant="outline"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-9 px-3 flex items-center gap-1.5"
-              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
-            >
-              {sortOrder === 'asc' ? (
-                <ArrowUp className="w-4 h-4" />
-              ) : (
-                <ArrowDown className="w-4 h-4" />
-              )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
-            </Button>
+            <div className="w-full lg:w-auto lg:flex-shrink-0">
+              <Button
+                variant="outline"
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="h-10 px-4 flex items-center gap-2 w-full lg:w-auto"
+                title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
+              >
+                {sortOrder === 'asc' ? (
+                  <ArrowUp className="w-4 h-4" />
+                ) : (
+                  <ArrowDown className="w-4 h-4" />
+                )}
+                <span className="text-sm whitespace-nowrap">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
+              </Button>
+            </div>
 
             {/* Reset Button */}
             {hasFilters && (
-              <Button
-                variant="outline"
-                onClick={handleResetFilters}
-                className="flex items-center gap-2 h-9"
-              >
-                <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
-              </Button>
+              <div className="w-full lg:w-auto lg:flex-shrink-0">
+                <Button
+                  variant="outline"
+                  onClick={handleResetFilters}
+                  className="flex items-center gap-2 h-10 w-full lg:w-auto"
+                >
+                  <X className="w-4 h-4" />
+                  <span className="text-sm">{__('Reset', 'Reset')}</span>
+                </Button>
+              </div>
             )}
           </div>
         </CardContent>

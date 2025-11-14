@@ -21,14 +21,17 @@ import {
   Footprints,
   Hotel,
   Car,
-  Moon
+  Moon,
+  CheckCircle2,
+  X
 } from 'lucide-react';
 import { __ } from '../../../lib/i18n';
 import { TripFormSectionProps, ItineraryEntry } from '../types';
 import { SectionHeader, ItineraryEntryFields } from '../shared';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
-import { Card, CardContent, CardHeader } from '../../ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card';
+import { HelpText } from '../../ui/help-text';
 
 interface ItinerarySectionProps extends TripFormSectionProps {
   handleItineraryDayAdd: () => void;
@@ -39,7 +42,7 @@ interface ItinerarySectionProps extends TripFormSectionProps {
   handleItineraryEntryChange: (day: number, entryId: string, field: keyof ItineraryEntry, value: any) => void;
   handleItineraryEntryMove: (day: number, entryId: string, direction: 'up' | 'down') => void;
   handleItineraryEntryDuplicate: (day: number, entryId: string) => void;
-  autoSave?: () => void;
+  handleFieldChange: (field: keyof TripFormSectionProps['formData'], value: any) => void;
 }
 
 export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
@@ -52,10 +55,12 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
   handleItineraryEntryChange,
   handleItineraryEntryMove,
   handleItineraryEntryDuplicate,
-  autoSave,
+  handleFieldChange,
 }) => {
   const [newIncludedItems, setNewIncludedItems] = useState<Record<string, string>>({});
   const [newExcludedItems, setNewExcludedItems] = useState<Record<string, string>>({});
+  const [newTripIncludedItem, setNewTripIncludedItem] = useState({ title: '', description: '' });
+  const [newTripExcludedItem, setNewTripExcludedItem] = useState({ title: '', description: '' });
 
   // Fetch item types (matching ItineraryForm.tsx)
   const { data: typesData } = useQuery({
@@ -142,7 +147,6 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
       if (entry) {
         handleItineraryEntryChange(day, entryId, 'included_items', [...entry.included_items, item]);
         setNewIncludedItems(prev => ({ ...prev, [key]: '' }));
-        autoSave?.();
       }
     }
   };
@@ -156,7 +160,6 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
     if (entry) {
       handleItineraryEntryChange(day, entryId, 'included_items', 
         entry.included_items.filter((_, i) => i !== index));
-      autoSave?.();
     }
   };
 
@@ -172,7 +175,6 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
       if (entry) {
         handleItineraryEntryChange(day, entryId, 'excluded_items', [...entry.excluded_items, item]);
         setNewExcludedItems(prev => ({ ...prev, [key]: '' }));
-        autoSave?.();
       }
     }
   };
@@ -186,19 +188,61 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
     if (entry) {
       handleItineraryEntryChange(day, entryId, 'excluded_items', 
         entry.excluded_items.filter((_, i) => i !== index));
-      autoSave?.();
     }
+  };
+
+  // Handle trip-level included/excluded items
+  const handleAddTripIncludedItem = () => {
+    if (newTripIncludedItem.title.trim()) {
+      handleFieldChange('included_items', [
+        ...formData.included_items,
+        { title: newTripIncludedItem.title.trim(), description: newTripIncludedItem.description.trim() },
+      ]);
+      setNewTripIncludedItem({ title: '', description: '' });
+    }
+  };
+
+  const handleUpdateTripIncludedItem = (index: number, field: 'title' | 'description', value: string) => {
+    const updated = formData.included_items.map((item, i) =>
+      i === index ? { ...item, [field]: value } : item
+    );
+    handleFieldChange('included_items', updated);
+  };
+
+  const handleRemoveTripIncludedItem = (index: number) => {
+    handleFieldChange('included_items', formData.included_items.filter((_, i) => i !== index));
+  };
+
+  const handleAddTripExcludedItem = () => {
+    if (newTripExcludedItem.title.trim()) {
+      handleFieldChange('excluded_items', [
+        ...formData.excluded_items,
+        { title: newTripExcludedItem.title.trim(), description: newTripExcludedItem.description.trim() },
+      ]);
+      setNewTripExcludedItem({ title: '', description: '' });
+    }
+  };
+
+  const handleUpdateTripExcludedItem = (index: number, field: 'title' | 'description', value: string) => {
+    const updated = formData.excluded_items.map((item, i) =>
+      i === index ? { ...item, [field]: value } : item
+    );
+    handleFieldChange('excluded_items', updated);
+  };
+
+  const handleRemoveTripExcludedItem = (index: number) => {
+    handleFieldChange('excluded_items', formData.excluded_items.filter((_, i) => i !== index));
   };
 
   const types = typesData || [];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
         <SectionHeader
           icon={Calendar}
           title="Itinerary Builder"
-          description="Build your trip itinerary day by day. Add activities, meals, accommodation, and transportation for each day."
+          description="Build your trip itinerary day by day, or use a simple included/excluded list. You can skip detailed itinerary if you prefer."
         />
         <Button
           type="button"
@@ -208,6 +252,191 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
           <Plus className="w-4 h-4 mr-2" />
           {__('Add Day', 'Add Day')}
         </Button>
+      </div>
+
+      {/* Trip-Level Included/Excluded Section */}
+      <div className="space-y-4">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{__('What\'s Included & Excluded', 'What\'s Included & Excluded')}</h3>
+          <HelpText
+            text={__('💡 Tip: If you\'re not building a detailed day-by-day itinerary, you can simply list what\'s included and excluded in your trip package here.', '💡 Tip: If you\'re not building a detailed day-by-day itinerary, you can simply list what\'s included and excluded in your trip package here.')}
+            className="mb-4"
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Included Items */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">{__('Included Items', 'Included Items')}</CardTitle>
+                <CardDescription className="text-xs">
+                  {__('List everything included in the trip price', 'List everything included in the trip price')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {formData.included_items.length > 0 ? (
+                  <div className="space-y-3">
+                    {formData.included_items.map((item, index) => (
+                      <div key={index} className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            <Input
+                              value={item.title}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateTripIncludedItem(index, 'title', e.target.value)}
+                              placeholder={__('Item title', 'Item title')}
+                              className="text-sm"
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveTripIncludedItem(index)}
+                            className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <textarea
+                          value={item.description}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleUpdateTripIncludedItem(index, 'description', e.target.value)}
+                          placeholder={__('Short description (optional)', 'Short description (optional)')}
+                          rows={2}
+                          className="text-xs w-full rounded-md border border-green-200 dark:border-green-800 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                    <CheckCircle2 className="w-6 h-6 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {__('No included items yet', 'No included items yet')}
+                    </p>
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <Input
+                    type="text"
+                    value={newTripIncludedItem.title}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTripIncludedItem(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder={__('e.g., Accommodation', 'e.g., Accommodation')}
+                    className="text-sm"
+                  />
+                  <textarea
+                    value={newTripIncludedItem.description}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewTripIncludedItem(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder={__('Describe what is included', 'Describe what is included')}
+                    rows={2}
+                    className="text-xs w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100"
+                    onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                        e.preventDefault();
+                        handleAddTripIncludedItem();
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddTripIncludedItem}
+                    disabled={!newTripIncludedItem.title.trim()}
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    {__('Add Included Item', 'Add Included Item')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Excluded Items */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">{__('Excluded Items', 'Excluded Items')}</CardTitle>
+                <CardDescription className="text-xs">
+                  {__('List what is NOT included', 'List what is NOT included')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {formData.excluded_items.length > 0 ? (
+                  <div className="space-y-3">
+                    {formData.excluded_items.map((item, index) => (
+                      <div key={index} className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <X className="w-4 h-4 text-red-600 dark:text-red-400" />
+                            <Input
+                              value={item.title}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateTripExcludedItem(index, 'title', e.target.value)}
+                              placeholder={__('Item title', 'Item title')}
+                              className="text-sm"
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveTripExcludedItem(index)}
+                            className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <textarea
+                          value={item.description}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleUpdateTripExcludedItem(index, 'description', e.target.value)}
+                          placeholder={__('Short description (optional)', 'Short description (optional)')}
+                          rows={2}
+                          className="text-xs w-full rounded-md border border-red-200 dark:border-red-800 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                    <X className="w-6 h-6 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {__('No excluded items yet', 'No excluded items yet')}
+                    </p>
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <Input
+                    type="text"
+                    value={newTripExcludedItem.title}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTripExcludedItem(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder={__('e.g., Flights', 'e.g., Flights')}
+                    className="text-sm"
+                  />
+                  <textarea
+                    value={newTripExcludedItem.description}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewTripExcludedItem(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder={__('Describe what is not included', 'Describe what is not included')}
+                    rows={2}
+                    className="text-xs w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100"
+                    onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                        e.preventDefault();
+                        handleAddTripExcludedItem();
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddTripExcludedItem}
+                    disabled={!newTripExcludedItem.title.trim()}
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    {__('Add Excluded Item', 'Add Excluded Item')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
 
       {formData.itinerary_days.length === 0 ? (
@@ -247,7 +476,6 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                         value={dayData.day_title || ''}
                         onChange={(e) => {
                           handleItineraryDayTitleChange(dayData.day, e.target.value);
-                          autoSave?.();
                         }}
                         placeholder={__('e.g., Arrival & Welcome', 'e.g., Arrival & Welcome')}
                         className="flex-1 max-w-md text-sm"
@@ -324,7 +552,6 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                                   newExcludedItem={newExcludedItems[entryKey] || ''}
                                   onFieldChange={(field, value) => {
                                     handleItineraryEntryChange(dayData.day, entry.id, field, value);
-                                    autoSave?.();
                                   }}
                                   onIncludedItemChange={(value) => setNewIncludedItems(prev => ({ ...prev, [entryKey]: value }))}
                                   onExcludedItemChange={(value) => setNewExcludedItems(prev => ({ ...prev, [entryKey]: value }))}

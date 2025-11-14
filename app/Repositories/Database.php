@@ -26,20 +26,7 @@ class Database
 
         $charset_collate = $wpdb->get_charset_collate();
 
-        // Ensure dbDelta function is available
-        if (!function_exists('\dbDelta')) {
-            if (defined('ABSPATH') && file_exists(ABSPATH . 'wp-admin/includes/upgrade.php')) {
-                require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-            } else {
-                // Fallback: try to find WordPress
-                $wpAdminPath = dirname(dirname(dirname(__DIR__))) . '/wp-admin/includes/upgrade.php';
-                if (file_exists($wpAdminPath)) {
-                    require_once $wpAdminPath;
-                } else {
-                    throw new \Exception('WordPress upgrade.php file not found. Cannot create database tables.');
-                }
-            }
-        }
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
         // ============================================
         // MAIN TRIPS TABLE
@@ -262,7 +249,7 @@ class Database
             FULLTEXT KEY `ft_search` (`title`,`description`,`short_description`)
         ) {$charset_collate} COMMENT='Main trips table';";
 
-        \dbDelta($sql_trips);
+        dbDelta($sql_trips);
 
         // ============================================
         // TRIP DESTINATIONS (Many-to-Many)
@@ -282,7 +269,7 @@ class Database
             KEY `idx_destination_id` (`destination_id`)
         ) {$charset_collate} COMMENT='Trip to destinations relationship';";
 
-        \dbDelta($sql_trip_destinations);
+        dbDelta($sql_trip_destinations);
 
         // ============================================
         // TRIP ACTIVITIES (Many-to-Many)
@@ -302,7 +289,7 @@ class Database
             KEY `idx_activity_id` (`activity_id`)
         ) {$charset_collate} COMMENT='Trip to activities relationship';";
 
-        \dbDelta($sql_trip_activities);
+        dbDelta($sql_trip_activities);
 
         // ============================================
         // TRIP PRICE TYPES (Traveler Category Pricing)
@@ -330,7 +317,7 @@ class Database
             KEY `idx_dates` (`valid_from`,`valid_to`)
         ) {$charset_collate} COMMENT='Traveler category pricing for trips';";
 
-        \dbDelta($sql_trip_price_types);
+        dbDelta($sql_trip_price_types);
 
         // ============================================
         // TRIP GALLERY IMAGES
@@ -356,7 +343,7 @@ class Database
             KEY `idx_image_id` (`image_id`)
         ) {$charset_collate} COMMENT='Trip gallery images';";
 
-        \dbDelta($sql_trip_gallery);
+        dbDelta($sql_trip_gallery);
 
         // ============================================
         // TRIP HIGHLIGHTS
@@ -377,7 +364,7 @@ class Database
             KEY `idx_order` (`trip_id`,`order`)
         ) {$charset_collate} COMMENT='Trip highlights';";
 
-        \dbDelta($sql_trip_highlights);
+        dbDelta($sql_trip_highlights);
 
         // ============================================
         // TRIP FAQS
@@ -403,7 +390,7 @@ class Database
             FULLTEXT KEY `ft_qa` (`question`,`answer`)
         ) {$charset_collate} COMMENT='Trip FAQs';";
 
-        \dbDelta($sql_trip_faqs);
+        dbDelta($sql_trip_faqs);
 
         // ============================================
         // TRIP AVAILABILITY DATES (Fixed Departures)
@@ -414,9 +401,7 @@ class Database
             `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             `trip_id` bigint(20) UNSIGNED NOT NULL,
             `departure_date` date NOT NULL,
-            `departure_time` time DEFAULT NULL COMMENT 'For single-day trips',
             `arrival_date` date DEFAULT NULL,
-            `arrival_time` time DEFAULT NULL COMMENT 'For single-day trips',
             `return_date` date DEFAULT NULL,
             `seats_total` smallint(5) UNSIGNED NOT NULL,
             `seats_available` smallint(5) UNSIGNED NOT NULL,
@@ -425,7 +410,7 @@ class Database
             `original_price` decimal(10,2) DEFAULT NULL,
             `discounted_price` decimal(10,2) DEFAULT NULL,
             `discount_percentage` decimal(5,2) DEFAULT NULL,
-            `status` enum('available','limited','sold_out','closed','cancelled','blocked') DEFAULT 'available',
+            `status` enum('available','limited','sold_out','closed','cancelled') DEFAULT 'available',
             `from_location` varchar(255) DEFAULT NULL,
             `to_location` varchar(255) DEFAULT NULL,
             `special_notes` text DEFAULT NULL,
@@ -440,10 +425,99 @@ class Database
             KEY `idx_available` (`trip_id`,`departure_date`,`status`)
         ) {$charset_collate} COMMENT='Fixed departure dates with availability';";
 
-        \dbDelta($sql_trip_availability);
+        dbDelta($sql_trip_availability);
 
-        // Create itinerary tables
-        self::createItineraryTables();
+        // ============================================
+        // TRIP ITINERARY DAYS
+        // ============================================
+        $table_trip_itinerary_days = $wpdb->prefix . 'yatra_trip_itinerary_days';
+        
+        $sql_trip_itinerary_days = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_days}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `trip_id` bigint(20) UNSIGNED NOT NULL,
+            `day_number` smallint(5) UNSIGNED NOT NULL COMMENT 'Day 1, 2, 3...',
+            `title` varchar(255) DEFAULT NULL COMMENT 'Day title',
+            `description` text DEFAULT NULL COMMENT 'Day overview',
+            `accommodation` varchar(255) DEFAULT NULL COMMENT 'Accommodation for this day',
+            `meals` varchar(100) DEFAULT NULL COMMENT 'Meals included (B, L, D)',
+            `order` smallint(5) UNSIGNED DEFAULT 0,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_trip_id` (`trip_id`),
+            KEY `idx_day_number` (`trip_id`,`day_number`),
+            KEY `idx_order` (`trip_id`,`order`)
+        ) {$charset_collate} COMMENT='Trip itinerary days';";
+
+        dbDelta($sql_trip_itinerary_days);
+
+        // ============================================
+        // TRIP ITINERARY ENTRIES
+        // ============================================
+        $table_trip_itinerary_entries = $wpdb->prefix . 'yatra_trip_itinerary_entries';
+        
+        $sql_trip_itinerary_entries = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_entries}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `trip_id` bigint(20) UNSIGNED NOT NULL,
+            `day_id` bigint(20) UNSIGNED NOT NULL,
+            `title` varchar(255) NOT NULL,
+            `description` text DEFAULT NULL,
+            `time` varchar(50) DEFAULT NULL COMMENT 'Time of day',
+            `location` varchar(255) DEFAULT NULL,
+            `activity_type` varchar(100) DEFAULT NULL,
+            `order` smallint(5) UNSIGNED DEFAULT 0,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_trip_id` (`trip_id`),
+            KEY `idx_day_id` (`day_id`),
+            KEY `idx_order` (`day_id`,`order`)
+        ) {$charset_collate} COMMENT='Trip itinerary entries';";
+
+        dbDelta($sql_trip_itinerary_entries);
+
+        // ============================================
+        // TRIP ITINERARY ENTRY ITEMS (Included/Excluded)
+        // ============================================
+        $table_trip_itinerary_entry_items = $wpdb->prefix . 'yatra_trip_itinerary_entry_items';
+        
+        $sql_trip_itinerary_entry_items = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_entry_items}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `entry_id` bigint(20) UNSIGNED NOT NULL,
+            `item_type` enum('included','excluded') NOT NULL,
+            `title` varchar(255) NOT NULL,
+            `description` text DEFAULT NULL,
+            `order` smallint(5) UNSIGNED DEFAULT 0,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_entry_id` (`entry_id`),
+            KEY `idx_item_type` (`entry_id`,`item_type`),
+            KEY `idx_order` (`entry_id`,`order`)
+        ) {$charset_collate} COMMENT='Trip itinerary entry items';";
+
+        dbDelta($sql_trip_itinerary_entry_items);
+
+        // ============================================
+        // TRIP ITINERARY ENTRY IMAGES
+        // ============================================
+        $table_trip_itinerary_entry_images = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
+        
+        $sql_trip_itinerary_entry_images = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_entry_images}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `entry_id` bigint(20) UNSIGNED NOT NULL,
+            `image_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'WordPress attachment ID',
+            `image_url` varchar(500) NOT NULL,
+            `alt_text` varchar(255) DEFAULT NULL,
+            `caption` text DEFAULT NULL,
+            `order` smallint(5) UNSIGNED DEFAULT 0,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_entry_id` (`entry_id`),
+            KEY `idx_order` (`entry_id`,`order`),
+            KEY `idx_image_id` (`image_id`)
+        ) {$charset_collate} COMMENT='Trip itinerary entry images';";
+
+        dbDelta($sql_trip_itinerary_entry_images);
 
         // ============================================
         // EXISTING TABLES (Keep existing structure)
@@ -470,7 +544,7 @@ class Database
             KEY `updated_by` (`updated_by`)
         ) {$charset_collate};";
 
-        \dbDelta($sql_activities);
+        dbDelta($sql_activities);
 
         // Destinations table
         $table_destinations = $wpdb->prefix . 'yatra_destinations';
@@ -493,7 +567,7 @@ class Database
             KEY `updated_by` (`updated_by`)
         ) {$charset_collate};";
 
-        \dbDelta($sql_destinations);
+        dbDelta($sql_destinations);
 
         // Traveler Categories table
         $table_traveler_categories = $wpdb->prefix . 'yatra_traveler_categories';
@@ -518,7 +592,7 @@ class Database
             KEY `updated_by` (`updated_by`)
         ) {$charset_collate};";
 
-        \dbDelta($sql_traveler_categories);
+        dbDelta($sql_traveler_categories);
 
         // Item Types table
         $table_item_types = $wpdb->prefix . 'yatra_item_types';
@@ -542,7 +616,7 @@ class Database
             KEY `updated_by` (`updated_by`)
         ) {$charset_collate};";
 
-        \dbDelta($sql_item_types);
+        dbDelta($sql_item_types);
 
         // Items table
         $table_items = $wpdb->prefix . 'yatra_items';
@@ -566,7 +640,7 @@ class Database
             KEY `updated_by` (`updated_by`)
         ) {$charset_collate};";
 
-        \dbDelta($sql_items);
+        dbDelta($sql_items);
 
         // Discounts table
         $table_discounts = $wpdb->prefix . 'yatra_discounts';
@@ -605,7 +679,7 @@ class Database
             KEY `updated_by` (`updated_by`)
         ) {$charset_collate};";
 
-        \dbDelta($sql_discounts);
+        dbDelta($sql_discounts);
 
         // Trip Revisions table
         $table_trip_revisions = $wpdb->prefix . 'yatra_trip_revisions';
@@ -627,7 +701,7 @@ class Database
             CONSTRAINT `fk_revisions_trip` FOREIGN KEY (`trip_id`) REFERENCES `{$table_trips}` (`id`) ON DELETE CASCADE
         ) {$charset_collate};";
 
-        \dbDelta($sql_trip_revisions);
+        dbDelta($sql_trip_revisions);
         
         // Update existing tables to add missing columns
         self::updateTables();
@@ -639,22 +713,6 @@ class Database
     public static function updateTables(): void
     {
         global $wpdb;
-        
-        // Ensure dbDelta function is available
-        if (!function_exists('\dbDelta')) {
-            if (defined('ABSPATH') && file_exists(ABSPATH . 'wp-admin/includes/upgrade.php')) {
-                require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-            } else {
-                // Fallback: try to find WordPress
-                $wpAdminPath = dirname(dirname(dirname(__DIR__))) . '/wp-admin/includes/upgrade.php';
-                if (file_exists($wpAdminPath)) {
-                    require_once $wpAdminPath;
-                } else {
-                    throw new \Exception('WordPress upgrade.php file not found. Cannot create database tables.');
-                }
-            }
-        }
-        
         $table_trips = $wpdb->prefix . 'yatra_trips';
         
         // Helper function to check if column exists
@@ -835,236 +893,6 @@ class Database
                 $wpdb->query($sql);
             }
         }
-        
-        // Update revisions table to add status column if it doesn't exist
-        $table_revisions = $wpdb->prefix . 'yatra_trip_revisions';
-        $revisionColumnExists = function($column) use ($wpdb, $table_revisions) {
-            return (int) $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-                     WHERE TABLE_SCHEMA = DATABASE() 
-                     AND TABLE_NAME = %s 
-                     AND COLUMN_NAME = %s",
-                    $table_revisions,
-                    $column
-                )
-            ) > 0;
-        };
-        
-        // Check if revisions table exists
-        $revisionsTableExists = (int) $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(*) FROM information_schema.tables 
-                 WHERE table_schema = DATABASE() 
-                 AND table_name = %s",
-                $table_revisions
-            )
-        ) > 0;
-        
-        if ($revisionsTableExists && !$revisionColumnExists('status')) {
-            // Add status column to revisions table
-            $wpdb->query(
-                "ALTER TABLE `{$table_revisions}` 
-                 ADD COLUMN `status` enum('inherit','restored') DEFAULT 'inherit' 
-                 COMMENT 'inherit = normal revision, restored = revision created from restore' 
-                 AFTER `version`"
-            );
-        }
-        
-        // Ensure itinerary tables exist (they should be created in createTables, but check here too)
-        $itineraryTables = [
-            'yatra_trip_itinerary_days',
-            'yatra_trip_itinerary_entries',
-            'yatra_trip_itinerary_entry_items',
-            'yatra_trip_itinerary_entry_images',
-        ];
-        
-        foreach ($itineraryTables as $tableName) {
-            $fullTableName = $wpdb->prefix . $tableName;
-            $tableExists = (int) $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT COUNT(*) FROM information_schema.tables 
-                     WHERE table_schema = DATABASE() 
-                     AND table_name = %s",
-                    $fullTableName
-                )
-            ) > 0;
-            
-            if (!$tableExists) {
-                // Re-create the table using the same schema from createTables
-                self::createItineraryTables();
-                break; // Only need to call once as it creates all tables
-            }
-        }
-        
-        // Update availability table to add time columns and blocked status
-        $table_availability = $wpdb->prefix . 'yatra_trip_availability_dates';
-        $availabilityTableExists = (int) $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(*) FROM information_schema.tables 
-                 WHERE table_schema = DATABASE() 
-                 AND table_name = %s",
-                $table_availability
-            )
-        ) > 0;
-        
-        if ($availabilityTableExists) {
-            // Check and add departure_time column
-            $departureTimeExists = (int) $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT COUNT(*) FROM information_schema.columns 
-                     WHERE table_schema = DATABASE() 
-                     AND table_name = %s 
-                     AND column_name = 'departure_time'",
-                    $table_availability
-                )
-            ) > 0;
-            
-            if (!$departureTimeExists) {
-                $wpdb->query(
-                    "ALTER TABLE `{$table_availability}` 
-                     ADD COLUMN `departure_time` time DEFAULT NULL 
-                     COMMENT 'For single-day trips' 
-                     AFTER `departure_date`"
-                );
-            }
-            
-            // Check and add arrival_time column
-            $arrivalTimeExists = (int) $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT COUNT(*) FROM information_schema.columns 
-                     WHERE table_schema = DATABASE() 
-                     AND table_name = %s 
-                     AND column_name = 'arrival_time'",
-                    $table_availability
-                )
-            ) > 0;
-            
-            if (!$arrivalTimeExists) {
-                $wpdb->query(
-                    "ALTER TABLE `{$table_availability}` 
-                     ADD COLUMN `arrival_time` time DEFAULT NULL 
-                     COMMENT 'For single-day trips' 
-                     AFTER `arrival_date`"
-                );
-            }
-            
-            // Update status enum to include 'blocked'
-            $wpdb->query(
-                "ALTER TABLE `{$table_availability}` 
-                 MODIFY COLUMN `status` enum('available','limited','sold_out','closed','cancelled','blocked') DEFAULT 'available'"
-            );
-        }
-    }
-    
-    /**
-     * Create itinerary-related tables
-     * Called from createTables() and updateTables()
-     */
-    private static function createItineraryTables(): void
-    {
-        global $wpdb;
-        
-        // Ensure dbDelta function is available
-        if (!function_exists('\dbDelta')) {
-            if (defined('ABSPATH') && file_exists(ABSPATH . 'wp-admin/includes/upgrade.php')) {
-                require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-            } else {
-                // Fallback: try to find WordPress
-                $wpAdminPath = dirname(dirname(dirname(__DIR__))) . '/wp-admin/includes/upgrade.php';
-                if (file_exists($wpAdminPath)) {
-                    require_once $wpAdminPath;
-                } else {
-                    throw new \Exception('WordPress upgrade.php file not found. Cannot create database tables.');
-                }
-            }
-        }
-        
-        $charset_collate = $wpdb->get_charset_collate();
-        
-        // ============================================
-        // TRIP ITINERARY DAYS
-        // ============================================
-        $table_trip_itinerary_days = $wpdb->prefix . 'yatra_trip_itinerary_days';
-        $sql_trip_itinerary_days = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_days}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `trip_id` bigint(20) UNSIGNED NOT NULL,
-            `day_number` smallint(5) UNSIGNED NOT NULL COMMENT 'Day 1, 2, 3...',
-            `title` varchar(255) DEFAULT NULL COMMENT 'Day title',
-            `description` text DEFAULT NULL COMMENT 'Day overview',
-            `accommodation` varchar(255) DEFAULT NULL COMMENT 'Accommodation for this day',
-            `meals` varchar(100) DEFAULT NULL COMMENT 'Meals included (B, L, D)',
-            `order` smallint(5) UNSIGNED DEFAULT 0,
-            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            KEY `idx_trip_id` (`trip_id`),
-            KEY `idx_day_number` (`trip_id`,`day_number`),
-            KEY `idx_order` (`trip_id`,`order`)
-        ) {$charset_collate} COMMENT='Trip itinerary days';";
-        \dbDelta($sql_trip_itinerary_days);
-
-        // ============================================
-        // TRIP ITINERARY ENTRIES
-        // ============================================
-        $table_trip_itinerary_entries = $wpdb->prefix . 'yatra_trip_itinerary_entries';
-        $sql_trip_itinerary_entries = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_entries}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `trip_id` bigint(20) UNSIGNED NOT NULL,
-            `day_id` bigint(20) UNSIGNED NOT NULL,
-            `title` varchar(255) NOT NULL,
-            `description` text DEFAULT NULL,
-            `time` varchar(50) DEFAULT NULL COMMENT 'Time of day',
-            `location` varchar(255) DEFAULT NULL,
-            `activity_type` varchar(100) DEFAULT NULL,
-            `order` smallint(5) UNSIGNED DEFAULT 0,
-            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            KEY `idx_trip_id` (`trip_id`),
-            KEY `idx_day_id` (`day_id`),
-            KEY `idx_order` (`day_id`,`order`)
-        ) {$charset_collate} COMMENT='Trip itinerary entries';";
-        \dbDelta($sql_trip_itinerary_entries);
-
-        // ============================================
-        // TRIP ITINERARY ENTRY ITEMS (Included/Excluded)
-        // ============================================
-        $table_trip_itinerary_entry_items = $wpdb->prefix . 'yatra_trip_itinerary_entry_items';
-        $sql_trip_itinerary_entry_items = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_entry_items}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `entry_id` bigint(20) UNSIGNED NOT NULL,
-            `item_type` enum('included','excluded') NOT NULL,
-            `title` varchar(255) NOT NULL,
-            `description` text DEFAULT NULL,
-            `order` smallint(5) UNSIGNED DEFAULT 0,
-            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            KEY `idx_entry_id` (`entry_id`),
-            KEY `idx_item_type` (`entry_id`,`item_type`),
-            KEY `idx_order` (`entry_id`,`order`)
-        ) {$charset_collate} COMMENT='Trip itinerary entry items';";
-        \dbDelta($sql_trip_itinerary_entry_items);
-
-        // ============================================
-        // TRIP ITINERARY ENTRY IMAGES
-        // ============================================
-        $table_trip_itinerary_entry_images = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
-        $sql_trip_itinerary_entry_images = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_entry_images}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `entry_id` bigint(20) UNSIGNED NOT NULL,
-            `image_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'WordPress attachment ID',
-            `image_url` varchar(500) NOT NULL,
-            `alt_text` varchar(255) DEFAULT NULL,
-            `caption` text DEFAULT NULL,
-            `order` smallint(5) UNSIGNED DEFAULT 0,
-            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            KEY `idx_entry_id` (`entry_id`),
-            KEY `idx_order` (`entry_id`,`order`),
-            KEY `idx_image_id` (`image_id`)
-        ) {$charset_collate} COMMENT='Trip itinerary entry images';";
-        \dbDelta($sql_trip_itinerary_entry_images);
     }
 
     /**

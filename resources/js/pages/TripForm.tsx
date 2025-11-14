@@ -12,8 +12,6 @@ import {
   Sparkles,
   Box,
   Calendar,
-  CheckSquare,
-  Mail,
   BarChart3,
   Image,
   HelpCircle,
@@ -36,10 +34,13 @@ import {
   History,
   Lightbulb,
   Copy,
-  BookOpen
+  BookOpen,
+  Mail,
+  Database
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -52,13 +53,13 @@ import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { useToast } from '../components/ui/toast';
 
 type SectionId = 
-  | 'basic'             // 1. Basic Information (title, description, highlights, featured image)
+  | 'basic'             // 1. Basic Information (title, description, highlights, featured image, trip type, duration)
   | 'location'          // 2. Location & Geography
-  | 'duration'          // 3. Duration & Schedule
+  | 'duration'          // 3. Schedule & Availability (renamed)
   | 'pricing'           // 4. Pricing & Payment
-  | 'itinerary'         // 5. Itinerary Builder (includes accommodation & transportation per day)
-  | 'included'          // 6. What's Included/Excluded
-  | 'booking'           // 7. Booking Requirements
+  | 'booking'           // 5. Booking Requirements
+  | 'itinerary'         // 6. Itinerary Builder (includes Included/Excluded)
+  | 'included'          // 7. What's Included/Excluded (deprecated - merged into itinerary)
   | 'media'             // 8. Media & Content (gallery, video, story, testimonials)
   | 'categorization'    // 9. Categorization & Tags (category, activities, difficulty, tags)
   | 'faqs'              // 10. FAQs
@@ -71,6 +72,7 @@ interface Section {
   icon: React.ComponentType<{ className?: string }>;
   required: boolean;
   completed: boolean;
+  hasErrors?: boolean;
 }
 
 interface FAQ {
@@ -93,6 +95,41 @@ interface PriceType {
   discounted_price: string;
 }
 
+interface TripAmenityItem {
+  title: string;
+  description: string;
+}
+
+const normalizeAmenityItems = (items: unknown): TripAmenityItem[] => {
+  if (!items) return [];
+  if (Array.isArray(items)) {
+    return items.map((item) => {
+      if (typeof item === 'string') {
+        return { title: item, description: '' };
+      }
+      if (item && typeof item === 'object') {
+        const obj = item as Partial<TripAmenityItem>;
+        return {
+          title: (obj.title ?? '').toString(),
+          description: (obj.description ?? '').toString(),
+        };
+      }
+      return { title: String(item), description: '' };
+    }).filter((item) => item.title.trim().length > 0);
+  }
+  if (typeof items === 'string') {
+    try {
+      const parsed = JSON.parse(items);
+      if (Array.isArray(parsed)) {
+        return normalizeAmenityItems(parsed);
+      }
+    } catch {
+      return [{ title: items, description: '' }];
+    }
+  }
+  return [];
+};
+
 interface TripFormData {
   // Overview
   title: string;
@@ -108,7 +145,7 @@ interface TripFormData {
   testimonials: string[]; // Testimonials Integration
   
   // Location & Geography
-  destination: string;
+  destinations: number[]; // Array of destination IDs
   starting_location: string;
   ending_location: string;
   countries: string[];
@@ -118,7 +155,7 @@ interface TripFormData {
   landmarks: string[]; // Geographic Tags - Landmarks
   
   // Duration & Schedule
-  trip_type: 'single_day' | 'multi_day';
+  trip_type: 'single_day' | 'multi_day' | 'flexible';
   duration_days: string;
   duration_nights: string;
   available_from: string;
@@ -130,7 +167,7 @@ interface TripFormData {
   off_season: string; // Off-season indicator
   
   // Activity & Category
-  activity_types: string[];
+  activity_types: number[]; // Array of activity IDs (changed from string[])
   difficulty_level: string;
   trip_category: string;
   trip_category_parent: string; // Parent category for hierarchy
@@ -175,8 +212,8 @@ interface TripFormData {
   vaccination_requirements: string;
   
   // Included/Excluded
-  included_items: string[];
-  excluded_items: string[];
+  included_items: TripAmenityItem[];
+  excluded_items: TripAmenityItem[];
   
   // Itinerary
   itinerary_days: ItineraryDay[];
@@ -195,7 +232,7 @@ interface TripFormData {
   availability_dates: AvailabilityDate[];
   
   // Status & Lifecycle
-  status: 'draft' | 'review' | 'approved' | 'published' | 'archived';
+  status: 'draft' | 'review' | 'approved' | 'published' | 'archived' | 'suspended';
   scheduled_publish_date: string; // Scheduled Publishing
   scheduled_unpublish_date: string; // Scheduled Unpublishing
   version: number; // Version Control
@@ -271,14 +308,10 @@ const TripForm: React.FC = () => {
   const { showToast } = useToast();
   
   const [currentSection, setCurrentSection] = useState<SectionId>('basic');
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [showCategorySelector, setShowCategorySelector] = useState(false);
   
   // Modal states for adding items
   const [showHighlightModal, setShowHighlightModal] = useState(false);
-  const [showIncludedModal, setShowIncludedModal] = useState(false);
-  const [showExcludedModal, setShowExcludedModal] = useState(false);
   const [modalInput, setModalInput] = useState({ text: '', question: '', answer: '' });
   
   // Revision states
@@ -289,12 +322,346 @@ const TripForm: React.FC = () => {
   // UI Enhancement states
   const [simpleMode, setSimpleMode] = useState(false); // Quick Start mode
   const [showSlugPreview, setShowSlugPreview] = useState(true);
+  const [dummyDataIndex, setDummyDataIndex] = useState(0); // Track which dummy data set to use
   
   // Static/dummy revisions data for UI only
   const dummyRevisions = [
     { id: 1, version: 3, created_by_name: 'Admin User', created_at: new Date().toISOString() },
     { id: 2, version: 2, created_by_name: 'Admin User', created_at: new Date(Date.now() - 86400000).toISOString() },
     { id: 3, version: 1, created_by_name: 'Admin User', created_at: new Date(Date.now() - 172800000).toISOString() },
+  ];
+
+  // Comprehensive dummy trip data sets (3 different trips)
+  const dummyTripsData: TripFormData[] = [
+    {
+      // Trip 1: Beach Adventure
+      title: '7-Day Bali Beach Adventure',
+      slug: '7-day-bali-beach-adventure',
+      description: 'Escape to paradise with our 7-day Bali beach adventure. Experience pristine beaches, explore ancient temples, enjoy world-class spa treatments, and immerse yourself in the rich Balinese culture. This carefully curated journey combines relaxation with adventure, offering the perfect balance for travelers seeking both tranquility and excitement.',
+      short_description: 'Escape to paradise with our 7-day Bali beach adventure featuring pristine beaches, ancient temples, and cultural immersion.',
+      highlights: ['Pristine white sand beaches', 'Ancient temple visits', 'Traditional spa treatments', 'Cultural dance performances', 'Sunset dinners by the ocean'],
+      trip_details: 'This comprehensive 7-day journey takes you through the best of Bali. Start your adventure in Seminyak with its trendy beach clubs and world-class restaurants. Visit the iconic Tanah Lot Temple perched on a rock formation in the sea. Explore the cultural heart of Ubud, known for its rice terraces, monkey forest, and art galleries. Enjoy traditional Balinese spa treatments and witness captivating cultural performances. End your trip with a relaxing stay at a beachfront resort where you can unwind and reflect on your incredible journey.',
+      what_makes_special: 'This trip offers exclusive access to private beach areas, personalized cultural experiences, and a perfect blend of relaxation and adventure. Our local guides share insider knowledge and hidden gems that most tourists never discover.',
+      trip_story: 'Imagine waking up to the gentle sound of waves lapping against the shore. As the sun rises over the horizon, you step onto your private balcony to witness a breathtaking sunrise. Your day begins with a traditional Balinese breakfast before heading out to explore ancient temples that have stood for centuries. In the afternoon, you find yourself surrounded by emerald-green rice terraces, learning about traditional farming methods from local farmers. As evening approaches, you\'re treated to a mesmerizing cultural dance performance followed by a candlelit dinner on the beach. This is more than a vacation—it\'s a journey into the heart and soul of Bali.',
+      video_url: 'https://www.youtube.com/watch?v=example1',
+      virtual_tour_url: '',
+      testimonials: ['Amazing experience! The beaches were pristine and the cultural tours were eye-opening.', 'Best trip ever! Perfect balance of relaxation and adventure.', 'The spa treatments were incredible and the guides were so knowledgeable.'],
+      destinations: [], // Will be populated based on available destinations
+      starting_location: 'Ngurah Rai International Airport (DPS)',
+      ending_location: 'Seminyak Beach Resort',
+      countries: ['Indonesia'],
+      regions: ['Bali'],
+      latitude: '-8.3405',
+      longitude: '115.0920',
+      landmarks: ['Tanah Lot Temple', 'Ubud Monkey Forest', 'Tegallalang Rice Terrace', 'Seminyak Beach'],
+      trip_type: 'multi_day',
+      duration_days: '7',
+      duration_nights: '6',
+      available_from: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+      available_to: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
+      booking_window_days: '30',
+      seasonal_availability: 'Year-round',
+      best_season: 'April to October',
+      peak_season: 'July to August',
+      off_season: 'November to March',
+      activity_types: [], // Will be populated based on available activities
+      difficulty_level: 'beginner',
+      trip_category: 'beach',
+      trip_category_parent: 'beach',
+      trip_category_sub: 'relaxation',
+      tags: ['family-friendly', 'beach', 'relaxation', 'cultural', 'spa'],
+      featured_priority: 'featured',
+      accommodation_type: 'Resort',
+      meal_plan: 'breakfast',
+      accommodation_details: '4-star beachfront resort with private balconies, infinity pool, and spa facilities',
+      transportation_included: true,
+      pickup_location: 'Ngurah Rai International Airport',
+      dropoff_location: 'Seminyak Beach Resort',
+      transportation_details: 'Private air-conditioned vehicle with professional driver',
+      pricing_type: 'traveler_based',
+      original_price: '',
+      discounted_price: '',
+      price_types: [
+        { category_id: 1, original_price: '1250', discounted_price: '' },
+        { category_id: 2, original_price: '625', discounted_price: '' },
+        { category_id: 3, original_price: '0', discounted_price: '' },
+      ],
+      sale_price: '',
+      currency: 'USD',
+      deposit_amount: '300',
+      deposit_percentage: '',
+      payment_terms: '50% deposit required at booking, remaining 50% due 30 days before departure',
+      group_pricing_enabled: true,
+      group_size_min: '4',
+      group_discount_percentage: '10',
+      max_travelers: '12',
+      min_travelers: '2',
+      booking_deadline: '',
+      cancellation_policy: 'Free cancellation up to 30 days before departure. 50% refund for cancellations 15-30 days before. No refund for cancellations less than 15 days before.',
+      age_min: '8',
+      age_max: '',
+      physical_requirements: 'Moderate fitness level required. Some walking involved but no strenuous activities.',
+      visa_requirements: 'Visa on arrival available for most nationalities. Valid passport required with at least 6 months validity.',
+      vaccination_requirements: 'No mandatory vaccinations. Recommended: Hepatitis A, Typhoid, and routine vaccinations.',
+      included_items: [
+        { title: 'Accommodation', description: '6 nights at 4-star beachfront resort' },
+        { title: 'Breakfast', description: 'Daily breakfast included' },
+        { title: 'Airport transfers', description: 'Private transfers to and from airport' },
+        { title: 'Temple visits', description: 'Entrance fees to all temples included' },
+        { title: 'Cultural performances', description: 'Traditional dance show tickets' },
+        { title: 'Professional guide', description: 'English-speaking local guide' },
+      ],
+      excluded_items: [
+        { title: 'International flights', description: 'Flights to and from Bali not included' },
+        { title: 'Lunch and dinner', description: 'Meals other than breakfast' },
+        { title: 'Travel insurance', description: 'Travel insurance recommended but not included' },
+        { title: 'Personal expenses', description: 'Souvenirs, tips, and personal items' },
+      ],
+      itinerary_days: [],
+      gallery_images: [],
+      featured_image: '',
+      faqs: [
+        { question: 'What is the best time to visit Bali?', answer: 'The best time to visit Bali is during the dry season from April to October, when you can expect sunny days and minimal rainfall.' },
+        { question: 'Do I need a visa?', answer: 'Most nationalities can get a visa on arrival at the airport. A valid passport with at least 6 months validity is required.' },
+        { question: 'What should I pack?', answer: 'Pack light, breathable clothing, swimwear, sunscreen, insect repellent, and comfortable walking shoes. Modest clothing is required for temple visits.' },
+      ],
+      frontend_tabs: [
+        { id: 'general', label: 'General', enabled: true, order: 1, content_type: 'general' },
+        { id: 'pricing', label: 'Pricing', enabled: true, order: 2, content_type: 'pricing' },
+        { id: 'itinerary', label: 'Itinerary', enabled: true, order: 3, content_type: 'itinerary' },
+        { id: 'included_excluded', label: 'Included/Excluded', enabled: true, order: 4, content_type: 'included_excluded' },
+        { id: 'gallery', label: 'Gallery', enabled: true, order: 5, content_type: 'gallery' },
+        { id: 'faqs', label: 'FAQs', enabled: true, order: 6, content_type: 'faqs' },
+      ],
+      availability_dates: [],
+      status: 'draft',
+      scheduled_publish_date: '',
+      scheduled_unpublish_date: '',
+      version: 1,
+      seasonal_auto_enable: false,
+      seasonal_enable_date: '',
+      seasonal_disable_date: '',
+      meta_title: '7-Day Bali Beach Adventure | Luxury Beach Resort Experience',
+      meta_description: 'Experience the best of Bali with our 7-day beach adventure. Pristine beaches, ancient temples, cultural immersion, and world-class spa treatments await.',
+      meta_keywords: 'Bali, beach vacation, cultural tour, spa retreat, Indonesia travel',
+    },
+    {
+      // Trip 2: Mountain Trekking Adventure
+      title: 'Everest Base Camp Trek - 14 Days',
+      slug: 'everest-base-camp-trek-14-days',
+      description: 'Embark on the adventure of a lifetime with our 14-day Everest Base Camp trek. This challenging yet rewarding journey takes you through the heart of the Himalayas, passing through traditional Sherpa villages, ancient monasteries, and breathtaking mountain landscapes. Experience the rich culture of the Khumbu region while pushing your limits to reach the base of the world\'s highest mountain.',
+      short_description: 'Embark on the adventure of a lifetime with our 14-day Everest Base Camp trek through the heart of the Himalayas.',
+      highlights: ['Trek to Everest Base Camp (5,364m)', 'Visit ancient Buddhist monasteries', 'Experience Sherpa culture', 'Breathtaking mountain views', 'Professional mountain guides'],
+      trip_details: 'This 14-day trekking adventure begins in Kathmandu, where you\'ll prepare for your journey and meet your experienced guides. Fly to Lukla, the gateway to the Khumbu region, and begin your trek through the stunning Himalayan landscape. Pass through traditional Sherpa villages like Namche Bazaar, Tengboche, and Dingboche, each offering unique cultural experiences and acclimatization opportunities. Visit ancient monasteries, learn about Sherpa traditions, and witness the daily life of mountain communities. The journey culminates at Everest Base Camp, where you\'ll stand in the shadow of the world\'s highest peak. Along the way, you\'ll be treated to spectacular views of peaks like Ama Dablam, Lhotse, and of course, Mount Everest itself.',
+      what_makes_special: 'Our trek includes experienced mountain guides, proper acclimatization schedules, high-altitude porters, and comprehensive safety equipment. We prioritize responsible tourism, supporting local communities and ensuring minimal environmental impact.',
+      trip_story: 'The crisp mountain air fills your lungs as you take your first steps on the trail. With each passing day, the mountains grow larger, the air thinner, and the sense of accomplishment greater. You wake before dawn to witness the sun painting the peaks in shades of gold and pink. You share meals with Sherpa families, learning about their way of life and the challenges they face in this harsh yet beautiful environment. As you approach Base Camp, the anticipation builds. When you finally arrive, standing at 5,364 meters with Everest towering above, you realize this is more than a trek—it\'s a transformation. The journey changes you, teaching resilience, appreciation for nature, and respect for the mountains and the people who call them home.',
+      video_url: 'https://www.youtube.com/watch?v=example2',
+      virtual_tour_url: '',
+      testimonials: ['Life-changing experience! The guides were incredible and the views were absolutely breathtaking.', 'Challenging but so rewarding. Made it to Base Camp and it was worth every step.', 'The best adventure of my life. The organization was perfect and the support team was amazing.'],
+      destinations: [], // Will be populated
+      starting_location: 'Kathmandu International Airport',
+      ending_location: 'Lukla Airport',
+      countries: ['Nepal'],
+      regions: ['Khumbu Region'],
+      latitude: '27.9881',
+      longitude: '86.9250',
+      landmarks: ['Mount Everest', 'Namche Bazaar', 'Tengboche Monastery', 'Kala Patthar'],
+      trip_type: 'multi_day',
+      duration_days: '14',
+      duration_nights: '13',
+      available_from: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      available_to: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      booking_window_days: '60',
+      seasonal_availability: 'March to May, September to November',
+      best_season: 'October to November',
+      peak_season: 'October to November',
+      off_season: 'December to February, June to August',
+      activity_types: [],
+      difficulty_level: 'challenging',
+      trip_category: 'adventure',
+      trip_category_parent: 'adventure',
+      trip_category_sub: 'trekking',
+      tags: ['trekking', 'mountains', 'adventure', 'challenging', 'everest'],
+      featured_priority: 'popular',
+      accommodation_type: 'Teahouse',
+      meal_plan: 'full_board',
+      accommodation_details: 'Traditional teahouses along the route with basic amenities. Rooms are shared, and facilities become more basic as altitude increases.',
+      transportation_included: true,
+      pickup_location: 'Kathmandu International Airport',
+      dropoff_location: 'Lukla Airport',
+      transportation_details: 'Domestic flights Kathmandu-Lukla-Kathmandu included. Airport transfers included.',
+      pricing_type: 'regular',
+      original_price: '1899',
+      discounted_price: '1699',
+      sale_price: '',
+      currency: 'USD',
+      deposit_amount: '500',
+      deposit_percentage: '',
+      payment_terms: '50% deposit required at booking, remaining 50% due 60 days before departure',
+      group_pricing_enabled: true,
+      group_size_min: '4',
+      group_discount_percentage: '15',
+      max_travelers: '12',
+      min_travelers: '2',
+      booking_deadline: '',
+      cancellation_policy: 'Free cancellation up to 60 days before departure. 50% refund for cancellations 30-60 days before. No refund for cancellations less than 30 days before.',
+      age_min: '18',
+      age_max: '65',
+      physical_requirements: 'Excellent physical fitness required. Previous trekking experience recommended. Must be able to walk 6-8 hours daily at high altitude.',
+      visa_requirements: 'Tourist visa required for Nepal. Can be obtained on arrival at airport or in advance. Valid passport required.',
+      vaccination_requirements: 'Recommended: Hepatitis A, Typhoid, Japanese Encephalitis, and routine vaccinations. Consult with travel health clinic.',
+      included_items: [
+        { title: 'Accommodation', description: '13 nights in teahouses along the route' },
+        { title: 'All meals', description: 'Breakfast, lunch, and dinner included' },
+        { title: 'Professional guides', description: 'Experienced mountain guides and porters' },
+        { title: 'Permits', description: 'TIMS and Sagarmatha National Park permits' },
+        { title: 'Domestic flights', description: 'Kathmandu-Lukla-Kathmandu flights' },
+        { title: 'Equipment', description: 'Sleeping bag and down jacket rental' },
+      ],
+      excluded_items: [
+        { title: 'International flights', description: 'Flights to and from Kathmandu' },
+        { title: 'Travel insurance', description: 'Comprehensive travel and medical insurance required' },
+        { title: 'Personal equipment', description: 'Trekking boots, clothing, and personal items' },
+        { title: 'Tips', description: 'Tips for guides and porters (recommended)' },
+        { title: 'Personal expenses', description: 'Drinks, snacks, and souvenirs' },
+      ],
+      itinerary_days: [],
+      gallery_images: [],
+      featured_image: '',
+      faqs: [
+        { question: 'How difficult is the trek?', answer: 'This is a challenging trek requiring excellent physical fitness. You\'ll be walking 6-8 hours daily at high altitude. Previous trekking experience is recommended.' },
+        { question: 'What is the altitude at Base Camp?', answer: 'Everest Base Camp is located at 5,364 meters (17,598 feet) above sea level.' },
+        { question: 'What happens if I get altitude sickness?', answer: 'Our guides are trained to recognize and treat altitude sickness. We have proper acclimatization schedules and emergency descent plans in place.' },
+      ],
+      frontend_tabs: [
+        { id: 'general', label: 'General', enabled: true, order: 1, content_type: 'general' },
+        { id: 'pricing', label: 'Pricing', enabled: true, order: 2, content_type: 'pricing' },
+        { id: 'itinerary', label: 'Itinerary', enabled: true, order: 3, content_type: 'itinerary' },
+        { id: 'included_excluded', label: 'Included/Excluded', enabled: true, order: 4, content_type: 'included_excluded' },
+        { id: 'gallery', label: 'Gallery', enabled: true, order: 5, content_type: 'gallery' },
+        { id: 'faqs', label: 'FAQs', enabled: true, order: 6, content_type: 'faqs' },
+      ],
+      availability_dates: [],
+      status: 'draft',
+      scheduled_publish_date: '',
+      scheduled_unpublish_date: '',
+      version: 1,
+      seasonal_auto_enable: false,
+      seasonal_enable_date: '',
+      seasonal_disable_date: '',
+      meta_title: 'Everest Base Camp Trek - 14 Days | Ultimate Himalayan Adventure',
+      meta_description: 'Embark on the adventure of a lifetime with our 14-day Everest Base Camp trek. Experience Sherpa culture, ancient monasteries, and breathtaking mountain views.',
+      meta_keywords: 'Everest Base Camp, trekking, Nepal, Himalayas, adventure travel, mountain trek',
+      price_types: [],
+    },
+    {
+      // Trip 3: European City Tour
+      title: 'European Grand Tour - 10 Days',
+      slug: 'european-grand-tour-10-days',
+      description: 'Discover the best of Europe with our 10-day grand tour covering Paris, Rome, and Barcelona. Experience world-famous landmarks, indulge in exquisite cuisine, explore rich history and art, and immerse yourself in diverse European cultures. This carefully crafted journey takes you through three of Europe\'s most iconic cities, each offering unique experiences and unforgettable memories.',
+      short_description: 'Discover the best of Europe with our 10-day grand tour covering Paris, Rome, and Barcelona.',
+      highlights: ['Eiffel Tower and Louvre Museum', 'Colosseum and Vatican City', 'Sagrada Familia and Park Güell', 'World-class cuisine', 'Professional local guides'],
+      trip_details: 'Begin your European adventure in the City of Light—Paris. Explore iconic landmarks like the Eiffel Tower, Louvre Museum, and Notre-Dame Cathedral. Stroll along the Champs-Élysées, enjoy a Seine River cruise, and indulge in French pastries at charming cafés. Next, travel to Rome, the Eternal City, where ancient history comes alive. Visit the Colosseum, Roman Forum, and Vatican City with its stunning Sistine Chapel. Enjoy authentic Italian cuisine and gelato while exploring cobblestone streets. Conclude your journey in Barcelona, Spain\'s vibrant cultural capital. Admire Gaudí\'s architectural masterpieces including the Sagrada Familia and Park Güell. Experience the lively atmosphere of Las Ramblas, enjoy tapas and sangria, and relax on beautiful Mediterranean beaches.',
+      what_makes_special: 'This tour includes skip-the-line tickets to major attractions, private guided tours in each city, and carefully selected accommodations in prime locations. Our small group size ensures personalized attention and authentic local experiences.',
+      trip_story: 'Your European adventure begins as you step off the plane in Paris, greeted by the elegant architecture and romantic atmosphere that has inspired artists for centuries. Each day brings new discoveries—from the artistic treasures of the Louvre to the bohemian charm of Montmartre. In Rome, you walk in the footsteps of emperors and gladiators, feeling the weight of history in every ancient stone. The Vatican\'s art and architecture leave you in awe, while a simple plate of pasta in a local trattoria reminds you that the best experiences are often the simplest. Barcelona welcomes you with its unique blend of Gothic and Modernist architecture, vibrant street life, and Mediterranean warmth. As you watch the sunset from Park Güell, you realize that this journey has not just shown you three cities—it has shown you three different ways of living, three different approaches to art and culture, and three different reasons to fall in love with Europe.',
+      video_url: 'https://www.youtube.com/watch?v=example3',
+      virtual_tour_url: '',
+      testimonials: ['Amazing tour! We saw so much in 10 days and the guides were fantastic.', 'Perfect blend of history, culture, and fun. Highly recommend!', 'The accommodations were excellent and the itinerary was well-planned.'],
+      destinations: [],
+      starting_location: 'Charles de Gaulle Airport (CDG)',
+      ending_location: 'El Prat Airport (BCN)',
+      countries: ['France', 'Italy', 'Spain'],
+      regions: ['Île-de-France', 'Lazio', 'Catalonia'],
+      latitude: '48.8566',
+      longitude: '2.3522',
+      landmarks: ['Eiffel Tower', 'Colosseum', 'Sagrada Familia', 'Louvre Museum', 'Vatican City'],
+      trip_type: 'multi_day',
+      duration_days: '10',
+      duration_nights: '9',
+      available_from: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      available_to: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      booking_window_days: '45',
+      seasonal_availability: 'Year-round',
+      best_season: 'April to June, September to October',
+      peak_season: 'June to August',
+      off_season: 'November to March',
+      activity_types: [],
+      difficulty_level: 'easy',
+      trip_category: 'cultural',
+      trip_category_parent: 'cultural',
+      trip_category_sub: 'city-tour',
+      tags: ['cultural', 'city-tour', 'history', 'art', 'food'],
+      featured_priority: 'popular',
+      accommodation_type: 'Hotel',
+      meal_plan: 'breakfast',
+      accommodation_details: '4-star hotels in city centers with easy access to major attractions',
+      transportation_included: true,
+      pickup_location: 'Charles de Gaulle Airport',
+      dropoff_location: 'El Prat Airport',
+      transportation_details: 'High-speed train between cities, private transfers, and metro passes included',
+      pricing_type: 'regular',
+      original_price: '2499',
+      discounted_price: '',
+      sale_price: '2199',
+      currency: 'USD',
+      deposit_amount: '600',
+      deposit_percentage: '',
+      payment_terms: '40% deposit required at booking, remaining 60% due 45 days before departure',
+      group_pricing_enabled: true,
+      group_size_min: '6',
+      group_discount_percentage: '12',
+      max_travelers: '20',
+      min_travelers: '4',
+      booking_deadline: '',
+      cancellation_policy: 'Free cancellation up to 45 days before departure. 75% refund for cancellations 30-45 days before. 50% refund for cancellations 15-30 days before. No refund for cancellations less than 15 days before.',
+      age_min: '',
+      age_max: '',
+      physical_requirements: 'Moderate walking required. Some sites involve stairs and uneven surfaces. Suitable for most fitness levels.',
+      visa_requirements: 'Schengen visa required for most non-EU nationals. Apply well in advance as processing can take several weeks.',
+      vaccination_requirements: 'No mandatory vaccinations. Routine vaccinations recommended.',
+      included_items: [
+        { title: 'Accommodation', description: '9 nights in 4-star city center hotels' },
+        { title: 'Breakfast', description: 'Daily breakfast included' },
+        { title: 'Transportation', description: 'High-speed trains, airport transfers, and city metro passes' },
+        { title: 'Guided tours', description: 'Professional local guides in each city' },
+        { title: 'Skip-the-line tickets', description: 'Priority access to major attractions' },
+        { title: 'Welcome dinner', description: 'Traditional welcome dinner in Paris' },
+      ],
+      excluded_items: [
+        { title: 'International flights', description: 'Flights to Paris and from Barcelona' },
+        { title: 'Lunch and dinner', description: 'Meals other than breakfast and welcome dinner' },
+        { title: 'Travel insurance', description: 'Travel insurance recommended' },
+        { title: 'Personal expenses', description: 'Souvenirs, tips, and personal items' },
+      ],
+      itinerary_days: [],
+      gallery_images: [],
+      featured_image: '',
+      faqs: [
+        { question: 'Do I need a visa?', answer: 'Most non-EU nationals need a Schengen visa. Apply at the embassy of your first entry country (France) well in advance.' },
+        { question: 'What languages are spoken?', answer: 'English-speaking guides provided. Local languages are French, Italian, and Spanish, but English is widely spoken in tourist areas.' },
+        { question: 'Is this suitable for families?', answer: 'Yes, this tour is family-friendly. However, some museums and sites may have age restrictions for children.' },
+      ],
+      frontend_tabs: [
+        { id: 'general', label: 'General', enabled: true, order: 1, content_type: 'general' },
+        { id: 'pricing', label: 'Pricing', enabled: true, order: 2, content_type: 'pricing' },
+        { id: 'itinerary', label: 'Itinerary', enabled: true, order: 3, content_type: 'itinerary' },
+        { id: 'included_excluded', label: 'Included/Excluded', enabled: true, order: 4, content_type: 'included_excluded' },
+        { id: 'gallery', label: 'Gallery', enabled: true, order: 5, content_type: 'gallery' },
+        { id: 'faqs', label: 'FAQs', enabled: true, order: 6, content_type: 'faqs' },
+      ],
+      availability_dates: [],
+      status: 'draft',
+      scheduled_publish_date: '',
+      scheduled_unpublish_date: '',
+      version: 1,
+      seasonal_auto_enable: false,
+      seasonal_enable_date: '',
+      seasonal_disable_date: '',
+      meta_title: 'European Grand Tour - 10 Days | Paris, Rome & Barcelona',
+      meta_description: 'Discover the best of Europe with our 10-day grand tour covering Paris, Rome, and Barcelona. Experience iconic landmarks, world-class cuisine, and rich history.',
+      meta_keywords: 'Europe tour, Paris, Rome, Barcelona, European travel, cultural tour',
+      price_types: [],
+    },
   ];
   
   const [formData, setFormData] = useState<TripFormData>({
@@ -309,7 +676,7 @@ const TripForm: React.FC = () => {
     video_url: '',
     virtual_tour_url: '',
     testimonials: [],
-    destination: '',
+    destinations: [], // Array of destination IDs
     starting_location: '',
     ending_location: '',
     countries: [],
@@ -327,7 +694,7 @@ const TripForm: React.FC = () => {
     best_season: '',
     peak_season: '',
     off_season: '',
-    activity_types: [],
+    activity_types: [], // Array of activity IDs
     difficulty_level: '',
     trip_category: '',
     trip_category_parent: '',
@@ -426,143 +793,228 @@ const TripForm: React.FC = () => {
     return travelerCategories.filter(cat => cat.status === 'active');
   }, [travelerCategories]);
 
+  // Fetch activities from API
+  const { data: activitiesData } = useQuery({
+    queryKey: ['activities-published'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/activities', { 
+          params: { 
+            per_page: 100,
+            status: 'publish' // Only get published activities
+          } 
+        });
+        return response.data || [];
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load activities', 'Failed to load activities'), 'error');
+        return [];
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
+  // Fetch destinations from API
+  const { data: destinationsData } = useQuery({
+    queryKey: ['destinations-published'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/destinations', { 
+          params: { 
+            per_page: 100,
+            status: 'publish' // Only get published destinations
+          } 
+        });
+        return response.data || [];
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load destinations', 'Failed to load destinations'), 'error');
+        return [];
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
   // Fetch trip data if editing
-  const { data: tripData, isLoading: isLoadingTrip } = useQuery({
+  const { data: tripData, isLoading: isLoadingTrip, error: tripError } = useQuery({
     queryKey: ['trip', tripId],
     queryFn: async () => {
       if (!tripId) return null;
-      // return await apiClient.get(`/trips/${tripId}`);
-      // Dummy data
-      return {
-        id: tripId,
-        title: 'Bali Beach Retreat - 7 Days',
-        slug: 'bali-beach-retreat-7-days',
-        description: 'Escape to paradise with our 7-day Bali beach retreat. Relax on pristine beaches, explore ancient temples, enjoy spa treatments, and experience the island\'s rich culture.',
-        short_description: 'Escape to paradise with our 7-day Bali beach retreat.',
-        highlights: ['Pristine beaches', 'Ancient temples', 'Spa treatments', 'Rich culture'],
-        trip_details: 'Detailed trip information...',
-        what_makes_special: 'This trip offers a perfect blend of relaxation and cultural immersion, with private beach access and exclusive temple visits.',
-        trip_story: 'Imagine waking up to the sound of waves, spending your days exploring ancient temples, and ending each evening with a traditional Balinese spa treatment. This is more than a vacation—it\'s a journey into the heart of Bali\'s rich culture and stunning natural beauty.',
-        video_url: '',
-        virtual_tour_url: '',
-        testimonials: ['Amazing experience!', 'Best trip ever!'],
-        destination: 'Bali, Indonesia',
-        starting_location: 'Denpasar Airport',
-        ending_location: 'Ubud Hotel',
-        countries: ['Indonesia'],
-        regions: ['Bali'],
-        latitude: '-8.3405',
-        longitude: '115.0920',
-        landmarks: ['Tanah Lot Temple', 'Ubud Monkey Forest', 'Tegallalang Rice Terrace'],
-        trip_type: 'multi_day',
-        duration_days: '7',
-        duration_nights: '6',
-        available_from: '',
-        available_to: '',
-        booking_window_days: '30',
-        seasonal_availability: '',
-        best_season: 'April to October',
-        peak_season: 'July to August',
-        off_season: 'November to March',
-        activity_types: [],
-        difficulty_level: 'beginner',
-        trip_category: 'beach',
-        trip_category_parent: 'beach',
-        trip_category_sub: 'relaxation',
-        tags: ['family-friendly', 'beach', 'relaxation'],
-        featured_priority: 'featured',
-        accommodation_type: '',
-        meal_plan: '',
-        accommodation_details: '',
-        transportation_included: true,
-        pickup_location: '',
-        dropoff_location: '',
-        transportation_details: '',
-        pricing_type: 'traveler_based',
-        original_price: '',
-        discounted_price: '',
-        price_types: [
-          { category_id: 1, original_price: '1250', discounted_price: '' },
-          { category_id: 2, original_price: '625', discounted_price: '' },
-          { category_id: 3, original_price: '0', discounted_price: '' },
-        ],
-        sale_price: '',
-        currency: 'USD',
-        deposit_amount: '',
-        deposit_percentage: '',
-        payment_terms: '',
-        group_pricing_enabled: false,
-        group_size_min: '',
-        group_discount_percentage: '',
-        max_travelers: '12',
-        min_travelers: '2',
-        booking_deadline: '',
-        cancellation_policy: 'Full refund 30 days before departure',
-        age_min: '',
-        age_max: '',
-        physical_requirements: '',
-        visa_requirements: '',
-        vaccination_requirements: '',
-        included_items: ['Accommodation', 'Breakfast', 'Airport transfers'],
-        excluded_items: ['Flights', 'Travel insurance'],
-        gallery_images: [],
-        featured_image: '',
-        faqs: [],
-        status: 'draft',
-        scheduled_publish_date: '',
-        scheduled_unpublish_date: '',
-        version: 1,
-        seasonal_auto_enable: false,
-        seasonal_enable_date: '',
-        seasonal_disable_date: '',
-        meta_title: '',
-        meta_description: '',
-        meta_keywords: '',
-      };
+      try {
+        console.log('Fetching trip data for ID:', tripId);
+        const response = await apiClient.get(`/trips/${tripId}`);
+        console.log('Trip API response:', response);
+        // WordPress REST API returns data directly, but check if it's wrapped
+        // Some endpoints return { data: {...} }, others return {...} directly
+        const tripData = response?.data || response;
+        console.log('Extracted trip data:', tripData);
+        return tripData;
+      } catch (error: any) {
+        console.error('Error loading trip:', error);
+        showToast(error?.message || __('Failed to load trip data', 'Failed to load trip data'), 'error');
+        throw error;
+      }
     },
     enabled: isEditMode && can('yatra_view_trips'),
   });
 
+
   // Load trip data into form when editing
   useEffect(() => {
+    console.log('useEffect triggered - tripData:', tripData, 'isEditMode:', isEditMode, 'tripId:', tripId);
     if (tripData && isEditMode) {
+      console.log('Loading trip data into form:', tripData);
+      // Helper to extract IDs from relationship objects
+      const extractIds = (items: any[]): number[] => {
+        if (!Array.isArray(items)) return [];
+        return items
+          .map((item: any) => {
+            if (typeof item === 'number') return item;
+            if (typeof item === 'string') return parseInt(item) || 0;
+            if (item && typeof item === 'object') {
+              return item.id || item.destination_id || item.activity_id || 0;
+            }
+            return 0;
+          })
+          .filter((id: number) => !isNaN(id) && id > 0);
+      };
+
+      // Helper to normalize highlights (can be array of strings or objects)
+      const normalizeHighlights = (highlights: any): string[] => {
+        if (!highlights) return [];
+        if (Array.isArray(highlights)) {
+          return highlights.map((h: any) => {
+            if (typeof h === 'string') return h;
+            if (h && typeof h === 'object') {
+              return h.highlight_text || h.text || h.title || String(h);
+            }
+            return String(h);
+          }).filter((h: string) => h.trim().length > 0);
+        }
+        if (typeof highlights === 'string') {
+          try {
+            const parsed = JSON.parse(highlights);
+            return normalizeHighlights(parsed);
+          } catch {
+            return [highlights];
+          }
+        }
+        return [];
+      };
+
+      // Helper to normalize gallery images
+      const normalizeGalleryImages = (images: any): string[] => {
+        if (!images) return [];
+        if (Array.isArray(images)) {
+          return images.map((img: any) => {
+            if (typeof img === 'string') return img;
+            if (img && typeof img === 'object') {
+              return img.image_url || img.url || img.src || String(img);
+            }
+            return String(img);
+          }).filter((img: string) => img.trim().length > 0);
+        }
+        if (typeof images === 'string') {
+          try {
+            const parsed = JSON.parse(images);
+            return normalizeGalleryImages(parsed);
+          } catch {
+            return [images];
+          }
+        }
+        return [];
+      };
+
+      // Helper to normalize FAQs
+      const normalizeFaqs = (faqs: any): FAQ[] => {
+        if (!faqs) return [];
+        if (Array.isArray(faqs)) {
+          return faqs.map((faq: any) => {
+            if (faq && typeof faq === 'object') {
+              return {
+                question: faq.question || faq.q || '',
+                answer: faq.answer || faq.a || '',
+              };
+            }
+            return { question: String(faq), answer: '' };
+          }).filter((faq: FAQ) => faq.question.trim().length > 0);
+        }
+        if (typeof faqs === 'string') {
+          try {
+            const parsed = JSON.parse(faqs);
+            return normalizeFaqs(parsed);
+          } catch {
+            return [];
+          }
+        }
+        return [];
+      };
+
+      // Helper to normalize itinerary days
+      const normalizeItineraryDays = (days: any): any[] => {
+        if (!days) return [];
+        if (Array.isArray(days)) return days;
+        if (typeof days === 'string') {
+          try {
+            const parsed = JSON.parse(days);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        }
+        return [];
+      };
+
+      // Helper to normalize availability dates
+      const normalizeAvailabilityDates = (dates: any): any[] => {
+        if (!dates) return [];
+        if (Array.isArray(dates)) return dates;
+        if (typeof dates === 'string') {
+          try {
+            const parsed = JSON.parse(dates);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        }
+        return [];
+      };
+
       setFormData({
         title: tripData.title || '',
         slug: tripData.slug || '',
         description: tripData.description || '',
-        highlights: tripData.highlights || [],
+        highlights: normalizeHighlights(tripData.highlights),
         trip_details: tripData.trip_details || '',
         short_description: tripData.short_description || '',
-        what_makes_special: (tripData as any).what_makes_special || '',
-        trip_story: (tripData as any).trip_story || '',
-        video_url: (tripData as any).video_url || '',
-        virtual_tour_url: (tripData as any).virtual_tour_url || '',
-        testimonials: (tripData as any).testimonials || [],
-        destination: tripData.destination || '',
+        what_makes_special: tripData.what_makes_special || '',
+        trip_story: tripData.trip_story || '',
+        video_url: tripData.video_url || '',
+        virtual_tour_url: tripData.virtual_tour_url || '',
+        testimonials: Array.isArray(tripData.testimonials) ? tripData.testimonials : [],
+        destinations: extractIds(tripData.destinations || []),
         starting_location: tripData.starting_location || '',
         ending_location: tripData.ending_location || '',
-        countries: tripData.countries || [],
-        regions: tripData.regions || [],
-        latitude: tripData.latitude || '',
-        longitude: tripData.longitude || '',
-        landmarks: (tripData as any).landmarks || [],
-        trip_type: (tripData.trip_type || (tripData.duration_days && parseInt(tripData.duration_days?.toString() || '0') === 1 ? 'single_day' : 'multi_day')) as 'single_day' | 'multi_day',
+        countries: Array.isArray(tripData.countries) ? tripData.countries : [],
+        regions: Array.isArray(tripData.regions) ? tripData.regions : [],
+        latitude: tripData.latitude?.toString() || '',
+        longitude: tripData.longitude?.toString() || '',
+        landmarks: Array.isArray(tripData.landmarks) ? tripData.landmarks : [],
+        trip_type: (tripData.trip_type || (tripData.duration_days && parseInt(tripData.duration_days?.toString() || '0') === 1 ? 'single_day' : 'multi_day')) as 'single_day' | 'multi_day' | 'flexible',
         duration_days: tripData.duration_days?.toString() || '',
         duration_nights: tripData.duration_nights?.toString() || '',
         available_from: tripData.available_from || '',
         available_to: tripData.available_to || '',
         booking_window_days: tripData.booking_window_days?.toString() || '',
         seasonal_availability: tripData.seasonal_availability || '',
-        best_season: (tripData as any).best_season || '',
-        peak_season: (tripData as any).peak_season || '',
-        off_season: (tripData as any).off_season || '',
-        activity_types: tripData.activity_types || [],
+        best_season: tripData.best_season || '',
+        peak_season: tripData.peak_season || '',
+        off_season: tripData.off_season || '',
+        activity_types: extractIds(tripData.activity_types || []),
         difficulty_level: tripData.difficulty_level || '',
         trip_category: tripData.trip_category || '',
-        trip_category_parent: (tripData as any).trip_category_parent || '',
-        trip_category_sub: (tripData as any).trip_category_sub || '',
-        tags: tripData.tags || [],
-        featured_priority: (tripData as any).featured_priority || 'none',
+        trip_category_parent: tripData.trip_category_parent || '',
+        trip_category_sub: tripData.trip_category_sub || '',
+        tags: Array.isArray(tripData.tags) ? tripData.tags : [],
+        featured_priority: tripData.featured_priority || 'none',
         accommodation_type: tripData.accommodation_type || '',
         meal_plan: tripData.meal_plan || '',
         accommodation_details: tripData.accommodation_details || '',
@@ -570,10 +1022,14 @@ const TripForm: React.FC = () => {
         pickup_location: tripData.pickup_location || '',
         dropoff_location: tripData.dropoff_location || '',
         transportation_details: tripData.transportation_details || '',
-        pricing_type: (tripData.pricing_type || (tripData.price_types && tripData.price_types.length > 0 ? 'traveler_based' : 'regular')) as 'regular' | 'traveler_based',
+        pricing_type: (tripData.pricing_type || (tripData.price_types && Array.isArray(tripData.price_types) && tripData.price_types.length > 0 ? 'traveler_based' : 'regular')) as 'regular' | 'traveler_based',
         original_price: tripData.original_price?.toString() || '',
         discounted_price: tripData.discounted_price?.toString() || '',
-        price_types: tripData.price_types || [],
+        price_types: Array.isArray(tripData.price_types) ? tripData.price_types.map((pt: any) => ({
+          category_id: pt.category_id || 0,
+          original_price: pt.original_price?.toString() || '',
+          discounted_price: pt.discounted_price?.toString() || '',
+        })) : [],
         sale_price: tripData.sale_price?.toString() || '',
         currency: tripData.currency || 'USD',
         deposit_amount: tripData.deposit_amount?.toString() || '',
@@ -591,13 +1047,13 @@ const TripForm: React.FC = () => {
         physical_requirements: tripData.physical_requirements || '',
         visa_requirements: tripData.visa_requirements || '',
         vaccination_requirements: tripData.vaccination_requirements || '',
-        included_items: tripData.included_items || [],
-        excluded_items: tripData.excluded_items || [],
-        itinerary_days: (tripData as any).itinerary_days || [],
-        gallery_images: tripData.gallery_images || [],
-        featured_image: tripData.featured_image || '',
-        faqs: tripData.faqs || [],
-        frontend_tabs: (tripData as any).frontend_tabs || [
+        included_items: normalizeAmenityItems(tripData.included_items),
+        excluded_items: normalizeAmenityItems(tripData.excluded_items),
+        itinerary_days: normalizeItineraryDays(tripData.itinerary_days),
+        gallery_images: normalizeGalleryImages(tripData.gallery_images),
+        featured_image: tripData.featured_image || tripData.featured_image_url || '',
+        faqs: normalizeFaqs(tripData.faqs),
+        frontend_tabs: Array.isArray(tripData.frontend_tabs) ? tripData.frontend_tabs : [
           { id: 'general', label: 'General', enabled: true, order: 1, content_type: 'general' },
           { id: 'pricing', label: 'Pricing', enabled: true, order: 2, content_type: 'pricing' },
           { id: 'itinerary', label: 'Itinerary', enabled: true, order: 3, content_type: 'itinerary' },
@@ -605,51 +1061,149 @@ const TripForm: React.FC = () => {
           { id: 'gallery', label: 'Gallery', enabled: true, order: 5, content_type: 'gallery' },
           { id: 'faqs', label: 'FAQs', enabled: true, order: 6, content_type: 'faqs' },
         ],
-        availability_dates: (tripData as any).availability_dates || [],
-        status: ((tripData as any).status || 'draft') as 'draft' | 'review' | 'approved' | 'published' | 'archived',
-        scheduled_publish_date: (tripData as any).scheduled_publish_date || '',
-        scheduled_unpublish_date: (tripData as any).scheduled_unpublish_date || '',
-        version: (tripData as any).version || 1,
-        seasonal_auto_enable: (tripData as any).seasonal_auto_enable || false,
-        seasonal_enable_date: (tripData as any).seasonal_enable_date || '',
-        seasonal_disable_date: (tripData as any).seasonal_disable_date || '',
+        availability_dates: normalizeAvailabilityDates(tripData.availability_dates),
+        status: (tripData.status || 'draft') as 'draft' | 'review' | 'approved' | 'published' | 'archived' | 'suspended',
+        scheduled_publish_date: tripData.scheduled_publish_date || '',
+        scheduled_unpublish_date: tripData.scheduled_unpublish_date || '',
+        version: tripData.version || 1,
+        seasonal_auto_enable: tripData.seasonal_auto_enable || false,
+        seasonal_enable_date: tripData.seasonal_enable_date || '',
+        seasonal_disable_date: tripData.seasonal_disable_date || '',
         meta_title: tripData.meta_title || '',
         meta_description: tripData.meta_description || '',
         meta_keywords: tripData.meta_keywords || '',
       });
-      setLastSaved(new Date());
+      console.log('Form data set successfully');
+    } else {
+      console.log('Not loading data - tripData:', tripData, 'isEditMode:', isEditMode);
     }
-  }, [tripData, isEditMode]);
+  }, [tripData, isEditMode, tripId]);
+
+  // Map errors to sections - also check for price_type errors
+  const getSectionErrors = (sectionId: SectionId): string[] => {
+    const errorMap: Record<SectionId, string[]> = {
+      'basic': ['title', 'slug', 'description', 'featured_image', 'trip_type', 'duration_days', 'duration_nights'],
+      'location': ['destinations', 'starting_location', 'ending_location'],
+      'duration': ['available_from', 'available_to', 'booking_window_days'],
+      'pricing': ['original_price', 'discounted_price', 'price_types', 'currency'],
+      'booking': ['min_travelers', 'max_travelers', 'age_min', 'age_max'],
+      'itinerary': ['itinerary_days'],
+      'included': ['included_items', 'excluded_items'],
+      'media': ['gallery_images', 'video_url', 'virtual_tour_url'], // Removed featured_image - it's in basic section
+      'categorization': ['trip_category', 'activity_types'],
+      'faqs': ['faqs'],
+      'seo': ['meta_title', 'meta_description'],
+      'advanced': [],
+    };
+    
+    const sectionFields = errorMap[sectionId] || [];
+    const fieldErrors = sectionFields.filter(field => errors[field]);
+    
+    // Also check for price_type errors (they have dynamic keys like price_type_0_original)
+    if (sectionId === 'pricing') {
+      const priceTypeErrors = Object.keys(errors).filter(key => key.startsWith('price_type_'));
+      return [...fieldErrors, ...priceTypeErrors];
+    }
+    
+    return fieldErrors;
+  };
 
   // Define sections - Organized in logical workflow order (First Things First)
   const essentialsSections: Section[] = [
-    // Step 1: Basic Information (Simplified - no tabs)
-    { id: 'basic', label: __('Basic Information', 'Basic Information'), icon: FileText, required: true, completed: !!(formData.title && formData.description && formData.featured_image) },
+    // Step 1: Basic Information (includes Trip Type & Duration)
+    { 
+      id: 'basic', 
+      label: __('Basic Information', 'Basic Information'), 
+      icon: FileText, 
+      required: true, 
+      completed: !!(formData.title && formData.description && formData.featured_image && formData.trip_type && formData.duration_days),
+      hasErrors: getSectionErrors('basic').length > 0,
+    },
     
     // Step 2: Location & Geography
-    { id: 'location', label: __('Location & Geography', 'Location & Geography'), icon: MapPin, required: true, completed: !!(formData.destination) },
+    { 
+      id: 'location', 
+      label: __('Location & Geography', 'Location & Geography'), 
+      icon: MapPin, 
+      required: true, 
+      completed: !!(formData.destinations.length > 0),
+      hasErrors: getSectionErrors('location').length > 0,
+    },
     
-    // Step 3: Duration & Schedule
-    { id: 'duration', label: __('Duration & Schedule', 'Duration & Schedule'), icon: Calendar, required: true, completed: !!(formData.duration_days && formData.trip_type) },
+    // Step 3: Schedule & Availability (renamed from Duration & Schedule)
+    { 
+      id: 'duration', 
+      label: __('Schedule & Availability', 'Schedule & Availability'), 
+      icon: Calendar, 
+      required: false, 
+      completed: !!(formData.available_from || formData.available_to),
+      hasErrors: getSectionErrors('duration').length > 0,
+    },
     
     // Step 4: Pricing & Payment
-    { id: 'pricing', label: __('Pricing & Payment', 'Pricing & Payment'), icon: DollarSign, required: true, completed: formData.pricing_type === 'regular' ? !!(formData.original_price && parseFloat(formData.original_price) > 0) : formData.price_types.some(pt => pt.original_price && parseFloat(pt.original_price) > 0) },
+    { 
+      id: 'pricing', 
+      label: __('Pricing & Payment', 'Pricing & Payment'), 
+      icon: DollarSign, 
+      required: true, 
+      completed: formData.pricing_type === 'regular' ? !!(formData.original_price && parseFloat(formData.original_price) > 0) : formData.price_types.some(pt => pt.original_price && parseFloat(pt.original_price) > 0),
+      hasErrors: getSectionErrors('pricing').length > 0,
+    },
     
-    // Step 5: Itinerary Builder (includes accommodation & transportation per day)
-    { id: 'itinerary', label: __('Itinerary Builder', 'Itinerary Builder'), icon: Calendar, required: true, completed: formData.itinerary_days.length > 0 },
+    // Step 5: Booking Requirements
+    { 
+      id: 'booking', 
+      label: __('Booking Requirements', 'Booking Requirements'), 
+      icon: Mail, 
+      required: true, 
+      completed: !!(formData.min_travelers && formData.max_travelers),
+      hasErrors: getSectionErrors('booking').length > 0,
+    },
     
-    // Step 6: What's Included/Excluded
-    { id: 'included', label: __('What\'s Included', 'What\'s Included'), icon: CheckSquare, required: true, completed: formData.included_items.length > 0 },
-    
-    // Step 7: Booking Requirements
-    { id: 'booking', label: __('Booking Requirements', 'Booking Requirements'), icon: Mail, required: true, completed: !!(formData.min_travelers && formData.max_travelers) },
+    // Step 6: Itinerary Builder (includes Included/Excluded, now optional)
+    { 
+      id: 'itinerary', 
+      label: __('Itinerary Builder', 'Itinerary Builder'), 
+      icon: Calendar, 
+      required: false, 
+      completed: formData.itinerary_days.length > 0 || formData.included_items.length > 0,
+      hasErrors: getSectionErrors('itinerary').length > 0,
+    },
   ];
 
   const marketingSections: Section[] = [
-    { id: 'media', label: __('Media & Content', 'Media & Content'), icon: Image, required: false, completed: formData.gallery_images.length > 0 || !!formData.video_url },
-    { id: 'categorization', label: __('Categorization & Tags', 'Categorization & Tags'), icon: Tag, required: false, completed: !!(formData.trip_category || formData.activity_types.length > 0 || formData.tags.length > 0) },
-    { id: 'faqs', label: __('FAQs', 'FAQs'), icon: HelpCircle, required: false, completed: formData.faqs.length > 0 },
-    { id: 'seo', label: __('SEO Settings', 'SEO Settings'), icon: Search, required: false, completed: !!(formData.meta_title && formData.meta_description) },
+    { 
+      id: 'media', 
+      label: __('Media & Content', 'Media & Content'), 
+      icon: Image, 
+      required: false, 
+      completed: formData.gallery_images.length > 0 || !!formData.video_url,
+      hasErrors: getSectionErrors('media').length > 0,
+    },
+    { 
+      id: 'categorization', 
+      label: __('Categorization & Tags', 'Categorization & Tags'), 
+      icon: Tag, 
+      required: false, 
+      completed: !!(formData.trip_category || formData.activity_types.length > 0 || formData.tags.length > 0),
+      hasErrors: getSectionErrors('categorization').length > 0,
+    },
+    { 
+      id: 'faqs', 
+      label: __('FAQs', 'FAQs'), 
+      icon: HelpCircle, 
+      required: false, 
+      completed: formData.faqs.length > 0,
+      hasErrors: getSectionErrors('faqs').length > 0,
+    },
+    { 
+      id: 'seo', 
+      label: __('SEO Settings', 'SEO Settings'), 
+      icon: Search, 
+      required: false, 
+      completed: !!(formData.meta_title && formData.meta_description),
+      hasErrors: getSectionErrors('seo').length > 0,
+    },
   ];
 
   // Calculate completion percentage
@@ -660,7 +1214,7 @@ const TripForm: React.FC = () => {
     : 0;
 
   // Get current step number and total steps for navigation
-  const allSections = [...essentialsSections, ...marketingSections, { id: 'advanced' as SectionId, label: __('Advanced', 'Advanced'), icon: Settings, required: false, completed: false }];
+  const allSections = [...essentialsSections, ...marketingSections, { id: 'advanced' as SectionId, label: __('Lifecycle', 'Lifecycle'), icon: Settings, required: false, completed: false }];
   const currentStepIndex = allSections.findIndex(s => s.id === currentSection);
   const currentStepNumber = currentStepIndex >= 0 ? currentStepIndex + 1 : 1;
   const totalSteps = allSections.length;
@@ -718,7 +1272,6 @@ const TripForm: React.FC = () => {
     if (errors.title) {
       setErrors(prev => ({ ...prev, title: '' }));
     }
-    autoSave();
   };
 
   const handleFieldChange = (field: keyof TripFormData, value: any) => {
@@ -726,7 +1279,6 @@ const TripForm: React.FC = () => {
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
-    autoSave();
   };
 
   const handleHighlightAdd = () => {
@@ -742,90 +1294,42 @@ const TripForm: React.FC = () => {
       }));
       setShowHighlightModal(false);
       setModalInput({ text: '', question: '', answer: '' });
-      autoSave();
     }
   };
 
   const handleHighlightRemove = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      highlights: prev.highlights.filter((_, i) => i !== index),
-    }));
-    autoSave();
-  };
-
-  const handleIncludedAdd = () => {
-    setShowIncludedModal(true);
-    setModalInput({ text: '', question: '', answer: '' });
-  };
-
-  const handleIncludedSave = () => {
-    if (modalInput.text && modalInput.text.trim()) {
       setFormData(prev => ({
         ...prev,
-        included_items: [...prev.included_items, modalInput.text.trim()],
+        highlights: prev.highlights.filter((_, i) => i !== index),
       }));
-      setShowIncludedModal(false);
-      setModalInput({ text: '', question: '', answer: '' });
-      autoSave();
-    }
   };
 
-  const handleIncludedRemove = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      included_items: prev.included_items.filter((_, i) => i !== index),
-    }));
-    autoSave();
-  };
-
-  const handleExcludedAdd = () => {
-    setShowExcludedModal(true);
-    setModalInput({ text: '', question: '', answer: '' });
-  };
-
-  const handleExcludedSave = () => {
-    if (modalInput.text && modalInput.text.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        excluded_items: [...prev.excluded_items, modalInput.text.trim()],
-      }));
-      setShowExcludedModal(false);
-      setModalInput({ text: '', question: '', answer: '' });
-      autoSave();
-    }
-  };
-
-  const handleExcludedRemove = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      excluded_items: prev.excluded_items.filter((_, i) => i !== index),
-    }));
-    autoSave();
-  };
+  // Included/Excluded handlers - will be integrated into ItinerarySection component
+  // Keeping for future integration when included/excluded are merged into itinerary section
+  // const handleIncludedAdd = () => { ... };
+  // const handleIncludedRemove = (index: number) => { ... };
+  // const handleExcludedAdd = () => { ... };
+  // const handleExcludedRemove = (index: number) => { ... };
 
   const handleFAQAdd = () => {
-    setFormData(prev => ({
-      ...prev,
-      faqs: [...prev.faqs, { question: '', answer: '' }],
-    }));
-    autoSave();
+      setFormData(prev => ({
+        ...prev,
+        faqs: [...prev.faqs, { question: '', answer: '' }],
+      }));
   };
 
   const handleFAQRemove = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      faqs: prev.faqs.filter((_, i) => i !== index),
-    }));
-    autoSave();
+      setFormData(prev => ({
+        ...prev,
+        faqs: prev.faqs.filter((_, i) => i !== index),
+      }));
   };
 
   const handleFAQChange = (index: number, field: 'question' | 'answer', value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      faqs: prev.faqs.map((faq, i) => i === index ? { ...faq, [field]: value } : faq),
-    }));
-    autoSave();
+      setFormData(prev => ({
+        ...prev,
+        faqs: prev.faqs.map((faq, i) => i === index ? { ...faq, [field]: value } : faq),
+      }));
   };
 
   const handleGalleryAdd = () => {
@@ -836,16 +1340,14 @@ const TripForm: React.FC = () => {
         ...prev,
         gallery_images: [...prev.gallery_images, imageUrl.trim()],
       }));
-      autoSave();
     }
   };
 
   const handleGalleryRemove = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      gallery_images: prev.gallery_images.filter((_, i) => i !== index),
-    }));
-    autoSave();
+      setFormData(prev => ({
+        ...prev,
+        gallery_images: prev.gallery_images.filter((_, i) => i !== index),
+      }));
   };
 
   const handlePriceTypeAdd = (categoryId: number) => {
@@ -857,7 +1359,6 @@ const TripForm: React.FC = () => {
       ...prev,
       price_types: [...prev.price_types, { category_id: categoryId, original_price: '', discounted_price: '' }],
     }));
-    autoSave();
   };
 
   const handlePriceTypeRemove = (categoryId: number) => {
@@ -865,7 +1366,6 @@ const TripForm: React.FC = () => {
       ...prev,
       price_types: prev.price_types.filter(pt => pt.category_id !== categoryId),
     }));
-    autoSave();
   };
 
   const handlePriceTypeChange = (categoryId: number, field: 'original_price' | 'discounted_price', value: string) => {
@@ -875,7 +1375,6 @@ const TripForm: React.FC = () => {
         pt.category_id === categoryId ? { ...pt, [field]: value } : pt
       ),
     }));
-    autoSave();
   };
 
   // Frontend Tabs Handlers
@@ -886,7 +1385,43 @@ const TripForm: React.FC = () => {
         tab.id === tabId ? { ...tab, enabled: !tab.enabled } : tab
       ),
     }));
-    autoSave();
+  };
+
+  // Handle dummy data fill
+  const handleFillDummyData = () => {
+    // Cycle through dummy data sets
+    const nextIndex = (dummyDataIndex + 1) % dummyTripsData.length;
+    setDummyDataIndex(nextIndex);
+    
+    const dummyData = dummyTripsData[nextIndex];
+    
+    // Populate form with dummy data
+    setFormData({
+      ...dummyData,
+      // Ensure arrays are properly set
+      destinations: dummyData.destinations || [],
+      activity_types: dummyData.activity_types || [],
+      price_types: dummyData.price_types || [],
+      included_items: dummyData.included_items || [],
+      excluded_items: dummyData.excluded_items || [],
+      highlights: dummyData.highlights || [],
+      faqs: dummyData.faqs || [],
+      gallery_images: dummyData.gallery_images || [],
+      itinerary_days: dummyData.itinerary_days || [],
+      tags: dummyData.tags || [],
+      testimonials: dummyData.testimonials || [],
+      countries: dummyData.countries || [],
+      regions: dummyData.regions || [],
+      landmarks: dummyData.landmarks || [],
+      availability_dates: dummyData.availability_dates || [],
+      frontend_tabs: dummyData.frontend_tabs || [],
+    });
+    
+    // Show toast notification
+    showToast(
+      __('Dummy data filled', 'Dummy data filled') + ` (${nextIndex + 1}/${dummyTripsData.length})`,
+      'success'
+    );
   };
 
   const handleTabLabelChange = (tabId: string, label: string) => {
@@ -896,7 +1431,6 @@ const TripForm: React.FC = () => {
         tab.id === tabId ? { ...tab, label } : tab
       ),
     }));
-    autoSave();
   };
 
   const handleTabMove = (tabId: string, direction: 'up' | 'down') => {
@@ -916,7 +1450,6 @@ const TripForm: React.FC = () => {
 
       return { ...prev, frontend_tabs: tabs };
     });
-    autoSave();
   };
 
   const handleTabRemove = (tabId: string) => {
@@ -926,7 +1459,6 @@ const TripForm: React.FC = () => {
         .filter(tab => tab.id !== tabId)
         .map((tab, i) => ({ ...tab, order: i + 1 })),
     }));
-    autoSave();
   };
 
   const handleTabAdd = () => {
@@ -946,7 +1478,6 @@ const TripForm: React.FC = () => {
         },
       ],
     }));
-    autoSave();
   };
 
   const handleTabContentTypeChange = (tabId: string, contentType: FrontendTab['content_type']) => {
@@ -956,7 +1487,6 @@ const TripForm: React.FC = () => {
         tab.id === tabId ? { ...tab, content_type: contentType } : tab
       ),
     }));
-    autoSave();
   };
 
   const handleTabCustomContentChange = (tabId: string, content: string) => {
@@ -966,7 +1496,6 @@ const TripForm: React.FC = () => {
         tab.id === tabId ? { ...tab, custom_content: content } : tab
       ),
     }));
-    autoSave();
   };
 
   // Itinerary handlers
@@ -983,7 +1512,6 @@ const TripForm: React.FC = () => {
       ...prev,
       itinerary_days: [...prev.itinerary_days, newDay],
     }));
-    autoSave();
   };
 
   const handleItineraryDayRemove = (day: number) => {
@@ -993,7 +1521,6 @@ const TripForm: React.FC = () => {
         .filter(d => d.day !== day)
         .map((d, idx) => ({ ...d, day: idx + 1 })),
     }));
-    autoSave();
   };
 
   const handleItineraryDayTitleChange = (day: number, title: string) => {
@@ -1003,7 +1530,6 @@ const TripForm: React.FC = () => {
         d.day === day ? { ...d, day_title: title } : d
       ),
     }));
-    autoSave();
   };
 
   const handleItineraryEntryAdd = (day: number) => {
@@ -1034,7 +1560,6 @@ const TripForm: React.FC = () => {
         d.day === day ? { ...d, entries: [...d.entries, newEntry] } : d
       ),
     }));
-    autoSave();
   };
 
   const handleItineraryEntryRemove = (day: number, entryId: string) => {
@@ -1044,7 +1569,6 @@ const TripForm: React.FC = () => {
         d.day === day ? { ...d, entries: d.entries.filter(e => e.id !== entryId) } : d
       ),
     }));
-    autoSave();
   };
 
   const handleItineraryEntryChange = (day: number, entryId: string, field: keyof ItineraryEntry, value: any) => {
@@ -1059,7 +1583,6 @@ const TripForm: React.FC = () => {
         } : d
       ),
     }));
-    autoSave();
   };
 
   const handleItineraryEntryMove = (day: number, entryId: string, direction: 'up' | 'down') => {
@@ -1084,7 +1607,6 @@ const TripForm: React.FC = () => {
         ),
       };
     });
-    autoSave();
   };
 
   const handleItineraryEntryDuplicate = (day: number, entryId: string) => {
@@ -1107,24 +1629,13 @@ const TripForm: React.FC = () => {
         ),
       };
     });
-    autoSave();
   };
 
-  // Auto-save functionality
-  const autoSave = () => {
-    if (isEditMode) {
-      setIsAutoSaving(true);
-      // Simulate auto-save
-      setTimeout(() => {
-        setLastSaved(new Date());
-        setIsAutoSaving(false);
-      }, 1000);
-    }
-  };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
+    // Basic Information - Required fields
     if (!formData.title.trim()) {
       newErrors.title = __('Title is required', 'Title is required');
     }
@@ -1139,6 +1650,15 @@ const TripForm: React.FC = () => {
       newErrors.description = __('Description is required', 'Description is required');
     }
 
+    if (!formData.featured_image) {
+      newErrors.featured_image = __('Featured image is required', 'Featured image is required');
+    }
+
+    // Trip Type & Duration (now in Basic Information)
+    if (!formData.trip_type) {
+      newErrors.trip_type = __('Trip type is required', 'Trip type is required');
+    }
+
     if (!formData.duration_days || parseInt(formData.duration_days) < 1) {
       newErrors.duration_days = __('Duration must be at least 1 day', 'Duration must be at least 1 day');
     }
@@ -1149,7 +1669,9 @@ const TripForm: React.FC = () => {
         newErrors.duration_nights = __('Nights cannot be negative. Use 0 for day trips.', 'Nights cannot be negative. Use 0 for day trips.');
       } else if (formData.duration_days) {
         const days = parseInt(formData.duration_days);
-        if (days === 1 && nights > 0) {
+        if (formData.trip_type === 'single_day' && nights > 0) {
+          newErrors.duration_nights = __('Single day trips should have 0 nights', 'Single day trips should have 0 nights');
+        } else if (days === 1 && nights > 0) {
           newErrors.duration_nights = __('Single day trips should have 0 nights', 'Single day trips should have 0 nights');
         } else if (days > 1 && nights >= days) {
           newErrors.duration_nights = __('Nights should be less than days (typically days - 1)', 'Nights should be less than days (typically days - 1)');
@@ -1157,6 +1679,12 @@ const TripForm: React.FC = () => {
       }
     }
 
+    // Location - Required fields
+    if (formData.destinations.length === 0) {
+      newErrors.destinations = __('At least one destination is required', 'At least one destination is required');
+    }
+
+    // Pricing, Payment & Booking - Required fields
     // Validate pricing based on pricing type
     if (formData.pricing_type === 'regular') {
       if (!formData.original_price || parseFloat(formData.original_price) <= 0) {
@@ -1184,6 +1712,35 @@ const TripForm: React.FC = () => {
       }
     }
 
+    // Booking Requirements (now merged into Pricing section)
+    if (!formData.min_travelers || parseInt(formData.min_travelers) < 1) {
+      newErrors.min_travelers = __('Minimum travelers is required and must be at least 1', 'Minimum travelers is required and must be at least 1');
+    }
+
+    if (!formData.max_travelers || parseInt(formData.max_travelers) < 1) {
+      newErrors.max_travelers = __('Maximum travelers is required and must be at least 1', 'Maximum travelers is required and must be at least 1');
+    }
+
+    if (formData.min_travelers && formData.max_travelers) {
+      const min = parseInt(formData.min_travelers);
+      const max = parseInt(formData.max_travelers);
+      if (!isNaN(min) && !isNaN(max) && min > max) {
+        newErrors.max_travelers = __('Maximum travelers must be greater than or equal to minimum travelers', 'Maximum travelers must be greater than or equal to minimum travelers');
+      }
+    }
+
+    // Age restrictions validation
+    if (formData.age_min && formData.age_max) {
+      const ageMin = parseInt(formData.age_min);
+      const ageMax = parseInt(formData.age_max);
+      if (!isNaN(ageMin) && !isNaN(ageMax) && ageMin > ageMax) {
+        newErrors.age_max = __('Maximum age must be greater than or equal to minimum age', 'Maximum age must be greater than or equal to minimum age');
+      }
+    }
+
+    // Itinerary is optional - no validation required
+    // Included/Excluded are optional - no validation required
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -1203,7 +1760,7 @@ const TripForm: React.FC = () => {
         video_url: data.video_url.trim(),
         virtual_tour_url: data.virtual_tour_url.trim(),
         testimonials: data.testimonials || [],
-        destination: data.destination.trim(),
+        destinations: data.destinations || [], // Array of destination IDs
         starting_location: data.starting_location.trim(),
         ending_location: data.ending_location.trim(),
         countries: data.countries || [],
@@ -1221,7 +1778,7 @@ const TripForm: React.FC = () => {
         best_season: data.best_season.trim(),
         peak_season: data.peak_season.trim(),
         off_season: data.off_season.trim(),
-        activity_types: data.activity_types || [],
+        activity_types: data.activity_types || [], // Array of activity IDs
         difficulty_level: data.difficulty_level || '',
         trip_category: data.trip_category || '',
         trip_category_parent: data.trip_category_parent || '',
@@ -1260,8 +1817,18 @@ const TripForm: React.FC = () => {
         physical_requirements: data.physical_requirements.trim(),
         visa_requirements: data.visa_requirements.trim(),
         vaccination_requirements: data.vaccination_requirements.trim(),
-        included_items: data.included_items || [],
-        excluded_items: data.excluded_items || [],
+        included_items: (data.included_items || [])
+          .map(item => ({
+            title: item.title?.trim() || '',
+            description: item.description?.trim() || '',
+          }))
+          .filter(item => item.title),
+        excluded_items: (data.excluded_items || [])
+          .map(item => ({
+            title: item.title?.trim() || '',
+            description: item.description?.trim() || '',
+          }))
+          .filter(item => item.title),
         itinerary_days: data.itinerary_days || [],
         gallery_images: data.gallery_images || [],
         featured_image: data.featured_image || '',
@@ -1286,7 +1853,7 @@ const TripForm: React.FC = () => {
           from_location: avail.from_location || null,
           to_location: avail.to_location || null,
         })),
-        status: data.status || 'draft',
+        status: data.status === 'published' ? 'published' : 'draft',
         scheduled_publish_date: data.scheduled_publish_date || null,
         scheduled_unpublish_date: data.scheduled_unpublish_date || null,
         version: data.version || 1,
@@ -1299,34 +1866,101 @@ const TripForm: React.FC = () => {
       };
 
       if (isEditMode && tripId) {
-        // return await apiClient.put(`/trips/${tripId}`, payload);
-        console.log('Updating trip:', tripId, payload);
-        return { success: true, id: tripId };
+        const response = await apiClient.put(`/trips/${tripId}`, payload);
+        return response.data || response;
       } else {
-        // return await apiClient.post('/trips', payload);
-        console.log('Creating trip:', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+        const response = await apiClient.post('/trips', payload);
+        return response.data || response;
       }
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
-      setLastSaved(new Date());
+      queryClient.invalidateQueries({ queryKey: ['trip', tripId] });
       setIsSubmitting(false);
       
-      if (variables.status === 'published') {
-        // Redirect to trips list after publishing
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=all`;
+      // Show success message - different for edit vs create mode
+      let successMessage: string;
+      if (isEditMode) {
+        // Edit mode: updating existing trip
+        successMessage = variables.status === 'published' 
+          ? __('Trip updated and published successfully', 'Trip updated and published successfully')
+          : __('Trip updated successfully', 'Trip updated successfully');
+      } else {
+        // Create mode: creating new trip
+        successMessage = variables.status === 'published' 
+          ? __('Trip created and published successfully', 'Trip created and published successfully')
+          : __('Trip saved as draft successfully', 'Trip saved as draft successfully');
       }
+      showToast(successMessage, 'success');
+      
+      if (variables.status === 'published') {
+        // Redirect to trips list after publishing (both create and edit)
+        setTimeout(() => {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=all`;
+        }, 1000);
+      } else if (!isEditMode && data?.id) {
+        // If creating new trip as draft, redirect to edit mode
+        setTimeout(() => {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${data.id}`;
+        }, 1000);
+      }
+      // If editing and saving as draft, stay on the same page (no redirect)
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving', 'An error occurred while saving');
+      const errorMessage = error?.response?.data?.message || error?.message || __('An error occurred while saving', 'An error occurred while saving');
+      showToast(errorMessage, 'error');
       setErrors({ submit: errorMessage });
       setIsSubmitting(false);
     },
   });
 
+  // Light validation for draft saves (only essential fields)
+  const validateDraft = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = __('Title is required', 'Title is required');
+    }
+
+    if (!formData.slug.trim()) {
+      newErrors.slug = __('Slug is required', 'Slug is required');
+    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
+      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Get sections with errors
+  const getSectionsWithErrors = (): Section[] => {
+    return [...essentialsSections, ...marketingSections].filter(s => s.hasErrors && s.required);
+  };
+
   const handleSaveDraft = async () => {
-    if (!validateForm()) {
+    if (!validateDraft()) {
+      const errorSections = getSectionsWithErrors();
+      if (errorSections.length > 0) {
+        const sectionNames = errorSections.map(s => s.label).join(', ');
+        showToast(
+          __('Please fix errors in:', 'Please fix errors in:') + ' ' + sectionNames,
+          'error'
+        );
+        // Switch to first section with errors
+        if (errorSections[0]) {
+          setCurrentSection(errorSections[0].id);
+        }
+      } else {
+        const firstError = Object.keys(errors)[0];
+        if (firstError) {
+          showToast(__('Please fix the form errors', 'Please fix the form errors'), 'error');
+          // Scroll to first error field
+          const errorElement = document.querySelector(`[name="${firstError}"], #${firstError}`);
+          if (errorElement) {
+            errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }
       return;
     }
     setIsSubmitting(true);
@@ -1335,6 +1969,28 @@ const TripForm: React.FC = () => {
 
   const handlePublish = async () => {
     if (!validateForm()) {
+      const errorSections = getSectionsWithErrors();
+      if (errorSections.length > 0) {
+        const sectionNames = errorSections.map(s => s.label).join(', ');
+        showToast(
+          __('Please fix required fields in:', 'Please fix required fields in:') + ' ' + sectionNames,
+          'error'
+        );
+        // Switch to first section with errors
+        if (errorSections[0]) {
+          setCurrentSection(errorSections[0].id);
+        }
+      } else {
+        const firstError = Object.keys(errors)[0];
+        if (firstError) {
+          showToast(__('Please fix all required fields before publishing', 'Please fix all required fields before publishing'), 'error');
+          // Scroll to first error field
+          const errorElement = document.querySelector(`[name="${firstError}"], #${firstError}`);
+          if (errorElement) {
+            errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }
       return;
     }
     setIsSubmitting(true);
@@ -1366,19 +2022,161 @@ const TripForm: React.FC = () => {
     setSelectedRevisionId(null);
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
+  // Debug logging
+  useEffect(() => {
+    console.log('Edit mode debug:', {
+      isEditMode,
+      tripId,
+      isLoadingTrip,
+      tripData: tripData ? 'Data exists' : 'No data',
+      tripError: tripError ? tripError.message : 'No error',
+      canView: can('yatra_view_trips'),
     });
-  };
+  }, [isEditMode, tripId, isLoadingTrip, tripData, tripError, can]);
 
+  // Skeleton loader for edit mode
   if (isEditMode && isLoadingTrip) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading trip...', 'Loading trip...')}</span>
+      <div className="h-screen flex flex-col bg-white dark:bg-gray-900">
+        {/* Header Skeleton */}
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4 min-w-0 flex-1">
+            <div className="min-w-0">
+              <div className="h-6 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+              <div className="flex items-center gap-3">
+                <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-9 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-9 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-9 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-9 w-36 bg-blue-200 dark:bg-blue-800 rounded animate-pulse" />
+          </div>
+        </div>
+
+        {/* Navigation Bar Skeleton */}
+        <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 px-4 py-2.5">
+          <div className="flex items-center justify-between gap-4">
+            <div className="h-9 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="flex-1 flex flex-col items-center gap-1 max-w-md mx-4">
+              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+              <div className="h-2.5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            </div>
+            <div className="h-9 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Sidebar Skeleton */}
+          <div className="w-80 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto">
+            <div className="p-5 pb-8 space-y-6">
+              {/* Essentials Section Skeleton */}
+              <div>
+                <div className="h-3.5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-3 px-1" />
+                <div className="space-y-0.5">
+                  {[...Array(8)].map((_, i) => (
+                    <div key={`essentials-${i}`} className="flex items-center gap-2 px-3 py-2.5 rounded-md">
+                      <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse flex-shrink-0" />
+                      <div className="h-4 flex-1 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Marketing Section Skeleton */}
+              <div>
+                <div className="h-3.5 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-3 px-1" />
+                <div className="space-y-0.5">
+                  {[...Array(9)].map((_, i) => (
+                    <div key={`marketing-${i}`} className="flex items-center gap-2 px-3 py-2.5 rounded-md">
+                      <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse flex-shrink-0" />
+                      <div className="h-4 flex-1 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Lifecycle Section Skeleton */}
+              <div>
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-md">
+                  <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse flex-shrink-0" />
+                  <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Form Area Skeleton */}
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="max-w-4xl mx-auto space-y-6">
+              {/* Section Header Skeleton */}
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="h-6 w-56 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </div>
+              <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-6" />
+
+              {/* Form Fields Skeleton */}
+              <Card>
+                <CardContent className="p-6 space-y-6">
+                  {/* Title Field */}
+                  <div className="space-y-2">
+                    <div className="h-3.5 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+
+                  {/* Slug Field */}
+                  <div className="space-y-2">
+                    <div className="h-3.5 w-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+
+                  {/* Description Field */}
+                  <div className="space-y-2">
+                    <div className="h-3.5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-32 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+
+                  {/* Featured Image Skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-3.5 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-48 w-full bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+                  </div>
+
+                  {/* Grid Fields Skeleton */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={`grid-${i}`} className="space-y-2">
+                        <div className="h-3.5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isEditMode && tripError) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8">
+        <AlertCircle className="w-8 h-8 text-red-500 mb-4" />
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{__('Error Loading Trip', 'Error Loading Trip')}</h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">
+          {tripError instanceof Error ? tripError.message : __('Failed to load trip data', 'Failed to load trip data')}
+        </p>
+        <Button onClick={() => window.location.reload()}>
+          {__('Reload Page', 'Reload Page')}
+        </Button>
       </div>
     );
   }
@@ -1610,19 +2408,27 @@ const TripForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('description', e.target.value)}
                       placeholder={__('Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...', 'Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...')}
                       rows={6}
-                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
+                      className={`flex w-full rounded-md border-2 px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors ${
+                        errors.description ? 'border-red-500 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                      } bg-white dark:bg-gray-800 dark:text-gray-100`}
                     />
                     <div className="mt-1.5 flex items-center justify-between">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {formData.description.length} {__('characters', 'characters')}
                       </span>
-                      {formData.description.length >= 150 && formData.description.length <= 500 && (
+                      {formData.description.length >= 150 && formData.description.length <= 500 && !errors.description && (
                         <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" />
                           {__('Great length!', 'Great length!')}
                         </span>
                       )}
                     </div>
+                    {errors.description && (
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.description}
+                      </p>
+                    )}
                   </div>
 
                   {/* Featured Image */}
@@ -1646,7 +2452,9 @@ const TripForm: React.FC = () => {
                     />
                     {formData.featured_image ? (
                       <div className="relative group">
-                        <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+                        <div className={`aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 ${
+                          errors.featured_image ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-gray-700'
+                        }`}>
                           <img src={formData.featured_image} alt={__('Featured Image', 'Featured Image')} className="w-full h-full object-cover" />
                         </div>
                         <button
@@ -1676,12 +2484,26 @@ const TripForm: React.FC = () => {
                             mediaUploader.open();
                           }
                         }}
-                        className="w-full aspect-video border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                        className={`w-full aspect-video border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-colors ${
+                          errors.featured_image 
+                            ? 'border-red-500 dark:border-red-600 bg-red-50 dark:bg-red-900/20' 
+                            : 'border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400'
+                        }`}
                       >
-                        <Upload className="w-10 h-10 text-gray-400 mb-2" />
-                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{__('Upload Featured Image', 'Upload Featured Image')}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-500 mt-1">{__('Recommended: 1200x800px', 'Recommended: 1200x800px')}</span>
+                        <Upload className={`w-10 h-10 mb-2 ${errors.featured_image ? 'text-red-400' : 'text-gray-400'}`} />
+                        <span className={`text-sm font-medium ${errors.featured_image ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                          {__('Upload Featured Image', 'Upload Featured Image')}
+                        </span>
+                        <span className={`text-xs mt-1 ${errors.featured_image ? 'text-red-500 dark:text-red-500' : 'text-gray-500 dark:text-gray-500'}`}>
+                          {__('Recommended: 1200x800px', 'Recommended: 1200x800px')}
+                        </span>
                       </button>
+                    )}
+                    {errors.featured_image && (
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.featured_image}
+                      </p>
                     )}
                   </div>
 
@@ -1734,6 +2556,187 @@ const TripForm: React.FC = () => {
                       </Button>
                     </CardContent>
                   </Card>
+
+                  {/* Trip Type & Duration - Moved from Duration section */}
+                  <div className="mt-6 space-y-4">
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{__('Trip Type & Duration', 'Trip Type & Duration')}</h3>
+                      
+                      {/* Trip Type */}
+                      <div className="mb-4">
+                        <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-3">
+                          {__('Trip Type', 'Trip Type')} <span className="text-red-500">*</span>
+                        </label>
+                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
+                          errors.trip_type ? 'mb-2' : ''
+                        }`}>
+                          <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                            formData.trip_type === 'single_day'
+                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                              : errors.trip_type
+                              ? 'border-red-500 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
+                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="trip_type"
+                              value="single_day"
+                              checked={formData.trip_type === 'single_day'}
+                              onChange={(e) => {
+                                handleFieldChange('trip_type', e.target.value);
+                                if (e.target.value === 'single_day') {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    duration_days: '1',
+                                    duration_nights: '0',
+                                  }));
+                                }
+                              }}
+                              className="sr-only"
+                            />
+                            <div className="flex flex-1">
+                              <div className="flex flex-col">
+                                <span className={`block text-sm font-semibold ${
+                                  formData.trip_type === 'single_day'
+                                    ? 'text-blue-900 dark:text-blue-300'
+                                    : 'text-gray-900 dark:text-white'
+                                }`}>
+                                  {__('Single Day Trip', 'Single Day Trip')}
+                                </span>
+                                <span className={`mt-1 flex items-center text-sm ${
+                                  formData.trip_type === 'single_day'
+                                    ? 'text-blue-700 dark:text-blue-400'
+                                    : 'text-gray-500 dark:text-gray-400'
+                                }`}>
+                                  {__('Trip completed within one day (no overnight stay)', 'Trip completed within one day (no overnight stay)')}
+                                </span>
+                              </div>
+                            </div>
+                            {formData.trip_type === 'single_day' && (
+                              <div className="absolute top-4 right-4">
+                                <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                              </div>
+                            )}
+                          </label>
+
+                          <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                            formData.trip_type === 'multi_day'
+                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                              : errors.trip_type
+                              ? 'border-red-500 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
+                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="trip_type"
+                              value="multi_day"
+                              checked={formData.trip_type === 'multi_day'}
+                              onChange={(e) => handleFieldChange('trip_type', e.target.value)}
+                              className="sr-only"
+                            />
+                            <div className="flex flex-1">
+                              <div className="flex flex-col">
+                                <span className={`block text-sm font-semibold ${
+                                  formData.trip_type === 'multi_day'
+                                    ? 'text-blue-900 dark:text-blue-300'
+                                    : 'text-gray-900 dark:text-white'
+                                }`}>
+                                  {__('Multi-Day Trip', 'Multi-Day Trip')}
+                                </span>
+                                <span className={`mt-1 flex items-center text-sm ${
+                                  formData.trip_type === 'multi_day'
+                                    ? 'text-blue-700 dark:text-blue-400'
+                                    : 'text-gray-500 dark:text-gray-400'
+                                }`}>
+                                  {__('Trip spans multiple days with overnight stays', 'Trip spans multiple days with overnight stays')}
+                                </span>
+                              </div>
+                            </div>
+                            {formData.trip_type === 'multi_day' && (
+                              <div className="absolute top-4 right-4">
+                                <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                              </div>
+                            )}
+                          </label>
+                        </div>
+                        {errors.trip_type && (
+                          <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" />
+                            {errors.trip_type}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Duration Days & Nights */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label htmlFor="duration_days" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                            {__('Duration (Days)', 'Duration (Days)')} <span className="text-red-500">*</span>
+                          </label>
+                          <Input
+                            id="duration_days"
+                            type="number"
+                            min="1"
+                            value={formData.duration_days}
+                            onChange={(e) => {
+                              const days = e.target.value;
+                              handleFieldChange('duration_days', days);
+                              // Auto-set nights based on trip type
+                              if (formData.trip_type === 'single_day') {
+                                setFormData(prev => ({ ...prev, duration_nights: '0' }));
+                              } else if (days && parseInt(days) > 1) {
+                                // For multi-day, typically nights = days - 1
+                                const nights = Math.max(0, parseInt(days) - 1).toString();
+                                setFormData(prev => ({ ...prev, duration_nights: nights }));
+                              }
+                            }}
+                            placeholder={formData.trip_type === 'single_day' ? '1' : __('e.g., 7', 'e.g., 7')}
+                            className={errors.duration_days ? 'border-red-500' : ''}
+                            disabled={formData.trip_type === 'single_day'}
+                          />
+                          <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                            {formData.trip_type === 'single_day' 
+                              ? __('Single day trips are always 1 day', 'Single day trips are always 1 day')
+                              : __('Enter the number of days for your trip', 'Enter the number of days for your trip')
+                            }
+                          </p>
+                          {errors.duration_days && (
+                            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" />
+                              {errors.duration_days}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <label htmlFor="duration_nights" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                            {__('Duration (Nights)', 'Duration (Nights)')}
+                          </label>
+                          <Input
+                            id="duration_nights"
+                            type="number"
+                            min="0"
+                            value={formData.duration_nights}
+                            onChange={(e) => handleFieldChange('duration_nights', e.target.value)}
+                            placeholder={formData.trip_type === 'single_day' ? '0' : __('e.g., 6', 'e.g., 6')}
+                            className={errors.duration_nights ? 'border-red-500' : ''}
+                            disabled={formData.trip_type === 'single_day'}
+                          />
+                          <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                            {formData.trip_type === 'single_day'
+                              ? __('Single day trips have 0 nights (no overnight stay)', 'Single day trips have 0 nights (no overnight stay)')
+                              : __('Enter the number of nights (typically days - 1)', 'Enter the number of nights (typically days - 1)')
+                            }
+                          </p>
+                          {errors.duration_nights && (
+                            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                              <AlertCircle className="w-4 h-4" />
+                              {errors.duration_nights}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
             </div>
           </div>
         );
@@ -1750,18 +2753,49 @@ const TripForm: React.FC = () => {
             </p>
 
             <div className="space-y-4">
-              {/* Destination */}
+              {/* Destinations - Multiple Selection */}
               <div>
-                <label htmlFor="destination" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Destination', 'Destination')} <span className="text-red-500">*</span>
+                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                  {__('Destinations', 'Destinations')} <span className="text-red-500">*</span>
                 </label>
-                <Input
-                  id="destination"
-                  type="text"
-                  value={formData.destination}
-                  onChange={(e) => handleFieldChange('destination', e.target.value)}
-                  placeholder={__('e.g., Bali, Indonesia', 'e.g., Bali, Indonesia')}
+                {destinationsData && destinationsData.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {destinationsData.map((destination: any) => (
+                      <label key={destination.id} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.destinations.some((id: number) => id === destination.id || id === Number(destination.id))}
+                          onChange={(e) => {
+                            const destId = Number(destination.id);
+                            if (e.target.checked) {
+                              handleFieldChange('destinations', [...formData.destinations, destId]);
+                            } else {
+                              handleFieldChange('destinations', formData.destinations.filter((id: number) => Number(id) !== destId));
+                            }
+                          }}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{destination.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {__('No destinations available. Please create destinations first.', 'No destinations available. Please create destinations first.')}
+                    </p>
+                  </div>
+                )}
+                <HelpText
+                  text={__('Select all destinations included in this trip', 'Select all destinations included in this trip')}
+                  className="mt-2"
                 />
+                {errors.destinations && (
+                  <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.destinations}
+                  </p>
+                )}
               </div>
 
               {/* Starting & Ending Locations */}
@@ -1891,175 +2925,13 @@ const TripForm: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <Calendar className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Duration & Schedule', 'Duration & Schedule')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Schedule & Availability', 'Schedule & Availability')}</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Define trip duration, type, and availability schedule', 'Define trip duration, type, and availability schedule')}
+              {__('Set when your trip is available for booking and any seasonal information', 'Set when your trip is available for booking and any seasonal information')}
             </p>
 
             <div className="space-y-4">
-              {/* Trip Type */}
-              <div>
-                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-3">
-                  {__('Trip Type', 'Trip Type')} <span className="text-red-500">*</span>
-                </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                    formData.trip_type === 'single_day'
-                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
-                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="trip_type"
-                      value="single_day"
-                      checked={formData.trip_type === 'single_day'}
-                      onChange={(e) => {
-                        handleFieldChange('trip_type', e.target.value);
-                        if (e.target.value === 'single_day') {
-                          setFormData(prev => ({
-                            ...prev,
-                            duration_days: '1',
-                            duration_nights: '0',
-                          }));
-                        }
-                      }}
-                      className="sr-only"
-                    />
-                    <div className="flex flex-1">
-                      <div className="flex flex-col">
-                        <span className={`block text-sm font-semibold ${
-                          formData.trip_type === 'single_day'
-                            ? 'text-blue-900 dark:text-blue-300'
-                            : 'text-gray-900 dark:text-white'
-                        }`}>
-                          {__('Single Day Trip', 'Single Day Trip')}
-                        </span>
-                        <span className={`mt-1 flex items-center text-sm ${
-                          formData.trip_type === 'single_day'
-                            ? 'text-blue-700 dark:text-blue-400'
-                            : 'text-gray-500 dark:text-gray-400'
-                        }`}>
-                          {__('Trip completed within one day (no overnight stay)', 'Trip completed within one day (no overnight stay)')}
-                        </span>
-                      </div>
-                    </div>
-                    {formData.trip_type === 'single_day' && (
-                      <div className="absolute top-4 right-4">
-                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
-                      </div>
-                    )}
-                  </label>
-
-                  <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
-                    formData.trip_type === 'multi_day'
-                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
-                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="trip_type"
-                      value="multi_day"
-                      checked={formData.trip_type === 'multi_day'}
-                      onChange={(e) => handleFieldChange('trip_type', e.target.value)}
-                      className="sr-only"
-                    />
-                    <div className="flex flex-1">
-                      <div className="flex flex-col">
-                        <span className={`block text-sm font-semibold ${
-                          formData.trip_type === 'multi_day'
-                            ? 'text-blue-900 dark:text-blue-300'
-                            : 'text-gray-900 dark:text-white'
-                        }`}>
-                          {__('Multi-Day Trip', 'Multi-Day Trip')}
-                        </span>
-                        <span className={`mt-1 flex items-center text-sm ${
-                          formData.trip_type === 'multi_day'
-                            ? 'text-blue-700 dark:text-blue-400'
-                            : 'text-gray-500 dark:text-gray-400'
-                        }`}>
-                          {__('Trip spans multiple days with overnight stays', 'Trip spans multiple days with overnight stays')}
-                        </span>
-                      </div>
-                    </div>
-                    {formData.trip_type === 'multi_day' && (
-                      <div className="absolute top-4 right-4">
-                        <div className="h-4 w-4 rounded-full bg-blue-600"></div>
-                      </div>
-                    )}
-                  </label>
-                </div>
-              </div>
-
-              {/* Duration Days & Nights */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="duration_days" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Duration (Days)', 'Duration (Days)')} <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    id="duration_days"
-                    type="number"
-                    min="1"
-                    value={formData.duration_days}
-                    onChange={(e) => {
-                      const days = e.target.value;
-                      handleFieldChange('duration_days', days);
-                      // Auto-set nights based on trip type
-                      if (formData.trip_type === 'single_day') {
-                        setFormData(prev => ({ ...prev, duration_nights: '0' }));
-                      } else if (days && parseInt(days) > 1) {
-                        // For multi-day, typically nights = days - 1
-                        const nights = Math.max(0, parseInt(days) - 1).toString();
-                        setFormData(prev => ({ ...prev, duration_nights: nights }));
-                      }
-                    }}
-                    placeholder={formData.trip_type === 'single_day' ? '1' : __('e.g., 7', 'e.g., 7')}
-                    className={errors.duration_days ? 'border-red-500' : ''}
-                    disabled={formData.trip_type === 'single_day'}
-                  />
-                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    {formData.trip_type === 'single_day' 
-                      ? __('Single day trips are always 1 day', 'Single day trips are always 1 day')
-                      : __('Enter the number of days for your trip', 'Enter the number of days for your trip')
-                    }
-                  </p>
-                  {errors.duration_days && (
-                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.duration_days}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="duration_nights" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Duration (Nights)', 'Duration (Nights)')}
-                  </label>
-                  <Input
-                    id="duration_nights"
-                    type="number"
-                    min="0"
-                    value={formData.duration_nights}
-                    onChange={(e) => handleFieldChange('duration_nights', e.target.value)}
-                    placeholder={formData.trip_type === 'single_day' ? '0' : __('e.g., 6', 'e.g., 6')}
-                    className={errors.duration_nights ? 'border-red-500' : ''}
-                    disabled={formData.trip_type === 'single_day'}
-                  />
-                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    {formData.trip_type === 'single_day'
-                      ? __('Single day trips have 0 nights (no overnight stay)', 'Single day trips have 0 nights (no overnight stay)')
-                      : __('Enter the number of nights (typically days - 1)', 'Enter the number of nights (typically days - 1)')
-                    }
-                  </p>
-                  {errors.duration_nights && (
-                    <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.duration_nights}
-                    </p>
-                  )}
-                </div>
-              </div>
-
               {/* Availability Dates */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -2248,32 +3120,33 @@ const TripForm: React.FC = () => {
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Activity Types', 'Activity Types')}
                 </label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {['Hiking', 'Swimming', 'Sightseeing', 'Photography', 'Wildlife Viewing', 'Cultural Tours', 'Adventure Sports', 'Relaxation'].map((activity) => (
-                    <label key={activity} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.activity_types.includes(activity.toLowerCase())}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData(prev => ({
-                              ...prev,
-                              activity_types: [...prev.activity_types, activity.toLowerCase()],
-                            }));
-                          } else {
-                            setFormData(prev => ({
-                              ...prev,
-                              activity_types: prev.activity_types.filter(a => a !== activity.toLowerCase()),
-                            }));
-                          }
-                          autoSave();
-                        }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{activity}</span>
-                    </label>
-                  ))}
-                </div>
+                {activitiesData && activitiesData.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {activitiesData.map((activity: any) => (
+                      <label key={activity.id} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.activity_types.includes(activity.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              handleFieldChange('activity_types', [...formData.activity_types, activity.id]);
+                            } else {
+                              handleFieldChange('activity_types', formData.activity_types.filter((id: number) => id !== activity.id));
+                            }
+                          }}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">{activity.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {__('No activities available. Please create activities first.', 'No activities available. Please create activities first.')}
+                    </p>
+                  </div>
+                )}
                 <HelpText
                   text={__('Select all activities included in this trip', 'Select all activities included in this trip')}
                   className="mt-2"
@@ -2344,12 +3217,24 @@ const TripForm: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleGalleryAdd}
-                      className="aspect-video border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg flex flex-col items-center justify-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                      className={`aspect-video border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-colors ${
+                        errors.gallery_images
+                          ? 'border-red-500 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
+                          : 'border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400'
+                      }`}
                     >
-                      <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{__('Add Image', 'Add Image')}</span>
+                      <Upload className={`w-8 h-8 mb-2 ${errors.gallery_images ? 'text-red-400' : 'text-gray-400'}`} />
+                      <span className={`text-sm ${errors.gallery_images ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>
+                        {__('Add Image', 'Add Image')}
+                      </span>
                     </button>
                   </div>
+                  {errors.gallery_images && (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.gallery_images}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
 
@@ -2375,8 +3260,14 @@ const TripForm: React.FC = () => {
                       value={formData.video_url}
                       onChange={(e) => handleFieldChange('video_url', e.target.value)}
                       placeholder="https://www.youtube.com/watch?v=..."
-                      className="font-mono text-xs"
+                      className={`font-mono text-xs ${errors.video_url ? 'border-red-500' : ''}`}
                     />
+                    {errors.video_url && (
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.video_url}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
@@ -2391,8 +3282,14 @@ const TripForm: React.FC = () => {
                       value={formData.virtual_tour_url}
                       onChange={(e) => handleFieldChange('virtual_tour_url', e.target.value)}
                       placeholder="https://..."
-                      className="font-mono text-xs"
+                      className={`font-mono text-xs ${errors.virtual_tour_url ? 'border-red-500' : ''}`}
                     />
+                    {errors.virtual_tour_url && (
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.virtual_tour_url}
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -3026,6 +3923,7 @@ const TripForm: React.FC = () => {
                   </div>
                 )}
               </div>
+
             </div>
           </div>
         );
@@ -3035,7 +3933,7 @@ const TripForm: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <Mail className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Settings & Requirements', 'Booking Settings & Requirements')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Requirements', 'Booking Requirements')}</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__('Configure booking limits, deadlines, and traveler requirements', 'Configure booking limits, deadlines, and traveler requirements')}
@@ -3056,7 +3954,14 @@ const TripForm: React.FC = () => {
                       min="1"
                       value={formData.min_travelers}
                       onChange={(e) => handleFieldChange('min_travelers', e.target.value)}
+                      className={errors.min_travelers ? 'border-red-500' : ''}
                     />
+                    {errors.min_travelers && (
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.min_travelers}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="max_travelers" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
@@ -3068,7 +3973,14 @@ const TripForm: React.FC = () => {
                       min="1"
                       value={formData.max_travelers}
                       onChange={(e) => handleFieldChange('max_travelers', e.target.value)}
+                      className={errors.max_travelers ? 'border-red-500' : ''}
                     />
+                    {errors.max_travelers && (
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.max_travelers}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -3088,7 +4000,14 @@ const TripForm: React.FC = () => {
                       value={formData.age_min}
                       onChange={(e) => handleFieldChange('age_min', e.target.value)}
                       placeholder={__('e.g., 18', 'e.g., 18')}
+                      className={errors.age_min ? 'border-red-500' : ''}
                     />
+                    {errors.age_min && (
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.age_min}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="age_max" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
@@ -3101,7 +4020,14 @@ const TripForm: React.FC = () => {
                       value={formData.age_max}
                       onChange={(e) => handleFieldChange('age_max', e.target.value)}
                       placeholder={__('e.g., 65', 'e.g., 65')}
+                      className={errors.age_max ? 'border-red-500' : ''}
                     />
+                    {errors.age_max && (
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.age_max}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -3125,7 +4051,7 @@ const TripForm: React.FC = () => {
                 </div>
               </div>
 
-              {/* Requirements */}
+              {/* Travel Requirements */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Travel Requirements', 'Travel Requirements')}</h3>
                 <div className="space-y-4">
@@ -3139,7 +4065,7 @@ const TripForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('physical_requirements', e.target.value)}
                       placeholder={__('e.g., Moderate fitness level required, ability to walk 5km per day', 'e.g., Moderate fitness level required, ability to walk 5km per day')}
                       rows={2}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
                   </div>
                   <div>
@@ -3152,7 +4078,7 @@ const TripForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('visa_requirements', e.target.value)}
                       placeholder={__('e.g., Valid passport required, visa on arrival available for most nationalities', 'e.g., Valid passport required, visa on arrival available for most nationalities')}
                       rows={2}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
                   </div>
                   <div>
@@ -3165,7 +4091,7 @@ const TripForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('vaccination_requirements', e.target.value)}
                       placeholder={__('e.g., Yellow fever vaccination required for entry', 'e.g., Yellow fever vaccination required for entry')}
                       rows={2}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
                   </div>
                 </div>
@@ -3184,7 +4110,7 @@ const TripForm: React.FC = () => {
                     onChange={(e) => handleFieldChange('cancellation_policy', e.target.value)}
                     placeholder={__('e.g., Full refund 30 days before departure, 50% refund 15-29 days before, no refund within 14 days', 'e.g., Full refund 30 days before departure, 50% refund 15-29 days before, no refund within 14 days')}
                     rows={3}
-                    className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                   />
                 </div>
               </div>
@@ -3206,122 +4132,19 @@ const TripForm: React.FC = () => {
             handleItineraryEntryChange={handleItineraryEntryChange}
             handleItineraryEntryMove={handleItineraryEntryMove}
             handleItineraryEntryDuplicate={handleItineraryEntryDuplicate}
-            autoSave={autoSave}
           />
         );
 
       case 'included':
+        // Redirect to itinerary section (included/excluded are now merged there)
+        if (currentSection === 'included') {
+          setTimeout(() => setCurrentSection('itinerary'), 100);
+        }
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <CheckSquare className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('What\'s Included & Excluded', 'What\'s Included & Excluded')}</h2>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('List what is included and excluded in your trip package', 'List what is included and excluded in your trip package')}
-            </p>
-
-            <div className="space-y-6">
-              {/* Included Items */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>{__('Included Items', 'Included Items')}</CardTitle>
-                  <CardDescription>
-                    {__('List everything that is included in the trip price. This helps set clear expectations and adds value.', 'List everything that is included in the trip price. This helps set clear expectations and adds value.')}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {formData.included_items.length > 0 ? (
-                    <div className="space-y-2">
-                      {formData.included_items.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                          <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                          <span className="flex-1 text-sm text-gray-900 dark:text-white">{item}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleIncludedRemove(index)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
-                      <CheckCircle2 className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        {__('No included items added yet', 'No included items added yet')}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">
-                        {__('Examples: Accommodation, Meals, Transportation, Guide, Entrance fees', 'Examples: Accommodation, Meals, Transportation, Guide, Entrance fees')}
-                      </p>
-                    </div>
-                  )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleIncludedAdd}
-                    className="w-full"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Included Item', 'Add Included Item')}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Excluded Items */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>{__('Excluded Items', 'Excluded Items')}</CardTitle>
-                  <CardDescription>
-                    {__('List what is NOT included. This prevents misunderstandings and helps customers plan their budget.', 'List what is NOT included. This prevents misunderstandings and helps customers plan their budget.')}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {formData.excluded_items.length > 0 ? (
-                    <div className="space-y-2">
-                      {formData.excluded_items.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                          <X className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0" />
-                          <span className="flex-1 text-sm text-gray-900 dark:text-white">{item}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleExcludedRemove(index)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
-                      <X className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        {__('No excluded items added yet', 'No excluded items added yet')}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">
-                        {__('Examples: Flights, Travel insurance, Personal expenses, Tips', 'Examples: Flights, Travel insurance, Personal expenses, Tips')}
-                      </p>
-                    </div>
-                  )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleExcludedAdd}
-                    className="w-full"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Excluded Item', 'Add Excluded Item')}
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            <Alert>
+              {__('What\'s Included & Excluded has been moved to the Itinerary Builder section.', 'What\'s Included & Excluded has been moved to the Itinerary Builder section.')}
+            </Alert>
           </div>
         );
 
@@ -3445,39 +4268,20 @@ const TripForm: React.FC = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-4">
               <Settings className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Status & Lifecycle Management', 'Status & Lifecycle Management')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Lifecycle Management', 'Lifecycle Management')}</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Manage trip status, publishing schedule, and lifecycle', 'Manage trip status, publishing schedule, and lifecycle')}
+              {__('Manage publishing schedule and lifecycle settings', 'Manage publishing schedule and lifecycle settings')}
             </p>
 
             <Card>
               <CardHeader>
-                <CardTitle>{__('Trip Status', 'Trip Status')}</CardTitle>
+                <CardTitle>{__('Version Control', 'Version Control')}</CardTitle>
                 <CardDescription>
-                  {__('Control the current state and visibility of your trip', 'Control the current state and visibility of your trip')}
+                  {__('Track changes and version history', 'Track changes and version history')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Status', 'Status')} <span className="text-red-500">*</span>
-                  </label>
-                  <Select
-                    value={formData.status}
-                    onChange={(e) => handleFieldChange('status', e.target.value as TripFormData['status'])}
-                  >
-                    <option value="draft">{__('Draft', 'Draft')}</option>
-                    <option value="review">{__('Review', 'Review')}</option>
-                    <option value="approved">{__('Approved', 'Approved')}</option>
-                    <option value="published">{__('Published', 'Published')}</option>
-                    <option value="archived">{__('Archived', 'Archived')}</option>
-                  </Select>
-                  <HelpText
-                    text={__('Draft: Work in progress | Review: Pending approval | Approved: Ready to publish | Published: Live on site | Archived: Hidden from public', 'Draft: Work in progress | Review: Pending approval | Approved: Ready to publish | Published: Live on site | Archived: Hidden from public')}
-                    className="mt-2"
-                  />
-                </div>
                 <div>
                   <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Version', 'Version')}
@@ -3758,6 +4562,8 @@ const TripForm: React.FC = () => {
                     ? 'text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800'
                     : formData.status === 'approved'
                     ? 'text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-800'
+                    : formData.status === 'suspended'
+                    ? 'text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-800'
                     : formData.status === 'archived'
                     ? 'text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-600'
                     : 'text-gray-700 dark:text-gray-300'
@@ -3767,21 +4573,9 @@ const TripForm: React.FC = () => {
                   : formData.status === 'review' ? __('Review', 'Review')
                   : formData.status === 'approved' ? __('Approved', 'Approved')
                   : formData.status === 'published' ? __('Published', 'Published')
+                  : formData.status === 'suspended' ? __('Suspended', 'Suspended')
                   : __('Archived', 'Archived')}
               </Badge>
-            {lastSaved && (
-              <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                <CheckCircle2 className="w-3.5 h-3.5 text-green-600 dark:text-green-400 flex-shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-green-700 dark:text-green-300 leading-tight">
-                    {__('Auto-saved', 'Auto-saved')}
-                  </span>
-                  <span className="text-[10px] text-green-600 dark:text-green-400 leading-tight">
-                    {formatTime(lastSaved)}
-                  </span>
-                </div>
-              </div>
-            )}
             </div>
           </div>
           
@@ -3813,6 +4607,20 @@ const TripForm: React.FC = () => {
               {__('Take a Tour', 'Take a Tour')}
             </Button>
           )}
+          
+          {/* Dummy Data Button */}
+          {!isEditMode && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleFillDummyData}
+              className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 flex-shrink-0"
+              title={__('Fill form with dummy data', 'Fill form with dummy data')}
+            >
+              <Database className="w-3.5 h-3.5 mr-1" />
+              {__('Fill Dummy Data', 'Fill Dummy Data')} ({dummyDataIndex + 1}/{dummyTripsData.length})
+            </Button>
+          )}
         </div>
 
         {/* Right Side - Action Buttons */}
@@ -3839,28 +4647,93 @@ const TripForm: React.FC = () => {
           <Button
             variant="outline"
             onClick={handleSaveDraft}
-            disabled={isSubmitting || isAutoSaving}
+            disabled={isSubmitting}
             className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
-            {isAutoSaving ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4 mr-2" />
-            )}
-            {__('Save Draft', 'Save Draft')}
+            <Save className="w-4 h-4 mr-2" />
+            {isEditMode ? __('Update Draft', 'Update Draft') : __('Save Draft', 'Save Draft')}
           </Button>
-          <Button
-            onClick={handlePublish}
-            disabled={isSubmitting || isAutoSaving}
-            className="bg-blue-600 hover:bg-blue-700 text-white border-0"
-          >
-            {isSubmitting ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
+          <div className="relative group">
+            <Button
+              onClick={handlePublish}
+              disabled={isSubmitting}
+              className="bg-blue-600 hover:bg-blue-700 text-white border-0 relative"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  {isEditMode ? __('Update Trip', 'Update Trip') : __('Publish Trip', 'Publish Trip')}
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </>
+              )}
+            </Button>
+            {!isSubmitting && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleFieldChange('status', 'draft');
+                      handleSaveDraft();
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <span>{__('Save as Draft', 'Save as Draft')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleFieldChange('status', 'review');
+                      handlePublish();
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <span>{__('Save for Review', 'Save for Review')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleFieldChange('status', 'approved');
+                      handlePublish();
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <span>{__('Mark as Approved', 'Mark as Approved')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePublish}
+                    className="w-full text-left px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium flex items-center gap-2"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>{isEditMode ? __('Update & Publish', 'Update & Publish') : __('Publish', 'Publish')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleFieldChange('status', 'suspended');
+                      handlePublish();
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <span>{__('Suspend', 'Suspend')}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleFieldChange('status', 'archived');
+                      handlePublish();
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                  >
+                    <span>{__('Archive', 'Archive')}</span>
+                  </button>
+                </div>
+              </div>
             )}
-            {__('Publish Trip', 'Publish Trip')}
-          </Button>
+          </div>
         </div>
       </div>
 
@@ -3951,6 +4824,8 @@ const TripForm: React.FC = () => {
                             ? 'bg-amber-500 text-white'
                             : section.completed
                             ? 'bg-green-500 text-white'
+                            : section.hasErrors
+                            ? 'bg-red-500 text-white'
                             : 'bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                         }`}>
                           {index + 1}
@@ -3960,10 +4835,15 @@ const TripForm: React.FC = () => {
                             ? 'text-blue-600 dark:text-blue-400' 
                             : isNext
                             ? 'text-amber-600 dark:text-amber-400'
+                            : section.hasErrors
+                            ? 'text-red-600 dark:text-red-400'
                             : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
                         }`} />
                       </div>
                       <span className="flex-1 min-w-0 break-words leading-snug">{section.label}</span>
+                      {section.hasErrors && (
+                        <span className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full" title={__('This section has errors', 'This section has errors')} />
+                      )}
                     </button>
                   );
                 })}
@@ -3990,15 +4870,22 @@ const TripForm: React.FC = () => {
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-all duration-200 text-left group border ${
                         isActive
                           ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm border-blue-200 dark:border-blue-800'
+                          : section.hasErrors
+                          ? 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10'
                           : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                     >
                       <Icon className={`w-4 h-4 flex-shrink-0 transition-colors ${
                         isActive 
                           ? 'text-blue-600 dark:text-blue-400' 
+                          : section.hasErrors
+                          ? 'text-red-600 dark:text-red-400'
                           : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
                       }`} />
                       <span className="flex-1 min-w-0 break-words leading-snug">{section.label}</span>
+                      {section.hasErrors && (
+                        <span className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full" title={__('This section has errors', 'This section has errors')} />
+                      )}
                     </button>
                   );
                 })}
@@ -4028,7 +4915,7 @@ const TripForm: React.FC = () => {
                       ? 'text-blue-600 dark:text-blue-400' 
                       : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
                   }`} />
-                  <span className="flex-1 min-w-0 break-words leading-snug">{__('Status & Lifecycle', 'Status & Lifecycle')}</span>
+                  <span className="flex-1 min-w-0 break-words leading-snug">{__('Lifecycle', 'Lifecycle')}</span>
                 </button>
               </div>
             </div>
@@ -4090,87 +4977,6 @@ const TripForm: React.FC = () => {
         </div>
       )}
 
-      {/* Included Item Modal */}
-      {showIncludedModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowIncludedModal(false)}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Included Item', 'Add Included Item')}</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Item', 'Item')} <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  type="text"
-                  value={modalInput.text}
-                  onChange={(e) => setModalInput({ ...modalInput, text: e.target.value })}
-                  placeholder={__('e.g., Accommodation, Meals, Transportation', 'e.g., Accommodation, Meals, Transportation')}
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleIncludedSave();
-                    }
-                  }}
-                />
-                <HelpText
-                  text={__('List what is included in the trip price. Be specific: "3-star hotel", "Breakfast and dinner", "Airport pickup"', 'List what is included in the trip price. Be specific: "3-star hotel", "Breakfast and dinner", "Airport pickup"')}
-                  className="mt-2"
-                />
-              </div>
-              <div className="flex items-center justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowIncludedModal(false)}>
-                  {__('Cancel', 'Cancel')}
-                </Button>
-                <Button onClick={handleIncludedSave} disabled={!modalInput.text.trim()}>
-                  {__('Add', 'Add')}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Excluded Item Modal */}
-      {showExcludedModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowExcludedModal(false)}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Excluded Item', 'Add Excluded Item')}</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Item', 'Item')} <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  type="text"
-                  value={modalInput.text}
-                  onChange={(e) => setModalInput({ ...modalInput, text: e.target.value })}
-                  placeholder={__('e.g., Flights, Travel insurance, Personal expenses', 'e.g., Flights, Travel insurance, Personal expenses')}
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleExcludedSave();
-                    }
-                  }}
-                />
-                <HelpText
-                  text={__('List what is NOT included. This helps set clear expectations. Examples: "International flights", "Travel insurance", "Tips and gratuities"', 'List what is NOT included. This helps set clear expectations. Examples: "International flights", "Travel insurance", "Tips and gratuities"')}
-                  className="mt-2"
-                />
-              </div>
-              <div className="flex items-center justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowExcludedModal(false)}>
-                  {__('Cancel', 'Cancel')}
-                </Button>
-                <Button onClick={handleExcludedSave} disabled={!modalInput.text.trim()}>
-                  {__('Add', 'Add')}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Revisions Dialog */}
       {showRevisionsDialog && (

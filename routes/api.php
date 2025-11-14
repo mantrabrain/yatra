@@ -23,6 +23,7 @@ use Yatra\Controllers\ItemTypeController;
 use Yatra\Controllers\ItemController;
 use Yatra\Controllers\DiscountController;
 use Yatra\Controllers\SettingsController;
+use Yatra\Controllers\AvailabilityController;
 
 // Register Trip routes
 if (class_exists('Yatra\Controllers\TripController')) {
@@ -185,6 +186,28 @@ if (class_exists('Yatra\Controllers\SettingsController')) {
     } catch (\Exception $e) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Yatra: Failed to register Settings routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
+
+// Register Availability routes
+if (class_exists('Yatra\Controllers\AvailabilityController')) {
+    try {
+        $availability_controller = new AvailabilityController();
+        $availability_controller->register_routes();
+        
+        // Debug: Verify route was registered
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $availability_routes = array_filter($routes, function($key) {
+                return strpos($key, '/availability') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Availability routes registered: ' . print_r(array_keys($availability_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Availability routes: ' . $e->getMessage());
             error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
         }
     }

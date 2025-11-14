@@ -38,17 +38,37 @@ abstract class BaseRepository
     /**
      * Find a record by ID
      */
-    public function find(int $id): ?\stdClass
+    public function find(int $id, bool $includeDeleted = false): ?\stdClass
     {
         $table = esc_sql($this->table);
+        $query = "SELECT * FROM `{$table}` WHERE id = %d";
+        
+        if (!$includeDeleted && $this->hasSoftDelete()) {
+            $query .= " AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')";
+        }
+        
         $result = $this->wpdb->get_row(
-            $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE id = %d",
-                $id
-            )
+            $this->wpdb->prepare($query, $id)
         );
 
         return $result ?: null;
+    }
+
+    /**
+     * Check if table has soft delete column
+     */
+    protected function hasSoftDelete(): bool
+    {
+        // Check if deleted_at column exists
+        $table = esc_sql($this->table);
+        $column = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+             WHERE TABLE_SCHEMA = DATABASE() 
+             AND TABLE_NAME = '{$table}' 
+             AND COLUMN_NAME = 'deleted_at'"
+        );
+        
+        return (int) $column > 0;
     }
 
     /**

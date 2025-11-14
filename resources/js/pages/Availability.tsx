@@ -36,6 +36,8 @@ import { Badge } from '../components/ui/badge';
 import { Alert } from '../components/ui/alert';
 import { useNavigate } from '../hooks/useNavigate';
 import { AvailabilityCalendar } from '../components/availability/AvailabilityCalendar';
+import { apiClient } from '../lib/api';
+import { useToast } from '../components/ui/toast';
 
 interface Trip {
   id: number;
@@ -62,7 +64,7 @@ interface AvailabilityDate {
   original_price: string;
   discounted_price: string;
   discount_percentage: string;
-  status: 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked';
+  status: 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked' | 'cancelled';
   from_location?: string;
   to_location?: string;
   is_blocked?: boolean; // Blocked for maintenance/holidays
@@ -76,6 +78,7 @@ interface AvailabilityDate {
 const Availability: React.FC = () => {
   const { navigate } = useNavigate();
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   
   // Trip selection
   const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
@@ -102,135 +105,66 @@ const Availability: React.FC = () => {
   const { data: tripsData } = useQuery({
     queryKey: ['trips', 'all'],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/trips', { params: { per_page: 100, status: 'published' } });
-      // Dummy data
+      const response = await apiClient.get('/trips', { params: { per_page: 100, status: 'published' } });
       return {
-        trips: [
-          { id: 1, title: 'Everest Base Camp Trek', slug: 'everest-base-camp-trek', currency: 'USD', starting_location: 'Kathmandu', ending_location: 'Kathmandu', trip_type: 'multi_day' },
-          { id: 2, title: 'Annapurna Circuit Adventure', slug: 'annapurna-circuit-adventure', currency: 'USD', starting_location: 'Pokhara', ending_location: 'Pokhara', trip_type: 'multi_day' },
-          { id: 3, title: 'Golden Triangle Tour', slug: 'golden-triangle-tour', currency: 'USD', starting_location: 'Delhi', ending_location: 'Delhi', trip_type: 'multi_day' },
-          { id: 4, title: 'Bhutan Cultural Journey', slug: 'bhutan-cultural-journey', currency: 'USD', starting_location: 'Paro', ending_location: 'Paro', trip_type: 'multi_day' },
-          { id: 9, title: 'Kathmandu City Tour', slug: 'kathmandu-city-tour', currency: 'USD', starting_location: 'Kathmandu', ending_location: 'Kathmandu', trip_type: 'single_day' },
-        ] as Trip[]
+        trips: (response?.data || []).map((trip: any) => ({
+          id: trip.id,
+          title: trip.title,
+          slug: trip.slug,
+          currency: trip.currency || 'USD',
+          starting_location: trip.starting_location,
+          ending_location: trip.ending_location,
+          trip_type: trip.trip_type || 'multi_day',
+        })) as Trip[]
       };
     },
   });
 
   // Fetch availability dates for selected trip
   const { data: availabilityData, isLoading } = useQuery({
-    queryKey: ['availability', selectedTripId, statusFilter, monthFilter, page],
+    queryKey: ['availability', selectedTripId, statusFilter, monthFilter, page, searchTerm],
     queryFn: async () => {
       if (!selectedTripId) return { dates: [], total: 0 };
       
-      // return await apiClient.get(`/yatra/v1/trips/${selectedTripId}/availability`, { params: { status: statusFilter, month: monthFilter, page, per_page: perPage } });
-      // Dummy data
-      const selectedTrip = tripsData?.trips.find(t => t.id === selectedTripId);
-      const isSingleDay = selectedTrip?.trip_type === 'single_day';
-      const today = new Date();
-      const dates: AvailabilityDate[] = [];
+      const response = await apiClient.get('/availability', { 
+        params: { 
+          trip_id: selectedTripId,
+          status: statusFilter !== 'all' ? statusFilter : undefined,
+          month: monthFilter !== 'all' ? monthFilter : undefined,
+          search: searchTerm || undefined,
+          page,
+          per_page: 50,
+        } 
+      });
       
-      if (isSingleDay) {
-        // For single-day trips, generate 12 different time slots on the same date
-        const baseDate = today.toISOString().split('T')[0];
-        const timeSlots = [
-          { dep: '08:00', arr: '12:00' },
-          { dep: '09:00', arr: '13:00' },
-          { dep: '10:00', arr: '14:00' },
-          { dep: '11:00', arr: '15:00' },
-          { dep: '12:00', arr: '16:00' },
-          { dep: '13:00', arr: '17:00' },
-          { dep: '14:00', arr: '18:00' },
-          { dep: '15:00', arr: '19:00' },
-          { dep: '16:00', arr: '20:00' },
-          { dep: '17:00', arr: '21:00' },
-          { dep: '18:00', arr: '22:00' },
-          { dep: '19:00', arr: '23:00' },
-        ];
-        
-        for (let i = 0; i < 12; i++) {
-          const originalPrice = 150 + (i * 10);
-          const discountedPrice = i % 3 === 0 ? originalPrice * 0.9 : originalPrice;
-          const discount = i % 3 === 0 ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100) : 0;
-          
-          // Calculate inventory data
-          const totalSeats = 20;
-          const bookedSeats = i % 4 === 0 ? 15 : i % 4 === 1 ? 5 : i % 4 === 2 ? 18 : 20;
-          const availableSeats = totalSeats - bookedSeats;
-          const waitlistCount = bookedSeats >= totalSeats ? (i % 3) + 1 : 0;
-          const isBlocked = i === 11; // Last one is blocked
-          const status = isBlocked ? 'blocked' : (i % 4 === 0 ? 'limited' : i % 4 === 1 ? 'available' : i % 4 === 2 ? 'sold_out' : 'closed');
-          
-          dates.push({
-            id: `avail_${i + 1}`,
-            trip_id: selectedTripId,
-            departure_date: baseDate,
-            departure_time: timeSlots[i].dep,
-            arrival_date: baseDate,
-            arrival_time: timeSlots[i].arr,
-            total_seats: totalSeats,
-            booked_seats: bookedSeats,
-            available_seats: availableSeats,
-            waitlist_count: waitlistCount,
-            seats_remaining: availableSeats > 10 ? '10+' : availableSeats.toString(),
-            original_price: originalPrice.toString(),
-            discounted_price: discountedPrice.toString(),
-            discount_percentage: discount.toString(),
-            status: status as any,
-            is_blocked: isBlocked,
-            block_reason: isBlocked ? 'Maintenance' : undefined,
-            alert_threshold: 5,
-            last_synced_at: new Date().toISOString(),
-            from_location: selectedTrip?.starting_location || '',
-            to_location: selectedTrip?.ending_location || '',
-          });
-        }
-      } else {
-        // For multi-day trips, generate sample dates for the next 6 months
-        for (let i = 0; i < 12; i++) {
-          const departureDate = new Date(today);
-          departureDate.setMonth(today.getMonth() + i);
-          departureDate.setDate(15 + (i % 7)); // Vary the day
-          
-          const arrivalDate = new Date(departureDate);
-          arrivalDate.setDate(departureDate.getDate() + 10);
-          
-          const originalPrice = 1200 + (i * 50);
-          const discountedPrice = i % 3 === 0 ? originalPrice * 0.9 : originalPrice;
-          const discount = i % 3 === 0 ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100) : 0;
-          
-          // Calculate inventory data
-          const totalSeats = 15;
-          const bookedSeats = i % 4 === 0 ? 10 : i % 4 === 1 ? 3 : i % 4 === 2 ? 13 : 15;
-          const availableSeats = totalSeats - bookedSeats;
-          const waitlistCount = bookedSeats >= totalSeats ? (i % 2) + 2 : 0;
-          const isBlocked = i === 5; // One date is blocked
-          const status = isBlocked ? 'blocked' : (i % 4 === 0 ? 'limited' : i % 4 === 1 ? 'available' : i % 4 === 2 ? 'sold_out' : 'closed');
-          
-          dates.push({
-            id: `avail_${i + 1}`,
-            trip_id: selectedTripId,
-            departure_date: departureDate.toISOString().split('T')[0],
-            arrival_date: arrivalDate.toISOString().split('T')[0],
-            total_seats: totalSeats,
-            booked_seats: bookedSeats,
-            available_seats: availableSeats,
-            waitlist_count: waitlistCount,
-            seats_remaining: availableSeats > 10 ? '10+' : availableSeats.toString(),
-            original_price: originalPrice.toString(),
-            discounted_price: discountedPrice.toString(),
-            discount_percentage: discount.toString(),
-            status: status as any,
-            is_blocked: isBlocked,
-            block_reason: isBlocked ? 'Holiday' : undefined,
-            alert_threshold: 5,
-            last_synced_at: new Date().toISOString(),
-            from_location: selectedTrip?.starting_location || '',
-            to_location: selectedTrip?.ending_location || '',
-          });
-        }
-      }
-      
-      return { dates, total: dates.length };
+      return {
+        dates: (response?.dates || []).map((date: any) => ({
+          id: date.id.toString(),
+          trip_id: date.trip_id,
+          departure_date: date.departure_date,
+          departure_time: date.departure_time,
+          arrival_date: date.arrival_date || date.departure_date,
+          arrival_time: date.arrival_time,
+          total_seats: date.total_seats || date.seats_total || 0,
+          booked_seats: date.booked_seats || (date.total_seats || date.seats_total) - (date.available_seats || date.seats_available || 0),
+          available_seats: date.available_seats || date.seats_available || 0,
+          waitlist_count: date.waitlist_count || date.seats_waitlist || 0,
+          seats_remaining: (date.available_seats || date.seats_available || 0) > 10 ? '10+' : (date.available_seats || date.seats_available || 0).toString(),
+          original_price: date.original_price?.toString() || '0',
+          discounted_price: date.discounted_price?.toString() || date.original_price?.toString() || '0',
+          discount_percentage: date.discount_percentage?.toString() || '0',
+          status: date.status || 'available',
+          is_blocked: date.is_blocked || date.status === 'blocked',
+          block_reason: date.block_reason,
+          alert_threshold: date.alert_threshold || 5,
+          last_synced_at: date.last_synced_at || date.updated_at,
+          from_location: date.from_location,
+          to_location: date.to_location,
+          created_at: date.created_at,
+          updated_at: date.updated_at,
+        })) as AvailabilityDate[],
+        total: response?.total || 0,
+      };
     },
     enabled: !!selectedTripId,
   });
@@ -238,12 +172,14 @@ const Availability: React.FC = () => {
   // Delete availability date
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      // return await apiClient.delete(`/yatra/v1/availability/${id}`);
-      console.log('Deleting availability:', id);
-      return { success: true };
+      return await apiClient.delete(`/availability/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['availability'] });
+      showToast(__('Availability date deleted successfully', 'Availability date deleted successfully'), 'success');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete availability date', 'Failed to delete availability date'), 'error');
     },
   });
 
@@ -303,13 +239,13 @@ const Availability: React.FC = () => {
   const handleSync = async () => {
     setIsSyncing(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // return await apiClient.post(`/yatra/v1/trips/${selectedTripId}/availability/sync`);
-      queryClient.invalidateQueries({ queryKey: ['availability'] });
+      // Refresh availability data
+      await queryClient.invalidateQueries({ queryKey: ['availability'] });
       setLastSyncTime(new Date());
+      showToast(__('Availability data synced successfully', 'Availability data synced successfully'), 'success');
     } catch (error) {
       console.error('Sync failed:', error);
+      showToast(__('Failed to sync availability data', 'Failed to sync availability data'), 'error');
     } finally {
       setIsSyncing(false);
     }
@@ -742,9 +678,68 @@ const Availability: React.FC = () => {
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">{__('Loading availability dates...', 'Loading availability dates...')}</p>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{selectedTrip?.trip_type === 'single_day' ? __('Departure Time', 'Departure Time') : __('Departure', 'Departure')}</TableHead>
+                        <TableHead>{selectedTrip?.trip_type === 'single_day' ? __('Arrival Time', 'Arrival Time') : __('Arrival', 'Arrival')}</TableHead>
+                        <TableHead>{__('From/To', 'From/To')}</TableHead>
+                        <TableHead className="text-center">{__('Capacity', 'Capacity')}</TableHead>
+                        <TableHead className="text-center">{__('Booked', 'Booked')}</TableHead>
+                        <TableHead className="text-center">{__('Available', 'Available')}</TableHead>
+                        <TableHead className="text-center">{__('Waitlist', 'Waitlist')}</TableHead>
+                        <TableHead>{__('Price', 'Price')}</TableHead>
+                        <TableHead>{__('Status', 'Status')}</TableHead>
+                        <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...Array(10)].map((_, index) => (
+                        <TableRow key={`skeleton-${index}`}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div>
+                                <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                                <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          </TableCell>
+                          <TableCell>
+                            <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               ) : filteredDates.length === 0 ? (
                 <div className="text-center py-12">

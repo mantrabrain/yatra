@@ -153,6 +153,9 @@ class Bootstrap
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log('Yatra: Database tables created automatically');
             }
+        } elseif ($trips_exists) {
+            // If trips table exists, update it to add any missing columns
+            Database::updateTables();
         }
     }
 

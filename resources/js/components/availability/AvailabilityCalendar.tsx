@@ -22,7 +22,7 @@ interface AvailabilityDate {
   booked_seats: number;
   available_seats: number;
   waitlist_count: number;
-  status: 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked';
+  status: 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked' | 'cancelled';
   is_blocked?: boolean;
   block_reason?: string;
   alert_threshold?: number;
