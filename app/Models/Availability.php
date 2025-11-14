@@ -49,6 +49,10 @@ class Availability
                 // Handle boolean conversion
                 if ($key === 'is_blocked' && is_string($value)) {
                     $availability->$key = in_array(strtolower($value), ['1', 'true', 'yes'], true);
+                } elseif ($key === 'id') {
+                    $availability->$key = (int) $value;
+                } elseif ($key === 'trip_id') {
+                    $availability->$key = (int) $value;
                 } elseif (in_array($key, ['seats_total', 'seats_available', 'seats_reserved', 'seats_waitlist', 'cutoff_hours', 'alert_threshold'], true)) {
                     $availability->$key = (int) $value;
                 } elseif (in_array($key, ['original_price', 'discounted_price', 'discount_percentage'], true)) {

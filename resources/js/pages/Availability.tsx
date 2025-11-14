@@ -4,7 +4,7 @@
  * Allows adding/editing dates for trips without modifying the trip itself
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   CalendarDays, 
@@ -29,6 +29,7 @@ import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { SearchableSelect } from '../components/ui/searchable-select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
@@ -80,8 +81,47 @@ const Availability: React.FC = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   
-  // Trip selection
-  const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
+  // Get trip_id from URL on mount and when URL changes
+  const [urlKey, setUrlKey] = useState(0);
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setUrlKey(prev => prev + 1);
+    };
+
+    // Listen for popstate (back/forward button)
+    window.addEventListener('popstate', handleLocationChange);
+    
+    // Also check periodically (fallback for direct navigation)
+    const interval = setInterval(() => {
+      const currentSearch = window.location.search;
+      if (currentSearch !== (window as any).__lastAvailabilitySearch) {
+        (window as any).__lastAvailabilitySearch = currentSearch;
+        handleLocationChange();
+      }
+    }, 100);
+
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Read trip_id from URL
+  const tripIdFromUrl = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tripId = params.get('trip_id');
+    return tripId ? parseInt(tripId) : null;
+  }, [urlKey]);
+  
+  // Trip selection - initialize from URL if available
+  const [selectedTripId, setSelectedTripId] = useState<number | null>(tripIdFromUrl);
+
+  // Update selectedTripId when URL changes
+  useEffect(() => {
+    if (tripIdFromUrl !== null) {
+      setSelectedTripId(tripIdFromUrl);
+    }
+  }, [tripIdFromUrl]);
   
   // View mode: 'list' or 'calendar'
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
@@ -380,57 +420,89 @@ const Availability: React.FC = () => {
         }
       />
 
-      {/* Trip Selector */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{__('Select Trip', 'Select Trip')}</CardTitle>
-          <CardDescription>
-            {__('Choose a trip to manage its availability dates', 'Choose a trip to manage its availability dates')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Trip', 'Trip')} <span className="text-red-500">*</span>
-              </label>
-              <Select
-                value={selectedTripId?.toString() || ''}
-                onChange={(e) => {
-                  const tripId = e.target.value ? parseInt(e.target.value) : null;
-                  setSelectedTripId(tripId);
-                  setPage(1);
-                }}
-                className="w-full"
-              >
-                <option value="">{__('-- Select a Trip --', '-- Select a Trip --')}</option>
-                {tripsData?.trips.map(trip => (
-                  <option key={trip.id} value={trip.id.toString()}>
-                    {trip.title} {trip.trip_type === 'single_day' ? '(Single Day)' : trip.trip_type === 'multi_day' ? '(Multi-Day)' : ''}
-                  </option>
-                ))}
-              </Select>
+      {/* Trip Selector - Clean Design */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 p-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {__('Select Trip', 'Select Trip')}
+              </h3>
             </div>
-            {selectedTrip && (
-              <div className="flex items-center gap-3 text-sm">
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <MapPin className="w-4 h-4" />
-                  <span>{selectedTrip.starting_location} → {selectedTrip.ending_location}</span>
-                </div>
-                {selectedTrip.trip_type && (
-                  <Badge className={
-                    selectedTrip.trip_type === 'single_day'
-                      ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
-                      : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
-                  }>
-                    {selectedTrip.trip_type === 'single_day' ? __('Single Day', 'Single Day') : __('Multi-Day', 'Multi-Day')}
-                  </Badge>
-                )}
-              </div>
-            )}
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {__('Choose a trip to manage its availability dates and departure schedules', 'Choose a trip to manage its availability dates and departure schedules')}
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+            </label>
+            <SearchableSelect
+              value={selectedTripId?.toString() || ''}
+              onChange={(value) => {
+                const tripId = value ? parseInt(value) : null;
+                setSelectedTripId(tripId);
+                setPage(1);
+              }}
+              options={[
+                { value: '', label: __('-- Select a Trip --', '-- Select a Trip --') },
+                ...(tripsData?.trips.map(trip => ({
+                  value: trip.id.toString(),
+                  label: `${trip.title}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`
+                })) || [])
+              ]}
+              placeholder={__('Search or select a trip...', 'Search or select a trip...')}
+              searchPlaceholder={__('Search by trip name or ID...', 'Search by trip name or ID...')}
+              className="w-full"
+              required
+            />
+          </div>
+
+          {selectedTrip && (
+            <div className="flex items-center gap-4 pt-2 border-t border-blue-200 dark:border-gray-700">
+              <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span className="font-medium">{selectedTrip.starting_location}</span>
+                <span className="text-gray-400">→</span>
+                <span className="font-medium">{selectedTrip.ending_location}</span>
+              </div>
+              {selectedTrip.trip_type && (
+                <Badge className={
+                  selectedTrip.trip_type === 'single_day'
+                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
+                    : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                }>
+                  {selectedTrip.trip_type === 'single_day' ? __('Single Day', 'Single Day') : __('Multi-Day', 'Multi-Day')}
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {!selectedTripId && (
+            <div className="mt-4 p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-blue-200/50 dark:border-gray-700/50">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                    {__('Get Started', 'Get Started')}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {__('Select a trip from the dropdown above to view and manage its availability dates, pricing, and booking status.', 'Select a trip from the dropdown above to view and manage its availability dates, pricing, and booking status.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {selectedTripId && (
         <>
@@ -943,14 +1015,6 @@ const Availability: React.FC = () => {
             </CardContent>
           </Card>
         </>
-      ) : (
-        <Alert variant="info">
-          <AlertCircle className="w-4 h-4" />
-          <div>
-            <p className="font-medium">{__('No Trip Selected', 'No Trip Selected')}</p>
-            <p className="text-sm">{__('Please select a trip from the dropdown above to manage its availability dates.', 'Please select a trip from the dropdown above to manage its availability dates.')}</p>
-          </div>
-        </Alert>
       )}
     </div>
   );

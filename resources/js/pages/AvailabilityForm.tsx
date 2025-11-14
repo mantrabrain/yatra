@@ -18,6 +18,8 @@ import { Alert } from '../components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { DatePicker } from '../components/ui/date-picker';
 import { TimePicker } from '../components/ui/time-picker';
+import { apiClient } from '../lib/api';
+import { useToast } from '../components/ui/toast';
 
 interface PriceType {
   category_id: number;
@@ -57,12 +59,16 @@ interface AvailabilityFormData {
 const AvailabilityForm: React.FC = () => {
   const { navigate } = useNavigate();
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   
   // Get trip_id and id from URL
   const urlParams = new URLSearchParams(window.location.search);
-  const tripId = urlParams.get('trip_id') ? parseInt(urlParams.get('trip_id')!) : null;
+  const tripIdFromUrl = urlParams.get('trip_id') ? parseInt(urlParams.get('trip_id')!) : null;
   const availabilityId = urlParams.get('id') || null;
   const isEditMode = !!availabilityId;
+  
+  // In edit mode, trip_id can come from availability data, so we'll use state
+  const [tripId, setTripId] = useState<number | null>(tripIdFromUrl);
 
   const [formData, setFormData] = useState<AvailabilityFormData>({
     departure_date: '',
@@ -92,29 +98,8 @@ const AvailabilityForm: React.FC = () => {
     queryKey: ['trip', tripId],
     queryFn: async () => {
       if (!tripId) return null;
-      // return await apiClient.get(`/yatra/v1/trips/${tripId}`);
-      // Dummy data - return different trip types based on tripId
-      if (tripId === 9) {
-        // Single day trip
-        return {
-          id: tripId,
-          title: 'Kathmandu City Tour',
-          currency: 'USD',
-          starting_location: 'Kathmandu',
-          ending_location: 'Kathmandu',
-          trip_type: 'single_day',
-        };
-      } else {
-        // Multi-day trip (default)
-        return {
-          id: tripId,
-          title: 'Everest Base Camp Trek',
-          currency: 'USD',
-          starting_location: 'Kathmandu',
-          ending_location: 'Kathmandu',
-          trip_type: 'multi_day',
-        };
-      }
+      const response = await apiClient.get(`/trips/${tripId}`);
+      return response?.data || response;
     },
     enabled: !!tripId,
   });
@@ -123,53 +108,33 @@ const AvailabilityForm: React.FC = () => {
   const { data: categoriesData, isLoading: isLoadingCategories } = useQuery({
     queryKey: ['traveler-categories'],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/traveler-categories');
-      // Dummy data
+      const response = await apiClient.get('/traveler-categories');
+      const categories = response?.data || response || [];
       return {
-        categories: [
-          { id: 1, label: 'Adult', description: 'Standard adult pricing', status: 'active' as const, age_min: 18 },
-          { id: 2, label: 'Child', description: 'Children aged 5-17', status: 'active' as const, age_min: 5, age_max: 17 },
-          { id: 3, label: 'Infant', description: 'Infants under 4 years', status: 'active' as const, age_max: 4 },
-        ] as TravelerCategory[]
+        categories: Array.isArray(categories) ? categories : []
       };
     },
   });
 
-  const activeCategories = categoriesData?.categories.filter(cat => cat.status === 'active') || [];
+  const activeCategories = categoriesData?.categories?.filter((cat: TravelerCategory) => cat.status === 'active') || [];
 
   // Fetch existing availability data if editing
   const { data: availabilityData, isLoading: isLoadingAvailability } = useQuery({
     queryKey: ['availability', availabilityId],
     queryFn: async () => {
       if (!availabilityId) return null;
-      // return await apiClient.get(`/yatra/v1/availability/${availabilityId}`);
-      // Dummy data
-      return {
-        id: availabilityId,
-        trip_id: tripId,
-        departure_date: '2026-03-22',
-        departure_time: '08:00',
-        arrival_date: '2026-03-31',
-        arrival_time: '18:00',
-        total_seats: 15,
-        booked_seats: 5,
-        seats_remaining: '10+',
-        pricing_type: 'traveler_based',
-        original_price: '2525',
-        discounted_price: '2335',
-        price_types: [
-          { category_id: 1, original_price: '2525', discounted_price: '2335' },
-        ],
-        status: 'available',
-        is_blocked: false,
-        block_reason: '',
-        alert_threshold: 5,
-        from_location: 'Rome',
-        to_location: 'Rome',
-      };
+      const response = await apiClient.get(`/availability/${availabilityId}`);
+      return response?.data || response;
     },
     enabled: isEditMode && !!availabilityId,
   });
+
+  // Set trip_id from availability data if not in URL (for edit mode)
+  useEffect(() => {
+    if (availabilityData && availabilityData.trip_id && !tripId) {
+      setTripId(availabilityData.trip_id);
+    }
+  }, [availabilityData, tripId]);
 
   // Load form data when trip or availability data is available
   useEffect(() => {
@@ -184,20 +149,24 @@ const AvailabilityForm: React.FC = () => {
 
   useEffect(() => {
     if (availabilityData) {
+      const totalSeats = availabilityData.total_seats || availabilityData.seats_total || 0;
+      const availableSeats = availabilityData.available_seats || availabilityData.seats_available || 0;
+      const bookedSeats = totalSeats - availableSeats;
+      
       setFormData({
         departure_date: availabilityData.departure_date || '',
         departure_time: availabilityData.departure_time || '',
-        arrival_date: availabilityData.arrival_date || '',
+        arrival_date: availabilityData.arrival_date || availabilityData.departure_date || '',
         arrival_time: availabilityData.arrival_time || '',
-        total_seats: availabilityData.total_seats?.toString() || '',
-        booked_seats: availabilityData.booked_seats?.toString() || '0',
-        seats_remaining: availabilityData.seats_remaining || '',
-        pricing_type: (availabilityData.pricing_type || (availabilityData.price_types && availabilityData.price_types.length > 0 ? 'traveler_based' : 'regular')) as 'regular' | 'traveler_based',
-        original_price: availabilityData.original_price || '',
-        discounted_price: availabilityData.discounted_price || '',
-        price_types: availabilityData.price_types || [],
+        total_seats: totalSeats.toString(),
+        booked_seats: bookedSeats.toString(),
+        seats_remaining: availableSeats > 10 ? '10+' : availableSeats.toString(),
+        pricing_type: 'regular' as 'regular' | 'traveler_based',
+        original_price: availabilityData.original_price?.toString() || '',
+        discounted_price: availabilityData.discounted_price?.toString() || '',
+        price_types: [],
         status: (availabilityData.status || (availabilityData.is_blocked ? 'blocked' : 'available')) as 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked',
-        is_blocked: availabilityData.is_blocked || false,
+        is_blocked: availabilityData.is_blocked || availabilityData.status === 'blocked' || false,
         block_reason: availabilityData.block_reason || '',
         alert_threshold: availabilityData.alert_threshold?.toString() || '5',
         from_location: availabilityData.from_location || tripData?.starting_location || '',
@@ -342,48 +311,53 @@ const AvailabilityForm: React.FC = () => {
 
   const saveMutation = useMutation({
     mutationFn: async (data: AvailabilityFormData) => {
+      const totalSeats = data.total_seats ? parseInt(data.total_seats) : 0;
+      const bookedSeats = isEditMode && data.booked_seats ? parseInt(data.booked_seats) : 0;
+      const availableSeats = totalSeats - bookedSeats;
+      
       const payload = {
         trip_id: tripId,
         departure_date: data.departure_date,
-        departure_time: tripData?.trip_type === 'single_day' ? data.departure_time : null,
-        arrival_date: data.arrival_date,
-        arrival_time: tripData?.trip_type === 'single_day' ? data.arrival_time : null,
-        total_seats: data.total_seats ? parseInt(data.total_seats) : null,
-        booked_seats: isEditMode && data.booked_seats ? parseInt(data.booked_seats) : 0,
-        seats_remaining: data.seats_remaining || null,
-        pricing_type: data.pricing_type,
-        original_price: data.pricing_type === 'regular' ? (data.original_price ? parseFloat(data.original_price) : null) : null,
-        discounted_price: data.pricing_type === 'regular' ? (data.discounted_price ? parseFloat(data.discounted_price) : null) : null,
-        price_types: data.pricing_type === 'traveler_based' ? data.price_types.map(pt => ({
-          category_id: pt.category_id,
-          original_price: pt.original_price ? parseFloat(pt.original_price) : 0,
-          discounted_price: pt.discounted_price ? parseFloat(pt.discounted_price) : null,
-        })) : [],
+        departure_time: tripData?.trip_type === 'single_day' ? (data.departure_time || null) : null,
+        arrival_date: data.arrival_date || null,
+        arrival_time: tripData?.trip_type === 'single_day' ? (data.arrival_time || null) : null,
+        seats_total: totalSeats,
+        seats_available: availableSeats,
+        seats_reserved: 0,
+        seats_waitlist: 0,
+        original_price: data.pricing_type === 'regular' && data.original_price ? parseFloat(data.original_price) : null,
+        discounted_price: data.pricing_type === 'regular' && data.discounted_price ? parseFloat(data.discounted_price) : null,
         status: data.is_blocked ? 'blocked' : data.status,
-        is_blocked: data.is_blocked || false,
-        block_reason: data.is_blocked ? (data.block_reason || null) : null,
-        alert_threshold: data.alert_threshold ? parseInt(data.alert_threshold) : 5,
         from_location: data.from_location || null,
         to_location: data.to_location || null,
+        special_notes: null,
+        cutoff_hours: 24,
       };
 
       if (isEditMode && availabilityId) {
-        // return await apiClient.put(`/yatra/v1/availability/${availabilityId}`, payload);
-        console.log('Updating availability:', availabilityId, payload);
-        return { success: true, id: availabilityId };
+        const response = await apiClient.put(`/availability/${availabilityId}`, payload);
+        return response?.data || response;
       } else {
-        // return await apiClient.post('/yatra/v1/availability', payload);
-        console.log('Creating availability:', payload);
-        return { success: true, id: `avail_${Date.now()}` };
+        const response = await apiClient.post('/availability', payload);
+        return response?.data || response;
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['availability'] });
+      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      showToast(
+        isEditMode 
+          ? __('Availability date updated successfully', 'Availability date updated successfully')
+          : __('Availability date created successfully', 'Availability date created successfully'),
+        'success'
+      );
       navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId?.toString() });
     },
     onError: (error: any) => {
+      const errorMessage = error?.message || error?.data?.message || __('An error occurred while saving', 'An error occurred while saving');
+      showToast(errorMessage, 'error');
       setErrors({ 
-        submit: error?.message || __('An error occurred while saving', 'An error occurred while saving') 
+        submit: errorMessage
       });
     },
   });
@@ -406,6 +380,23 @@ const AvailabilityForm: React.FC = () => {
     return symbols[currency] || currency;
   };
 
+  // Show loading if we're in edit mode and waiting for availability data to get trip_id
+  if (isEditMode && !tripId && isLoadingAvailability) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6"></div>
+          <div className="space-y-4">
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!tripId) {
     return (
       <Alert variant="error">
@@ -418,11 +409,86 @@ const AvailabilityForm: React.FC = () => {
     );
   }
 
-  if (isLoadingAvailability) {
+  // Show skeleton loader while loading data
+  if (isLoadingAvailability || (isEditMode && !availabilityData)) {
     return (
-      <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">{__('Loading...', 'Loading...')}</p>
+      <div className="space-y-6">
+        {/* Header Skeleton */}
+        <div className="animate-pulse">
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-6"></div>
+        </div>
+
+        {/* Form Skeleton */}
+        <div className="space-y-6 animate-pulse">
+          {/* Date & Time Section */}
+          <Card>
+            <CardHeader>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Seats Section */}
+          <Card>
+            <CardHeader>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2"></div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pricing Section */}
+          <Card>
+            <CardHeader>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2"></div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Buttons Skeleton */}
+          <div className="flex items-center justify-end gap-4">
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -437,13 +503,15 @@ const AvailabilityForm: React.FC = () => {
             : __('Add a new availability date for this trip', 'Add a new availability date for this trip')
         }
         actions={
-          <Button
-            variant="outline"
-            onClick={() => navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId.toString() })}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {__('Back', 'Back')}
-          </Button>
+          tripId ? (
+            <Button
+              variant="outline"
+              onClick={() => navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId.toString() })}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {__('Back', 'Back')}
+            </Button>
+          ) : null
         }
       />
 
@@ -538,6 +606,43 @@ const AvailabilityForm: React.FC = () => {
                   />
                   {errors.arrival_date && (
                     <p className="mt-1 text-xs text-red-600">{errors.arrival_date}</p>
+                  )}
+                  {tripData?.duration_days && formData.departure_date && formData.arrival_date && (
+                    <div className="mt-1.5">
+                      {(() => {
+                        const departure = new Date(formData.departure_date);
+                        const arrival = new Date(formData.arrival_date);
+                        const selectedDays = Math.ceil((arrival.getTime() - departure.getTime()) / (1000 * 60 * 60 * 24));
+                        const expectedDays = tripData.duration_days;
+                        const diff = selectedDays - expectedDays;
+                        
+                        if (diff === 0) {
+                          return (
+                            <p className="text-xs text-green-600 dark:text-green-400">
+                              {__('Duration matches trip duration', 'Duration matches trip duration')} ({selectedDays} {__('days', 'days')})
+                            </p>
+                          );
+                        } else if (diff < 0) {
+                          return (
+                            <p className="text-xs text-amber-600 dark:text-amber-400">
+                              {__('Shorter than trip duration', 'Shorter than trip duration')}: {selectedDays} {__('days', 'days')} ({Math.abs(diff)} {__('days shorter', 'days shorter')} than expected {expectedDays} {__('days', 'days')})
+                            </p>
+                          );
+                        } else {
+                          return (
+                            <p className="text-xs text-amber-600 dark:text-amber-400">
+                              {__('Longer than trip duration', 'Longer than trip duration')}: {selectedDays} {__('days', 'days')} ({diff} {__('days longer', 'days longer')} than expected {expectedDays} {__('days', 'days')})
+                            </p>
+                          );
+                        }
+                      })()}
+                    </div>
+                  )}
+                  {tripData?.duration_days && !formData.arrival_date && (
+                    <HelpText
+                      text={`${__('Trip duration', 'Trip duration')}: ${tripData.duration_days} ${tripData.duration_days === 1 ? __('day', 'day') : __('days', 'days')}${tripData.duration_nights ? ` (${tripData.duration_nights} ${tripData.duration_nights === 1 ? __('night', 'night') : __('nights', 'nights')})` : ''}`}
+                      className="mt-1"
+                    />
                   )}
                 </div>
               </div>
@@ -1092,7 +1197,13 @@ const AvailabilityForm: React.FC = () => {
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId.toString() })}
+            onClick={() => {
+              if (tripId) {
+                navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId.toString() });
+              } else {
+                navigate({ subpage: 'trips', tab: 'availability' });
+              }
+            }}
           >
             {__('Cancel', 'Cancel')}
           </Button>

@@ -205,7 +205,7 @@ class AvailabilityService
      */
     public function find(int $id): ?Availability
     {
-        return $this->repository->find($id);
+        return $this->repository->findModel($id);
     }
 }
 

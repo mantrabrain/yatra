@@ -36,9 +36,10 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Filter options based on search term
+  // Filter options based on search term (search by both label and value)
   const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+    option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    option.value.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Get selected option
@@ -92,7 +93,18 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           className="flex-1 flex items-center justify-between text-left"
         >
           <span className={selectedOption ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}>
-            {selectedOption ? selectedOption.label : placeholder}
+            {selectedOption ? (
+              <div className="flex items-center justify-between w-full">
+                <span>{selectedOption.label}</span>
+                {selectedOption.value && selectedOption.value !== '' && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium">
+                    ID: {selectedOption.value}
+                  </span>
+                )}
+              </div>
+            ) : (
+              placeholder
+            )}
           </span>
           <div className="flex items-center gap-1">
             {value && !disabled && (
@@ -148,7 +160,14 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                       : 'text-gray-900 dark:text-white'
                   }`}
                 >
-                  {option.label}
+                  <div className="flex items-center justify-between">
+                    <span>{option.label}</span>
+                    {option.value && option.value !== '' && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium">
+                        ID: {option.value}
+                      </span>
+                    )}
+                  </div>
                 </button>
               ))
             )}
