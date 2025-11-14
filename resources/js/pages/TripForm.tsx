@@ -10,7 +10,6 @@ import {
   Loader2, 
   Eye, 
   Sparkles,
-  Compass,
   Box,
   Calendar,
   CheckSquare,
@@ -678,6 +677,7 @@ const TripForm: React.FC = () => {
       setCurrentSection(allSections[currentStepIndex - 1].id);
     }
   };
+
 
   // Smart defaults - Auto-calculate nights from days
   useEffect(() => {
@@ -1388,13 +1388,21 @@ const TripForm: React.FC = () => {
       case 'basic':
         return (
           <div className="space-y-6">
-            <div className="flex items-center gap-2 mb-4">
-              <FileText className="w-5 h-5 text-gray-500" />
+            <div className="flex items-center gap-2 mb-3">
+              <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Basic Information', 'Basic Information')}</h2>
+              <Badge variant="outline" className="ml-2 text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
+                {__('Start Here', 'Start Here')}
+              </Badge>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              {__('Essential information about your trip that appears in listings and search results', 'Essential information about your trip that appears in listings and search results')}
-            </p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-3 rounded-r-md mb-6">
+              <p className="text-sm text-blue-900 dark:text-blue-100 font-medium mb-1">
+                {__('💡 Getting Started', '💡 Getting Started')}
+              </p>
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                {__('Fill in the essential details below. These fields are required to create your trip. Don\'t worry - you can always come back and edit later!', 'Fill in the essential details below. These fields are required to create your trip. Don\'t worry - you can always come back and edit later!')}
+              </p>
+            </div>
 
             {/* Essential Fields - Single View (No Tabs) */}
             <div className="space-y-6">
@@ -1402,11 +1410,14 @@ const TripForm: React.FC = () => {
                   {/* Tour Title */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1.5">
-                      <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        {__('Trip Title', 'Trip Title')} <span className="text-red-500">*</span>
+                      <label htmlFor="title" className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                        {__('Trip Title', 'Trip Title')}
+                        <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
+                          {__('Required', 'Required')}
+                        </Badge>
                         <button
                           type="button"
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-auto"
                           title={__('A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results.', 'A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results.')}
                         >
                           <HelpCircle className="w-3.5 h-3.5" />
@@ -1423,7 +1434,7 @@ const TripForm: React.FC = () => {
                       </span>
                     </div>
                     <HelpText
-                      text={__('Choose a clear, descriptive title that includes the destination and duration. This appears in search results and listings.', 'Choose a clear, descriptive title that includes the destination and duration. This appears in search results and listings.')}
+                      text={__('💡 Tip: Include your destination and trip length. Example: "Bali Beach Retreat - 7 Days" or "Paris City Tour - Half Day"', '💡 Tip: Include your destination and trip length. Example: "Bali Beach Retreat - 7 Days" or "Paris City Tour - Half Day"')}
                       className="mb-2"
                     />
                     <Input
@@ -1452,12 +1463,15 @@ const TripForm: React.FC = () => {
                   {/* URL Slug */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1.5">
-                      <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        {__('URL Slug', 'URL Slug')}
+                      <label htmlFor="slug" className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                        {__('Trip URL', 'Trip URL')}
+                        <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700">
+                          {__('Auto', 'Auto')}
+                        </Badge>
                         <button
                           type="button"
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                          title={__('The URL-friendly version of your title. This is what appears in the trip URL.', 'The URL-friendly version of your title. This is what appears in the trip URL.')}
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-auto"
+                          title={__('The web address for your trip page. Auto-generated from your title, but you can customize it.', 'The web address for your trip page. Auto-generated from your title, but you can customize it.')}
                         >
                           <HelpCircle className="w-3.5 h-3.5" />
                         </button>
@@ -1473,7 +1487,7 @@ const TripForm: React.FC = () => {
                       )}
                     </div>
                     <HelpText
-                      text={__('The URL-friendly version of your title. Auto-generated from title, but you can customize it. Only lowercase letters, numbers, and hyphens allowed.', 'The URL-friendly version of your title. Auto-generated from title, but you can customize it. Only lowercase letters, numbers, and hyphens allowed.')}
+                      text={__('💡 This is automatically created from your title. You usually don\'t need to change it unless you want a custom web address.', '💡 This is automatically created from your title. You usually don\'t need to change it unless you want a custom web address.')}
                       className="mb-2"
                     />
                     <Input
@@ -1526,11 +1540,14 @@ const TripForm: React.FC = () => {
                   {/* Short Description */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1.5">
-                      <label htmlFor="short_description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                      <label htmlFor="short_description" className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                         {__('Short Description', 'Short Description')}
+                        <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
+                          {__('Recommended', 'Recommended')}
+                        </Badge>
                         <button
                           type="button"
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-auto"
                           title={__('A brief summary that appears in listings. Recommended: 100-150 characters for best results.', 'A brief summary that appears in listings. Recommended: 100-150 characters for best results.')}
                         >
                           <HelpCircle className="w-3.5 h-3.5" />
@@ -1549,7 +1566,7 @@ const TripForm: React.FC = () => {
                       </span>
                     </div>
                     <HelpText
-                      text={__('A brief summary (100-150 characters) that appears in listings and search results. Make it compelling to encourage clicks.', 'A brief summary (100-150 characters) that appears in listings and search results. Make it compelling to encourage clicks.')}
+                      text={__('💡 Write 2-3 sentences that grab attention! This appears in trip listings. Example: "Escape to paradise with our 7-day Bali beach retreat. Experience stunning sunsets, world-class diving, and authentic local culture."', '💡 Write 2-3 sentences that grab attention! This appears in trip listings. Example: "Escape to paradise with our 7-day Bali beach retreat. Experience stunning sunsets, world-class diving, and authentic local culture."')}
                       className="mb-2"
                     />
                     <textarea
@@ -1559,11 +1576,11 @@ const TripForm: React.FC = () => {
                       placeholder={__('Escape to paradise with our 7-day Bali beach retreat...', 'Escape to paradise with our 7-day Bali beach retreat...')}
                       rows={2}
                       maxLength={200}
-                      className={`flex w-full rounded-md border px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none transition-colors ${
+                      className={`flex w-full rounded-md border-2 px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 dark:text-gray-100 dark:bg-gray-800 resize-none transition-colors ${
                         formData.short_description.length >= 100 && formData.short_description.length <= 150
-                          ? 'border-green-500 dark:border-green-600 bg-white dark:bg-gray-800 dark:border-gray-600'
+                          ? 'border-green-500 dark:border-green-600 bg-white dark:bg-gray-800'
                           : formData.short_description.length > 200
-                          ? 'border-red-500 dark:border-red-600 bg-white dark:bg-gray-800 dark:border-gray-600'
+                          ? 'border-red-500 dark:border-red-600 bg-white dark:bg-gray-800'
                           : 'border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600'
                       }`}
                     />
@@ -1577,11 +1594,14 @@ const TripForm: React.FC = () => {
 
                   {/* Tour Description */}
                   <div className="mb-4">
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Trip Description', 'Trip Description')} <span className="text-red-500">*</span>
+                    <label htmlFor="description" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
+                      {__('Trip Description', 'Trip Description')}
+                      <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
+                        {__('Required', 'Required')}
+                      </Badge>
                     </label>
                     <HelpText
-                      text={__('The main description of your trip. Be detailed and engaging. Include what makes your trip special, what travelers will experience, and key information. Aim for 150-500 characters for best results.', 'The main description of your trip. Be detailed and engaging. Include what makes your trip special, what travelers will experience, and key information. Aim for 150-500 characters for best results.')}
+                      text={__('💡 Tell travelers what makes your trip special! Describe the experience, highlights, and what they\'ll see. Write 2-4 paragraphs. Be enthusiastic and detailed!', '💡 Tell travelers what makes your trip special! Describe the experience, highlights, and what they\'ll see. Write 2-4 paragraphs. Be enthusiastic and detailed!')}
                       className="mb-2"
                     />
                     <textarea
@@ -1590,7 +1610,7 @@ const TripForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('description', e.target.value)}
                       placeholder={__('Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...', 'Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...')}
                       rows={6}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
                     <div className="mt-1.5 flex items-center justify-between">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -1607,18 +1627,21 @@ const TripForm: React.FC = () => {
 
                   {/* Featured Image */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-1.5">
-                      {__('Featured Image', 'Featured Image')} <span className="text-red-500">*</span>
+                    <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
+                      {__('Featured Image', 'Featured Image')}
+                      <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
+                        {__('Required', 'Required')}
+                      </Badge>
                       <button
                         type="button"
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-auto"
                         title={__('The main image that represents your trip. This appears in listings and as the hero image on the trip page.', 'The main image that represents your trip. This appears in listings and as the hero image on the trip page.')}
                       >
                         <HelpCircle className="w-3.5 h-3.5" />
                       </button>
                     </label>
                     <HelpText
-                      text={__('Upload a high-quality image that best represents your trip. Recommended size: 1200x800px', 'Upload a high-quality image that best represents your trip. Recommended size: 1200x800px')}
+                      text={__('💡 Choose your best photo! This is the first thing travelers see. Use a high-quality image (1200x800px recommended) that shows what makes your trip special.', '💡 Choose your best photo! This is the first thing travelers see. Use a high-quality image (1200x800px recommended) that shows what makes your trip special.')}
                       className="mb-2"
                     />
                     {formData.featured_image ? (
@@ -1729,7 +1752,7 @@ const TripForm: React.FC = () => {
             <div className="space-y-4">
               {/* Destination */}
               <div>
-                <label htmlFor="destination" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="destination" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Destination', 'Destination')} <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -1744,7 +1767,7 @@ const TripForm: React.FC = () => {
               {/* Starting & Ending Locations */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="starting_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="starting_location" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Starting Location', 'Starting Location')}
                   </label>
                   <Input
@@ -1756,7 +1779,7 @@ const TripForm: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="ending_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="ending_location" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Ending Location', 'Ending Location')}
                   </label>
                   <Input
@@ -1772,7 +1795,7 @@ const TripForm: React.FC = () => {
               {/* GPS Coordinates */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="latitude" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="latitude" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Latitude', 'Latitude')}
                   </label>
                   <Input
@@ -1788,7 +1811,7 @@ const TripForm: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="longitude" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="longitude" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Longitude', 'Longitude')}
                   </label>
                   <Input
@@ -1807,7 +1830,7 @@ const TripForm: React.FC = () => {
 
               {/* Landmarks */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Key Landmarks / Points of Interest', 'Key Landmarks / Points of Interest')}
                 </label>
                 <HelpText
@@ -1877,7 +1900,7 @@ const TripForm: React.FC = () => {
             <div className="space-y-4">
               {/* Trip Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-3">
                   {__('Trip Type', 'Trip Type')} <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1905,7 +1928,7 @@ const TripForm: React.FC = () => {
                     />
                     <div className="flex flex-1">
                       <div className="flex flex-col">
-                        <span className={`block text-sm font-medium ${
+                        <span className={`block text-sm font-semibold ${
                           formData.trip_type === 'single_day'
                             ? 'text-blue-900 dark:text-blue-300'
                             : 'text-gray-900 dark:text-white'
@@ -1943,7 +1966,7 @@ const TripForm: React.FC = () => {
                     />
                     <div className="flex flex-1">
                       <div className="flex flex-col">
-                        <span className={`block text-sm font-medium ${
+                        <span className={`block text-sm font-semibold ${
                           formData.trip_type === 'multi_day'
                             ? 'text-blue-900 dark:text-blue-300'
                             : 'text-gray-900 dark:text-white'
@@ -1971,7 +1994,7 @@ const TripForm: React.FC = () => {
               {/* Duration Days & Nights */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="duration_days" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="duration_days" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Duration (Days)', 'Duration (Days)')} <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -2009,7 +2032,7 @@ const TripForm: React.FC = () => {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="duration_nights" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="duration_nights" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Duration (Nights)', 'Duration (Nights)')}
                   </label>
                   <Input
@@ -2040,7 +2063,7 @@ const TripForm: React.FC = () => {
               {/* Availability Dates */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="available_from" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="available_from" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Available From', 'Available From')}
                   </label>
                   <Input
@@ -2055,7 +2078,7 @@ const TripForm: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="available_to" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="available_to" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Available To', 'Available To')}
                   </label>
                   <Input
@@ -2073,7 +2096,7 @@ const TripForm: React.FC = () => {
 
               {/* Booking Window */}
               <div>
-                <label htmlFor="booking_window_days" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="booking_window_days" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Booking Window (Days in Advance)', 'Booking Window (Days in Advance)')}
                 </label>
                 <Input
@@ -2092,7 +2115,7 @@ const TripForm: React.FC = () => {
 
               {/* Seasonal Availability */}
               <div>
-                <label htmlFor="seasonal_availability" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="seasonal_availability" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Seasonal Availability Notes', 'Seasonal Availability Notes')}
                 </label>
                 <Input
@@ -2125,7 +2148,7 @@ const TripForm: React.FC = () => {
             <div className="space-y-4">
               {/* Trip Category */}
               <div>
-                <label htmlFor="trip_category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="trip_category" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Trip Category', 'Trip Category')}
                 </label>
                 <Select
@@ -2148,7 +2171,7 @@ const TripForm: React.FC = () => {
               {/* Category Hierarchy */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="trip_category_parent" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="trip_category_parent" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Parent Category', 'Parent Category')}
                   </label>
                   <Select
@@ -2169,7 +2192,7 @@ const TripForm: React.FC = () => {
                 </div>
                 {formData.trip_category_parent && (
                   <div>
-                    <label htmlFor="trip_category_sub" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="trip_category_sub" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Sub-Category', 'Sub-Category')}
                     </label>
                     <Select
@@ -2200,7 +2223,7 @@ const TripForm: React.FC = () => {
 
               {/* Difficulty Level */}
               <div>
-                <label htmlFor="difficulty_level" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="difficulty_level" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Difficulty Level', 'Difficulty Level')}
                 </label>
                 <Select
@@ -2222,7 +2245,7 @@ const TripForm: React.FC = () => {
 
               {/* Activity Types */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Activity Types', 'Activity Types')}
                 </label>
                 <div className="flex flex-wrap gap-2 mb-2">
@@ -2247,7 +2270,7 @@ const TripForm: React.FC = () => {
                         }}
                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{activity}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{activity}</span>
                     </label>
                   ))}
                 </div>
@@ -2259,7 +2282,7 @@ const TripForm: React.FC = () => {
 
               {/* Featured Priority */}
               <div>
-                <label htmlFor="featured_priority" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="featured_priority" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Featured Priority', 'Featured Priority')}
                 </label>
                 <Select
@@ -2340,7 +2363,7 @@ const TripForm: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Video URL', 'Video URL')} (YouTube/Vimeo)
                     </label>
                     <HelpText
@@ -2356,7 +2379,7 @@ const TripForm: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('360° Virtual Tour URL', '360° Virtual Tour URL')}
                     </label>
                     <HelpText
@@ -2384,7 +2407,7 @@ const TripForm: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('What Makes This Trip Special', 'What Makes This Trip Special')}
                     </label>
                     <HelpText
@@ -2396,11 +2419,11 @@ const TripForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('what_makes_special', e.target.value)}
                       placeholder={__('Describe what makes this trip unique and special...', 'Describe what makes this trip unique and special...')}
                       rows={5}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Trip Story / Narrative', 'Trip Story / Narrative')}
                     </label>
                     <HelpText
@@ -2412,7 +2435,7 @@ const TripForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('trip_story', e.target.value)}
                       placeholder={__('Write an engaging narrative about this trip...', 'Write an engaging narrative about this trip...')}
                       rows={8}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
                   </div>
                 </CardContent>
@@ -2490,7 +2513,7 @@ const TripForm: React.FC = () => {
             <div className="space-y-4">
               {/* Currency */}
               <div>
-                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="currency" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Currency', 'Currency')}
                 </label>
                 <Select
@@ -2508,7 +2531,7 @@ const TripForm: React.FC = () => {
 
               {/* Pricing Type Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-3">
                   {__('Pricing Type', 'Pricing Type')} <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -2527,7 +2550,7 @@ const TripForm: React.FC = () => {
                     />
                     <div className="flex flex-1">
                       <div className="flex flex-col">
-                        <span className={`block text-sm font-medium ${
+                        <span className={`block text-sm font-semibold ${
                           formData.pricing_type === 'regular'
                             ? 'text-blue-900 dark:text-blue-300'
                             : 'text-gray-900 dark:text-white'
@@ -2565,7 +2588,7 @@ const TripForm: React.FC = () => {
                     />
                     <div className="flex flex-1">
                       <div className="flex flex-col">
-                        <span className={`block text-sm font-medium ${
+                        <span className={`block text-sm font-semibold ${
                           formData.pricing_type === 'traveler_based'
                             ? 'text-blue-900 dark:text-blue-300'
                             : 'text-gray-900 dark:text-white'
@@ -2595,7 +2618,7 @@ const TripForm: React.FC = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
@@ -2618,7 +2641,7 @@ const TripForm: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Discounted Price', 'Discounted Price')} ({__('Optional', 'Optional')})
                       </label>
                       <div className="relative">
@@ -2647,7 +2670,7 @@ const TripForm: React.FC = () => {
               {formData.pricing_type === 'traveler_based' && (
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="block text-xs font-normal text-gray-500 dark:text-gray-400">
                     {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-red-500">*</span>
                   </label>
                 </div>
@@ -2873,7 +2896,7 @@ const TripForm: React.FC = () => {
 
               {/* Sale Price */}
               <div>
-                <label htmlFor="sale_price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="sale_price" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Sale Price', 'Sale Price')} ({__('Optional', 'Optional')})
                 </label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -2899,7 +2922,7 @@ const TripForm: React.FC = () => {
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Deposit & Payment Terms', 'Deposit & Payment Terms')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="deposit_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="deposit_amount" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Deposit Amount', 'Deposit Amount')}
                     </label>
                     <div className="relative">
@@ -2917,7 +2940,7 @@ const TripForm: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="deposit_percentage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="deposit_percentage" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Deposit Percentage', 'Deposit Percentage')}
                     </label>
                     <div className="relative">
@@ -2937,7 +2960,7 @@ const TripForm: React.FC = () => {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <label htmlFor="payment_terms" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="payment_terms" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Payment Terms', 'Payment Terms')}
                   </label>
                   <textarea
@@ -2969,7 +2992,7 @@ const TripForm: React.FC = () => {
                 {formData.group_pricing_enabled && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="group_size_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      <label htmlFor="group_size_min" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Minimum Group Size', 'Minimum Group Size')}
                       </label>
                       <Input
@@ -2982,7 +3005,7 @@ const TripForm: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label htmlFor="group_discount_percentage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      <label htmlFor="group_discount_percentage" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Group Discount (%)', 'Group Discount (%)')}
                       </label>
                       <div className="relative">
@@ -3024,7 +3047,7 @@ const TripForm: React.FC = () => {
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Group Size', 'Group Size')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="min_travelers" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="min_travelers" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Minimum Travelers', 'Minimum Travelers')} <span className="text-red-500">*</span>
                     </label>
                     <Input
@@ -3036,7 +3059,7 @@ const TripForm: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label htmlFor="max_travelers" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="max_travelers" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Maximum Travelers', 'Maximum Travelers')} <span className="text-red-500">*</span>
                     </label>
                     <Input
@@ -3055,7 +3078,7 @@ const TripForm: React.FC = () => {
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Age Restrictions', 'Age Restrictions')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="age_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="age_min" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Minimum Age', 'Minimum Age')}
                     </label>
                     <Input
@@ -3068,7 +3091,7 @@ const TripForm: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label htmlFor="age_max" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="age_max" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Maximum Age', 'Maximum Age')}
                     </label>
                     <Input
@@ -3087,7 +3110,7 @@ const TripForm: React.FC = () => {
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Booking Deadlines', 'Booking Deadlines')}</h3>
                 <div>
-                  <label htmlFor="booking_deadline" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="booking_deadline" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Booking Deadline', 'Booking Deadline')}
                   </label>
                   <Input
@@ -3107,7 +3130,7 @@ const TripForm: React.FC = () => {
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Travel Requirements', 'Travel Requirements')}</h3>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="physical_requirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="physical_requirements" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Physical Requirements', 'Physical Requirements')}
                     </label>
                     <textarea
@@ -3120,7 +3143,7 @@ const TripForm: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label htmlFor="visa_requirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="visa_requirements" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Visa Requirements', 'Visa Requirements')}
                     </label>
                     <textarea
@@ -3133,7 +3156,7 @@ const TripForm: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label htmlFor="vaccination_requirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="vaccination_requirements" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                       {__('Vaccination Requirements', 'Vaccination Requirements')}
                     </label>
                     <textarea
@@ -3152,7 +3175,7 @@ const TripForm: React.FC = () => {
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Cancellation Policy', 'Cancellation Policy')}</h3>
                 <div>
-                  <label htmlFor="cancellation_policy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label htmlFor="cancellation_policy" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Cancellation Policy Details', 'Cancellation Policy Details')}
                   </label>
                   <textarea
@@ -3329,7 +3352,7 @@ const TripForm: React.FC = () => {
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Question', 'Question')}
                       </label>
                       <Input
@@ -3340,7 +3363,7 @@ const TripForm: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Answer', 'Answer')}
                       </label>
                       <textarea
@@ -3378,7 +3401,7 @@ const TripForm: React.FC = () => {
             </div>
             <div className="space-y-4">
               <div>
-                <label htmlFor="meta_title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="meta_title" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Meta Title', 'Meta Title')}
                 </label>
                 <Input
@@ -3390,7 +3413,7 @@ const TripForm: React.FC = () => {
                 />
               </div>
               <div>
-                <label htmlFor="meta_description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="meta_description" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Meta Description', 'Meta Description')}
                 </label>
                 <textarea
@@ -3402,7 +3425,7 @@ const TripForm: React.FC = () => {
                 />
               </div>
               <div>
-                <label htmlFor="meta_keywords" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="meta_keywords" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Meta Keywords', 'Meta Keywords')}
                 </label>
                 <Input
@@ -3437,7 +3460,7 @@ const TripForm: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Status', 'Status')} <span className="text-red-500">*</span>
                   </label>
                   <Select
@@ -3456,7 +3479,7 @@ const TripForm: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Version', 'Version')}
                   </label>
                   <Input
@@ -3484,7 +3507,7 @@ const TripForm: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Schedule Publish Date', 'Schedule Publish Date')}
                   </label>
                   <Input
@@ -3498,7 +3521,7 @@ const TripForm: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Schedule Unpublish Date', 'Schedule Unpublish Date')}
                   </label>
                   <Input
@@ -3537,7 +3560,7 @@ const TripForm: React.FC = () => {
                 {formData.seasonal_auto_enable && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Auto-Enable Date', 'Auto-Enable Date')}
                       </label>
                       <Input
@@ -3551,7 +3574,7 @@ const TripForm: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Auto-Disable Date', 'Auto-Disable Date')}
                       </label>
                       <Input
@@ -3719,84 +3742,52 @@ const TripForm: React.FC = () => {
 
   return (
     <div className="h-screen flex flex-col bg-white dark:bg-gray-900">
-      {/* Top Progress Bar with Step Navigation */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2.5">
-        <div className="flex items-center justify-between gap-4">
-          {/* Previous Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={goToPreviousSection}
-            disabled={currentStepIndex === 0}
-            className="flex items-center gap-1.5 text-xs"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            {__('Previous', 'Previous')}
-          </Button>
-
-          {/* Progress Indicator */}
-          <div className="flex-1 flex flex-col items-center gap-1.5 min-w-0">
-            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-              <span className="font-medium text-gray-900 dark:text-white">
-                {__('Step', 'Step')} {currentStepNumber} {__('of', 'of')} {totalSteps}
-              </span>
-              <span className="text-gray-400 dark:text-gray-500">•</span>
-              <span>{completionPercentage}% {__('Complete', 'Complete')}</span>
-            </div>
-            <div className="w-full max-w-md bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${completionPercentage}%` }}
-              />
-            </div>
-            <div className="text-[10px] text-gray-500 dark:text-gray-400">
-              {allSections[currentStepIndex]?.label || __('Overview', 'Overview')}
-            </div>
-          </div>
-
-          {/* Next Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={goToNextSection}
-            disabled={currentStepIndex >= allSections.length - 1}
-            className="flex items-center gap-1.5 text-xs"
-          >
-            {__('Next', 'Next')}
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Button>
-        </div>
-      </div>
-
       {/* Header */}
       <div className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
-        {/* Trip Progress & Quick Actions */}
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-md bg-blue-50 dark:bg-blue-900/20 flex-shrink-0">
-              <Compass className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-gray-900 dark:text-white whitespace-nowrap">
-                  {completionPercentage}%
-                </span>
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                  {completedSections}/{totalRequiredSections} {__('sections', 'sections')}
-                </span>
+        {/* Left Side - Title, Status, Saved Time */}
+        <div className="flex items-center gap-4 min-w-0 flex-1">
+          <div className="min-w-0">
+            <h1 className="text-base font-semibold text-gray-900 dark:text-white truncate">{formData.title || __('New Trip', 'New Trip')}</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge 
+                variant="outline" 
+                className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 ${
+                  formData.status === 'published' 
+                    ? 'text-green-700 dark:text-green-400 border-green-300 dark:border-green-800'
+                    : formData.status === 'review'
+                    ? 'text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800'
+                    : formData.status === 'approved'
+                    ? 'text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-800'
+                    : formData.status === 'archived'
+                    ? 'text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-600'
+                    : 'text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                {formData.status === 'draft' ? __('Draft', 'Draft') 
+                  : formData.status === 'review' ? __('Review', 'Review')
+                  : formData.status === 'approved' ? __('Approved', 'Approved')
+                  : formData.status === 'published' ? __('Published', 'Published')
+                  : __('Archived', 'Archived')}
+              </Badge>
+            {lastSaved && (
+              <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <CheckCircle2 className="w-3.5 h-3.5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-green-700 dark:text-green-300 leading-tight">
+                    {__('Auto-saved', 'Auto-saved')}
+                  </span>
+                  <span className="text-[10px] text-green-600 dark:text-green-400 leading-tight">
+                    {formatTime(lastSaved)}
+                  </span>
+                </div>
               </div>
-              <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden mt-1">
-                <div
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-1.5 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${completionPercentage}%` }}
-                />
-              </div>
+            )}
             </div>
           </div>
           
           {/* Quick Start Mode Toggle */}
           {!isEditMode && (
-            <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-gray-50 dark:bg-gray-700/50">
+            <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-gray-50 dark:bg-gray-700/50 flex-shrink-0">
               <button
                 onClick={() => setSimpleMode(!simpleMode)}
                 className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
@@ -3816,47 +3807,16 @@ const TripForm: React.FC = () => {
               onClick={() => {
                 showToast(__('Guided tour feature coming soon!', 'Guided tour feature coming soon!'), 'info');
               }}
-              className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+              className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 flex-shrink-0"
             >
               <BookOpen className="w-3.5 h-3.5 mr-1" />
               {__('Take a Tour', 'Take a Tour')}
             </Button>
           )}
         </div>
-        
-        <div className="flex-1 text-center">
-          <h1 className="text-base font-semibold text-gray-900 dark:text-white">{formData.title || __('New Trip', 'New Trip')}</h1>
-          <div className="flex items-center justify-center gap-2 mt-1">
-            <Badge 
-              variant="outline" 
-              className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 ${
-                formData.status === 'published' 
-                  ? 'text-green-700 dark:text-green-400 border-green-300 dark:border-green-800'
-                  : formData.status === 'review'
-                  ? 'text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800'
-                  : formData.status === 'approved'
-                  ? 'text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-800'
-                  : formData.status === 'archived'
-                  ? 'text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-600'
-                  : 'text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              {formData.status === 'draft' ? __('Draft', 'Draft') 
-                : formData.status === 'review' ? __('Review', 'Review')
-                : formData.status === 'approved' ? __('Approved', 'Approved')
-                : formData.status === 'published' ? __('Published', 'Published')
-                : __('Archived', 'Archived')}
-            </Badge>
-            {lastSaved && (
-              <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" />
-                {__('Saved', 'Saved')} {formatTime(lastSaved)}
-              </span>
-            )}
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2">
+        {/* Right Side - Action Buttons */}
+        <div className="flex items-center gap-2 flex-shrink-0">
           {isEditMode && (
             <Button
               variant="outline"
@@ -3904,6 +3864,55 @@ const TripForm: React.FC = () => {
         </div>
       </div>
 
+      {/* Navigation Bar with Progress */}
+      <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700 px-4 py-2.5">
+        <div className="flex items-center justify-between gap-4">
+          {/* Previous Button */}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={goToPreviousSection}
+            disabled={currentStepIndex === 0}
+            className="flex items-center gap-2 text-sm font-semibold border-2 border-blue-400 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:border-blue-500 dark:hover:border-blue-500 text-blue-700 dark:text-blue-300 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0 px-4 py-2"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            {__('Previous', 'Previous')}
+          </Button>
+
+          {/* Progress Indicator - Compact */}
+          <div className="flex-1 flex flex-col items-center gap-1 min-w-0 max-w-md mx-4">
+            <div className="flex items-center gap-1.5 text-[10px] font-medium w-full">
+              <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                {__('Step', 'Step')} {currentStepNumber}/{totalSteps}
+              </span>
+              <span className="text-gray-400 dark:text-gray-500">•</span>
+              <span className="text-blue-600 dark:text-blue-400 font-semibold whitespace-nowrap">{completionPercentage}%</span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-blue-500 to-blue-600 h-1.5 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${completionPercentage}%` }}
+              />
+            </div>
+            <div className="text-[9px] font-medium text-gray-600 dark:text-gray-400 truncate w-full text-center">
+              {allSections[currentStepIndex]?.label || __('Overview', 'Overview')}
+            </div>
+          </div>
+
+          {/* Next Button */}
+          <Button
+            variant="outline"
+            size="default"
+            onClick={goToNextSection}
+            disabled={currentStepIndex >= allSections.length - 1}
+            className="flex items-center gap-2 text-sm font-semibold border-2 border-blue-400 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:border-blue-500 dark:hover:border-blue-500 text-blue-700 dark:text-blue-300 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0 px-4 py-2"
+          >
+            {__('Next', 'Next')}
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
       <div className="flex flex-1 min-h-0 p-0">
         {/* Sidebar */}
         <div className="w-80 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto overflow-x-hidden flex-shrink-0 min-h-0">
@@ -3917,33 +3926,44 @@ const TripForm: React.FC = () => {
                 </h3>
               </div>
               <div className="space-y-0.5">
-                {essentialsSections.map((section) => {
+                {essentialsSections.map((section, index) => {
                   const Icon = section.icon;
                   const isActive = currentSection === section.id;
+                  const isNext = !section.completed && essentialsSections.slice(0, index).every(s => s.completed);
                   return (
                     <button
                       key={section.id}
                       type="button"
                       onClick={() => setCurrentSection(section.id)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-all duration-200 text-left group border ${
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-normal transition-all duration-200 text-left group border relative ${
                         isActive
                           ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-sm border-blue-200 dark:border-blue-800'
+                          : isNext
+                          ? 'border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10 text-gray-700 dark:text-gray-300 hover:bg-amber-50 dark:hover:bg-amber-900/20'
                           : 'border-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                        isActive 
-                          ? 'text-blue-600 dark:text-blue-400' 
-                          : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
-                      }`} />
-                      <span className="flex-1 min-w-0 break-words leading-snug">{section.label}</span>
-                      {section.completed && (
-                        <CheckCircle2 className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full ${
+                          isActive
+                            ? 'bg-blue-600 text-white dark:bg-blue-500'
+                            : isNext
+                            ? 'bg-amber-500 text-white'
+                            : section.completed
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                        }`}>
+                          {index + 1}
+                        </span>
+                        <Icon className={`w-4 h-4 transition-colors ${
                           isActive 
                             ? 'text-blue-600 dark:text-blue-400' 
-                            : 'text-green-500 dark:text-green-400'
+                            : isNext
+                            ? 'text-amber-600 dark:text-amber-400'
+                            : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
                         }`} />
-                      )}
+                      </div>
+                      <span className="flex-1 min-w-0 break-words leading-snug">{section.label}</span>
                     </button>
                   );
                 })}
@@ -3979,20 +3999,6 @@ const TripForm: React.FC = () => {
                           : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
                       }`} />
                       <span className="flex-1 min-w-0 break-words leading-snug">{section.label}</span>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {!section.required && (
-                          <span className="text-[9px] font-normal text-gray-400 dark:text-gray-500 uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800">
-                            {__('Opt', 'Opt')}
-                          </span>
-                        )}
-                        {section.completed && (
-                          <CheckCircle2 className={`w-4 h-4 transition-colors ${
-                            isActive 
-                              ? 'text-blue-600 dark:text-blue-400' 
-                              : 'text-green-500 dark:text-green-400'
-                          }`} />
-                        )}
-                      </div>
                     </button>
                   );
                 })}
@@ -4023,13 +4029,6 @@ const TripForm: React.FC = () => {
                       : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
                   }`} />
                   <span className="flex-1 min-w-0 break-words leading-snug">{__('Status & Lifecycle', 'Status & Lifecycle')}</span>
-                  {formData.status !== 'draft' && (
-                    <CheckCircle2 className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                      currentSection === 'advanced' 
-                        ? 'text-blue-600 dark:text-blue-400' 
-                        : 'text-green-500 dark:text-green-400'
-                    }`} />
-                  )}
                 </button>
               </div>
             </div>
@@ -4057,7 +4056,7 @@ const TripForm: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Highlight', 'Add Highlight')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Highlight Text', 'Highlight Text')} <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -4098,7 +4097,7 @@ const TripForm: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Included Item', 'Add Included Item')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Item', 'Item')} <span className="text-red-500">*</span>
                 </label>
                 <Input
@@ -4139,7 +4138,7 @@ const TripForm: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Excluded Item', 'Add Excluded Item')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                   {__('Item', 'Item')} <span className="text-red-500">*</span>
                 </label>
                 <Input

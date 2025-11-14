@@ -20,9 +20,9 @@ export const HelpText: React.FC<HelpTextProps> = ({
   const Icon = variant === 'help' ? HelpCircle : Info;
   
   return (
-    <div className={`flex items-start gap-1.5 text-xs text-gray-500 dark:text-gray-400 ${className}`}>
-      <Icon className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-      <span>{text}</span>
+    <div className={`flex items-start gap-1.5 text-[11px] text-gray-400 dark:text-gray-500 ${className}`}>
+      <Icon className="w-3 h-3 mt-0.5 flex-shrink-0 opacity-60" />
+      <span className="opacity-80">{text}</span>
     </div>
   );
 };
