@@ -263,28 +263,13 @@ class TripRepository extends BaseRepository
                 )
             ) ?: [];
             
-            // For each entry, load items and images
+            // For each entry, load images
             foreach ($entries as $entry) {
                 $entryId = (int) $entry->id;
                 
-                // Get included/excluded items for this entry
-                $includedItems = $wpdb->get_results(
-                    $wpdb->prepare(
-                        "SELECT * FROM `{$tableEntryItems}` 
-                         WHERE entry_id = %d AND item_type = 'included'
-                         ORDER BY `order` ASC",
-                        $entryId
-                    )
-                ) ?: [];
-                
-                $excludedItems = $wpdb->get_results(
-                    $wpdb->prepare(
-                        "SELECT * FROM `{$tableEntryItems}` 
-                         WHERE entry_id = %d AND item_type = 'excluded'
-                         ORDER BY `order` ASC",
-                        $entryId
-                    )
-                ) ?: [];
+                // Note: included_items and excluded_items are no longer stored in a separate table
+                $entry->included_items = [];
+                $entry->excluded_items = [];
                 
                 // Get images for this entry
                 $images = $wpdb->get_results(
@@ -295,21 +280,6 @@ class TripRepository extends BaseRepository
                         $entryId
                     )
                 ) ?: [];
-                
-                // Attach items and images to entry
-                $entry->included_items = array_map(function ($item) {
-                    return [
-                        'title' => $item->title ?? '',
-                        'description' => $item->description ?? '',
-                    ];
-                }, $includedItems);
-                
-                $entry->excluded_items = array_map(function ($item) {
-                    return [
-                        'title' => $item->title ?? '',
-                        'description' => $item->description ?? '',
-                    ];
-                }, $excludedItems);
                 
                 $entry->images = array_map(function ($img) {
                     return $img->image_url ?? '';
@@ -537,11 +507,9 @@ class TripRepository extends BaseRepository
                             'day_number' => $day['day_number'] ?? ($dayIndex + 1),
                             'title' => isset($day['title']) ? sanitize_text_field($day['title']) : null,
                             'description' => isset($day['description']) ? wp_kses_post($day['description']) : null,
-                            'accommodation' => isset($day['accommodation']) ? sanitize_text_field($day['accommodation']) : null,
-                            'meals' => isset($day['meals']) ? sanitize_text_field($day['meals']) : null,
                             'order' => $dayIndex,
                         ],
-                        ['%d', '%d', '%s', '%s', '%s', '%s', '%d']
+                        ['%d', '%d', '%s', '%s', '%d']
                     );
                     
                     // Save entries for this day
@@ -558,9 +526,11 @@ class TripRepository extends BaseRepository
                                         'description' => isset($entry['description']) ? wp_kses_post($entry['description']) : null,
                                         'time' => isset($entry['time']) ? sanitize_text_field($entry['time']) : null,
                                         'location' => isset($entry['location']) ? sanitize_text_field($entry['location']) : null,
+                                        'item_type_id' => isset($entry['item_type_id']) ? (int) $entry['item_type_id'] : null,
+                                        'item_id' => isset($entry['item_id']) ? (int) $entry['item_id'] : null,
                                         'order' => $entryIndex,
                                     ],
-                                    ['%d', '%d', '%s', '%s', '%s', '%s', '%d']
+                                    ['%d', '%d', '%s', '%s', '%s', '%s', '%d', '%d', '%d']
                                 );
                             }
                         }

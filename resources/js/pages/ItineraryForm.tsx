@@ -96,6 +96,11 @@ const ItineraryForm: React.FC = () => {
     return params.get('type');
   }, []);
 
+  const typeIdParam = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('type_id');
+  }, []);
+
   const itemParam = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('item');
@@ -117,8 +122,11 @@ const ItineraryForm: React.FC = () => {
     if (dayParam) {
       setFormData(prev => ({ ...prev, day: dayParam }));
     }
-    if (typeParam) {
-      // Find type ID from name
+    // Handle type_id parameter (preferred - direct ID)
+    if (typeIdParam) {
+      setFormData(prev => ({ ...prev, item_type_id: typeIdParam }));
+    } else if (typeParam) {
+      // Fallback: Find type ID from name (for backward compatibility)
       const typeMap: Record<string, string> = {
         'Meal': '2',
         'Activity': '1',
@@ -133,7 +141,7 @@ const ItineraryForm: React.FC = () => {
     if (itemParam) {
       // This will be set after item_type_id is set and items are loaded
     }
-  }, [tripIdParam, dayParam, typeParam, itemParam]);
+  }, [tripIdParam, dayParam, typeParam, typeIdParam, itemParam]);
 
   // Fetch trips
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery({

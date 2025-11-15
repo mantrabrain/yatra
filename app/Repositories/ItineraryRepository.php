@@ -355,7 +355,6 @@ class ItineraryRepository extends BaseRepository
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
-        $tableItems = $wpdb->prefix . 'yatra_trip_itinerary_entry_items';
         $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
 

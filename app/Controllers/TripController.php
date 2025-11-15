@@ -653,8 +653,6 @@ class TripController extends BaseController
                     'day_number' => isset($day->day_number) ? (int) $day->day_number : 0,
                     'title' => $day->title ?? '',
                     'description' => $day->description ?? '',
-                    'accommodation' => $day->accommodation ?? '',
-                    'meal_plan' => $day->meals ?? $day->meal_plan ?? '', // Database uses 'meals', form uses 'meal_plan'
                     'entries' => [],
                 ];
 
@@ -701,7 +699,8 @@ class TripController extends BaseController
                             'description' => $entry->description ?? '',
                             'location' => $entry->location ?? '',
                             'duration' => $entry->duration ?? '',
-                            'activity_type' => $entry->activity_type ?? '',
+                            'item_type_id' => isset($entry->item_type_id) ? (int) $entry->item_type_id : null,
+                            'item_id' => isset($entry->item_id) ? (int) $entry->item_id : null,
                             'status' => $entry->status ?? 'active',
                             'created_at' => $entry->created_at ?? '',
                             'updated_at' => $entry->updated_at ?? '',

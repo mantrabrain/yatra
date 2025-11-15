@@ -32,6 +32,7 @@ import { Badge } from '../components/ui/badge';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Alert } from '../components/ui/alert';
 import { IconSelector } from '../components/ui/icon-selector';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 
 interface ItineraryEntry {
   id: number;
@@ -42,6 +43,9 @@ interface ItineraryEntry {
   item_type: string;
   item_name: string;
   item_icon: string;
+  item_color?: string;
+  item_type_id: number | null;
+  item_id: number | null;
   title: string;
   description: string;
   location?: string;
@@ -68,6 +72,10 @@ const Itinerary: React.FC = () => {
   const [tripFilter, setTripFilter] = useState(tripIdParam || 'all');
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [selectedDay, setSelectedDay] = useState<{ tripId: number; day: number } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; entry: ItineraryEntry | null }>({
+    isOpen: false,
+    entry: null,
+  });
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
@@ -98,6 +106,9 @@ const Itinerary: React.FC = () => {
       }
     },
     enabled: can('yatra_view_trips'),
+    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch when switching tabs
   });
 
   // Fetch item types and items for mapping
@@ -114,6 +125,11 @@ const Itinerary: React.FC = () => {
       }
     },
     enabled: can('yatra_view_trips'),
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch when switching tabs
+    refetchOnMount: false, // Don't refetch on component mount if data exists
+    refetchOnReconnect: true, // Only refetch on network reconnect
   });
 
   const { data: itemsData } = useQuery({
@@ -121,58 +137,85 @@ const Itinerary: React.FC = () => {
     queryFn: async () => {
       try {
         const response = await apiClient.get('/items', {
-          params: { per_page: 100, status: 'publish' }
+          params: { per_page: 1000, status: 'publish' }
         });
-        return response?.data?.data || response?.data || response || [];
+        // Handle different response structures
+        let items = [];
+        if (response?.data?.data) {
+          items = response.data.data;
+        } else if (response?.data) {
+          items = Array.isArray(response.data) ? response.data : [];
+        } else if (Array.isArray(response)) {
+          items = response;
+        }
+        
+        // Ensure items is an array
+        const itemsArray = Array.isArray(items) ? items : [];
+        
+        return itemsArray;
       } catch (error: any) {
+        console.error('Error fetching items:', error);
         return [];
       }
     },
     enabled: can('yatra_view_trips'),
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch when switching tabs
+    refetchOnMount: false, // Don't refetch on component mount if data exists
+    refetchOnReconnect: true, // Only refetch on network reconnect
   });
 
-  // Helper function to map activity_type to item_type/item_name/item_icon
-  const mapActivityType = (activityType: string | null | undefined) => {
-    if (!activityType) {
-      return { item_type: 'Activity', item_name: 'Activity', item_icon: 'footprints' };
-    }
-
-    // Try to find in item types and items
+  // Helper function to map item_type_id and item_id to item_type/item_name/item_icon/item_color
+  const mapItemIds = (itemTypeId: number | null | undefined, itemId: number | null | undefined) => {
     const itemTypes = Array.isArray(itemTypesData) ? itemTypesData : [];
     const items = Array.isArray(itemsData) ? itemsData : [];
 
-    // First, try to find by activity_type matching item name
-    const matchedItem = items.find((item: any) => 
-      item.name?.toLowerCase() === activityType.toLowerCase()
-    );
+    // Find item type
+    const itemType = itemTypeId ? itemTypes.find((type: any) => type.id === itemTypeId || type.id?.toString() === itemTypeId?.toString()) : null;
+    
+    // Find item
+    const item = itemId ? items.find((it: any) => it.id === itemId || it.id?.toString() === itemId?.toString()) : null;
 
-    if (matchedItem && matchedItem.type_id) {
-      const itemType = itemTypes.find((type: any) => type.id === matchedItem.type_id);
-      if (itemType) {
-        return {
-          item_type: itemType.name || 'Activity',
-          item_name: matchedItem.name || activityType,
-          item_icon: itemType.icon || 'footprints',
-        };
+    // Extract icon and color from item type
+    let iconName = 'footprints'; // default
+    let itemColor = 'gray'; // default
+    if (itemType) {
+      // Extract icon
+      if (itemType.icon) {
+        if (typeof itemType.icon === 'string') {
+          iconName = itemType.icon;
+        } else if (typeof itemType.icon === 'object' && itemType.icon.value) {
+          iconName = itemType.icon.value;
+        }
+      }
+      // Extract color
+      if (itemType.color) {
+        itemColor = itemType.color;
       }
     }
 
-    // Fallback: map common activity types
-    const typeMap: Record<string, { item_type: string; item_name: string; item_icon: string }> = {
-      'meal': { item_type: 'Meal', item_name: 'Meal', item_icon: 'utensils' },
-      'activity': { item_type: 'Activity', item_name: 'Activity', item_icon: 'footprints' },
-      'accommodation': { item_type: 'Accommodation', item_name: 'Hotel Stay', item_icon: 'hotel' },
-      'transportation': { item_type: 'Transportation', item_name: 'Transfer', item_icon: 'car' },
-    };
-
-    const lowerType = activityType.toLowerCase();
-    for (const [key, value] of Object.entries(typeMap)) {
-      if (lowerType.includes(key)) {
-        return value;
-      }
+    if (itemType && item) {
+      return {
+        item_type: itemType.name || 'Activity',
+        item_name: item.name || 'Activity',
+        item_icon: iconName,
+        item_color: itemColor,
+      };
     }
 
-    return { item_type: 'Activity', item_name: activityType, item_icon: 'footprints' };
+    if (itemType) {
+      // Only item type found
+      return {
+        item_type: itemType.name || 'Activity',
+        item_name: itemType.name || 'Activity',
+        item_icon: iconName,
+        item_color: itemColor,
+      };
+    }
+
+    // Fallback
+    return { item_type: 'Activity', item_name: 'Activity', item_icon: 'footprints', item_color: 'gray' };
   };
 
   // Helper to parse time field to start_time and end_time
@@ -237,7 +280,7 @@ const Itinerary: React.FC = () => {
                   continue;
                 }
 
-                const mapped = mapActivityType(entry.activity_type);
+                const mapped = mapItemIds(entry.item_type_id, entry.item_id);
                 const times = parseTime(entry.time);
 
                 const processedEntry = {
@@ -249,6 +292,9 @@ const Itinerary: React.FC = () => {
                   item_type: mapped.item_type,
                   item_name: mapped.item_name,
                   item_icon: mapped.item_icon,
+                  item_color: mapped.item_color || 'gray',
+                  item_type_id: entry.item_type_id || null,
+                  item_id: entry.item_id || null,
                   title: entry.title || '',
                   description: entry.description || '',
                   location: entry.location || '',
@@ -314,25 +360,27 @@ const Itinerary: React.FC = () => {
   }, [data, expandedDays.size]);
 
   const deleteMutation = useMutation({
-    mutationFn: async (_entry: ItineraryEntry) => {
+    mutationFn: async (entry: ItineraryEntry) => {
       try {
-        // Note: Itinerary entries are part of trips, so deletion requires updating the trip
-        // For now, we'll show a message that this needs to be done through the trip edit form
-        // In the future, we could implement a direct delete endpoint
-        showToast(__('Please delete itinerary entries through the trip edit form', 'Please delete itinerary entries through the trip edit form'), 'info');
-        return { success: false, message: 'Delete through trip form' };
+        const response = await apiClient.delete(`/itinerary/${entry.id}`);
+        return response?.data || response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to delete itinerary entry', 'Failed to delete itinerary entry'), 'error');
         throw error;
       }
     },
     onSuccess: () => {
+      showToast(__('Itinerary entry deleted successfully', 'Itinerary entry deleted successfully'), 'success');
+      // Close confirmation dialog
+      setDeleteConfirm({ isOpen: false, entry: null });
       // Refresh itinerary data
       queryClient.invalidateQueries({ queryKey: ['itinerary'] });
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       queryClient.invalidateQueries({ queryKey: ['trips-simple'] });
       // Force refetch
       refetch();
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete itinerary entry', 'Failed to delete itinerary entry'), 'error');
     },
   });
 
@@ -383,14 +431,8 @@ const Itinerary: React.FC = () => {
   // Get quick add options from item types and items
   const quickAddOptions = useMemo(() => {
     const itemTypes = Array.isArray(itemTypesData) ? itemTypesData : [];
-    const items = Array.isArray(itemsData) ? itemsData : [];
     
     return itemTypes.map((itemType: any) => {
-      // Find first item of this type
-      const firstItem = items.find((item: any) => 
-        item.type_id === itemType.id || item.type_id === itemType.id?.toString()
-      );
-      
       // Extract icon - handle both string and object formats
       let iconName = 'footprints'; // default
       if (itemType.icon) {
@@ -416,13 +458,11 @@ const Itinerary: React.FC = () => {
         typeIcon: iconName,
         typeIconData: itemType.icon, // Keep full icon data for image handling
         typeColor: color,
-        itemId: firstItem?.id || null,
-        itemName: firstItem?.name || itemType.name || '',
       };
     }).filter((option: any) => option.typeName); // Filter out invalid options
-  }, [itemTypesData, itemsData]);
+  }, [itemTypesData]);
 
-  const handleQuickAdd = (typeId: number | string, _itemId: number | string | null, itemName: string) => {
+  const handleQuickAdd = (typeId: number | string) => {
     if (!selectedDay) {
       // Select first day if none selected
       const firstDay = data?.[0];
@@ -436,12 +476,8 @@ const Itinerary: React.FC = () => {
     const tripId = selectedDay?.tripId || (tripFilter !== 'all' ? parseInt(tripFilter) : 1);
     const day = selectedDay?.day || 1;
     
-    // Use item type name for type param and item name for item param
-    const itemTypes = Array.isArray(itemTypesData) ? itemTypesData : [];
-    const itemType = itemTypes.find((type: any) => type.id === typeId || type.id?.toString() === typeId?.toString());
-    const typeName = itemType?.name || '';
-    
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&type=${encodeURIComponent(typeName)}&item=${encodeURIComponent(itemName)}`;
+    // Use item type ID for navigation
+    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&type_id=${typeId}`;
   };
 
   const handleEdit = (entry: ItineraryEntry) => {
@@ -449,10 +485,17 @@ const Itinerary: React.FC = () => {
   };
 
   const handleDelete = (entry: ItineraryEntry) => {
-    const confirmMessage = __('Are you sure you want to delete this itinerary entry? This action cannot be undone.', 'Are you sure you want to delete this itinerary entry? This action cannot be undone.');
-    if (confirm(confirmMessage)) {
-      deleteMutation.mutate(entry);
+    setDeleteConfirm({ isOpen: true, entry });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteConfirm.entry) {
+      deleteMutation.mutate(deleteConfirm.entry);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirm({ isOpen: false, entry: null });
   };
 
   const toggleDay = (tripId: number, day: number) => {
@@ -476,20 +519,6 @@ const Itinerary: React.FC = () => {
     return { meals, activities, accommodations, total: entries.length };
   };
 
-  const getItemTypeColor = (type: string) => {
-    switch (type) {
-      case 'Meal':
-        return 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400';
-      case 'Activity':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400';
-      case 'Accommodation':
-        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400';
-      case 'Transportation':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400';
-      default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
-    }
-  };
 
   const formatTime = (time: string) => {
     // Convert 24h to 12h format
@@ -759,7 +788,7 @@ const Itinerary: React.FC = () => {
                                   key={option.typeId}
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => handleQuickAdd(option.typeId, option.itemId, option.itemName)}
+                                  onClick={() => handleQuickAdd(option.typeId)}
                                   className={`flex items-center gap-2 ${colorClass}`}
                                   style={{
                                     borderColor: option.typeColor ? `var(--color-${option.typeColor}-500)` : undefined,
@@ -777,7 +806,7 @@ const Itinerary: React.FC = () => {
                                       className="w-4 h-4"
                                     />
                                   )}
-                                  {option.itemName}
+                                  {option.typeName}
                                 </Button>
                               );
                             })
@@ -811,13 +840,40 @@ const Itinerary: React.FC = () => {
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <Badge className={`${getItemTypeColor(entry.item_type)} text-xs font-medium px-2 py-0.5`}>
+                                    <Badge 
+                                      className="text-xs font-medium px-2 py-0.5"
+                                      style={{
+                                        backgroundColor: entry.item_color === 'blue' ? 'rgb(219, 234, 254)' : 
+                                                       entry.item_color === 'green' ? 'rgb(220, 252, 231)' :
+                                                       entry.item_color === 'orange' ? 'rgb(255, 237, 213)' :
+                                                       entry.item_color === 'purple' ? 'rgb(243, 232, 255)' :
+                                                       entry.item_color === 'red' ? 'rgb(254, 226, 226)' :
+                                                       entry.item_color === 'yellow' ? 'rgb(254, 249, 195)' :
+                                                       'rgb(243, 244, 246)',
+                                        color: entry.item_color === 'blue' ? 'rgb(29, 78, 216)' :
+                                               entry.item_color === 'green' ? 'rgb(21, 128, 61)' :
+                                               entry.item_color === 'orange' ? 'rgb(194, 65, 12)' :
+                                               entry.item_color === 'purple' ? 'rgb(126, 34, 206)' :
+                                               entry.item_color === 'red' ? 'rgb(185, 28, 28)' :
+                                               entry.item_color === 'yellow' ? 'rgb(161, 98, 7)' :
+                                               'rgb(55, 65, 81)',
+                                        borderColor: entry.item_color === 'blue' ? 'rgb(147, 197, 253)' :
+                                                    entry.item_color === 'green' ? 'rgb(134, 239, 172)' :
+                                                    entry.item_color === 'orange' ? 'rgb(254, 215, 170)' :
+                                                    entry.item_color === 'purple' ? 'rgb(221, 214, 254)' :
+                                                    entry.item_color === 'red' ? 'rgb(252, 165, 165)' :
+                                                    entry.item_color === 'yellow' ? 'rgb(253, 230, 138)' :
+                                                    'rgb(209, 213, 219)',
+                                        borderWidth: '1px',
+                                        borderStyle: 'solid',
+                                      }}
+                                    >
                                       <div className="flex items-center gap-1.5">
                                         <IconSelector 
                                           iconName={entry.item_icon as any} 
                                           className="w-3 h-3"
                                         />
-                                        <span>{entry.item_name}</span>
+                                        <span>{entry.item_type}</span>
                                       </div>
                                     </Badge>
                                   </div>
@@ -846,7 +902,16 @@ const Itinerary: React.FC = () => {
                                 {/* Actions */}
                                 <div className="flex items-center gap-1 relative z-10">
                                   <Select
-                                    value={entry.item_name || ''}
+                                    value={(() => {
+                                      // Find the current item by item_id to get exact name match
+                                      if (entry.item_id && itemsData) {
+                                        const currentItem = itemsData.find((item: any) => 
+                                          item.id === entry.item_id || item.id?.toString() === entry.item_id?.toString()
+                                        );
+                                        return currentItem?.name || entry.item_name || '';
+                                      }
+                                      return entry.item_name || '';
+                                    })()}
                                     className="h-8 text-xs min-w-[140px] w-auto relative z-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 px-2 py-1"
                                     style={{ 
                                       minWidth: '140px', 
@@ -867,17 +932,13 @@ const Itinerary: React.FC = () => {
                                         item.name === selectedItemName
                                       );
                                       
-                                      // Find the item type
-                                      const itemType = itemTypesData?.find((type: any) => 
-                                        type.name === entry.item_type
-                                      );
-                                      
-                                      if (selectedItem && itemType) {
+                                      // Use entry.item_type_id directly (no need to find by name)
+                                      if (selectedItem && entry.item_type_id) {
                                         // Update the entry with new item
                                         updateItemMutation.mutate({
                                           entryId: entry.id,
                                           itemId: selectedItem.id,
-                                          itemTypeId: itemType.id,
+                                          itemTypeId: entry.item_type_id,
                                         });
                                       }
                                     }}
@@ -885,17 +946,65 @@ const Itinerary: React.FC = () => {
                                   >
                                     <option value="">{__('Select item...', 'Select item...')}</option>
                                     {(() => {
-                                      // Find the item type ID from entry.item_type
-                                      const itemType = itemTypesData?.find((type: any) => 
-                                        type.name === entry.item_type
-                                      );
+                                      // Use entry.item_type_id directly
+                                      const itemTypeId = entry.item_type_id;
                                       
-                                      if (!itemType) return null;
+                                      // Ensure itemsData is an array
+                                      const allItems = Array.isArray(itemsData) ? itemsData : [];
                                       
-                                      // Filter items by this item type
-                                      const filteredItems = itemsData?.filter((item: any) => 
-                                        item.type_id === itemType.id || item.type_id === itemType.id?.toString()
-                                      ) || [];
+                                      if (!itemTypeId || itemTypeId === null || itemTypeId === undefined) {
+                                        return (
+                                          <option value="" disabled>
+                                            {__('No item type selected', 'No item type selected')}
+                                          </option>
+                                        );
+                                      }
+                                      
+                                      if (allItems.length === 0) {
+                                        return (
+                                          <option value="" disabled>
+                                            {__('Loading items...', 'Loading items...')}
+                                          </option>
+                                        );
+                                      }
+                                      
+                                      // Convert itemTypeId to number for comparison
+                                      const itemTypeIdNum = itemTypeId ? (typeof itemTypeId === 'string' ? parseInt(itemTypeId, 10) : Number(itemTypeId)) : null;
+                                      
+                                      if (!itemTypeIdNum || itemTypeIdNum <= 0 || isNaN(itemTypeIdNum)) {
+                                        return (
+                                          <option value="" disabled>
+                                            {__('Invalid item type', 'Invalid item type')}
+                                          </option>
+                                        );
+                                      }
+                                      
+                                      // Filter items by this item type ID
+                                      // Items from API have 'type_id' field
+                                      const filteredItems = allItems.filter((item: any) => {
+                                        if (!item || !item.id) return false;
+                                        
+                                        // Get type_id from item - could be type_id or item_type_id
+                                        const itemTypeIdFromItem = item.type_id || item.item_type_id;
+                                        
+                                        if (!itemTypeIdFromItem) return false;
+                                        
+                                        // Convert to number for comparison
+                                        const itemTypeIdNumFromItem = typeof itemTypeIdFromItem === 'string' 
+                                          ? parseInt(itemTypeIdFromItem, 10) 
+                                          : Number(itemTypeIdFromItem);
+                                        
+                                        // Compare as numbers
+                                        return !isNaN(itemTypeIdNumFromItem) && itemTypeIdNumFromItem === itemTypeIdNum;
+                                      });
+                                      
+                                      if (filteredItems.length === 0) {
+                                        return (
+                                          <option value="" disabled>
+                                            {__('No items available for this type', 'No items available for this type')}
+                                          </option>
+                                        );
+                                      }
                                       
                                       return filteredItems.map((item: any) => (
                                         <option key={item.id} value={item.name}>
@@ -957,6 +1066,18 @@ const Itinerary: React.FC = () => {
           </div>
         )}
       </ConditionalRender>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title={__('Delete Itinerary Entry', 'Delete Itinerary Entry')}
+        message={__('Are you sure you want to delete this itinerary entry? This action cannot be undone.', 'Are you sure you want to delete this itinerary entry? This action cannot be undone.')}
+        confirmText={__('Delete', 'Delete')}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 };
