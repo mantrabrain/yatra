@@ -97,7 +97,11 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                 // Reset item_id when type changes
                 onFieldChange('item_id', '');
               }}
-              className={`${errors.item_type_id ? 'border-red-500' : ''} ${textSize}`}
+              className={`${errors.item_type_id ? 'border-red-500' : ''} ${textSize} text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800`}
+              style={{
+                color: 'rgb(17, 24, 39)',
+                backgroundColor: 'rgb(255, 255, 255)',
+              }}
               required
             >
               <option value="">{__('Select a type...', 'Select a type...')}</option>
@@ -127,7 +131,11 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
               value={entry.item_id || ''}
               onChange={(e) => onFieldChange('item_id', e.target.value)}
               disabled={!entry.item_type_id || items.length === 0}
-              className={`${errors.item_id ? 'border-red-500' : ''} ${textSize}`}
+              className={`${errors.item_id ? 'border-red-500' : ''} ${textSize} text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800`}
+              style={{
+                color: 'rgb(17, 24, 39)',
+                backgroundColor: 'rgb(255, 255, 255)',
+              }}
               required
             >
               <option value="">

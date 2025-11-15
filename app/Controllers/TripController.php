@@ -661,16 +661,53 @@ class TripController extends BaseController
                 // Load entries if they exist
                 if (isset($day->entries) && is_array($day->entries)) {
                     $dayData['entries'] = array_map(function ($entry) {
+                        // Handle included_items - already array from repository or JSON string
+                        $includedItems = [];
+                        if (isset($entry->included_items)) {
+                            if (is_array($entry->included_items)) {
+                                $includedItems = $entry->included_items;
+                            } elseif (is_string($entry->included_items)) {
+                                $decoded = json_decode($entry->included_items, true);
+                                $includedItems = is_array($decoded) ? $decoded : [];
+                            }
+                        }
+
+                        // Handle excluded_items - already array from repository or JSON string
+                        $excludedItems = [];
+                        if (isset($entry->excluded_items)) {
+                            if (is_array($entry->excluded_items)) {
+                                $excludedItems = $entry->excluded_items;
+                            } elseif (is_string($entry->excluded_items)) {
+                                $decoded = json_decode($entry->excluded_items, true);
+                                $excludedItems = is_array($decoded) ? $decoded : [];
+                            }
+                        }
+
+                        // Handle images - already array from repository or JSON string
+                        $images = [];
+                        if (isset($entry->images)) {
+                            if (is_array($entry->images)) {
+                                $images = $entry->images;
+                            } elseif (is_string($entry->images)) {
+                                $decoded = json_decode($entry->images, true);
+                                $images = is_array($decoded) ? $decoded : [];
+                            }
+                        }
+
                         return [
                             'id' => isset($entry->id) ? (int) $entry->id : null,
                             'time' => $entry->time ?? '',
                             'title' => $entry->title ?? '',
                             'description' => $entry->description ?? '',
                             'location' => $entry->location ?? '',
+                            'duration' => $entry->duration ?? '',
                             'activity_type' => $entry->activity_type ?? '',
-                            'included_items' => isset($entry->included_items) ? json_decode($entry->included_items, true) : [],
-                            'excluded_items' => isset($entry->excluded_items) ? json_decode($entry->excluded_items, true) : [],
-                            'images' => isset($entry->images) ? (is_array($entry->images) ? $entry->images : json_decode($entry->images, true)) : [],
+                            'status' => $entry->status ?? 'active',
+                            'created_at' => $entry->created_at ?? '',
+                            'updated_at' => $entry->updated_at ?? '',
+                            'included_items' => $includedItems,
+                            'excluded_items' => $excludedItems,
+                            'images' => $images,
                         ];
                     }, $day->entries);
                 }

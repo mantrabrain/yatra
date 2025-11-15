@@ -224,7 +224,6 @@ class TripRepository extends BaseRepository
         global $wpdb;
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
         $tableEntries = $wpdb->prefix . 'yatra_trip_itinerary_entries';
-        $tableEntryItems = $wpdb->prefix . 'yatra_trip_itinerary_entry_items';
         $tableEntryImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
         
         // Check if tables exist, return empty array if they don't

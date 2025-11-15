@@ -86,7 +86,7 @@ interface TravelerCategory {
   description: string;
   age_min?: number;
   age_max?: number;
-  status: 'active' | 'inactive';
+  status: 'active' | 'inactive' | 'publish' | 'draft';
 }
 
 interface PriceType {
@@ -192,7 +192,6 @@ interface TripFormData {
   discounted_price: string;
   price_types: PriceType[];
   sale_price: string;
-  currency: string;
   deposit_amount: string;
   deposit_percentage: string;
   payment_terms: string;
@@ -302,6 +301,20 @@ interface ItineraryDay {
   entries: ItineraryEntry[];
 }
 
+// Helper function to get currency symbol
+const getCurrencySymbol = (currency: string): string => {
+  const symbols: Record<string, string> = {
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'INR': '₹',
+    'NPR': '₨',
+    'AUD': 'A$',
+    'CAD': 'C$',
+  };
+  return symbols[currency] || currency;
+};
+
 const TripForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
@@ -387,7 +400,6 @@ const TripForm: React.FC = () => {
         { category_id: 3, original_price: '0', discounted_price: '' },
       ],
       sale_price: '',
-      currency: 'USD',
       deposit_amount: '300',
       deposit_percentage: '',
       payment_terms: '50% deposit required at booking, remaining 50% due 30 days before departure',
@@ -494,7 +506,6 @@ const TripForm: React.FC = () => {
       original_price: '1899',
       discounted_price: '1699',
       sale_price: '',
-      currency: 'USD',
       deposit_amount: '500',
       deposit_percentage: '',
       payment_terms: '50% deposit required at booking, remaining 50% due 60 days before departure',
@@ -603,7 +614,6 @@ const TripForm: React.FC = () => {
       original_price: '2499',
       discounted_price: '',
       sale_price: '2199',
-      currency: 'USD',
       deposit_amount: '600',
       deposit_percentage: '',
       payment_terms: '40% deposit required at booking, remaining 60% due 45 days before departure',
@@ -713,7 +723,6 @@ const TripForm: React.FC = () => {
     discounted_price: '',
     price_types: [],
     sale_price: '',
-    currency: 'USD',
     deposit_amount: '',
     deposit_percentage: '',
     payment_terms: '',
@@ -773,25 +782,51 @@ const TripForm: React.FC = () => {
   const isEditMode = action === 'edit' && tripId !== null;
 
   // Fetch traveler categories
-  const { data: travelerCategories = [], isLoading: isLoadingCategories } = useQuery<TravelerCategory[]>({
+  const { data: travelerCategoriesData, isLoading: isLoadingCategories } = useQuery({
     queryKey: ['traveler-categories'],
     queryFn: async () => {
-      // Simulate API call - replace with actual API
-      await new Promise(resolve => setTimeout(resolve, 300));
-      return [
-        { id: 1, label: 'Adult', description: 'Standard adult pricing', age_min: 18, age_max: undefined, status: 'active' as const },
-        { id: 2, label: 'Child', description: 'Pricing for children', age_min: 5, age_max: 17, status: 'active' as const },
-        { id: 3, label: 'Infant', description: 'Pricing for infants', age_min: 0, age_max: 4, status: 'active' as const },
-        { id: 4, label: 'Senior', description: 'Senior citizen pricing', age_min: 60, age_max: undefined, status: 'active' as const },
-        { id: 5, label: 'Student', description: 'Student pricing', age_min: undefined, age_max: undefined, status: 'active' as const },
-      ];
+      try {
+        const response = await apiClient.get('/traveler-categories', {
+          params: {
+            per_page: 100,
+            status: 'publish' // Only get published categories
+          }
+        });
+        const categories = response?.data?.data || response?.data || response || [];
+        return Array.isArray(categories) ? categories : [];
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load traveler categories', 'Failed to load traveler categories'), 'error');
+        return [];
+      }
     },
+    enabled: can('yatra_view_trips'),
   });
 
-  // Get only active categories
+  // Get only active/published categories
   const activeCategories = useMemo(() => {
-    return travelerCategories.filter(cat => cat.status === 'active');
-  }, [travelerCategories]);
+    const categories = travelerCategoriesData || [];
+    return categories.filter((cat: TravelerCategory) => 
+      cat.status === 'active' || cat.status === 'publish'
+    );
+  }, [travelerCategoriesData]);
+
+  // Fetch settings to get global currency
+  const { data: settingsData } = useQuery({
+    queryKey: ['settings'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/settings');
+        return response;
+      } catch (error: any) {
+        // Return default currency if settings fetch fails
+        return { currency: 'USD' };
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
+  // Get global currency from settings, default to USD
+  const globalCurrency = settingsData?.currency || settingsData?.default_currency || 'USD';
 
   // Fetch activities from API
   const { data: activitiesData } = useQuery({
@@ -1031,7 +1066,6 @@ const TripForm: React.FC = () => {
           discounted_price: pt.discounted_price?.toString() || '',
         })) : [],
         sale_price: tripData.sale_price?.toString() || '',
-        currency: tripData.currency || 'USD',
         deposit_amount: tripData.deposit_amount?.toString() || '',
         deposit_percentage: tripData.deposit_percentage?.toString() || '',
         payment_terms: tripData.payment_terms || '',
@@ -1085,7 +1119,7 @@ const TripForm: React.FC = () => {
       'basic': ['title', 'slug', 'description', 'featured_image', 'trip_type', 'duration_days', 'duration_nights'],
       'location': ['destinations', 'starting_location', 'ending_location'],
       'duration': ['available_from', 'available_to', 'booking_window_days'],
-      'pricing': ['original_price', 'discounted_price', 'price_types', 'currency'],
+      'pricing': ['original_price', 'discounted_price', 'price_types'],
       'booking': ['min_travelers', 'max_travelers', 'age_min', 'age_max'],
       'itinerary': ['itinerary_days'],
       'included': ['included_items', 'excluded_items'],
@@ -1801,7 +1835,6 @@ const TripForm: React.FC = () => {
           discounted_price: pt.discounted_price ? parseFloat(pt.discounted_price) : null,
         })) : [],
         sale_price: data.sale_price ? parseFloat(data.sale_price) : null,
-        currency: data.currency,
         deposit_amount: data.deposit_amount ? parseFloat(data.deposit_amount) : null,
         deposit_percentage: data.deposit_percentage ? parseFloat(data.deposit_percentage) : null,
         payment_terms: data.payment_terms.trim(),
@@ -3408,24 +3441,6 @@ const TripForm: React.FC = () => {
             </p>
 
             <div className="space-y-4">
-              {/* Currency */}
-              <div>
-                <label htmlFor="currency" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Currency', 'Currency')}
-                </label>
-                <Select
-                  id="currency"
-                  value={formData.currency}
-                  onChange={(e) => handleFieldChange('currency', e.target.value)}
-                >
-                  <option value="USD">USD - US Dollar</option>
-                  <option value="EUR">EUR - Euro</option>
-                  <option value="GBP">GBP - British Pound</option>
-                  <option value="INR">INR - Indian Rupee</option>
-                  <option value="AUD">AUD - Australian Dollar</option>
-                </Select>
-              </div>
-
               {/* Pricing Type Selection */}
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-3">
@@ -3520,7 +3535,7 @@ const TripForm: React.FC = () => {
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                          {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                          {getCurrencySymbol(globalCurrency)}
                         </span>
                         <Input
                           type="number"
@@ -3543,7 +3558,7 @@ const TripForm: React.FC = () => {
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                          {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                          {getCurrencySymbol(globalCurrency)}
                         </span>
                         <Input
                           type="number"
@@ -3722,7 +3737,7 @@ const TripForm: React.FC = () => {
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                      {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                                      {getCurrencySymbol(globalCurrency)}
                                     </span>
                                     <Input
                                       type="number"
@@ -3746,7 +3761,7 @@ const TripForm: React.FC = () => {
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                      {formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}
+                                      {getCurrencySymbol(globalCurrency)}
                                     </span>
                                     <Input
                                       type="number"
@@ -3800,7 +3815,7 @@ const TripForm: React.FC = () => {
                   {__('Apply a sale price discount to all price types', 'Apply a sale price discount to all price types')}
                 </p>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{getCurrencySymbol(globalCurrency)}</span>
                   <Input
                     id="sale_price"
                     type="number"
@@ -3823,7 +3838,7 @@ const TripForm: React.FC = () => {
                       {__('Deposit Amount', 'Deposit Amount')}
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{formData.currency === 'USD' ? '$' : formData.currency === 'EUR' ? '€' : formData.currency === 'GBP' ? '£' : '₹'}</span>
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{getCurrencySymbol(globalCurrency)}</span>
                       <Input
                         id="deposit_amount"
                         type="number"

@@ -11,6 +11,7 @@ import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { SearchableSelect } from '../components/ui/searchable-select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
@@ -18,6 +19,7 @@ import { HelpText } from '../components/ui/help-text';
 import { Alert } from '../components/ui/alert';
 import { ItineraryEntryFields } from '../components/trip-form/shared/ItineraryEntryFields';
 import { apiClient } from '../lib/api';
+import { useToast } from '../components/ui/toast';
 
 interface ItineraryFormData {
   trip_id: string;
@@ -43,6 +45,7 @@ interface ItineraryFormData {
 const ItineraryForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<ItineraryFormData>({
     trip_id: '',
     day: '1',
@@ -61,7 +64,7 @@ const ItineraryForm: React.FC = () => {
     notes: '',
     included_items: [],
     excluded_items: [],
-    status: 'active',
+    status: 'draft',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -98,7 +101,13 @@ const ItineraryForm: React.FC = () => {
     return params.get('item');
   }, []);
 
+  const modeParam = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('mode') || 'activity'; // 'day' or 'activity'
+  }, []);
+
   const isEditMode = action === 'edit' && entryId !== null;
+  const isAddDayMode = !isEditMode && modeParam === 'day';
 
   // Initialize from URL params
   useEffect(() => {
@@ -127,15 +136,24 @@ const ItineraryForm: React.FC = () => {
   }, [tripIdParam, dayParam, typeParam, itemParam]);
 
   // Fetch trips
-  const { data: tripsData } = useQuery({
+  const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
     queryKey: ['trips-simple'],
     queryFn: async () => {
-      return [
-        { id: 1, title: 'Everest Base Camp Trek' },
-        { id: 2, title: 'Annapurna Circuit Adventure' },
-        { id: 3, title: 'Golden Triangle Tour' },
-      ];
+      try {
+        const response = await apiClient.get('/trips', {
+          params: {
+            per_page: 100,
+            status: 'all' // Get all trips for selection
+          }
+        });
+        const trips = response?.data?.data || response?.data || response || [];
+        return Array.isArray(trips) ? trips : [];
+      } catch (error: any) {
+        console.error('Failed to load trips:', error);
+        return [];
+      }
     },
+    enabled: can('yatra_view_trips'),
   });
 
   // Fetch item types - only published ones are usable
@@ -172,7 +190,9 @@ const ItineraryForm: React.FC = () => {
             status: 'publish' // Only get published items
           } 
         });
-        return response.data || [];
+        // Handle different response structures
+        const items = response?.data?.data || response?.data || response || [];
+        return Array.isArray(items) ? items : [];
       } catch (error: any) {
         console.error('Failed to load items:', error);
         return [];
@@ -196,27 +216,15 @@ const ItineraryForm: React.FC = () => {
     queryKey: ['itinerary-entry', entryId],
     queryFn: async () => {
       if (!entryId) return null;
-      return {
-        id: entryId,
-        trip_id: 1,
-        day: 1,
-        day_title: 'Arrival & Welcome',
-        item_type_id: 1,
-        item_id: 1,
-        title: 'Arrival in Kathmandu',
-        description: 'Arrive at airport and transfer to hotel',
-        location: 'Tribhuvan International Airport',
-        duration: '4 hours',
-        start_time: '08:00',
-        end_time: '12:00',
-        time_type: 'exact',
-        cost: '0',
-        cost_per_person: true,
-        notes: 'Please arrive 2 hours before flight',
-        included_items: ['Airport transfer', 'Welcome drink'],
-        excluded_items: ['Lunch', 'Tips'],
-        status: 'active',
-      };
+      try {
+        const response = await apiClient.get(`/itinerary/${entryId}`);
+        const data = response?.data?.data || response?.data || response;
+        return data;
+      } catch (error: any) {
+        console.error('Failed to load itinerary entry:', error);
+        showToast(error?.message || __('Failed to load itinerary entry', 'Failed to load itinerary entry'), 'error');
+        return null;
+      }
     },
     enabled: isEditMode && can('yatra_view_trips'),
   });
@@ -241,7 +249,7 @@ const ItineraryForm: React.FC = () => {
         notes: entryData.notes || '',
         included_items: entryData.included_items || [],
         excluded_items: entryData.excluded_items || [],
-        status: entryData.status || 'active',
+        status: entryData.status || 'draft',
       });
     }
   }, [entryData, isEditMode]);
@@ -376,19 +384,52 @@ const ItineraryForm: React.FC = () => {
       };
 
       if (isEditMode && entryId) {
-        console.log('Updating itinerary entry:', entryId, payload);
-        return { success: true, id: entryId };
+        const response = await apiClient.put(`/itinerary/${entryId}`, payload);
+        return response.data || response;
       } else {
-        console.log('Creating itinerary entry:', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+        const response = await apiClient.post('/itinerary', payload);
+        return response.data || response;
       }
     },
     onSuccess: () => {
+      // Invalidate all itinerary-related queries
       queryClient.invalidateQueries({ queryKey: ['itinerary'] });
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary`;
+      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips-simple'] });
+      
+      // Also invalidate the specific trip query if we have trip_id
+      if (formData.trip_id) {
+        queryClient.invalidateQueries({ 
+          queryKey: ['trips', parseInt(formData.trip_id)] 
+        });
+        // Force refetch the trip data
+        queryClient.refetchQueries({ 
+          queryKey: ['trips', parseInt(formData.trip_id)] 
+        });
+      }
+      
+      // Force refetch all trips to ensure fresh data
+      queryClient.refetchQueries({ queryKey: ['trips'] });
+      queryClient.refetchQueries({ queryKey: ['trips-simple'] });
+      
+      // Show success toast first
+      showToast(
+        isEditMode 
+          ? __('Itinerary entry updated successfully', 'Itinerary entry updated successfully')
+          : __('Itinerary entry created successfully', 'Itinerary entry created successfully'),
+        'success'
+      );
+      
+      // Redirect after toast is shown (small delay to ensure toast is visible and cache is cleared)
+      setTimeout(() => {
+        const tripIdParam = formData.trip_id ? `&trip_id=${formData.trip_id}` : '';
+        // Force a hard reload to ensure fresh data
+        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary${tripIdParam}`;
+      }, 1000);
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving', 'An error occurred while saving');
+      showToast(errorMessage, 'error');
       setErrors({ submit: errorMessage });
       setIsSubmitting(false);
     },
@@ -419,15 +460,26 @@ const ItineraryForm: React.FC = () => {
     );
   }
 
-  const trips = tripsData || [];
   const types = typesData || [];
   const items = itemsData || [];
 
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Itinerary Entry', 'Edit Itinerary Entry') : __('Add New Itinerary Entry', 'Add New Itinerary Entry')}
-        description={isEditMode ? __('Update itinerary entry information', 'Update itinerary entry information') : __('Create a new itinerary entry for a trip. Each entry belongs to a specific trip, day, item type, and item.', 'Create a new itinerary entry for a trip. Each entry belongs to a specific trip, day, item type, and item.')}
+        title={
+          isEditMode 
+            ? __('Edit Itinerary Entry', 'Edit Itinerary Entry') 
+            : isAddDayMode
+            ? __('Add New Day', 'Add New Day')
+            : __('Add New Activity', 'Add New Activity')
+        }
+        description={
+          isEditMode 
+            ? __('Update itinerary entry information', 'Update itinerary entry information') 
+            : isAddDayMode
+            ? __('Create a new day entry for your trip itinerary. This will be the first activity of the new day.', 'Create a new day entry for your trip itinerary. This will be the first activity of the new day.')
+            : __('Add a new activity, meal, or accommodation to this day of the trip itinerary.', 'Add a new activity, meal, or accommodation to this day of the trip itinerary.')
+        }
         actions={
           <Button
             variant="outline"
@@ -459,20 +511,23 @@ const ItineraryForm: React.FC = () => {
                         text={__('Select the trip this entry belongs to.', 'Select the trip this entry belongs to.')}
                         className="mb-2"
                       />
-                      <Select
-                        id="trip_id"
+                      <SearchableSelect
                         value={formData.trip_id}
-                        onChange={(e) => handleFieldChange('trip_id', e.target.value)}
+                        onChange={(value) => handleFieldChange('trip_id', value)}
+                        options={[
+                          { value: '', label: __('-- Select a Trip --', '-- Select a Trip --') },
+                          ...((Array.isArray(tripsData) ? tripsData : []).map((trip: any) => ({
+                            value: trip.id.toString(),
+                            label: `${trip.title || trip.name || ''}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`,
+                          })) || [])
+                        ]}
+                        placeholder={__('Search or select a trip...', 'Search or select a trip...')}
+                        searchPlaceholder={__('Search by trip name or ID...', 'Search by trip name or ID...')}
                         className={errors.trip_id ? 'border-red-500' : ''}
+                        error={!!errors.trip_id}
                         required
-                      >
-                        <option value="">{__('Select a trip...', 'Select a trip...')}</option>
-                        {trips.map((trip: any) => (
-                          <option key={trip.id} value={trip.id}>
-                            {trip.title}
-                          </option>
-                        ))}
-                      </Select>
+                        disabled={isLoadingTrips}
+                      />
                       {errors.trip_id && (
                         <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                           <Info className="w-4 h-4" />
@@ -573,16 +628,22 @@ const ItineraryForm: React.FC = () => {
                       {__('Entry Status', 'Entry Status')}
                     </label>
                     <HelpText 
-                      text={__('Active entries are visible in trip schedules. Inactive entries are hidden.', 'Active entries are visible in trip schedules. Inactive entries are hidden.')}
+                      text={__('Published entries are visible in trip schedules. Draft entries are saved but not visible. Trashed entries are deleted.', 'Published entries are visible in trip schedules. Draft entries are saved but not visible. Trashed entries are deleted.')}
                       className="mb-2"
                     />
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
+                      className="h-9 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
+                      style={{
+                        color: 'rgb(17, 24, 39)',
+                        backgroundColor: 'rgb(255, 255, 255)',
+                      }}
                     >
-                      <option value="active">{__('Active', 'Active')}</option>
-                      <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                      <option value="draft">{__('Draft', 'Draft')}</option>
+                      <option value="publish">{__('Publish', 'Publish')}</option>
+                      <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>
                 </CardContent>

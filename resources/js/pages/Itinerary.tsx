@@ -3,7 +3,7 @@
  * Manage itinerary entries organized by days with expandable cards
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Plus, 
@@ -15,15 +15,18 @@ import {
   Clock, 
   Info,
   UtensilsCrossed,
-  Footprints,
   Hotel,
-  Car,
-  Calendar
+  Calendar,
+  CalendarDays,
+  AlertCircle
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { apiClient } from '../lib/api';
+import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
 import { Select } from '../components/ui/select';
+import { SearchableSelect } from '../components/ui/searchable-select';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { ConditionalRender } from '../components/ui/conditional-render';
@@ -58,188 +61,368 @@ interface DayGroup {
 }
 
 const Itinerary: React.FC = () => {
-  const [tripFilter, setTripFilter] = useState('1');
-  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set(['1-1'])); // trip-day format
+  // Get trip_id from URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripIdParam = urlParams.get('trip_id');
+  
+  const [tripFilter, setTripFilter] = useState(tripIdParam || 'all');
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [selectedDay, setSelectedDay] = useState<{ tripId: number; day: number } | null>(null);
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
+
+  // Update trip filter when URL param changes
+  useEffect(() => {
+    if (tripIdParam) {
+      setTripFilter(tripIdParam);
+    }
+  }, [tripIdParam]);
 
   // Fetch trips for filter
-  const { data: tripsData } = useQuery({
+  const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
     queryKey: ['trips-simple'],
     queryFn: async () => {
-      return [
-        { id: 1, title: 'Everest Base Camp Trek' },
-        { id: 2, title: 'Annapurna Circuit Adventure' },
-        { id: 3, title: 'Golden Triangle Tour' },
-      ];
-    },
-  });
-
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['itinerary', tripFilter],
-    queryFn: async () => {
-      const allEntries: ItineraryEntry[] = [
-        {
-          id: 1,
-          trip_id: 1,
-          trip_title: 'Everest Base Camp Trek',
-          day: 1,
-          day_title: 'Arrival & Welcome to Paradise',
-          item_type: 'Meal',
-          item_name: 'Breakfast',
-          item_icon: 'utensils',
-          title: 'Tropical breakfast buffet',
-          description: 'Tropical breakfast buffet',
-          location: 'Resort restaurant',
-          duration: '1 hour',
-          start_time: '08:00',
-          end_time: '09:00',
-          status: 'active',
-          created_at: '2024-01-15',
-        },
-        {
-          id: 2,
-          trip_id: 1,
-          trip_title: 'Everest Base Camp Trek',
-          day: 1,
-          day_title: 'Arrival & Welcome to Paradise',
-          item_type: 'Activity',
-          item_name: 'Beach relaxation',
-          item_icon: 'footprints',
-          title: 'Beach relaxation',
-          description: 'Sunbathe, swim, beach activities',
-          location: 'Private beach',
-          duration: '3 hours',
-          start_time: '10:00',
-          end_time: '13:00',
-          status: 'active',
-          created_at: '2024-01-15',
-        },
-        {
-          id: 3,
-          trip_id: 1,
-          trip_title: 'Everest Base Camp Trek',
-          day: 1,
-          day_title: 'Arrival & Welcome to Paradise',
-          item_type: 'Meal',
-          item_name: 'Lunch',
-          item_icon: 'utensils',
-          title: 'Welcome Lunch',
-          description: 'Traditional Nepali lunch at hotel',
-          location: 'Hotel restaurant',
-          duration: '1 hour',
-          start_time: '13:00',
-          end_time: '14:00',
-          status: 'active',
-          created_at: '2024-01-15',
-        },
-        {
-          id: 4,
-          trip_id: 1,
-          trip_title: 'Everest Base Camp Trek',
-          day: 1,
-          day_title: 'Arrival & Welcome to Paradise',
-          item_type: 'Accommodation',
-          item_name: 'Hotel Stay',
-          item_icon: 'hotel',
-          title: 'Resort Accommodation',
-          description: 'Luxury beachfront resort',
-          location: 'Beach Resort',
-          start_time: '14:00',
-          end_time: '10:00',
-          status: 'active',
-          created_at: '2024-01-15',
-        },
-        {
-          id: 5,
-          trip_id: 1,
-          trip_title: 'Everest Base Camp Trek',
-          day: 2,
-          day_title: 'Beach Day & Spa',
-          item_type: 'Meal',
-          item_name: 'Breakfast',
-          item_icon: 'utensils',
-          title: 'Breakfast',
-          description: 'Continental breakfast',
-          location: 'Resort restaurant',
-          duration: '1 hour',
-          start_time: '08:00',
-          end_time: '09:00',
-          status: 'active',
-          created_at: '2024-01-15',
-        },
-        {
-          id: 6,
-          trip_id: 1,
-          trip_title: 'Everest Base Camp Trek',
-          day: 2,
-          day_title: 'Beach Day & Spa',
-          item_type: 'Activity',
-          item_name: 'Spa Treatment',
-          item_icon: 'footprints',
-          title: 'Spa Treatment',
-          description: 'Relaxing spa session',
-          location: 'Resort spa',
-          duration: '2 hours',
-          start_time: '14:00',
-          end_time: '16:00',
-          status: 'active',
-          created_at: '2024-01-15',
-        },
-      ];
-
-      let filtered = allEntries;
-      if (tripFilter !== 'all') {
-        filtered = filtered.filter(e => e.trip_id === parseInt(tripFilter));
+      try {
+        const response = await apiClient.get('/trips', {
+          params: {
+            per_page: 100,
+            status: 'all' // Get all trips for filter
+          }
+        });
+        const trips = response?.data?.data || response?.data || response || [];
+        return Array.isArray(trips) ? trips : [];
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load trips', 'Failed to load trips'), 'error');
+        return [];
       }
-
-      // Group by trip and day
-      const grouped: DayGroup[] = [];
-      const seen = new Set<string>();
-
-      filtered.forEach(entry => {
-        const key = `${entry.trip_id}-${entry.day}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          grouped.push({
-            trip_id: entry.trip_id,
-            trip_title: entry.trip_title,
-            day: entry.day,
-            day_title: entry.day_title,
-            entries: filtered.filter(e => e.trip_id === entry.trip_id && e.day === entry.day),
-          });
-        }
-      });
-
-      // Sort by trip_id and day
-      grouped.sort((a, b) => {
-        if (a.trip_id !== b.trip_id) return a.trip_id - b.trip_id;
-        return a.day - b.day;
-      });
-
-      return grouped;
     },
     enabled: can('yatra_view_trips'),
   });
 
+  // Fetch item types and items for mapping
+  const { data: itemTypesData } = useQuery({
+    queryKey: ['item-types'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/item-types', {
+          params: { per_page: 100, status: 'publish' }
+        });
+        return response?.data?.data || response?.data || response || [];
+      } catch (error: any) {
+        return [];
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
+  const { data: itemsData } = useQuery({
+    queryKey: ['items'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/items', {
+          params: { per_page: 100, status: 'publish' }
+        });
+        return response?.data?.data || response?.data || response || [];
+      } catch (error: any) {
+        return [];
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
+  // Helper function to map activity_type to item_type/item_name/item_icon
+  const mapActivityType = (activityType: string | null | undefined) => {
+    if (!activityType) {
+      return { item_type: 'Activity', item_name: 'Activity', item_icon: 'footprints' };
+    }
+
+    // Try to find in item types and items
+    const itemTypes = Array.isArray(itemTypesData) ? itemTypesData : [];
+    const items = Array.isArray(itemsData) ? itemsData : [];
+
+    // First, try to find by activity_type matching item name
+    const matchedItem = items.find((item: any) => 
+      item.name?.toLowerCase() === activityType.toLowerCase()
+    );
+
+    if (matchedItem && matchedItem.type_id) {
+      const itemType = itemTypes.find((type: any) => type.id === matchedItem.type_id);
+      if (itemType) {
+        return {
+          item_type: itemType.name || 'Activity',
+          item_name: matchedItem.name || activityType,
+          item_icon: itemType.icon || 'footprints',
+        };
+      }
+    }
+
+    // Fallback: map common activity types
+    const typeMap: Record<string, { item_type: string; item_name: string; item_icon: string }> = {
+      'meal': { item_type: 'Meal', item_name: 'Meal', item_icon: 'utensils' },
+      'activity': { item_type: 'Activity', item_name: 'Activity', item_icon: 'footprints' },
+      'accommodation': { item_type: 'Accommodation', item_name: 'Hotel Stay', item_icon: 'hotel' },
+      'transportation': { item_type: 'Transportation', item_name: 'Transfer', item_icon: 'car' },
+    };
+
+    const lowerType = activityType.toLowerCase();
+    for (const [key, value] of Object.entries(typeMap)) {
+      if (lowerType.includes(key)) {
+        return value;
+      }
+    }
+
+    return { item_type: 'Activity', item_name: activityType, item_icon: 'footprints' };
+  };
+
+  // Helper to parse time field to start_time and end_time
+  const parseTime = (time: string | null | undefined): { start_time: string; end_time: string } => {
+    if (!time) return { start_time: '08:00', end_time: '17:00' };
+    
+    // Try to parse formats like "08:00-17:00" or "08:00 to 17:00"
+    const timeMatch = time.match(/(\d{1,2}):(\d{2})\s*(?:-|to|–)\s*(\d{1,2}):(\d{2})/i);
+    if (timeMatch) {
+      return {
+        start_time: `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`,
+        end_time: `${timeMatch[3].padStart(2, '0')}:${timeMatch[4]}`,
+      };
+    }
+
+    // Try single time format
+    const singleTime = time.match(/(\d{1,2}):(\d{2})/);
+    if (singleTime) {
+      const hour = parseInt(singleTime[1]);
+      return {
+        start_time: `${singleTime[1].padStart(2, '0')}:${singleTime[2]}`,
+        end_time: `${((hour + 1) % 24).toString().padStart(2, '0')}:${singleTime[2]}`,
+      };
+    }
+
+    return { start_time: '08:00', end_time: '17:00' };
+  };
+
+  const { data, isLoading, error, refetch } = useQuery<DayGroup[]>({
+    queryKey: ['itinerary', tripFilter, tripsData],
+    queryFn: async (): Promise<DayGroup[]> => {
+      try {
+        const trips = Array.isArray(tripsData) ? tripsData : [];
+        const allEntries: ItineraryEntry[] = [];
+
+        // Fetch itinerary data for each trip (or filtered trip)
+        const tripsToFetch = tripFilter !== 'all' 
+          ? trips.filter((t: any) => t.id === parseInt(tripFilter))
+          : trips;
+
+        for (const trip of tripsToFetch) {
+          try {
+            // Add timestamp to prevent caching
+            const tripResponse = await apiClient.get(`/trips/${trip.id}`, {
+              params: {
+                _t: Date.now(), // Cache buster
+              }
+            });
+            const tripData = tripResponse?.data || tripResponse;
+            const itineraryDays = tripData.itinerary_days || [];
+
+            // Process each day
+            for (const day of itineraryDays) {
+              const dayNumber = day.day_number || day.day || 1;
+              const dayTitle = day.title || day.day_title || '';
+              const entries = day.entries || [];
+
+              // Process each entry
+              for (const entry of entries) {
+                // Ensure entry has required fields from database
+                if (!entry || !entry.id) {
+                  continue;
+                }
+
+                const mapped = mapActivityType(entry.activity_type);
+                const times = parseTime(entry.time);
+
+                const processedEntry = {
+                  id: entry.id || 0,
+                  trip_id: trip.id,
+                  trip_title: trip.title || trip.name || '',
+                  day: dayNumber,
+                  day_title: dayTitle,
+                  item_type: mapped.item_type,
+                  item_name: mapped.item_name,
+                  item_icon: mapped.item_icon,
+                  title: entry.title || '',
+                  description: entry.description || '',
+                  location: entry.location || '',
+                  duration: entry.duration || '',
+                  start_time: times.start_time,
+                  end_time: times.end_time,
+                  status: entry.status || 'active',
+                  created_at: entry.created_at || entry.createdAt || '',
+                };
+
+                allEntries.push(processedEntry);
+              }
+            }
+          } catch (error: any) {
+            console.error(`Failed to fetch itinerary for trip ${trip.id}:`, error);
+          }
+        }
+
+        // Group by trip and day
+        const grouped: DayGroup[] = [];
+        const seen = new Set<string>();
+
+        allEntries.forEach(entry => {
+          const key = `${entry.trip_id}-${entry.day}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            grouped.push({
+              trip_id: entry.trip_id,
+              trip_title: entry.trip_title,
+              day: entry.day,
+              day_title: entry.day_title,
+              entries: allEntries.filter(e => e.trip_id === entry.trip_id && e.day === entry.day),
+            });
+          }
+        });
+
+        // Sort by trip_id and day
+        grouped.sort((a, b) => {
+          if (a.trip_id !== b.trip_id) return a.trip_id - b.trip_id;
+          return a.day - b.day;
+        });
+
+        return grouped;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load itinerary', 'Failed to load itinerary'), 'error');
+        return [];
+      }
+    },
+    enabled: can('yatra_view_trips') && !!tripsData,
+    staleTime: 0, // Always refetch to ensure fresh data
+    gcTime: 0, // Don't cache to ensure fresh data (formerly cacheTime)
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchOnReconnect: true, // Refetch when network reconnects
+  });
+
+  // Auto-expand first day when data loads
+  useEffect(() => {
+    if (data && data.length > 0 && expandedDays.size === 0) {
+      const firstDay = data[0];
+      setExpandedDays(new Set([`${firstDay.trip_id}-${firstDay.day}`]));
+    }
+  }, [data, expandedDays.size]);
+
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      console.log('Deleting itinerary entry:', id);
-      return { success: true };
+    mutationFn: async (_entry: ItineraryEntry) => {
+      try {
+        // Note: Itinerary entries are part of trips, so deletion requires updating the trip
+        // For now, we'll show a message that this needs to be done through the trip edit form
+        // In the future, we could implement a direct delete endpoint
+        showToast(__('Please delete itinerary entries through the trip edit form', 'Please delete itinerary entries through the trip edit form'), 'info');
+        return { success: false, message: 'Delete through trip form' };
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to delete itinerary entry', 'Failed to delete itinerary entry'), 'error');
+        throw error;
+      }
     },
     onSuccess: () => {
+      // Refresh itinerary data
       queryClient.invalidateQueries({ queryKey: ['itinerary'] });
+      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips-simple'] });
+      // Force refetch
+      refetch();
+    },
+  });
+
+  // Mutation to update itinerary entry item
+  const updateItemMutation = useMutation({
+    mutationFn: async ({ entryId, itemId, itemTypeId }: { entryId: number; itemId: number; itemTypeId: number }) => {
+      // First, get the current entry data
+      const currentEntry = await apiClient.get(`/itinerary/${entryId}`);
+      const entryData = currentEntry?.data?.data || currentEntry?.data || currentEntry;
+      
+      // Update with new item_id and item_type_id
+      return await apiClient.put(`/itinerary/${entryId}`, {
+        ...entryData,
+        item_id: itemId,
+        item_type_id: itemTypeId,
+      });
+    },
+    onSuccess: () => {
+      showToast(__('Item updated successfully', 'Item updated successfully'), 'success');
+      queryClient.invalidateQueries({ queryKey: ['itinerary'] });
+      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips-simple'] });
+      refetch();
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to update item', 'Failed to update item'), 'error');
     },
   });
 
   const handleAddDay = () => {
-    // Navigate to add day form
-    const tripId = tripFilter !== 'all' ? tripFilter : '1';
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}`;
+    // Navigate to add day form - this creates a new day entry
+    // If a trip is selected, pass trip_id; otherwise let the form show the trip selector
+    if (tripFilter !== 'all') {
+      // Get the max day number for this trip to suggest the next day
+      const tripEntries = dayGroups.filter((dg: DayGroup) => dg.trip_id === parseInt(tripFilter));
+      const maxDay = tripEntries.length > 0 
+        ? Math.max(...tripEntries.map((dg: DayGroup) => dg.day))
+        : 0;
+      const nextDay = maxDay + 1;
+      
+      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripFilter}&day=${nextDay}&mode=day`;
+    } else {
+      // No trip selected - navigate without trip_id so form shows trip selector
+      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&mode=day`;
+    }
   };
 
-  const handleQuickAdd = (type: string, itemName: string) => {
+  // Get quick add options from item types and items
+  const quickAddOptions = useMemo(() => {
+    const itemTypes = Array.isArray(itemTypesData) ? itemTypesData : [];
+    const items = Array.isArray(itemsData) ? itemsData : [];
+    
+    return itemTypes.map((itemType: any) => {
+      // Find first item of this type
+      const firstItem = items.find((item: any) => 
+        item.type_id === itemType.id || item.type_id === itemType.id?.toString()
+      );
+      
+      // Extract icon - handle both string and object formats
+      let iconName = 'footprints'; // default
+      if (itemType.icon) {
+        if (typeof itemType.icon === 'string') {
+          iconName = itemType.icon;
+        } else if (typeof itemType.icon === 'object' && itemType.icon.value) {
+          // If it's an image URL, we can't use IconSelector, so use a default
+          // Otherwise use the value as icon name
+          if (itemType.icon.type === 'image') {
+            iconName = 'image'; // Special case for images
+          } else {
+            iconName = itemType.icon.value;
+          }
+        }
+      }
+      
+      // Extract color - default to blue if not set
+      const color = itemType.color || 'blue';
+      
+      return {
+        typeId: itemType.id,
+        typeName: itemType.name || '',
+        typeIcon: iconName,
+        typeIconData: itemType.icon, // Keep full icon data for image handling
+        typeColor: color,
+        itemId: firstItem?.id || null,
+        itemName: firstItem?.name || itemType.name || '',
+      };
+    }).filter((option: any) => option.typeName); // Filter out invalid options
+  }, [itemTypesData, itemsData]);
+
+  const handleQuickAdd = (typeId: number | string, _itemId: number | string | null, itemName: string) => {
     if (!selectedDay) {
       // Select first day if none selected
       const firstDay = data?.[0];
@@ -253,7 +436,12 @@ const Itinerary: React.FC = () => {
     const tripId = selectedDay?.tripId || (tripFilter !== 'all' ? parseInt(tripFilter) : 1);
     const day = selectedDay?.day || 1;
     
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&type=${type}&item=${itemName}`;
+    // Use item type name for type param and item name for item param
+    const itemTypes = Array.isArray(itemTypesData) ? itemTypesData : [];
+    const itemType = itemTypes.find((type: any) => type.id === typeId || type.id?.toString() === typeId?.toString());
+    const typeName = itemType?.name || '';
+    
+    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&type=${encodeURIComponent(typeName)}&item=${encodeURIComponent(itemName)}`;
   };
 
   const handleEdit = (entry: ItineraryEntry) => {
@@ -263,7 +451,7 @@ const Itinerary: React.FC = () => {
   const handleDelete = (entry: ItineraryEntry) => {
     const confirmMessage = __('Are you sure you want to delete this itinerary entry? This action cannot be undone.', 'Are you sure you want to delete this itinerary entry? This action cannot be undone.');
     if (confirm(confirmMessage)) {
-      deleteMutation.mutate(entry.id);
+      deleteMutation.mutate(entry);
     }
   };
 
@@ -312,11 +500,10 @@ const Itinerary: React.FC = () => {
     return `${hour12}:${minutes} ${ampm}`;
   };
 
-  const trips = tripsData || [];
-  const dayGroups = data || [];
+  const dayGroups: DayGroup[] = (data || []) as DayGroup[];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-6">
       <div className="flex items-center justify-between mb-8">
         <div>
           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -331,42 +518,112 @@ const Itinerary: React.FC = () => {
         </ConditionalRender>
       </div>
 
-      {/* Trip Filter */}
-      <Card>
-        <CardContent className="p-3">
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {__('Trip:', 'Trip:')}
-            </label>
-            <Select
-              value={tripFilter}
-              onChange={(e) => setTripFilter(e.target.value)}
-              className="w-64 h-9"
-            >
-              <option value="all">{__('All Trips', 'All Trips')}</option>
-              {trips.map((trip: any) => (
-                <option key={trip.id} value={trip.id}>
-                  {trip.title}
-                </option>
-              ))}
-            </Select>
+      {/* Trip Selector - Clean Design */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 p-6 mb-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {__('Select Trip', 'Select Trip')}
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {__('Choose a trip to manage its itinerary entries and day-by-day schedule', 'Choose a trip to manage its itinerary entries and day-by-day schedule')}
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        
+        <div className="space-y-4 overflow-visible">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+            </label>
+            <SearchableSelect
+              value={tripFilter}
+              onChange={(value) => setTripFilter(value)}
+              options={[
+                { value: 'all', label: __('All Trips', 'All Trips') },
+                ...((Array.isArray(tripsData) ? tripsData : []).map((trip: any) => ({
+                  value: trip.id.toString(),
+                  label: `${trip.title || trip.name || ''}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`,
+                })) || [])
+              ]}
+              placeholder={__('Search or select a trip...', 'Search or select a trip...')}
+              searchPlaceholder={__('Search by trip name or ID...', 'Search by trip name or ID...')}
+              className="w-full"
+              required
+            />
+          </div>
+
+          {tripFilter !== 'all' && (() => {
+            const tripsList = Array.isArray(tripsData) ? tripsData : [];
+            const selectedTrip = tripsList.find((t: any) => t.id === parseInt(tripFilter));
+            return selectedTrip ? (
+              <div className="flex items-center gap-4 pt-2 border-t border-blue-200 dark:border-gray-700">
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span className="font-medium">{selectedTrip.starting_location || selectedTrip.start_location || 'N/A'}</span>
+                  <span className="text-gray-400">→</span>
+                  <span className="font-medium">{selectedTrip.ending_location || selectedTrip.end_location || 'N/A'}</span>
+                </div>
+                {selectedTrip.trip_type && (
+                  <Badge className={
+                    selectedTrip.trip_type === 'single_day'
+                      ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
+                      : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                  }>
+                    {selectedTrip.trip_type === 'single_day' ? __('Single Day', 'Single Day') : __('Multi-Day', 'Multi-Day')}
+                  </Badge>
+                )}
+              </div>
+            ) : null;
+          })()}
+
+          {tripFilter === 'all' && (
+            <div className="mt-4 p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-blue-200/50 dark:border-gray-700/50 overflow-visible">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <AlertCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                    {__('Get Started', 'Get Started')}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {__('Select a trip from the dropdown above to view and manage its itinerary entries and day-by-day schedule.', 'Select a trip from the dropdown above to view and manage its itinerary entries and day-by-day schedule.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       <ConditionalRender capability="yatra_view_trips">
         {error ? (
           <Alert variant="error" title={__('Error Loading Itinerary', 'Error Loading Itinerary')}>
             {__('We couldn\'t load itinerary entries. Please refresh the page or try again later.', 'We couldn\'t load itinerary entries. Please refresh the page or try again later.')}
           </Alert>
-        ) : isLoading ? (
-          <div className="p-12 text-center">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('Loading itinerary...', 'Loading itinerary...')}
-              </p>
-            </div>
+        ) : isLoading || isLoadingTrips ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="flex items-center gap-4 p-4">
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="w-16 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse"></div>
+                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         ) : dayGroups.length === 0 ? (
           <Card>
@@ -403,8 +660,8 @@ const Itinerary: React.FC = () => {
               });
 
               return (
-              <Card key={key} className="overflow-hidden">
-                <CardContent className="p-0">
+              <Card key={key} className="overflow-visible">
+                <CardContent className="p-0 overflow-visible">
                   {/* Day Header */}
                   <div 
                     className="flex items-center gap-4 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
@@ -468,76 +725,76 @@ const Itinerary: React.FC = () => {
 
                   {/* Day Content - Expanded */}
                   {isExpanded && (
-                    <div className="border-t border-gray-200 dark:border-gray-700">
+                    <div className="border-t border-gray-200 dark:border-gray-700 overflow-visible">
                       {/* Quick Add Section */}
                       <div className="p-4 bg-gray-50 dark:bg-gray-800/30 border-b border-gray-200 dark:border-gray-700">
                         <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
                           {__('QUICK ADD', 'QUICK ADD')}
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleQuickAdd('Meal', 'Breakfast')}
-                            className="flex items-center gap-2"
-                          >
-                            <UtensilsCrossed className="w-4 h-4" />
-                            {__('Breakfast', 'Breakfast')}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleQuickAdd('Meal', 'Lunch')}
-                            className="flex items-center gap-2"
-                          >
-                            <UtensilsCrossed className="w-4 h-4" />
-                            {__('Lunch', 'Lunch')}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleQuickAdd('Meal', 'Dinner')}
-                            className="flex items-center gap-2"
-                          >
-                            <UtensilsCrossed className="w-4 h-4" />
-                            {__('Dinner', 'Dinner')}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleQuickAdd('Activity', 'Activity')}
-                            className="flex items-center gap-2"
-                          >
-                            <Footprints className="w-4 h-4" />
-                            {__('Activity', 'Activity')}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleQuickAdd('Transportation', 'Transfer')}
-                            className="flex items-center gap-2"
-                          >
-                            <Car className="w-4 h-4" />
-                            {__('Transfer', 'Transfer')}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleQuickAdd('Accommodation', 'Hotel Stay')}
-                            className="flex items-center gap-2"
-                          >
-                            <Hotel className="w-4 h-4" />
-                            {__('Hotel Stay', 'Hotel Stay')}
-                          </Button>
+                          {quickAddOptions.length > 0 ? (
+                            quickAddOptions.map((option: any) => {
+                              // Determine if icon is an image
+                              const isImageIcon = option.typeIconData && 
+                                typeof option.typeIconData === 'object' && 
+                                option.typeIconData.type === 'image';
+                              
+                              // Get color classes based on typeColor
+                              const colorClasses: Record<string, string> = {
+                                blue: 'border-blue-500 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20',
+                                green: 'border-green-500 text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20',
+                                red: 'border-red-500 text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20',
+                                yellow: 'border-yellow-500 text-yellow-700 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-900/20',
+                                purple: 'border-purple-500 text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20',
+                                orange: 'border-orange-500 text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20',
+                                pink: 'border-pink-500 text-pink-700 hover:bg-pink-50 dark:text-pink-400 dark:hover:bg-pink-900/20',
+                                indigo: 'border-indigo-500 text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/20',
+                                gray: 'border-gray-500 text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-900/20',
+                              };
+                              
+                              const colorClass = colorClasses[option.typeColor] || colorClasses.blue;
+                              
+                              return (
+                                <Button
+                                  key={option.typeId}
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleQuickAdd(option.typeId, option.itemId, option.itemName)}
+                                  className={`flex items-center gap-2 ${colorClass}`}
+                                  style={{
+                                    borderColor: option.typeColor ? `var(--color-${option.typeColor}-500)` : undefined,
+                                  }}
+                                >
+                                  {isImageIcon && option.typeIconData.value ? (
+                                    <img 
+                                      src={option.typeIconData.value} 
+                                      alt={option.typeName}
+                                      className="w-4 h-4 object-contain"
+                                    />
+                                  ) : (
+                                    <IconSelector 
+                                      iconName={option.typeIcon as any} 
+                                      className="w-4 h-4"
+                                    />
+                                  )}
+                                  {option.itemName}
+                                </Button>
+                              );
+                            })
+                          ) : (
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              {__('No item types available', 'No item types available')}
+                            </div>
+                          )}
                         </div>
                       </div>
 
                       {/* Itinerary Items */}
-                      <div className="p-4 space-y-3">
+                      <div className="p-4 space-y-3 overflow-visible">
                         {sortedEntries.map((entry) => (
                           <div
                             key={entry.id}
-                            className="flex items-start gap-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"
+                            className="flex items-start gap-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-visible"
                           >
                             {/* Time */}
                             <div className="flex flex-col items-center min-w-[80px]">
@@ -587,18 +844,65 @@ const Itinerary: React.FC = () => {
                                 </div>
 
                                 {/* Actions */}
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-1 relative z-10">
                                   <Select
-                                    value={entry.item_type}
-                                    className="h-8 text-xs min-w-[100px]"
-                                    onChange={() => {
-                                      // Handle type change
+                                    value={entry.item_name || ''}
+                                    className="h-8 text-xs min-w-[140px] w-auto relative z-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 px-2 py-1"
+                                    style={{ 
+                                      minWidth: '140px', 
+                                      width: 'auto',
+                                      color: 'rgb(17, 24, 39)',
+                                      backgroundColor: 'rgb(255, 255, 255)',
+                                      paddingLeft: '8px',
+                                      paddingRight: '24px',
+                                      paddingTop: '4px',
+                                      paddingBottom: '4px',
                                     }}
+                                    onChange={(e) => {
+                                      // Find the selected item
+                                      const selectedItemName = e.target.value;
+                                      if (!selectedItemName) return;
+                                      
+                                      const selectedItem = itemsData?.find((item: any) => 
+                                        item.name === selectedItemName
+                                      );
+                                      
+                                      // Find the item type
+                                      const itemType = itemTypesData?.find((type: any) => 
+                                        type.name === entry.item_type
+                                      );
+                                      
+                                      if (selectedItem && itemType) {
+                                        // Update the entry with new item
+                                        updateItemMutation.mutate({
+                                          entryId: entry.id,
+                                          itemId: selectedItem.id,
+                                          itemTypeId: itemType.id,
+                                        });
+                                      }
+                                    }}
+                                    disabled={updateItemMutation.isPending}
                                   >
-                                    <option value="Meal">{__('Meal', 'Meal')}</option>
-                                    <option value="Activity">{__('Activity', 'Activity')}</option>
-                                    <option value="Accommodation">{__('Accommodation', 'Accommodation')}</option>
-                                    <option value="Transportation">{__('Transportation', 'Transportation')}</option>
+                                    <option value="">{__('Select item...', 'Select item...')}</option>
+                                    {(() => {
+                                      // Find the item type ID from entry.item_type
+                                      const itemType = itemTypesData?.find((type: any) => 
+                                        type.name === entry.item_type
+                                      );
+                                      
+                                      if (!itemType) return null;
+                                      
+                                      // Filter items by this item type
+                                      const filteredItems = itemsData?.filter((item: any) => 
+                                        item.type_id === itemType.id || item.type_id === itemType.id?.toString()
+                                      ) || [];
+                                      
+                                      return filteredItems.map((item: any) => (
+                                        <option key={item.id} value={item.name}>
+                                          {item.name}
+                                        </option>
+                                      ));
+                                    })()}
                                   </Select>
                                   <ConditionalRender capability="yatra_edit_trips">
                                     <Button
@@ -636,7 +940,7 @@ const Itinerary: React.FC = () => {
                             onClick={() => {
                               const tripId = dayGroup.trip_id;
                               const day = dayGroup.day;
-                              window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}`;
+                              window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=activity`;
                             }}
                           >
                             <Plus className="w-4 h-4" />

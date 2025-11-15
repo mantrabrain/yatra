@@ -875,9 +875,23 @@ class Database
         $itineraryTables = [
             'yatra_trip_itinerary_days',
             'yatra_trip_itinerary_entries',
-            'yatra_trip_itinerary_entry_items',
             'yatra_trip_itinerary_entry_images',
         ];
+        
+        // Drop yatra_trip_itinerary_entry_items table if it exists (no longer needed)
+        $table_entry_items = $wpdb->prefix . 'yatra_trip_itinerary_entry_items';
+        $entryItemsTableExists = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM information_schema.tables 
+                 WHERE table_schema = DATABASE() 
+                 AND table_name = %s",
+                $table_entry_items
+            )
+        ) > 0;
+        
+        if ($entryItemsTableExists) {
+            $wpdb->query("DROP TABLE IF EXISTS `{$table_entry_items}`");
+        }
         
         foreach ($itineraryTables as $tableName) {
             $fullTableName = $wpdb->prefix . $tableName;
@@ -894,6 +908,135 @@ class Database
                 // Re-create the table using the same schema from createTables
                 self::createItineraryTables();
                 break; // Only need to call once as it creates all tables
+            }
+        }
+        
+        // Migration: Remove accommodation and meals from yatra_trip_itinerary_days
+        $table_itinerary_days = $wpdb->prefix . 'yatra_trip_itinerary_days';
+        $daysTableExists = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM information_schema.tables 
+                 WHERE table_schema = DATABASE() 
+                 AND table_name = %s",
+                $table_itinerary_days
+            )
+        ) > 0;
+        
+        if ($daysTableExists) {
+            // Check if accommodation column exists and remove it
+            $accommodationExists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM information_schema.columns 
+                     WHERE table_schema = DATABASE() 
+                     AND table_name = %s 
+                     AND column_name = 'accommodation'",
+                    $table_itinerary_days
+                )
+            ) > 0;
+            
+            if ($accommodationExists) {
+                $wpdb->query("ALTER TABLE `{$table_itinerary_days}` DROP COLUMN `accommodation`");
+            }
+            
+            // Check if meals column exists and remove it
+            $mealsExists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM information_schema.columns 
+                     WHERE table_schema = DATABASE() 
+                     AND table_name = %s 
+                     AND column_name = 'meals'",
+                    $table_itinerary_days
+                )
+            ) > 0;
+            
+            if ($mealsExists) {
+                $wpdb->query("ALTER TABLE `{$table_itinerary_days}` DROP COLUMN `meals`");
+            }
+        }
+        
+        // Migration: Replace activity_type with item_type_id and item_id in yatra_trip_itinerary_entries
+        $table_itinerary_entries = $wpdb->prefix . 'yatra_trip_itinerary_entries';
+        $entriesTableExists = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM information_schema.tables 
+                 WHERE table_schema = DATABASE() 
+                 AND table_name = %s",
+                $table_itinerary_entries
+            )
+        ) > 0;
+        
+        if ($entriesTableExists) {
+            // Check if activity_type column exists
+            $activityTypeExists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM information_schema.columns 
+                     WHERE table_schema = DATABASE() 
+                     AND table_name = %s 
+                     AND column_name = 'activity_type'",
+                    $table_itinerary_entries
+                )
+            ) > 0;
+            
+            // Check if item_type_id column exists
+            $itemTypeIdExists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM information_schema.columns 
+                     WHERE table_schema = DATABASE() 
+                     AND table_name = %s 
+                     AND column_name = 'item_type_id'",
+                    $table_itinerary_entries
+                )
+            ) > 0;
+            
+            // Check if item_id column exists
+            $itemIdExists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM information_schema.columns 
+                     WHERE table_schema = DATABASE() 
+                     AND table_name = %s 
+                     AND column_name = 'item_id'",
+                    $table_itinerary_entries
+                )
+            ) > 0;
+            
+            // Add item_type_id if it doesn't exist
+            if (!$itemTypeIdExists) {
+                $wpdb->query(
+                    "ALTER TABLE `{$table_itinerary_entries}` 
+                     ADD COLUMN `item_type_id` bigint(20) UNSIGNED DEFAULT NULL 
+                     COMMENT 'Reference to yatra_item_types' 
+                     AFTER `location`"
+                );
+                
+                // Add index
+                $wpdb->query(
+                    "ALTER TABLE `{$table_itinerary_entries}` 
+                     ADD INDEX `idx_item_type_id` (`item_type_id`)"
+                );
+            }
+            
+            // Add item_id if it doesn't exist
+            if (!$itemIdExists) {
+                $afterColumn = $itemTypeIdExists ? 'item_type_id' : 'location';
+                $wpdb->query(
+                    "ALTER TABLE `{$table_itinerary_entries}` 
+                     ADD COLUMN `item_id` bigint(20) UNSIGNED DEFAULT NULL 
+                     COMMENT 'Reference to yatra_items' 
+                     AFTER `{$afterColumn}`"
+                );
+                
+                // Add index
+                $wpdb->query(
+                    "ALTER TABLE `{$table_itinerary_entries}` 
+                     ADD INDEX `idx_item_id` (`item_id`)"
+                );
+            }
+            
+            // If activity_type exists and we have item_type_id/item_id, we can optionally migrate data
+            // For now, just drop activity_type after adding new columns
+            if ($activityTypeExists && $itemTypeIdExists && $itemIdExists) {
+                // Drop activity_type column (data migration would happen here if needed)
+                $wpdb->query("ALTER TABLE `{$table_itinerary_entries}` DROP COLUMN `activity_type`");
             }
         }
         
@@ -992,8 +1135,6 @@ class Database
             `day_number` smallint(5) UNSIGNED NOT NULL COMMENT 'Day 1, 2, 3...',
             `title` varchar(255) DEFAULT NULL COMMENT 'Day title',
             `description` text DEFAULT NULL COMMENT 'Day overview',
-            `accommodation` varchar(255) DEFAULT NULL COMMENT 'Accommodation for this day',
-            `meals` varchar(100) DEFAULT NULL COMMENT 'Meals included (B, L, D)',
             `order` smallint(5) UNSIGNED DEFAULT 0,
             `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
             `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -1008,6 +1149,7 @@ class Database
         // TRIP ITINERARY ENTRIES
         // ============================================
         $table_trip_itinerary_entries = $wpdb->prefix . 'yatra_trip_itinerary_entries';
+        $table_item_types = $wpdb->prefix . 'yatra_item_types';
         $sql_trip_itinerary_entries = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_entries}` (
             `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             `trip_id` bigint(20) UNSIGNED NOT NULL,
@@ -1016,35 +1158,22 @@ class Database
             `description` text DEFAULT NULL,
             `time` varchar(50) DEFAULT NULL COMMENT 'Time of day',
             `location` varchar(255) DEFAULT NULL,
-            `activity_type` varchar(100) DEFAULT NULL,
+            `item_type_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Reference to yatra_item_types',
+            `item_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Reference to yatra_items',
             `order` smallint(5) UNSIGNED DEFAULT 0,
             `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
             `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
             KEY `idx_trip_id` (`trip_id`),
             KEY `idx_day_id` (`day_id`),
+            KEY `idx_item_type_id` (`item_type_id`),
+            KEY `idx_item_id` (`item_id`),
             KEY `idx_order` (`day_id`,`order`)
         ) {$charset_collate} COMMENT='Trip itinerary entries';";
         \dbDelta($sql_trip_itinerary_entries);
 
-        // ============================================
-        // TRIP ITINERARY ENTRY ITEMS (Included/Excluded)
-        // ============================================
-        $table_trip_itinerary_entry_items = $wpdb->prefix . 'yatra_trip_itinerary_entry_items';
-        $sql_trip_itinerary_entry_items = "CREATE TABLE IF NOT EXISTS `{$table_trip_itinerary_entry_items}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `entry_id` bigint(20) UNSIGNED NOT NULL,
-            `item_type` enum('included','excluded') NOT NULL,
-            `title` varchar(255) NOT NULL,
-            `description` text DEFAULT NULL,
-            `order` smallint(5) UNSIGNED DEFAULT 0,
-            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            KEY `idx_entry_id` (`entry_id`),
-            KEY `idx_item_type` (`entry_id`,`item_type`),
-            KEY `idx_order` (`entry_id`,`order`)
-        ) {$charset_collate} COMMENT='Trip itinerary entry items';";
-        \dbDelta($sql_trip_itinerary_entry_items);
+        // Note: yatra_trip_itinerary_entry_items table has been removed
+        // included_items and excluded_items are no longer stored separately
 
         // ============================================
         // TRIP ITINERARY ENTRY IMAGES

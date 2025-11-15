@@ -31,7 +31,7 @@ interface TravelerCategory {
   id: number;
   label: string;
   description: string;
-  status: 'active' | 'inactive';
+  status: 'active' | 'inactive' | 'publish' | 'draft';
   age_min?: number;
   age_max?: number;
 }
@@ -116,7 +116,10 @@ const AvailabilityForm: React.FC = () => {
     },
   });
 
-  const activeCategories = categoriesData?.categories?.filter((cat: TravelerCategory) => cat.status === 'active') || [];
+  // Filter for active categories - check both 'active' and 'publish' status
+  const activeCategories = categoriesData?.categories?.filter((cat: TravelerCategory) => 
+    cat.status === 'active' || cat.status === 'publish'
+  ) || [];
 
   // Fetch existing availability data if editing
   const { data: availabilityData, isLoading: isLoadingAvailability } = useQuery({
@@ -345,13 +348,18 @@ const AvailabilityForm: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['availability'] });
       queryClient.invalidateQueries({ queryKey: ['trips'] });
-      showToast(
-        isEditMode 
-          ? __('Availability date updated successfully', 'Availability date updated successfully')
-          : __('Availability date created successfully', 'Availability date created successfully'),
-        'success'
-      );
+      // Navigate immediately, toast will be shown on the availability page if needed
       navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId?.toString() });
+      // Show toast after a brief delay to ensure navigation happens first
+      setTimeout(() => {
+        showToast(
+          isEditMode 
+            ? __('Availability date updated successfully', 'Availability date updated successfully')
+            : __('Availability date created successfully', 'Availability date created successfully'),
+          'success',
+          3000 // Shorter duration
+        );
+      }, 100);
     },
     onError: (error: any) => {
       const errorMessage = error?.message || error?.data?.message || __('An error occurred while saving', 'An error occurred while saving');
@@ -831,15 +839,16 @@ const AvailabilityForm: React.FC = () => {
 
             {/* Traveler Category Pricing */}
             {formData.pricing_type === 'traveler_based' && (
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-red-500">*</span>
                   </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'Add pricing for traveler categories. Categories are managed in Traveler Categories page.')}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                  {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'Add pricing for traveler categories. Categories are managed in Traveler Categories page.')}
-                </p>
+                
                 {isLoadingCategories ? (
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
@@ -896,15 +905,15 @@ const AvailabilityForm: React.FC = () => {
                                 <div className="space-y-1">
                                   {activeCategories
                                     .filter(cat => !formData.price_types.some(pt => pt.category_id === cat.id))
-                                    .map(category => {
+                                    .map((category: TravelerCategory) => {
                                       const ageRange = category.age_min !== undefined || category.age_max !== undefined
                                         ? category.age_min !== undefined && category.age_max !== undefined
                                           ? `${category.age_min}-${category.age_max} ${__('years', 'years')}`
                                           : category.age_min !== undefined
-                                          ? `${category.age_min}+ ${__('years', 'years')}`
-                                          : category.age_max !== undefined
-                                          ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
-                                          : ''
+                                            ? `${category.age_min}+ ${__('years', 'years')}`
+                                            : category.age_max !== undefined
+                                              ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
+                                              : ''
                                         : null;
 
                                       return (
@@ -925,9 +934,11 @@ const AvailabilityForm: React.FC = () => {
                                               </span>
                                             )}
                                           </div>
-                                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                            {category.description}
-                                          </div>
+                                          {category.description && (
+                                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                              {category.description}
+                                            </div>
+                                          )}
                                         </button>
                                       );
                                     })}

@@ -80,7 +80,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   };
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative ${className}`} style={{ zIndex: isOpen ? 9999 : 'auto' }}>
       <div
         className={`flex h-10 w-full rounded-md border ${
           error ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
@@ -125,7 +125,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-hidden">
+        <div className="absolute z-[9999] w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-visible">
           {/* Search Input */}
           <div className="p-2 border-b border-gray-200 dark:border-gray-700">
             <div className="relative">
@@ -143,7 +143,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           </div>
 
           {/* Options List */}
-          <div className="max-h-48 overflow-y-auto">
+          <div className="max-h-48 overflow-y-auto overflow-x-visible">
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
                 {__('No options found', 'No options found')}

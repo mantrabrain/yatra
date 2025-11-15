@@ -75,6 +75,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          type="button"
           variant="outline"
           disabled={disabled}
           className={`w-full justify-start text-left font-normal ${error ? "border-red-500" : ""} ${!value ? "text-gray-500" : ""} ${className}`}

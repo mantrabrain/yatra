@@ -1015,7 +1015,7 @@ const Availability: React.FC = () => {
             </CardContent>
           </Card>
         </>
-      )}
+      ) : null}
     </div>
   );
 };

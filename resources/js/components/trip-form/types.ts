@@ -145,7 +145,6 @@ export interface TripFormData {
   discounted_price: string;
   price_types: PriceType[];
   sale_price: string;
-  currency: string;
   deposit_amount: string;
   deposit_percentage: string;
   payment_terms: string;
