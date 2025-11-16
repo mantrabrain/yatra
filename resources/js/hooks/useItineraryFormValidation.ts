@@ -48,30 +48,19 @@ export const useItineraryFormValidation = () => {
       newErrors.day = __('Day must be at least 1', 'Day must be at least 1');
     }
 
-    // For day mode, validate trip and day, and only validate activities that have been started
+    // For day mode, validate trip and day, and all activity fields
     if (isAddDayMode) {
-      // Only validate activity forms that have at least one field filled (user started filling it)
-      // Empty activity forms will be skipped during save
+      // Validate all activity forms
       activityForms.forEach((activityForm, index) => {
-        const hasAnyField = activityForm.data.item_type_id || 
-                           activityForm.data.item_id || 
-                           activityForm.data.title?.trim() ||
-                           activityForm.data.description?.trim() ||
-                           activityForm.data.location?.trim();
-        
-        // Only validate if user has started filling this activity
-        if (hasAnyField) {
-          if (!activityForm.data.item_type_id) {
-            newErrors[`activity_${activityForm.id}_item_type_id`] = __('Item type is required for Activity', 'Item type is required for Activity') + ` ${index + 1}`;
-          }
-          if (!activityForm.data.item_id) {
-            newErrors[`activity_${activityForm.id}_item_id`] = __('Item is required for Activity', 'Item is required for Activity') + ` ${index + 1}`;
-          }
-          if (!activityForm.data.title?.trim()) {
-            newErrors[`activity_${activityForm.id}_title`] = __('Title is required for Activity', 'Title is required for Activity') + ` ${index + 1}`;
-          }
+        if (!activityForm.data.item_type_id) {
+          newErrors[`activity_${activityForm.id}_item_type_id`] = __('Item type is required for Activity', 'Item type is required for Activity') + ` ${index + 1}`;
         }
-        // If activity form is completely empty, skip validation (it won't be saved)
+        if (!activityForm.data.item_id) {
+          newErrors[`activity_${activityForm.id}_item_id`] = __('Item is required for Activity', 'Item is required for Activity') + ` ${index + 1}`;
+        }
+        if (!activityForm.data.title?.trim()) {
+          newErrors[`activity_${activityForm.id}_title`] = __('Title is required for Activity', 'Title is required for Activity') + ` ${index + 1}`;
+        }
       });
       return { isValid: Object.keys(newErrors).length === 0, errors: newErrors };
     }

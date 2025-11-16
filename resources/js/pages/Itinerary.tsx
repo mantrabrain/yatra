@@ -705,59 +705,33 @@ const Itinerary: React.FC = () => {
   }, [dayMenuOpen]);
 
   return (
-    <div className="space-y-6 pb-6">
-      {/* Page Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {__('Itinerary Management', 'Itinerary Management')}
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {__('Build and manage your complete day-by-day itinerary with activities, meals, and accommodations', 'Build and manage your complete day-by-day itinerary with activities, meals, and accommodations')}
-            </p>
-          </div>
-          <ConditionalRender capability="yatra_edit_trips">
-            <Button 
-              onClick={handleAddDay} 
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-              size="lg"
-            >
-              <Plus className="w-5 h-5" />
-              {__('Add New Day', 'Add New Day')}
-            </Button>
-          </ConditionalRender>
+    <div className="space-y-4 pb-6">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {__('Build your complete itinerary with activities, meals, and accommodations', 'Build your complete itinerary with activities, meals, and accommodations')}
+          </p>
         </div>
-        
-        {/* Bulk Actions Bar - More Prominent */}
-        {selectedEntries.size > 0 && (
-          <ConditionalRender capability="yatra_delete_trips">
-            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-800 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-                  <span className="text-white text-sm font-semibold">{selectedEntries.size}</span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {selectedEntries.size} {selectedEntries.size === 1 ? __('item selected', 'item selected') : __('items selected', 'items selected')}
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {__('Click "Delete Selected" to remove all selected items', 'Click "Delete Selected" to remove all selected items')}
-                  </p>
-                </div>
-              </div>
+        <div className="flex items-center gap-2">
+          {selectedEntries.size > 0 && (
+            <ConditionalRender capability="yatra_delete_trips">
               <Button 
                 onClick={handleBulkDelete}
                 variant="destructive"
-                size="lg"
-                className="flex items-center gap-2 shadow-sm"
+                className="flex items-center gap-2"
               >
-                <Trash2 className="w-5 h-5" />
-                {__('Delete Selected', 'Delete Selected')}
+                <Trash2 className="w-4 h-4" />
+                {__('Delete Selected', 'Delete Selected')} ({selectedEntries.size})
               </Button>
-            </div>
+            </ConditionalRender>
+          )}
+          <ConditionalRender capability="yatra_edit_trips">
+            <Button onClick={handleAddDay} className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
+              <Plus className="w-4 h-4" />
+              {__('Add Day', 'Add Day')}
+            </Button>
           </ConditionalRender>
-        )}
+        </div>
       </div>
 
       {/* Trip Selector - Clean Design */}
@@ -891,37 +865,37 @@ const Itinerary: React.FC = () => {
           </Card>
         ) : (
           <div className="space-y-3">
-            {/* Bulk Select All Option - Enhanced */}
+            {/* Bulk Select All Option */}
             {dayGroups.length > 0 && (
               <ConditionalRender capability="yatra_delete_trips">
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-700 p-4 mb-4 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          id="select-all-checkbox"
-                          checked={dayGroups.length > 0 && dayGroups.every(dg => dg.entries.length > 0 && dg.entries.every(e => selectedEntries.has(e.id)))}
-                          onChange={handleSelectAllDays}
-                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all"
-                        />
-                        <label 
-                          htmlFor="select-all-checkbox"
-                          className="text-base font-semibold text-gray-900 dark:text-white cursor-pointer"
-                        >
-                          {__('Select All Items', 'Select All Items')}
-                        </label>
-                      </div>
-                      {selectedEntries.size > 0 && (
-                        <Badge variant="info" className="text-sm px-3 py-1">
-                          {selectedEntries.size} {selectedEntries.size === 1 ? __('selected', 'selected') : __('selected', 'selected')}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {__('💡 Tip: Use checkboxes to select multiple items for bulk actions', '💡 Tip: Use checkboxes to select multiple items for bulk actions')}
-                    </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 mb-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={dayGroups.length > 0 && dayGroups.every(dg => dg.entries.length > 0 && dg.entries.every(e => selectedEntries.has(e.id)))}
+                      onChange={handleSelectAllDays}
+                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                    />
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                      {__('Select All', 'Select All')}
+                    </label>
+                    {selectedEntries.size > 0 && (
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        ({selectedEntries.size} {__('selected', 'selected')})
+                      </span>
+                    )}
                   </div>
+                  {selectedEntries.size > 0 && (
+                    <Button 
+                      onClick={handleBulkDelete}
+                      variant="destructive"
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      {__('Delete Selected', 'Delete Selected')}
+                    </Button>
+                  )}
                 </div>
               </ConditionalRender>
             )}
@@ -935,84 +909,59 @@ const Itinerary: React.FC = () => {
                 return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
               });
 
-              const allDayEntriesSelected = dayGroup.entries.length > 0 && dayGroup.entries.every(e => selectedEntries.has(e.id));
-              const someDayEntriesSelected = dayGroup.entries.some(e => selectedEntries.has(e.id));
-              
               return (
-              <Card 
-                key={key} 
-                className={`overflow-visible transition-all ${
-                  allDayEntriesSelected || someDayEntriesSelected 
-                    ? 'ring-2 ring-blue-500 border-blue-300 dark:border-blue-700 shadow-md' 
-                    : 'hover:shadow-md'
-                }`}
-              >
+              <Card key={key} className="overflow-visible">
                 <CardContent className="p-0 overflow-visible">
-                  {/* Day Header - Enhanced */}
+                  {/* Day Header */}
                   <div 
-                    className={`flex items-center gap-4 p-5 transition-all ${
-                      allDayEntriesSelected || someDayEntriesSelected
-                        ? 'bg-blue-50 dark:bg-blue-900/20'
-                        : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
-                    }`}
+                    className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                   >
                     <ConditionalRender capability="yatra_delete_trips">
-                      <div className="flex-shrink-0">
-                        <input
-                          type="checkbox"
-                          checked={allDayEntriesSelected}
-                          ref={(el) => {
-                            if (el) {
-                              el.indeterminate = someDayEntriesSelected && !allDayEntriesSelected;
-                            }
-                          }}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            handleSelectAll(dayGroup);
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all"
-                          title={allDayEntriesSelected 
-                            ? __('Deselect all entries for this day', 'Deselect all entries for this day')
-                            : __('Select all entries for this day', 'Select all entries for this day')
-                          }
-                        />
-                      </div>
+                      <input
+                        type="checkbox"
+                        checked={dayGroup.entries.length > 0 && dayGroup.entries.every(e => selectedEntries.has(e.id))}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleSelectAll(dayGroup);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                        title={__('Select all entries for this day', 'Select all entries for this day')}
+                      />
                     </ConditionalRender>
                     <div 
                       className="flex items-center gap-4 flex-1 cursor-pointer"
                       onClick={() => toggleDay(dayGroup.trip_id, dayGroup.day)}
                     >
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="flex-shrink-0">
-                          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
-                            {dayGroup.day}
-                          </div>
+                      <div className="flex items-center gap-3">
+                        <div className="px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-medium">
+                          {__('Day', 'Day')} {dayGroup.day}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">
-                            {dayGroup.day_title || `${__('Day', 'Day')} ${dayGroup.day}`}
+                        <div>
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {dayGroup.day_title 
+                              ? `${__('Day', 'Day')} ${dayGroup.day}: ${dayGroup.day_title}`
+                              : `${__('Day', 'Day')} ${dayGroup.day}`
+                            }
                           </h3>
-                          <div className="flex items-center gap-4 flex-wrap">
-                            <Badge variant="outline" className="text-xs">
-                              {counts.total} {counts.total === 1 ? __('item', 'item') : __('items', 'items')}
-                            </Badge>
+                          <div className="flex items-center gap-3 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            <span>{counts.total} {__('items', 'items')}</span>
                             {counts.meals > 0 && (
-                              <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                                <UtensilsCrossed className="w-4 h-4 text-orange-500" />
-                                <span className="font-medium">{counts.meals} {__('Meals', 'Meals')}</span>
+                              <div className="flex items-center gap-1">
+                                <UtensilsCrossed className="w-3.5 h-3.5" />
+                                <span>{counts.meals}</span>
                               </div>
                             )}
                             {counts.activities > 0 && (
-                              <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                                <MapPin className="w-4 h-4 text-blue-500" />
-                                <span className="font-medium">{counts.activities} {__('Activities', 'Activities')}</span>
+                              <div className="flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5" />
+                                <span>{counts.activities}</span>
                               </div>
                             )}
                             {counts.accommodations > 0 && (
-                              <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                                <Hotel className="w-4 h-4 text-purple-500" />
-                                <span className="font-medium">{__('Accommodation', 'Accommodation')}</span>
+                              <div className="flex items-center gap-1">
+                                <Hotel className="w-3.5 h-3.5" />
+                                <span>{__('Stay', 'Stay')}</span>
                               </div>
                             )}
                           </div>
@@ -1139,66 +1088,42 @@ const Itinerary: React.FC = () => {
 
                       {/* Itinerary Items */}
                       <div className="p-4 space-y-3 overflow-visible">
-                        {sortedEntries.length === 0 ? (
-                          <div className="p-8 text-center bg-gray-50 dark:bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
-                            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                              {__('No activities for this day', 'No activities for this day')}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500">
-                              {__('Click "Add Activity" below to get started', 'Click "Add Activity" below to get started')}
-                            </p>
-                          </div>
-                        ) : (
-                          sortedEntries.map((entry) => {
-                            const isSelected = selectedEntries.has(entry.id);
-                            return (
-                            <div
-                              key={entry.id}
-                              className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-all overflow-visible ${
-                                isSelected
-                                  ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-400 dark:border-blue-700 shadow-md'
-                                  : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm'
-                              }`}
-                            >
-                              {/* Checkbox - Enhanced */}
-                              <ConditionalRender capability="yatra_delete_trips">
-                                <div className="flex-shrink-0 pt-0.5">
-                                  <input
-                                    type="checkbox"
-                                    checked={isSelected}
-                                    onChange={(e) => {
-                                      e.stopPropagation();
-                                      handleToggleSelect(entry.id);
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all"
-                                    title={isSelected ? __('Deselect this entry', 'Deselect this entry') : __('Select this entry', 'Select this entry')}
-                                  />
-                                </div>
-                              </ConditionalRender>
-                            {/* Time - Enhanced */}
-                            <div className="flex flex-col items-center min-w-[90px] flex-shrink-0">
-                              <div className="text-base font-bold text-gray-900 dark:text-white mb-1">
+                        {sortedEntries.map((entry) => (
+                          <div
+                            key={entry.id}
+                            className="flex items-start gap-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-visible"
+                          >
+                            {/* Checkbox */}
+                            <ConditionalRender capability="yatra_delete_trips">
+                              <input
+                                type="checkbox"
+                                checked={selectedEntries.has(entry.id)}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleSelect(entry.id);
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                                title={__('Select this entry', 'Select this entry')}
+                              />
+                            </ConditionalRender>
+                            {/* Time */}
+                            <div className="flex flex-col items-center min-w-[80px]">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">
                                 {formatTime(entry.start_time)}
                               </div>
-                              {entry.end_time && (
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                                  {__('until', 'until')} {formatTime(entry.end_time)}
-                                </div>
-                              )}
-                              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center border-2 border-blue-300 dark:border-blue-700">
-                                <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                              <div className="mt-1 w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                                <div className="w-2 h-2 rounded-full bg-blue-600"></div>
                               </div>
                             </div>
 
-                            {/* Content - Enhanced */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-3 mb-2">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-2">
+                            {/* Content */}
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
                                     <Badge 
-                                      className="text-xs font-semibold px-3 py-1 shadow-sm"
+                                      className="text-xs font-medium px-2 py-0.5"
                                       style={{
                                         backgroundColor: entry.item_color === 'blue' ? 'rgb(219, 234, 254)' : 
                                                        entry.item_color === 'green' ? 'rgb(220, 252, 231)' :
@@ -1221,27 +1146,25 @@ const Itinerary: React.FC = () => {
                                                     entry.item_color === 'red' ? 'rgb(252, 165, 165)' :
                                                     entry.item_color === 'yellow' ? 'rgb(253, 230, 138)' :
                                                     'rgb(209, 213, 219)',
-                                        borderWidth: '2px',
+                                        borderWidth: '1px',
                                         borderStyle: 'solid',
                                       }}
                                     >
                                       <div className="flex items-center gap-1.5">
                                         <IconSelector 
                                           iconName={entry.item_icon as any} 
-                                          className="w-3.5 h-3.5"
+                                          className="w-3 h-3"
                                         />
-                                        <span className="font-semibold">{entry.item_type}</span>
+                                        <span>{entry.item_type}</span>
                                       </div>
                                     </Badge>
                                   </div>
-                                  <h4 className="text-base font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
+                                  <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
                                     {entry.title}
-                                  </h4>
-                                  {entry.description && (
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                                      {entry.description}
-                                    </p>
-                                  )}
+                                  </div>
+                                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                    {entry.description}
+                                  </div>
                                   <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                                     {entry.location && (
                                       <div className="flex items-center gap-1">
@@ -1398,9 +1321,7 @@ const Itinerary: React.FC = () => {
                               </div>
                             </div>
                           </div>
-                          );
-                          })
-                        )}
+                        ))}
 
                         {/* Add Activity Button */}
                         <ConditionalRender capability="yatra_edit_trips">

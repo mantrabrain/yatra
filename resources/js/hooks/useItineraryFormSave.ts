@@ -181,17 +181,9 @@ export const useItineraryFormSave = ({
           return dayResponse.data || dayResponse;
         }
         
-        // Create mode: create day entry ONLY (no activities unless explicitly added and filled)
-        // First, filter out incomplete activities (only keep those with all required fields)
-        const completeActivities = activityForms.filter(af => {
-          const activityData = af.data;
-          return activityData.item_type_id && 
-                 activityData.item_id && 
-                 activityData.title?.trim();
-        });
-        
-        // If no complete activities, create ONLY the day entry
-        if (completeActivities.length === 0) {
+        // Create mode: create day and all activities
+        // If no activities, create a minimal day entry
+        if (activityForms.length === 0) {
           const payload = {
             trip_id: tripId,
             day: day,
@@ -217,58 +209,23 @@ export const useItineraryFormSave = ({
           return response.data || response;
         }
         
-        // If there are complete activities, create day first, then save activities
-        // The first activity creation will also create the day if it doesn't exist
-        // But we need to ensure the day entry exists first
-        let dayResponse: any = null;
-        
-        // Create day entry first (if not already created by first activity)
-        try {
-          const dayPayload = {
-            trip_id: tripId,
-            day: day,
-            day_title: dayTitle,
-            item_type_id: null,
-            item_id: null,
-            title: dayTitle || `Day ${day}`,
-            description: '',
-            location: null,
-            duration: null,
-            start_time: null,
-            end_time: null,
-            time_type: 'exact',
-            cost: null,
-            cost_per_person: false,
-            notes: null,
-            included_items: [],
-            excluded_items: [],
-            status: data.status || 'draft',
-          };
-          
-          dayResponse = await apiClient.post('/itinerary', dayPayload);
-        } catch (error: any) {
-          // If day already exists (from a previous activity), that's okay
-          // We'll continue to create activities
-          console.log('Day may already exist, continuing with activities...');
-        }
-        
-        // Now save all complete activities sequentially
+        // Save all activities sequentially to ensure proper ordering and day creation
         const responses = [];
-        for (let index = 0; index < completeActivities.length; index++) {
-          const activityForm = completeActivities[index];
+        for (let index = 0; index < activityForms.length; index++) {
+          const activityForm = activityForms[index];
           const activityData = activityForm.data;
           
-          // Type guard: we've already filtered for complete activities, but TypeScript doesn't know
+          // Validate required fields
           if (!activityData.item_type_id || !activityData.item_id || !activityData.title?.trim()) {
-            continue; // Skip if somehow incomplete (shouldn't happen after filter)
+            throw new Error(`Activity ${index + 1} is missing required fields (item type, item, or title)`);
           }
           
           const payload = {
             trip_id: tripId,
             day: day,
             day_title: dayTitle,
-            item_type_id: parseInt(activityData.item_type_id),
-            item_id: parseInt(activityData.item_id),
+            item_type_id: parseInt(activityData.item_type_id!),
+            item_id: parseInt(activityData.item_id!),
             title: activityData.title.trim(),
             description: (activityData.description || '').trim(),
             location: (activityData.location || '').trim(),
@@ -287,13 +244,13 @@ export const useItineraryFormSave = ({
           try {
             const response = await apiClient.post('/itinerary', payload);
             responses.push(response.data || response);
-          } catch (error: any) {
-            throw new Error(`Failed to save activity ${index + 1}: ${error?.message || 'Unknown error'}`);
-          }
+                  } catch (error: any) {
+                    throw new Error(`Failed to save activity ${index + 1}: ${error?.message || 'Unknown error'}`);
+                  }
         }
         
-        // Return the day response if available, otherwise the first activity response
-        return dayResponse?.data || dayResponse || responses[0] || responses;
+        // Return the first response (contains day info)
+        return responses[0] || responses;
       }
       
       // For activity mode, use all fields
@@ -334,15 +291,7 @@ export const useItineraryFormSave = ({
     onSuccess: () => {
       // For day mode, show success message and navigate
       if (isAddDayMode) {
-        // Count only complete activities (those that were actually saved)
-        const completeActivities = activityForms.filter(af => {
-          const activityData = af.data;
-          return activityData.item_type_id && 
-                 activityData.item_id && 
-                 activityData.title?.trim();
-        });
-        const activityCount = completeActivities.length;
-        
+        const activityCount = activityForms.length;
         if (isEditMode) {
           // Edit mode messages
           if (activityCount === 0) {
