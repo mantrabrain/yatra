@@ -13,12 +13,12 @@ import {
   Trash2, 
   MapPin, 
   Clock, 
-  Info,
   UtensilsCrossed,
   Hotel,
   Calendar,
   CalendarDays,
-  AlertCircle
+  AlertCircle,
+  Pencil
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -76,6 +76,7 @@ const Itinerary: React.FC = () => {
     isOpen: false,
     entry: null,
   });
+  const [dayMenuOpen, setDayMenuOpen] = useState<{ tripId: number; day: number } | null>(null);
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
@@ -484,6 +485,20 @@ const Itinerary: React.FC = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${entry.id}`;
   };
 
+  const handleEditDay = (tripId: number, day: number) => {
+    // Navigate to edit day form - use the first entry's ID if available, or create mode with day info
+    const dayGroup = dayGroups.find((dg: DayGroup) => dg.trip_id === tripId && dg.day === day);
+    if (dayGroup && dayGroup.entries.length > 0) {
+      // Use the first entry's ID to edit the day
+      // The form will detect it's a day edit based on the entry having no item_type_id/item_id
+      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${dayGroup.entries[0].id}&mode=day`;
+    } else {
+      // No entries yet, navigate to create day form with existing day info
+      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=day`;
+    }
+    setDayMenuOpen(null);
+  };
+
   const handleDelete = (entry: ItineraryEntry) => {
     setDeleteConfirm({ isOpen: true, entry });
   };
@@ -530,6 +545,17 @@ const Itinerary: React.FC = () => {
   };
 
   const dayGroups: DayGroup[] = (data || []) as DayGroup[];
+
+  // Close day menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setDayMenuOpen(null);
+    };
+    if (dayMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [dayMenuOpen]);
 
   return (
     <div className="space-y-4 pb-6">
@@ -732,18 +758,41 @@ const Itinerary: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Handle menu
-                        }}
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
+                    <div className="flex items-center gap-2 relative">
+                      <ConditionalRender capability="yatra_edit_trips">
+                        <div className="relative">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (dayMenuOpen && dayMenuOpen.tripId === dayGroup.trip_id && dayMenuOpen.day === dayGroup.day) {
+                                setDayMenuOpen(null);
+                              } else {
+                                setDayMenuOpen({ tripId: dayGroup.trip_id, day: dayGroup.day });
+                              }
+                            }}
+                            title={__('Day Options', 'Day Options')}
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                          {dayMenuOpen && dayMenuOpen.tripId === dayGroup.trip_id && dayMenuOpen.day === dayGroup.day && (
+                            <div 
+                              className="absolute right-0 top-10 z-50 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <button
+                                onClick={() => handleEditDay(dayGroup.trip_id, dayGroup.day)}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                              >
+                                <Pencil className="w-4 h-4" />
+                                {__('Edit Day', 'Edit Day')}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </ConditionalRender>
                       {isExpanded ? (
                         <ChevronDown className="w-5 h-5 text-gray-400" />
                       ) : (
@@ -1019,9 +1068,9 @@ const Itinerary: React.FC = () => {
                                       size="icon"
                                       onClick={() => handleEdit(entry)}
                                       className="h-8 w-8"
-                                      title={__('Edit', 'Edit')}
+                                      title={__('Edit Activity', 'Edit Activity')}
                                     >
-                                      <Info className="w-4 h-4" />
+                                      <Pencil className="w-4 h-4" />
                                     </Button>
                                   </ConditionalRender>
                                   <ConditionalRender capability="yatra_delete_trips">

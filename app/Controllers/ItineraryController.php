@@ -150,6 +150,19 @@ class ItineraryController extends BaseController
      */
     protected function prepare_item_for_response($item, WP_REST_Request $request): array
     {
+        // Parse included_items and excluded_items from JSON if they're strings
+        $includedItems = $item->included_items ?? [];
+        if (is_string($includedItems)) {
+            $decoded = json_decode($includedItems, true);
+            $includedItems = is_array($decoded) ? $decoded : [];
+        }
+        
+        $excludedItems = $item->excluded_items ?? [];
+        if (is_string($excludedItems)) {
+            $decoded = json_decode($excludedItems, true);
+            $excludedItems = is_array($decoded) ? $decoded : [];
+        }
+        
         return [
             'id' => (int) $item->id,
             'trip_id' => (int) $item->trip_id,
@@ -161,11 +174,17 @@ class ItineraryController extends BaseController
             'time' => $item->time ?? null,
             'start_time' => $item->start_time ?? null,
             'end_time' => $item->end_time ?? null,
+            'time_type' => $item->time_type ?? 'exact',
             'location' => $item->location ?? null,
+            'duration' => $item->duration ?? null,
+            'cost' => isset($item->cost) ? (float) $item->cost : null,
+            'cost_per_person' => isset($item->cost_per_person) ? (bool) $item->cost_per_person : false,
+            'notes' => $item->notes ?? null,
             'item_type_id' => isset($item->item_type_id) ? (int) $item->item_type_id : null,
             'item_id' => isset($item->item_id) ? (int) $item->item_id : null,
-            'included_items' => $item->included_items ?? [],
-            'excluded_items' => $item->excluded_items ?? [],
+            'included_items' => $includedItems,
+            'excluded_items' => $excludedItems,
+            'status' => $item->status ?? 'draft',
             'images' => $item->images ?? [],
             'order' => (int) ($item->order ?? 0),
             'created_at' => $item->created_at ?? null,

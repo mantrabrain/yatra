@@ -54,6 +54,52 @@ class ItineraryService
         if ($dayNumber < 1) {
             throw new InvalidArgumentException(__('Day number must be at least 1', 'yatra'));
         }
+
+        // Check for duplicate day numbers when creating new entries (not when updating)
+        // Only check if item_type_id and item_id are null (meaning it's a day creation, not an activity)
+        if ($id === null && empty($data['item_type_id']) && empty($data['item_id'])) {
+            $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+            $existingDay = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$tableDays}` 
+                     WHERE trip_id = %d AND day_number = %d",
+                    (int) $data['trip_id'],
+                    $dayNumber
+                )
+            );
+
+            if ($existingDay > 0) {
+                // Get all existing day numbers for this trip
+                $existingDays = $wpdb->get_col(
+                    $wpdb->prepare(
+                        "SELECT day_number FROM `{$tableDays}` 
+                         WHERE trip_id = %d 
+                         ORDER BY day_number ASC",
+                        (int) $data['trip_id']
+                    )
+                ) ?: [];
+                
+                // Get next available day number
+                $maxDay = $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT MAX(day_number) FROM `{$tableDays}` WHERE trip_id = %d",
+                        (int) $data['trip_id']
+                    )
+                ) ?: 0;
+                $nextDay = (int) $maxDay + 1;
+                
+                // Format existing days list (e.g., "1, 2" or "1, 2, 3")
+                $existingDaysList = implode(', ', $existingDays);
+                
+                throw new InvalidArgumentException(
+                    sprintf(
+                        __('Day %s already exists for this trip. Please use day %d instead.', 'yatra'),
+                        $existingDaysList,
+                        $nextDay
+                    )
+                );
+            }
+        }
     }
 
     /**

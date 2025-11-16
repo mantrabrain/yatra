@@ -23,8 +23,15 @@ class ItineraryRepository extends BaseRepository
 
     /**
      * Get or create a day for a trip
+     * 
+     * @param int $tripId Trip ID
+     * @param int $dayNumber Day number
+     * @param string|null $dayTitle Day title (optional)
+     * @param bool $allowExisting If false, throws exception if day already exists (for new day creation)
+     * @return int Day ID
+     * @throws \InvalidArgumentException If day exists and $allowExisting is false
      */
-    public function getOrCreateDay(int $tripId, int $dayNumber, ?string $dayTitle = null): int
+    public function getOrCreateDay(int $tripId, int $dayNumber, ?string $dayTitle = null, bool $allowExisting = true): int
     {
         global $wpdb;
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
@@ -41,6 +48,39 @@ class ItineraryRepository extends BaseRepository
         );
 
         if ($existingDay) {
+            // If not allowing existing days (for new day creation), throw error
+            if (!$allowExisting) {
+                // Get all existing day numbers for this trip
+                $existingDays = $wpdb->get_col(
+                    $wpdb->prepare(
+                        "SELECT day_number FROM `{$tableDays}` 
+                         WHERE trip_id = %d 
+                         ORDER BY day_number ASC",
+                        $tripId
+                    )
+                ) ?: [];
+                
+                // Get next available day number
+                $maxDay = $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT MAX(day_number) FROM `{$tableDays}` WHERE trip_id = %d",
+                        $tripId
+                    )
+                ) ?: 0;
+                $nextDay = (int) $maxDay + 1;
+                
+                // Format existing days list (e.g., "1, 2" or "1, 2, 3")
+                $existingDaysList = implode(', ', $existingDays);
+                
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        __('Day %s already exists for this trip. Please use day %d instead.', 'yatra'),
+                        $existingDaysList,
+                        $nextDay
+                    )
+                );
+            }
+            
             // Update day title if provided
             if ($dayTitle !== null) {
                 $wpdb->update(
@@ -80,10 +120,14 @@ class ItineraryRepository extends BaseRepository
         $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
 
         // Get or create day
+        // If item_type_id and item_id are null, it's a day creation - don't allow existing days
+        // Otherwise, it's an activity - allow using existing days
+        $isDayCreation = empty($data['item_type_id']) && empty($data['item_id']);
         $dayId = $this->getOrCreateDay(
             (int) $data['trip_id'],
             (int) $data['day'],
-            $data['day_title'] ?? null
+            $data['day_title'] ?? null,
+            !$isDayCreation // Allow existing only if it's an activity, not a day creation
         );
 
         // Format time field (combine start_time and end_time if needed)
@@ -102,7 +146,15 @@ class ItineraryRepository extends BaseRepository
             )
         ) ?: 0;
 
-        // Insert entry with item_type_id and item_id
+        // Prepare included_items and excluded_items as JSON
+        $includedItemsJson = !empty($data['included_items']) && is_array($data['included_items']) 
+            ? json_encode($data['included_items']) 
+            : null;
+        $excludedItemsJson = !empty($data['excluded_items']) && is_array($data['excluded_items']) 
+            ? json_encode($data['excluded_items']) 
+            : null;
+        
+        // Insert entry with all fields
         $wpdb->insert(
             $tableEntries,
             [
@@ -111,12 +163,22 @@ class ItineraryRepository extends BaseRepository
                 'title' => sanitize_text_field($data['title']),
                 'description' => !empty($data['description']) ? wp_kses_post($data['description']) : null,
                 'time' => $timeField,
+                'start_time' => !empty($data['start_time']) ? sanitize_text_field($data['start_time']) : null,
+                'end_time' => !empty($data['end_time']) ? sanitize_text_field($data['end_time']) : null,
+                'time_type' => !empty($data['time_type']) ? sanitize_text_field($data['time_type']) : 'exact',
                 'location' => !empty($data['location']) ? sanitize_text_field($data['location']) : null,
+                'duration' => !empty($data['duration']) ? sanitize_text_field($data['duration']) : null,
+                'cost' => !empty($data['cost']) ? (float) $data['cost'] : null,
+                'cost_per_person' => !empty($data['cost_per_person']) ? 1 : 0,
+                'notes' => !empty($data['notes']) ? wp_kses_post($data['notes']) : null,
+                'included_items' => $includedItemsJson,
+                'excluded_items' => $excludedItemsJson,
                 'item_type_id' => !empty($data['item_type_id']) ? (int) $data['item_type_id'] : null,
                 'item_id' => !empty($data['item_id']) ? (int) $data['item_id'] : null,
+                'status' => !empty($data['status']) ? sanitize_text_field($data['status']) : 'draft',
                 'order' => (int) $maxOrder + 1,
             ],
-            ['%d', '%d', '%s', '%s', '%s', '%s', '%d', '%d', '%d']
+            ['%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%f', '%d', '%s', '%s', '%s', '%d', '%d', '%s', '%d']
         );
 
         $entryId = (int) $wpdb->insert_id;
@@ -171,7 +233,8 @@ class ItineraryRepository extends BaseRepository
             $newDayTitle = $data['day_title'] ?? null;
             
             if ($newDayNumber !== null) {
-                $dayId = $this->getOrCreateDay($tripId, $newDayNumber, $newDayTitle);
+                // When updating, allow using existing days (activities can be moved to existing days)
+                $dayId = $this->getOrCreateDay($tripId, $newDayNumber, $newDayTitle, true);
             } elseif ($newDayTitle !== null) {
                 $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
                 $wpdb->update(
@@ -194,6 +257,25 @@ class ItineraryRepository extends BaseRepository
             $timeField = $data['time'];
         }
 
+        // Prepare included_items and excluded_items as JSON
+        $includedItemsJson = null;
+        if (isset($data['included_items'])) {
+            if (is_array($data['included_items'])) {
+                $includedItemsJson = json_encode($data['included_items']);
+            } elseif (is_string($data['included_items'])) {
+                $includedItemsJson = $data['included_items'];
+            }
+        }
+        
+        $excludedItemsJson = null;
+        if (isset($data['excluded_items'])) {
+            if (is_array($data['excluded_items'])) {
+                $excludedItemsJson = json_encode($data['excluded_items']);
+            } elseif (is_string($data['excluded_items'])) {
+                $excludedItemsJson = $data['excluded_items'];
+            }
+        }
+        
         // Prepare update data
         $updateData = [];
         $updateFormat = [];
@@ -213,8 +295,53 @@ class ItineraryRepository extends BaseRepository
             $updateFormat[] = '%s';
         }
 
+        if (isset($data['start_time'])) {
+            $updateData['start_time'] = !empty($data['start_time']) ? sanitize_text_field($data['start_time']) : null;
+            $updateFormat[] = '%s';
+        }
+
+        if (isset($data['end_time'])) {
+            $updateData['end_time'] = !empty($data['end_time']) ? sanitize_text_field($data['end_time']) : null;
+            $updateFormat[] = '%s';
+        }
+
+        if (isset($data['time_type'])) {
+            $updateData['time_type'] = sanitize_text_field($data['time_type']);
+            $updateFormat[] = '%s';
+        }
+
         if (isset($data['location'])) {
             $updateData['location'] = !empty($data['location']) ? sanitize_text_field($data['location']) : null;
+            $updateFormat[] = '%s';
+        }
+
+        if (isset($data['duration'])) {
+            $updateData['duration'] = !empty($data['duration']) ? sanitize_text_field($data['duration']) : null;
+            $updateFormat[] = '%s';
+        }
+
+        if (isset($data['cost'])) {
+            $updateData['cost'] = !empty($data['cost']) ? (float) $data['cost'] : null;
+            $updateFormat[] = '%f';
+        }
+
+        if (isset($data['cost_per_person'])) {
+            $updateData['cost_per_person'] = !empty($data['cost_per_person']) ? 1 : 0;
+            $updateFormat[] = '%d';
+        }
+
+        if (isset($data['notes'])) {
+            $updateData['notes'] = !empty($data['notes']) ? wp_kses_post($data['notes']) : null;
+            $updateFormat[] = '%s';
+        }
+
+        if ($includedItemsJson !== null) {
+            $updateData['included_items'] = $includedItemsJson;
+            $updateFormat[] = '%s';
+        }
+
+        if ($excludedItemsJson !== null) {
+            $updateData['excluded_items'] = $excludedItemsJson;
             $updateFormat[] = '%s';
         }
 
@@ -226,6 +353,11 @@ class ItineraryRepository extends BaseRepository
         if (isset($data['item_id'])) {
             $updateData['item_id'] = !empty($data['item_id']) ? (int) $data['item_id'] : null;
             $updateFormat[] = '%d';
+        }
+
+        if (isset($data['status'])) {
+            $updateData['status'] = sanitize_text_field($data['status']);
+            $updateFormat[] = '%s';
         }
 
         if ($dayId !== (int) $existingEntry->day_id) {

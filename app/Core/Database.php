@@ -1038,6 +1038,52 @@ class Database
                 // Drop activity_type column (data migration would happen here if needed)
                 $wpdb->query("ALTER TABLE `{$table_itinerary_entries}` DROP COLUMN `activity_type`");
             }
+            
+            // Add missing columns for itinerary entries
+            $columnsToAdd = [
+                'start_time' => "ADD COLUMN `start_time` varchar(10) DEFAULT NULL COMMENT 'Start time (HH:MM)' AFTER `time`",
+                'end_time' => "ADD COLUMN `end_time` varchar(10) DEFAULT NULL COMMENT 'End time (HH:MM)' AFTER `start_time`",
+                'time_type' => "ADD COLUMN `time_type` varchar(20) DEFAULT 'exact' COMMENT 'exact, approximate, all_day, flexible' AFTER `end_time`",
+                'duration' => "ADD COLUMN `duration` varchar(50) DEFAULT NULL COMMENT 'Duration (e.g., 3 hours)' AFTER `location`",
+                'cost' => "ADD COLUMN `cost` decimal(10,2) DEFAULT NULL AFTER `duration`",
+                'cost_per_person' => "ADD COLUMN `cost_per_person` tinyint(1) DEFAULT 0 AFTER `cost`",
+                'notes' => "ADD COLUMN `notes` text DEFAULT NULL AFTER `cost_per_person`",
+                'included_items' => "ADD COLUMN `included_items` text DEFAULT NULL COMMENT 'JSON array of included items' AFTER `notes`",
+                'excluded_items' => "ADD COLUMN `excluded_items` text DEFAULT NULL COMMENT 'JSON array of excluded items' AFTER `included_items`",
+                'status' => "ADD COLUMN `status` varchar(20) DEFAULT 'draft' COMMENT 'draft, publish, trash' AFTER `item_id`",
+            ];
+            
+            foreach ($columnsToAdd as $columnName => $alterSql) {
+                $columnExists = (int) $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT COUNT(*) FROM information_schema.columns 
+                         WHERE table_schema = DATABASE() 
+                         AND table_name = %s 
+                         AND column_name = %s",
+                        $table_itinerary_entries,
+                        $columnName
+                    )
+                ) > 0;
+                
+                if (!$columnExists) {
+                    $wpdb->query("ALTER TABLE `{$table_itinerary_entries}` {$alterSql}");
+                }
+            }
+            
+            // Add status index if it doesn't exist
+            $statusIndexExists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM information_schema.statistics 
+                     WHERE table_schema = DATABASE() 
+                     AND table_name = %s 
+                     AND index_name = 'idx_status'",
+                    $table_itinerary_entries
+                )
+            ) > 0;
+            
+            if (!$statusIndexExists) {
+                $wpdb->query("ALTER TABLE `{$table_itinerary_entries}` ADD INDEX `idx_status` (`status`)");
+            }
         }
         
         // Update availability table to add time columns and blocked status
@@ -1157,9 +1203,19 @@ class Database
             `title` varchar(255) NOT NULL,
             `description` text DEFAULT NULL,
             `time` varchar(50) DEFAULT NULL COMMENT 'Time of day',
+            `start_time` varchar(10) DEFAULT NULL COMMENT 'Start time (HH:MM)',
+            `end_time` varchar(10) DEFAULT NULL COMMENT 'End time (HH:MM)',
+            `time_type` varchar(20) DEFAULT 'exact' COMMENT 'exact, approximate, all_day, flexible',
             `location` varchar(255) DEFAULT NULL,
+            `duration` varchar(50) DEFAULT NULL COMMENT 'Duration (e.g., 3 hours)',
+            `cost` decimal(10,2) DEFAULT NULL,
+            `cost_per_person` tinyint(1) DEFAULT 0,
+            `notes` text DEFAULT NULL,
+            `included_items` text DEFAULT NULL COMMENT 'JSON array of included items',
+            `excluded_items` text DEFAULT NULL COMMENT 'JSON array of excluded items',
             `item_type_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Reference to yatra_item_types',
             `item_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Reference to yatra_items',
+            `status` varchar(20) DEFAULT 'draft' COMMENT 'draft, publish, trash',
             `order` smallint(5) UNSIGNED DEFAULT 0,
             `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
             `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -1168,6 +1224,7 @@ class Database
             KEY `idx_day_id` (`day_id`),
             KEY `idx_item_type_id` (`item_type_id`),
             KEY `idx_item_id` (`item_id`),
+            KEY `idx_status` (`status`),
             KEY `idx_order` (`day_id`,`order`)
         ) {$charset_collate} COMMENT='Trip itinerary entries';";
         \dbDelta($sql_trip_itinerary_entries);

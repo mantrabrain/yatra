@@ -130,7 +130,11 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
             <Select
               value={entry.item_id || ''}
               onChange={(e) => onFieldChange('item_id', e.target.value)}
-              disabled={!entry.item_type_id || items.length === 0}
+              disabled={!entry.item_type_id || items.filter((item: any) => {
+                const itemTypeId = entry.item_type_id ? String(entry.item_type_id) : '';
+                const itemTypeIdNum = item.type_id || item.item_type_id;
+                return String(itemTypeIdNum) === itemTypeId;
+              }).length === 0}
               className={`${errors.item_id ? 'border-red-500' : ''} ${textSize} text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800`}
               style={{
                 color: 'rgb(17, 24, 39)',
@@ -141,15 +145,28 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
               <option value="">
                 {!entry.item_type_id 
                   ? __('Select type first...', 'Select type first...')
-                  : items.length === 0
+                  : items.filter((item: any) => {
+                      // Filter items by the entry's item_type_id
+                      const itemTypeId = entry.item_type_id ? String(entry.item_type_id) : '';
+                      const itemTypeIdNum = item.type_id || item.item_type_id;
+                      return String(itemTypeIdNum) === itemTypeId;
+                    }).length === 0
                   ? __('No items available', 'No items available')
                   : __('Select an item...', 'Select an item...')}
               </option>
-              {items.map((item: any) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
+              {items
+                .filter((item: any) => {
+                  // Filter items by the entry's item_type_id
+                  if (!entry.item_type_id) return false;
+                  const itemTypeId = String(entry.item_type_id);
+                  const itemTypeIdNum = item.type_id || item.item_type_id;
+                  return String(itemTypeIdNum) === itemTypeId;
+                })
+                .map((item: any) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
             </Select>
             {errors.item_id && (
               <p className={`mt-1.5 ${textSize} text-red-600 dark:text-red-400 flex items-center gap-1`}>
@@ -440,7 +457,14 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                   type="button"
                   variant="outline"
                   size="icon"
-                  onClick={onAddIncludedItem}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (newIncludedItem.trim()) {
+                      onAddIncludedItem?.();
+                    }
+                  }}
+                  disabled={!newIncludedItem.trim()}
                   className={`flex-shrink-0 ${isCompact ? 'h-9 w-9' : ''}`}
                 >
                   <Plus className="w-4 h-4" />
@@ -490,7 +514,14 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                   type="button"
                   variant="outline"
                   size="icon"
-                  onClick={onAddExcludedItem}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (newExcludedItem.trim()) {
+                      onAddExcludedItem?.();
+                    }
+                  }}
+                  disabled={!newExcludedItem.trim()}
                   className={`flex-shrink-0 ${isCompact ? 'h-9 w-9' : ''}`}
                 >
                   <Plus className="w-4 h-4" />
