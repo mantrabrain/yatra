@@ -114,21 +114,49 @@ class ItineraryRepository extends BaseRepository
      */
     public function createEntry(array $data): int
     {
+        
         global $wpdb;
         $tableEntries = $this->getTableName();
+        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
         $tableItems = $wpdb->prefix . 'yatra_trip_itinerary_entry_items';
         $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
 
         // Get or create day
-        // If item_type_id and item_id are null, it's a day creation - don't allow existing days
-        // Otherwise, it's an activity - allow using existing days
+        // If item_type_id and item_id are null, it's a day entry
+        // For day entries, we allow existing days (because we might be updating)
+        // For activities, we also allow existing days
         $isDayCreation = empty($data['item_type_id']) && empty($data['item_id']);
         $dayId = $this->getOrCreateDay(
             (int) $data['trip_id'],
             (int) $data['day'],
             $data['day_title'] ?? null,
-            !$isDayCreation // Allow existing only if it's an activity, not a day creation
+            true // Always allow existing days - we'll check for duplicate day entries separately
         );
+
+        // If this is a day entry (item_type_id and item_id are null), check if a day entry already exists
+        // If it does, update it instead of creating a new one
+        if ($isDayCreation) {
+            // Check for existing day entry by trip_id and day_number (more robust than just day_id)
+            // This ensures we find the day entry even if day_id changes
+            $existingDayEntry = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT e.id FROM `{$tableEntries}` e
+                     INNER JOIN `{$tableDays}` d ON e.day_id = d.id
+                     WHERE e.trip_id = %d 
+                     AND d.day_number = %d
+                     AND e.item_type_id IS NULL 
+                     AND e.item_id IS NULL
+                     LIMIT 1",
+                    (int) $data['trip_id'],
+                    (int) $data['day']
+                )
+            );
+            
+            if ($existingDayEntry) {
+                // Day entry already exists, update it instead of creating a new one
+                return $this->updateEntry((int) $existingDayEntry->id, $data) ? (int) $existingDayEntry->id : 0;
+            }
+        }
 
         // Format time field (combine start_time and end_time if needed)
         $timeField = null;
@@ -233,8 +261,29 @@ class ItineraryRepository extends BaseRepository
             $newDayTitle = $data['day_title'] ?? null;
             
             if ($newDayNumber !== null) {
-                // When updating, allow using existing days (activities can be moved to existing days)
-                $dayId = $this->getOrCreateDay($tripId, $newDayNumber, $newDayTitle, true);
+                // Get current day number from existing entry's day
+                $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+                $currentDay = $wpdb->get_row(
+                    $wpdb->prepare("SELECT day_number FROM `{$tableDays}` WHERE id = %d", $dayId)
+                );
+                $currentDayNumber = $currentDay ? (int) $currentDay->day_number : null;
+                
+                // If day number hasn't changed, just update the title if needed
+                if ($currentDayNumber !== null && $newDayNumber === $currentDayNumber) {
+                    if ($newDayTitle !== null) {
+                        $wpdb->update(
+                            $tableDays,
+                            ['title' => sanitize_text_field($newDayTitle)],
+                            ['id' => $dayId],
+                            ['%s'],
+                            ['%d']
+                        );
+                    }
+                    // Keep using the same dayId, no need to call getOrCreateDay
+                } else {
+                    // Day number changed - allow using existing days (activities can be moved to existing days)
+                    $dayId = $this->getOrCreateDay($tripId, $newDayNumber, $newDayTitle, true);
+                }
             } elseif ($newDayTitle !== null) {
                 $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
                 $wpdb->update(
@@ -547,15 +596,56 @@ class ItineraryRepository extends BaseRepository
 
     /**
      * Delete entry and related data
+     * If deleting a day entry, also delete all activities for that day
      */
     public function delete(int $id): bool
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
         $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
+        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
 
-        // Note: included_items and excluded_items table has been removed
+        // Get the entry to check if it's a day entry
+        $entry = $wpdb->get_row(
+            $wpdb->prepare("SELECT day_id, item_type_id, item_id FROM `{$tableEntries}` WHERE id = %d", $id)
+        );
 
+        if (!$entry) {
+            return false;
+        }
+
+        $dayId = (int) $entry->day_id;
+        $isDayEntry = ($entry->item_type_id === null || $entry->item_type_id === 0) && 
+                      ($entry->item_id === null || $entry->item_id === 0);
+
+        // If this is a day entry, delete all entries for this day (activities + day entry)
+        if ($isDayEntry) {
+            // Get all entry IDs for this day
+            $dayEntryIds = $wpdb->get_col(
+                $wpdb->prepare("SELECT id FROM `{$tableEntries}` WHERE day_id = %d", $dayId)
+            );
+
+            if (!empty($dayEntryIds)) {
+                // Delete images for all entries
+                $placeholders = implode(',', array_fill(0, count($dayEntryIds), '%d'));
+                $wpdb->query(
+                    $wpdb->prepare(
+                        "DELETE FROM `{$tableImages}` WHERE entry_id IN ($placeholders)",
+                        ...$dayEntryIds
+                    )
+                );
+
+                // Delete all entries for this day
+                $wpdb->delete($tableEntries, ['day_id' => $dayId], ['%d']);
+
+                // Delete the day itself
+                $wpdb->delete($tableDays, ['id' => $dayId], ['%d']);
+            }
+
+            return true;
+        }
+
+        // For activity entries, just delete the entry and its images
         // Delete related images
         $wpdb->delete($tableImages, ['entry_id' => $id], ['%d']);
 
@@ -563,6 +653,171 @@ class ItineraryRepository extends BaseRepository
         $result = $wpdb->delete($tableEntries, ['id' => $id], ['%d']);
 
         return $result !== false;
+    }
+
+    /**
+     * Bulk delete entries
+     * @param array $ids Array of entry IDs to delete
+     * @return array ['deleted' => count, 'failed' => count]
+     */
+    public function bulkDelete(array $ids): array
+    {
+        global $wpdb;
+        $tableEntries = $this->getTableName();
+        $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
+        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+
+        if (empty($ids)) {
+            return ['deleted' => 0, 'failed' => 0];
+        }
+
+        // Sanitize IDs
+        $ids = array_map('intval', $ids);
+        $ids = array_filter($ids, function($id) {
+            return $id > 0;
+        });
+
+        if (empty($ids)) {
+            return ['deleted' => 0, 'failed' => 0];
+        }
+
+        $deleted = 0;
+        $failed = 0;
+        $processedDayIds = []; // Track days we've already processed
+
+        foreach ($ids as $id) {
+            try {
+                // Get the entry to check if it's a day entry
+                $entry = $wpdb->get_row(
+                    $wpdb->prepare("SELECT day_id, item_type_id, item_id FROM `{$tableEntries}` WHERE id = %d", $id)
+                );
+
+                if (!$entry) {
+                    $failed++;
+                    continue;
+                }
+
+                $dayId = (int) $entry->day_id;
+                $isDayEntry = ($entry->item_type_id === null || $entry->item_type_id === 0) && 
+                              ($entry->item_id === null || $entry->item_id === 0);
+
+                // If this is a day entry, delete all entries for this day
+                if ($isDayEntry) {
+                    // Skip if we've already processed this day
+                    if (in_array($dayId, $processedDayIds)) {
+                        continue;
+                    }
+
+                    $processedDayIds[] = $dayId;
+
+                    // Get all entry IDs for this day
+                    $dayEntryIds = $wpdb->get_col(
+                        $wpdb->prepare("SELECT id FROM `{$tableEntries}` WHERE day_id = %d", $dayId)
+                    );
+
+                    if (!empty($dayEntryIds)) {
+                        // Delete images for all entries
+                        $placeholders = implode(',', array_fill(0, count($dayEntryIds), '%d'));
+                        $wpdb->query(
+                            $wpdb->prepare(
+                                "DELETE FROM `{$tableImages}` WHERE entry_id IN ($placeholders)",
+                                ...$dayEntryIds
+                            )
+                        );
+
+                        // Delete all entries for this day
+                        $wpdb->delete($tableEntries, ['day_id' => $dayId], ['%d']);
+
+                        // Delete the day itself
+                        $wpdb->delete($tableDays, ['id' => $dayId], ['%d']);
+                    }
+
+                    $deleted++;
+                } else {
+                    // For activity entries, just delete the entry and its images
+                    // Delete related images
+                    $wpdb->delete($tableImages, ['entry_id' => $id], ['%d']);
+
+                    // Delete entry
+                    $result = $wpdb->delete($tableEntries, ['id' => $id], ['%d']);
+
+                    if ($result !== false) {
+                        $deleted++;
+                    } else {
+                        $failed++;
+                    }
+                }
+            } catch (\Exception $e) {
+                $failed++;
+            }
+        }
+
+        return ['deleted' => $deleted, 'failed' => $failed];
+    }
+
+    /**
+     * Get day entry ID by day_id
+     * Returns the entry ID where item_type_id and item_id are null for a given day_id
+     */
+    public function getDayEntryIdByDayId(int $dayId): ?int
+    {
+        global $wpdb;
+        $tableEntries = $this->getTableName();
+        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+        
+        // First, try to find existing day entry
+        $entryId = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT id FROM `{$tableEntries}` 
+                 WHERE day_id = %d 
+                 AND (item_type_id IS NULL OR item_type_id = 0)
+                 AND (item_id IS NULL OR item_id = 0)
+                 LIMIT 1",
+                $dayId
+            )
+        );
+        
+        if ($entryId) {
+            return (int) $entryId;
+        }
+        
+        // Day entry doesn't exist - get day info and create it
+        $day = $wpdb->get_row(
+            $wpdb->prepare("SELECT trip_id, day_number, title FROM `{$tableDays}` WHERE id = %d", $dayId)
+        );
+        
+        if (!$day) {
+            return null; // Day doesn't exist
+        }
+        
+        // Create the day entry
+        $wpdb->insert(
+            $tableEntries,
+            [
+                'trip_id' => (int) $day->trip_id,
+                'day_id' => $dayId,
+                'title' => $day->title ?: sprintf(__('Day %d', 'yatra'), (int) $day->day_number),
+                'description' => '',
+                'location' => null,
+                'duration' => null,
+                'time' => null,
+                'start_time' => null,
+                'end_time' => null,
+                'time_type' => 'exact',
+                'cost' => null,
+                'cost_per_person' => 0,
+                'notes' => null,
+                'included_items' => null,
+                'excluded_items' => null,
+                'item_type_id' => null,
+                'item_id' => null,
+                'status' => 'draft',
+                'order' => 0,
+            ],
+            ['%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%f', '%d', '%s', '%s', '%s', '%d', '%d', '%s', '%d']
+        );
+        
+        return (int) $wpdb->insert_id;
     }
 }
 

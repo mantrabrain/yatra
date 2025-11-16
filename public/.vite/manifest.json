@@ -1,13 +1,13 @@
 {
-  "_query-vendor-B9I7ekuz.js": {
-    "file": "js/query-vendor-B9I7ekuz.js",
+  "_query-vendor-CYjVNHJ6.js": {
+    "file": "js/query-vendor-CYjVNHJ6.js",
     "name": "query-vendor",
     "imports": [
-      "_react-vendor-DtX1tuCI.js"
+      "_react-vendor-BbIXT3su.js"
     ]
   },
-  "_react-vendor-DtX1tuCI.js": {
-    "file": "js/react-vendor-DtX1tuCI.js",
+  "_react-vendor-BbIXT3su.js": {
+    "file": "js/react-vendor-BbIXT3su.js",
     "name": "react-vendor"
   },
   "resources/js/main.tsx": {
@@ -16,8 +16,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_query-vendor-B9I7ekuz.js",
-      "_react-vendor-DtX1tuCI.js"
+      "_query-vendor-CYjVNHJ6.js",
+      "_react-vendor-BbIXT3su.js"
     ],
     "css": [
       "css/app.css"

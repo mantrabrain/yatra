@@ -38,6 +38,11 @@ class ItineraryController extends BaseController
                 'callback' => [$this, 'create_item'],
                 'permission_callback' => [$this, 'check_permission'],
             ],
+            [
+                'methods' => \WP_REST_Server::DELETABLE,
+                'callback' => [$this, 'bulk_delete_items'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
         ]);
 
         // Single item routes
@@ -55,6 +60,15 @@ class ItineraryController extends BaseController
             [
                 'methods' => \WP_REST_Server::DELETABLE,
                 'callback' => [$this, 'delete_item'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
+        // Get day entry ID by day_id
+        register_rest_route($namespace, '/' . $base . '/day-entry-by-day-id/(?P<day_id>[\d]+)', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_day_entry_id_by_day_id'],
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
@@ -139,6 +153,53 @@ class ItineraryController extends BaseController
 
             return $this->success_response([
                 'message' => __('Itinerary entry deleted successfully', 'yatra'),
+            ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Bulk delete items
+     */
+    public function bulk_delete_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $data = $request->get_json_params();
+            $ids = $data['ids'] ?? [];
+
+            if (empty($ids) || !is_array($ids)) {
+                return $this->error_response('No IDs provided for bulk delete', 400);
+            }
+
+            $result = $this->service->bulkDelete($ids);
+
+            return $this->success_response([
+                'deleted' => $result['deleted'],
+                'failed' => $result['failed'],
+                'message' => sprintf(
+                    __('%d item(s) deleted successfully. %d item(s) failed to delete.', 'yatra'),
+                    $result['deleted'],
+                    $result['failed']
+                ),
+            ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get day entry ID by day_id
+     */
+    public function get_day_entry_id_by_day_id(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $dayId = (int) $request->get_param('day_id');
+            $repository = new ItineraryRepository();
+            $dayEntryId = $repository->getDayEntryIdByDayId($dayId);
+
+            return $this->success_response([
+                'day_entry_id' => $dayEntryId,
             ]);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);

@@ -12,13 +12,13 @@ export default defineConfig({
   build: {
     outDir: 'public',
     emptyOutDir: false,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+    minify: false, // Disable minification for better debugging
+    // terserOptions: {
+    //   compress: {
+    //     drop_console: true,
+    //     drop_debugger: true,
+    //   },
+    // },
     rollupOptions: {
       input: {
         app: path.resolve(__dirname, 'resources/js/main.tsx'),
@@ -39,7 +39,7 @@ export default defineConfig({
       },
     },
     manifest: true,
-    sourcemap: false,
+    sourcemap: true, // Enable source maps for better error debugging
     chunkSizeWarningLimit: 1000,
   },
   server: {

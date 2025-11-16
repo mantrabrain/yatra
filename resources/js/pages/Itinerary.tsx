@@ -77,6 +77,11 @@ const Itinerary: React.FC = () => {
     entry: null,
   });
   const [dayMenuOpen, setDayMenuOpen] = useState<{ tripId: number; day: number } | null>(null);
+  const [selectedEntries, setSelectedEntries] = useState<Set<number>>(new Set());
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState<{ isOpen: boolean; entryIds: number[] }>({
+    isOpen: false,
+    entryIds: [],
+  });
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
@@ -360,17 +365,60 @@ const Itinerary: React.FC = () => {
     }
   }, [data, expandedDays.size]);
 
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      const response = await apiClient.delete('/itinerary', {
+        data: { ids },
+      });
+      return response?.data || response;
+    },
+    onSuccess: (data) => {
+      const deleted = data?.deleted || 0;
+      const failed = data?.failed || 0;
+      
+      if (deleted > 0) {
+        showToast(
+          failed > 0
+            ? `${deleted} item(s) deleted successfully. ${failed} item(s) failed to delete.`
+            : `${deleted} item(s) deleted successfully.`,
+          'success'
+        );
+      } else {
+        showToast('Failed to delete items. Please try again.', 'error');
+      }
+      
+      setBulkDeleteConfirm({ isOpen: false, entryIds: [] });
+      setSelectedEntries(new Set());
+      queryClient.invalidateQueries({ queryKey: ['itinerary'] });
+      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips-simple'] });
+      refetch();
+    },
+    onError: (error: any) => {
+      showToast(error?.message || 'Failed to delete items. Please try again.', 'error');
+      setBulkDeleteConfirm({ isOpen: false, entryIds: [] });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (entry: ItineraryEntry) => {
       try {
         const response = await apiClient.delete(`/itinerary/${entry.id}`);
-        return response?.data || response;
+        return { response: response?.data || response, entry };
       } catch (error: any) {
         throw error;
       }
     },
-    onSuccess: () => {
-      showToast(__('Itinerary entry deleted successfully', 'Itinerary entry deleted successfully'), 'success');
+    onSuccess: (data) => {
+      const entry = data.entry;
+      const isDayDeletion = (entry as any)?._isDayDeletion;
+      showToast(
+        isDayDeletion
+          ? __('Day and all activities deleted successfully', 'Day and all activities deleted successfully')
+          : __('Itinerary entry deleted successfully', 'Itinerary entry deleted successfully'),
+        'success'
+      );
       // Close confirmation dialog
       setDeleteConfirm({ isOpen: false, entry: null });
       // Refresh itinerary data
@@ -486,15 +534,58 @@ const Itinerary: React.FC = () => {
   };
 
   const handleEditDay = (tripId: number, day: number) => {
-    // Navigate to edit day form - use the first entry's ID if available, or create mode with day info
+    // Navigate to edit day form - find the day entry (with null item_type_id and item_id)
     const dayGroup = dayGroups.find((dg: DayGroup) => dg.trip_id === tripId && dg.day === day);
     if (dayGroup && dayGroup.entries.length > 0) {
-      // Use the first entry's ID to edit the day
-      // The form will detect it's a day edit based on the entry having no item_type_id/item_id
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${dayGroup.entries[0].id}&mode=day`;
+      // Find the day entry (the one with null/undefined item_type_id and item_id)
+      // Check explicitly for null/undefined, not just falsy values (to avoid matching 0)
+      const dayEntry = dayGroup.entries.find((entry: any) => 
+        (entry.item_type_id === null || entry.item_type_id === undefined) && 
+        (entry.item_id === null || entry.item_id === undefined)
+      );
+      
+      if (dayEntry && dayEntry.id) {
+        // Use the day entry's ID for edit mode
+        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${dayEntry.id}&mode=day`;
+      } else {
+        // No day entry found, but day exists - use first activity's ID to get day info
+        // The form will detect it's day mode and load day info from the day metadata
+        const firstEntry = dayGroup.entries[0];
+        if (firstEntry && firstEntry.id) {
+          // Navigate to edit mode with first entry's ID, but mode=day will tell form to edit day
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${firstEntry.id}&mode=day&trip_id=${tripId}&day=${day}`;
+        } else {
+          // Fallback to create mode
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=day`;
+        }
+      }
     } else {
       // No entries yet, navigate to create day form with existing day info
       window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=day`;
+    }
+    setDayMenuOpen(null);
+  };
+
+  const handleDeleteDay = (tripId: number, day: number) => {
+    // Find the day entry to delete
+    const dayGroup = dayGroups.find((dg: DayGroup) => dg.trip_id === tripId && dg.day === day);
+    if (dayGroup && dayGroup.entries.length > 0) {
+      // Find the day entry (the one with null/undefined item_type_id and item_id)
+      const dayEntry = dayGroup.entries.find((entry: any) => 
+        (entry.item_type_id === null || entry.item_type_id === undefined) && 
+        (entry.item_id === null || entry.item_id === undefined)
+      );
+      
+      if (dayEntry && dayEntry.id) {
+        // Mark this as a day deletion for custom message
+        const dayEntryWithFlag = { ...dayEntry, _isDayDeletion: true, _dayNumber: day } as ItineraryEntry & { _isDayDeletion?: boolean; _dayNumber?: number };
+        setDeleteConfirm({ isOpen: true, entry: dayEntryWithFlag });
+      } else {
+        // No day entry found, but day exists - show error
+        showToast(__('Day entry not found', 'Day entry not found'), 'error');
+      }
+    } else {
+      showToast(__('Day not found', 'Day not found'), 'error');
     }
     setDayMenuOpen(null);
   };
@@ -511,6 +602,62 @@ const Itinerary: React.FC = () => {
 
   const handleDeleteCancel = () => {
     setDeleteConfirm({ isOpen: false, entry: null });
+  };
+
+  // Bulk selection handlers
+  const handleToggleSelect = (entryId: number) => {
+    setSelectedEntries(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(entryId)) {
+        newSet.delete(entryId);
+      } else {
+        newSet.add(entryId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = (dayGroup: DayGroup) => {
+    const allEntryIds = dayGroup.entries.map(e => e.id);
+    setSelectedEntries(prev => {
+      const newSet = new Set(prev);
+      const allSelected = allEntryIds.every(id => newSet.has(id));
+      if (allSelected) {
+        allEntryIds.forEach(id => newSet.delete(id));
+      } else {
+        allEntryIds.forEach(id => newSet.add(id));
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAllDays = () => {
+    const allEntryIds = dayGroups.flatMap(dg => dg.entries.map(e => e.id));
+    setSelectedEntries(prev => {
+      const newSet = new Set(prev);
+      const allSelected = allEntryIds.length > 0 && allEntryIds.every(id => newSet.has(id));
+      if (allSelected) {
+        allEntryIds.forEach(id => newSet.delete(id));
+      } else {
+        allEntryIds.forEach(id => newSet.add(id));
+      }
+      return newSet;
+    });
+  };
+
+  const handleBulkDelete = () => {
+    const entryIds = Array.from(selectedEntries);
+    if (entryIds.length === 0) return;
+    
+    setBulkDeleteConfirm({ isOpen: true, entryIds });
+  };
+
+  const handleBulkDeleteConfirm = () => {
+    bulkDeleteMutation.mutate(bulkDeleteConfirm.entryIds);
+  };
+
+  const handleBulkDeleteCancel = () => {
+    setBulkDeleteConfirm({ isOpen: false, entryIds: [] });
   };
 
   const toggleDay = (tripId: number, day: number) => {
@@ -558,19 +705,59 @@ const Itinerary: React.FC = () => {
   }, [dayMenuOpen]);
 
   return (
-    <div className="space-y-4 pb-6">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Build your complete itinerary with activities, meals, and accommodations', 'Build your complete itinerary with activities, meals, and accommodations')}
-          </p>
+    <div className="space-y-6 pb-6">
+      {/* Page Header */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              {__('Itinerary Management', 'Itinerary Management')}
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {__('Build and manage your complete day-by-day itinerary with activities, meals, and accommodations', 'Build and manage your complete day-by-day itinerary with activities, meals, and accommodations')}
+            </p>
+          </div>
+          <ConditionalRender capability="yatra_edit_trips">
+            <Button 
+              onClick={handleAddDay} 
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+              size="lg"
+            >
+              <Plus className="w-5 h-5" />
+              {__('Add New Day', 'Add New Day')}
+            </Button>
+          </ConditionalRender>
         </div>
-        <ConditionalRender capability="yatra_edit_trips">
-          <Button onClick={handleAddDay} className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
-            <Plus className="w-4 h-4" />
-            {__('Add Day', 'Add Day')}
-          </Button>
-        </ConditionalRender>
+        
+        {/* Bulk Actions Bar - More Prominent */}
+        {selectedEntries.size > 0 && (
+          <ConditionalRender capability="yatra_delete_trips">
+            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-800 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                  <span className="text-white text-sm font-semibold">{selectedEntries.size}</span>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {selectedEntries.size} {selectedEntries.size === 1 ? __('item selected', 'item selected') : __('items selected', 'items selected')}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {__('Click "Delete Selected" to remove all selected items', 'Click "Delete Selected" to remove all selected items')}
+                  </p>
+                </div>
+              </div>
+              <Button 
+                onClick={handleBulkDelete}
+                variant="destructive"
+                size="lg"
+                className="flex items-center gap-2 shadow-sm"
+              >
+                <Trash2 className="w-5 h-5" />
+                {__('Delete Selected', 'Delete Selected')}
+              </Button>
+            </div>
+          </ConditionalRender>
+        )}
       </div>
 
       {/* Trip Selector - Clean Design */}
@@ -704,6 +891,40 @@ const Itinerary: React.FC = () => {
           </Card>
         ) : (
           <div className="space-y-3">
+            {/* Bulk Select All Option - Enhanced */}
+            {dayGroups.length > 0 && (
+              <ConditionalRender capability="yatra_delete_trips">
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-700 p-4 mb-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          id="select-all-checkbox"
+                          checked={dayGroups.length > 0 && dayGroups.every(dg => dg.entries.length > 0 && dg.entries.every(e => selectedEntries.has(e.id)))}
+                          onChange={handleSelectAllDays}
+                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all"
+                        />
+                        <label 
+                          htmlFor="select-all-checkbox"
+                          className="text-base font-semibold text-gray-900 dark:text-white cursor-pointer"
+                        >
+                          {__('Select All Items', 'Select All Items')}
+                        </label>
+                      </div>
+                      {selectedEntries.size > 0 && (
+                        <Badge variant="info" className="text-sm px-3 py-1">
+                          {selectedEntries.size} {selectedEntries.size === 1 ? __('selected', 'selected') : __('selected', 'selected')}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {__('💡 Tip: Use checkboxes to select multiple items for bulk actions', '💡 Tip: Use checkboxes to select multiple items for bulk actions')}
+                    </div>
+                  </div>
+                </div>
+              </ConditionalRender>
+            )}
             {dayGroups.map((dayGroup) => {
               const key = `${dayGroup.trip_id}-${dayGroup.day}`;
               const isExpanded = expandedDays.has(key);
@@ -714,44 +935,84 @@ const Itinerary: React.FC = () => {
                 return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
               });
 
+              const allDayEntriesSelected = dayGroup.entries.length > 0 && dayGroup.entries.every(e => selectedEntries.has(e.id));
+              const someDayEntriesSelected = dayGroup.entries.some(e => selectedEntries.has(e.id));
+              
               return (
-              <Card key={key} className="overflow-visible">
+              <Card 
+                key={key} 
+                className={`overflow-visible transition-all ${
+                  allDayEntriesSelected || someDayEntriesSelected 
+                    ? 'ring-2 ring-blue-500 border-blue-300 dark:border-blue-700 shadow-md' 
+                    : 'hover:shadow-md'
+                }`}
+              >
                 <CardContent className="p-0 overflow-visible">
-                  {/* Day Header */}
+                  {/* Day Header - Enhanced */}
                   <div 
-                    className="flex items-center gap-4 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                    onClick={() => toggleDay(dayGroup.trip_id, dayGroup.day)}
+                    className={`flex items-center gap-4 p-5 transition-all ${
+                      allDayEntriesSelected || someDayEntriesSelected
+                        ? 'bg-blue-50 dark:bg-blue-900/20'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                    }`}
                   >
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="flex items-center gap-3">
-                        <div className="px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-medium">
-                          {__('Day', 'Day')} {dayGroup.day}
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {dayGroup.day_title 
-                              ? `${__('Day', 'Day')} ${dayGroup.day}: ${dayGroup.day_title}`
-                              : `${__('Day', 'Day')} ${dayGroup.day}`
+                    <ConditionalRender capability="yatra_delete_trips">
+                      <div className="flex-shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={allDayEntriesSelected}
+                          ref={(el) => {
+                            if (el) {
+                              el.indeterminate = someDayEntriesSelected && !allDayEntriesSelected;
                             }
+                          }}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleSelectAll(dayGroup);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all"
+                          title={allDayEntriesSelected 
+                            ? __('Deselect all entries for this day', 'Deselect all entries for this day')
+                            : __('Select all entries for this day', 'Select all entries for this day')
+                          }
+                        />
+                      </div>
+                    </ConditionalRender>
+                    <div 
+                      className="flex items-center gap-4 flex-1 cursor-pointer"
+                      onClick={() => toggleDay(dayGroup.trip_id, dayGroup.day)}
+                    >
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
+                            {dayGroup.day}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">
+                            {dayGroup.day_title || `${__('Day', 'Day')} ${dayGroup.day}`}
                           </h3>
-                          <div className="flex items-center gap-3 mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            <span>{counts.total} {__('items', 'items')}</span>
+                          <div className="flex items-center gap-4 flex-wrap">
+                            <Badge variant="outline" className="text-xs">
+                              {counts.total} {counts.total === 1 ? __('item', 'item') : __('items', 'items')}
+                            </Badge>
                             {counts.meals > 0 && (
-                              <div className="flex items-center gap-1">
-                                <UtensilsCrossed className="w-3.5 h-3.5" />
-                                <span>{counts.meals}</span>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                <UtensilsCrossed className="w-4 h-4 text-orange-500" />
+                                <span className="font-medium">{counts.meals} {__('Meals', 'Meals')}</span>
                               </div>
                             )}
                             {counts.activities > 0 && (
-                              <div className="flex items-center gap-1">
-                                <MapPin className="w-3.5 h-3.5" />
-                                <span>{counts.activities}</span>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                <MapPin className="w-4 h-4 text-blue-500" />
+                                <span className="font-medium">{counts.activities} {__('Activities', 'Activities')}</span>
                               </div>
                             )}
                             {counts.accommodations > 0 && (
-                              <div className="flex items-center gap-1">
-                                <Hotel className="w-3.5 h-3.5" />
-                                <span>{__('Stay', 'Stay')}</span>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
+                                <Hotel className="w-4 h-4 text-purple-500" />
+                                <span className="font-medium">{__('Accommodation', 'Accommodation')}</span>
                               </div>
                             )}
                           </div>
@@ -789,6 +1050,15 @@ const Itinerary: React.FC = () => {
                                 <Pencil className="w-4 h-4" />
                                 {__('Edit Day', 'Edit Day')}
                               </button>
+                              <ConditionalRender capability="yatra_delete_trips">
+                                <button
+                                  onClick={() => handleDeleteDay(dayGroup.trip_id, dayGroup.day)}
+                                  className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  {__('Delete Day', 'Delete Day')}
+                                </button>
+                              </ConditionalRender>
                             </div>
                           )}
                         </div>
@@ -869,28 +1139,66 @@ const Itinerary: React.FC = () => {
 
                       {/* Itinerary Items */}
                       <div className="p-4 space-y-3 overflow-visible">
-                        {sortedEntries.map((entry) => (
-                          <div
-                            key={entry.id}
-                            className="flex items-start gap-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-visible"
-                          >
-                            {/* Time */}
-                            <div className="flex flex-col items-center min-w-[80px]">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                        {sortedEntries.length === 0 ? (
+                          <div className="p-8 text-center bg-gray-50 dark:bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+                            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                              {__('No activities for this day', 'No activities for this day')}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-500">
+                              {__('Click "Add Activity" below to get started', 'Click "Add Activity" below to get started')}
+                            </p>
+                          </div>
+                        ) : (
+                          sortedEntries.map((entry) => {
+                            const isSelected = selectedEntries.has(entry.id);
+                            return (
+                            <div
+                              key={entry.id}
+                              className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-all overflow-visible ${
+                                isSelected
+                                  ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-400 dark:border-blue-700 shadow-md'
+                                  : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm'
+                              }`}
+                            >
+                              {/* Checkbox - Enhanced */}
+                              <ConditionalRender capability="yatra_delete_trips">
+                                <div className="flex-shrink-0 pt-0.5">
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={(e) => {
+                                      e.stopPropagation();
+                                      handleToggleSelect(entry.id);
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-all"
+                                    title={isSelected ? __('Deselect this entry', 'Deselect this entry') : __('Select this entry', 'Select this entry')}
+                                  />
+                                </div>
+                              </ConditionalRender>
+                            {/* Time - Enhanced */}
+                            <div className="flex flex-col items-center min-w-[90px] flex-shrink-0">
+                              <div className="text-base font-bold text-gray-900 dark:text-white mb-1">
                                 {formatTime(entry.start_time)}
                               </div>
-                              <div className="mt-1 w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                              {entry.end_time && (
+                                <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                  {__('until', 'until')} {formatTime(entry.end_time)}
+                                </div>
+                              )}
+                              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center border-2 border-blue-300 dark:border-blue-700">
+                                <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                               </div>
                             </div>
 
-                            {/* Content */}
-                            <div className="flex-1">
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
+                            {/* Content - Enhanced */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-3 mb-2">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-2">
                                     <Badge 
-                                      className="text-xs font-medium px-2 py-0.5"
+                                      className="text-xs font-semibold px-3 py-1 shadow-sm"
                                       style={{
                                         backgroundColor: entry.item_color === 'blue' ? 'rgb(219, 234, 254)' : 
                                                        entry.item_color === 'green' ? 'rgb(220, 252, 231)' :
@@ -913,25 +1221,27 @@ const Itinerary: React.FC = () => {
                                                     entry.item_color === 'red' ? 'rgb(252, 165, 165)' :
                                                     entry.item_color === 'yellow' ? 'rgb(253, 230, 138)' :
                                                     'rgb(209, 213, 219)',
-                                        borderWidth: '1px',
+                                        borderWidth: '2px',
                                         borderStyle: 'solid',
                                       }}
                                     >
                                       <div className="flex items-center gap-1.5">
                                         <IconSelector 
                                           iconName={entry.item_icon as any} 
-                                          className="w-3 h-3"
+                                          className="w-3.5 h-3.5"
                                         />
-                                        <span>{entry.item_type}</span>
+                                        <span className="font-semibold">{entry.item_type}</span>
                                       </div>
                                     </Badge>
                                   </div>
-                                  <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                                  <h4 className="text-base font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
                                     {entry.title}
-                                  </div>
-                                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                    {entry.description}
-                                  </div>
+                                  </h4>
+                                  {entry.description && (
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                                      {entry.description}
+                                    </p>
+                                  )}
                                   <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                                     {entry.location && (
                                       <div className="flex items-center gap-1">
@@ -1088,7 +1398,9 @@ const Itinerary: React.FC = () => {
                               </div>
                             </div>
                           </div>
-                        ))}
+                          );
+                          })
+                        )}
 
                         {/* Add Activity Button */}
                         <ConditionalRender capability="yatra_edit_trips">
@@ -1121,11 +1433,34 @@ const Itinerary: React.FC = () => {
         isOpen={deleteConfirm.isOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title={__('Delete Itinerary Entry', 'Delete Itinerary Entry')}
-        message={__('Are you sure you want to delete this itinerary entry? This action cannot be undone.', 'Are you sure you want to delete this itinerary entry? This action cannot be undone.')}
+        title={
+          (deleteConfirm.entry as any)?._isDayDeletion
+            ? __('Delete Day', 'Delete Day')
+            : __('Delete Itinerary Entry', 'Delete Itinerary Entry')
+        }
+        message={
+          (deleteConfirm.entry as any)?._isDayDeletion
+            ? __('Are you sure you want to delete this day and all its activities? This action cannot be undone.', 'Are you sure you want to delete this day and all its activities? This action cannot be undone.')
+            : __('Are you sure you want to delete this itinerary entry? This action cannot be undone.', 'Are you sure you want to delete this itinerary entry? This action cannot be undone.')
+        }
         confirmText={__('Delete', 'Delete')}
         variant="danger"
         isLoading={deleteMutation.isPending}
+      />
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={bulkDeleteConfirm.isOpen}
+        onClose={handleBulkDeleteCancel}
+        onConfirm={handleBulkDeleteConfirm}
+        title={__('Bulk Delete', 'Bulk Delete')}
+        message={__(
+          `Are you sure you want to delete ${bulkDeleteConfirm.entryIds.length} selected item(s)? This will also delete all activities for any selected days. This action cannot be undone.`,
+          `Are you sure you want to delete ${bulkDeleteConfirm.entryIds.length} selected item(s)? This will also delete all activities for any selected days. This action cannot be undone.`
+        )}
+        confirmText={__('Delete All', 'Delete All')}
+        variant="danger"
+        isLoading={bulkDeleteMutation.isPending}
       />
     </div>
   );
