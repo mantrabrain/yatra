@@ -23,9 +23,16 @@ import {
   CreditCard,
   UserCircle,
   CalendarDays,
-  MessageSquare
+  MessageSquare,
+  FolderTree,
+  TrendingUp,
+  RefreshCw
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { Button } from '../components/ui/button';
+import { ConditionalRender } from '../components/ui/conditional-render';
+import { useToast } from '../components/ui/toast';
+import { apiClient } from '../lib/api';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -50,6 +57,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   }, [darkMode]);
   
+  const { showToast } = useToast();
+
+  const [isRegenerating, setIsRegenerating] = useState(false);
+
+  const handleRegenerateTables = async () => {
+    if (isRegenerating) return;
+    try {
+      setIsRegenerating(true);
+      await apiClient.post('/maintenance/regenerate-tables');
+      showToast(__('Tables regenerated successfully.', 'Tables regenerated successfully.'), 'success');
+    } catch (error: any) {
+      showToast(error?.message || __('Failed to regenerate tables.', 'Failed to regenerate tables.'), 'error');
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
   // Track URL changes to update menu state
   const [urlKey, setUrlKey] = useState(0);
 
@@ -155,6 +179,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'all', label: 'All Trips', icon: List },
         { tab: 'activities', label: 'Activities', icon: Activity },
         { tab: 'destinations', label: 'Destinations', icon: Map },
+        { tab: 'categories', label: 'Categories', icon: FolderTree },
+        { tab: 'difficulty-levels', label: 'Difficulty Levels', icon: TrendingUp },
         { tab: 'availability', label: 'Availability', icon: CalendarDays },
       ]
     },
@@ -337,6 +363,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </h1>
               
               <div className="flex items-center gap-4">
+                <ConditionalRender capability="yatra_edit_trips">
+                  <Button
+                    variant="outline"
+                    onClick={handleRegenerateTables}
+                    disabled={isRegenerating}
+                    className="flex items-center gap-2"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isRegenerating ? 'animate-spin' : ''}`} />
+                    {isRegenerating ? __('Regenerating...', 'Regenerating...') : __('Regenerate Tables', 'Regenerate Tables')}
+                  </Button>
+                </ConditionalRender>
                 <button
                   onClick={() => {
                     setDarkMode(!darkMode);

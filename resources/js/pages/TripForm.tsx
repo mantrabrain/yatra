@@ -95,10 +95,81 @@ interface PriceType {
   discounted_price: string;
 }
 
+interface TripCategoryOption {
+  id: number;
+  name: string;
+  slug?: string;
+  description?: string;
+  parent_id: number | null;
+  status?: string;
+  subcategories?: TripCategoryOption[];
+}
+
+interface DifficultyLevelOption {
+  id: number;
+  name: string;
+  slug?: string;
+  description?: string;
+  level_order?: number;
+  status?: string;
+}
+
 interface TripAmenityItem {
   title: string;
   description: string;
 }
+
+const buildCategoryOptionNodes = (
+  categories: TripCategoryOption[],
+  depth = 0
+): React.ReactNode[] => {
+  return categories.flatMap((category) => {
+    const optionValue = category.slug || category.name || category.id?.toString() || '';
+    const labelPrefix = depth > 0 ? `${'-- '.repeat(depth)}${category.name}` : category.name;
+    const nodes: React.ReactNode[] = [
+      <option key={`category-option-${category.id}`} value={optionValue}>
+        {labelPrefix}
+      </option>,
+    ];
+
+    if (Array.isArray(category.subcategories) && category.subcategories.length > 0) {
+      nodes.push(...buildCategoryOptionNodes(category.subcategories, depth + 1));
+    }
+
+    return nodes;
+  });
+};
+
+const findCategoryByValue = (
+  categories: TripCategoryOption[],
+  value: string | number | null | undefined
+): TripCategoryOption | null => {
+  if (!value) return null;
+  const normalizedValue = value.toString();
+
+  for (const category of categories) {
+    const categoryValue = category.slug || category.name || category.id?.toString() || '';
+    if (categoryValue === normalizedValue) {
+      return category;
+    }
+    if (Array.isArray(category.subcategories) && category.subcategories.length > 0) {
+      const found = findCategoryByValue(category.subcategories, normalizedValue);
+      if (found) {
+        return found;
+      }
+    }
+  }
+
+  return null;
+};
+
+const extractArrayPayload = (payload: any): any[] => {
+  if (!payload) return [];
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload.data)) return payload.data;
+  if (Array.isArray(payload?.data?.data)) return payload.data.data;
+  return [];
+};
 
 const normalizeAmenityItems = (items: unknown): TripAmenityItem[] => {
   if (!items) return [];
@@ -847,6 +918,85 @@ const TripForm: React.FC = () => {
     },
     enabled: can('yatra_view_trips'),
   });
+
+  const { data: tripCategoriesResponse, isLoading: isLoadingTripCategories } = useQuery({
+    queryKey: ['trip-categories', 'published'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/trip-categories', {
+          params: {
+            per_page: 100,
+            status: 'publish',
+            hierarchical: true,
+            orderby: 'name',
+            order: 'ASC',
+          },
+        });
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load trip categories', 'Failed to load trip categories'), 'error');
+        return [];
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
+  const { data: difficultyLevelsResponse, isLoading: isLoadingDifficultyLevels } = useQuery({
+    queryKey: ['difficulty-levels', 'published'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/difficulty-levels', {
+          params: {
+            per_page: 100,
+            status: 'publish',
+            orderby: 'level_order',
+            order: 'ASC',
+          },
+        });
+        return response;
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to load difficulty levels', 'Failed to load difficulty levels'), 'error');
+        return [];
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
+  const tripCategories: TripCategoryOption[] = useMemo(() => {
+    const payload = extractArrayPayload(tripCategoriesResponse);
+    return (payload as TripCategoryOption[]).filter((category) => {
+      if (!category) return false;
+      if (typeof category !== 'object') return false;
+      if ('status' in category && category.status && category.status !== 'publish') {
+        return false;
+      }
+      return true;
+    });
+  }, [tripCategoriesResponse]);
+
+  const topLevelCategories = useMemo(
+    () => tripCategories.filter((category) => !category.parent_id),
+    [tripCategories]
+  );
+
+  const selectedParentCategory = useMemo(
+    () => findCategoryByValue(topLevelCategories, formData.trip_category_parent),
+    [topLevelCategories, formData.trip_category_parent]
+  );
+
+  const subcategoryOptions = selectedParentCategory?.subcategories || [];
+
+  const difficultyLevels: DifficultyLevelOption[] = useMemo(() => {
+    const payload = extractArrayPayload(difficultyLevelsResponse);
+    return (payload as DifficultyLevelOption[]).filter((level) => {
+      if (!level) return false;
+      if (typeof level !== 'object') return false;
+      if ('status' in level && level.status && level.status !== 'publish') {
+        return false;
+      }
+      return true;
+    });
+  }, [difficultyLevelsResponse]);
 
   // Fetch destinations from API
   const { data: destinationsData } = useQuery({
@@ -3060,16 +3210,20 @@ const TripForm: React.FC = () => {
                   id="trip_category"
                   value={formData.trip_category}
                   onChange={(e) => handleFieldChange('trip_category', e.target.value)}
+                  disabled={isLoadingTripCategories}
                 >
                   <option value="">{__('Select a category', 'Select a category')}</option>
-                  <option value="adventure">Adventure</option>
-                  <option value="beach">Beach</option>
-                  <option value="cultural">Cultural</option>
-                  <option value="nature">Nature</option>
-                  <option value="wildlife">Wildlife</option>
-                  <option value="wellness">Wellness</option>
-                  <option value="family">Family</option>
-                  <option value="luxury">Luxury</option>
+                  {isLoadingTripCategories && (
+                    <option value="" disabled>
+                      {__('Loading categories...', 'Loading categories...')}
+                    </option>
+                  )}
+                  {!isLoadingTripCategories && tripCategories.length === 0 && (
+                    <option value="" disabled>
+                      {__('No published categories available', 'No published categories available')}
+                    </option>
+                  )}
+                  {!isLoadingTripCategories && tripCategories.length > 0 && buildCategoryOptionNodes(tripCategories)}
                 </Select>
               </div>
 
@@ -3082,13 +3236,27 @@ const TripForm: React.FC = () => {
                   <Select
                     id="trip_category_parent"
                     value={formData.trip_category_parent}
-                    onChange={(e) => handleFieldChange('trip_category_parent', e.target.value)}
+                    onChange={(e) => {
+                      handleFieldChange('trip_category_parent', e.target.value);
+                      handleFieldChange('trip_category_sub', '');
+                    }}
+                    disabled={isLoadingTripCategories || topLevelCategories.length === 0}
                   >
                     <option value="">{__('None', 'None')}</option>
-                    <option value="adventure">Adventure</option>
-                    <option value="beach">Beach</option>
-                    <option value="cultural">Cultural</option>
-                    <option value="nature">Nature</option>
+                    {isLoadingTripCategories && (
+                      <option value="" disabled>
+                        {__('Loading categories...', 'Loading categories...')}
+                      </option>
+                    )}
+                    {!isLoadingTripCategories &&
+                      topLevelCategories.map((category) => (
+                        <option
+                          key={`parent-category-${category.id}`}
+                          value={category.slug || category.name || category.id?.toString() || ''}
+                        >
+                          {category.name}
+                        </option>
+                      ))}
                   </Select>
                   <HelpText
                     text={__('Main category for hierarchical organization', 'Main category for hierarchical organization')}
@@ -3104,23 +3272,28 @@ const TripForm: React.FC = () => {
                       id="trip_category_sub"
                       value={formData.trip_category_sub}
                       onChange={(e) => handleFieldChange('trip_category_sub', e.target.value)}
+                      disabled={!selectedParentCategory || subcategoryOptions.length === 0}
                     >
                       <option value="">{__('Select sub-category', 'Select sub-category')}</option>
-                      {formData.trip_category_parent === 'adventure' && (
-                        <>
-                          <option value="hiking">Hiking</option>
-                          <option value="trekking">Trekking</option>
-                          <option value="climbing">Climbing</option>
-                          <option value="water-sports">Water Sports</option>
-                        </>
+                      {!selectedParentCategory && (
+                        <option value="" disabled>
+                          {__('Select a parent category first', 'Select a parent category first')}
+                        </option>
                       )}
-                      {formData.trip_category_parent === 'beach' && (
-                        <>
-                          <option value="relaxation">Relaxation</option>
-                          <option value="snorkeling">Snorkeling</option>
-                          <option value="diving">Diving</option>
-                        </>
-                      )}
+                      {selectedParentCategory &&
+                        subcategoryOptions.length === 0 && (
+                          <option value="" disabled>
+                            {__('No subcategories available', 'No subcategories available')}
+                          </option>
+                        )}
+                      {subcategoryOptions.map((subcategory) => (
+                        <option
+                          key={`subcategory-${subcategory.id}`}
+                          value={subcategory.slug || subcategory.name || subcategory.id?.toString() || ''}
+                        >
+                          {subcategory.name}
+                        </option>
+                      ))}
                     </Select>
                   </div>
                 )}
@@ -3135,12 +3308,28 @@ const TripForm: React.FC = () => {
                   id="difficulty_level"
                   value={formData.difficulty_level}
                   onChange={(e) => handleFieldChange('difficulty_level', e.target.value)}
+                  disabled={isLoadingDifficultyLevels}
                 >
                   <option value="">{__('Select difficulty', 'Select difficulty')}</option>
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                  <option value="expert">Expert</option>
+                  {isLoadingDifficultyLevels && (
+                    <option value="" disabled>
+                      {__('Loading difficulty levels...', 'Loading difficulty levels...')}
+                    </option>
+                  )}
+                  {!isLoadingDifficultyLevels && difficultyLevels.length === 0 && (
+                    <option value="" disabled>
+                      {__('No published difficulty levels available', 'No published difficulty levels available')}
+                    </option>
+                  )}
+                  {!isLoadingDifficultyLevels &&
+                    difficultyLevels.map((level) => (
+                      <option
+                        key={`difficulty-${level.id}`}
+                        value={level.slug || level.name || level.id?.toString() || ''}
+                      >
+                        {level.name}
+                      </option>
+                    ))}
                 </Select>
                 <HelpText
                   text={__('Physical difficulty level required for this trip', 'Physical difficulty level required for this trip')}

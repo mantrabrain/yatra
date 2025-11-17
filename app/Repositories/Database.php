@@ -618,6 +618,56 @@ class Database
 
         dbDelta($sql_item_types);
 
+        // Trip Categories table
+        $table_categories = $wpdb->prefix . 'yatra_trip_categories';
+        
+        $sql_categories = "CREATE TABLE IF NOT EXISTS `{$table_categories}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `name` varchar(255) NOT NULL,
+            `slug` varchar(255) NOT NULL,
+            `description` text,
+            `icon` text,
+            `parent_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'Parent category ID for subcategories',
+            `status` varchar(20) DEFAULT 'draft',
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `created_by` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+            `updated_by` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `slug` (`slug`),
+            KEY `status` (`status`),
+            KEY `parent_id` (`parent_id`),
+            KEY `created_by` (`created_by`),
+            KEY `updated_by` (`updated_by`)
+        ) {$charset_collate};";
+
+        dbDelta($sql_categories);
+
+        // Difficulty Levels table
+        $table_difficulty_levels = $wpdb->prefix . 'yatra_difficulty_levels';
+        
+        $sql_difficulty_levels = "CREATE TABLE IF NOT EXISTS `{$table_difficulty_levels}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `name` varchar(255) NOT NULL,
+            `slug` varchar(255) NOT NULL,
+            `description` text,
+            `icon` text,
+            `level_order` smallint(5) UNSIGNED DEFAULT 0 COMMENT 'Order for sorting difficulty levels',
+            `status` varchar(20) DEFAULT 'draft',
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `created_by` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+            `updated_by` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `slug` (`slug`),
+            KEY `status` (`status`),
+            KEY `level_order` (`level_order`),
+            KEY `created_by` (`created_by`),
+            KEY `updated_by` (`updated_by`)
+        ) {$charset_collate};";
+
+        dbDelta($sql_difficulty_levels);
+
         // Items table
         $table_items = $wpdb->prefix . 'yatra_items';
         

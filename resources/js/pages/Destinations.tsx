@@ -280,7 +280,7 @@ const Destinations: React.FC = () => {
                 placeholder={__('Search destinations...', 'Search destinations...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-9 h-10"
               />
             </div>
 
@@ -288,7 +288,7 @@ const Destinations: React.FC = () => {
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:min-w-[180px] h-10"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
               <option value="draft">{__('Draft', 'Draft')}</option>
@@ -300,7 +300,7 @@ const Destinations: React.FC = () => {
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:min-w-[170px] h-10"
             >
               <option value="name">{__('Name', 'Name')}</option>
               <option value="status">{__('Status', 'Status')}</option>
@@ -312,7 +312,7 @@ const Destinations: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-9 px-3 flex items-center gap-1.5"
+              className="h-10 px-3 flex items-center gap-1.5"
               title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
             >
               {sortOrder === 'asc' ? (
@@ -328,7 +328,7 @@ const Destinations: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
-                className="flex items-center gap-2 h-9"
+                className="flex items-center gap-2 h-10"
               >
                 <X className="w-4 h-4" />
                 {__('Reset', 'Reset')}
@@ -369,38 +369,41 @@ const Destinations: React.FC = () => {
                       {[...Array(5)].map((_, index) => (
                         <TableRow key={`skeleton-${index}`}>
                           <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                              <div className="space-y-2">
+                                <div className="h-4 w-36 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                                <div className="h-3 w-24 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                              </div>
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            <div className="h-4 w-48 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                           </TableCell>
                           <TableCell>
-                            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            <div className="h-5 w-16 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse" />
                           </TableCell>
                           {isPro && (
                             <TableCell>
-                              <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-4 w-12 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                             </TableCell>
                           )}
                           <TableCell>
                             <div className="space-y-1">
-                              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-4 w-24 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                              <div className="h-3 w-20 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="space-y-1">
-                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                              <div className="h-4 w-20 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                              <div className="h-3 w-24 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                            <div className="flex items-center justify-end gap-2">
+                              <div className="h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+                              <div className="h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                             </div>
                           </TableCell>
                         </TableRow>
@@ -548,13 +551,13 @@ const Destinations: React.FC = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
+                            <div className="flex items-center justify-end gap-2">
                               <ConditionalRender capability="yatra_edit_trips">
                                 <Button
                                   variant="ghost"
-                                  size="icon"
+                                  size="sm"
                                   onClick={() => handleEdit(destination)}
-                                  className="h-8 w-8"
+                                  className="h-9 w-9 p-0"
                                   aria-label={__('Edit destination', 'Edit destination')}
                                 >
                                   <Edit className="w-4 h-4" />
@@ -564,9 +567,9 @@ const Destinations: React.FC = () => {
                               <ConditionalRender capability="yatra_delete_trips">
                                 <Button
                                   variant="ghost"
-                                  size="icon"
+                                  size="sm"
                                   onClick={() => handleDelete(destination)}
-                                  className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                  className="h-9 w-9 p-0 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                                   aria-label={__('Delete destination', 'Delete destination')}
                                 >
                                   <Trash2 className="w-4 h-4" />

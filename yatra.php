@@ -88,7 +88,6 @@ function yatra_check_requirements(): bool {
     if (!yatra_check_requirements()) {
     return;
 }
-
 // Load Composer autoloader
 $autoloader = YATRA_PLUGIN_PATH . 'vendor/autoload.php';
 if (!file_exists($autoloader)) {

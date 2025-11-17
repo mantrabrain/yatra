@@ -7,6 +7,10 @@ import Activities from './pages/Activities';
 import ActivityForm from './pages/ActivityForm';
 import Destinations from './pages/Destinations';
 import DestinationForm from './pages/DestinationForm';
+import Categories from './pages/Categories';
+import CategoryForm from './pages/CategoryForm';
+import DifficultyLevels from './pages/DifficultyLevels';
+import DifficultyLevelForm from './pages/DifficultyLevelForm';
 import Bookings from './pages/Bookings';
 import BookingForm from './pages/BookingForm';
 import ViewBooking from './pages/ViewBooking';
@@ -97,6 +101,18 @@ const App: React.FC = () => {
               return <DestinationForm />;
             }
             return <Destinations />;
+          case 'categories':
+            // Check if we're creating or editing a category
+            if (action === 'create' || action === 'edit') {
+              return <CategoryForm />;
+            }
+            return <Categories />;
+          case 'difficulty-levels':
+            // Check if we're creating or editing a difficulty level
+            if (action === 'create' || action === 'edit') {
+              return <DifficultyLevelForm />;
+            }
+            return <DifficultyLevels />;
           case 'availability':
             // Check if we're creating or editing an availability date
             if (action === 'create' || action === 'edit') {

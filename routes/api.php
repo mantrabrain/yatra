@@ -18,6 +18,8 @@ if (!defined('ABSPATH')) {
 use Yatra\Controllers\TripController;
 use Yatra\Controllers\ActivityController;
 use Yatra\Controllers\DestinationController;
+use Yatra\Controllers\TripCategoryController;
+use Yatra\Controllers\DifficultyLevelController;
 use Yatra\Controllers\TravelerCategoryController;
 use Yatra\Controllers\ItemTypeController;
 use Yatra\Controllers\ItemController;
@@ -25,6 +27,7 @@ use Yatra\Controllers\DiscountController;
 use Yatra\Controllers\SettingsController;
 use Yatra\Controllers\AvailabilityController;
 use Yatra\Controllers\ItineraryController;
+use Yatra\Controllers\MaintenanceController;
 
 // Register Trip routes
 if (class_exists('Yatra\Controllers\TripController')) {
@@ -77,6 +80,50 @@ if (class_exists('Yatra\Controllers\DestinationController')) {
     } catch (\Exception $e) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Yatra: Failed to register Destination routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
+
+// Register Trip Category routes
+if (class_exists('Yatra\Controllers\TripCategoryController')) {
+    try {
+        $trip_category_controller = new TripCategoryController();
+        $trip_category_controller->register_routes();
+        
+        // Debug: Verify route was registered
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $trip_category_routes = array_filter($routes, function($key) {
+                return strpos($key, '/trip-categories') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Trip Category routes registered: ' . print_r(array_keys($trip_category_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Trip Category routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
+
+// Register Difficulty Level routes
+if (class_exists('Yatra\Controllers\DifficultyLevelController')) {
+    try {
+        $difficulty_level_controller = new DifficultyLevelController();
+        $difficulty_level_controller->register_routes();
+        
+        // Debug: Verify route was registered
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $difficulty_level_routes = array_filter($routes, function($key) {
+                return strpos($key, '/difficulty-levels') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Difficulty Level routes registered: ' . print_r(array_keys($difficulty_level_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Difficulty Level routes: ' . $e->getMessage());
             error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
         }
     }
@@ -231,6 +278,27 @@ if (class_exists('Yatra\Controllers\ItineraryController')) {
     } catch (\Exception $e) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Yatra: Failed to register Itinerary routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
+
+// Register Maintenance routes
+if (class_exists('Yatra\Controllers\MaintenanceController')) {
+    try {
+        $maintenance_controller = new MaintenanceController();
+        $maintenance_controller->register_routes();
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $maintenance_routes = array_filter($routes, function($key) {
+                return strpos($key, '/maintenance') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Maintenance routes registered: ' . print_r(array_keys($maintenance_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Maintenance routes: ' . $e->getMessage());
             error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
         }
     }

@@ -146,8 +146,32 @@ class Bootstrap
             $table_discounts
         )) === $table_discounts;
 
+        // Check if trip categories table exists
+        $table_trip_categories = $wpdb->prefix . 'yatra_trip_categories';
+        $trip_categories_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_trip_categories
+        )) === $table_trip_categories;
+
+        // Check if difficulty levels table exists
+        $table_difficulty_levels = $wpdb->prefix . 'yatra_difficulty_levels';
+        $difficulty_levels_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_difficulty_levels
+        )) === $table_difficulty_levels;
+
         // If any table doesn't exist, create all tables
-        if (!$activities_exists || !$trips_exists || !$destinations_exists || !$traveler_categories_exists || !$item_types_exists || !$items_exists || !$discounts_exists) {
+        if (
+            !$activities_exists ||
+            !$trips_exists ||
+            !$destinations_exists ||
+            !$traveler_categories_exists ||
+            !$item_types_exists ||
+            !$items_exists ||
+            !$discounts_exists ||
+            !$trip_categories_exists ||
+            !$difficulty_levels_exists
+        ) {
             Database::createTables();
             
             if (defined('WP_DEBUG') && WP_DEBUG) {

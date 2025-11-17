@@ -148,7 +148,20 @@ abstract class BaseRepository
             foreach ($args['where'] as $key => $value) {
                 // Sanitize column name to prevent SQL injection
                 $key = preg_replace('/[^a-zA-Z0-9_]/', '', $key);
-                $conditions[] = $this->wpdb->prepare("`{$key}` = %s", $value);
+
+                if ($value === null) {
+                    $conditions[] = "`{$key}` IS NULL";
+                } elseif ($value === 'NOT NULL') {
+                    $conditions[] = "`{$key}` IS NOT NULL";
+                } elseif (is_array($value) && !empty($value)) {
+                    $placeholders = implode(',', array_fill(0, count($value), '%s'));
+                    $conditions[] = $this->wpdb->prepare(
+                        "`{$key}` IN ({$placeholders})",
+                        ...$value
+                    );
+                } else {
+                    $conditions[] = $this->wpdb->prepare("`{$key}` = %s", $value);
+                }
             }
         }
 
