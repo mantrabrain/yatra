@@ -39,6 +39,7 @@ import Availability from './pages/Availability';
 import AvailabilityForm from './pages/AvailabilityForm';
 import Enquiries from './pages/Enquiries';
 import ViewEnquiry from './pages/ViewEnquiry';
+import Modules from './pages/Modules';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -212,6 +213,8 @@ const App: React.FC = () => {
         return <Reports />;
       case 'settings':
         return <Settings />;
+      case 'modules':
+        return <Modules />;
       case 'dashboard':
       default:
         return <Dashboard />;

@@ -6,6 +6,7 @@ namespace Yatra\Providers;
 
 use Yatra\Core\ServiceProvider;
 use Yatra\Core\Container;
+use Yatra\Core\Modules\ModuleManager;
 
 /**
  * Application Service Provider
@@ -58,6 +59,8 @@ class AppServiceProvider extends ServiceProvider
         if (get_option('yatra_version') === false) {
             add_option('yatra_version', YATRA_VERSION);
         }
+
+        ModuleManager::initializeDefaults();
     }
 }
 

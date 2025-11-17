@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   LayoutDashboard, 
   MapPin, 
@@ -26,13 +26,18 @@ import {
   MessageSquare,
   FolderTree,
   TrendingUp,
-  RefreshCw
+  RefreshCw,
+  Puzzle,
+  Loader2
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { useModulesQuery, useToggleModule, type ModuleDefinition } from '../hooks/useModules';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -60,6 +65,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { showToast } = useToast();
 
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isModulesPanelOpen, setIsModulesPanelOpen] = useState(false);
+  const modulesPanelRef = useRef<HTMLDivElement | null>(null);
+  const { data: modulesData = [], isLoading: isLoadingModules } = useModulesQuery({
+    enabled: isModulesPanelOpen,
+  });
+  const toggleModuleMutation = useToggleModule();
+  const modulesPreview = useMemo<ModuleDefinition[]>(() => modulesData.slice(0, 3), [modulesData]);
+  const handleQuickToggle = (module: ModuleDefinition, enabled: boolean) => {
+    toggleModuleMutation.mutate({ slug: module.slug, enabled, name: module.name });
+  };
 
   const handleRegenerateTables = async () => {
     if (isRegenerating) return;
@@ -99,6 +114,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isModulesPanelOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modulesPanelRef.current && !modulesPanelRef.current.contains(event.target as Node)) {
+        setIsModulesPanelOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isModulesPanelOpen]);
   
   // Get current subpage and tab from URL
   const currentSubpage = useMemo(() => {
@@ -169,6 +197,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       : '/wp-admin/admin.php?page=yatra';
   }, []);
 
+  const modulesPageUrl = useMemo(() => `${baseUrl}&subpage=modules`, [baseUrl]);
+
   const menuItems = [
     { subpage: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { 
@@ -202,6 +232,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { subpage: 'enquiries', label: 'Enquiries', icon: MessageSquare },
     { subpage: 'reviews', label: 'Reviews', icon: Star },
     { subpage: 'reports', label: 'Reports', icon: BarChart3 },
+    { subpage: 'modules', label: 'Modules', icon: Puzzle },
     { subpage: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -373,6 +404,117 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <RefreshCw className={`w-4 h-4 ${isRegenerating ? 'animate-spin' : ''}`} />
                     {isRegenerating ? __('Regenerating...', 'Regenerating...') : __('Regenerate Tables', 'Regenerate Tables')}
                   </Button>
+                </ConditionalRender>
+                <ConditionalRender capability="yatra_edit_trips">
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsModulesPanelOpen(prev => !prev)}
+                      className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${isModulesPanelOpen ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                      aria-label={__('Toggle modules panel', 'Toggle modules panel')}
+                    >
+                      <Puzzle className="w-5 h-5" />
+                    </button>
+                    {isModulesPanelOpen && (
+                      <div
+                        ref={modulesPanelRef}
+                        className="absolute right-0 top-12 z-50 w-80"
+                      >
+                        <Card className="shadow-xl border border-gray-200 dark:border-gray-700">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <CardTitle className="text-base">{__('Modules', 'Modules')}</CardTitle>
+                                <CardDescription>
+                                  {__('Quickly enable or disable feature packs.', 'Quickly enable or disable feature packs.')}
+                                </CardDescription>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setIsModulesPanelOpen(false);
+                                  window.location.href = modulesPageUrl;
+                                }}
+                              >
+                                {__('Open', 'Open')}
+                              </Button>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            {isLoadingModules && (
+                              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                {__('Loading modules…', 'Loading modules…')}
+                              </div>
+                            )}
+                            {!isLoadingModules && modulesPreview.length === 0 && (
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                {__('No modules found.', 'No modules found.')}
+                              </div>
+                            )}
+                            {!isLoadingModules && modulesPreview.length > 0 && (
+                              <div className="space-y-3">
+                                {modulesPreview.map((module) => (
+                                  <div
+                                    key={module.slug}
+                                    className="flex items-center justify-between border border-gray-100 dark:border-gray-800 rounded-lg p-2"
+                                  >
+                                    <div>
+                                      <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                        {module.name}
+                                        {module.is_core && (
+                                          <Badge variant="outline" className="text-[10px]">
+                                            {__('Core', 'Core')}
+                                          </Badge>
+                                        )}
+                                      </p>
+                                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        {module.enabled
+                                          ? __('Enabled', 'Enabled')
+                                          : __('Disabled', 'Disabled')}
+                                      </p>
+                                    </div>
+                                    <button
+                                      onClick={() => handleQuickToggle(module, !module.enabled)}
+                                      disabled={module.is_core || toggleModuleMutation.isPending}
+                                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                                        module.enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                                      } ${module.is_core ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+                                      aria-pressed={module.enabled}
+                                      aria-label={
+                                        module.enabled
+                                          ? __('Disable module', 'Disable module')
+                                          : __('Enable module', 'Enable module')
+                                      }
+                                    >
+                                      <span
+                                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
+                                          module.enabled ? 'translate-x-5' : 'translate-x-1'
+                                        }`}
+                                      />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            <div className="pt-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={() => {
+                                  setIsModulesPanelOpen(false);
+                                  window.location.href = modulesPageUrl;
+                                }}
+                              >
+                                {__('Manage all modules', 'Manage all modules')}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                  </div>
                 </ConditionalRender>
                 <button
                   onClick={() => {
