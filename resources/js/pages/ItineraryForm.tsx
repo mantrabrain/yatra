@@ -127,6 +127,7 @@ const ItineraryForm: React.FC = () => {
     tripIdParam,
     dayParam,
     formDataItemTypeId: formData.item_type_id,
+    formDataTripId: formData.trip_id || undefined,
   });
 
   // Validation hook
@@ -167,6 +168,7 @@ const ItineraryForm: React.FC = () => {
     calculateDuration,
     entryData,
     dayTripData,
+    tripsData,
   });
 
   // Reset refs when entry ID changes
@@ -378,6 +380,15 @@ const ItineraryForm: React.FC = () => {
     return day?.title || day?.day_title || null;
   }, [effectiveTripData, dayParam]);
 
+  // Get trip type (single_day or multi_day)
+  const selectedTripType = useMemo(() => {
+    if (!formData.trip_id) return null;
+    const trip = tripsData?.find((t: any) => t.id.toString() === formData.trip_id);
+    return trip?.trip_type || null;
+  }, [formData.trip_id, tripsData]);
+
+  const isSingleDayTrip = selectedTripType === 'single_day';
+
   // Get existing day numbers for the trip
   const existingDayNumbers = useMemo(() => {
     if (!effectiveTripData || !isAddDayMode) return [];
@@ -409,7 +420,27 @@ const ItineraryForm: React.FC = () => {
         dayManuallyEditedRef.current = false;
       }
       
-      if (tripIdParam && effectiveTripData !== undefined && effectiveTripData !== null) {
+      // For single-day trips, auto-fill entry number if empty
+      if (isSingleDayTrip) {
+        if (!formData.day || formData.day === '') {
+          // Auto-fill with next available entry number for single-day trips
+          const currentDay = parseInt(formData.day) || 0;
+          const shouldUpdate = !formData.day || 
+                              formData.day === '' ||
+                              existingDayNumbers.includes(currentDay);
+          
+          if (shouldUpdate && nextAvailableDayNumber) {
+            setFormData(prev => ({ ...prev, day: nextAvailableDayNumber.toString() }));
+          } else if (!formData.day || formData.day === '') {
+            // Default to 1 if no existing entries
+            setFormData(prev => ({ ...prev, day: '1' }));
+          }
+        }
+        // Allow manual editing for single-day trips, so don't return early
+      }
+      
+      // For multi-day trips, auto-fill day number when trip data is loaded
+      if (effectiveTripData !== undefined && effectiveTripData !== null) {
         if (!dayManuallyEditedRef.current) {
           const currentDay = parseInt(formData.day) || 0;
           const shouldUpdate = !formData.day || 
@@ -426,7 +457,7 @@ const ItineraryForm: React.FC = () => {
       dayManuallyEditedRef.current = false;
       lastTripIdRef.current = null;
     }
-  }, [isAddDayMode, currentTripId, tripIdParam, effectiveTripData, nextAvailableDayNumber, existingDayNumbers.length, formData.day]);
+  }, [isAddDayMode, currentTripId, effectiveTripData, nextAvailableDayNumber, existingDayNumbers.length, formData.day, isSingleDayTrip]);
 
   // Handlers
   const handleFieldChange = (field: keyof ItineraryFormData, value: any) => {
@@ -690,14 +721,16 @@ const ItineraryForm: React.FC = () => {
           isEditMode 
             ? __('Edit Itinerary Entry', 'Edit Itinerary Entry') 
             : isAddDayMode
-            ? __('Add New Day', 'Add New Day')
+            ? (isSingleDayTrip ? __('Add New Entry', 'Add New Entry') : __('Add New Day', 'Add New Day'))
             : __('Add New Activity', 'Add New Activity')
         }
         description={
           isEditMode 
             ? __('Update itinerary entry information', 'Update itinerary entry information') 
             : isAddDayMode
-            ? __('Create a new day entry for your trip itinerary. This will be the first activity of the new day.', 'Create a new day entry for your trip itinerary. This will be the first activity of the new day.')
+            ? (isSingleDayTrip 
+                ? __('Create a new entry for your single-day trip itinerary.', 'Create a new entry for your single-day trip itinerary.')
+                : __('Create a new day entry for your trip itinerary. This will be the first activity of the new day.', 'Create a new day entry for your trip itinerary. This will be the first activity of the new day.'))
             : __('Add a new activity, meal, or accommodation to this day of the trip itinerary.', 'Add a new activity, meal, or accommodation to this day of the trip itinerary.')
         }
         actions={
@@ -729,6 +762,7 @@ const ItineraryForm: React.FC = () => {
                     tripsData={tripsData}
                     isLoadingTrips={isLoadingTrips}
                     isEditMode={isEditMode && isAddDayMode}
+                    isSingleDayTrip={isSingleDayTrip}
                     onFieldChange={handleFieldChange}
                   />
 
@@ -873,7 +907,7 @@ const ItineraryForm: React.FC = () => {
                             {isEditMode 
                               ? __('Update Entry', 'Update Entry') 
                               : isAddDayMode
-                              ? __('Create Day', 'Create Day')
+                              ? (isSingleDayTrip ? __('Create Entry', 'Create Entry') : __('Create Day', 'Create Day'))
                               : __('Create Activity', 'Create Activity')
                             }
                           </>

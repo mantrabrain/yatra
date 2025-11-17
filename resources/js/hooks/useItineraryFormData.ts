@@ -17,6 +17,7 @@ interface UseItineraryFormDataParams {
   tripIdParam: string | null;
   dayParam: string | null;
   formDataItemTypeId: string;
+  formDataTripId?: string; // Trip ID from form data (for dropdown selection)
 }
 
 export const useItineraryFormData = ({
@@ -27,6 +28,7 @@ export const useItineraryFormData = ({
   tripIdParam,
   dayParam,
   formDataItemTypeId,
+  formDataTripId,
 }: UseItineraryFormDataParams) => {
   const { can } = usePermissions();
   const { showToast } = useToast();
@@ -161,24 +163,27 @@ export const useItineraryFormData = ({
   });
 
   // Fetch trip data to get day title when in activity mode, and to check existing days in day mode
+  // Use tripIdParam if available (from URL), otherwise use formDataTripId (from dropdown selection)
+  const effectiveTripIdForQuery = tripIdParam || formDataTripId || '';
+  
   const tripDataQueryKey = useMemo(() => 
-    ['trip-for-day', tripIdParam || '', dayParam || ''],
-    [tripIdParam, dayParam]
+    ['trip-for-day', effectiveTripIdForQuery, dayParam || ''],
+    [effectiveTripIdForQuery, dayParam]
   );
 
   const { data: tripDataForDay } = useQuery({
     queryKey: tripDataQueryKey,
     queryFn: async () => {
-      if (!tripIdParam) return null;
+      if (!effectiveTripIdForQuery) return null;
       try {
-        const response = await apiClient.get(`/trips/${tripIdParam}`);
+        const response = await apiClient.get(`/trips/${effectiveTripIdForQuery}`);
         return response?.data || response;
       } catch (error) {
         console.error('Failed to fetch trip data:', error);
         return null;
       }
     },
-    enabled: !isEditDayMode && !!tripIdParam && can('yatra_view_trips'),
+    enabled: !isEditDayMode && !!effectiveTripIdForQuery && can('yatra_view_trips'),
   });
 
   // Use dayTripData when in edit day mode, otherwise use tripDataForDay

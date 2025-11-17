@@ -69,7 +69,7 @@ const Itinerary: React.FC = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const tripIdParam = urlParams.get('trip_id');
   
-  const [tripFilter, setTripFilter] = useState(tripIdParam || 'all');
+  const [tripFilter, setTripFilter] = useState(tripIdParam || '');
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [selectedDay, setSelectedDay] = useState<{ tripId: number; day: number } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; entry: ItineraryEntry | null }>({
@@ -256,11 +256,13 @@ const Itinerary: React.FC = () => {
       try {
         const trips = Array.isArray(tripsData) ? tripsData : [];
         const allEntries: ItineraryEntry[] = [];
+        const allDays = new Map<string, { trip_id: number; trip_title: string; day: number; day_title: string }>();
 
-        // Fetch itinerary data for each trip (or filtered trip)
-        const tripsToFetch = tripFilter !== 'all' 
-          ? trips.filter((t: any) => t.id === parseInt(tripFilter))
-          : trips;
+        // Fetch itinerary data for the selected trip
+        if (!tripFilter) {
+          return [];
+        }
+        const tripsToFetch = trips.filter((t: any) => t.id === parseInt(tripFilter));
 
         for (const trip of tripsToFetch) {
           try {
@@ -279,10 +281,17 @@ const Itinerary: React.FC = () => {
               const dayTitle = day.title || day.day_title || '';
               const entries = day.entries || [];
 
-              // Process each entry
+              // Process each entry (only activities, not day entries)
               for (const entry of entries) {
                 // Ensure entry has required fields from database
                 if (!entry || !entry.id) {
+                  continue;
+                }
+
+                // Skip day entries (entries where item_type_id and item_id are null)
+                // Day entries should not be displayed as activities
+                if ((entry.item_type_id === null || entry.item_type_id === undefined || entry.item_type_id === 0) &&
+                    (entry.item_id === null || entry.item_id === undefined || entry.item_id === 0)) {
                   continue;
                 }
 
@@ -314,15 +323,48 @@ const Itinerary: React.FC = () => {
                 allEntries.push(processedEntry);
               }
             }
+            
+            // Also track all days (even if they have no activities) to ensure they appear in the listing
+            for (const day of itineraryDays) {
+              const dayNumber = day.day_number || day.day || 1;
+              const dayTitle = day.title || day.day_title || '';
+              const dayKey = `${trip.id}-${dayNumber}`;
+              
+              // Store day info for grouping later
+              if (!allDays.has(dayKey)) {
+                allDays.set(dayKey, {
+                  trip_id: trip.id,
+                  trip_title: trip.title || trip.name || '',
+                  day: dayNumber,
+                  day_title: dayTitle,
+                });
+              }
+            }
           } catch (error: any) {
             console.error(`Failed to fetch itinerary for trip ${trip.id}:`, error);
           }
         }
 
         // Group by trip and day
+        // First, create groups from all days (even if they have no activities)
         const grouped: DayGroup[] = [];
         const seen = new Set<string>();
 
+        // Add all days first (from allDays map)
+        allDays.forEach((dayInfo: { trip_id: number; trip_title: string; day: number; day_title: string }, key: string) => {
+          if (!seen.has(key)) {
+            seen.add(key);
+            grouped.push({
+              trip_id: dayInfo.trip_id,
+              trip_title: dayInfo.trip_title,
+              day: dayInfo.day,
+              day_title: dayInfo.day_title,
+              entries: allEntries.filter(e => e.trip_id === dayInfo.trip_id && e.day === dayInfo.day),
+            });
+          }
+        });
+
+        // Also add any days that have entries but weren't in allDays (fallback)
         allEntries.forEach(entry => {
           const key = `${entry.trip_id}-${entry.day}`;
           if (!seen.has(key)) {
@@ -349,7 +391,7 @@ const Itinerary: React.FC = () => {
         return [];
       }
     },
-    enabled: can('yatra_view_trips') && !!tripsData,
+    enabled: can('yatra_view_trips') && !!tripsData && !!tripFilter,
     staleTime: 0, // Always refetch to ensure fresh data
     gcTime: 0, // Don't cache to ensure fresh data (formerly cacheTime)
     refetchOnMount: true, // Always refetch when component mounts
@@ -462,7 +504,7 @@ const Itinerary: React.FC = () => {
   const handleAddDay = () => {
     // Navigate to add day form - this creates a new day entry
     // If a trip is selected, pass trip_id; otherwise let the form show the trip selector
-    if (tripFilter !== 'all') {
+    if (tripFilter) {
       // Get the max day number for this trip to suggest the next day
       const tripEntries = dayGroups.filter((dg: DayGroup) => dg.trip_id === parseInt(tripFilter));
       const maxDay = tripEntries.length > 0 
@@ -522,7 +564,7 @@ const Itinerary: React.FC = () => {
       }
     }
     
-    const tripId = selectedDay?.tripId || (tripFilter !== 'all' ? parseInt(tripFilter) : 1);
+    const tripId = selectedDay?.tripId || (tripFilter ? parseInt(tripFilter) : 1);
     const day = selectedDay?.day || 1;
     
     // Use item type ID for navigation
@@ -725,12 +767,20 @@ const Itinerary: React.FC = () => {
               </Button>
             </ConditionalRender>
           )}
-          <ConditionalRender capability="yatra_edit_trips">
-            <Button onClick={handleAddDay} className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
-              <Plus className="w-4 h-4" />
-              {__('Add Day', 'Add Day')}
-            </Button>
-          </ConditionalRender>
+          {tripFilter && (() => {
+            const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
+            const isSingleDay = selectedTrip?.trip_type === 'single_day';
+            const buttonLabel = isSingleDay ? __('Add Entry', 'Add Entry') : __('Add Day', 'Add Day');
+            
+            return (
+              <ConditionalRender capability="yatra_edit_trips">
+                <Button onClick={handleAddDay} className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
+                  <Plus className="w-4 h-4" />
+                  {buttonLabel}
+                </Button>
+              </ConditionalRender>
+            );
+          })()}
         </div>
       </div>
 
@@ -758,13 +808,10 @@ const Itinerary: React.FC = () => {
             <SearchableSelect
               value={tripFilter}
               onChange={(value) => setTripFilter(value)}
-              options={[
-                { value: 'all', label: __('All Trips', 'All Trips') },
-                ...((Array.isArray(tripsData) ? tripsData : []).map((trip: any) => ({
-                  value: trip.id.toString(),
-                  label: `${trip.title || trip.name || ''}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`,
-                })) || [])
-              ]}
+              options={((Array.isArray(tripsData) ? tripsData : []).map((trip: any) => ({
+                value: trip.id.toString(),
+                label: `${trip.title || trip.name || ''}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`,
+              })) || [])}
               placeholder={__('Search or select a trip...', 'Search or select a trip...')}
               searchPlaceholder={__('Search by trip name or ID...', 'Search by trip name or ID...')}
               className="w-full"
@@ -772,7 +819,7 @@ const Itinerary: React.FC = () => {
             />
           </div>
 
-          {tripFilter !== 'all' && (() => {
+          {tripFilter && (() => {
             const tripsList = Array.isArray(tripsData) ? tripsData : [];
             const selectedTrip = tripsList.find((t: any) => t.id === parseInt(tripFilter));
             return selectedTrip ? (
@@ -796,7 +843,7 @@ const Itinerary: React.FC = () => {
             ) : null;
           })()}
 
-          {tripFilter === 'all' && (
+          {!tripFilter && (
             <div className="mt-4 p-4 bg-white/60 dark:bg-gray-800/60 rounded-lg border border-blue-200/50 dark:border-gray-700/50 overflow-visible">
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-0.5">
@@ -850,14 +897,28 @@ const Itinerary: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-                    {__('No itinerary days yet', 'No itinerary days yet')}
+                    {(() => {
+                      const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
+                      const isSingleDay = selectedTrip?.trip_type === 'single_day';
+                      return isSingleDay ? __('No itinerary entries yet', 'No itinerary entries yet') : __('No itinerary days yet', 'No itinerary days yet');
+                    })()}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                    {__('Start building your itinerary by adding your first day.', 'Start building your itinerary by adding your first day.')}
+                    {(() => {
+                      const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
+                      const isSingleDay = selectedTrip?.trip_type === 'single_day';
+                      return isSingleDay 
+                        ? __('Start building your itinerary by adding your first entry.', 'Start building your itinerary by adding your first entry.')
+                        : __('Start building your itinerary by adding your first day.', 'Start building your itinerary by adding your first day.');
+                    })()}
                   </p>
                   <Button onClick={handleAddDay} className="flex items-center gap-2 mx-auto">
                     <Plus className="w-4 h-4" />
-                    {__('Add Your First Day', 'Add Your First Day')}
+                    {(() => {
+                      const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
+                      const isSingleDay = selectedTrip?.trip_type === 'single_day';
+                      return isSingleDay ? __('Add Your First Entry', 'Add Your First Entry') : __('Add Your First Day', 'Add Your First Day');
+                    })()}
                   </Button>
                 </div>
               </div>

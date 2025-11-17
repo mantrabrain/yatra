@@ -31,7 +31,7 @@ export const DayConflictDialog: React.FC<DayConflictDialogProps> = ({
   let confirmText = '';
 
   if (isUpdateMode && conflictDayNumber !== null) {
-    // Update mode: User is trying to change day number to an existing day
+    // Update mode: User is trying to change number to an existing day
     title = __('Replace Existing Day?', 'Replace Existing Day?');
     message = __('Day', 'Day') + ` ${conflictDayNumber} ` + __('already exists for this trip. Do you want to replace it with the current day\'s data?', 'already exists for this trip. Do you want to replace it with the current day\'s data?');
     confirmText = __('Yes, Replace Day', 'Yes, Replace Day') + ` ${conflictDayNumber}`;

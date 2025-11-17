@@ -21,6 +21,7 @@ interface DayFormFieldsProps {
   tripsData: any[];
   isLoadingTrips: boolean;
   isEditMode?: boolean; // If true, disable trip field
+  isSingleDayTrip?: boolean; // If true, hide/disable day number field
   onFieldChange: (field: keyof DayFormFieldsProps['formData'], value: any) => void;
 }
 
@@ -30,6 +31,7 @@ export const DayFormFields: React.FC<DayFormFieldsProps> = ({
   tripsData,
   isLoadingTrips,
   isEditMode = false,
+  isSingleDayTrip = false,
   onFieldChange,
 }) => {
   return (
@@ -87,30 +89,58 @@ export const DayFormFields: React.FC<DayFormFieldsProps> = ({
             )}
           </div>
 
-          <div>
-            <label htmlFor="day" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-              {__('Day Number', 'Day Number')} <span className="text-red-500">*</span>
-            </label>
-            <HelpText 
-              text={__('Which day number is this?', 'Which day number is this?')}
-              className="mb-2"
-            />
-            <Input
-              id="day"
-              type="number"
-              min="1"
-              value={formData.day}
-              onChange={(e) => onFieldChange('day', e.target.value)}
-              className={errors.day ? 'border-red-500' : ''}
-              required
-            />
-            {errors.day && (
-              <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                <Info className="w-4 h-4" />
-                {errors.day}
-              </p>
-            )}
-          </div>
+          {!isSingleDayTrip && (
+            <div>
+              <label htmlFor="day" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                {__('Day Number', 'Day Number')} <span className="text-red-500">*</span>
+              </label>
+              <HelpText 
+                text={__('Which day number is this in the itinerary?', 'Which day number is this in the itinerary?')}
+                className="mb-2"
+              />
+              <Input
+                id="day"
+                type="number"
+                min="1"
+                value={formData.day}
+                onChange={(e) => onFieldChange('day', e.target.value)}
+                className={errors.day ? 'border-red-500' : ''}
+                required
+              />
+              {errors.day && (
+                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                  <Info className="w-4 h-4" />
+                  {errors.day}
+                </p>
+              )}
+            </div>
+          )}
+          {isSingleDayTrip && (
+            <div>
+              <label htmlFor="day" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                {__('Entry Number', 'Entry Number')} <span className="text-red-500">*</span>
+              </label>
+              <HelpText 
+                text={__('Entry number for ordering entries in this single-day trip.', 'Entry number for ordering entries in this single-day trip.')}
+                className="mb-2"
+              />
+              <Input
+                id="day"
+                type="number"
+                min="1"
+                value={formData.day}
+                onChange={(e) => onFieldChange('day', e.target.value)}
+                className={errors.day ? 'border-red-500' : ''}
+                required
+              />
+              {errors.day && (
+                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                  <Info className="w-4 h-4" />
+                  {errors.day}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <div>

@@ -17,6 +17,7 @@ interface UseItineraryFormSaveParams {
   calculateDuration: (startTime?: string, endTime?: string, timeType?: string) => string;
   entryData?: any; // Entry data to check if it's a day entry
   dayTripData?: any; // Trip data to find day entry
+  tripsData?: any[]; // Trips data to check trip type
 }
 
 export const useItineraryFormSave = ({
@@ -28,6 +29,7 @@ export const useItineraryFormSave = ({
   calculateDuration,
   entryData,
   dayTripData,
+  tripsData,
 }: UseItineraryFormSaveParams) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -182,8 +184,16 @@ export const useItineraryFormSave = ({
         }
         
         // Create mode: create day and all activities
-        // If no activities, create a minimal day entry
-        if (activityForms.length === 0) {
+        // Filter out empty/invalid activities (those missing required fields)
+        const validActivities = activityForms.filter(af => {
+          const activityData = af.data;
+          return activityData.item_type_id && 
+                 activityData.item_id && 
+                 activityData.title?.trim();
+        });
+        
+        // If no valid activities, create only the day entry
+        if (validActivities.length === 0) {
           const payload = {
             trip_id: tripId,
             day: day,
@@ -209,16 +219,11 @@ export const useItineraryFormSave = ({
           return response.data || response;
         }
         
-        // Save all activities sequentially to ensure proper ordering and day creation
+        // Save all valid activities sequentially to ensure proper ordering and day creation
         const responses = [];
-        for (let index = 0; index < activityForms.length; index++) {
-          const activityForm = activityForms[index];
+        for (let index = 0; index < validActivities.length; index++) {
+          const activityForm = validActivities[index];
           const activityData = activityForm.data;
-          
-          // Validate required fields
-          if (!activityData.item_type_id || !activityData.item_id || !activityData.title?.trim()) {
-            throw new Error(`Activity ${index + 1} is missing required fields (item type, item, or title)`);
-          }
           
           const payload = {
             trip_id: tripId,
@@ -226,7 +231,7 @@ export const useItineraryFormSave = ({
             day_title: dayTitle,
             item_type_id: parseInt(activityData.item_type_id!),
             item_id: parseInt(activityData.item_id!),
-            title: activityData.title.trim(),
+            title: activityData.title!.trim(),
             description: (activityData.description || '').trim(),
             location: (activityData.location || '').trim(),
             duration: (activityData.duration || '').trim() || (activityData.start_time && activityData.end_time && activityData.time_type === 'exact' ? calculateDuration(activityData.start_time, activityData.end_time, activityData.time_type) : null),
@@ -244,9 +249,9 @@ export const useItineraryFormSave = ({
           try {
             const response = await apiClient.post('/itinerary', payload);
             responses.push(response.data || response);
-                  } catch (error: any) {
-                    throw new Error(`Failed to save activity ${index + 1}: ${error?.message || 'Unknown error'}`);
-                  }
+          } catch (error: any) {
+            throw new Error(`Failed to save activity ${index + 1}: ${error?.message || 'Unknown error'}`);
+          }
         }
         
         // Return the first response (contains day info)
@@ -291,26 +296,39 @@ export const useItineraryFormSave = ({
     onSuccess: () => {
       // For day mode, show success message and navigate
       if (isAddDayMode) {
-        const activityCount = activityForms.length;
+        // Count only valid activities (those with required fields filled)
+        const validActivitiesCount = activityForms.filter(af => {
+          const activityData = af.data;
+          return activityData.item_type_id && 
+                 activityData.item_id && 
+                 activityData.title?.trim();
+        }).length;
+        
         if (isEditMode) {
           // Edit mode messages
-          if (activityCount === 0) {
+          if (validActivitiesCount === 0) {
             showToast(__('Day updated successfully!', 'Day updated successfully!'), 'success');
           } else {
             showToast(
-              __('Day and activities updated successfully!', 'Day and activities updated successfully!').replace('activities', `${activityCount} ${activityCount === 1 ? 'activity' : 'activities'}`),
+              __('Day and activities updated successfully!', 'Day and activities updated successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`),
               'success'
             );
           }
         } else {
-          // Create mode messages
-          if (activityCount === 0) {
-            showToast(__('Day created successfully!', 'Day created successfully!'), 'success');
+          // Create mode messages - check if it's a single-day trip
+          const selectedTrip = tripsData?.find((t: any) => t.id.toString() === formData.trip_id);
+          const isSingleDay = selectedTrip?.trip_type === 'single_day';
+          
+          if (validActivitiesCount === 0) {
+            const message = isSingleDay 
+              ? __('Entry created successfully!', 'Entry created successfully!')
+              : __('Day created successfully!', 'Day created successfully!');
+            showToast(message, 'success');
           } else {
-            showToast(
-              __('Day and activities created successfully!', 'Day and activities created successfully!').replace('activities', `${activityCount} ${activityCount === 1 ? 'activity' : 'activities'}`),
-              'success'
-            );
+            const message = isSingleDay
+              ? __('Entry and activities created successfully!', 'Entry and activities created successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`)
+              : __('Day and activities created successfully!', 'Day and activities created successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`);
+            showToast(message, 'success');
           }
         }
         
