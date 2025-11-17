@@ -11,6 +11,7 @@ namespace Yatra\Core\Modules;
 class ModuleManager
 {
     private const OPTION_KEY = 'yatra_modules';
+    private const DEFAULT_VIDEO_URL = 'https://www.youtube.com/embed/2g811Eo7K8U';
 
     /**
      * Ensure option exists with defaults
@@ -47,6 +48,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['payments', 'checkout'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'activity_addons',
@@ -57,6 +59,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['upsell', 'activities'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'cross_sell_recommendations',
@@ -67,6 +70,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['sales', 'personalization'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'tiered_pricing',
@@ -77,6 +81,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['sales', 'pricing'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'guide_portal',
@@ -87,6 +92,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['operations', 'departures'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'custom_booking_forms',
@@ -97,6 +103,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['forms', 'booking'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'loyalty_rewards',
@@ -107,6 +114,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['marketing', 'customers'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'inventory_sync',
@@ -119,6 +127,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['integrations', 'automation'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'payment_plans',
@@ -131,6 +140,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['payments', 'billing'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'currency_switcher',
@@ -143,6 +153,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['payments', 'currency'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'marketing_automation',
@@ -153,6 +164,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['marketing', 'automation'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'affiliate_portal',
@@ -163,6 +175,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['affiliate', 'sales'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'operations_dashboard',
@@ -173,6 +186,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['operations', 'analytics'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'resource_scheduler',
@@ -183,6 +197,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['operations', 'resources'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'crm_sync',
@@ -193,6 +208,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['integrations', 'crm'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'api_access',
@@ -203,6 +219,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['developers', 'api'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'waitlist_manager',
@@ -213,6 +230,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['bookings', 'automation'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
             [
                 'slug' => 'traveler_portal',
@@ -223,6 +241,7 @@ class ModuleManager
                 'is_core' => false,
                 'enabled' => false,
                 'tags' => ['bookings', 'self-service'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
             ],
         ];
     }
@@ -247,6 +266,7 @@ class ModuleManager
             $modules[] = array_merge($module, [
                 'enabled' => $enabled,
                 'updated_at' => $state['updated_at'] ?? null,
+                'video_url' => $state['video_url'] ?? ($module['video_url'] ?? self::DEFAULT_VIDEO_URL),
             ]);
         }
 
@@ -264,6 +284,7 @@ class ModuleManager
                     'enabled' => (bool) ($state['enabled'] ?? false),
                     'tags' => $state['tags'] ?? [],
                     'updated_at' => $state['updated_at'] ?? null,
+                    'video_url' => $state['video_url'] ?? self::DEFAULT_VIDEO_URL,
                 ];
             }
         }

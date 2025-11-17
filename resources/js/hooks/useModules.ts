@@ -13,6 +13,7 @@ export interface ModuleDefinition {
   is_core?: boolean;
   is_premium?: boolean;
   purchase_url?: string;
+  video_url?: string;
   enabled: boolean;
   tags?: string[];
   updated_at?: string | null;

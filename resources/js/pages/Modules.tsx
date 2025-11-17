@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Puzzle, Loader2, Search, Filter, ArrowUpDown, ExternalLink, Crown } from 'lucide-react';
+import { Puzzle, Search, Filter, ArrowUpDown, ExternalLink, Crown } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
@@ -102,8 +102,7 @@ const Modules: React.FC = () => {
     const disabled =
       module.is_core ||
       toggleMutation.isPending ||
-      !canManageModules ||
-      isLockedPremium;
+      !canManageModules;
     return (
       <button
         onClick={(event) => {
@@ -117,7 +116,9 @@ const Modules: React.FC = () => {
         disabled={disabled}
         className={`relative inline-flex h-7 w-12 items-center rounded-full transition ${
           module.enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
-        } ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+        } ${
+          isLockedPremium ? 'ring-2 ring-amber-300 dark:ring-amber-500 cursor-pointer' : ''
+        } ${disabled && !isLockedPremium ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
         aria-pressed={module.enabled}
         aria-label={
           module.enabled
@@ -300,9 +301,31 @@ const Modules: React.FC = () => {
 
       {isLoading && (
         <Card>
-          <CardContent className="p-6 flex items-center gap-3 text-gray-500 dark:text-gray-400">
-            <Loader2 className="w-5 h-5 animate-spin" />
-            {__('Loading modules...', 'Loading modules...')}
+          <CardContent className="p-4">
+            <div className="animate-pulse space-y-4">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                <div className="flex-1 h-10 rounded-md bg-gray-100 dark:bg-gray-800" />
+                <div className="flex gap-3 w-full lg:w-auto">
+                  <div className="h-10 w-40 rounded-md bg-gray-100 dark:bg-gray-800" />
+                  <div className="h-10 w-40 rounded-md bg-gray-100 dark:bg-gray-800" />
+                  <div className="h-10 w-24 rounded-md bg-gray-100 dark:bg-gray-800" />
+                </div>
+              </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, idx) => (
+                  <div key={`module-skeleton-${idx}`} className="border border-gray-200 dark:border-gray-800 rounded-xl p-4 space-y-3">
+                    <div className="flex gap-3">
+                      <div className="h-5 w-5 rounded bg-gray-200 dark:bg-gray-700" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700" />
+                        <div className="h-3 w-full rounded bg-gray-100 dark:bg-gray-800" />
+                      </div>
+                    </div>
+                    <div className="h-24 rounded bg-gray-50 dark:bg-gray-900" />
+                  </div>
+                ))}
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -391,7 +414,10 @@ const Modules: React.FC = () => {
                                 <Badge variant="outline">{__('Core', 'Core')}</Badge>
                               )}
                               {module.is_premium && (
-                                <Badge variant="outline" className="flex items-center gap-1 text-amber-600 border-amber-300 dark:text-amber-300 dark:border-amber-500/60">
+                                <Badge
+                                  variant="outline"
+                                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-200 to-amber-100 border-amber-300 text-amber-800 shadow-sm dark:bg-amber-500/30 dark:border-amber-500/60 dark:text-amber-50"
+                                >
                                   <Crown className="w-3 h-3" />
                                   {__('Premium', 'Premium')}
                                 </Badge>
@@ -411,7 +437,7 @@ const Modules: React.FC = () => {
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="flex items-center justify-between pt-0 text-xs text-gray-500 dark:text-gray-400">
+                    <CardContent className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                       <div className="h-5" />
                       {module.docs_url && (
                         <a
@@ -436,6 +462,8 @@ const Modules: React.FC = () => {
         open={premiumDialog.open}
         moduleName={premiumDialog.module?.name}
         purchaseUrl={premiumDialog.module?.purchase_url}
+        moduleDescription={premiumDialog.module?.description}
+        videoUrl={premiumDialog.module?.video_url}
         onClose={() => setPremiumDialog({ open: false })}
       />
     </div>
