@@ -429,7 +429,7 @@ const Modules: React.FC = () => {
                               {module.is_premium && (
                                 <Badge
                                   variant="outline"
-                                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-200 to-amber-100 border-amber-300 text-amber-800 shadow-sm dark:bg-amber-500/30 dark:border-amber-500/60 dark:text-amber-50"
+                                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 border-orange-600 text-white shadow-sm dark:bg-orange-600/60 dark:border-orange-500 dark:text-orange-50"
                                 >
                                   <Crown className="w-3 h-3" />
                                   {__('Premium', 'Premium')}
