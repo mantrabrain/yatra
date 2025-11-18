@@ -251,11 +251,15 @@ class SettingsController extends BaseController
             }
 
             if (!empty($errors)) {
-                return $this->error_response([
-                    'message' => 'Some settings could not be updated',
-                    'errors' => $errors,
-                    'updated' => $updated,
-                ], 400);
+                $errorSummary = implode('; ', $errors);
+                return $this->error_response(
+                    sprintf('Some settings could not be updated: %s', $errorSummary),
+                    400,
+                    [
+                        'errors' => $errors,
+                        'updated' => $updated,
+                    ]
+                );
             }
 
             return $this->success_response([

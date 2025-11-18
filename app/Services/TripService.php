@@ -62,50 +62,17 @@ class TripService extends BaseService
             throw new \InvalidArgumentException('Trip slug is required');
         }
 
+        if (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
+            throw new \InvalidArgumentException('Trip slug can only contain lowercase letters, numbers, and hyphens');
+        }
+
         // Check if slug is unique (exclude current trip when updating)
         $existing = $this->repository->findBySlug($data['slug']);
         if ($existing) {
             $existingId = (int) $existing->id;
             // Only throw error if creating new trip OR if existing trip is different from current trip
             if ($id === null || $existingId !== (int) $id) {
-                throw new \InvalidArgumentException('Trip slug must be unique');
-            }
-        }
-
-        // Validate pricing
-        if (isset($data['pricing_type'])) {
-            $this->validatePricing($data);
-        }
-
-        // Validate duration
-        if (isset($data['trip_type']) && isset($data['duration_days'])) {
-            $this->validateDuration($data);
-        }
-
-        // Validate booking settings
-        if (isset($data['min_travelers']) && isset($data['max_travelers'])) {
-            if ($data['min_travelers'] > 0 && $data['max_travelers'] > 0) {
-                if ($data['min_travelers'] > $data['max_travelers']) {
-                    throw new \InvalidArgumentException('Minimum travelers cannot exceed maximum travelers');
-                }
-            }
-        }
-
-        // Validate dates
-        if (isset($data['available_from']) && isset($data['available_to'])) {
-            if (!empty($data['available_from']) && !empty($data['available_to'])) {
-                if (strtotime($data['available_from']) > strtotime($data['available_to'])) {
-                    throw new \InvalidArgumentException('Available from date must be before available to date');
-                }
-            }
-        }
-
-        // Validate age restrictions
-        if (isset($data['age_min']) && isset($data['age_max'])) {
-            if ($data['age_min'] > 0 && $data['age_max'] > 0) {
-                if ($data['age_min'] > $data['age_max']) {
-                    throw new \InvalidArgumentException('Minimum age cannot exceed maximum age');
-                }
+            throw new \InvalidArgumentException('Trip slug must be unique');
             }
         }
     }

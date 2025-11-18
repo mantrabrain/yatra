@@ -4,7 +4,7 @@
  * Left sidebar navigation + Right side form fields with detailed configurations
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Settings as SettingsIcon,
@@ -36,6 +36,36 @@ import { Label } from '../components/ui/label';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+
+// Helper component for form field with description - MUST be outside component to prevent remounts
+const FormField = React.memo(({ 
+  id, 
+  label, 
+  description, 
+  required = false, 
+  children 
+}: { 
+  id: string; 
+  label: string; 
+  description?: string; 
+  required?: boolean;
+  children: React.ReactNode;
+}) => (
+  <div className="space-y-2">
+    <Label htmlFor={id} className="flex items-center gap-1.5">
+      {label}
+      {required && <span className="text-red-500">*</span>}
+    </Label>
+    {description && (
+      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1">
+        <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+        {description}
+      </p>
+    )}
+    {children}
+  </div>
+));
+FormField.displayName = 'FormField';
 
 type SettingsSection = 
   | 'general'
@@ -233,13 +263,16 @@ const Settings: React.FC = () => {
       }
     },
     enabled: can('manage_yatra'),
-    // Fallback to default values if API fails
+    // Avoid overwriting in-progress edits due to background refetches
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: Infinity,
     retry: 1,
     retryDelay: 1000,
   });
 
   // Default settings fallback
-  const defaultSettings: SettingsData = {
+  const defaultSettings: SettingsData = useMemo<SettingsData>(() => ({
         company_name: 'Yatra Travel Agency',
         company_email: 'info@yatra.com',
         company_phone: '+1-234-567-8900',
@@ -382,39 +415,59 @@ const Settings: React.FC = () => {
         api_key: '',
         api_rate_limit: 100,
         session_timeout: 3600,
-      } as SettingsData;
+      }), []);
 
   const [formData, setFormData] = useState<SettingsData | null>(null);
+  const isInitializedRef = React.useRef(false);
 
+  // Initialize form data only once
   React.useEffect(() => {
+    if (isInitializedRef.current) return;
+    
     if (settings) {
       setFormData(settings);
-    } else if (!isLoading) {
+      isInitializedRef.current = true;
+    } else if (!isLoading && !settings) {
       // Use default settings if API fails or returns empty
       setFormData(defaultSettings);
+      isInitializedRef.current = true;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings, isLoading]);
 
-  const handleFieldChange = (field: keyof SettingsData, value: any) => {
-    if (formData) {
-      setFormData({ ...formData, [field]: value });
+  // Single stable onChange handler that reads field name from input's name or id attribute
+  const handleFieldChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const field = (e.target.name || e.target.id) as keyof SettingsData;
+    let value: any;
+    
+    if (e.target.type === 'checkbox') {
+      value = (e.target as HTMLInputElement).checked;
+    } else if (e.target.type === 'number') {
+      const numValue = parseFloat(e.target.value);
+      value = isNaN(numValue) ? 0 : numValue;
+    } else {
+      value = e.target.value;
     }
-  };
+    
+    setFormData(prev => {
+      if (!prev) return prev;
+      return { ...prev, [field]: value };
+    });
+  }, []);
 
-  const handleGatewayConfigChange = (gateway: string, field: keyof PaymentGatewayConfig, value: any) => {
-    if (formData && formData.gateway_configs) {
-      const configs = { ...formData.gateway_configs };
-      if (!configs[gateway]) {
-        configs[gateway] = {
-          enabled: false,
-          title: gateway,
-          description: '',
-        };
-      }
-      configs[gateway] = { ...configs[gateway], [field]: value };
-      setFormData({ ...formData, gateway_configs: configs });
-    }
-  };
+  const handleGatewayConfigChange = React.useCallback((gateway: string, field: keyof PaymentGatewayConfig, value: any) => {
+    setFormData(prev => {
+      if (!prev) return prev;
+      const configs = { ...(prev.gateway_configs || {}) };
+      const existingConfig = configs[gateway] || {
+        enabled: false,
+        title: gateway,
+        description: '',
+      };
+      configs[gateway] = { ...existingConfig, [field]: value };
+      return { ...prev, gateway_configs: configs };
+    });
+  }, []);
 
   const toggleGatewayExpanded = (gateway: string) => {
     setExpandedGateways(prev => ({ ...prev, [gateway]: !prev[gateway] }));
@@ -423,16 +476,19 @@ const Settings: React.FC = () => {
   const saveMutation = useMutation({
     mutationFn: async (data: SettingsData) => {
       try {
-        return await apiClient.put('/settings', data);
+        await apiClient.put('/settings', data);
+        return data;
       } catch (error: any) {
         showToast(error?.message || __('Failed to save settings', 'Failed to save settings'), 'error');
         throw error;
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['settings'] });
+    onSuccess: (savedData) => {
+      queryClient.setQueryData(['settings'], savedData);
       showToast(__('Settings saved successfully', 'Settings saved successfully'), 'success');
       setIsSaving(false);
+      setFormData(savedData);
+      isInitializedRef.current = true; // Keep initialized after save
     },
     onError: (error: any) => {
       setIsSaving(false);
@@ -475,35 +531,6 @@ const Settings: React.FC = () => {
     { id: 'advanced' as SettingsSection, label: __('Advanced', 'Advanced'), icon: Shield },
   ];
 
-  // Helper component for form field with description
-  const FormField = ({ 
-    id, 
-    label, 
-    description, 
-    required = false, 
-    children 
-  }: { 
-    id: string; 
-    label: string; 
-    description?: string; 
-    required?: boolean;
-    children: React.ReactNode;
-  }) => (
-    <div className="space-y-2">
-      <Label htmlFor={id} className="flex items-center gap-1.5">
-        {label}
-        {required && <span className="text-red-500">*</span>}
-      </Label>
-      {description && (
-        <p className="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1">
-          <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-          {description}
-        </p>
-      )}
-      {children}
-    </div>
-  );
-
   // Helper component for section divider
   const SectionDivider = ({ title }: { title: string }) => (
     <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-6">
@@ -529,12 +556,13 @@ const Settings: React.FC = () => {
                   description={__('Your travel agency or company name', 'Your travel agency or company name')}
                   required
                 >
-                  <Input
-                    id="company_name"
-                    value={formData.company_name}
-                    onChange={(e) => handleFieldChange('company_name', e.target.value)}
-                    placeholder={__('Enter company name', 'Enter company name')}
-                  />
+                    <Input
+                      id="company_name"
+                      name="company_name"
+                      value={formData.company_name || ''}
+                      onChange={handleFieldChange}
+                      placeholder={__('Enter company name', 'Enter company name')}
+                    />
                 </FormField>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -546,9 +574,10 @@ const Settings: React.FC = () => {
                   >
                     <Input
                       id="company_email"
+                      name="company_email"
                       type="email"
-                      value={formData.company_email}
-                      onChange={(e) => handleFieldChange('company_email', e.target.value)}
+                      value={formData.company_email || ''}
+                      onChange={handleFieldChange}
                       placeholder={__('company@example.com', 'company@example.com')}
                     />
                   </FormField>
@@ -560,8 +589,9 @@ const Settings: React.FC = () => {
                   >
                     <Input
                       id="company_phone"
-                      value={formData.company_phone}
-                      onChange={(e) => handleFieldChange('company_phone', e.target.value)}
+                      name="company_phone"
+                      value={formData.company_phone || ''}
+                      onChange={handleFieldChange}
                       placeholder={__('+1-234-567-8900', '+1-234-567-8900')}
                     />
                   </FormField>
@@ -572,12 +602,13 @@ const Settings: React.FC = () => {
                   label={__('Street Address', 'Street Address')}
                   description={__('Street address of your company', 'Street address of your company')}
                 >
-                  <Input
-                    id="company_address"
-                    value={formData.company_address}
-                    onChange={(e) => handleFieldChange('company_address', e.target.value)}
-                    placeholder={__('123 Main Street', '123 Main Street')}
-                  />
+                    <Input
+                      id="company_address"
+                      name="company_address"
+                      value={formData.company_address || ''}
+                      onChange={handleFieldChange}
+                      placeholder={__('123 Main Street', '123 Main Street')}
+                    />
                 </FormField>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -587,8 +618,9 @@ const Settings: React.FC = () => {
                   >
                     <Input
                       id="company_city"
-                      value={formData.company_city}
-                      onChange={(e) => handleFieldChange('company_city', e.target.value)}
+                      name="company_city"
+                      value={formData.company_city || ''}
+                      onChange={handleFieldChange}
                       placeholder={__('City', 'City')}
                     />
                   </FormField>
@@ -599,8 +631,9 @@ const Settings: React.FC = () => {
                   >
                     <Input
                       id="company_state"
-                      value={formData.company_state}
-                      onChange={(e) => handleFieldChange('company_state', e.target.value)}
+                      name="company_state"
+                      value={formData.company_state || ''}
+                      onChange={handleFieldChange}
                       placeholder={__('State or Province', 'State or Province')}
                     />
                   </FormField>
@@ -613,8 +646,9 @@ const Settings: React.FC = () => {
                   >
                     <Input
                       id="company_country"
-                      value={formData.company_country}
-                      onChange={(e) => handleFieldChange('company_country', e.target.value)}
+                      name="company_country"
+                      value={formData.company_country || ''}
+                      onChange={handleFieldChange}
                       placeholder={__('Country', 'Country')}
                     />
                   </FormField>
@@ -626,7 +660,8 @@ const Settings: React.FC = () => {
                     <Input
                       id="company_zip"
                       value={formData.company_zip}
-                      onChange={(e) => handleFieldChange('company_zip', e.target.value)}
+                      name="company_zip"
+onChange={handleFieldChange}
                       placeholder={__('ZIP Code', 'ZIP Code')}
                     />
                   </FormField>
@@ -641,7 +676,8 @@ const Settings: React.FC = () => {
                     id="company_website"
                     type="url"
                     value={formData.company_website}
-                    onChange={(e) => handleFieldChange('company_website', e.target.value)}
+                    name="company_website"
+onChange={handleFieldChange}
                     placeholder={__('https://example.com', 'https://example.com')}
                   />
                 </FormField>
@@ -660,7 +696,8 @@ const Settings: React.FC = () => {
                   <Select
                     id="timezone"
                     value={formData.timezone}
-                    onChange={(e) => handleFieldChange('timezone', e.target.value)}
+                    name="timezone"
+onChange={handleFieldChange}
                   >
                     <option value="UTC">UTC</option>
                     <option value="America/New_York">America/New_York</option>
@@ -679,7 +716,8 @@ const Settings: React.FC = () => {
                   <Select
                     id="date_format"
                     value={formData.date_format}
-                    onChange={(e) => handleFieldChange('date_format', e.target.value)}
+                    name="date_format"
+onChange={handleFieldChange}
                   >
                     <option value="Y-m-d">YYYY-MM-DD</option>
                     <option value="m/d/Y">MM/DD/YYYY</option>
@@ -696,7 +734,8 @@ const Settings: React.FC = () => {
                   <Select
                     id="time_format"
                     value={formData.time_format}
-                    onChange={(e) => handleFieldChange('time_format', e.target.value)}
+                    name="time_format"
+onChange={handleFieldChange}
                   >
                     <option value="H:i">24 Hour (14:30)</option>
                     <option value="h:i A">12 Hour (2:30 PM)</option>
@@ -712,7 +751,8 @@ const Settings: React.FC = () => {
                 <Select
                   id="language"
                   value={formData.language}
-                  onChange={(e) => handleFieldChange('language', e.target.value)}
+                  name="language"
+onChange={handleFieldChange}
                 >
                   <option value="en">English</option>
                   <option value="es">Spanish</option>
@@ -742,7 +782,8 @@ const Settings: React.FC = () => {
                   <Select
                     id="currency"
                     value={formData.currency}
-                    onChange={(e) => handleFieldChange('currency', e.target.value)}
+                    name="currency"
+onChange={handleFieldChange}
                   >
                     <option value="USD">USD - US Dollar</option>
                     <option value="EUR">EUR - Euro</option>
@@ -759,7 +800,8 @@ const Settings: React.FC = () => {
                     type="checkbox"
                     id="partial_payment"
                     checked={formData.partial_payment}
-                    onChange={(e) => handleFieldChange('partial_payment', e.target.checked)}
+                    name="partial_payment"
+onChange={handleFieldChange}
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <div className="flex-1">
@@ -783,7 +825,8 @@ const Settings: React.FC = () => {
                         id="partial_payment_percentage"
                         type="number"
                         value={formData.partial_payment_percentage}
-                        onChange={(e) => handleFieldChange('partial_payment_percentage', parseInt(e.target.value))}
+                        name="partial_payment_percentage"
+onChange={handleFieldChange}
                         min="0"
                         max="100"
                         className="flex-1"
@@ -798,7 +841,8 @@ const Settings: React.FC = () => {
                     type="checkbox"
                     id="deposit_required"
                     checked={formData.deposit_required}
-                    onChange={(e) => handleFieldChange('deposit_required', e.target.checked)}
+                    name='deposit_required'
+                      onChange={handleFieldChange}
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <div className="flex-1">
@@ -822,7 +866,8 @@ const Settings: React.FC = () => {
                         id="deposit_percentage"
                         type="number"
                         value={formData.deposit_percentage}
-                        onChange={(e) => handleFieldChange('deposit_percentage', parseInt(e.target.value))}
+                        name='deposit_percentage'
+                      onChange={handleFieldChange}
                         min="0"
                         max="100"
                         className="flex-1"
@@ -1114,7 +1159,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="booking_confirmation"
                   checked={formData.booking_confirmation}
-                  onChange={(e) => handleFieldChange('booking_confirmation', e.target.checked)}
+                  name='booking_confirmation'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1132,7 +1178,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="auto_confirm_bookings"
                   checked={formData.auto_confirm_bookings}
-                  onChange={(e) => handleFieldChange('auto_confirm_bookings', e.target.checked)}
+                  name='auto_confirm_bookings'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1150,7 +1197,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="require_login"
                   checked={formData.require_login}
-                  onChange={(e) => handleFieldChange('require_login', e.target.checked)}
+                  name='require_login'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1168,7 +1216,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="allow_guest_checkout"
                   checked={formData.allow_guest_checkout}
-                  onChange={(e) => handleFieldChange('allow_guest_checkout', e.target.checked)}
+                  name='allow_guest_checkout'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1193,7 +1242,8 @@ const Settings: React.FC = () => {
                 <Select
                   id="cancellation_policy"
                   value={formData.cancellation_policy}
-                  onChange={(e) => handleFieldChange('cancellation_policy', e.target.value)}
+                  name='cancellation_policy'
+                      onChange={handleFieldChange}
                 >
                   <option value="no_refund">{__('No Refund', 'No Refund')}</option>
                   <option value="full_refund">{__('Full Refund', 'Full Refund')}</option>
@@ -1210,7 +1260,8 @@ const Settings: React.FC = () => {
                   id="cancellation_days"
                   type="number"
                   value={formData.cancellation_days}
-                  onChange={(e) => handleFieldChange('cancellation_days', parseInt(e.target.value))}
+                  name='cancellation_days'
+                      onChange={handleFieldChange}
                   min="0"
                 />
               </FormField>
@@ -1223,7 +1274,8 @@ const Settings: React.FC = () => {
                 <textarea
                   id="refund_policy"
                   value={formData.refund_policy}
-                  onChange={(e) => handleFieldChange('refund_policy', e.target.value)}
+                  name='refund_policy'
+                      onChange={handleFieldChange}
                   rows={4}
                   className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                   placeholder={__('Enter your refund policy details...', 'Enter your refund policy details...')}
@@ -1243,7 +1295,8 @@ const Settings: React.FC = () => {
                   id="booking_expiry_hours"
                   type="number"
                   value={formData.booking_expiry_hours}
-                  onChange={(e) => handleFieldChange('booking_expiry_hours', parseInt(e.target.value))}
+                  name='booking_expiry_hours'
+                      onChange={handleFieldChange}
                   min="1"
                 />
               </FormField>
@@ -1257,7 +1310,8 @@ const Settings: React.FC = () => {
                   id="booking_reminder_days"
                   type="number"
                   value={formData.booking_reminder_days}
-                  onChange={(e) => handleFieldChange('booking_reminder_days', parseInt(e.target.value))}
+                  name='booking_reminder_days'
+                      onChange={handleFieldChange}
                   min="0"
                 />
               </FormField>
@@ -1283,7 +1337,8 @@ const Settings: React.FC = () => {
                     id="admin_email"
                     type="email"
                     value={formData.admin_email}
-                    onChange={(e) => handleFieldChange('admin_email', e.target.value)}
+                    name='admin_email'
+                      onChange={handleFieldChange}
                     placeholder={__('admin@example.com', 'admin@example.com')}
                   />
                 </FormField>
@@ -1298,7 +1353,8 @@ const Settings: React.FC = () => {
                     id="from_email"
                     type="email"
                     value={formData.from_email}
-                    onChange={(e) => handleFieldChange('from_email', e.target.value)}
+                    name='from_email'
+                      onChange={handleFieldChange}
                     placeholder={__('noreply@example.com', 'noreply@example.com')}
                   />
                 </FormField>
@@ -1311,7 +1367,8 @@ const Settings: React.FC = () => {
                   <Input
                     id="from_name"
                     value={formData.from_name}
-                    onChange={(e) => handleFieldChange('from_name', e.target.value)}
+                    name='from_name'
+                      onChange={handleFieldChange}
                     placeholder={__('Your Company Name', 'Your Company Name')}
                   />
                 </FormField>
@@ -1332,7 +1389,8 @@ const Settings: React.FC = () => {
                     type="checkbox"
                     id={template.id}
                     checked={formData[template.id as keyof SettingsData] as boolean}
-                    onChange={(e) => handleFieldChange(template.id as keyof SettingsData, e.target.checked)}
+                    name={template.id}
+                    onChange={handleFieldChange}
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <div className="flex-1">
@@ -1353,7 +1411,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="smtp_enabled"
                   checked={formData.smtp_enabled}
-                  onChange={(e) => handleFieldChange('smtp_enabled', e.target.checked)}
+                  name='smtp_enabled'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1377,7 +1436,8 @@ const Settings: React.FC = () => {
                       <Input
                         id="smtp_host"
                         value={formData.smtp_host}
-                        onChange={(e) => handleFieldChange('smtp_host', e.target.value)}
+                        name='smtp_host'
+                      onChange={handleFieldChange}
                         placeholder="smtp.gmail.com"
                       />
                     </FormField>
@@ -1391,7 +1451,8 @@ const Settings: React.FC = () => {
                         id="smtp_port"
                         type="number"
                         value={formData.smtp_port}
-                        onChange={(e) => handleFieldChange('smtp_port', parseInt(e.target.value))}
+                        name='smtp_port'
+                      onChange={handleFieldChange}
                         placeholder="587"
                       />
                     </FormField>
@@ -1405,7 +1466,8 @@ const Settings: React.FC = () => {
                     <Select
                       id="smtp_encryption"
                       value={formData.smtp_encryption}
-                      onChange={(e) => handleFieldChange('smtp_encryption', e.target.value)}
+                      name='smtp_encryption'
+                      onChange={handleFieldChange}
                     >
                       <option value="tls">TLS</option>
                       <option value="ssl">SSL</option>
@@ -1421,7 +1483,8 @@ const Settings: React.FC = () => {
                     <Input
                       id="smtp_username"
                       value={formData.smtp_username}
-                      onChange={(e) => handleFieldChange('smtp_username', e.target.value)}
+                      name='smtp_username'
+                      onChange={handleFieldChange}
                       placeholder={__('your-email@gmail.com', 'your-email@gmail.com')}
                     />
                   </FormField>
@@ -1435,7 +1498,8 @@ const Settings: React.FC = () => {
                       id="smtp_password"
                       type="password"
                       value={formData.smtp_password}
-                      onChange={(e) => handleFieldChange('smtp_password', e.target.value)}
+                      name='smtp_password'
+                      onChange={handleFieldChange}
                       placeholder={__('Enter SMTP password', 'Enter SMTP password')}
                     />
                   </FormField>
@@ -1457,7 +1521,8 @@ const Settings: React.FC = () => {
                 <Select
                   id="default_trip_status"
                   value={formData.default_trip_status}
-                  onChange={(e) => handleFieldChange('default_trip_status', e.target.value)}
+                  name='default_trip_status'
+                      onChange={handleFieldChange}
                 >
                   <option value="draft">{__('Draft', 'Draft')}</option>
                   <option value="active">{__('Active', 'Active')}</option>
@@ -1470,7 +1535,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="require_availability"
                   checked={formData.require_availability}
-                  onChange={(e) => handleFieldChange('require_availability', e.target.checked)}
+                  name='require_availability'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1493,7 +1559,8 @@ const Settings: React.FC = () => {
                     id="max_group_size"
                     type="number"
                     value={formData.max_group_size}
-                    onChange={(e) => handleFieldChange('max_group_size', parseInt(e.target.value))}
+                    name='max_group_size'
+                      onChange={handleFieldChange}
                     min="1"
                   />
                 </FormField>
@@ -1507,7 +1574,8 @@ const Settings: React.FC = () => {
                     id="min_group_size"
                     type="number"
                     value={formData.min_group_size}
-                    onChange={(e) => handleFieldChange('min_group_size', parseInt(e.target.value))}
+                    name='min_group_size'
+                      onChange={handleFieldChange}
                     min="1"
                   />
                 </FormField>
@@ -1522,7 +1590,8 @@ const Settings: React.FC = () => {
                   id="booking_advance_days"
                   type="number"
                   value={formData.booking_advance_days}
-                  onChange={(e) => handleFieldChange('booking_advance_days', parseInt(e.target.value))}
+                  name='booking_advance_days'
+                      onChange={handleFieldChange}
                   min="1"
                 />
               </FormField>
@@ -1532,7 +1601,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="allow_custom_dates"
                   checked={formData.allow_custom_dates}
-                  onChange={(e) => handleFieldChange('allow_custom_dates', e.target.checked)}
+                  name='allow_custom_dates'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1550,7 +1620,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="require_minimum_participants"
                   checked={formData.require_minimum_participants}
-                  onChange={(e) => handleFieldChange('require_minimum_participants', e.target.checked)}
+                  name='require_minimum_participants'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1573,7 +1644,8 @@ const Settings: React.FC = () => {
                     id="minimum_participants"
                     type="number"
                     value={formData.minimum_participants}
-                    onChange={(e) => handleFieldChange('minimum_participants', parseInt(e.target.value))}
+                    name='minimum_participants'
+                      onChange={handleFieldChange}
                     min="1"
                   />
                 </FormField>
@@ -1591,7 +1663,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="customer_registration"
                   checked={formData.customer_registration}
-                  onChange={(e) => handleFieldChange('customer_registration', e.target.checked)}
+                  name='customer_registration'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1612,7 +1685,8 @@ const Settings: React.FC = () => {
                 <Input
                   id="customer_account_page"
                   value={formData.customer_account_page}
-                  onChange={(e) => handleFieldChange('customer_account_page', e.target.value)}
+                  name='customer_account_page'
+                      onChange={handleFieldChange}
                   placeholder="/my-account"
                 />
               </FormField>
@@ -1622,7 +1696,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="require_email_verification"
                   checked={formData.require_email_verification}
-                  onChange={(e) => handleFieldChange('require_email_verification', e.target.checked)}
+                  name='require_email_verification'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1640,7 +1715,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="customer_dashboard_enabled"
                   checked={formData.customer_dashboard_enabled}
-                  onChange={(e) => handleFieldChange('customer_dashboard_enabled', e.target.checked)}
+                  name='customer_dashboard_enabled'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1670,7 +1746,7 @@ const Settings: React.FC = () => {
                       const fields = e.target.checked
                         ? [...formData.customer_fields, field]
                         : formData.customer_fields.filter(f => f !== field);
-                      handleFieldChange('customer_fields', fields);
+                      setFormData(prev => prev ? { ...prev, customer_fields: fields } : prev);
                     }}
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
@@ -1692,7 +1768,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="enable_reviews"
                   checked={formData.enable_reviews}
-                  onChange={(e) => handleFieldChange('enable_reviews', e.target.checked)}
+                  name='enable_reviews'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1712,7 +1789,8 @@ const Settings: React.FC = () => {
                       type="checkbox"
                       id="require_booking"
                       checked={formData.require_booking}
-                      onChange={(e) => handleFieldChange('require_booking', e.target.checked)}
+                      name='require_booking'
+                      onChange={handleFieldChange}
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <div className="flex-1">
@@ -1730,7 +1808,8 @@ const Settings: React.FC = () => {
                       type="checkbox"
                       id="auto_approve_reviews"
                       checked={formData.auto_approve_reviews}
-                      onChange={(e) => handleFieldChange('auto_approve_reviews', e.target.checked)}
+                      name='auto_approve_reviews'
+                      onChange={handleFieldChange}
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <div className="flex-1">
@@ -1748,7 +1827,8 @@ const Settings: React.FC = () => {
                       type="checkbox"
                       id="review_moderation"
                       checked={formData.review_moderation}
-                      onChange={(e) => handleFieldChange('review_moderation', e.target.checked)}
+                      name='review_moderation'
+                      onChange={handleFieldChange}
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <div className="flex-1">
@@ -1769,7 +1849,8 @@ const Settings: React.FC = () => {
                     <Select
                       id="min_rating"
                       value={formData.min_rating}
-                      onChange={(e) => handleFieldChange('min_rating', parseInt(e.target.value))}
+                      name='min_rating'
+                      onChange={handleFieldChange}
                     >
                       <option value="1">1 {__('Star', 'Star')}</option>
                       <option value="2">2 {__('Stars', 'Stars')}</option>
@@ -1788,7 +1869,8 @@ const Settings: React.FC = () => {
                       id="review_reminder_days"
                       type="number"
                       value={formData.review_reminder_days}
-                      onChange={(e) => handleFieldChange('review_reminder_days', parseInt(e.target.value))}
+                      name='review_reminder_days'
+                      onChange={handleFieldChange}
                       min="0"
                     />
                   </FormField>
@@ -1807,7 +1889,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="enable_tax"
                   checked={formData.enable_tax}
-                  onChange={(e) => handleFieldChange('enable_tax', e.target.checked)}
+                  name='enable_tax'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1832,7 +1915,8 @@ const Settings: React.FC = () => {
                         id="tax_rate"
                         type="number"
                         value={formData.tax_rate}
-                        onChange={(e) => handleFieldChange('tax_rate', parseFloat(e.target.value))}
+                        name='tax_rate'
+                      onChange={handleFieldChange}
                         min="0"
                         max="100"
                         step="0.01"
@@ -1847,7 +1931,8 @@ const Settings: React.FC = () => {
                       type="checkbox"
                       id="tax_inclusive"
                       checked={formData.tax_inclusive}
-                      onChange={(e) => handleFieldChange('tax_inclusive', e.target.checked)}
+                      name='tax_inclusive'
+                      onChange={handleFieldChange}
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <div className="flex-1">
@@ -1868,7 +1953,8 @@ const Settings: React.FC = () => {
                     <Input
                       id="vat_number"
                       value={formData.vat_number}
-                      onChange={(e) => handleFieldChange('vat_number', e.target.value)}
+                      name='vat_number'
+                      onChange={handleFieldChange}
                       placeholder={__('Enter VAT number', 'Enter VAT number')}
                     />
                   </FormField>
@@ -1891,7 +1977,8 @@ const Settings: React.FC = () => {
                 <Select
                   id="default_currency"
                   value={formData.default_currency}
-                  onChange={(e) => handleFieldChange('default_currency', e.target.value)}
+                  name='default_currency'
+                      onChange={handleFieldChange}
                 >
                   <option value="USD">USD - US Dollar</option>
                   <option value="EUR">EUR - Euro</option>
@@ -1906,7 +1993,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="multi_currency"
                   checked={formData.multi_currency}
-                  onChange={(e) => handleFieldChange('multi_currency', e.target.checked)}
+                  name='multi_currency'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -1927,7 +2015,8 @@ const Settings: React.FC = () => {
                 <Select
                   id="currency_position"
                   value={formData.currency_position}
-                  onChange={(e) => handleFieldChange('currency_position', e.target.value)}
+                  name='currency_position'
+                      onChange={handleFieldChange}
                 >
                   <option value="left">$100 (Left)</option>
                   <option value="right">100$ (Right)</option>
@@ -1945,7 +2034,8 @@ const Settings: React.FC = () => {
                   id="currency_decimals"
                   type="number"
                   value={formData.currency_decimals}
-                  onChange={(e) => handleFieldChange('currency_decimals', parseInt(e.target.value))}
+                  name='currency_decimals'
+                      onChange={handleFieldChange}
                   min="0"
                   max="4"
                 />
@@ -1975,7 +2065,8 @@ const Settings: React.FC = () => {
                       type="checkbox"
                       id={notif.id}
                       checked={formData[notif.id as keyof SettingsData] as boolean}
-                      onChange={(e) => handleFieldChange(notif.id as keyof SettingsData, e.target.checked)}
+                      name={notif.id}
+                      onChange={handleFieldChange}
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <div className="flex-1">
@@ -1997,7 +2088,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="sms_notifications"
                   checked={formData.sms_notifications}
-                  onChange={(e) => handleFieldChange('sms_notifications', e.target.checked)}
+                  name='sms_notifications'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -2020,7 +2112,8 @@ const Settings: React.FC = () => {
                     <Select
                       id="sms_provider"
                       value={formData.sms_provider}
-                      onChange={(e) => handleFieldChange('sms_provider', e.target.value)}
+                      name='sms_provider'
+                      onChange={handleFieldChange}
                     >
                       <option value="twilio">Twilio</option>
                       <option value="nexmo">Nexmo (Vonage)</option>
@@ -2037,7 +2130,8 @@ const Settings: React.FC = () => {
                       id="sms_api_key"
                       type="password"
                       value={formData.sms_api_key}
-                      onChange={(e) => handleFieldChange('sms_api_key', e.target.value)}
+                      name='sms_api_key'
+                      onChange={handleFieldChange}
                       placeholder={__('Enter SMS API key', 'Enter SMS API key')}
                     />
                   </FormField>
@@ -2059,7 +2153,8 @@ const Settings: React.FC = () => {
                 <Input
                   id="google_analytics"
                   value={formData.google_analytics}
-                  onChange={(e) => handleFieldChange('google_analytics', e.target.value)}
+                  name='google_analytics'
+                      onChange={handleFieldChange}
                   placeholder="UA-XXXXXXXXX-X"
                 />
               </FormField>
@@ -2072,7 +2167,8 @@ const Settings: React.FC = () => {
                 <Input
                   id="facebook_pixel"
                   value={formData.facebook_pixel}
-                  onChange={(e) => handleFieldChange('facebook_pixel', e.target.value)}
+                  name='facebook_pixel'
+                      onChange={handleFieldChange}
                   placeholder={__('Enter Facebook Pixel ID', 'Enter Facebook Pixel ID')}
                 />
               </FormField>
@@ -2086,7 +2182,8 @@ const Settings: React.FC = () => {
                   id="google_maps_api"
                   type="password"
                   value={formData.google_maps_api}
-                  onChange={(e) => handleFieldChange('google_maps_api', e.target.value)}
+                  name='google_maps_api'
+                      onChange={handleFieldChange}
                   placeholder={__('Enter Google Maps API Key', 'Enter Google Maps API Key')}
                 />
               </FormField>
@@ -2100,7 +2197,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="recaptcha_enabled"
                   checked={formData.recaptcha_enabled}
-                  onChange={(e) => handleFieldChange('recaptcha_enabled', e.target.checked)}
+                  name='recaptcha_enabled'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -2123,7 +2221,8 @@ const Settings: React.FC = () => {
                     <Input
                       id="recaptcha_site_key"
                       value={formData.recaptcha_site_key}
-                      onChange={(e) => handleFieldChange('recaptcha_site_key', e.target.value)}
+                      name='recaptcha_site_key'
+                      onChange={handleFieldChange}
                       placeholder={__('Enter site key', 'Enter site key')}
                     />
                   </FormField>
@@ -2137,7 +2236,8 @@ const Settings: React.FC = () => {
                       id="recaptcha_secret_key"
                       type="password"
                       value={formData.recaptcha_secret_key}
-                      onChange={(e) => handleFieldChange('recaptcha_secret_key', e.target.value)}
+                      name='recaptcha_secret_key'
+                      onChange={handleFieldChange}
                       placeholder={__('Enter secret key', 'Enter secret key')}
                     />
                   </FormField>
@@ -2156,7 +2256,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="debug_mode"
                   checked={formData.debug_mode}
-                  onChange={(e) => handleFieldChange('debug_mode', e.target.checked)}
+                  name='debug_mode'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -2174,7 +2275,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="enable_logging"
                   checked={formData.enable_logging}
-                  onChange={(e) => handleFieldChange('enable_logging', e.target.checked)}
+                  name='enable_logging'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -2192,7 +2294,8 @@ const Settings: React.FC = () => {
                   type="checkbox"
                   id="cache_enabled"
                   checked={formData.cache_enabled}
-                  onChange={(e) => handleFieldChange('cache_enabled', e.target.checked)}
+                  name='cache_enabled'
+                      onChange={handleFieldChange}
                   className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex-1">
@@ -2214,7 +2317,8 @@ const Settings: React.FC = () => {
                   id="api_key"
                   type="password"
                   value={formData.api_key}
-                  onChange={(e) => handleFieldChange('api_key', e.target.value)}
+                  name='api_key'
+                      onChange={handleFieldChange}
                   placeholder={__('Enter API Key', 'Enter API Key')}
                 />
               </FormField>
@@ -2229,7 +2333,8 @@ const Settings: React.FC = () => {
                     id="api_rate_limit"
                     type="number"
                     value={formData.api_rate_limit}
-                    onChange={(e) => handleFieldChange('api_rate_limit', parseInt(e.target.value))}
+                    name='api_rate_limit'
+                      onChange={handleFieldChange}
                     min="1"
                   />
                 </FormField>
@@ -2243,7 +2348,8 @@ const Settings: React.FC = () => {
                     id="session_timeout"
                     type="number"
                     value={formData.session_timeout}
-                    onChange={(e) => handleFieldChange('session_timeout', parseInt(e.target.value))}
+                    name='session_timeout'
+                      onChange={handleFieldChange}
                     min="60"
                   />
                 </FormField>

@@ -801,7 +801,7 @@ const TripForm: React.FC = () => {
     group_size_min: '',
     group_discount_percentage: '',
     max_travelers: '',
-    min_travelers: '1',
+    min_travelers: '',
     booking_deadline: '',
     cancellation_policy: '',
     age_min: '',
@@ -851,6 +851,7 @@ const TripForm: React.FC = () => {
   }, []);
 
   const isEditMode = action === 'edit' && tripId !== null;
+const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [formData.trip_type]);
 
   // Fetch traveler categories
   const { data: travelerCategoriesData, isLoading: isLoadingCategories } = useQuery({
@@ -1223,7 +1224,7 @@ const TripForm: React.FC = () => {
         group_size_min: tripData.group_size_min?.toString() || '',
         group_discount_percentage: tripData.group_discount_percentage?.toString() || '',
         max_travelers: tripData.max_travelers?.toString() || '',
-        min_travelers: tripData.min_travelers?.toString() || '1',
+        min_travelers: tripData.min_travelers?.toString() || '',
         booking_deadline: tripData.booking_deadline || '',
         cancellation_policy: tripData.cancellation_policy || '',
         age_min: tripData.age_min?.toString() || '',
@@ -1300,7 +1301,7 @@ const TripForm: React.FC = () => {
       label: __('Basic Information', 'Basic Information'), 
       icon: FileText, 
       required: true, 
-      completed: !!(formData.title && formData.description && formData.featured_image && formData.trip_type && formData.duration_days),
+      completed: !!(formData.title?.trim() && formData.slug?.trim()),
       hasErrors: getSectionErrors('basic').length > 0,
     },
     
@@ -1309,7 +1310,7 @@ const TripForm: React.FC = () => {
       id: 'location', 
       label: __('Location & Geography', 'Location & Geography'), 
       icon: MapPin, 
-      required: true, 
+      required: false, 
       completed: !!(formData.destinations.length > 0),
       hasErrors: getSectionErrors('location').length > 0,
     },
@@ -1329,7 +1330,7 @@ const TripForm: React.FC = () => {
       id: 'pricing', 
       label: __('Pricing & Payment', 'Pricing & Payment'), 
       icon: DollarSign, 
-      required: true, 
+      required: false, 
       completed: formData.pricing_type === 'regular' ? !!(formData.original_price && parseFloat(formData.original_price) > 0) : formData.price_types.some(pt => pt.original_price && parseFloat(pt.original_price) > 0),
       hasErrors: getSectionErrors('pricing').length > 0,
     },
@@ -1339,7 +1340,7 @@ const TripForm: React.FC = () => {
       id: 'booking', 
       label: __('Booking Requirements', 'Booking Requirements'), 
       icon: Mail, 
-      required: true, 
+      required: false, 
       completed: !!(formData.min_travelers && formData.max_travelers),
       hasErrors: getSectionErrors('booking').length > 0,
     },
@@ -1683,19 +1684,39 @@ const TripForm: React.FC = () => {
   };
 
   // Itinerary handlers
-  const handleItineraryDayAdd = () => {
-    const maxDay = formData.itinerary_days.length > 0 
-      ? Math.max(...formData.itinerary_days.map(d => d.day))
-      : 0;
-    const newDay: ItineraryDay = {
-      day: maxDay + 1,
-      day_title: '',
-      entries: [],
-    };
-    setFormData(prev => ({
-      ...prev,
-      itinerary_days: [...prev.itinerary_days, newDay],
-    }));
+  const getNextItineraryDayNumber = (days: ItineraryDay[]) => {
+    if (!days || days.length === 0) return 1;
+    return Math.max(...days.map(d => d.day)) + 1;
+  };
+
+  const handleItineraryDayAdd = (dayData?: Partial<ItineraryDay>) => {
+    setFormData(prev => {
+      const nextDayNumber = dayData?.day ?? getNextItineraryDayNumber(prev.itinerary_days);
+      const newDay: ItineraryDay = {
+        day: nextDayNumber,
+        day_title: dayData?.day_title || '',
+        entries: dayData?.entries ? [...dayData.entries] : [],
+      };
+
+      const existingIndex = prev.itinerary_days.findIndex(d => d.day === nextDayNumber);
+      const itinerary_days = [...prev.itinerary_days];
+
+      if (existingIndex >= 0) {
+        itinerary_days[existingIndex] = {
+          ...itinerary_days[existingIndex],
+          ...newDay,
+          entries: dayData?.entries ? [...dayData.entries] : itinerary_days[existingIndex].entries,
+        };
+      } else {
+        itinerary_days.push(newDay);
+        itinerary_days.sort((a, b) => a.day - b.day);
+      }
+
+      return {
+        ...prev,
+        itinerary_days,
+      };
+    });
   };
 
   const handleItineraryDayRemove = (day: number) => {
@@ -1716,33 +1737,19 @@ const TripForm: React.FC = () => {
     }));
   };
 
-  const handleItineraryEntryAdd = (day: number) => {
-    const newEntry: ItineraryEntry = {
-      id: `entry_${Date.now()}`,
-      day,
-      item_type_id: '1', // Default to Activity (matching ItineraryForm structure)
-      item_id: '', // Will be selected by user
-      item_type: 'Activity', // Legacy field for backward compatibility
-      item_name: 'Activity',
-      item_icon: 'footprints',
-      title: '',
-      description: '',
-      start_time: '08:00',
-      end_time: '17:00',
-      time_type: 'exact',
-      cost: '',
-      cost_per_person: true,
-      notes: '',
-      included_items: [],
-      excluded_items: [],
-      images: [],
-      status: 'active',
-    };
+  const handleItineraryEntryUpsert = (day: number, entry: ItineraryEntry) => {
     setFormData(prev => ({
       ...prev,
-      itinerary_days: prev.itinerary_days.map(d =>
-        d.day === day ? { ...d, entries: [...d.entries, newEntry] } : d
-      ),
+      itinerary_days: prev.itinerary_days.map(d => {
+        if (d.day !== day) return d;
+        const entryIndex = d.entries.findIndex(e => e.id === entry.id);
+        if (entryIndex >= 0) {
+          const updatedEntries = [...d.entries];
+          updatedEntries[entryIndex] = { ...entry, day };
+          return { ...d, entries: updatedEntries };
+        }
+        return { ...d, entries: [...d.entries, { ...entry, day }] };
+      }),
     }));
   };
 
@@ -1753,44 +1760,6 @@ const TripForm: React.FC = () => {
         d.day === day ? { ...d, entries: d.entries.filter(e => e.id !== entryId) } : d
       ),
     }));
-  };
-
-  const handleItineraryEntryChange = (day: number, entryId: string, field: keyof ItineraryEntry, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      itinerary_days: prev.itinerary_days.map(d =>
-        d.day === day ? {
-          ...d,
-          entries: d.entries.map(e =>
-            e.id === entryId ? { ...e, [field]: value } : e
-          ),
-        } : d
-      ),
-    }));
-  };
-
-  const handleItineraryEntryMove = (day: number, entryId: string, direction: 'up' | 'down') => {
-    setFormData(prev => {
-      const dayData = prev.itinerary_days.find(d => d.day === day);
-      if (!dayData) return prev;
-      
-      const entries = [...dayData.entries];
-      const index = entries.findIndex(e => e.id === entryId);
-      if (index === -1) return prev;
-      
-      if (direction === 'up' && index > 0) {
-        [entries[index - 1], entries[index]] = [entries[index], entries[index - 1]];
-      } else if (direction === 'down' && index < entries.length - 1) {
-        [entries[index], entries[index + 1]] = [entries[index + 1], entries[index]];
-      }
-      
-      return {
-        ...prev,
-        itinerary_days: prev.itinerary_days.map(d =>
-          d.day === day ? { ...d, entries } : d
-        ),
-      };
-    });
   };
 
   const handleItineraryEntryDuplicate = (day: number, entryId: string) => {
@@ -1816,10 +1785,9 @@ const TripForm: React.FC = () => {
   };
 
 
-  const validateForm = (): boolean => {
+  const buildEssentialFieldErrors = (): Record<string, string> => {
     const newErrors: Record<string, string> = {};
 
-    // Basic Information - Required fields
     if (!formData.title.trim()) {
       newErrors.title = __('Title is required', 'Title is required');
     }
@@ -1830,101 +1798,11 @@ const TripForm: React.FC = () => {
       newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
     }
 
-    if (!formData.description.trim()) {
-      newErrors.description = __('Description is required', 'Description is required');
-    }
+    return newErrors;
+  };
 
-    if (!formData.featured_image) {
-      newErrors.featured_image = __('Featured image is required', 'Featured image is required');
-    }
-
-    // Trip Type & Duration (now in Basic Information)
-    if (!formData.trip_type) {
-      newErrors.trip_type = __('Trip type is required', 'Trip type is required');
-    }
-
-    if (!formData.duration_days || parseInt(formData.duration_days) < 1) {
-      newErrors.duration_days = __('Duration must be at least 1 day', 'Duration must be at least 1 day');
-    }
-
-    if (formData.duration_nights) {
-      const nights = parseInt(formData.duration_nights);
-      if (isNaN(nights) || nights < 0) {
-        newErrors.duration_nights = __('Nights cannot be negative. Use 0 for day trips.', 'Nights cannot be negative. Use 0 for day trips.');
-      } else if (formData.duration_days) {
-        const days = parseInt(formData.duration_days);
-        if (formData.trip_type === 'single_day' && nights > 0) {
-          newErrors.duration_nights = __('Single day trips should have 0 nights', 'Single day trips should have 0 nights');
-        } else if (days === 1 && nights > 0) {
-          newErrors.duration_nights = __('Single day trips should have 0 nights', 'Single day trips should have 0 nights');
-        } else if (days > 1 && nights >= days) {
-          newErrors.duration_nights = __('Nights should be less than days (typically days - 1)', 'Nights should be less than days (typically days - 1)');
-        }
-      }
-    }
-
-    // Location - Required fields
-    if (formData.destinations.length === 0) {
-      newErrors.destinations = __('At least one destination is required', 'At least one destination is required');
-    }
-
-    // Pricing, Payment & Booking - Required fields
-    // Validate pricing based on pricing type
-    if (formData.pricing_type === 'regular') {
-      if (!formData.original_price || parseFloat(formData.original_price) <= 0) {
-        newErrors.original_price = __('Original price is required and must be greater than 0', 'Original price is required and must be greater than 0');
-      }
-      if (formData.discounted_price && parseFloat(formData.discounted_price) >= parseFloat(formData.original_price)) {
-        newErrors.discounted_price = __('Discounted price must be less than original price', 'Discounted price must be less than original price');
-      }
-    } else {
-      // Validate price types
-      if (formData.price_types.length === 0) {
-        newErrors.price_types = __('At least one traveler category pricing is required', 'At least one traveler category pricing is required');
-      } else {
-        formData.price_types.forEach((priceType, index) => {
-          if (!priceType.original_price || isNaN(parseFloat(priceType.original_price)) || parseFloat(priceType.original_price) < 0) {
-            newErrors[`price_type_${index}_original`] = __('Original price must be a valid number', 'Original price must be a valid number');
-          }
-          if (priceType.discounted_price && (isNaN(parseFloat(priceType.discounted_price)) || parseFloat(priceType.discounted_price) < 0)) {
-            newErrors[`price_type_${index}_discounted`] = __('Discounted price must be a valid number', 'Discounted price must be a valid number');
-          }
-          if (priceType.discounted_price && priceType.original_price && parseFloat(priceType.discounted_price) >= parseFloat(priceType.original_price)) {
-            newErrors[`price_type_${index}_discounted`] = __('Discounted price must be less than original price', 'Discounted price must be less than original price');
-          }
-        });
-      }
-    }
-
-    // Booking Requirements (now merged into Pricing section)
-    if (!formData.min_travelers || parseInt(formData.min_travelers) < 1) {
-      newErrors.min_travelers = __('Minimum travelers is required and must be at least 1', 'Minimum travelers is required and must be at least 1');
-    }
-
-    if (!formData.max_travelers || parseInt(formData.max_travelers) < 1) {
-      newErrors.max_travelers = __('Maximum travelers is required and must be at least 1', 'Maximum travelers is required and must be at least 1');
-    }
-
-    if (formData.min_travelers && formData.max_travelers) {
-      const min = parseInt(formData.min_travelers);
-      const max = parseInt(formData.max_travelers);
-      if (!isNaN(min) && !isNaN(max) && min > max) {
-        newErrors.max_travelers = __('Maximum travelers must be greater than or equal to minimum travelers', 'Maximum travelers must be greater than or equal to minimum travelers');
-      }
-    }
-
-    // Age restrictions validation
-    if (formData.age_min && formData.age_max) {
-      const ageMin = parseInt(formData.age_min);
-      const ageMax = parseInt(formData.age_max);
-      if (!isNaN(ageMin) && !isNaN(ageMax) && ageMin > ageMax) {
-        newErrors.age_max = __('Maximum age must be greater than or equal to minimum age', 'Maximum age must be greater than or equal to minimum age');
-      }
-    }
-
-    // Itinerary is optional - no validation required
-    // Included/Excluded are optional - no validation required
-
+  const validateForm = (): boolean => {
+    const newErrors = buildEssentialFieldErrors();
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -1992,7 +1870,7 @@ const TripForm: React.FC = () => {
         group_size_min: data.group_size_min ? parseInt(data.group_size_min) : null,
         group_discount_percentage: data.group_discount_percentage ? parseFloat(data.group_discount_percentage) : null,
         max_travelers: data.max_travelers ? parseInt(data.max_travelers) : null,
-        min_travelers: data.min_travelers ? parseInt(data.min_travelers) : 1,
+        min_travelers: data.min_travelers ? parseInt(data.min_travelers) : null,
         booking_deadline: data.booking_deadline || null,
         cancellation_policy: data.cancellation_policy || '',
         age_min: data.age_min ? parseInt(data.age_min) : null,
@@ -2099,51 +1977,14 @@ const TripForm: React.FC = () => {
 
   // Light validation for draft saves (only essential fields)
   const validateDraft = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.title.trim()) {
-      newErrors.title = __('Title is required', 'Title is required');
-    }
-
-    if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'Slug is required');
-    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
-    }
-
+    const newErrors = buildEssentialFieldErrors();
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Get sections with errors
-  const getSectionsWithErrors = (): Section[] => {
-    return [...essentialsSections, ...marketingSections].filter(s => s.hasErrors && s.required);
-  };
-
   const handleSaveDraft = async () => {
     if (!validateDraft()) {
-      const errorSections = getSectionsWithErrors();
-      if (errorSections.length > 0) {
-        const sectionNames = errorSections.map(s => s.label).join(', ');
-        showToast(
-          __('Please fix errors in:', 'Please fix errors in:') + ' ' + sectionNames,
-          'error'
-        );
-        // Switch to first section with errors
-        if (errorSections[0]) {
-          setCurrentSection(errorSections[0].id);
-        }
-      } else {
-        const firstError = Object.keys(errors)[0];
-        if (firstError) {
-          showToast(__('Please fix the form errors', 'Please fix the form errors'), 'error');
-          // Scroll to first error field
-          const errorElement = document.querySelector(`[name="${firstError}"], #${firstError}`);
-          if (errorElement) {
-            errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }
-      }
+      showToast(__('Please add a trip title and URL before saving.', 'Please add a trip title and URL before saving.'), 'error');
       return;
     }
     setIsSubmitting(true);
@@ -2152,26 +1993,12 @@ const TripForm: React.FC = () => {
 
   const handlePublish = async () => {
     if (!validateForm()) {
-      const errorSections = getSectionsWithErrors();
-      if (errorSections.length > 0) {
-        const sectionNames = errorSections.map(s => s.label).join(', ');
-        showToast(
-          __('Please fix required fields in:', 'Please fix required fields in:') + ' ' + sectionNames,
-          'error'
-        );
-        // Switch to first section with errors
-        if (errorSections[0]) {
-          setCurrentSection(errorSections[0].id);
-        }
-      } else {
-        const firstError = Object.keys(errors)[0];
-        if (firstError) {
-          showToast(__('Please fix all required fields before publishing', 'Please fix all required fields before publishing'), 'error');
-          // Scroll to first error field
-          const errorElement = document.querySelector(`[name="${firstError}"], #${firstError}`);
-          if (errorElement) {
-            errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
+      const firstError = Object.keys(errors)[0];
+      if (firstError) {
+        showToast(__('Trip title and slug are required before publishing.', 'Trip title and slug are required before publishing.'), 'error');
+        const errorElement = document.querySelector(`[name="${firstError}"], #${firstError}`);
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }
       return;
@@ -2381,7 +2208,7 @@ const TripForm: React.FC = () => {
                 {__('💡 Getting Started', '💡 Getting Started')}
               </p>
               <p className="text-xs text-blue-800 dark:text-blue-200">
-                {__('Fill in the essential details below. These fields are required to create your trip. Don\'t worry - you can always come back and edit later!', 'Fill in the essential details below. These fields are required to create your trip. Don\'t worry - you can always come back and edit later!')}
+                {__('Only the Trip Title and Trip URL are required to create a draft. Everything else is optional for now, but filling it in is highly recommended for better discovery and conversions.', 'Only the Trip Title and Trip URL are required to create a draft. Everything else is optional for now, but filling it in is highly recommended for better discovery and conversions.')}
               </p>
             </div>
 
@@ -2446,8 +2273,8 @@ const TripForm: React.FC = () => {
                     <div className="flex items-center justify-between mb-1.5">
                       <label htmlFor="slug" className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                         {__('Trip URL', 'Trip URL')}
-                        <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700">
-                          {__('Auto', 'Auto')}
+                        <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
+                          {__('Required', 'Required')}
                         </Badge>
                         <button
                           type="button"
@@ -2478,6 +2305,7 @@ const TripForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('slug', e.target.value)}
                       placeholder={__('bali-beach-retreat-7-days', 'bali-beach-retreat-7-days')}
                       className={`font-mono text-sm ${errors.slug ? 'border-red-500' : ''}`}
+                      required
                     />
                     {errors.slug && (
                       <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -2577,8 +2405,8 @@ const TripForm: React.FC = () => {
                   <div className="mb-4">
                     <label htmlFor="description" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
                       {__('Trip Description', 'Trip Description')}
-                      <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
-                        {__('Required', 'Required')}
+                      <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
+                        {__('Recommended', 'Recommended')}
                       </Badge>
                     </label>
                     <HelpText
@@ -2618,8 +2446,8 @@ const TripForm: React.FC = () => {
                   <div className="mb-6">
                     <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
                       {__('Featured Image', 'Featured Image')}
-                      <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
-                        {__('Required', 'Required')}
+                      <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
+                        {__('Recommended', 'Recommended')}
                       </Badge>
                       <button
                         type="button"
@@ -2748,7 +2576,7 @@ const TripForm: React.FC = () => {
                       {/* Trip Type */}
                       <div className="mb-4">
                         <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-3">
-                          {__('Trip Type', 'Trip Type')} <span className="text-red-500">*</span>
+                        {__('Trip Type', 'Trip Type')}
                         </label>
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
                           errors.trip_type ? 'mb-2' : ''
@@ -2854,7 +2682,7 @@ const TripForm: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label htmlFor="duration_days" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                            {__('Duration (Days)', 'Duration (Days)')} <span className="text-red-500">*</span>
+                            {__('Duration (Days)', 'Duration (Days)')}
                           </label>
                           <Input
                             id="duration_days"
@@ -2927,19 +2755,33 @@ const TripForm: React.FC = () => {
       case 'location':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <MapPin className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Location & Geography', 'Location & Geography')}</h2>
+              <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                {__('Recommended', 'Recommended')}
+              </Badge>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Specify where your trip takes place, including destinations, coordinates, and key landmarks', 'Specify where your trip takes place, including destinations, coordinates, and key landmarks')}
-            </p>
+            <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 dark:border-amber-400 p-3 rounded-r-md">
+              <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">
+                {__('Specify where your trip takes place, including destinations, coordinates, and key landmarks.', 'Specify where your trip takes place, including destinations, coordinates, and key landmarks.')}
+              </p>
+              <p className="text-xs text-amber-800 dark:text-amber-200">
+                {__('Optional but highly recommended to help travelers understand the experience.', 'Optional but highly recommended to help travelers understand the experience.')}
+              </p>
+            </div>
 
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Optimize how your trip appears in search engines and social shares', 'Optimize how your trip appears in search engines and social shares')}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__('Optional, but completing these fields improves SEO and click-through rates.', 'Optional, but completing these fields improves SEO and click-through rates.')}
+              </span>
+            </p>
             <div className="space-y-4">
               {/* Destinations - Multiple Selection */}
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Destinations', 'Destinations')} <span className="text-red-500">*</span>
+                  {__('Destinations', 'Destinations')}
                 </label>
                 {destinationsData && destinationsData.length > 0 ? (
                   <div className="flex flex-wrap gap-2 mb-2">
@@ -3106,12 +2948,18 @@ const TripForm: React.FC = () => {
       case 'duration':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <Calendar className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Schedule & Availability', 'Schedule & Availability')}</h2>
+              <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                {__('Recommended', 'Recommended')}
+              </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__('Set when your trip is available for booking and any seasonal information', 'Set when your trip is available for booking and any seasonal information')}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__('Optional, but completing this helps automate calendar availability and booking rules.', 'Optional, but completing this helps automate calendar availability and booking rules.')}
+              </span>
             </p>
 
             <div className="space-y-4">
@@ -3192,12 +3040,18 @@ const TripForm: React.FC = () => {
       case 'categorization':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <Tag className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Categorization & Tags', 'Categorization & Tags')}</h2>
+              <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                {__('Recommended', 'Recommended')}
+              </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__('Organize and classify your trip for better discoverability and filtering', 'Organize and classify your trip for better discoverability and filtering')}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__('Optional, but completing this helps your trip appear in the right categories and search results.', 'Optional, but completing this helps your trip appear in the right categories and search results.')}
+              </span>
             </p>
 
             <div className="space-y-4">
@@ -3403,12 +3257,18 @@ const TripForm: React.FC = () => {
       case 'media':
         return (
           <div className="space-y-6">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <Image className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Media & Content', 'Media & Content')}</h2>
+              <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                {__('Recommended', 'Recommended')}
+              </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
               {__('Add visual content, videos, stories, and testimonials to showcase your trip', 'Add visual content, videos, stories, and testimonials to showcase your trip')}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__('Optional, but adding rich media greatly increases engagement and conversions.', 'Optional, but adding rich media greatly increases engagement and conversions.')}
+              </span>
             </p>
 
             <div className="space-y-6">
@@ -3621,19 +3481,25 @@ const TripForm: React.FC = () => {
       case 'pricing':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <DollarSign className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Pricing & Payment', 'Pricing & Payment')}</h2>
+              <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                {__('Recommended', 'Recommended')}
+              </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__('Set pricing for different traveler types and payment options', 'Set pricing for different traveler types and payment options')}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__('Optional for drafts, but adding pricing now makes publishing and selling much easier later.', 'Optional for drafts, but adding pricing now makes publishing and selling much easier later.')}
+              </span>
             </p>
 
             <div className="space-y-4">
               {/* Pricing Type Selection */}
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-3">
-                  {__('Pricing Type', 'Pricing Type')} <span className="text-red-500">*</span>
+                  {__('Pricing Type', 'Pricing Type')}
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
@@ -3720,7 +3586,7 @@ const TripForm: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
+                        {__('Original Price', 'Original Price')}
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -3772,7 +3638,7 @@ const TripForm: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <label className="block text-xs font-normal text-gray-500 dark:text-gray-400">
-                    {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-red-500">*</span>
+                    {__('Traveler Category Pricing', 'Traveler Category Pricing')}
                   </label>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
@@ -3922,7 +3788,7 @@ const TripForm: React.FC = () => {
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
+                                    {__('Original Price', 'Original Price')}
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -4135,12 +4001,18 @@ const TripForm: React.FC = () => {
       case 'booking':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <Mail className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Requirements', 'Booking Requirements')}</h2>
+              <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                {__('Recommended', 'Recommended')}
+              </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__('Configure booking limits, deadlines, and traveler requirements', 'Configure booking limits, deadlines, and traveler requirements')}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__('Optional today, but setting these helps automate capacity and avoid overbookings later.', 'Optional today, but setting these helps automate capacity and avoid overbookings later.')}
+              </span>
             </p>
 
             <div className="space-y-6">
@@ -4150,7 +4022,7 @@ const TripForm: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="min_travelers" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Minimum Travelers', 'Minimum Travelers')} <span className="text-red-500">*</span>
+                      {__('Minimum Travelers', 'Minimum Travelers')}
                     </label>
                     <Input
                       id="min_travelers"
@@ -4169,7 +4041,7 @@ const TripForm: React.FC = () => {
                   </div>
                   <div>
                     <label htmlFor="max_travelers" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Maximum Travelers', 'Maximum Travelers')} <span className="text-red-500">*</span>
+                      {__('Maximum Travelers', 'Maximum Travelers')}
                     </label>
                     <Input
                       id="max_travelers"
@@ -4331,11 +4203,12 @@ const TripForm: React.FC = () => {
             handleItineraryDayAdd={handleItineraryDayAdd}
             handleItineraryDayRemove={handleItineraryDayRemove}
             handleItineraryDayTitleChange={handleItineraryDayTitleChange}
-            handleItineraryEntryAdd={handleItineraryEntryAdd}
             handleItineraryEntryRemove={handleItineraryEntryRemove}
-            handleItineraryEntryChange={handleItineraryEntryChange}
-            handleItineraryEntryMove={handleItineraryEntryMove}
             handleItineraryEntryDuplicate={handleItineraryEntryDuplicate}
+            handleItineraryEntryUpsert={handleItineraryEntryUpsert}
+            isSingleDayTrip={isSingleDayTrip}
+            isEditMode={isEditMode}
+            tripId={tripId}
           />
         );
 
@@ -4355,12 +4228,18 @@ const TripForm: React.FC = () => {
       case 'faqs':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <HelpCircle className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Frequently Asked Questions', 'Frequently Asked Questions')}</h2>
+              <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                {__('Recommended', 'Recommended')}
+              </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__('Add common questions and answers about your trip', 'Add common questions and answers about your trip')}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__('Optional, but addressing FAQs up front reduces support questions later.', 'Optional, but addressing FAQs up front reduces support questions later.')}
+              </span>
             </p>
             <div className="space-y-4">
               {formData.faqs.map((faq, index) => (
@@ -4422,9 +4301,12 @@ const TripForm: React.FC = () => {
       case 'seo':
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <Search className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('SEO Settings', 'SEO Settings')}</h2>
+              <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                {__('Recommended', 'Recommended')}
+              </Badge>
             </div>
             <div className="space-y-4">
               <div>
@@ -4470,12 +4352,18 @@ const TripForm: React.FC = () => {
       case 'advanced':
         return (
           <div className="space-y-6">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
               <Settings className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Lifecycle Management', 'Lifecycle Management')}</h2>
+              <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
+                {__('Recommended', 'Recommended')}
+              </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               {__('Manage publishing schedule and lifecycle settings', 'Manage publishing schedule and lifecycle settings')}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__('Optional, but scheduling ahead saves time when launching seasonal trips.', 'Optional, but scheduling ahead saves time when launching seasonal trips.')}
+              </span>
             </p>
 
             <Card>
@@ -5148,7 +5036,7 @@ const TripForm: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Highlight Text', 'Highlight Text')} <span className="text-red-500">*</span>
+                {__('Highlight Text', 'Highlight Text')}
                 </label>
                 <Input
                   type="text"

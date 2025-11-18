@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Package } from 'lucide-react';
+import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Package, MapPin, Calendar, Users, Tag, Mountain } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -20,6 +20,8 @@ import { Edit, Trash2, Eye } from 'lucide-react';
 import { HelpText } from '../components/ui/help-text';
 import { Alert } from '../components/ui/alert';
 import { apiClient } from '../lib/api';
+import { useToast } from '../components/ui/toast';
+import { generateSlug } from '../lib/slug';
 
 interface Trip {
   id: number;
@@ -34,6 +36,18 @@ interface Trip {
   featured?: boolean;
   trip_type?: 'single_day' | 'multi_day' | 'flexible';
   featured_priority?: string;
+  duration_days?: number;
+  duration_nights?: number;
+  min_travelers?: number;
+  max_travelers?: number;
+  trip_category?: string;
+  difficulty_level?: string;
+  destinations?: Array<{
+    id: number;
+    name: string;
+    slug?: string;
+    is_primary?: boolean;
+  }>;
 }
 
 const Trips: React.FC = () => {
@@ -42,8 +56,14 @@ const Trips: React.FC = () => {
   const [sortBy, setSortBy] = useState('title');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newTripTitle, setNewTripTitle] = useState('');
+  const [createTripError, setCreateTripError] = useState<string | null>(null);
+  const [newTripSlug, setNewTripSlug] = useState('');
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
   const queryClient = useQueryClient();
   const { can, isPro } = usePermissions();
+  const { showToast } = useToast();
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -85,9 +105,102 @@ const Trips: React.FC = () => {
     },
   });
 
+  const createTripMutation = useMutation({
+    mutationFn: async ({ title, slug }: { title: string; slug: string }) => {
+      const trimmedTitle = title.trim();
+      const trimmedSlug = slug.trim();
+      const payload = {
+        title: trimmedTitle,
+        slug: trimmedSlug,
+        status: 'draft',
+        trip_type: 'multi_day',
+      };
+      const response = await apiClient.post('/trips', payload);
+      return response?.data || response;
+    },
+    onSuccess: (data) => {
+      showToast(__('Trip created as draft. Redirecting to builder...', 'Trip created as draft. Redirecting to builder...'), 'success');
+      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      setIsCreateModalOpen(false);
+      setNewTripTitle('');
+      setNewTripSlug('');
+      setIsSlugManuallyEdited(false);
+      setCreateTripError(null);
+      if (data?.id) {
+        setTimeout(() => {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${data.id}`;
+        }, 600);
+      }
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.message || __('Failed to create trip. Please try again.', 'Failed to create trip. Please try again.');
+      setCreateTripError(message);
+      showToast(message, 'error');
+    },
+  });
+
   const trips = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+
+  const formatLabel = (value?: string | null) => {
+    if (!value) return '';
+    return value
+      .replace(/[-_]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const summarizeDestinations = (trip: Trip) => {
+    const names = (trip.destinations || []).map(dest => dest.name).filter(Boolean);
+    if (!names.length) return null;
+    const summary = names.slice(0, 2).join(', ');
+    const remaining = names.length - 2;
+    return remaining > 0 ? `${summary} +${remaining}` : summary;
+  };
+
+  const summarizeTravelers = (trip: Trip) => {
+    const { min_travelers, max_travelers } = trip;
+    if (min_travelers && max_travelers) {
+      return `${min_travelers}-${max_travelers} ${__('pax', 'pax')}`;
+    }
+    if (min_travelers) {
+      return `${__('Min', 'Min')} ${min_travelers} ${__('pax', 'pax')}`;
+    }
+    if (max_travelers) {
+      return `${__('Up to', 'Up to')} ${max_travelers} ${__('pax', 'pax')}`;
+    }
+    return null;
+  };
+
+  const handleNewTripTitleChange = (value: string) => {
+    setNewTripTitle(value);
+    if (!isSlugManuallyEdited) {
+      setNewTripSlug(generateSlug(value));
+    }
+  };
+
+  const handleNewTripSlugChange = (value: string) => {
+    if (!isSlugManuallyEdited) {
+      setIsSlugManuallyEdited(true);
+    }
+    const sanitized = value
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    setNewTripSlug(sanitized);
+  };
+
+  const enableSlugEditing = () => {
+    if (!isSlugManuallyEdited) {
+      if (!newTripSlug.trim()) {
+        setNewTripSlug(generateSlug(newTripTitle || 'new-trip'));
+      }
+      setIsSlugManuallyEdited(true);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -192,7 +305,31 @@ const Trips: React.FC = () => {
   };
 
   const handleCreateTrip = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=create`;
+    setIsCreateModalOpen(true);
+    setCreateTripError(null);
+    setNewTripTitle('');
+    setNewTripSlug('');
+    setIsSlugManuallyEdited(false);
+  };
+
+  const handleCreateTripConfirm = () => {
+    const title = newTripTitle.trim();
+    if (!title) {
+      setCreateTripError(__('Trip title is required', 'Trip title is required'));
+      return;
+    }
+    const slugBase = isSlugManuallyEdited ? newTripSlug : generateSlug(title);
+    const slug = slugBase.trim();
+    if (!slug) {
+      setCreateTripError(__('Trip slug is required', 'Trip slug is required'));
+      return;
+    }
+    if (!/^[a-z0-9-]+$/.test(slug)) {
+      setCreateTripError(__('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens'));
+      return;
+    }
+    setNewTripSlug(slug);
+    createTripMutation.mutate({ title, slug });
   };
 
   const handleResetFilters = () => {
@@ -224,6 +361,7 @@ const Trips: React.FC = () => {
   const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'title' || sortOrder !== 'asc';
 
   return (
+    <>
     <div className="space-y-3">
       <PageHeader
         title={__('All Trips', 'All Trips')}
@@ -502,6 +640,36 @@ const Trips: React.FC = () => {
                                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                   {trip.slug}
                                 </div>
+                                {(() => {
+                                  const destinationLabel = summarizeDestinations(trip);
+                                  const durationLabel = trip.duration_days
+                                    ? `${trip.duration_days}${__('d', 'd')}${trip.duration_nights ? ` / ${trip.duration_nights}${__('n', 'n')}` : ''}`
+                                    : null;
+                                  const travelerLabel = summarizeTravelers(trip);
+                                  const categoryLabel = formatLabel(trip.trip_category);
+                                  const difficultyLabel = formatLabel(trip.difficulty_level);
+                                  const chips = [
+                                    destinationLabel && { key: 'dest', label: destinationLabel, icon: MapPin },
+                                    durationLabel && { key: 'duration', label: durationLabel, icon: Calendar },
+                                    travelerLabel && { key: 'traveler', label: travelerLabel, icon: Users },
+                                    categoryLabel && { key: 'category', label: categoryLabel, icon: Tag },
+                                    difficultyLabel && { key: 'difficulty', label: difficultyLabel, icon: Mountain },
+                                  ].filter(Boolean) as Array<{ key: string; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }>;
+                                  if (!chips.length) return null;
+                                  return (
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                      {chips.map(({ key, label, icon: Icon }) => (
+                                        <span
+                                          key={`${trip.id}-${key}`}
+                                          className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 text-[11px]"
+                                        >
+                                          <Icon className="w-3 h-3" />
+                                          {label}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  );
+                                })()}
                               </div>
                               {(trip.featured_priority && trip.featured_priority !== 'none' && isPro) && (
                                 <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
@@ -619,6 +787,126 @@ const Trips: React.FC = () => {
         )}
       </ConditionalRender>
     </div>
+
+    {isCreateModalOpen && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+        onClick={() => {
+          if (!createTripMutation.isPending) {
+            setIsCreateModalOpen(false);
+            setCreateTripError(null);
+          }
+        }}
+      >
+        <div
+          className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl p-6 space-y-5"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {__('Create Trip Draft', 'Create Trip Draft')}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {__('Give your trip a name. We\'ll create a draft and take you to the builder.', 'Give your trip a name. We\'ll create a draft and take you to the builder.')}
+              </p>
+            </div>
+            <button
+              className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              onClick={() => {
+                if (!createTripMutation.isPending) {
+                  setIsCreateModalOpen(false);
+                  setCreateTripError(null);
+                }
+              }}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                {__('Trip Title', 'Trip Title')}
+              </label>
+              <Input
+                value={newTripTitle}
+                onChange={(e) => handleNewTripTitleChange(e.target.value)}
+                placeholder={__('e.g., Bali Beach Retreat', 'e.g., Bali Beach Retreat')}
+                disabled={createTripMutation.isPending}
+                className="text-base"
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  {__('Trip Slug', 'Trip Slug')}
+                  <span className="text-[10px] font-normal text-gray-400">{__('(URL friendly)', '(URL friendly)')}</span>
+                </label>
+                {!isSlugManuallyEdited && (
+                  <button
+                    type="button"
+                    onClick={enableSlugEditing}
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    {__('Customize URL', 'Customize URL')}
+                  </button>
+                )}
+              </div>
+              <Input
+                value={newTripSlug}
+                onChange={(e) => handleNewTripSlugChange(e.target.value)}
+                placeholder={__('bali-beach-retreat', 'bali-beach-retreat')}
+                disabled={createTripMutation.isPending}
+                readOnly={!isSlugManuallyEdited}
+                className={`font-mono text-sm ${!isSlugManuallyEdited ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''}`}
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {isSlugManuallyEdited
+                  ? __('Editing slug manually. Keep it short, lowercase, and hyphen-separated.', 'Editing slug manually. Keep it short, lowercase, and hyphen-separated.')
+                  : __('Auto-generated from the title. Click "Customize URL" if you need a custom slug.', 'Auto-generated from the title. Click "Customize URL" if you need a custom slug.')}
+              </p>
+              {(newTripSlug || newTripTitle) && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                  {(window as any).yatraAdmin?.siteUrl || 'https://example.com'}/trips/{newTripSlug || generateSlug(newTripTitle)}
+                </p>
+              )}
+            </div>
+            {createTripError && (
+              <p className="text-sm text-red-600 dark:text-red-400">
+                {createTripError}
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (!createTripMutation.isPending) {
+                  setIsCreateModalOpen(false);
+                  setCreateTripError(null);
+                }
+              }}
+              disabled={createTripMutation.isPending}
+            >
+              {__('Cancel', 'Cancel')}
+            </Button>
+            <Button
+              onClick={handleCreateTripConfirm}
+              className="flex items-center gap-2"
+              disabled={createTripMutation.isPending}
+            >
+              {createTripMutation.isPending && (
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              )}
+              {createTripMutation.isPending ? __('Creating…', 'Creating…') : __('Create & Continue', 'Create & Continue')}
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 
