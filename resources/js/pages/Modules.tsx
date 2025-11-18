@@ -76,7 +76,7 @@ const Modules: React.FC = () => {
   }, [modules]);
 
   const groupedModules = useMemo(() => {
-    return filteredModules.reduce<Record<string, ModuleDefinition[]>>((acc, module) => {
+    const grouped = filteredModules.reduce<Record<string, ModuleDefinition[]>>((acc, module) => {
       const category = module.category || __('General', 'General');
       if (!acc[category]) {
         acc[category] = [];
@@ -84,6 +84,19 @@ const Modules: React.FC = () => {
       acc[category].push(module);
       return acc;
     }, {});
+    
+    // Sort modules within each category: premium first, then by name
+    Object.keys(grouped).forEach((category) => {
+      grouped[category].sort((a, b) => {
+        // Premium modules first
+        if (a.is_premium && !b.is_premium) return -1;
+        if (!a.is_premium && b.is_premium) return 1;
+        // Then sort by name
+        return a.name.localeCompare(b.name);
+      });
+    });
+    
+    return grouped;
   }, [filteredModules]);
 
   const [premiumDialog, setPremiumDialog] = useState<{ open: boolean; module?: ModuleDefinition }>({ open: false });
