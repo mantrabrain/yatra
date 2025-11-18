@@ -210,6 +210,22 @@ const ItineraryForm: React.FC = () => {
     if (!isEditMode) return;
     if (!entryData || !entryData.id) return;
     
+    // In edit day mode, if entryData is an activity (has item_type_id and item_id), 
+    // we should wait for the day entry to be loaded (effectiveEntryData will be the day entry)
+    if (isEditDayMode) {
+      const isActivityEntry = entryData.item_type_id !== null && 
+                             entryData.item_type_id !== undefined && 
+                             entryData.item_id !== null && 
+                             entryData.item_id !== undefined;
+      // If it's an activity, wait - the hook will fetch the day entry and update entryData
+      if (isActivityEntry) {
+        // Check if this is the same activity we've already processed
+        if (initializedEntryIdRef.current === entryData.id) return;
+        // Otherwise, wait for day entry to load
+        return;
+      }
+    }
+    
     // Prevent re-loading the same entry
     if (initializedEntryIdRef.current === entryData.id) return;
     
@@ -242,58 +258,25 @@ const ItineraryForm: React.FC = () => {
         status: entryData.status || 'draft',
       });
     } else if (isEditDayMode) {
-      // For day editing, load day info into formData
-      // If entryData is an activity (has item_type_id/item_id), use day metadata from URL params or dayTripData
-      // Otherwise, use entryData (which is the day entry itself)
-      const isActivityEntry = entryData.item_type_id !== null && entryData.item_type_id !== undefined && 
-                             entryData.item_id !== null && entryData.item_id !== undefined;
+      // For day editing, entryData should now be the day entry (thanks to effectiveEntryData in useItineraryFormData)
+      // Load all day info into formData
+      const dayNumber = entryData.day ? parseInt(entryData.day.toString()) : null;
+      setOriginalDayNumber(dayNumber);
       
-      if (isActivityEntry && (tripIdParam || dayParam)) {
-        // Entry is an activity, but we're editing the day - use URL params or dayTripData
-        const dayNumber = dayParam ? parseInt(dayParam) : (entryData.day ? parseInt(entryData.day.toString()) : null);
-        setOriginalDayNumber(dayNumber);
-        
-        // Try to get day info from dayTripData first, then fallback to entryData
-        let dayTitle = entryData.day_title || '';
-        let dayStatus = entryData.status || 'draft';
-        
-        if (dayTripData && dayNumber) {
-          const itineraryDays = dayTripData.itinerary_days || [];
-          const dayData = itineraryDays.find((d: any) => 
-            (d.day_number || d.day) === dayNumber
-          );
-          if (dayData) {
-            dayTitle = dayData.title || dayData.day_title || dayTitle;
-            // Status comes from the day entry if it exists, otherwise use default
-          }
-        }
-        
-        setFormData(prev => ({
-          ...prev,
-          trip_id: tripIdParam || entryData.trip_id?.toString() || prev.trip_id,
-          day: dayParam || entryData.day?.toString() || prev.day,
-          day_title: dayTitle,
-          status: dayStatus,
-        }));
-      } else {
-        // Entry is the day entry itself
-        const dayNumber = entryData.day ? parseInt(entryData.day.toString()) : null;
-        setOriginalDayNumber(dayNumber);
-        setFormData(prev => ({
-          ...prev,
-          trip_id: entryData.trip_id?.toString() || prev.trip_id,
-          day: entryData.day?.toString() || prev.day,
-          day_title: entryData.day_title || prev.day_title,
-          status: entryData.status || prev.status,
-        }));
-      }
+      setFormData(prev => ({
+        ...prev,
+        trip_id: entryData.trip_id?.toString() || tripIdParam || prev.trip_id,
+        day: entryData.day?.toString() || dayParam || prev.day,
+        day_title: entryData.day_title || prev.day_title,
+        status: entryData.status || prev.status,
+      }));
     }
     
     // Clear loading flag after form data is set
     setTimeout(() => {
       isLoadingInitialDataRef.current = false;
     }, 100);
-  }, [entryId, isEditMode, isEditDayMode, entryData]); // Include entryData to trigger when data arrives
+  }, [entryId, isEditMode, isEditDayMode, entryData, tripIdParam, dayParam, dayTripData]); // Include entryData to trigger when data arrives
 
   // Load activities for day editing
   useEffect(() => {
@@ -351,7 +334,7 @@ const ItineraryForm: React.FC = () => {
     });
     setActivityIncludedItems(includedItems);
     setActivityExcludedItems(excludedItems);
-  }, [isEditDayMode, entryTripId, entryDay]);
+  }, [isEditDayMode, entryTripId, entryDay, dayTripData]);
 
   // Track if we're loading initial data to prevent item_id reset during load
   const isLoadingInitialDataRef = useRef(false);
@@ -389,6 +372,25 @@ const ItineraryForm: React.FC = () => {
 
   const isSingleDayTrip = selectedTripType === 'single_day';
 
+  const submitButtonLabel = useMemo(() => {
+    if (isEditMode) {
+      if (isAddDayMode) {
+        return isSingleDayTrip
+          ? __('Update Entry', 'Update Entry')
+          : __('Update Day', 'Update Day');
+      }
+      return __('Update Itinerary Activity', 'Update Itinerary Activity');
+    }
+
+    if (isAddDayMode) {
+      return isSingleDayTrip
+        ? __('Create Entry', 'Create Entry')
+        : __('Create Day', 'Create Day');
+    }
+
+    return __('Create Itinerary Activity', 'Create Itinerary Activity');
+  }, [isEditMode, isAddDayMode, isSingleDayTrip]);
+
   // Get existing day numbers for the trip
   const existingDayNumbers = useMemo(() => {
     if (!effectiveTripData || !isAddDayMode) return [];
@@ -412,7 +414,8 @@ const ItineraryForm: React.FC = () => {
   const tripIdChanged = lastTripIdRef.current !== currentTripId;
   
   useEffect(() => {
-    if (!isAddDayMode) return;
+    // Only auto-fill when creating a new day/entry, not when editing
+    if (!isAddDayMode || isEditMode) return;
     
     if (currentTripId) {
       if (tripIdChanged) {
@@ -457,7 +460,7 @@ const ItineraryForm: React.FC = () => {
       dayManuallyEditedRef.current = false;
       lastTripIdRef.current = null;
     }
-  }, [isAddDayMode, currentTripId, effectiveTripData, nextAvailableDayNumber, existingDayNumbers.length, formData.day, isSingleDayTrip]);
+  }, [isAddDayMode, isEditMode, currentTripId, effectiveTripData, nextAvailableDayNumber, existingDayNumbers.length, formData.day, isSingleDayTrip]);
 
   // Handlers
   const handleFieldChange = (field: keyof ItineraryFormData, value: any) => {
@@ -904,12 +907,7 @@ const ItineraryForm: React.FC = () => {
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode 
-                              ? __('Update Entry', 'Update Entry') 
-                              : isAddDayMode
-                              ? (isSingleDayTrip ? __('Create Entry', 'Create Entry') : __('Create Day', 'Create Day'))
-                              : __('Create Activity', 'Create Activity')
-                            }
+                            {submitButtonLabel}
                           </>
                         )}
                       </Button>

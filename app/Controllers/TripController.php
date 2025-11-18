@@ -694,11 +694,18 @@ class TripController extends BaseController
 
                         return [
                             'id' => isset($entry->id) ? (int) $entry->id : null,
+                            'day_id' => isset($entry->day_id) ? (int) $entry->day_id : null,
                             'time' => $entry->time ?? '',
+                            'start_time' => $entry->start_time ?? null,
+                            'end_time' => $entry->end_time ?? null,
+                            'time_type' => $entry->time_type ?? 'exact',
                             'title' => $entry->title ?? '',
                             'description' => $entry->description ?? '',
                             'location' => $entry->location ?? '',
                             'duration' => $entry->duration ?? '',
+                            'cost' => isset($entry->cost) ? (float) $entry->cost : null,
+                            'cost_per_person' => isset($entry->cost_per_person) ? (bool) $entry->cost_per_person : false,
+                            'notes' => $entry->notes ?? '',
                             'item_type_id' => isset($entry->item_type_id) ? (int) $entry->item_type_id : null,
                             'item_id' => isset($entry->item_id) ? (int) $entry->item_id : null,
                             'status' => $entry->status ?? 'active',

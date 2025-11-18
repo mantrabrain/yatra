@@ -132,50 +132,79 @@ export const useItineraryFormSave = ({
           
           // In edit mode, ALWAYS use PUT - never POST
           const dayResponse = await apiClient.put(`/itinerary/${dayEntryId}`, dayPayload);
+
+          const buildActivityPayload = (activityData: ActivityForm['data']) => ({
+            trip_id: tripId,
+            day: day,
+            day_title: dayTitle,
+            item_type_id: parseInt(activityData.item_type_id!),
+            item_id: parseInt(activityData.item_id!),
+            title: activityData.title!.trim(),
+            description: (activityData.description || '').trim(),
+            location: (activityData.location || '').trim(),
+            duration:
+              (activityData.duration || '').trim() ||
+              (activityData.start_time &&
+              activityData.end_time &&
+              activityData.time_type === 'exact'
+                ? calculateDuration(activityData.start_time, activityData.end_time, activityData.time_type)
+                : null),
+            start_time: activityData.start_time || '08:00',
+            end_time: activityData.end_time || '17:00',
+            time_type: activityData.time_type || 'exact',
+            cost: activityData.cost ? parseFloat(activityData.cost) : null,
+            cost_per_person: activityData.cost_per_person !== false,
+            notes: (activityData.notes || '').trim(),
+            included_items: Array.isArray(activityData.included_items) ? activityData.included_items : [],
+            excluded_items: Array.isArray(activityData.excluded_items) ? activityData.excluded_items : [],
+            status: activityData.status || 'draft',
+          });
+
+          const existingActivities = activityForms.filter(af => af.entryId);
+          for (let index = 0; index < existingActivities.length; index++) {
+            const activityForm = existingActivities[index];
+            const activityData = activityForm.data;
+
+            if (!activityData.item_type_id || !activityData.item_id || !activityData.title?.trim()) {
+              throw new Error(`Activity ${index + 1} is missing required fields (item type, item, or title)`);
+            }
+
+            const payload = buildActivityPayload(activityData);
+            const activityEntryId = typeof activityForm.entryId === 'string'
+              ? parseInt(activityForm.entryId, 10)
+              : activityForm.entryId;
+
+            if (!activityEntryId) {
+              throw new Error(`Activity ${index + 1} is missing an entry ID for update.`);
+            }
+
+            try {
+              await apiClient.put(`/itinerary/${activityEntryId}`, payload);
+            } catch (error: any) {
+              throw new Error(`Failed to update activity ${index + 1}: ${error?.message || 'Unknown error'}`);
+            }
+          }
           
-          // Only update activities that are new (don't have entryId) or explicitly modified
-          // For existing activities, we skip them unless they're new
           const newActivities = activityForms.filter(af => !af.entryId);
           
           if (newActivities.length > 0) {
-            // Save only new activities
             const responses = [dayResponse.data || dayResponse];
             for (let index = 0; index < newActivities.length; index++) {
               const activityForm = newActivities[index];
               const activityData = activityForm.data;
               
-              // Validate required fields
               if (!activityData.item_type_id || !activityData.item_id || !activityData.title?.trim()) {
                 throw new Error(`Activity ${index + 1} is missing required fields (item type, item, or title)`);
               }
               
-              const payload = {
-                trip_id: tripId,
-                day: day,
-                day_title: dayTitle,
-                item_type_id: parseInt(activityData.item_type_id!),
-                item_id: parseInt(activityData.item_id!),
-                title: activityData.title.trim(),
-                description: (activityData.description || '').trim(),
-                location: (activityData.location || '').trim(),
-                duration: (activityData.duration || '').trim() || (activityData.start_time && activityData.end_time && activityData.time_type === 'exact' ? calculateDuration(activityData.start_time, activityData.end_time, activityData.time_type) : null),
-                start_time: activityData.start_time || '08:00',
-                end_time: activityData.end_time || '17:00',
-                time_type: activityData.time_type || 'exact',
-                cost: activityData.cost ? parseFloat(activityData.cost) : null,
-                cost_per_person: activityData.cost_per_person !== false,
-                notes: (activityData.notes || '').trim(),
-                included_items: Array.isArray(activityData.included_items) ? activityData.included_items : [],
-                excluded_items: Array.isArray(activityData.excluded_items) ? activityData.excluded_items : [],
-                status: activityData.status || 'draft',
-              };
+              const payload = buildActivityPayload(activityData);
               
               try {
                 const response = await apiClient.post('/itinerary', payload);
                 responses.push(response.data || response);
-                      } catch (error: any) {
-                        throw new Error(`Failed to save activity ${index + 1}: ${error?.message || 'Unknown error'}`);
-                      }
+              } catch (error: any) {
+                throw new Error(`Failed to save activity ${index + 1}: ${error?.message || 'Unknown error'}`);
+              }
             }
             return responses[0];
           }
@@ -304,21 +333,25 @@ export const useItineraryFormSave = ({
                  activityData.title?.trim();
         }).length;
         
+        // Check if it's a single-day trip for dynamic messages
+        const selectedTrip = tripsData?.find((t: any) => t.id.toString() === formData.trip_id);
+        const isSingleDay = selectedTrip?.trip_type === 'single_day';
+        
         if (isEditMode) {
-          // Edit mode messages
+          // Edit mode messages - dynamic based on trip type
           if (validActivitiesCount === 0) {
-            showToast(__('Day updated successfully!', 'Day updated successfully!'), 'success');
+            const message = isSingleDay 
+              ? __('Entry updated successfully!', 'Entry updated successfully!')
+              : __('Day updated successfully!', 'Day updated successfully!');
+            showToast(message, 'success');
           } else {
-            showToast(
-              __('Day and activities updated successfully!', 'Day and activities updated successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`),
-              'success'
-            );
+            const message = isSingleDay
+              ? __('Entry and activities updated successfully!', 'Entry and activities updated successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`)
+              : __('Day and activities updated successfully!', 'Day and activities updated successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`);
+            showToast(message, 'success');
           }
         } else {
-          // Create mode messages - check if it's a single-day trip
-          const selectedTrip = tripsData?.find((t: any) => t.id.toString() === formData.trip_id);
-          const isSingleDay = selectedTrip?.trip_type === 'single_day';
-          
+          // Create mode messages - dynamic based on trip type
           if (validActivitiesCount === 0) {
             const message = isSingleDay 
               ? __('Entry created successfully!', 'Entry created successfully!')
@@ -348,9 +381,15 @@ export const useItineraryFormSave = ({
           });
         }
         
-        // Navigate back to itinerary page
+        // Navigate back to itinerary page with trip_id and day parameters for auto-selection
+        const day = parseInt(formData.day);
+        const tripId = formData.trip_id;
         setTimeout(() => {
-          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary`;
+          const params = new URLSearchParams({
+            trip_id: tripId,
+            day: day.toString(),
+          });
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&${params.toString()}`;
         }, 1500);
         return;
       }

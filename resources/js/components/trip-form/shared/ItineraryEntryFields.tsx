@@ -179,10 +179,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
 
         <div>
           <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-            {__('Entry Title', 'Entry Title')} <span className="text-red-500">*</span>
+            {__('Itinerary Activity Title', 'Itinerary Activity Title')} <span className="text-red-500">*</span>
           </label>
           <HelpText 
-            text={__('A descriptive title for this itinerary entry. Examples: "Arrival in Kathmandu", "Trek to Base Camp".', 'A descriptive title for this itinerary entry. Examples: "Arrival in Kathmandu", "Trek to Base Camp".')}
+            text={__('A descriptive title for this itinerary activity. Examples: "Arrival in Kathmandu", "Trek to Base Camp".', 'A descriptive title for this itinerary activity. Examples: "Arrival in Kathmandu", "Trek to Base Camp".')}
             className="mb-2"
           />
           <Input

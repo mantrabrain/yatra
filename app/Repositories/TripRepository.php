@@ -267,9 +267,9 @@ class TripRepository extends BaseRepository
             foreach ($entries as $entry) {
                 $entryId = (int) $entry->id;
                 
-                // Note: included_items and excluded_items are no longer stored in a separate table
-                $entry->included_items = [];
-                $entry->excluded_items = [];
+                // Decode included/excluded items JSON stored directly on the entry
+                $entry->included_items = $this->decodeAmenityItems($entry->included_items ?? null);
+                $entry->excluded_items = $this->decodeAmenityItems($entry->excluded_items ?? null);
                 
                 // Get images for this entry
                 $images = $wpdb->get_results(
@@ -796,5 +796,26 @@ class TripRepository extends BaseRepository
         );
         
         return $this->wpdb->get_results($query) ?: [];
+    }
+
+    /**
+     * Decode included/excluded items JSON column stored on itinerary entries
+     */
+    private function decodeAmenityItems($value): array
+    {
+        if (empty($value)) {
+            return [];
+        }
+
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return [];
     }
 }

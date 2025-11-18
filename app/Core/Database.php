@@ -693,7 +693,7 @@ class Database
         // Ensure dbDelta function is available
         if (!function_exists('\dbDelta')) {
             if (defined('ABSPATH') && file_exists(ABSPATH . 'wp-admin/includes/upgrade.php')) {
-                require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
             } else {
                 // Fallback: try to find WordPress
                 $wpAdminPath = dirname(dirname(dirname(__DIR__))) . '/wp-admin/includes/upgrade.php';

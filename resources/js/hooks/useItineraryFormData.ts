@@ -142,9 +142,51 @@ export const useItineraryFormData = ({
     enabled: isEditMode && can('yatra_view_trips'),
   });
 
-  // Extract stable primitive values from entryData
-  const entryTripId = useMemo(() => entryData?.trip_id, [entryData?.trip_id]);
-  const entryDay = useMemo(() => entryData?.day, [entryData?.day]);
+  // Extract identifiers from the initially loaded entry (could be activity)
+  const entryDayId = useMemo(() => entryData?.day_id, [entryData?.day_id]);
+
+  // Check if entryData is an activity (has item_type_id and item_id)
+  const isActivityEntry = useMemo(() => {
+    return entryData && 
+           entryData.item_type_id !== null && 
+           entryData.item_type_id !== undefined && 
+           entryData.item_id !== null && 
+           entryData.item_id !== undefined;
+  }, [entryData]);
+
+  // Fetch day entry when editing a day and entryData is an activity
+  const { data: dayEntryData } = useQuery({
+    queryKey: ['day-entry-by-day-id', entryDayId],
+    queryFn: async () => {
+      if (!entryDayId || !isEditDayMode) return null;
+      try {
+        const response = await apiClient.get(`/itinerary/day-entry-by-day-id/${entryDayId}`);
+        const dayEntryId = response?.data?.day_entry_id || response?.day_entry_id || response?.data?.id || response?.id || null;
+        if (dayEntryId) {
+          // Fetch the actual day entry data
+          const entryResponse = await apiClient.get(`/itinerary/${dayEntryId}`);
+          return entryResponse?.data?.data || entryResponse?.data || entryResponse;
+        }
+        return null;
+      } catch (error: any) {
+        console.error('Failed to load day entry:', error);
+        return null;
+      }
+    },
+    enabled: isEditDayMode && !!entryDayId && isActivityEntry && can('yatra_view_trips'),
+  });
+
+  // Determine the effective entry data (day entry when editing a day)
+  const effectiveEntryData = useMemo(() => {
+    if (isEditDayMode && isActivityEntry && dayEntryData) {
+      return dayEntryData;
+    }
+    return entryData;
+  }, [isEditDayMode, isActivityEntry, dayEntryData, entryData]);
+
+  // Extract stable primitive values from the effective entry data
+  const entryTripId = useMemo(() => effectiveEntryData?.trip_id, [effectiveEntryData?.trip_id]);
+  const entryDay = useMemo(() => effectiveEntryData?.day, [effectiveEntryData?.day]);
 
   // Fetch trip data for day editing to get all activities
   const { data: dayTripData } = useQuery({
@@ -194,7 +236,7 @@ export const useItineraryFormData = ({
     isLoadingTrips,
     typesData: typesData || [],
     itemsData: itemsData || [],
-    entryData,
+    entryData: effectiveEntryData,
     isLoadingEntry,
     dayTripData,
     tripDataForDay,

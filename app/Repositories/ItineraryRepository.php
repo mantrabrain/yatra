@@ -558,9 +558,9 @@ class ItineraryRepository extends BaseRepository
             $entry->day_title = $day->title;
         }
 
-        // Note: included_items and excluded_items are no longer stored in a separate table
-        $entry->included_items = [];
-        $entry->excluded_items = [];
+        // Decode included/excluded items JSON columns (stored directly on the entry)
+        $entry->included_items = $this->decodeAmenityItems($entry->included_items ?? null);
+        $entry->excluded_items = $this->decodeAmenityItems($entry->excluded_items ?? null);
 
         // Get images
         $images = $wpdb->get_results(
@@ -592,6 +592,27 @@ class ItineraryRepository extends BaseRepository
         // No need to map from activity_type anymore
 
         return $entry;
+    }
+
+    /**
+     * Decode included/excluded items JSON column
+     */
+    private function decodeAmenityItems($value): array
+    {
+        if (empty($value)) {
+            return [];
+        }
+
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return [];
     }
 
     /**

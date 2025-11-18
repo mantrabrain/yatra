@@ -61,13 +61,15 @@ interface DayGroup {
   trip_title: string;
   day: number;
   day_title?: string;
+  day_id?: number;
   entries: ItineraryEntry[];
 }
 
 const Itinerary: React.FC = () => {
-  // Get trip_id from URL params
+  // Get trip_id and day from URL params
   const urlParams = new URLSearchParams(window.location.search);
   const tripIdParam = urlParams.get('trip_id');
+  const dayParam = urlParams.get('day');
   
   const [tripFilter, setTripFilter] = useState(tripIdParam || '');
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
@@ -256,7 +258,7 @@ const Itinerary: React.FC = () => {
       try {
         const trips = Array.isArray(tripsData) ? tripsData : [];
         const allEntries: ItineraryEntry[] = [];
-        const allDays = new Map<string, { trip_id: number; trip_title: string; day: number; day_title: string }>();
+        const allDays = new Map<string, { trip_id: number; trip_title: string; day: number; day_title: string; day_id?: number }>();
 
         // Fetch itinerary data for the selected trip
         if (!tripFilter) {
@@ -328,6 +330,7 @@ const Itinerary: React.FC = () => {
             for (const day of itineraryDays) {
               const dayNumber = day.day_number || day.day || 1;
               const dayTitle = day.title || day.day_title || '';
+              const dayId = day.id || day.day_id || null;
               const dayKey = `${trip.id}-${dayNumber}`;
               
               // Store day info for grouping later
@@ -337,6 +340,7 @@ const Itinerary: React.FC = () => {
                   trip_title: trip.title || trip.name || '',
                   day: dayNumber,
                   day_title: dayTitle,
+                  day_id: dayId,
                 });
               }
             }
@@ -351,7 +355,7 @@ const Itinerary: React.FC = () => {
         const seen = new Set<string>();
 
         // Add all days first (from allDays map)
-        allDays.forEach((dayInfo: { trip_id: number; trip_title: string; day: number; day_title: string }, key: string) => {
+        allDays.forEach((dayInfo: { trip_id: number; trip_title: string; day: number; day_title: string; day_id?: number }, key: string) => {
           if (!seen.has(key)) {
             seen.add(key);
             grouped.push({
@@ -359,6 +363,7 @@ const Itinerary: React.FC = () => {
               trip_title: dayInfo.trip_title,
               day: dayInfo.day,
               day_title: dayInfo.day_title,
+              day_id: dayInfo.day_id,
               entries: allEntries.filter(e => e.trip_id === dayInfo.trip_id && e.day === dayInfo.day),
             });
           }
@@ -399,13 +404,38 @@ const Itinerary: React.FC = () => {
     refetchOnReconnect: true, // Refetch when network reconnects
   });
 
-  // Auto-expand first day when data loads
+  // Auto-expand day from URL or first day when data loads
   useEffect(() => {
     if (data && data.length > 0 && expandedDays.size === 0) {
-      const firstDay = data[0];
-      setExpandedDays(new Set([`${firstDay.trip_id}-${firstDay.day}`]));
+      // If day parameter is in URL, expand that specific day
+      if (dayParam && tripIdParam) {
+        const dayNumber = parseInt(dayParam);
+        const tripId = parseInt(tripIdParam);
+        const targetDay = data.find((dg: DayGroup) => dg.trip_id === tripId && dg.day === dayNumber);
+        
+        if (targetDay) {
+          const dayKey = `${tripId}-${dayNumber}`;
+          setExpandedDays(new Set([dayKey]));
+          setSelectedDay({ tripId, day: dayNumber });
+          // Scroll to the day after a short delay to ensure it's rendered
+          setTimeout(() => {
+            const dayElement = document.querySelector(`[data-day-key="${dayKey}"]`);
+            if (dayElement) {
+              dayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 300);
+        } else {
+          // If target day not found, expand first day as fallback
+          const firstDay = data[0];
+          setExpandedDays(new Set([`${firstDay.trip_id}-${firstDay.day}`]));
+        }
+      } else {
+        // No day parameter, expand first day
+        const firstDay = data[0];
+        setExpandedDays(new Set([`${firstDay.trip_id}-${firstDay.day}`]));
+      }
     }
-  }, [data, expandedDays.size]);
+  }, [data, expandedDays.size, dayParam, tripIdParam]);
 
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
@@ -575,59 +605,103 @@ const Itinerary: React.FC = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${entry.id}`;
   };
 
-  const handleEditDay = (tripId: number, day: number) => {
-    // Navigate to edit day form - find the day entry (with null item_type_id and item_id)
+  const handleEditDay = async (tripId: number, day: number) => {
+    const redirectToCreate = () => {
+      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=day`;
+    };
+
+    const redirectToEdit = (entryId: number) => {
+      const params = new URLSearchParams({
+        action: 'edit',
+        id: entryId.toString(),
+        mode: 'day',
+        trip_id: tripId.toString(),
+        day: day.toString(),
+      });
+      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&${params.toString()}`;
+    };
+
     const dayGroup = dayGroups.find((dg: DayGroup) => dg.trip_id === tripId && dg.day === day);
-    if (dayGroup && dayGroup.entries.length > 0) {
-      // Find the day entry (the one with null/undefined item_type_id and item_id)
-      // Check explicitly for null/undefined, not just falsy values (to avoid matching 0)
+
+    if (!dayGroup) {
+      redirectToCreate();
+      setDayMenuOpen(null);
+      return;
+    }
+
+    if (dayGroup.day_id) {
+      try {
+        const response = await apiClient.get(`/itinerary/day-entry-by-day-id/${dayGroup.day_id}`);
+        const dayEntryId = response?.data?.day_entry_id || response?.day_entry_id || response?.data?.id || response?.id || null;
+
+        if (dayEntryId) {
+          redirectToEdit(dayEntryId);
+          setDayMenuOpen(null);
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to fetch day entry for editing:', error);
+      }
+    }
+
+    if (dayGroup.entries.length > 0) {
       const dayEntry = dayGroup.entries.find((entry: any) => 
         (entry.item_type_id === null || entry.item_type_id === undefined) && 
         (entry.item_id === null || entry.item_id === undefined)
       );
-      
+
       if (dayEntry && dayEntry.id) {
-        // Use the day entry's ID for edit mode
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${dayEntry.id}&mode=day`;
-      } else {
-        // No day entry found, but day exists - use first activity's ID to get day info
-        // The form will detect it's day mode and load day info from the day metadata
-        const firstEntry = dayGroup.entries[0];
-        if (firstEntry && firstEntry.id) {
-          // Navigate to edit mode with first entry's ID, but mode=day will tell form to edit day
-          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${firstEntry.id}&mode=day&trip_id=${tripId}&day=${day}`;
-        } else {
-          // Fallback to create mode
-          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=day`;
-        }
+        redirectToEdit(dayEntry.id);
+        setDayMenuOpen(null);
+        return;
       }
-    } else {
-      // No entries yet, navigate to create day form with existing day info
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=day`;
+
+      const firstEntry = dayGroup.entries[0];
+      if (firstEntry && firstEntry.id) {
+        redirectToEdit(firstEntry.id);
+        setDayMenuOpen(null);
+        return;
+      }
     }
+
+    redirectToCreate();
     setDayMenuOpen(null);
   };
 
-  const handleDeleteDay = (tripId: number, day: number) => {
-    // Find the day entry to delete
+  const handleDeleteDay = async (tripId: number, day: number) => {
+    // Find the day group
     const dayGroup = dayGroups.find((dg: DayGroup) => dg.trip_id === tripId && dg.day === day);
-    if (dayGroup && dayGroup.entries.length > 0) {
-      // Find the day entry (the one with null/undefined item_type_id and item_id)
-      const dayEntry = dayGroup.entries.find((entry: any) => 
-        (entry.item_type_id === null || entry.item_type_id === undefined) && 
-        (entry.item_id === null || entry.item_id === undefined)
-      );
-      
-      if (dayEntry && dayEntry.id) {
-        // Mark this as a day deletion for custom message
-        const dayEntryWithFlag = { ...dayEntry, _isDayDeletion: true, _dayNumber: day } as ItineraryEntry & { _isDayDeletion?: boolean; _dayNumber?: number };
-        setDeleteConfirm({ isOpen: true, entry: dayEntryWithFlag });
-      } else {
-        // No day entry found, but day exists - show error
-        showToast(__('Day entry not found', 'Day entry not found'), 'error');
+    
+    if (!dayGroup) {
+      showToast(__('Day not found', 'Day not found'), 'error');
+      setDayMenuOpen(null);
+      return;
+    }
+
+    // If we have day_id, fetch the day entry ID from backend
+    if (dayGroup.day_id) {
+      try {
+        const response = await apiClient.get(`/itinerary/day-entry-by-day-id/${dayGroup.day_id}`);
+        const dayEntryId = response?.data?.day_entry_id || response?.day_entry_id || response?.data?.id || response?.id || null;
+        
+        if (dayEntryId) {
+          const dayEntryForDeletion = {
+            id: dayEntryId,
+            trip_id: tripId,
+            day: day,
+            _isDayDeletion: true,
+            _dayNumber: day,
+          } as ItineraryEntry & { _isDayDeletion?: boolean; _dayNumber?: number };
+          
+          setDeleteConfirm({ isOpen: true, entry: dayEntryForDeletion });
+        } else {
+          showToast(__('Day entry not found', 'Day entry not found'), 'error');
+        }
+      } catch (error: any) {
+        showToast(__('Failed to fetch day entry', 'Failed to fetch day entry'), 'error');
       }
     } else {
-      showToast(__('Day not found', 'Day not found'), 'error');
+      showToast(__('Day ID not available', 'Day ID not available'), 'error');
     }
     setDayMenuOpen(null);
   };
@@ -971,7 +1045,7 @@ const Itinerary: React.FC = () => {
               });
 
               return (
-              <Card key={key} className="overflow-visible">
+              <Card key={key} className="overflow-visible" data-day-key={key}>
                 <CardContent className="p-0 overflow-visible">
                   {/* Day Header */}
                   <div 
