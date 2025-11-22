@@ -22,6 +22,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         app: path.resolve(__dirname, 'resources/js/main.tsx'),
+        'account-page': path.resolve(__dirname, 'resources/js/account-page.tsx'),
       },
       output: {
         entryFileNames: 'js/[name].js',
@@ -32,9 +33,30 @@ export default defineConfig({
           }
           return 'assets/[name]-[hash][extname]';
         },
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'query-vendor': ['@tanstack/react-query'],
+        manualChunks(id) {
+          // Separate chunking for admin app vs frontend account page
+          if (id.includes('account-page')) {
+            // Frontend account page - minimal dependencies
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'account-react-vendor';
+              }
+              if (id.includes('@tanstack/react-query')) {
+                return 'account-query-vendor';
+              }
+            }
+            return null;
+          }
+          // Admin app - full dependencies
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('@tanstack/react-query')) {
+              return 'query-vendor';
+            }
+          }
+          return null;
         },
       },
     },

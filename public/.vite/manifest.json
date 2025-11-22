@@ -1,14 +1,31 @@
 {
-  "_query-vendor-CYjVNHJ6.js": {
-    "file": "js/query-vendor-CYjVNHJ6.js",
-    "name": "query-vendor",
+  "_index-!~{002}~.js": {
+    "file": "css/index.css",
+    "src": "_index-!~{002}~.js"
+  },
+  "_index-Ce6YHESX.js": {
+    "file": "js/index-Ce6YHESX.js",
+    "name": "index",
     "imports": [
-      "_react-vendor-BbIXT3su.js"
+      "_react-vendor-hhdpRrBt.js"
+    ],
+    "css": [
+      "css/index.css"
     ]
   },
-  "_react-vendor-BbIXT3su.js": {
-    "file": "js/react-vendor-BbIXT3su.js",
+  "_react-vendor-hhdpRrBt.js": {
+    "file": "js/react-vendor-hhdpRrBt.js",
     "name": "react-vendor"
+  },
+  "resources/js/account-page.tsx": {
+    "file": "js/account-page.js",
+    "name": "account-page",
+    "src": "resources/js/account-page.tsx",
+    "isEntry": true,
+    "imports": [
+      "_react-vendor-hhdpRrBt.js",
+      "_index-Ce6YHESX.js"
+    ]
   },
   "resources/js/main.tsx": {
     "file": "js/app.js",
@@ -16,11 +33,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_query-vendor-CYjVNHJ6.js",
-      "_react-vendor-BbIXT3su.js"
-    ],
-    "css": [
-      "css/app.css"
+      "_react-vendor-hhdpRrBt.js",
+      "_index-Ce6YHESX.js"
     ]
   }
 }

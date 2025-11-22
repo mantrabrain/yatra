@@ -1682,13 +1682,34 @@ onChange={handleFieldChange}
                 label={__('Customer Account Page', 'Customer Account Page')}
                 description={__('URL slug for customer account page (e.g., /my-account)', 'URL slug for customer account page (e.g., /my-account)')}
               >
-                <Input
-                  id="customer_account_page"
-                  value={formData.customer_account_page}
-                  name='customer_account_page'
-                      onChange={handleFieldChange}
-                  placeholder="/my-account"
-                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="customer_account_page"
+                    value={formData.customer_account_page}
+                    name='customer_account_page'
+                    onChange={handleFieldChange}
+                    placeholder="/my-account"
+                    className="flex-1"
+                  />
+                  {formData.customer_account_page && (() => {
+                    const siteUrl = (window as any).yatraAdmin?.siteUrl || '';
+                    const slug = formData.customer_account_page.trim();
+                    // Ensure slug starts with / for proper URL construction
+                    const accountSlug = slug.startsWith('/') ? slug : '/' + slug;
+                    // Construct URL: siteUrl + slug (WordPress will handle permalink structure)
+                    const accountUrl = siteUrl.replace(/\/$/, '') + accountSlug;
+                    return (
+                      <a
+                        href={accountUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 whitespace-nowrap border border-blue-300 dark:border-blue-600 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                      >
+                        {__('View Page', 'View Page')} →
+                      </a>
+                    );
+                  })()}
+                </div>
               </FormField>
 
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">

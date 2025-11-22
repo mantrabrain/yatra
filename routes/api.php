@@ -29,6 +29,7 @@ use Yatra\Controllers\AvailabilityController;
 use Yatra\Controllers\ItineraryController;
 use Yatra\Controllers\MaintenanceController;
 use Yatra\Controllers\ModuleController;
+use Yatra\Controllers\CustomerController;
 
 // Register Trip routes
 if (class_exists('Yatra\Controllers\TripController')) {
@@ -321,6 +322,27 @@ if (class_exists('Yatra\Controllers\ModuleController')) {
     } catch (\Exception $e) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Yatra: Failed to register Module routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
+
+// Register Customer routes
+if (class_exists('Yatra\Controllers\CustomerController')) {
+    try {
+        $customer_controller = new CustomerController();
+        $customer_controller->register_routes();
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $customer_routes = array_filter($routes, function($key) {
+                return strpos($key, '/customers') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Customer routes registered: ' . print_r(array_keys($customer_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Customer routes: ' . $e->getMessage());
             error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
         }
     }

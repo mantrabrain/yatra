@@ -347,12 +347,12 @@ const Itinerary: React.FC = () => {
           } catch (error: any) {
             console.error(`Failed to fetch itinerary for trip ${trip.id}:`, error);
           }
-        }
+      }
 
-        // Group by trip and day
+      // Group by trip and day
         // First, create groups from all days (even if they have no activities)
-        const grouped: DayGroup[] = [];
-        const seen = new Set<string>();
+      const grouped: DayGroup[] = [];
+      const seen = new Set<string>();
 
         // Add all days first (from allDays map)
         allDays.forEach((dayInfo: { trip_id: number; trip_title: string; day: number; day_title: string; day_id?: number }, key: string) => {
@@ -371,26 +371,26 @@ const Itinerary: React.FC = () => {
 
         // Also add any days that have entries but weren't in allDays (fallback)
         allEntries.forEach(entry => {
-          const key = `${entry.trip_id}-${entry.day}`;
-          if (!seen.has(key)) {
-            seen.add(key);
-            grouped.push({
-              trip_id: entry.trip_id,
-              trip_title: entry.trip_title,
-              day: entry.day,
-              day_title: entry.day_title,
+        const key = `${entry.trip_id}-${entry.day}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          grouped.push({
+            trip_id: entry.trip_id,
+            trip_title: entry.trip_title,
+            day: entry.day,
+            day_title: entry.day_title,
               entries: allEntries.filter(e => e.trip_id === entry.trip_id && e.day === entry.day),
-            });
-          }
-        });
+          });
+        }
+      });
 
-        // Sort by trip_id and day
-        grouped.sort((a, b) => {
-          if (a.trip_id !== b.trip_id) return a.trip_id - b.trip_id;
-          return a.day - b.day;
-        });
+      // Sort by trip_id and day
+      grouped.sort((a, b) => {
+        if (a.trip_id !== b.trip_id) return a.trip_id - b.trip_id;
+        return a.day - b.day;
+      });
 
-        return grouped;
+      return grouped;
       } catch (error: any) {
         showToast(error?.message || __('Failed to load itinerary', 'Failed to load itinerary'), 'error');
         return [];
@@ -847,12 +847,12 @@ const Itinerary: React.FC = () => {
             const buttonLabel = isSingleDay ? __('Add Entry', 'Add Entry') : __('Add Day', 'Add Day');
             
             return (
-              <ConditionalRender capability="yatra_edit_trips">
-                <Button onClick={handleAddDay} className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
-                  <Plus className="w-4 h-4" />
+        <ConditionalRender capability="yatra_edit_trips">
+          <Button onClick={handleAddDay} className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
+            <Plus className="w-4 h-4" />
                   {buttonLabel}
-                </Button>
-              </ConditionalRender>
+          </Button>
+        </ConditionalRender>
             );
           })()}
         </div>
@@ -955,7 +955,7 @@ const Itinerary: React.FC = () => {
                       <div className="flex-1">
                         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse"></div>
                         <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
-                      </div>
+            </div>
                     </div>
                   </div>
                 </CardContent>
@@ -1066,8 +1066,8 @@ const Itinerary: React.FC = () => {
                     </ConditionalRender>
                     <div 
                       className="flex items-center gap-4 flex-1 cursor-pointer"
-                      onClick={() => toggleDay(dayGroup.trip_id, dayGroup.day)}
-                    >
+                    onClick={() => toggleDay(dayGroup.trip_id, dayGroup.day)}
+                  >
                       <div className="flex items-center gap-3">
                         <div className="px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-medium">
                           {__('Day', 'Day')} {dayGroup.day}
@@ -1106,12 +1106,12 @@ const Itinerary: React.FC = () => {
                     <div className="flex items-center gap-2 relative">
                       <ConditionalRender capability="yatra_edit_trips">
                         <div className="relative">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={(e) => {
-                              e.stopPropagation();
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
                               if (dayMenuOpen && dayMenuOpen.tripId === dayGroup.trip_id && dayMenuOpen.day === dayGroup.day) {
                                 setDayMenuOpen(null);
                               } else {
@@ -1119,9 +1119,9 @@ const Itinerary: React.FC = () => {
                               }
                             }}
                             title={__('Day Options', 'Day Options')}
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </Button>
                           {dayMenuOpen && dayMenuOpen.tripId === dayGroup.trip_id && dayMenuOpen.day === dayGroup.day && (
                             <div 
                               className="absolute right-0 top-10 z-50 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1"
@@ -1187,10 +1187,10 @@ const Itinerary: React.FC = () => {
                               const colorClass = colorClasses[option.typeColor] || colorClasses.blue;
                               
                               return (
-                                <Button
+                          <Button
                                   key={option.typeId}
-                                  variant="outline"
-                                  size="sm"
+                            variant="outline"
+                            size="sm"
                                   onClick={() => handleQuickAdd(option.typeId)}
                                   className={`flex items-center gap-2 ${colorClass}`}
                                   style={{
@@ -1210,7 +1210,7 @@ const Itinerary: React.FC = () => {
                                     />
                                   )}
                                   {option.typeName}
-                                </Button>
+                          </Button>
                               );
                             })
                           ) : (
