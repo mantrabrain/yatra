@@ -178,6 +178,9 @@ class AppServiceProvider extends ServiceProvider
             
             // Add critical inline styles to ensure layout works
             $inline_css = '
+                html {
+                    font-size: 1em !important;
+                }
                 #yatra-account-page-root .flex.flex-col.lg\\:flex-row {
                     display: flex !important;
                 }
