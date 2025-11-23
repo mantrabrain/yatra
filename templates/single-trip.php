@@ -102,6 +102,11 @@ add_filter('wp_title', function($title) use ($trip_data) {
 get_header();
 ?>
 
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <div class="yatra-single-trip">
     <!-- Hero Section -->
     <div class="yatra-trip-hero-new">
@@ -768,7 +773,7 @@ get_header();
                         <div class="yatra-booking-field-icon">
                             <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
                         </div>
-                        <input type="date" id="travel_date" name="travel_date" class="yatra-booking-select" placeholder="Select date" required>
+                        <input type="text" id="travel_date" name="travel_date" class="yatra-booking-select yatra-datepicker" placeholder="Select date" readonly required>
                         <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
@@ -778,7 +783,7 @@ get_header();
                         Make Enquiry
                     </button>
 
-                    <button type="submit" class="yatra-booking-button">
+                    <button type="button" class="yatra-booking-button">
                         Check availability
                     </button>
 
