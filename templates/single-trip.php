@@ -63,6 +63,13 @@ function yatra_svg_icon($name, $class = 'yatra-icon') {
         'truck' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
         'shield' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>',
         'info' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+        'phone' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>',
+        'mail' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>',
+        'clock' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+        'credit-card' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>',
+        'alert' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
+        'cloud' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>',
+        'tag' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>',
         'chevron-down' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>',
         'book-open' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>',
         'heart' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>',
@@ -654,6 +661,81 @@ get_header();
                 </ul>
             </section>
 
+            <!-- Weather & Climate Section -->
+            <section class="yatra-trip-section">
+                <h2 class="yatra-trip-section-title">
+                    <?php echo yatra_svg_icon('cloud', 'yatra-trip-section-title-icon'); ?>
+                    Weather & Climate
+                </h2>
+                <div class="yatra-weather-info">
+                    <div class="yatra-weather-card">
+                        <h3 class="yatra-weather-season">Best Time to Visit</h3>
+                        <p class="yatra-weather-desc">The best times for the Everest Base Camp trek are during the pre-monsoon (March to May) and post-monsoon (September to November) seasons. These periods offer clear skies, stable weather, and excellent visibility.</p>
+                    </div>
+                    <div class="yatra-weather-details">
+                        <div class="yatra-weather-detail-item">
+                            <div class="yatra-weather-detail-label">Spring (Mar-May)</div>
+                            <div class="yatra-weather-detail-value">Mild temperatures, clear skies, blooming rhododendrons</div>
+                        </div>
+                        <div class="yatra-weather-detail-item">
+                            <div class="yatra-weather-detail-label">Autumn (Sep-Nov)</div>
+                            <div class="yatra-weather-detail-value">Crisp air, excellent visibility, stable weather</div>
+                        </div>
+                        <div class="yatra-weather-detail-item">
+                            <div class="yatra-weather-detail-label">Temperature Range</div>
+                            <div class="yatra-weather-detail-value">-10°C to 15°C (varies with altitude)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Packing List Section -->
+            <section class="yatra-trip-section">
+                <h2 class="yatra-trip-section-title">
+                    <?php echo yatra_svg_icon('tag', 'yatra-trip-section-title-icon'); ?>
+                    What to Pack
+                </h2>
+                <div class="yatra-packing-list">
+                    <div class="yatra-packing-category">
+                        <h3 class="yatra-packing-category-title">Essential Clothing</h3>
+                        <ul class="yatra-packing-items">
+                            <li>Base layers (thermal underwear)</li>
+                            <li>Fleece jacket and pants</li>
+                            <li>Down jacket (rated to -20°C)</li>
+                            <li>Waterproof jacket and pants</li>
+                            <li>Trekking pants (2-3 pairs)</li>
+                            <li>Hiking boots (broken in)</li>
+                            <li>Woolen socks (4-5 pairs)</li>
+                            <li>Gloves and warm hat</li>
+                        </ul>
+                    </div>
+                    <div class="yatra-packing-category">
+                        <h3 class="yatra-packing-category-title">Equipment & Accessories</h3>
+                        <ul class="yatra-packing-items">
+                            <li>Sleeping bag (rated to -20°C)</li>
+                            <li>Trekking poles (highly recommended)</li>
+                            <li>Headlamp with extra batteries</li>
+                            <li>Water bottles or hydration system</li>
+                            <li>Daypack (30-40L)</li>
+                            <li>Sunglasses and sunscreen (SPF 50+)</li>
+                            <li>First aid kit and personal medications</li>
+                            <li>Camera and extra memory cards</li>
+                        </ul>
+                    </div>
+                    <div class="yatra-packing-category">
+                        <h3 class="yatra-packing-category-title">Documents & Money</h3>
+                        <ul class="yatra-packing-items">
+                            <li>Valid passport (6 months validity)</li>
+                            <li>Travel insurance documents</li>
+                            <li>Nepal visa (obtainable on arrival)</li>
+                            <li>Cash (USD recommended for tips and extras)</li>
+                            <li>Credit/debit cards</li>
+                            <li>Emergency contact information</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
             <!-- Testimonials Section -->
             <section class="yatra-trip-section">
                 <h2 class="yatra-trip-section-title">
@@ -696,11 +778,82 @@ get_header();
                     </div>
                 </div>
             </section>
+
+            <!-- Similar Trips Section -->
+            <section class="yatra-trip-section">
+                <h2 class="yatra-trip-section-title">
+                    <?php echo yatra_svg_icon('mountain', 'yatra-trip-section-title-icon'); ?>
+                    Similar Adventures
+                </h2>
+                <div class="yatra-similar-trips">
+                    <div class="yatra-similar-trip-card">
+                        <div class="yatra-similar-trip-image">
+                            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80" alt="Annapurna Base Camp">
+                        </div>
+                        <div class="yatra-similar-trip-content">
+                            <h3 class="yatra-similar-trip-title">Annapurna Base Camp Trek</h3>
+                            <div class="yatra-similar-trip-meta">
+                                <span>12 Days</span>
+                                <span>•</span>
+                                <span>Moderate</span>
+                                <span>•</span>
+                                <span><?php echo yatra_format_price(1450, $trip_data->currency); ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="yatra-similar-trip-card">
+                        <div class="yatra-similar-trip-image">
+                            <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80" alt="Langtang Valley">
+                        </div>
+                        <div class="yatra-similar-trip-content">
+                            <h3 class="yatra-similar-trip-title">Langtang Valley Trek</h3>
+                            <div class="yatra-similar-trip-meta">
+                                <span>10 Days</span>
+                                <span>•</span>
+                                <span>Moderate</span>
+                                <span>•</span>
+                                <span><?php echo yatra_format_price(1200, $trip_data->currency); ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="yatra-similar-trip-card">
+                        <div class="yatra-similar-trip-image">
+                            <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80" alt="Manaslu Circuit">
+                        </div>
+                        <div class="yatra-similar-trip-content">
+                            <h3 class="yatra-similar-trip-title">Manaslu Circuit Trek</h3>
+                            <div class="yatra-similar-trip-meta">
+                                <span>16 Days</span>
+                                <span>•</span>
+                                <span>Challenging</span>
+                                <span>•</span>
+                                <span><?php echo yatra_format_price(1850, $trip_data->currency); ?></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <!-- Sidebar - Booking Card -->
         <aside class="yatra-trip-sidebar" id="booking">
             <div class="yatra-booking-card">
+                <!-- Instant Confirmation Badge -->
+                <div class="yatra-booking-badge">
+                    <div class="yatra-booking-badge-icon">
+                        <?php echo yatra_svg_icon('check', 'yatra-icon-xs'); ?>
+                    </div>
+                    <span class="yatra-booking-badge-text">Instant Confirmation</span>
+                </div>
+
+                <!-- Availability Alert -->
+                <div class="yatra-booking-availability">
+                    <div class="yatra-booking-availability-icon">
+                        <?php echo yatra_svg_icon('alert', 'yatra-icon-xs'); ?>
+                    </div>
+                    <span class="yatra-booking-availability-text">Only <strong>3 spots left</strong> for March 2024</span>
+                </div>
+
                 <div class="yatra-booking-price">
                     <div class="yatra-booking-price-from">
                         <?php if ($trip_data->original_price > $trip_data->sale_price): ?>
@@ -713,6 +866,12 @@ get_header();
                         <span class="yatra-booking-price-amount"><?php echo yatra_format_price($trip_data->sale_price, $trip_data->currency); ?></span>
                         <span class="yatra-booking-price-label">per person</span>
                     </div>
+                </div>
+
+                <!-- Total Price Display (Dynamic) -->
+                <div class="yatra-booking-total" id="booking-total" style="display: none;">
+                    <div class="yatra-booking-total-label">Total</div>
+                    <div class="yatra-booking-total-amount" id="total-amount"><?php echo yatra_format_price($trip_data->sale_price, $trip_data->currency); ?></div>
                 </div>
 
                 <form class="yatra-booking-form">
@@ -805,6 +964,35 @@ get_header();
                                 <div class="yatra-booking-feature-title">Reserve now & pay later</div>
                                 <div class="yatra-booking-feature-desc">Keep your travel plans flexible — book your spot and pay nothing today. <a href="#" class="yatra-booking-feature-link">Read more</a></div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="yatra-booking-payment-methods">
+                        <div class="yatra-booking-payment-label">
+                            <?php echo yatra_svg_icon('credit-card', 'yatra-icon-xs'); ?>
+                            <span>Secure Payment</span>
+                        </div>
+                        <div class="yatra-booking-payment-icons">
+                            <span class="yatra-payment-icon" title="Visa">Visa</span>
+                            <span class="yatra-payment-icon" title="Mastercard">MC</span>
+                            <span class="yatra-payment-icon" title="PayPal">PayPal</span>
+                            <span class="yatra-payment-icon" title="Stripe">Stripe</span>
+                        </div>
+                    </div>
+
+                    <!-- Contact Support -->
+                    <div class="yatra-booking-support">
+                        <div class="yatra-booking-support-title">Need Help?</div>
+                        <div class="yatra-booking-support-options">
+                            <a href="tel:+1234567890" class="yatra-booking-support-item">
+                                <?php echo yatra_svg_icon('phone', 'yatra-icon-xs'); ?>
+                                <span>Call Us</span>
+                            </a>
+                            <a href="mailto:support@yatra.com" class="yatra-booking-support-item">
+                                <?php echo yatra_svg_icon('mail', 'yatra-icon-xs'); ?>
+                                <span>Email Us</span>
+                            </a>
                         </div>
                     </div>
                 </form>
