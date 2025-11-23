@@ -79,6 +79,7 @@ type SettingsSection =
   | 'currency'
   | 'notification'
   | 'integration'
+  | 'permalink'
   | 'advanced';
 
 interface PaymentGatewayConfig {
@@ -214,6 +215,11 @@ interface SettingsData {
   recaptcha_site_key: string;
   recaptcha_secret_key: string;
   
+  // Permalink Settings
+  trip_base: string;
+  destination_base: string;
+  activity_base: string;
+  
   // Advanced Settings
   debug_mode: boolean;
   enable_logging: boolean;
@@ -232,7 +238,7 @@ const Settings: React.FC = () => {
   const getInitialActiveSection = (): SettingsSection => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('yatra_settings_active_section');
-      if (saved && ['general', 'booking', 'payment', 'email', 'trip', 'customer', 'review', 'tax', 'currency', 'notification', 'integration', 'advanced'].includes(saved)) {
+      if (saved && ['general', 'booking', 'payment', 'email', 'trip', 'customer', 'review', 'tax', 'currency', 'notification', 'integration', 'permalink', 'advanced'].includes(saved)) {
         return saved as SettingsSection;
       }
     }
@@ -409,6 +415,9 @@ const Settings: React.FC = () => {
         recaptcha_enabled: false,
         recaptcha_site_key: '',
         recaptcha_secret_key: '',
+        trip_base: 'trip',
+        destination_base: 'destination',
+        activity_base: 'activity',
         debug_mode: false,
         enable_logging: false,
         cache_enabled: true,
@@ -497,6 +506,20 @@ const Settings: React.FC = () => {
     },
   });
 
+  // Flush rewrite rules mutation - must be at top level
+  const flushRewriteRulesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiClient.post('/settings/flush-rewrite-rules');
+      return response;
+    },
+    onSuccess: () => {
+      showToast(__('Rewrite rules flushed successfully', 'Rewrite rules flushed successfully'), 'success');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to flush rewrite rules', 'Failed to flush rewrite rules'), 'error');
+    },
+  });
+
   const handleSave = () => {
     if (formData) {
       setIsSaving(true);
@@ -528,6 +551,7 @@ const Settings: React.FC = () => {
     { id: 'currency' as SettingsSection, label: __('Currency', 'Currency'), icon: Globe },
     { id: 'notification' as SettingsSection, label: __('Notification', 'Notification'), icon: Bell },
     { id: 'integration' as SettingsSection, label: __('Integration', 'Integration'), icon: Plug },
+    { id: 'permalink' as SettingsSection, label: __('Permalink', 'Permalink'), icon: Globe },
     { id: 'advanced' as SettingsSection, label: __('Advanced', 'Advanced'), icon: Shield },
   ];
 
@@ -2264,6 +2288,113 @@ onChange={handleFieldChange}
                   </FormField>
                 </>
               )}
+            </div>
+          </div>
+        );
+
+      case 'permalink':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+                {__('Permalink Settings', 'Permalink Settings')}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                {__('Configure URL slugs for your Yatra content types. These settings control how your trips, destinations, and activities appear in URLs.', 'Configure URL slugs for your Yatra content types. These settings control how your trips, destinations, and activities appear in URLs.')}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <FormField
+                id="trip_base"
+                label={__('Trip Base', 'Trip Base')}
+                description={__('URL slug for trip single pages (e.g., "trip" will create URLs like /trip/everest-base-camp)', 'URL slug for trip single pages (e.g., "trip" will create URLs like /trip/everest-base-camp)')}
+              >
+                <Input
+                  id="trip_base"
+                  name="trip_base"
+                  value={formData.trip_base || 'trip'}
+                  onChange={handleFieldChange}
+                  placeholder="trip"
+                  className="font-mono"
+                />
+                {formData.trip_base && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {__('Example URL:', 'Example URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">/{formData.trip_base || 'trip'}/trip-name</code>
+                  </p>
+                )}
+              </FormField>
+
+              <FormField
+                id="destination_base"
+                label={__('Destination Base', 'Destination Base')}
+                description={__('URL slug for destination archive pages (e.g., "destination" will create URLs like /destination/nepal)', 'URL slug for destination archive pages (e.g., "destination" will create URLs like /destination/nepal)')}
+              >
+                <Input
+                  id="destination_base"
+                  name="destination_base"
+                  value={formData.destination_base || 'destination'}
+                  onChange={handleFieldChange}
+                  placeholder="destination"
+                  className="font-mono"
+                />
+                {formData.destination_base && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {__('Example URL:', 'Example URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">/{formData.destination_base || 'destination'}/nepal</code>
+                  </p>
+                )}
+              </FormField>
+
+              <FormField
+                id="activity_base"
+                label={__('Activity Base', 'Activity Base')}
+                description={__('URL slug for activity archive pages (e.g., "activity" will create URLs like /activity/trekking)', 'URL slug for activity archive pages (e.g., "activity" will create URLs like /activity/trekking)')}
+              >
+                <Input
+                  id="activity_base"
+                  name="activity_base"
+                  value={formData.activity_base || 'activity'}
+                  onChange={handleFieldChange}
+                  placeholder="activity"
+                  className="font-mono"
+                />
+                {formData.activity_base && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {__('Example URL:', 'Example URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">/{formData.activity_base || 'activity'}/trekking</code>
+                  </p>
+                )}
+              </FormField>
+
+            </div>
+
+            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-start gap-2">
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 text-sm text-blue-800 dark:text-blue-200">
+                  <p className="font-medium mb-1">{__('Important:', 'Important:')}</p>
+                  <p className="mb-3">{__('After changing permalink settings, you must flush rewrite rules for the changes to take effect.', 'After changing permalink settings, you must flush rewrite rules for the changes to take effect.')}</p>
+                  <Button
+                    type="button"
+                    onClick={() => flushRewriteRulesMutation.mutate()}
+                    disabled={flushRewriteRulesMutation.isPending}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    {flushRewriteRulesMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {__('Flushing...', 'Flushing...')}
+                      </>
+                    ) : (
+                      <>
+                        <Globe className="w-4 h-4" />
+                        {__('Flush Rewrite Rules', 'Flush Rewrite Rules')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         );

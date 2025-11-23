@@ -300,8 +300,34 @@ const Trips: React.FC = () => {
     }
   };
 
+  // Fetch trip_base setting for permalink
+  const { data: settings } = useQuery({
+    queryKey: ['settings'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/settings');
+        return response;
+      } catch (error) {
+        return null;
+      }
+    },
+    enabled: can('manage_yatra'),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
   const handleView = (trip: Trip) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=view&id=${trip.id}`;
+    const siteUrl = window.yatraAdmin?.siteUrl || '';
+    const tripBase = settings?.trip_base || 'trip';
+    const tripSlug = trip.slug || '';
+    
+    if (!tripSlug) {
+      showToast(__('Trip slug is missing', 'Trip slug is missing'), 'error');
+      return;
+    }
+    
+    // Construct URL: domain.com/tripbase/tripslug
+    const tripUrl = `${siteUrl.replace(/\/$/, '')}/${tripBase}/${tripSlug}`;
+    window.open(tripUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleCreateTrip = () => {

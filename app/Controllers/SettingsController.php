@@ -134,6 +134,11 @@ class SettingsController extends BaseController
         'recaptcha_site_key' => '',
         'recaptcha_secret_key' => '',
         
+        // Permalink Settings
+        'trip_base' => 'trip',
+        'destination_base' => 'destination',
+        'activity_base' => 'activity',
+        
         // Advanced Settings
         'debug_mode' => false,
         'enable_logging' => false,
@@ -157,6 +162,15 @@ class SettingsController extends BaseController
             [
                 'methods' => \WP_REST_Server::EDITABLE,
                 'callback' => [$this, 'update_settings'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
+        // Flush rewrite rules endpoint
+        register_rest_route($namespace, '/' . $base . '/flush-rewrite-rules', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'flush_rewrite_rules'],
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
@@ -260,6 +274,14 @@ class SettingsController extends BaseController
                         'updated' => $updated,
                     ]
                 );
+            }
+
+            // Flush rewrite rules if permalink settings were updated
+            if (in_array('trip_base', $updated, true) || 
+                in_array('destination_base', $updated, true) || 
+                in_array('activity_base', $updated, true)) {
+                // Use hard flush to ensure rules are saved to database
+                flush_rewrite_rules(true);
             }
 
             return $this->success_response([
@@ -457,6 +479,23 @@ class SettingsController extends BaseController
             }
         }
         return $sanitized;
+    }
+
+    /**
+     * Flush rewrite rules
+     */
+    public function flush_rewrite_rules(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            // Flush rewrite rules
+            flush_rewrite_rules(true);
+
+            return $this->success_response([
+                'message' => 'Rewrite rules flushed successfully',
+            ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
     }
 }
 
