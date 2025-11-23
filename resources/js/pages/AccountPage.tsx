@@ -106,23 +106,76 @@ const navigation: Array<{ id: Section; label: string; icon: React.ElementType }>
 ];
 
 const AccountPage: React.FC = () => {
-  // Load section from localStorage or default to 'dashboard'
-  const [section, setSection] = useState<Section>(() => {
+  // Track URL changes
+  const [urlKey, setUrlKey] = useState(0);
+  
+  React.useEffect(() => {
+    const handleLocationChange = () => {
+      setUrlKey(prev => prev + 1);
+    };
+
+    // Listen for popstate (back/forward button)
+    window.addEventListener('popstate', handleLocationChange);
+    
+    // Also check periodically (fallback for direct navigation)
+    const interval = setInterval(() => {
+      const currentSearch = window.location.search;
+      if (currentSearch !== (window as any).__lastAccountSearch) {
+        (window as any).__lastAccountSearch = currentSearch;
+        handleLocationChange();
+      }
+    }, 100);
+
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Get section from URL parameter, localStorage, or default to 'dashboard'
+  const getSectionFromUrl = (): Section => {
     if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab && ['dashboard', 'bookings', 'payments', 'documents', 'profile', 'support'].includes(tab)) {
+        return tab as Section;
+      }
+      // Fallback to localStorage
       const saved = localStorage.getItem('yatra-account-active-section');
       if (saved && ['dashboard', 'bookings', 'payments', 'documents', 'profile', 'support'].includes(saved)) {
         return saved as Section;
       }
     }
     return 'dashboard';
-  });
+  };
+
+  const [section, setSection] = useState<Section>(getSectionFromUrl);
   
-  // Save section to localStorage when it changes
+  // Update section when URL changes
   React.useEffect(() => {
+    const newSection = getSectionFromUrl();
+    setSection(newSection);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlKey]);
+  
+  // Update URL and localStorage when section changes
+  const handleSectionChange = (newSection: Section) => {
+    setSection(newSection);
+    
     if (typeof window !== 'undefined') {
-      localStorage.setItem('yatra-account-active-section', section);
+      // Update URL
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('tab', newSection);
+      const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+      window.history.pushState({}, '', newUrl);
+      
+      // Save to localStorage
+      localStorage.setItem('yatra-account-active-section', newSection);
+      
+      // Trigger URL change event
+      window.dispatchEvent(new PopStateEvent('popstate'));
     }
-  }, [section]);
+  };
   
   const [bookingFilter, setBookingFilter] = useState<'all' | 'upcoming' | 'pending' | 'completed'>('all');
   
@@ -140,6 +193,14 @@ const AccountPage: React.FC = () => {
   // Support ticket form state
   const [ticketSubject, setTicketSubject] = useState('');
   const [ticketMessage, setTicketMessage] = useState('');
+  
+  // Password change state
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const { data: profile, isLoading: isLoadingProfile } = useQuery<CustomerProfile | null>({
     queryKey: ['account-profile'],
@@ -673,7 +734,7 @@ const AccountPage: React.FC = () => {
                   <div 
                     role="button"
                     tabIndex={0}
-                    onClick={() => setSection('bookings')}
+                    onClick={() => handleSectionChange('bookings')}
                     className="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 hover:opacity-90 cursor-pointer"
                     style={{ 
                       backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -687,7 +748,7 @@ const AccountPage: React.FC = () => {
                   <div 
                     role="button"
                     tabIndex={0}
-                    onClick={() => setSection('documents')}
+                    onClick={() => handleSectionChange('documents')}
                     className="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 hover:opacity-90 cursor-pointer"
                     style={{ 
                       backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -770,7 +831,7 @@ const AccountPage: React.FC = () => {
                   <div
                     role="button"
                     tabIndex={0}
-                    onClick={() => setSection('bookings')}
+                    onClick={() => handleSectionChange('bookings')}
                     className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     {__('View all', 'View all')}
@@ -848,7 +909,7 @@ const AccountPage: React.FC = () => {
                 <div
                   role="button"
                   tabIndex={0}
-                  onClick={() => setSection('bookings')}
+                  onClick={() => handleSectionChange('bookings')}
                   className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm"
                 >
                   <div className="flex items-center gap-3">
@@ -862,7 +923,7 @@ const AccountPage: React.FC = () => {
                 <div
                   role="button"
                   tabIndex={0}
-                  onClick={() => setSection('payments')}
+                  onClick={() => handleSectionChange('payments')}
                   className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm"
                 >
                   <div className="flex items-center gap-3">
@@ -876,7 +937,7 @@ const AccountPage: React.FC = () => {
                 <div
                   role="button"
                   tabIndex={0}
-                  onClick={() => setSection('documents')}
+                  onClick={() => handleSectionChange('documents')}
                   className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm"
                 >
                   <div className="flex items-center gap-3">
@@ -890,7 +951,7 @@ const AccountPage: React.FC = () => {
                 <div
                   role="button"
                   tabIndex={0}
-                  onClick={() => setSection('support')}
+                  onClick={() => handleSectionChange('support')}
                   className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group cursor-pointer text-sm"
                 >
                   <div className="flex items-center gap-3">
@@ -1296,11 +1357,11 @@ const AccountPage: React.FC = () => {
                         <Download className="w-4 h-4" />
                         {__('Download Voucher', 'Download Voucher')}
                       </div>
-                      <div role="button" tabIndex={0} onClick={() => setSection('payments')} className="yatra-booking-action yatra-booking-action-payment inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer">
+                      <div role="button" tabIndex={0} onClick={() => handleSectionChange('payments')} className="yatra-booking-action yatra-booking-action-payment inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer">
                         <CreditCard className="w-4 h-4" />
                         {__('Payment', 'Payment')}
                       </div>
-                      <div role="button" tabIndex={0} onClick={() => setSection('support')} className="yatra-booking-action yatra-booking-action-support inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer">
+                      <div role="button" tabIndex={0} onClick={() => handleSectionChange('support')} className="yatra-booking-action yatra-booking-action-support inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer">
                         <LifeBuoy className="w-4 h-4" />
                         {__('Support', 'Support')}
                       </div>
@@ -1573,7 +1634,7 @@ const AccountPage: React.FC = () => {
                           {__('Pay Now', 'Pay Now')}
                         </div>
                       )}
-                      <div role="button" tabIndex={0} onClick={() => setSection('bookings')} className="yatra-payment-action yatra-payment-action-booking inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer">
+                      <div role="button" tabIndex={0} onClick={() => handleSectionChange('bookings')} className="yatra-payment-action yatra-payment-action-booking inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer">
                         <Eye className="w-4 h-4" />
                         {__('View Booking', 'View Booking')}
                       </div>
@@ -1981,6 +2042,117 @@ const AccountPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Password Change Section */}
+        <div className="yatra-profile-password bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                {__('Change Password', 'Change Password')}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {__('Update your password to keep your account secure.', 'Update your password to keep your account secure.')}
+              </p>
+            </div>
+            {!isChangingPassword && (
+              <div 
+                role="button" 
+                tabIndex={0} 
+                onClick={() => setIsChangingPassword(true)} 
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                {__('Change Password', 'Change Password')}
+              </div>
+            )}
+          </div>
+
+          {isChangingPassword && (
+            <div className="space-y-4">
+              <div className="yatra-password-field">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {__('Current Password', 'Current Password')} <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder={__('Enter your current password', 'Enter your current password')}
+                />
+              </div>
+
+              <div className="yatra-password-field">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {__('New Password', 'New Password')} <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder={__('Enter your new password', 'Enter your new password')}
+                />
+              </div>
+
+              <div className="yatra-password-field">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {__('Confirm New Password', 'Confirm New Password')} <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder={__('Confirm your new password', 'Confirm your new password')}
+                />
+                {passwordData.newPassword && passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword && (
+                  <p className="text-xs text-red-500 mt-1">{__('Passwords do not match', 'Passwords do not match')}</p>
+                )}
+              </div>
+
+              <div className="yatra-password-actions flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  type="button"
+                  onClick={() => {
+                    // TODO: Implement password change functionality
+                    if (passwordData.newPassword !== passwordData.confirmPassword) {
+                      return;
+                    }
+                    setIsChangingPassword(false);
+                    setPasswordData({
+                      currentPassword: '',
+                      newPassword: '',
+                      confirmPassword: '',
+                    });
+                  }}
+                  disabled={!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword || passwordData.newPassword !== passwordData.confirmPassword}
+                  className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {__('Update Password', 'Update Password')}
+                </button>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    setIsChangingPassword(false);
+                    setPasswordData({
+                      currentPassword: '',
+                      newPassword: '',
+                      confirmPassword: '',
+                    });
+                  }}
+                  className="inline-flex items-center gap-2 px-6 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
+                >
+                  <XCircle className="w-4 h-4" />
+                  {__('Cancel', 'Cancel')}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Additional Sections */}
         <div className="yatra-profile-sections grid gap-6 lg:grid-cols-2">
           <div className="yatra-profile-communication bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
@@ -2340,7 +2512,7 @@ const AccountPage: React.FC = () => {
                     key={item.id}
                     role="button"
                     tabIndex={0}
-                    onClick={() => setSection(item.id)}
+                    onClick={() => handleSectionChange(item.id)}
                     className={`yatra-nav-item yatra-nav-item-${item.id} w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
                       section === item.id
                         ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200'
