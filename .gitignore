@@ -3,9 +3,7 @@
 /node_modules/
 
 # Build outputs
-/public/js/
-/public/css/
-/public/assets/
+
 
 # IDE
 .idea/
