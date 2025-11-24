@@ -348,12 +348,7 @@ get_header();
                     <!-- Rating -->
                     <div class="yatra-filter-section">
                         <div class="yatra-filter-title" data-toggle="rating">
-                            <div class="yatra-filter-title-content">
-                                <svg class="yatra-filter-icon" width="18" height="18" fill="#fbbf24" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                                <span>Rating</span>
-                            </div>
+                            <span>Rating</span>
                             <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
