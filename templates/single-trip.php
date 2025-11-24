@@ -960,7 +960,7 @@ get_header();
                     </div>
 
                     <!-- Action Buttons -->
-                    <button type="button" class="yatra-booking-button">
+                    <button type="button" class="yatra-booking-button" id="check-availability-btn" data-trip-id="<?php echo esc_attr($wp_query->get('yatra_trip_id') ?: 1); ?>">
                         Check availability
                     </button>
 

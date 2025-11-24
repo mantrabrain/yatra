@@ -437,6 +437,15 @@ class AppServiceProvider extends ServiceProvider
                 $js_version,
                 true
             );
+
+            // Localize script with trip data
+            global $wp_query;
+            $trip_id = $wp_query->get('yatra_trip_id') ?: 1;
+            wp_localize_script('yatra-trip', 'yatraTripData', [
+                'tripId' => $trip_id,
+                'restUrl' => rest_url('yatra/v1'),
+                'nonce' => wp_create_nonce('wp_rest'),
+            ]);
         }
     }
 

@@ -257,6 +257,10 @@
             this.dateInput = document.getElementById('travel_date');
             this.participantsSelect = document.querySelector('.yatra-participants-select');
 
+            if (!this.checkAvailabilityBtn) {
+                console.warn('Check Availability button not found');
+            }
+            
             this.attachEventListeners();
             this.initDateField();
             this.initTravelersField();
@@ -437,6 +441,8 @@
         }
 
         handleCheckAvailability() {
+            console.log('Check Availability clicked');
+            
             // Get form values
             const dateInput = document.getElementById('travel_date');
             const adultsInput = document.getElementById('adults');
@@ -445,6 +451,8 @@
             const date = dateInput ? dateInput.value : '';
             const adults = adultsInput ? parseInt(adultsInput.value) || 0 : 0;
             const children = childrenInput ? parseInt(childrenInput.value) || 0 : 0;
+
+            console.log('Form values:', { date, adults, children });
 
             // Basic validation
             if (!date) {
@@ -458,16 +466,242 @@
             }
 
             // Show loading state
-            const originalText = this.checkAvailabilityBtn.textContent;
-            this.checkAvailabilityBtn.textContent = 'Checking...';
-            this.checkAvailabilityBtn.disabled = true;
+            const originalText = this.checkAvailabilityBtn ? this.checkAvailabilityBtn.textContent : 'Check availability';
+            if (this.checkAvailabilityBtn) {
+                this.checkAvailabilityBtn.textContent = 'Checking...';
+                this.checkAvailabilityBtn.disabled = true;
+            }
 
-            // Simulate API call (replace with actual implementation)
+            // Get trip ID from data attribute or global variable
+            const tripId = this.checkAvailabilityBtn?.dataset?.tripId || 
+                          document.querySelector('[data-trip-id]')?.dataset?.tripId ||
+                          (window.yatraTripData && window.yatraTripData.tripId) ||
+                          1; // Fallback to 1 for dummy data
+
+            // Check if availability section already exists
+            let availabilitySection = document.getElementById('availability');
+            
+            if (availabilitySection) {
+                // Section already loaded, just show it
+                availabilitySection.style.display = 'block';
+                this.scrollToAvailability(availabilitySection);
+                this.resetButton(originalText);
+                return;
+            }
+
+            // Make AJAX call to get availability template
+            let baseUrl = '/wp-json';
+            if (window.yatraTripData && window.yatraTripData.restUrl) {
+                baseUrl = window.yatraTripData.restUrl;
+            } else if (window.wpApiSettings && window.wpApiSettings.root) {
+                baseUrl = window.wpApiSettings.root;
+            }
+            
+            // Ensure baseUrl doesn't end with slash
+            baseUrl = baseUrl.replace(/\/$/, '');
+            
+            // Check if baseUrl already includes /yatra/v1 (rest_url('yatra/v1') includes it)
+            let restUrl;
+            if (baseUrl.includes('/yatra/v1')) {
+                // baseUrl already includes the namespace, just add the endpoint
+                restUrl = baseUrl + '/trips/' + tripId + '/availability-template';
+            } else {
+                // Need to add the namespace
+                restUrl = baseUrl + '/yatra/v1/trips/' + tripId + '/availability-template';
+            }
+            const nonce = (window.yatraTripData && window.yatraTripData.nonce) || '';
+
+            console.log('Fetching availability from:', restUrl);
+
+            fetch(restUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    // Try to get error message from response
+                    return response.json().then(err => {
+                        console.error('API Error:', err);
+                        throw new Error(err.message || 'Failed to fetch availability');
+                    }).catch(() => {
+                        throw new Error('Failed to fetch availability (Status: ' + response.status + ')');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (!data || !data.html) {
+                    throw new Error('No HTML returned from server');
+                }
+
+                // Find the currently active section (first visible section or overview)
+                const activeSection = this.findActiveSection();
+                
+                // Create a temporary container to parse HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = data.html;
+                const newSection = tempDiv.firstElementChild;
+
+                if (!newSection) {
+                    throw new Error('Invalid HTML structure');
+                }
+
+                // Insert before the active section
+                if (activeSection && activeSection.parentNode) {
+                    activeSection.parentNode.insertBefore(newSection, activeSection);
+                } else {
+                    // Fallback: insert at the end of main content
+                    const mainContent = document.querySelector('.yatra-trip-main');
+                    if (mainContent) {
+                        mainContent.appendChild(newSection);
+                    }
+                }
+
+                // Add menu item to sticky nav at the same position
+                // Pass the activeSection so we can find the corresponding menu item
+                this.addAvailabilityMenuItem(activeSection);
+
+                // Initialize availability section handlers
+                if (window.availabilitySection) {
+                    window.availabilitySection.setup();
+                } else {
+                    // Initialize if not already done
+                    window.availabilitySection = new AvailabilitySection();
+                    window.availabilitySection.setup();
+                }
+
+                // Re-setup sticky nav to include the new menu item
+                if (window.stickyNav) {
+                    window.stickyNav.setup();
+                }
+
+                // Scroll to the new section
+                this.scrollToAvailability(newSection);
+
+                // Reset button state
+                this.resetButton(originalText);
+            })
+            .catch(error => {
+                console.error('Error loading availability:', error);
+                alert('Failed to load availability. Please try again.');
+                this.resetButton(originalText);
+            });
+        }
+
+        findActiveSection() {
+            // Find the first visible section or default to overview
+            const sections = document.querySelectorAll('.yatra-trip-section');
+            for (let section of sections) {
+                const rect = section.getBoundingClientRect();
+                if (rect.top >= 0 && rect.top < window.innerHeight) {
+                    return section;
+                }
+            }
+            // Default to overview section
+            return document.getElementById('overview') || sections[0];
+        }
+
+        addAvailabilityMenuItem(activeSection) {
+            const stickyNav = document.querySelector('.yatra-sticky-nav-container');
+            if (!stickyNav) return;
+
+            // Check if menu item already exists
+            if (document.querySelector('.yatra-sticky-nav-item[href="#availability"]')) {
+                return;
+            }
+
+            // Find the corresponding menu item for the active section
+            let insertBeforeItem = null;
+            let activeSectionId = null;
+            
+            if (activeSection) {
+                activeSectionId = activeSection.id;
+                if (activeSectionId) {
+                    // Find the menu item that links to this section
+                    insertBeforeItem = document.querySelector('.yatra-sticky-nav-item[href="#' + activeSectionId + '"]');
+                }
+            }
+            
+            // If no active section or menu item found, default to inserting after "What's Included"
+            if (!insertBeforeItem) {
+                insertBeforeItem = document.querySelector('.yatra-sticky-nav-item[href="#included"]');
+                if (insertBeforeItem) {
+                    insertBeforeItem = insertBeforeItem.nextSibling; // Insert after "What's Included"
+                }
+            }
+
+            // Create new menu item
+            const newItem = document.createElement('a');
+            newItem.href = '#availability';
+            newItem.className = 'yatra-sticky-nav-item';
+            newItem.innerHTML = `
+                <svg class="yatra-icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>Availability</span>
+            `;
+
+            // Insert before the target item (or after "What's Included" if no target)
+            if (insertBeforeItem && insertBeforeItem.parentNode) {
+                insertBeforeItem.parentNode.insertBefore(newItem, insertBeforeItem);
+            } else {
+                // Fallback: append to the end
+                stickyNav.appendChild(newItem);
+            }
+
+            // Update sticky nav to handle new item
+            if (window.stickyNav) {
+                // Add availability to sections array if not already there
+                // Insert it in the correct position based on where the section was inserted
+                if (!window.stickyNav.sections.includes('availability')) {
+                    if (activeSectionId) {
+                        const activeIndex = window.stickyNav.sections.indexOf(activeSectionId);
+                        if (activeIndex >= 0) {
+                            // Insert availability before the active section
+                            window.stickyNav.sections.splice(activeIndex, 0, 'availability');
+                        } else {
+                            window.stickyNav.sections.push('availability');
+                        }
+                    } else {
+                        window.stickyNav.sections.push('availability');
+                    }
+                }
+                // Re-setup to attach event listeners to new menu item
+                window.stickyNav.setup();
+            }
+        }
+
+        scrollToAvailability(section) {
             setTimeout(() => {
-                alert(`Availability checked for ${adults} adult(s) and ${children} child(ren) on ${date}`);
+                const offset = 150;
+                const elementPosition = section.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+                
+                // Update sticky nav active state after scroll completes
+                setTimeout(() => {
+                    if (window.stickyNav) {
+                        window.stickyNav.updateActiveNav();
+                    }
+                }, 300); // Wait for smooth scroll to complete
+            }, 100);
+        }
+
+        resetButton(originalText) {
+            if (this.checkAvailabilityBtn) {
                 this.checkAvailabilityBtn.textContent = originalText;
                 this.checkAvailabilityBtn.disabled = false;
-            }, 1000);
+            }
         }
 
         handleMakeEnquiry() {
@@ -475,6 +709,25 @@
             // Just trigger the modal open
             if (window.enquiryModal) {
                 window.enquiryModal.open();
+            }
+        }
+
+        setTravelers(adults, children) {
+            const adultsInput = document.getElementById('adults');
+            const childrenInput = document.getElementById('children');
+            
+            if (adultsInput) {
+                adultsInput.value = adults;
+                // Trigger change event to update display
+                const event = new Event('change', { bubbles: true });
+                adultsInput.dispatchEvent(event);
+            }
+            
+            if (childrenInput) {
+                childrenInput.value = children;
+                // Trigger change event to update display
+                const event = new Event('change', { bubbles: true });
+                childrenInput.dispatchEvent(event);
             }
         }
     }
@@ -755,10 +1008,12 @@
     class StickyNav {
         constructor() {
             this.nav = null;
+            this.sidebar = null;
             this.navItems = [];
             this.sections = [];
             this.scrollThreshold = 200;
             this.lastScrollTop = 0;
+            this.navHeight = 0;
             this.init();
         }
 
@@ -774,12 +1029,17 @@
             this.nav = document.querySelector('.yatra-sticky-nav');
             if (!this.nav) return;
 
+            this.sidebar = document.querySelector('.yatra-trip-sidebar');
             this.navItems = this.nav.querySelectorAll('.yatra-sticky-nav-item');
-            this.sections = ['overview', 'trip-details', 'itinerary', 'included'];
+            this.sections = ['overview', 'trip-details', 'itinerary', 'included', 'availability'];
+            
+            // Calculate nav height
+            this.navHeight = this.nav.offsetHeight || 60;
 
             this.attachEventListeners();
             this.handleScroll(); // Initial check
             this.updateActiveNav(); // Initial check
+            this.updateSidebarPosition(); // Initial check
         }
 
         attachEventListeners() {
@@ -801,6 +1061,39 @@
 
             // Handle scroll events
             window.addEventListener('scroll', () => this.onScroll(), { passive: true });
+            
+            // Update sidebar position when nav visibility changes
+            const observer = new MutationObserver(() => {
+                this.updateSidebarPosition();
+            });
+            observer.observe(this.nav, { attributes: true, attributeFilter: ['class'] });
+        }
+
+        updateSidebarPosition() {
+            if (!this.sidebar) return;
+            
+            const isNavVisible = this.nav.classList.contains('visible');
+            const isAdminBar = document.body.classList.contains('admin-bar');
+            
+            // Calculate base top position
+            let topPosition = 0;
+            
+            if (isAdminBar) {
+                // Check if mobile admin bar (782px breakpoint)
+                if (window.innerWidth <= 782) {
+                    topPosition = 46; // Mobile admin bar
+                } else {
+                    topPosition = 32; // Desktop admin bar
+                }
+            }
+            
+            // Add sticky nav height if visible
+            if (isNavVisible) {
+                topPosition += this.navHeight;
+            }
+            
+            // Apply to sidebar
+            this.sidebar.style.top = topPosition + 'px';
         }
 
         scrollToSection(sectionId) {
@@ -832,26 +1125,377 @@
 
         updateActiveNav() {
             const scrollPos = window.scrollY + 150;
+            let activeSectionId = null;
             
-            this.sections.forEach((sectionId, index) => {
+            // Find which section is currently in view
+            this.sections.forEach((sectionId) => {
                 const section = document.getElementById(sectionId);
                 if (section) {
                     const sectionTop = section.offsetTop;
                     const sectionBottom = sectionTop + section.offsetHeight;
                     
                     if (scrollPos >= sectionTop && scrollPos < sectionBottom) {
-                        this.navItems.forEach((nav) => nav.classList.remove('active'));
-                        if (this.navItems[index]) {
-                            this.navItems[index].classList.add('active');
-                        }
+                        activeSectionId = sectionId;
                     }
                 }
             });
+            
+            // Update active state based on section ID (not index)
+            if (activeSectionId) {
+                this.navItems.forEach((nav) => {
+                    nav.classList.remove('active');
+                    const href = nav.getAttribute('href');
+                    if (href === '#' + activeSectionId) {
+                        nav.classList.add('active');
+                    }
+                });
+            }
         }
 
         onScroll() {
             this.handleScroll();
             this.updateActiveNav();
+            this.updateSidebarPosition();
+        }
+    }
+
+    /**
+     * Availability Section Class
+     * Handles availability section interactions (filters, load more)
+     */
+    class AvailabilitySection {
+        constructor() {
+            this.section = null;
+            this.filterButtons = [];
+            this.availabilityItems = [];
+            this.init();
+        }
+
+        init() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.setup());
+            } else {
+                this.setup();
+            }
+        }
+
+        setup() {
+            this.section = document.getElementById('availability');
+            if (!this.section) return;
+
+            this.filterButtons = this.section.querySelectorAll('.yatra-availability-filter-btn');
+            this.availabilityItems = this.section.querySelectorAll('.yatra-availability-card');
+
+            this.attachEventListeners();
+        }
+
+        attachEventListeners() {
+            // Month filter buttons
+            this.filterButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const filter = btn.getAttribute('data-filter');
+                    this.filterByMonth(filter);
+                    
+                    // Update active state
+                    this.filterButtons.forEach((b) => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // Sort dropdown
+            const sortSelect = document.getElementById('availability-sort');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', (e) => {
+                    this.sortItems(e.target.value);
+                });
+            }
+
+            this.setupToggleHandlers();
+
+            // Traveler selector buttons
+            this.initTravelerSelectors();
+
+            // Book Now buttons
+            const bookButtons = this.section.querySelectorAll('.yatra-card-book-btn');
+            bookButtons.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const date = btn.getAttribute('data-date');
+                    const price = btn.getAttribute('data-price');
+                    const itemIndex = btn.getAttribute('data-item');
+                    const adults = this.getTravelerCount(itemIndex, 'adults');
+                    const children = this.getTravelerCount(itemIndex, 'children');
+                    this.handleBookNow(date, price, btn, adults, children);
+                });
+            });
+
+            // Load more button
+            const loadMoreBtn = this.section.querySelector('.yatra-availability-load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', () => {
+                    this.handleLoadMore();
+                });
+            }
+        }
+
+        initTravelerSelectors() {
+            const participantsSelects = this.section.querySelectorAll('.yatra-availability-participants');
+            
+            participantsSelects.forEach((select) => {
+                const itemIndex = select.getAttribute('data-item');
+                const display = select.querySelector('.yatra-availability-participants-display');
+                const adultsInput = select.querySelector('.yatra-availability-adults');
+                const childrenInput = select.querySelector('.yatra-availability-children');
+                
+                if (!display || !adultsInput || !childrenInput) return;
+                
+                // Toggle dropdown on display click
+                display.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    select.classList.toggle('active');
+                });
+                
+                // Update display text
+                const updateDisplay = () => {
+                    const adults = parseInt(adultsInput.value) || 0;
+                    const children = parseInt(childrenInput.value) || 0;
+                    let displayText = '';
+                    if (adults > 0) {
+                        displayText = `Adult${adults > 1 ? 's' : ''} x ${adults}`;
+                    }
+                    if (children > 0) {
+                        if (displayText) displayText += ', ';
+                        displayText += `Child${children > 1 ? 'ren' : ''} x ${children}`;
+                    }
+                    if (!displayText) displayText = 'Adult x 1';
+                    display.textContent = displayText;
+                };
+                
+                // Quantity button handlers
+                const quantityButtons = select.querySelectorAll('.yatra-quantity-btn');
+                quantityButtons.forEach((btn) => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const target = btn.getAttribute('data-target');
+                        const input = target === 'adults' ? adultsInput : childrenInput;
+                        const isMinus = btn.classList.contains('yatra-quantity-minus');
+                        const isPlus = btn.classList.contains('yatra-quantity-plus');
+                        
+                        let current = parseInt(input.value) || 0;
+                        const min = parseInt(input.getAttribute('min')) || 0;
+                        const max = parseInt(input.getAttribute('max')) || 999;
+                        let newValue = current;
+                        
+                        if (isPlus && current < max) {
+                            newValue = current + 1;
+                        } else if (isMinus && current > min) {
+                            newValue = current - 1;
+                        }
+                        
+                        if (newValue !== current) {
+                            input.value = newValue;
+                            updateDisplay();
+                            
+                            // Update button states
+                            const row = btn.closest('.yatra-quantity-row');
+                            if (row) {
+                                const minusBtn = row.querySelector('.yatra-quantity-minus');
+                                const plusBtn = row.querySelector('.yatra-quantity-plus');
+                                if (minusBtn) minusBtn.disabled = newValue <= min;
+                                if (plusBtn) plusBtn.disabled = newValue >= max;
+                            }
+                            
+                            // Update total price
+                            this.updateTotalPrice(itemIndex);
+                        }
+                    });
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!select.contains(e.target)) {
+                        select.classList.remove('active');
+                    }
+                });
+                
+                // Initialize display
+                updateDisplay();
+                
+                // Initialize button states
+                [adultsInput, childrenInput].forEach((input) => {
+                    const value = parseInt(input.value || 0);
+                    const min = parseInt(input.getAttribute('min') || 0);
+                    const max = parseInt(input.getAttribute('max') || 999);
+                    const row = input.closest('.yatra-quantity-row');
+                    if (row) {
+                        const minusBtn = row.querySelector('.yatra-quantity-minus');
+                        const plusBtn = row.querySelector('.yatra-quantity-plus');
+                        if (minusBtn) minusBtn.disabled = value <= min;
+                        if (plusBtn) plusBtn.disabled = value >= max;
+                    }
+                });
+            });
+        }
+
+        setupToggleHandlers() {
+            if (!this.availabilityItems || !this.availabilityItems.length) return;
+            this.availabilityItems.forEach((item) => {
+                const toggle = item.querySelector('.yatra-availability-toggle');
+                if (!toggle) return;
+
+                toggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const isOpen = item.classList.contains('open');
+                    this.availabilityItems.forEach((other) => other.classList.remove('open'));
+                    if (!isOpen) {
+                        item.classList.add('open');
+                    }
+                });
+            });
+        }
+
+        getTravelerCount(itemIndex, type) {
+            const select = this.section.querySelector(
+                `.yatra-availability-participants[data-item="${itemIndex}"]`
+            );
+            if (!select) return type === 'adults' ? 1 : 0;
+            
+            const input = select.querySelector(
+                type === 'adults' ? '.yatra-availability-adults' : '.yatra-availability-children'
+            );
+            if (!input) return type === 'adults' ? 1 : 0;
+            const value = parseInt(input.value) || 0;
+            return type === 'adults' && value === 0 ? 1 : value;
+        }
+
+        updateTotalPrice(itemIndex) {
+            const adults = this.getTravelerCount(itemIndex, 'adults');
+            const children = this.getTravelerCount(itemIndex, 'children');
+            const totalTravelers = adults + children;
+
+            const totalAmountElement = this.section.querySelector(
+                `.yatra-availability-total-amount[data-item="${itemIndex}"]`
+            );
+            if (!totalAmountElement) return;
+
+            const basePrice = parseFloat(totalAmountElement.getAttribute('data-base-price')) || 0;
+            // Assume children are 50% of adult price (can be adjusted)
+            const childPrice = basePrice * 0.5;
+            const totalPrice = (adults * basePrice) + (children * childPrice);
+
+            // Get currency from data attribute or default to USD
+            const currency = totalAmountElement.getAttribute('data-currency') || 'USD';
+            totalAmountElement.textContent = currency + totalPrice.toFixed(2);
+
+            const noteElement = this.section.querySelector(
+                `.yatra-availability-total-note[data-item="${itemIndex}"]`
+            );
+            if (noteElement) {
+                const travelerText = totalTravelers === 1
+                    ? 'for 1 traveler'
+                    : `for ${totalTravelers} travelers`;
+                noteElement.textContent = travelerText;
+            }
+        }
+
+        filterByMonth(filter) {
+            this.availabilityItems.forEach((item) => {
+                if (filter === 'all') {
+                    item.style.display = 'block';
+                } else {
+                    const itemMonth = item.getAttribute('data-month');
+                    if (itemMonth === filter) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        sortItems(sortBy) {
+            const items = Array.from(this.availabilityItems);
+            const list = this.section.querySelector('.yatra-availability-list');
+            if (!list) return;
+
+            items.sort((a, b) => {
+                switch (sortBy) {
+                    case 'date-asc':
+                        return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+                    case 'date-desc':
+                        return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+                    case 'price-asc':
+                        return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+                    case 'price-desc':
+                        return parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price'));
+                    case 'seats-desc':
+                        return parseInt(b.getAttribute('data-seats')) - parseInt(a.getAttribute('data-seats'));
+                    default:
+                        return 0;
+                }
+            });
+
+            // Re-append sorted items
+            items.forEach((item) => {
+                list.appendChild(item);
+            });
+        }
+
+        handleBookNow(date, price, button, adults = 1, children = 0) {
+            // Get travelers from the availability card if not provided
+            const itemIndex = button.getAttribute('data-item');
+            if (itemIndex) {
+                adults = this.getTravelerCount(itemIndex, 'adults');
+                children = this.getTravelerCount(itemIndex, 'children');
+            }
+            
+            // Update the main booking form with selected date
+            const dateInput = document.getElementById('travel_date');
+            if (dateInput) {
+                // Format date for display (YYYY-MM-DD)
+                dateInput.value = date;
+                // Trigger change event if using Flatpickr
+                if (dateInput._flatpickr) {
+                    dateInput._flatpickr.setDate(date, true);
+                }
+            }
+
+            // Update travelers in booking sidebar
+            if (window.bookingSidebar) {
+                window.bookingSidebar.setTravelers(adults, children);
+            }
+
+            // Scroll to booking sidebar
+            const bookingSidebar = document.getElementById('booking');
+            if (bookingSidebar) {
+                bookingSidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // Show success feedback
+            const originalText = button.textContent;
+            button.textContent = 'Selected!';
+            button.style.background = '#10b981';
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        handleLoadMore() {
+            // Simulate loading more departures
+            const btn = this.section.querySelector('.yatra-availability-load-more-btn');
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = 'Loading...';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    // In real implementation, this would load more items via AJAX
+                }, 1000);
+            }
         }
     }
 
@@ -860,6 +1504,7 @@
     window.bookingSidebar = new BookingSidebar();
     window.enquiryModal = new EnquiryModal();
     window.stickyNav = new StickyNav();
+    window.availabilitySection = new AvailabilitySection();
 
 })();
 

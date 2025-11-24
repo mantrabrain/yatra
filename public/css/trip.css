@@ -1455,12 +1455,7 @@
     height: fit-content;
     max-width: 100%;
     align-self: flex-start;
-}
-
-/* Account for sticky navigation bar (approximately 60px height) */
-.yatra-sticky-nav.visible ~ * .yatra-trip-sidebar,
-.yatra-sticky-nav.visible + * .yatra-trip-sidebar {
-    top: 60px;
+    transition: top 0.3s ease;
 }
 
 /* Account for WordPress admin bar */
@@ -1468,21 +1463,9 @@
     top: 32px; /* Admin bar height */
 }
 
-/* Account for both admin bar and sticky nav */
-.admin-bar .yatra-sticky-nav.visible ~ * .yatra-trip-sidebar,
-.admin-bar .yatra-sticky-nav.visible + * .yatra-trip-sidebar {
-    top: 92px; /* 32px admin bar + 60px sticky nav */
-}
-
 @media screen and (max-width: 782px) {
     .admin-bar .yatra-trip-sidebar {
         top: 46px; /* Mobile admin bar height */
-    }
-    
-    /* Account for both admin bar and sticky nav on mobile */
-    .admin-bar .yatra-sticky-nav.visible ~ * .yatra-trip-sidebar,
-    .admin-bar .yatra-sticky-nav.visible + * .yatra-trip-sidebar {
-        top: 106px; /* 46px admin bar + 60px sticky nav */
     }
 }
 
@@ -2741,7 +2724,6 @@ input.yatra-datepicker,
         width: 100%;
         margin-top: 8px;
     }
-}
 
     .yatra-quick-fact {
         gap: 10px;
@@ -2828,8 +2810,6 @@ input.yatra-datepicker,
         width: 60px;
         height: 60px;
     }
-
-    
 
     .yatra-trip-section {
         padding: 32px 24px;
@@ -2925,3 +2905,1309 @@ input.yatra-datepicker,
     background: #fce7f3;
     color: #9f1239;
 }
+
+/* ============================================
+   TRIP AVAILABILITY SECTION
+   ============================================ */
+.yatra-availability-section {
+    margin-bottom: 48px;
+}
+
+.yatra-availability-header {
+    margin-bottom: 32px;
+}
+
+.yatra-availability-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 24px;
+}
+
+.yatra-availability-sort {
+    flex-shrink: 0;
+}
+
+.yatra-availability-sort-select {
+    padding: 10px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 200px;
+}
+
+.yatra-availability-sort-select:hover {
+    border-color: #3b82f6;
+}
+
+.yatra-availability-sort-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.yatra-availability-subtitle {
+    font-size: 16px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.yatra-availability-filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.yatra-availability-filter-btn {
+    padding: 10px 20px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yatra-availability-filter-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #eff6ff;
+}
+
+.yatra-availability-filter-btn.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+}
+
+/* Availability Card List */
+.yatra-availability-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+/* Availability Card */
+.yatra-availability-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: visible;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.yatra-availability-card:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.yatra-availability-card.open {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+}
+
+/* Card Header */
+.yatra-availability-card-header {
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
+    background: #fff;
+    transition: background 0.2s ease;
+}
+
+.yatra-availability-card-header:hover {
+    background: #f9fafb;
+}
+
+.yatra-card-header-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 180px auto;
+    gap: 20px;
+    align-items: center;
+}
+
+.yatra-card-header-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.yatra-card-header-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
+}
+
+.yatra-card-header-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.yatra-card-header-location {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.yatra-card-header-seats {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.yatra-card-header-sub {
+    font-size: 11px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.yatra-card-header-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.yatra-card-discount-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: #dc2626;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
+}
+
+.yatra-card-price-group {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.yatra-card-price-original {
+    font-size: 12px;
+    color: #9ca3af;
+    text-decoration: line-through;
+    line-height: 1.2;
+}
+
+.yatra-card-price-sale {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.2;
+}
+
+.yatra-card-header-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: #6b7280;
+    transition: transform 0.3s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.yatra-availability-card.open .yatra-card-header-arrow {
+    transform: rotate(180deg);
+    color: #3b82f6;
+}
+
+/* Card Body */
+.yatra-availability-card-body {
+    display: none;
+    padding: 16px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    overflow: visible;
+    position: relative;
+    border-radius:0 0 10px 10px;
+}
+
+.yatra-availability-card.open .yatra-availability-card-body {
+    display: block;
+}
+
+.yatra-card-body-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.yatra-card-tour-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.yatra-card-tour-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.yatra-card-tour-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.yatra-card-tour-type {
+    font-size: 13px;
+    color: #3b82f6;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.yatra-card-tour-separator {
+    font-size: 13px;
+    color: #9ca3af;
+    line-height: 1.4;
+}
+
+.yatra-card-tour-location {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+/* Info Grid */
+.yatra-card-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.yatra-card-info-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.yatra-card-info-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border-radius: 6px;
+    color: #6b7280;
+}
+
+.yatra-card-info-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.yatra-card-info-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    line-height: 1.3;
+}
+
+.yatra-card-info-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.4;
+}
+
+/* Timeline */
+.yatra-card-timeline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.yatra-timeline-item {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.yatra-timeline-dot {
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    margin-top: 20px;
+}
+
+.yatra-timeline-dot-start {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.yatra-timeline-dot-end {
+    background: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.yatra-timeline-content {
+    flex: 1;
+}
+
+.yatra-timeline-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 3px;
+    line-height: 1.3;
+}
+
+.yatra-timeline-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 2px;
+    line-height: 1.3;
+}
+
+.yatra-timeline-location {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.yatra-card-traveler-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.yatra-card-traveler-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1.4;
+}
+
+.yatra-card-traveler-section .yatra-booking-field-select {
+    width: 100%;
+}
+
+/* Booking Row */
+.yatra-card-booking-row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.yatra-card-total-box {
+    flex: 1;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+
+.yatra-card-total-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.yatra-card-total-note {
+    font-size: 12px;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.yatra-card-total-amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: #3b82f6;
+    line-height: 1;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+.yatra-card-book-btn {
+    flex: 1;
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.yatra-card-book-btn:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.yatra-card-book-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Availability Participants Select */
+.yatra-availability-participants {
+    position: relative;
+    width: 100%;
+}
+
+.yatra-availability-participants-display {
+    flex: 1;
+    padding: 14px 12px 14px 0;
+    font-size: 15px;
+    color: #111827;
+    cursor: pointer;
+    user-select: none;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.yatra-availability-quantity-selector {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    display: none;
+}
+
+.yatra-availability-participants.active .yatra-availability-quantity-selector {
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .yatra-card-header-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    
+    .yatra-card-header-price {
+        grid-column: 1 / -1;
+        align-items: flex-start;
+    }
+    
+    .yatra-card-header-arrow {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: end;
+    }
+    
+    .yatra-card-body-content {
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .yatra-availability-card-header {
+        padding: 14px 16px;
+    }
+    
+    .yatra-card-header-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .yatra-card-header-arrow {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+    }
+    
+    .yatra-availability-card-body {
+        padding: 14px;
+    }
+    
+    .yatra-card-body-content {
+        gap: 16px;
+    }
+    
+    .yatra-card-body-left {
+        gap: 10px;
+    }
+    
+    .yatra-card-info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    .yatra-card-booking-row {
+        flex-direction: column;
+        margin-top: 12px;
+        padding-top: 12px;
+    }
+    
+    .yatra-card-book-btn {
+        width: 100%;
+    }
+}
+
+.yatra-availability-toggle {
+    border: none;
+    background: transparent;
+    width: 100%;
+    border-radius:10px 10px 0 0 ;
+}
+
+/* Load More Section */
+.yatra-availability-load-more {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 120px;
+    flex: 1 1 0;
+}
+
+.yatra-summary-label {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yatra-summary-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.yatra-summary-sub {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.yatra-summary-price {
+    margin-left: auto;
+    text-align: right;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    min-width: 250px;
+}
+
+.yatra-summary-price div {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.yatra-summary-original {
+    font-size: 13px;
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+.yatra-summary-sale {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.yatra-summary-arrow {
+    width: 14px;
+    height: 14px;
+    border-right: 2px solid #374151;
+    border-bottom: 2px solid #374151;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+}
+
+.yatra-availability-item.open .yatra-summary-arrow {
+    transform: rotate(-135deg);
+}
+
+.yatra-availability-details {
+    display: none;
+    border-top: 1px solid #e5e7eb;
+    padding: 0 24px 24px;
+    background: #f9fafb;
+}
+
+.yatra-availability-item.open .yatra-availability-details {
+    display: block;
+}
+
+.yatra-availability-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 20px;
+}
+
+.yatra-details-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.yatra-details-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.yatra-details-subtitle {
+    font-size: 14px;
+    color: #3b82f6;
+    font-weight: 600;
+    margin: 0;
+}
+
+.yatra-details-timeline {
+    border-left: 2px dashed #d1d5db;
+    padding-left: 18px;
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.yatra-timeline-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.yatra-timeline-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-left: -25px;
+    margin-top: 20px;
+}
+
+.yatra-timeline-dot.success {
+    background: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.yatra-timeline-dot.danger {
+    background: #ef4444;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+}
+
+.yatra-timeline-label {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.yatra-timeline-meta {
+    display: block;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.yatra-details-right {
+    border-left: 1px solid #e5e7eb;
+    padding-left: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.yatra-details-price-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.yatra-details-price-label {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.yatra-details-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.yatra-details-price-note {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.yatra-availability-traveler-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.yatra-availability-traveler-picker .yatra-booking-field-select {
+    width: 100%;
+}
+
+ .yatra-availability-total-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.yatra-availability-total-price {
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px;
+    flex: 1 1 50%;
+}
+
+.yatra-availability-total-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.yatra-availability-total-note {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.yatra-availability-total-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.yatra-availability-book-btn {
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: none;
+    background: #3b82f6;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    flex: 1 1 50%;
+}
+
+.yatra-availability-book-btn:hover {
+    background: #2563eb;
+}
+
+.yatra-availability-book-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .yatra-availability-total-row {
+        flex-direction: column;
+    }
+
+    .yatra-availability-book-btn {
+        width: 100%;
+    }
+}
+
+.yatra-availability-book-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.yatra-availability-details-content {
+    flex-direction: column;
+}
+
+@media (min-width: 900px) {
+    .yatra-availability-summary {
+        flex-wrap: nowrap;
+    }
+
+    .yatra-availability-details-content {
+        flex-direction: row;
+        gap: 32px;
+    }
+
+    .yatra-details-left {
+        flex: 1 1 55%;
+    }
+
+    .yatra-details-right {
+        flex: 1 1 45%;
+    }
+}
+
+.yatra-availability-date-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.yatra-availability-main-date {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.yatra-availability-day {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yatra-availability-date {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+}
+
+.yatra-availability-year {
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.yatra-availability-date-range {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.yatra-availability-date-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.yatra-availability-date-label {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.yatra-availability-date-value {
+    font-weight: 600;
+    color: #111827;
+    font-size: 13px;
+}
+
+.yatra-availability-separator {
+    color: #9ca3af;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.yatra-availability-location-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.yatra-availability-location-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.yatra-availability-location-item svg {
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.yatra-availability-location-value {
+    font-weight: 600;
+    color: #111827;
+    font-size: 13px;
+}
+
+.yatra-availability-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.yatra-availability-duration {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.yatra-availability-duration-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: #6b7280;
+}
+
+.yatra-availability-seats-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.yatra-availability-seats-info svg {
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.yatra-availability-status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: fit-content;
+}
+
+.yatra-availability-status-available {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.yatra-availability-status-limited {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.yatra-availability-status-waitlist {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Right Column: Pricing & Booking */
+.yatra-availability-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-left: 24px;
+    border-left: 1px solid #e5e7eb;
+}
+
+.yatra-availability-pricing-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.yatra-availability-discount-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #dc2626;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yatra-availability-pricing {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.yatra-availability-price-original {
+    font-size: 14px;
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+.yatra-availability-price-main {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.yatra-availability-price-sale {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+}
+
+.yatra-availability-price-label {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Traveler Selector */
+.yatra-availability-travelers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.yatra-availability-traveler-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+/* Availability Participants Select - Same as sidebar */
+.yatra-availability-participants {
+    position: relative;
+    width: 100%;
+}
+
+.yatra-availability-participants-display {
+    flex: 1;
+    padding: 14px 12px 14px 0;
+    font-size: 15px;
+    color: #111827;
+    cursor: pointer;
+    user-select: none;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    pointer-events: auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* Quantity Selector for Availability */
+.yatra-availability-quantity-selector {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    display: none;
+    min-width: 100%;
+}
+
+.yatra-availability-participants.active .yatra-availability-quantity-selector {
+    display: block;
+}
+
+.yatra-availability-total-price {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: #fff;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+.yatra-availability-total-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.yatra-availability-total-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #3b82f6;
+}
+
+.yatra-availability-book-btn {
+    padding: 14px 24px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
+}
+
+.yatra-availability-book-btn:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.yatra-availability-book-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .yatra-availability-item-main {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .yatra-availability-right {
+        padding-left: 0;
+        border-left: none;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 24px;
+    }
+}
+
+.yatra-availability-load-more {
+    text-align: center;
+    margin-top: 32px;
+    margin-bottom: 24px;
+}
+
+.yatra-availability-load-more-btn {
+    padding: 12px 32px;
+    background: #10b981;
+    color: #fff;
+    border: 2px solid #10b981;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.yatra-availability-load-more-btn:hover {
+    background: #059669;
+    border-color: #059669;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .yatra-availability-header-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .yatra-availability-sort-select {
+        width: 100%;
+    }
+    
+    .yatra-availability-item-main {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .yatra-availability-pricing-info {
+        align-items: flex-start;
+    }
+    
+    .yatra-availability-book-btn {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .yatra-availability-filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .yatra-availability-filter-btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    
+    .yatra-availability-item {
+        padding: 20px;
+    }
+    
+    .yatra-availability-date {
+        font-size: 20px;
+    }
+    
+    .yatra-availability-price-sale {
+        font-size: 24px;
+    }
+}
+
+
