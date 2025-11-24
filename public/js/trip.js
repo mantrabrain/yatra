@@ -748,10 +748,118 @@
         }
     }
 
+    /**
+     * Sticky Navigation Class
+     * Handles sticky navigation bar functionality
+     */
+    class StickyNav {
+        constructor() {
+            this.nav = null;
+            this.navItems = [];
+            this.sections = [];
+            this.scrollThreshold = 200;
+            this.lastScrollTop = 0;
+            this.init();
+        }
+
+        init() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.setup());
+            } else {
+                this.setup();
+            }
+        }
+
+        setup() {
+            this.nav = document.querySelector('.yatra-sticky-nav');
+            if (!this.nav) return;
+
+            this.navItems = this.nav.querySelectorAll('.yatra-sticky-nav-item');
+            this.sections = ['overview', 'trip-details', 'itinerary', 'included'];
+
+            this.attachEventListeners();
+            this.handleScroll(); // Initial check
+            this.updateActiveNav(); // Initial check
+        }
+
+        attachEventListeners() {
+            // Handle clicks on nav items
+            this.navItems.forEach((item) => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const href = item.getAttribute('href');
+                    if (href && href.startsWith('#')) {
+                        const sectionId = href.substring(1);
+                        this.scrollToSection(sectionId);
+                        
+                        // Update active state
+                        this.navItems.forEach((nav) => nav.classList.remove('active'));
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            // Handle scroll events
+            window.addEventListener('scroll', () => this.onScroll(), { passive: true });
+        }
+
+        scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+
+            const offset = 100;
+            const elementPosition = section.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+
+        handleScroll() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Show nav when scrolling down past threshold
+            if (scrollTop > this.scrollThreshold) {
+                this.nav.classList.add('visible');
+            } else {
+                this.nav.classList.remove('visible');
+            }
+
+            this.lastScrollTop = scrollTop;
+        }
+
+        updateActiveNav() {
+            const scrollPos = window.scrollY + 150;
+            
+            this.sections.forEach((sectionId, index) => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionTop = section.offsetTop;
+                    const sectionBottom = sectionTop + section.offsetHeight;
+                    
+                    if (scrollPos >= sectionTop && scrollPos < sectionBottom) {
+                        this.navItems.forEach((nav) => nav.classList.remove('active'));
+                        if (this.navItems[index]) {
+                            this.navItems[index].classList.add('active');
+                        }
+                    }
+                }
+            });
+        }
+
+        onScroll() {
+            this.handleScroll();
+            this.updateActiveNav();
+        }
+    }
+
     // Initialize all classes
     window.galleryModal = new GalleryModal();
     window.bookingSidebar = new BookingSidebar();
     window.enquiryModal = new EnquiryModal();
+    window.stickyNav = new StickyNav();
 
 })();
 

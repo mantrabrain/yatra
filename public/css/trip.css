@@ -1198,6 +1198,12 @@
     z-index: 1;
 }
 
+/* Account for WordPress admin bar */
+.admin-bar .yatra-gallery-modal-content {
+    margin-top: 32px;
+    max-height: calc(90vh - 32px);
+}
+
 .yatra-gallery-modal-close {
     position: absolute;
     top: 20px;
@@ -1451,14 +1457,32 @@
     align-self: flex-start;
 }
 
+/* Account for sticky navigation bar (approximately 60px height) */
+.yatra-sticky-nav.visible ~ * .yatra-trip-sidebar,
+.yatra-sticky-nav.visible + * .yatra-trip-sidebar {
+    top: 60px;
+}
+
 /* Account for WordPress admin bar */
 .admin-bar .yatra-trip-sidebar {
     top: 32px; /* Admin bar height */
 }
 
+/* Account for both admin bar and sticky nav */
+.admin-bar .yatra-sticky-nav.visible ~ * .yatra-trip-sidebar,
+.admin-bar .yatra-sticky-nav.visible + * .yatra-trip-sidebar {
+    top: 92px; /* 32px admin bar + 60px sticky nav */
+}
+
 @media screen and (max-width: 782px) {
     .admin-bar .yatra-trip-sidebar {
         top: 46px; /* Mobile admin bar height */
+    }
+    
+    /* Account for both admin bar and sticky nav on mobile */
+    .admin-bar .yatra-sticky-nav.visible ~ * .yatra-trip-sidebar,
+    .admin-bar .yatra-sticky-nav.visible + * .yatra-trip-sidebar {
+        top: 106px; /* 46px admin bar + 60px sticky nav */
     }
 }
 
@@ -2788,6 +2812,16 @@ input.yatra-datepicker,
         right: 10px;
         width: 36px;
         height: 36px;
+    }
+    
+    /* Account for WordPress admin bar on mobile */
+    .admin-bar .yatra-gallery-modal-close {
+        top: 56px; /* 10px + 46px admin bar on mobile */
+    }
+    
+    .admin-bar .yatra-gallery-modal-content {
+        margin-top: 46px;
+        max-height: calc(100vh - 46px);
     }
 
     .yatra-gallery-thumbnail {
