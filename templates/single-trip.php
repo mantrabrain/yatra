@@ -516,6 +516,37 @@ get_header();
                 </div>
             </section>
 
+            <!-- Booking Information -->
+            <section class="yatra-trip-section">
+                <h2 class="yatra-trip-section-title">
+                    <?php echo yatra_svg_icon('info', 'yatra-trip-section-title-icon'); ?>
+                    Booking Information
+                </h2>
+                <div class="yatra-booking-info-grid">
+                    <div class="yatra-booking-info-card">
+                        <div class="yatra-booking-info-icon">
+                            <?php echo yatra_svg_icon('credit-card', 'yatra-icon-lg'); ?>
+                        </div>
+                        <h3 class="yatra-booking-info-title">Payment Methods</h3>
+                        <p class="yatra-booking-info-desc">We accept Visa, Mastercard, PayPal, and Stripe. Secure payment processing with SSL encryption.</p>
+                    </div>
+                    <div class="yatra-booking-info-card">
+                        <div class="yatra-booking-info-icon">
+                            <?php echo yatra_svg_icon('phone', 'yatra-icon-lg'); ?>
+                        </div>
+                        <h3 class="yatra-booking-info-title">Need Help?</h3>
+                        <p class="yatra-booking-info-desc">Call us at <a href="tel:+1234567890" class="yatra-booking-info-link">+1 (234) 567-890</a> or email <a href="mailto:support@yatra.com" class="yatra-booking-info-link">support@yatra.com</a></p>
+                    </div>
+                    <div class="yatra-booking-info-card">
+                        <div class="yatra-booking-info-icon">
+                            <?php echo yatra_svg_icon('check', 'yatra-icon-lg'); ?>
+                        </div>
+                        <h3 class="yatra-booking-info-title">Instant Confirmation</h3>
+                        <p class="yatra-booking-info-desc">Receive instant booking confirmation via email. Reserve now and pay later for flexible travel planning.</p>
+                    </div>
+                </div>
+            </section>
+
             <!-- Requirements & Policies -->
             <section class="yatra-trip-section">
                 <h2 class="yatra-trip-section-title">
@@ -838,28 +869,11 @@ get_header();
         <!-- Sidebar - Booking Card -->
         <aside class="yatra-trip-sidebar" id="booking">
             <div class="yatra-booking-card">
-                <!-- Instant Confirmation Badge -->
-                <div class="yatra-booking-badge">
-                    <div class="yatra-booking-badge-icon">
-                        <?php echo yatra_svg_icon('check', 'yatra-icon-xs'); ?>
-                    </div>
-                    <span class="yatra-booking-badge-text">Instant Confirmation</span>
-                </div>
-
-                <!-- Availability Alert -->
-                <div class="yatra-booking-availability">
-                    <div class="yatra-booking-availability-icon">
-                        <?php echo yatra_svg_icon('alert', 'yatra-icon-xs'); ?>
-                    </div>
-                    <span class="yatra-booking-availability-text">Only <strong>3 spots left</strong> for March 2024</span>
-                </div>
-
+                <!-- Price -->
                 <div class="yatra-booking-price">
                     <div class="yatra-booking-price-from">
                         <?php if ($trip_data->original_price > $trip_data->sale_price): ?>
-                        <span class="yatra-booking-price-original">From <?php echo yatra_format_price($trip_data->original_price, $trip_data->currency); ?></span>
-                        <?php else: ?>
-                        <span class="yatra-booking-price-from-text">From</span>
+                        <span class="yatra-booking-price-original"><?php echo yatra_format_price($trip_data->original_price, $trip_data->currency); ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="yatra-booking-price-main">
@@ -868,13 +882,24 @@ get_header();
                     </div>
                 </div>
 
-                <!-- Total Price Display (Dynamic) -->
-                <div class="yatra-booking-total" id="booking-total" style="display: none;">
-                    <div class="yatra-booking-total-label">Total</div>
-                    <div class="yatra-booking-total-amount" id="total-amount"><?php echo yatra_format_price($trip_data->sale_price, $trip_data->currency); ?></div>
+                <!-- Availability Alert (Compact) -->
+                <div class="yatra-booking-availability-compact">
+                    <span class="yatra-booking-availability-text">Only <strong>3 spots</strong> left for March</span>
                 </div>
 
                 <form class="yatra-booking-form">
+                    <!-- Date Selection -->
+                    <div class="yatra-booking-field-select">
+                        <div class="yatra-booking-field-icon">
+                            <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
+                        </div>
+                        <input type="text" id="travel_date" name="travel_date" class="yatra-booking-select yatra-datepicker" placeholder="Select date" readonly required>
+                        <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+
+                    <!-- Travelers Selection -->
                     <div class="yatra-booking-field-select yatra-participants-select">
                         <div class="yatra-booking-field-icon">
                             <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
@@ -928,71 +953,28 @@ get_header();
                         </div>
                     </div>
 
-                    <div class="yatra-booking-field-select">
-                        <div class="yatra-booking-field-icon">
-                            <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
-                        </div>
-                        <input type="text" id="travel_date" name="travel_date" class="yatra-booking-select yatra-datepicker" placeholder="Select date" readonly required>
-                        <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
+                    <!-- Total Price Display (Dynamic) -->
+                    <div class="yatra-booking-total" id="booking-total" style="display: none;">
+                        <div class="yatra-booking-total-label">Total</div>
+                        <div class="yatra-booking-total-amount" id="total-amount"><?php echo yatra_format_price($trip_data->sale_price, $trip_data->currency); ?></div>
                     </div>
 
-                    <button type="button" class="yatra-booking-enquiry-button">
-                        Make Enquiry
-                    </button>
-
+                    <!-- Action Buttons -->
                     <button type="button" class="yatra-booking-button">
                         Check availability
                     </button>
 
-                    <div class="yatra-booking-features">
-                        <div class="yatra-booking-feature-item">
-                            <div class="yatra-booking-feature-icon">
-                                <?php echo yatra_svg_icon('check', 'yatra-booking-features-icon'); ?>
-                            </div>
-                            <div class="yatra-booking-feature-content">
-                                <div class="yatra-booking-feature-title">Free cancellation</div>
-                                <div class="yatra-booking-feature-desc">Cancel up to 24 hours in advance for a full refund</div>
-                            </div>
-                        </div>
-                        <div class="yatra-booking-feature-item">
-                            <div class="yatra-booking-feature-icon">
-                                <?php echo yatra_svg_icon('check', 'yatra-booking-features-icon'); ?>
-                            </div>
-                            <div class="yatra-booking-feature-content">
-                                <div class="yatra-booking-feature-title">Reserve now & pay later</div>
-                                <div class="yatra-booking-feature-desc">Keep your travel plans flexible — book your spot and pay nothing today. <a href="#" class="yatra-booking-feature-link">Read more</a></div>
-                            </div>
-                        </div>
-                    </div>
+                    <button type="button" class="yatra-booking-enquiry-button" id="open-enquiry-modal" onclick="event.preventDefault(); event.stopPropagation(); const modal = document.getElementById('enquiry-modal'); if(modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; } return false;">
+                        Make Enquiry
+                    </button>
 
-                    <!-- Payment Methods -->
-                    <div class="yatra-booking-payment-methods">
-                        <div class="yatra-booking-payment-label">
-                            <?php echo yatra_svg_icon('credit-card', 'yatra-icon-xs'); ?>
-                            <span>Secure Payment</span>
+                    <!-- Single Trust Signal -->
+                    <div class="yatra-booking-trust">
+                        <div class="yatra-booking-trust-icon">
+                            <?php echo yatra_svg_icon('check', 'yatra-icon-xs'); ?>
                         </div>
-                        <div class="yatra-booking-payment-icons">
-                            <span class="yatra-payment-icon" title="Visa">Visa</span>
-                            <span class="yatra-payment-icon" title="Mastercard">MC</span>
-                            <span class="yatra-payment-icon" title="PayPal">PayPal</span>
-                            <span class="yatra-payment-icon" title="Stripe">Stripe</span>
-                        </div>
-                    </div>
-
-                    <!-- Contact Support -->
-                    <div class="yatra-booking-support">
-                        <div class="yatra-booking-support-title">Need Help?</div>
-                        <div class="yatra-booking-support-options">
-                            <a href="tel:+1234567890" class="yatra-booking-support-item">
-                                <?php echo yatra_svg_icon('phone', 'yatra-icon-xs'); ?>
-                                <span>Call Us</span>
-                            </a>
-                            <a href="mailto:support@yatra.com" class="yatra-booking-support-item">
-                                <?php echo yatra_svg_icon('mail', 'yatra-icon-xs'); ?>
-                                <span>Email Us</span>
-                            </a>
+                        <div class="yatra-booking-trust-text">
+                            <strong>Free cancellation</strong> up to 24 hours before
                         </div>
                     </div>
                 </form>
@@ -1001,6 +983,122 @@ get_header();
     </div>
 </div>
 
+<!-- Enquiry Modal -->
+<div class="yatra-enquiry-modal" id="enquiry-modal" role="dialog" aria-modal="true" aria-label="Make Enquiry">
+    <div class="yatra-enquiry-modal-overlay"></div>
+    <div class="yatra-enquiry-modal-content">
+        <button type="button" class="yatra-enquiry-modal-close" aria-label="Close Enquiry Form">
+            <svg class="yatra-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+        <div class="yatra-enquiry-modal-header">
+            <h2 class="yatra-enquiry-modal-title">Make an Enquiry</h2>
+            <p class="yatra-enquiry-modal-subtitle">Fill out the form below and we'll get back to you as soon as possible</p>
+        </div>
+        <form class="yatra-enquiry-form" id="enquiry-form">
+            <div class="yatra-enquiry-form-grid">
+                <div class="yatra-enquiry-field">
+                    <label for="enquiry-name" class="yatra-enquiry-label">Full Name <span class="yatra-enquiry-required">*</span></label>
+                    <input type="text" id="enquiry-name" name="name" class="yatra-enquiry-input" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="yatra-enquiry-field">
+                    <label for="enquiry-email" class="yatra-enquiry-label">Email Address <span class="yatra-enquiry-required">*</span></label>
+                    <input type="email" id="enquiry-email" name="email" class="yatra-enquiry-input" placeholder="your.email@example.com" required>
+                </div>
+                
+                <div class="yatra-enquiry-field">
+                    <label for="enquiry-phone" class="yatra-enquiry-label">Phone Number</label>
+                    <input type="tel" id="enquiry-phone" name="phone" class="yatra-enquiry-input" placeholder="+1 (234) 567-8900">
+                </div>
+            </div>
+            
+            <div class="yatra-enquiry-field-group">
+                <div class="yatra-enquiry-field">
+                    <label for="enquiry-travel-date" class="yatra-enquiry-label">Preferred Travel Date</label>
+                    <div class="yatra-booking-field-select">
+                        <div class="yatra-booking-field-icon">
+                            <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
+                        </div>
+                        <input type="text" id="enquiry-travel-date" name="travel_date" class="yatra-booking-select yatra-enquiry-datepicker" placeholder="Select date" readonly>
+                        <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="yatra-enquiry-field">
+                    <label for="enquiry-travelers" class="yatra-enquiry-label">Number of Travelers</label>
+                    <div class="yatra-booking-field-select yatra-participants-select yatra-enquiry-participants">
+                        <div class="yatra-booking-field-icon">
+                            <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
+                        </div>
+                        <div class="yatra-participants-display" id="enquiry-participants-display">
+                            Adult x 1
+                        </div>
+                        <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                        <div class="yatra-booking-quantity-selector" id="enquiry-quantity-selector">
+                            <div class="yatra-quantity-row">
+                                <div class="yatra-quantity-label">
+                                    <span class="yatra-quantity-title">Adult</span>
+                                    <span class="yatra-quantity-subtitle">(Age 13-99)</span>
+                                </div>
+                                <div class="yatra-quantity-controls">
+                                    <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="enquiry-adults" aria-label="Decrease adults">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                        </svg>
+                                    </button>
+                                    <input type="number" id="enquiry-adults" name="enquiry_adults" class="yatra-quantity-input" value="1" min="1" max="20" readonly>
+                                    <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="enquiry-adults" aria-label="Increase adults">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="yatra-quantity-row">
+                                <div class="yatra-quantity-label">
+                                    <span class="yatra-quantity-title">Child</span>
+                                    <span class="yatra-quantity-subtitle">(Age 4-12)</span>
+                                </div>
+                                <div class="yatra-quantity-controls">
+                                    <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="enquiry-children" aria-label="Decrease children" disabled>
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                        </svg>
+                                    </button>
+                                    <input type="number" id="enquiry-children" name="enquiry_children" class="yatra-quantity-input" value="0" min="0" max="10" readonly>
+                                    <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="enquiry-children" aria-label="Increase children">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="yatra-quantity-note">Ages 3 and younger are not permitted.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="yatra-enquiry-field">
+                <label for="enquiry-message" class="yatra-enquiry-label">Message <span class="yatra-enquiry-required">*</span></label>
+                <textarea id="enquiry-message" name="message" class="yatra-enquiry-textarea" rows="3" placeholder="Tell us about your travel plans, special requirements, or any questions you have..." required></textarea>
+            </div>
+            
+            <div class="yatra-enquiry-actions">
+                <button type="button" class="yatra-enquiry-cancel" id="close-enquiry-modal">Cancel</button>
+                <button type="submit" class="yatra-enquiry-submit">Send Enquiry</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <?php
 get_footer();
 ?>
+

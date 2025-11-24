@@ -1,611 +1,757 @@
 /**
  * Yatra Single Trip Page JavaScript
- * Interactive features for trip page
+ * Class-based implementation for trip page features
  */
 
 (function() {
     'use strict';
 
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-
-    function init() {
-        initHeroSlider();
-        initGalleryModal();
-        initFAQ();
-        initBookingForm();
-        initPriceCalculation();
-    }
-
     /**
-     * Hero Image Slider (disabled - showing single image only)
+     * Gallery Modal Class
+     * Handles image gallery modal functionality
      */
-    function initHeroSlider() {
-        // Single image hero - no slider functionality needed
-        // Just ensure the active slide is visible
-        const slides = document.querySelectorAll('.yatra-trip-hero-slide');
-        slides.forEach((slide, i) => {
-            if (i === 0) {
-                slide.classList.add('active');
+    class GalleryModal {
+        constructor() {
+            this.modal = null;
+            this.images = [];
+            this.currentIndex = 0;
+            this.init();
+        }
+
+        init() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.setup());
             } else {
-                slide.classList.remove('active');
+                this.setup();
             }
-        });
-    }
+        }
 
-    /**
-     * Gallery Modal System
-     */
-    function initGalleryModal() {
-        const galleryImages = [];
-        
-        // Collect all gallery images from hero slides and gallery section
-        const heroSlides = document.querySelectorAll('.yatra-trip-hero-slide img');
-        const galleryItems = document.querySelectorAll('.yatra-trip-gallery .yatra-gallery-item img');
-        
-        heroSlides.forEach((img, index) => {
-            galleryImages.push({
-                src: img.src,
-                alt: img.alt || `Gallery Image ${index + 1}`,
-                index: index
-            });
-        });
+        setup() {
+            this.modal = document.getElementById('hero-gallery');
+            if (!this.modal) return;
 
-        galleryItems.forEach((img, index) => {
-            const existingIndex = galleryImages.findIndex(g => g.src === img.src);
-            if (existingIndex === -1) {
-                galleryImages.push({
+            this.collectImages();
+            this.createThumbnails();
+            this.attachEventListeners();
+        }
+
+        collectImages() {
+            this.images = [];
+
+            // Collect from hero slides
+            const heroSlides = document.querySelectorAll('.yatra-trip-hero-slide img');
+            heroSlides.forEach((img, index) => {
+                this.images.push({
                     src: img.src,
-                    alt: img.alt || `Gallery Image ${galleryImages.length + 1}`,
-                    index: galleryImages.length
+                    alt: img.alt || `Gallery Image ${index + 1}`
                 });
+            });
+
+            // Collect from gallery section
+            const galleryItems = document.querySelectorAll('.yatra-trip-gallery .yatra-gallery-item img');
+            galleryItems.forEach((img) => {
+                const exists = this.images.some(i => i.src === img.src);
+                if (!exists) {
+                    this.images.push({
+                        src: img.src,
+                        alt: img.alt || `Gallery Image ${this.images.length + 1}`
+                    });
+                }
+            });
+        }
+
+        createThumbnails() {
+            const container = this.modal.querySelector('.yatra-gallery-thumbnails-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+            const totalCount = this.modal.querySelector('.yatra-gallery-total-count');
+            if (totalCount) {
+                totalCount.textContent = this.images.length;
             }
-        });
 
-        if (galleryImages.length === 0) return;
-
-        const modal = document.getElementById('hero-gallery');
-        if (!modal) return;
-
-        const modalImage = modal.querySelector('.yatra-gallery-modal-image');
-        const modalLoader = modal.querySelector('.yatra-gallery-modal-loader');
-        const currentIndexSpan = modal.querySelector('.yatra-gallery-current-index');
-        const totalCountSpan = modal.querySelector('.yatra-gallery-total-count');
-        const thumbnailsContainer = modal.querySelector('.yatra-gallery-thumbnails-container');
-        const prevBtn = modal.querySelector('.yatra-gallery-modal-prev');
-        const nextBtn = modal.querySelector('.yatra-gallery-modal-next');
-        const closeBtn = modal.querySelector('.yatra-gallery-modal-close');
-        const overlay = modal.querySelector('.yatra-gallery-modal-overlay');
-
-        let currentIndex = 0;
-
-        // Set total count
-        totalCountSpan.textContent = galleryImages.length;
-
-        // Create thumbnails
-        function createThumbnails() {
-            thumbnailsContainer.innerHTML = '';
-            galleryImages.forEach((img, index) => {
+            this.images.forEach((img, index) => {
                 const thumbnail = document.createElement('div');
                 thumbnail.className = 'yatra-gallery-thumbnail';
                 thumbnail.setAttribute('data-index', index);
                 if (index === 0) thumbnail.classList.add('active');
-                
+
                 const thumbnailImg = document.createElement('img');
                 thumbnailImg.src = img.src;
                 thumbnailImg.alt = img.alt;
                 thumbnail.appendChild(thumbnailImg);
-                
-                thumbnail.addEventListener('click', () => {
-                    showImage(index);
-                });
-                
-                thumbnailsContainer.appendChild(thumbnail);
+
+                thumbnail.addEventListener('click', () => this.showImage(index));
+                container.appendChild(thumbnail);
             });
         }
 
-        // Show image in modal
-        function showImage(index) {
-            if (index < 0 || index >= galleryImages.length) return;
-            
-            currentIndex = index;
-            const image = galleryImages[index];
-            
-            // Update counter
-            currentIndexSpan.textContent = index + 1;
-            
+        showImage(index) {
+            if (index < 0 || index >= this.images.length) return;
+
+            this.currentIndex = index;
+            const image = this.images[index];
+            const modalImage = this.modal.querySelector('.yatra-gallery-modal-image');
+            const modalLoader = this.modal.querySelector('.yatra-gallery-modal-loader');
+            const currentIndexSpan = this.modal.querySelector('.yatra-gallery-current-index');
+            const prevBtn = this.modal.querySelector('.yatra-gallery-modal-prev');
+            const nextBtn = this.modal.querySelector('.yatra-gallery-modal-next');
+
+            if (currentIndexSpan) {
+                currentIndexSpan.textContent = index + 1;
+            }
+
             // Update thumbnails
-            const thumbnails = thumbnailsContainer.querySelectorAll('.yatra-gallery-thumbnail');
+            const thumbnails = this.modal.querySelectorAll('.yatra-gallery-thumbnail');
             thumbnails.forEach((thumb, i) => {
                 thumb.classList.toggle('active', i === index);
             });
-            
+
             // Show loader
-            modalLoader.classList.add('active');
-            modalImage.classList.remove('loaded');
-            
+            if (modalLoader) modalLoader.classList.add('active');
+            if (modalImage) modalImage.classList.remove('loaded');
+
             // Load image
             const img = new Image();
-            img.onload = function() {
-                modalImage.src = image.src;
-                modalImage.alt = image.alt;
-                modalImage.classList.add('loaded');
-                modalLoader.classList.remove('active');
+            img.onload = () => {
+                if (modalImage) {
+                    modalImage.src = image.src;
+                    modalImage.alt = image.alt;
+                    modalImage.classList.add('loaded');
+                }
+                if (modalLoader) modalLoader.classList.remove('active');
             };
-            img.onerror = function() {
-                modalLoader.classList.remove('active');
-                modalImage.src = image.src; // Try anyway
+            img.onerror = () => {
+                if (modalLoader) modalLoader.classList.remove('active');
+                if (modalImage) modalImage.src = image.src;
             };
             img.src = image.src;
-            
+
             // Update button states
-            prevBtn.style.opacity = index === 0 ? '0.5' : '1';
-            prevBtn.style.pointerEvents = index === 0 ? 'none' : 'auto';
-            nextBtn.style.opacity = index === galleryImages.length - 1 ? '0.5' : '1';
-            nextBtn.style.pointerEvents = index === galleryImages.length - 1 ? 'none' : 'auto';
+            if (prevBtn) {
+                prevBtn.style.opacity = index === 0 ? '0.5' : '1';
+                prevBtn.style.pointerEvents = index === 0 ? 'none' : 'auto';
+            }
+            if (nextBtn) {
+                nextBtn.style.opacity = index === this.images.length - 1 ? '0.5' : '1';
+                nextBtn.style.pointerEvents = index === this.images.length - 1 ? 'none' : 'auto';
+            }
         }
 
-        // Open modal
-        function openModal(startIndex = 0) {
-            modal.classList.add('active');
+        open(startIndex = 0) {
+            if (this.images.length === 0) return;
+            this.modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            showImage(startIndex);
+            this.showImage(startIndex);
         }
 
-        // Close modal
-        function closeModal() {
-            modal.classList.remove('active');
+        close() {
+            this.modal.classList.remove('active');
             document.body.style.overflow = '';
         }
 
-        // Navigation
-        function nextImage() {
-            if (currentIndex < galleryImages.length - 1) {
-                showImage(currentIndex + 1);
+        next() {
+            if (this.currentIndex < this.images.length - 1) {
+                this.showImage(this.currentIndex + 1);
             }
         }
 
-        function prevImage() {
-            if (currentIndex > 0) {
-                showImage(currentIndex - 1);
+        prev() {
+            if (this.currentIndex > 0) {
+                this.showImage(this.currentIndex - 1);
             }
         }
 
-        // Event listeners
-        closeBtn.addEventListener('click', closeModal);
-        overlay.addEventListener('click', closeModal);
-        prevBtn.addEventListener('click', prevImage);
-        nextBtn.addEventListener('click', nextImage);
-
-        // Keyboard navigation
-        document.addEventListener('keydown', function(e) {
-            if (!modal.classList.contains('active')) return;
-            
-            if (e.key === 'Escape') {
-                closeModal();
-            } else if (e.key === 'ArrowLeft') {
-                prevImage();
-            } else if (e.key === 'ArrowRight') {
-                nextImage();
+        attachEventListeners() {
+            // Close button
+            const closeBtn = this.modal.querySelector('.yatra-gallery-modal-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => this.close());
             }
-        });
 
-        // Initialize thumbnails
-        createThumbnails();
+            // Overlay
+            const overlay = this.modal.querySelector('.yatra-gallery-modal-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', () => this.close());
+            }
 
-        // Open modal from play button
-        const playButton = document.querySelector('.yatra-hero-gallery-play');
-        const galleryPlayBtn = document.querySelector('.yatra-gallery-play-btn');
-        
-        if (playButton) {
-            playButton.addEventListener('click', () => openModal(0));
-        }
-        
-        if (galleryPlayBtn) {
-            galleryPlayBtn.addEventListener('click', () => openModal(0));
-        }
+            // Navigation buttons
+            const prevBtn = this.modal.querySelector('.yatra-gallery-modal-prev');
+            const nextBtn = this.modal.querySelector('.yatra-gallery-modal-next');
+            if (prevBtn) prevBtn.addEventListener('click', () => this.prev());
+            if (nextBtn) nextBtn.addEventListener('click', () => this.next());
 
-        // Open modal from gallery items
-        galleryItems.forEach((item, index) => {
-            const galleryItem = item.closest('.yatra-gallery-item');
-            if (galleryItem) {
-                galleryItem.addEventListener('click', () => {
-                    const imageIndex = galleryImages.findIndex(g => g.src === item.src);
-                    openModal(imageIndex >= 0 ? imageIndex : index);
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (!this.modal.classList.contains('active')) return;
+                if (e.key === 'Escape') this.close();
+                if (e.key === 'ArrowLeft') this.prev();
+                if (e.key === 'ArrowRight') this.next();
+            });
+
+            // Open from play button
+            const playButton = document.querySelector('.yatra-hero-gallery-play');
+            const galleryPlayBtn = document.querySelector('.yatra-gallery-play-btn');
+            if (playButton) {
+                playButton.addEventListener('click', () => this.open(0));
+            }
+            if (galleryPlayBtn) {
+                galleryPlayBtn.addEventListener('click', () => this.open(0));
+            }
+
+            // Open from gallery items
+            const galleryItems = document.querySelectorAll('.yatra-trip-gallery .yatra-gallery-item');
+            galleryItems.forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    const img = item.querySelector('img');
+                    if (img) {
+                        const imageIndex = this.images.findIndex(i => i.src === img.src);
+                        this.open(imageIndex >= 0 ? imageIndex : index);
+                    }
                 });
-            }
-        });
+            });
 
-        // Open modal from side images
-        const sideImages = document.querySelectorAll('.yatra-side-image-item img');
-        sideImages.forEach((img, index) => {
-            const sideImageItem = img.closest('.yatra-side-image-item');
-            if (sideImageItem) {
-                sideImageItem.addEventListener('click', (e) => {
-                    // Don't open if clicking on buttons
+            // Open from side images
+            const sideImages = document.querySelectorAll('.yatra-side-image-item');
+            sideImages.forEach((item) => {
+                item.addEventListener('click', (e) => {
                     if (e.target.closest('.yatra-favorite-btn') || e.target.closest('.yatra-view-all-photos-btn')) {
                         return;
                     }
-                    const imageIndex = galleryImages.findIndex(g => g.src === img.src);
-                    openModal(imageIndex >= 0 ? imageIndex : index + 1);
-                });
-            }
-        });
-    }
-
-    /**
-     * FAQ Accordion
-     */
-    function initFAQ() {
-        const faqItems = document.querySelectorAll('.yatra-faq-item');
-        
-        faqItems.forEach(item => {
-            const question = item.querySelector('.yatra-faq-question');
-            if (!question) return;
-
-            question.addEventListener('click', function(e) {
-                e.preventDefault();
-                const isActive = item.classList.contains('active');
-                
-                // Close all other items
-                faqItems.forEach(otherItem => {
-                    if (otherItem !== item) {
-                        otherItem.classList.remove('active');
+                    const img = item.querySelector('img');
+                    if (img) {
+                        const imageIndex = this.images.findIndex(i => i.src === img.src);
+                        this.open(imageIndex >= 0 ? imageIndex : 0);
                     }
                 });
-
-                // Toggle current item
-                if (isActive) {
-                    item.classList.remove('active');
-                } else {
-                    item.classList.add('active');
-                }
-            });
-        });
-    }
-
-    /**
-     * Booking Form Validation
-     */
-    function initBookingForm() {
-        const bookingForm = document.querySelector('.yatra-booking-form');
-        if (!bookingForm) return;
-
-        const bookingButton = bookingForm.querySelector('.yatra-booking-button');
-        if (!bookingButton) return;
-
-        bookingButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Get form values
-            const date = bookingForm.querySelector('[name="travel_date"]')?.value;
-            const travelers = bookingForm.querySelector('[name="travelers"]')?.value;
-            
-            // Basic validation
-            if (!date) {
-                alert('Please select a travel date');
-                return;
-            }
-            
-            if (!travelers || parseInt(travelers) < 1) {
-                alert('Please enter number of travelers');
-                return;
-            }
-
-            // Show loading state
-            const originalText = bookingButton.textContent;
-            bookingButton.textContent = 'Processing...';
-            bookingButton.disabled = true;
-
-            // Simulate booking process (replace with actual API call)
-            setTimeout(() => {
-                alert('Booking functionality will be implemented soon!');
-                bookingButton.textContent = originalText;
-                bookingButton.disabled = false;
-            }, 1000);
-        });
-    }
-
-    /**
-     * Smooth scroll to section
-     */
-    function scrollToSection(sectionId) {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            const offset = 100;
-            const elementPosition = section.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
             });
         }
     }
 
     /**
-     * Sticky Navigation
+     * Booking Sidebar Class
+     * Handles booking form interactions (Check Availability & Make Enquiry buttons)
+     * Also handles date picker and travelers selector for main booking form
      */
-    function initStickyNav() {
-        const stickyNav = document.querySelector('.yatra-sticky-nav');
-        if (!stickyNav) return;
+    class BookingSidebar {
+        constructor() {
+            this.checkAvailabilityBtn = null;
+            this.makeEnquiryBtn = null;
+            this.dateInput = null;
+            this.participantsSelect = null;
+            this.datepickerInstance = null;
+            this.init();
+        }
 
-        const navItems = document.querySelectorAll('.yatra-sticky-nav-item');
-        const sections = ['overview', 'trip-details', 'itinerary', 'included'];
-        let lastScrollTop = 0;
-        const scrollThreshold = 200; // Show nav after scrolling 200px
-
-        // Handle click on nav items
-        navItems.forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const href = this.getAttribute('href');
-                if (href && href.startsWith('#')) {
-                    const sectionId = href.substring(1);
-                    scrollToSection(sectionId);
-                    
-                    // Update active state
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                }
-            });
-        });
-
-        // Show/hide nav based on scroll
-        function handleScroll() {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            // Show nav when scrolling down past threshold
-            if (scrollTop > scrollThreshold) {
-                stickyNav.classList.add('visible');
+        init() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.setup());
             } else {
-                stickyNav.classList.remove('visible');
+                this.setup();
             }
-
-            lastScrollTop = scrollTop;
         }
 
-        // Update active nav item on scroll
-        function updateActiveNav() {
-            const scrollPos = window.scrollY + 150;
-            
-            sections.forEach((sectionId, index) => {
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    const sectionTop = section.offsetTop;
-                    const sectionBottom = sectionTop + section.offsetHeight;
-                    
-                    if (scrollPos >= sectionTop && scrollPos < sectionBottom) {
-                        navItems.forEach(nav => nav.classList.remove('active'));
-                        if (navItems[index]) {
-                            navItems[index].classList.add('active');
-                        }
+        setup() {
+            this.checkAvailabilityBtn = document.getElementById('check-availability-btn');
+            this.makeEnquiryBtn = document.getElementById('open-enquiry-modal');
+            this.dateInput = document.getElementById('travel_date');
+            this.participantsSelect = document.querySelector('.yatra-participants-select');
+
+            this.attachEventListeners();
+            this.initDateField();
+            this.initTravelersField();
+        }
+
+        attachEventListeners() {
+            // Check Availability button
+            if (this.checkAvailabilityBtn) {
+                this.checkAvailabilityBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.handleCheckAvailability();
+                });
+            }
+
+            // Make Enquiry button
+            if (this.makeEnquiryBtn) {
+                this.makeEnquiryBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.handleMakeEnquiry();
+                });
+            }
+        }
+
+        initDateField() {
+            if (!this.dateInput || typeof flatpickr === 'undefined') return;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Format today's date as Y-m-d
+            const todayStr = today.getFullYear() + '-' + 
+                           String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                           String(today.getDate()).padStart(2, '0');
+
+            // Set today's date as default value
+            this.dateInput.value = todayStr;
+
+            // Destroy existing instance if any
+            if (this.dateInput._flatpickr) {
+                this.dateInput._flatpickr.destroy();
+            }
+
+            this.datepickerInstance = flatpickr(this.dateInput, {
+                dateFormat: 'Y-m-d',
+                minDate: today,
+                defaultDate: today,
+                enableTime: false,
+                clickOpens: true,
+                allowInput: false,
+                static: false,
+                monthSelectorType: 'static',
+                animate: true,
+                locale: {
+                    firstDayOfWeek: 1
+                },
+                onChange: (selectedDates, dateStr) => {
+                    this.dateInput.value = dateStr;
+                }
+            });
+
+            // Make container clickable
+            const container = this.dateInput.closest('.yatra-booking-field-select');
+            if (container) {
+                container.style.cursor = 'pointer';
+                container.onclick = (e) => {
+                    if (e.target === this.dateInput) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (this.datepickerInstance.isOpen) {
+                        this.datepickerInstance.close();
+                    } else {
+                        this.datepickerInstance.open();
                     }
-                }
-            });
-        }
-
-        // Combined scroll handler
-        function onScroll() {
-            handleScroll();
-            updateActiveNav();
-        }
-
-        window.addEventListener('scroll', onScroll, { passive: true });
-        handleScroll(); // Initial check
-        updateActiveNav(); // Initial check
-    }
-
-    /**
-     * Quantity Selector (Plus/Minus buttons)
-     */
-    function initQuantitySelector() {
-        const participantsSelect = document.querySelector('.yatra-participants-select');
-        const participantsDisplay = document.getElementById('participants-display');
-        const quantitySelector = document.getElementById('quantity-selector');
-        
-        if (!participantsSelect || !participantsDisplay || !quantitySelector) return;
-        
-        // Toggle dropdown on click
-        participantsSelect.addEventListener('click', function(e) {
-            e.stopPropagation();
-            participantsSelect.classList.toggle('active');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!participantsSelect.contains(e.target)) {
-                participantsSelect.classList.remove('active');
+                };
             }
-        });
-        
-        // Update display text
-        function updateDisplay() {
-            const adults = parseInt(document.getElementById('adults')?.value || 1);
-            const children = parseInt(document.getElementById('children')?.value || 0);
-            
-            let displayText = '';
-            if (adults > 0 && children > 0) {
-                displayText = `Adult x ${adults}, Child x ${children}`;
-            } else if (adults > 0) {
-                displayText = `Adult x ${adults}`;
-            } else if (children > 0) {
-                displayText = `Child x ${children}`;
-            } else {
-                displayText = 'Adult x 1';
-            }
-            
-            participantsDisplay.textContent = displayText;
         }
-        
-        // Quantity button handlers
-        const quantityButtons = document.querySelectorAll('.yatra-quantity-btn');
-        
-        quantityButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
+
+        initTravelersField() {
+            if (!this.participantsSelect) return;
+
+            const display = document.getElementById('participants-display');
+            const selector = document.getElementById('quantity-selector');
+            const adultsInput = document.getElementById('adults');
+            const childrenInput = document.getElementById('children');
+
+            if (!display || !selector || !adultsInput || !childrenInput) return;
+
+            // Make display clickable
+            display.style.cursor = 'pointer';
+
+            // Toggle dropdown
+            this.participantsSelect.onclick = (e) => {
+                if (e.target.closest('.yatra-quantity-btn')) return;
+                if (selector.contains(e.target)) return;
+                e.preventDefault();
                 e.stopPropagation();
-                const target = this.getAttribute('data-target');
-                const input = document.getElementById(target);
-                if (!input) return;
-                
-                const currentValue = parseInt(input.value) || 0;
-                const min = parseInt(input.getAttribute('min')) || 0;
-                const max = parseInt(input.getAttribute('max')) || 999;
-                const isPlus = this.classList.contains('yatra-quantity-plus');
-                const isMinus = this.classList.contains('yatra-quantity-minus');
-                
-                let newValue = currentValue;
-                
-                if (isPlus && currentValue < max) {
-                    newValue = currentValue + 1;
-                } else if (isMinus && currentValue > min) {
-                    newValue = currentValue - 1;
+                this.participantsSelect.classList.toggle('active');
+            };
+
+            // Update display function
+            const updateDisplay = () => {
+                const adults = parseInt(adultsInput.value || 1);
+                const children = parseInt(childrenInput.value || 0);
+                let text = '';
+                if (adults > 0 && children > 0) {
+                    text = `Adult x ${adults}, Child x ${children}`;
+                } else if (adults > 0) {
+                    text = `Adult x ${adults}`;
+                } else if (children > 0) {
+                    text = `Child x ${children}`;
+                } else {
+                    text = 'Adult x 1';
                 }
-                
-                if (newValue !== currentValue) {
+                display.textContent = text;
+            };
+
+            // Quantity button handlers
+            selector.onclick = (e) => {
+                const btn = e.target.closest('.yatra-quantity-btn');
+                if (!btn) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const targetId = btn.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                if (!input) return;
+
+                const current = parseInt(input.value || 0);
+                const min = parseInt(input.getAttribute('min') || 0);
+                const max = parseInt(input.getAttribute('max') || 999);
+                const isPlus = btn.classList.contains('yatra-quantity-plus');
+                const isMinus = btn.classList.contains('yatra-quantity-minus');
+
+                let newValue = current;
+                if (isPlus && current < max) {
+                    newValue = current + 1;
+                } else if (isMinus && current > min) {
+                    newValue = current - 1;
+                }
+
+                if (newValue !== current) {
                     input.value = newValue;
                     updateDisplay();
-                    
+
                     // Update button states
                     const row = input.closest('.yatra-quantity-row');
                     if (row) {
                         const minusBtn = row.querySelector('.yatra-quantity-minus');
                         const plusBtn = row.querySelector('.yatra-quantity-plus');
-                        
-                        if (minusBtn) {
-                            minusBtn.disabled = newValue <= min;
-                        }
-                        if (plusBtn) {
-                            plusBtn.disabled = newValue >= max;
-                        }
+                        if (minusBtn) minusBtn.disabled = newValue <= min;
+                        if (plusBtn) plusBtn.disabled = newValue >= max;
                     }
                 }
+            };
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!this.participantsSelect.contains(e.target)) {
+                    this.participantsSelect.classList.remove('active');
+                }
             });
-        });
-        
-        // Initialize button states and display
-        document.querySelectorAll('.yatra-quantity-input').forEach(input => {
-            const value = parseInt(input.value) || 0;
-            const min = parseInt(input.getAttribute('min')) || 0;
-            const max = parseInt(input.getAttribute('max')) || 999;
-            const row = input.closest('.yatra-quantity-row');
-            
-            if (row) {
-                const minusBtn = row.querySelector('.yatra-quantity-minus');
-                const plusBtn = row.querySelector('.yatra-quantity-plus');
-                
-                if (minusBtn) {
-                    minusBtn.disabled = value <= min;
+
+            // Initialize
+            updateDisplay();
+            [adultsInput, childrenInput].forEach((input) => {
+                const value = parseInt(input.value || 0);
+                const min = parseInt(input.getAttribute('min') || 0);
+                const max = parseInt(input.getAttribute('max') || 999);
+                const row = input.closest('.yatra-quantity-row');
+                if (row) {
+                    const minusBtn = row.querySelector('.yatra-quantity-minus');
+                    const plusBtn = row.querySelector('.yatra-quantity-plus');
+                    if (minusBtn) minusBtn.disabled = value <= min;
+                    if (plusBtn) plusBtn.disabled = value >= max;
                 }
-                if (plusBtn) {
-                    plusBtn.disabled = value >= max;
-                }
-            }
-        });
-        
-        updateDisplay();
-    }
+            });
+        }
 
-    /**
-     * Initialize Datepicker
-     */
-    function initDatepicker() {
-        const dateInput = document.getElementById('travel_date');
-        if (!dateInput || typeof flatpickr === 'undefined') return;
+        handleCheckAvailability() {
+            // Get form values
+            const dateInput = document.getElementById('travel_date');
+            const adultsInput = document.getElementById('adults');
+            const childrenInput = document.getElementById('children');
 
-        // Get minimum date (today)
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+            const date = dateInput ? dateInput.value : '';
+            const adults = adultsInput ? parseInt(adultsInput.value) || 0 : 0;
+            const children = childrenInput ? parseInt(childrenInput.value) || 0 : 0;
 
-        flatpickr(dateInput, {
-            dateFormat: 'Y-m-d',
-            minDate: today,
-            defaultDate: today,
-            enableTime: false,
-            clickOpens: true,
-            allowInput: false,
-            static: false,
-            monthSelectorType: 'static',
-            animate: true,
-            locale: {
-                firstDayOfWeek: 1
-            },
-            onChange: function(selectedDates, dateStr, instance) {
-                // Update the input value
-                dateInput.value = dateStr;
-            }
-        });
-    }
-
-    function init() {
-        initHeroSlider();
-        initGalleryModal();
-        initFAQ();
-        initBookingForm();
-        initStickyNav();
-        initQuantitySelector();
-        initDatepicker();
-    }
-
-    // Expose scroll function globally if needed
-    window.yatraScrollToSection = scrollToSection;
-
-    /**
-     * Dynamic Price Calculation
-     * Updates total price based on number of adults and children
-     */
-    function initPriceCalculation() {
-        const adultsInput = document.getElementById('adults');
-        const childrenInput = document.getElementById('children');
-        const totalDisplay = document.getElementById('booking-total');
-        const totalAmount = document.getElementById('total-amount');
-        const pricePerPerson = 1650; // Base price per person (should come from data attribute)
-        const childDiscount = 0.5; // Children pay 50% of adult price
-
-        if (!adultsInput || !childrenInput || !totalDisplay || !totalAmount) return;
-
-        function calculateTotal() {
-            const adults = parseInt(adultsInput.value) || 0;
-            const children = parseInt(childrenInput.value) || 0;
-            
-            if (adults === 0 && children === 0) {
-                totalDisplay.style.display = 'none';
+            // Basic validation
+            if (!date) {
+                alert('Please select a travel date');
                 return;
             }
 
-            const adultTotal = adults * pricePerPerson;
-            const childTotal = children * (pricePerPerson * childDiscount);
-            const grandTotal = adultTotal + childTotal;
+            if (adults === 0 && children === 0) {
+                alert('Please select number of travelers');
+                return;
+            }
 
-            // Format and display total
-            totalAmount.textContent = '$' + grandTotal.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
+            // Show loading state
+            const originalText = this.checkAvailabilityBtn.textContent;
+            this.checkAvailabilityBtn.textContent = 'Checking...';
+            this.checkAvailabilityBtn.disabled = true;
 
-            totalDisplay.style.display = 'flex';
+            // Simulate API call (replace with actual implementation)
+            setTimeout(() => {
+                alert(`Availability checked for ${adults} adult(s) and ${children} child(ren) on ${date}`);
+                this.checkAvailabilityBtn.textContent = originalText;
+                this.checkAvailabilityBtn.disabled = false;
+            }, 1000);
         }
 
-        // Listen for changes in quantity inputs
-        adultsInput.addEventListener('change', calculateTotal);
-        childrenInput.addEventListener('input', calculateTotal);
-        adultsInput.addEventListener('input', calculateTotal);
-        childrenInput.addEventListener('change', calculateTotal);
-
-        // Also listen to quantity button changes
-        const quantityButtons = document.querySelectorAll('.yatra-quantity-btn');
-        quantityButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                setTimeout(calculateTotal, 100); // Small delay to ensure value is updated
-            });
-        });
-
-        // Initial calculation
-        calculateTotal();
+        handleMakeEnquiry() {
+            // This will be handled by EnquiryModal class
+            // Just trigger the modal open
+            if (window.enquiryModal) {
+                window.enquiryModal.open();
+            }
+        }
     }
 
+    /**
+     * Enquiry Modal Class
+     * Handles enquiry form modal functionality
+     */
+    class EnquiryModal {
+        constructor() {
+            this.modal = null;
+            this.form = null;
+            this.dateInput = null;
+            this.participantsSelect = null;
+            this.datepickerInstance = null;
+            this.init();
+        }
+
+        init() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.setup());
+            } else {
+                this.setup();
+            }
+        }
+
+        setup() {
+            this.modal = document.getElementById('enquiry-modal');
+            if (!this.modal) return;
+
+            this.form = document.getElementById('enquiry-form');
+            this.dateInput = document.getElementById('enquiry-travel-date');
+            this.participantsSelect = document.querySelector('.yatra-enquiry-participants');
+
+            this.attachEventListeners();
+        }
+
+        attachEventListeners() {
+            // Close button
+            const closeBtn = document.getElementById('close-enquiry-modal');
+            const modalClose = document.querySelector('.yatra-enquiry-modal-close');
+            const overlay = document.querySelector('.yatra-enquiry-modal-overlay');
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => this.close());
+            }
+            if (modalClose) {
+                modalClose.addEventListener('click', () => this.close());
+            }
+            if (overlay) {
+                overlay.addEventListener('click', () => this.close());
+            }
+
+            // ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.modal.classList.contains('active')) {
+                    this.close();
+                }
+            });
+
+            // Form submission
+            if (this.form) {
+                this.form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleSubmit();
+                });
+            }
+        }
+
+        open() {
+            if (!this.modal) return;
+            this.modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Initialize form fields after modal is visible
+            setTimeout(() => {
+                this.initDateField();
+                this.initTravelersField();
+            }, 300);
+        }
+
+        close() {
+            if (!this.modal) return;
+            this.modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        initDateField() {
+            if (!this.dateInput || typeof flatpickr === 'undefined') return;
+
+            // Sync date from main form
+            const mainDateInput = document.getElementById('travel_date');
+            if (mainDateInput && mainDateInput.value) {
+                this.dateInput.value = mainDateInput.value;
+            }
+
+            // Destroy existing instance
+            if (this.dateInput._flatpickr) {
+                this.dateInput._flatpickr.destroy();
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            this.datepickerInstance = flatpickr(this.dateInput, {
+                dateFormat: 'Y-m-d',
+                minDate: today,
+                enableTime: false,
+                clickOpens: true,
+                allowInput: false,
+                static: false,
+                monthSelectorType: 'static',
+                animate: true,
+                locale: {
+                    firstDayOfWeek: 1
+                },
+                onChange: (selectedDates, dateStr) => {
+                    this.dateInput.value = dateStr;
+                }
+            });
+
+            // Make container clickable
+            const container = this.dateInput.closest('.yatra-booking-field-select');
+            if (container) {
+                container.style.cursor = 'pointer';
+                container.onclick = (e) => {
+                    if (e.target === this.dateInput) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (this.datepickerInstance.isOpen) {
+                        this.datepickerInstance.close();
+                    } else {
+                        this.datepickerInstance.open();
+                    }
+                };
+            }
+        }
+
+        initTravelersField() {
+            if (!this.participantsSelect) return;
+
+            const display = document.getElementById('enquiry-participants-display');
+            const selector = document.getElementById('enquiry-quantity-selector');
+            const adultsInput = document.getElementById('enquiry-adults');
+            const childrenInput = document.getElementById('enquiry-children');
+
+            if (!display || !selector || !adultsInput || !childrenInput) return;
+
+            // Make display clickable
+            display.style.cursor = 'pointer';
+
+            // Toggle dropdown
+            this.participantsSelect.onclick = (e) => {
+                if (e.target.closest('.yatra-quantity-btn')) return;
+                if (selector.contains(e.target)) return;
+                e.preventDefault();
+                e.stopPropagation();
+                this.participantsSelect.classList.toggle('active');
+            };
+
+            // Update display function
+            const updateDisplay = () => {
+                const adults = parseInt(adultsInput.value || 1);
+                const children = parseInt(childrenInput.value || 0);
+                let text = '';
+                if (adults > 0 && children > 0) {
+                    text = `Adult x ${adults}, Child x ${children}`;
+                } else if (adults > 0) {
+                    text = `Adult x ${adults}`;
+                } else if (children > 0) {
+                    text = `Child x ${children}`;
+                } else {
+                    text = 'Adult x 1';
+                }
+                display.textContent = text;
+            };
+
+            // Quantity button handlers
+            selector.onclick = (e) => {
+                const btn = e.target.closest('.yatra-quantity-btn');
+                if (!btn) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const targetId = btn.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                if (!input) return;
+
+                const current = parseInt(input.value || 0);
+                const min = parseInt(input.getAttribute('min') || 0);
+                const max = parseInt(input.getAttribute('max') || 999);
+                const isPlus = btn.classList.contains('yatra-quantity-plus');
+                const isMinus = btn.classList.contains('yatra-quantity-minus');
+
+                let newValue = current;
+                if (isPlus && current < max) {
+                    newValue = current + 1;
+                } else if (isMinus && current > min) {
+                    newValue = current - 1;
+                }
+
+                if (newValue !== current) {
+                    input.value = newValue;
+                    updateDisplay();
+
+                    // Update button states
+                    const row = input.closest('.yatra-quantity-row');
+                    if (row) {
+                        const minusBtn = row.querySelector('.yatra-quantity-minus');
+                        const plusBtn = row.querySelector('.yatra-quantity-plus');
+                        if (minusBtn) minusBtn.disabled = newValue <= min;
+                        if (plusBtn) plusBtn.disabled = newValue >= max;
+                    }
+                }
+            };
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!this.participantsSelect.contains(e.target)) {
+                    this.participantsSelect.classList.remove('active');
+                }
+            });
+
+            // Initialize
+            updateDisplay();
+            [adultsInput, childrenInput].forEach((input) => {
+                const value = parseInt(input.value || 0);
+                const min = parseInt(input.getAttribute('min') || 0);
+                const max = parseInt(input.getAttribute('max') || 999);
+                const row = input.closest('.yatra-quantity-row');
+                if (row) {
+                    const minusBtn = row.querySelector('.yatra-quantity-minus');
+                    const plusBtn = row.querySelector('.yatra-quantity-plus');
+                    if (minusBtn) minusBtn.disabled = value <= min;
+                    if (plusBtn) plusBtn.disabled = value >= max;
+                }
+            });
+        }
+
+        handleSubmit() {
+            if (!this.form) return;
+
+            const formData = new FormData(this.form);
+            const data = Object.fromEntries(formData);
+
+            // Validation
+            if (!data.name || !data.email || !data.message) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Show loading
+            const submitBtn = this.form.querySelector('.yatra-enquiry-submit');
+            const originalText = submitBtn ? submitBtn.textContent : 'Submit';
+            if (submitBtn) {
+                submitBtn.textContent = 'Sending...';
+                submitBtn.disabled = true;
+            }
+
+            // Simulate API call (replace with actual implementation)
+            setTimeout(() => {
+                alert('Thank you for your enquiry! We will get back to you soon.');
+                this.form.reset();
+                this.close();
+                if (submitBtn) {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            }, 1000);
+        }
+    }
+
+    // Initialize all classes
+    window.galleryModal = new GalleryModal();
+    window.bookingSidebar = new BookingSidebar();
+    window.enquiryModal = new EnquiryModal();
+
 })();
+
