@@ -46,6 +46,9 @@ class AppServiceProvider extends ServiceProvider
         // Handle trip single page - use early priority to catch before 404
         add_action('template_redirect', [$this, 'handleTripPage'], 1);
 
+        // Handle listing pages - use early priority to catch before 404
+        add_action('template_redirect', [$this, 'handleListingPages'], 1);
+
         // Ensure frontend bundles are marked as ES modules
         add_filter('script_loader_tag', [$this, 'addFrontendModuleType'], 10, 2);
     }
@@ -240,32 +243,81 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Add rewrite rules for trip permalinks
+     * Add rewrite rules for trip permalinks and listing pages
      */
     public function addTripRewriteRules(): void
     {
-        // Get trip_base from settings (stored with yatra_ prefix)
+        // Get permalink bases from settings (stored with yatra_ prefix)
         $trip_base = get_option('yatra_trip_base', 'trip');
+        $destination_base = get_option('yatra_destination_base', 'destination');
+        $activity_base = get_option('yatra_activity_base', 'activity');
+        $trip_category_base = get_option('yatra_trip_category_base', 'trip-category');
         
-        // Sanitize trip_base (only allow alphanumeric, hyphens, underscores)
+        // Sanitize bases (only allow alphanumeric, hyphens, underscores)
         $trip_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_base);
         if (empty($trip_base)) {
             $trip_base = 'trip';
         }
+        
+        $destination_base = preg_replace('/[^a-z0-9_-]/i', '', $destination_base);
+        if (empty($destination_base)) {
+            $destination_base = 'destination';
+        }
+        
+        $activity_base = preg_replace('/[^a-z0-9_-]/i', '', $activity_base);
+        if (empty($activity_base)) {
+            $activity_base = 'activity';
+        }
+        
+        $trip_category_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_category_base);
+        if (empty($trip_category_base)) {
+            $trip_category_base = 'trip-category';
+        }
 
-        // Add query var first (must be registered before rewrite rules)
+        // Add query vars first (must be registered before rewrite rules)
         add_rewrite_tag('%yatra_trip_slug%', '([^&]+)');
+        add_rewrite_tag('%yatra_listing_page%', '([^&]+)');
 
-        // Add rewrite rule: {trip_base}/{trip_slug}
+        // Add rewrite rule for trip single page: {trip_base}/{trip_slug}
         add_rewrite_rule(
             '^' . $trip_base . '/([^/]+)/?$',
             'index.php?yatra_trip_slug=$matches[1]',
             'top'
         );
 
+        // Add rewrite rules for listing pages
+        // Trip listing: /trip/
+        add_rewrite_rule(
+            '^' . $trip_base . '/?$',
+            'index.php?yatra_listing_page=trip',
+            'top'
+        );
+
+        // Destination listing: /destination/
+        add_rewrite_rule(
+            '^' . $destination_base . '/?$',
+            'index.php?yatra_listing_page=destination',
+            'top'
+        );
+
+        // Activity listing: /activity/
+        add_rewrite_rule(
+            '^' . $activity_base . '/?$',
+            'index.php?yatra_listing_page=activity',
+            'top'
+        );
+
+        // Trip category listing: /trip-category/
+        add_rewrite_rule(
+            '^' . $trip_category_base . '/?$',
+            'index.php?yatra_listing_page=trip-category',
+            'top'
+        );
+
         // Debug logging
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log(sprintf('Yatra: Registered rewrite rule for trip_base: %s', $trip_base));
+            error_log(sprintf('Yatra: Registered rewrite rules for trip_base: %s, destination_base: %s, activity_base: %s, trip_category_base: %s', 
+                $trip_base, $destination_base, $activity_base, $trip_category_base));
         }
     }
 
@@ -404,6 +456,126 @@ class AppServiceProvider extends ServiceProvider
             // Fallback: simple template
             $this->renderTripTemplate($trip);
             exit;
+        }
+    }
+
+    /**
+     * Handle listing pages (trip, destination, activity, trip-category)
+     */
+    public function handleListingPages(): void
+    {
+        global $wp_query, $wp;
+
+        // Get listing page type from query var
+        $listing_page = get_query_var('yatra_listing_page');
+        
+        // If query var is empty, check request path directly
+        if (empty($listing_page)) {
+            $request_path = '';
+            
+            // Get from $wp->request if available
+            if (isset($wp) && isset($wp->request)) {
+                $request_path = trim((string) $wp->request, '/');
+            }
+            
+            // Fallback: parse from REQUEST_URI
+            if (empty($request_path)) {
+                $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+                $parsed_uri = wp_parse_url($request_uri);
+                $path = $parsed_uri['path'] ?? '';
+                $path = trim($path, '/');
+
+                // Remove site subdirectory (if WordPress is installed in subdir)
+                $home_path = wp_parse_url(home_url('/'), PHP_URL_PATH);
+                $home_path = $home_path ? trim($home_path, '/') : '';
+                if ($home_path && str_starts_with($path, $home_path)) {
+                    $path = trim(substr($path, strlen($home_path)), '/');
+                }
+                $request_path = $path;
+            }
+
+            // Check if request path matches listing page patterns
+            if (!empty($request_path)) {
+                $trip_base = get_option('yatra_trip_base', 'trip');
+                $destination_base = get_option('yatra_destination_base', 'destination');
+                $activity_base = get_option('yatra_activity_base', 'activity');
+                $trip_category_base = get_option('yatra_trip_category_base', 'trip-category');
+                
+                // Sanitize bases
+                $trip_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_base);
+                $destination_base = preg_replace('/[^a-z0-9_-]/i', '', $destination_base);
+                $activity_base = preg_replace('/[^a-z0-9_-]/i', '', $activity_base);
+                $trip_category_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_category_base);
+                
+                // Check if path matches any listing page base (exact match, no trailing slug)
+                if ($request_path === $trip_base) {
+                    $listing_page = 'trip';
+                } elseif ($request_path === $destination_base) {
+                    $listing_page = 'destination';
+                } elseif ($request_path === $activity_base) {
+                    $listing_page = 'activity';
+                } elseif ($request_path === $trip_category_base) {
+                    $listing_page = 'trip-category';
+                }
+            }
+        }
+
+        if (empty($listing_page)) {
+            return;
+        }
+
+        // Prevent 404 handling
+        $wp_query->is_404 = false;
+        status_header(200);
+
+        // Set up query vars for template
+        $wp_query->set('yatra_listing_page', $listing_page);
+
+        // Enqueue listing page assets
+        $this->enqueueListingPageAssets();
+
+        // Load the appropriate listing page template
+        $template_path = YATRA_PLUGIN_PATH . 'templates/listing-' . $listing_page . '.php';
+        
+        if (file_exists($template_path)) {
+            include $template_path;
+            exit;
+        } else {
+            // Fallback: simple message
+            wp_die(sprintf('Listing page template not found for: %s', esc_html($listing_page)));
+        }
+    }
+
+    /**
+     * Enqueue listing page assets
+     */
+    private function enqueueListingPageAssets(): void
+    {
+        // Enqueue CSS
+        $css_file = YATRA_PLUGIN_PATH . 'public/css/listing.css';
+        if (file_exists($css_file)) {
+            $css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $css_file);
+            $css_version = YATRA_VERSION . '.' . filemtime($css_file);
+            wp_enqueue_style(
+                'yatra-listing',
+                $css_url,
+                [],
+                $css_version
+            );
+        }
+
+        // Enqueue JS
+        $js_file = YATRA_PLUGIN_PATH . 'public/js/listing.js';
+        if (file_exists($js_file)) {
+            $js_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $js_file);
+            $js_version = YATRA_VERSION . '.' . filemtime($js_file);
+            wp_enqueue_script(
+                'yatra-listing',
+                $js_url,
+                [],
+                $js_version,
+                true
+            );
         }
     }
 

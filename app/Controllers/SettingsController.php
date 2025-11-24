@@ -138,6 +138,7 @@ class SettingsController extends BaseController
         'trip_base' => 'trip',
         'destination_base' => 'destination',
         'activity_base' => 'activity',
+        'trip_category_base' => 'trip-category',
         
         // Advanced Settings
         'debug_mode' => false,
@@ -279,7 +280,8 @@ class SettingsController extends BaseController
             // Flush rewrite rules if permalink settings were updated
             if (in_array('trip_base', $updated, true) || 
                 in_array('destination_base', $updated, true) || 
-                in_array('activity_base', $updated, true)) {
+                in_array('activity_base', $updated, true) ||
+                in_array('trip_category_base', $updated, true)) {
                 // Use hard flush to ensure rules are saved to database
                 flush_rewrite_rules(true);
             }

@@ -16390,6 +16390,7 @@ const Settings = () => {
     trip_base: "trip",
     destination_base: "destination",
     activity_base: "activity",
+    trip_category_base: "trip-category",
     debug_mode: false,
     enable_logging: false,
     cache_enabled: true,
@@ -18490,6 +18491,36 @@ const Settings = () => {
                       "/",
                       formData.activity_base || "activity",
                       "/trekking"
+                    ] })
+                  ] })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              FormField,
+              {
+                id: "trip_category_base",
+                label: __("Trip Category Base", "Trip Category Base"),
+                description: __('URL slug for trip category archive pages (e.g., "trip-category" will create URLs like /trip-category/adventure)', 'URL slug for trip category archive pages (e.g., "trip-category" will create URLs like /trip-category/adventure)'),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      id: "trip_category_base",
+                      name: "trip_category_base",
+                      value: formData.trip_category_base || "trip-category",
+                      onChange: handleFieldChange,
+                      placeholder: "trip-category",
+                      className: "font-mono"
+                    }
+                  ),
+                  formData.trip_category_base && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: [
+                    __("Example URL:", "Example URL:"),
+                    " ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("code", { className: "bg-gray-100 dark:bg-gray-800 px-1 rounded", children: [
+                      "/",
+                      formData.trip_category_base || "trip-category",
+                      "/adventure"
                     ] })
                   ] })
                 ]
