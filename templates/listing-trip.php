@@ -553,7 +553,10 @@ get_header();
                                         <div class="yatra-current-price"><?php echo esc_html($trip['price']); ?></div>
                                         <div class="yatra-price-note">per person</div>
                                     </div>
-                                    <button class="yatra-view-btn">View Details</button>
+                                    <div class="yatra-trip-actions">
+                                        <a href="<?php echo esc_url(home_url('/trip/' . sanitize_title($trip['title']))); ?>" class="yatra-view-btn">View Details</a>
+                                        <a href="<?php echo esc_url(home_url('/book/' . sanitize_title($trip['title']))); ?>" class="yatra-book-btn">Book Now</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

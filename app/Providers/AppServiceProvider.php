@@ -49,6 +49,9 @@ class AppServiceProvider extends ServiceProvider
         // Handle listing pages - use early priority to catch before 404
         add_action('template_redirect', [$this, 'handleListingPages'], 1);
 
+        // Handle booking page - use early priority to catch before 404
+        add_action('template_redirect', [$this, 'handleBookingPage'], 1);
+
         // Ensure frontend bundles are marked as ES modules
         add_filter('script_loader_tag', [$this, 'addFrontendModuleType'], 10, 2);
     }
@@ -277,6 +280,7 @@ class AppServiceProvider extends ServiceProvider
         // Add query vars first (must be registered before rewrite rules)
         add_rewrite_tag('%yatra_trip_slug%', '([^&]+)');
         add_rewrite_tag('%yatra_listing_page%', '([^&]+)');
+        add_rewrite_tag('%yatra_booking_page%', '([^&]+)');
 
         // Add rewrite rule for trip single page: {trip_base}/{trip_slug}
         add_rewrite_rule(
@@ -311,6 +315,13 @@ class AppServiceProvider extends ServiceProvider
         add_rewrite_rule(
             '^' . $trip_category_base . '/?$',
             'index.php?yatra_listing_page=trip-category',
+            'top'
+        );
+
+        // Booking page: /book/{trip_slug}
+        add_rewrite_rule(
+            '^book/([^/]+)/?$',
+            'index.php?yatra_booking_page=$matches[1]',
             'top'
         );
 
@@ -543,6 +554,74 @@ class AppServiceProvider extends ServiceProvider
         } else {
             // Fallback: simple message
             wp_die(sprintf('Listing page template not found for: %s', esc_html($listing_page)));
+        }
+    }
+
+    /**
+     * Handle booking page routing
+     */
+    public function handleBookingPage(): void
+    {
+        global $wp_query;
+
+        $booking_trip_slug = get_query_var('yatra_booking_page');
+
+        if (empty($booking_trip_slug)) {
+            return;
+        }
+
+        // Prevent 404 handling
+        $wp_query->is_404 = false;
+        status_header(200);
+
+        // Enqueue booking page assets
+        $this->enqueueBookingPageAssets();
+
+        // Set up query vars for template
+        $wp_query->set('yatra_booking_trip_slug', $booking_trip_slug);
+
+        // Load the booking page template
+        $template_path = YATRA_PLUGIN_PATH . 'templates/booking.php';
+
+        if (file_exists($template_path)) {
+            include $template_path;
+            exit;
+        } else {
+            // Fallback: simple message
+            wp_die(sprintf('Booking page template not found for trip: %s', esc_html($booking_trip_slug)));
+        }
+    }
+
+    /**
+     * Enqueue booking page assets
+     */
+    private function enqueueBookingPageAssets(): void
+    {
+        // Enqueue CSS
+        $css_file = YATRA_PLUGIN_PATH . 'public/css/booking.css';
+        if (file_exists($css_file)) {
+            $css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $css_file);
+            $css_version = YATRA_VERSION . '.' . filemtime($css_file);
+            wp_enqueue_style(
+                'yatra-booking',
+                $css_url,
+                [],
+                $css_version
+            );
+        }
+
+        // Enqueue JS
+        $js_file = YATRA_PLUGIN_PATH . 'public/js/booking.js';
+        if (file_exists($js_file)) {
+            $js_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $js_file);
+            $js_version = YATRA_VERSION . '.' . filemtime($js_file);
+            wp_enqueue_script(
+                'yatra-booking',
+                $js_url,
+                ['jquery'],
+                $js_version,
+                true
+            );
         }
     }
 

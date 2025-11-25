@@ -885,105 +885,368 @@
 }
 
 /* ============================================
-   ITINERARY
+   ITINERARY - New Timeline Design
    ============================================ */
-.yatra-trip-itinerary {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    position: relative;
+
+/* Section Header with Actions */
+.yatra-section-header-with-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.yatra-section-header-with-actions .yatra-trip-section-title {
+    margin-bottom: 0;
+}
+
+.yatra-itinerary-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.yatra-toggle-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.yatra-toggle-all-btn:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.yatra-toggle-all-btn svg {
+    color: #6b7280;
+}
+
+.yatra-itinerary-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
 .yatra-itinerary-day {
-    position: relative;
-    padding-left: 80px;
-    padding-bottom: 48px;
-    border-left: 3px solid #e5e7eb;
-}
-
-.yatra-itinerary-day:last-child {
-    border-left: none;
-    padding-bottom: 0;
-}
-
-.yatra-itinerary-day::before {
-    content: '';
-    position: absolute;
-    left: -10px;
-    top: 0;
-    width: 20px;
-    height: 20px;
-    background: #3b82f6;
-    border-radius: 50%;
-    border: 4px solid #fff;
-    box-shadow: 0 0 0 3px #3b82f6;
-    z-index: 2;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .yatra-itinerary-day-header {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+    padding: 20px 24px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
-.yatra-itinerary-day-number {
-    font-size: 20px;
-    font-weight: 800;
-    color: #3b82f6;
-    min-width: 60px;
-    background: #eff6ff;
-    padding: 8px 16px;
-    border-radius: 8px;
-    text-align: center;
+.yatra-itinerary-day-header:hover {
+    background: #f3f4f6;
 }
 
-.yatra-itinerary-day-title {
-    font-size: 22px;
+.yatra-day-badge {
+    font-size: 14px;
     font-weight: 700;
+    color: #fff;
+    background: #3b82f6;
+    padding: 6px 14px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.yatra-day-title {
+    font-size: 18px;
+    font-weight: 600;
     color: #111827;
     margin: 0;
     flex: 1;
 }
 
+.yatra-day-toggle {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.yatra-day-toggle:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.yatra-day-toggle .yatra-chevron-icon {
+    transition: transform 0.3s;
+    color: #6b7280;
+    width: 20px;
+    height: 20px;
+}
+
+.yatra-day-toggle svg {
+    width: 20px;
+    height: 20px;
+    color: #6b7280;
+    stroke: currentColor;
+}
+
+.yatra-itinerary-day[data-expanded="false"] .yatra-day-toggle .yatra-chevron-icon {
+    transform: rotate(-90deg);
+}
+
 .yatra-itinerary-day-content {
-    font-size: 16px;
-    line-height: 1.8;
-    color: #374151;
-    margin-left: 76px;
+    padding: 24px;
 }
 
-.yatra-itinerary-day-content p {
-    margin-bottom: 16px;
+/* Entry Timeline */
+.yatra-entries-timeline {
+    position: relative;
+    padding-left: 32px;
 }
 
-.yatra-itinerary-day-content p:last-child {
+.yatra-entries-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.yatra-entry-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.yatra-entry-item:last-child {
     margin-bottom: 0;
 }
 
-.yatra-itinerary-activities {
-    margin-top: 16px;
-    padding-left: 20px;
+.yatra-entry-timeline-dot {
+    position: absolute;
+    left: -28px;
+    top: 20px;
+    width: 12px;
+    height: 12px;
+    background: var(--entry-color, #3b82f6);
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px var(--entry-color, #3b82f6);
+    z-index: 2;
 }
 
-.yatra-itinerary-activity {
-    list-style: none;
-    padding: 8px 0;
-    font-size: 15px;
-    color: #4b5563;
+.yatra-entry-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s;
+}
+
+.yatra-entry-card:hover {
+    border-color: var(--entry-color, #3b82f6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.yatra-entry-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.yatra-entry-icon {
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    border-radius: 10px;
+    flex-shrink: 0;
 }
 
-.yatra-itinerary-activity::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background: #3b82f6;
-    border-radius: 50%;
-    flex-shrink: 0;
+.yatra-entry-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.yatra-entry-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.yatra-entry-type {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.yatra-entry-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.yatra-entry-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #6b7280;
+    background: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.yatra-entry-time svg {
+    color: #9ca3af;
+}
+
+.yatra-entry-description {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #4b5563;
+    margin: 0 0 12px 0;
+}
+
+.yatra-entry-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.yatra-entry-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.yatra-entry-meta-item svg {
+    color: #9ca3af;
+}
+
+.yatra-entry-included {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.yatra-included-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #059669;
+    background: #ecfdf5;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.yatra-included-tag svg {
+    color: #10b981;
+}
+
+/* Summary Day */
+.yatra-itinerary-summary .yatra-day-badge {
+    background: #8b5cf6;
+}
+
+.yatra-summary-content {
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 12px;
+}
+
+.yatra-summary-content p {
+    font-size: 15px;
+    color: #374151;
+    margin-bottom: 16px;
+}
+
+.yatra-summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.yatra-summary-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.yatra-summary-list li:last-child {
+    border-bottom: none;
+}
+
+.yatra-summary-list li strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .yatra-itinerary-day-header {
+        padding: 16px;
+    }
+    
+    .yatra-day-title {
+        font-size: 16px;
+    }
+    
+    .yatra-itinerary-day-content {
+        padding: 16px;
+    }
+    
+    .yatra-entries-timeline {
+        padding-left: 24px;
+    }
+    
+    .yatra-entry-header {
+        flex-wrap: wrap;
+    }
+    
+    .yatra-entry-time {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 8px;
+    }
 }
 
 /* ============================================
@@ -3399,12 +3662,18 @@ input.yatra-datepicker,
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
 }
 
-.yatra-card-book-btn:hover:not(:disabled) {
+.yatra-card-book-btn:hover:not(:disabled),
+a.yatra-card-book-btn:hover {
     background: #2563eb;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    color: #fff;
+    text-decoration: none;
 }
 
 .yatra-card-book-btn:disabled {

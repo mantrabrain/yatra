@@ -1215,17 +1215,29 @@
             // Traveler selector buttons
             this.initTravelerSelectors();
 
-            // Book Now buttons
+            // Book Now buttons - redirect to booking page with parameters
             const bookButtons = this.section.querySelectorAll('.yatra-card-book-btn');
             bookButtons.forEach((btn) => {
                 btn.addEventListener('click', (e) => {
-                    e.preventDefault();
+                    // Get booking details
                     const date = btn.getAttribute('data-date');
                     const price = btn.getAttribute('data-price');
                     const itemIndex = btn.getAttribute('data-item');
                     const adults = this.getTravelerCount(itemIndex, 'adults');
                     const children = this.getTravelerCount(itemIndex, 'children');
-                    this.handleBookNow(date, price, btn, adults, children);
+                    
+                    // Build URL with parameters
+                    const baseUrl = btn.getAttribute('href');
+                    const params = new URLSearchParams({
+                        date: date,
+                        adults: adults,
+                        children: children,
+                        price: price
+                    });
+                    
+                    // Navigate to booking page with parameters
+                    window.location.href = baseUrl + '?' + params.toString();
+                    e.preventDefault();
                 });
             });
 
@@ -1499,12 +1511,121 @@
         }
     }
 
+    /**
+     * Itinerary Section Class
+     * Handles day toggle functionality for itinerary timeline
+     */
+    class ItinerarySection {
+        constructor() {
+            this.init();
+        }
+
+        init() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.setup());
+            } else {
+                this.setup();
+            }
+        }
+
+        setup() {
+            this.container = document.querySelector('.yatra-itinerary-timeline');
+            if (!this.container) return;
+
+            this.days = this.container.querySelectorAll('.yatra-itinerary-day');
+            this.expandAllBtn = document.getElementById('yatra-expand-all');
+            this.collapseAllBtn = document.getElementById('yatra-collapse-all');
+            this.attachEventListeners();
+        }
+
+        attachEventListeners() {
+            // Expand All button
+            if (this.expandAllBtn) {
+                this.expandAllBtn.addEventListener('click', () => this.expandAll());
+            }
+
+            // Collapse All button
+            if (this.collapseAllBtn) {
+                this.collapseAllBtn.addEventListener('click', () => this.collapseAll());
+            }
+
+            this.days.forEach(day => {
+                const header = day.querySelector('.yatra-itinerary-day-header');
+                const toggle = day.querySelector('.yatra-day-toggle');
+                const content = day.querySelector('.yatra-itinerary-day-content');
+
+                if (header && content) {
+                    header.addEventListener('click', (e) => {
+                        // Don't toggle if clicking on a link inside header
+                        if (e.target.tagName === 'A') return;
+                        this.toggleDay(day, content, toggle);
+                    });
+                }
+            });
+        }
+
+        toggleDay(day, content, toggle) {
+            const isExpanded = content.style.display !== 'none';
+            
+            if (isExpanded) {
+                content.style.display = 'none';
+                day.setAttribute('data-expanded', 'false');
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', 'false');
+                    const icon = toggle.querySelector('.yatra-chevron-icon');
+                    if (icon) icon.style.transform = 'rotate(-90deg)';
+                }
+            } else {
+                content.style.display = 'block';
+                day.setAttribute('data-expanded', 'true');
+                if (toggle) {
+                    toggle.setAttribute('aria-expanded', 'true');
+                    const icon = toggle.querySelector('.yatra-chevron-icon');
+                    if (icon) icon.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+
+        expandAll() {
+            this.days.forEach(day => {
+                const content = day.querySelector('.yatra-itinerary-day-content');
+                const toggle = day.querySelector('.yatra-day-toggle');
+                if (content) {
+                    content.style.display = 'block';
+                    day.setAttribute('data-expanded', 'true');
+                    if (toggle) {
+                        toggle.setAttribute('aria-expanded', 'true');
+                        const icon = toggle.querySelector('.yatra-chevron-icon');
+                        if (icon) icon.style.transform = 'rotate(0deg)';
+                    }
+                }
+            });
+        }
+
+        collapseAll() {
+            this.days.forEach(day => {
+                const content = day.querySelector('.yatra-itinerary-day-content');
+                const toggle = day.querySelector('.yatra-day-toggle');
+                if (content) {
+                    content.style.display = 'none';
+                    day.setAttribute('data-expanded', 'false');
+                    if (toggle) {
+                        toggle.setAttribute('aria-expanded', 'false');
+                        const icon = toggle.querySelector('.yatra-chevron-icon');
+                        if (icon) icon.style.transform = 'rotate(-90deg)';
+                    }
+                }
+            });
+        }
+    }
+
     // Initialize all classes
     window.galleryModal = new GalleryModal();
     window.bookingSidebar = new BookingSidebar();
     window.enquiryModal = new EnquiryModal();
     window.stickyNav = new StickyNav();
     window.availabilitySection = new AvailabilitySection();
+    window.itinerarySection = new ItinerarySection();
 
 })();
 

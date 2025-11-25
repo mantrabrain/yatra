@@ -819,6 +819,16 @@ class TripController extends BaseController
      */
     private function render_availability_template($trip_data): void
     {
+        // Get trip slug from query var or create from title
+        global $wp_query;
+        $trip_slug = get_query_var('yatra_trip_slug');
+        if (empty($trip_slug) && !empty($trip_data->title)) {
+            $trip_slug = sanitize_title($trip_data->title);
+        }
+        if (empty($trip_slug)) {
+            $trip_slug = 'trip';
+        }
+
         $format_price = function($price) {
             return 'USD ' . number_format($price, 0);
         };
@@ -1120,12 +1130,13 @@ class TripController extends BaseController
                                     <?php echo esc_html($format_price($card['sale_price'])); ?>
                                 </div>
                             </div>
-                            <button type="button" class="yatra-card-book-btn" 
-                                    data-date="<?php echo esc_attr($card['data_date']); ?>"
-                                    data-price="<?php echo esc_attr($sale_price); ?>"
-                                    data-item="<?php echo esc_attr($item_id); ?>">
+                            <a href="<?php echo esc_url(home_url('/book/' . $trip_slug)); ?>" 
+                               class="yatra-card-book-btn" 
+                               data-date="<?php echo esc_attr($card['data_date']); ?>"
+                               data-price="<?php echo esc_attr($sale_price); ?>"
+                               data-item="<?php echo esc_attr($item_id); ?>">
                                 Book Now
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
