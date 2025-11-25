@@ -220,6 +220,11 @@ interface SettingsData {
   destination_base: string;
   activity_base: string;
   trip_category_base: string;
+  booking_base: string;
+  
+  // Booking Page Settings
+  use_booking_page: boolean;
+  booking_page_id: number;
   
   // Advanced Settings
   debug_mode: boolean;
@@ -420,6 +425,9 @@ const Settings: React.FC = () => {
         destination_base: 'destination',
         activity_base: 'activity',
         trip_category_base: 'trip-category',
+        booking_base: 'book',
+        use_booking_page: false,
+        booking_page_id: 0,
         debug_mode: false,
         enable_logging: false,
         cache_enabled: true,
@@ -521,6 +529,91 @@ const Settings: React.FC = () => {
       showToast(error?.message || __('Failed to flush rewrite rules', 'Failed to flush rewrite rules'), 'error');
     },
   });
+
+  // Fetch WordPress pages for booking page selection (without shortcode check for performance)
+  const { data: pagesData } = useQuery({
+    queryKey: ['wordpress-pages'],
+    queryFn: async () => {
+      const response = await apiClient.get('/settings/pages');
+      return response as Array<{ id: number; title: string; slug: string; url: string }>;
+    },
+    enabled: can('manage_yatra') && viewingSection === 'permalink',
+  });
+
+  // Check shortcode on-demand when user selects a page
+  const checkShortcodeMutation = useMutation({
+    mutationFn: async (pageId: number) => {
+      const response = await apiClient.get(`/settings/check-shortcode/${pageId}`);
+      return response as { has_shortcode: boolean; page_title: string; page_url: string; edit_url: string };
+    },
+  });
+
+  // Insert shortcode mutation
+  const insertShortcodeMutation = useMutation({
+    mutationFn: async (pageId: number) => {
+      const response = await apiClient.post(`/settings/insert-shortcode/${pageId}`);
+      return response;
+    },
+    onSuccess: () => {
+      showToast(__('Shortcode added successfully', 'Shortcode added successfully'), 'success');
+      queryClient.invalidateQueries({ queryKey: ['wordpress-pages'] });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to add shortcode', 'Failed to add shortcode'), 'error');
+    },
+  });
+
+  // State for shortcode dialog
+  const [showShortcodeDialog, setShowShortcodeDialog] = useState(false);
+  const [selectedPageForShortcode, setSelectedPageForShortcode] = useState<{ id: number; title: string } | null>(null);
+  const [isCheckingShortcode, setIsCheckingShortcode] = useState(false);
+
+  // Handle booking page selection - checks shortcode in real-time
+  const handleBookingPageChange = async (pageId: number) => {
+    if (pageId === 0) {
+      handleFieldChange({ target: { name: 'booking_page_id', value: 0 } } as any);
+      handleFieldChange({ target: { name: 'use_booking_page', value: false } } as any);
+      return;
+    }
+
+    const page = pagesData?.find(p => p.id === pageId);
+    if (!page) return;
+
+    // Check shortcode in real-time
+    setIsCheckingShortcode(true);
+    try {
+      const result = await checkShortcodeMutation.mutateAsync(pageId);
+      
+      if (result.has_shortcode) {
+        // Page has shortcode - save directly
+        handleFieldChange({ target: { name: 'booking_page_id', value: pageId } } as any);
+        handleFieldChange({ target: { name: 'use_booking_page', value: true } } as any);
+        showToast(__('Booking page selected successfully', 'Booking page selected successfully'), 'success');
+      } else {
+        // Page doesn't have shortcode - show dialog
+        setSelectedPageForShortcode({ id: pageId, title: page.title });
+        setShowShortcodeDialog(true);
+      }
+    } catch (error: any) {
+      showToast(error?.message || __('Failed to check page', 'Failed to check page'), 'error');
+    } finally {
+      setIsCheckingShortcode(false);
+    }
+  };
+
+  const handleConfirmInsertShortcode = async () => {
+    if (!selectedPageForShortcode) return;
+    
+    try {
+      await insertShortcodeMutation.mutateAsync(selectedPageForShortcode.id);
+      handleFieldChange({ target: { name: 'booking_page_id', value: selectedPageForShortcode.id } } as any);
+      handleFieldChange({ target: { name: 'use_booking_page', value: true } } as any);
+      setShowShortcodeDialog(false);
+      setSelectedPageForShortcode(null);
+    } catch (error) {
+      // Error handled by mutation
+    }
+  };
 
   const handleSave = () => {
     if (formData) {
@@ -2388,6 +2481,158 @@ onChange={handleFieldChange}
               </FormField>
 
             </div>
+
+            {/* Booking Page Settings */}
+            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+                {__('Booking Page Settings', 'Booking Page Settings')}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                {__('Configure the booking page URL. By default, bookings use /book/{trip-slug}. You can customize the URL base or use a custom WordPress page.', 'Configure the booking page URL. By default, bookings use /book/{trip-slug}. You can customize the URL base or use a custom WordPress page.')}
+              </p>
+
+              <div className="space-y-4">
+                <FormField
+                  id="booking_base"
+                  label={__('Default Booking URL Base', 'Default Booking URL Base')}
+                  description={__('URL slug for the booking page (e.g., "book" will create URLs like /book/trip-name)', 'URL slug for the booking page (e.g., "book" will create URLs like /book/trip-name)')}
+                >
+                  <Input
+                    id="booking_base"
+                    name="booking_base"
+                    value={formData.booking_base || 'book'}
+                    onChange={handleFieldChange}
+                    placeholder="book"
+                    className="font-mono"
+                    disabled={formData.use_booking_page}
+                  />
+                  {formData.booking_base && !formData.use_booking_page && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {__('Example URL:', 'Example URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">/{formData.booking_base || 'book'}/nepal-adventure</code>
+                    </p>
+                  )}
+                </FormField>
+
+                <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                  <input
+                    type="checkbox"
+                    id="use_booking_page"
+                    checked={formData.use_booking_page}
+                    onChange={(e) => {
+                      handleFieldChange({ target: { name: 'use_booking_page', value: e.target.checked } } as any);
+                      if (!e.target.checked) {
+                        handleFieldChange({ target: { name: 'booking_page_id', value: 0 } } as any);
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="use_booking_page" className="font-medium cursor-pointer">
+                      {__('Use Custom Page for Booking', 'Use Custom Page for Booking')}
+                    </Label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {__('Select a WordPress page to use for bookings instead of the default URL. The page must contain the [yatra_booking] shortcode.', 'Select a WordPress page to use for bookings instead of the default URL. The page must contain the [yatra_booking] shortcode.')}
+                    </p>
+                  </div>
+                </div>
+
+                {formData.use_booking_page && (
+                  <FormField
+                    id="booking_page_id"
+                    label={__('Select Booking Page', 'Select Booking Page')}
+                    description={__('Choose a page that contains the [yatra_booking] shortcode. If the page doesn\'t have the shortcode, you\'ll be prompted to add it.', 'Choose a page that contains the [yatra_booking] shortcode. If the page doesn\'t have the shortcode, you\'ll be prompted to add it.')}
+                  >
+                    <div className="relative">
+                      <select
+                        id="booking_page_id"
+                        name="booking_page_id"
+                        value={formData.booking_page_id || 0}
+                        onChange={(e) => handleBookingPageChange(parseInt(e.target.value))}
+                        disabled={isCheckingShortcode}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-wait"
+                      >
+                        <option value={0}>{__('-- Select a page --', '-- Select a page --')}</option>
+                        {pagesData?.map((page) => (
+                          <option key={page.id} value={page.id}>
+                            {page.title}
+                          </option>
+                        ))}
+                      </select>
+                      {isCheckingShortcode && (
+                        <div className="absolute right-8 top-1/2 -translate-y-1/2">
+                          <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                        </div>
+                      )}
+                    </div>
+                    {formData.booking_page_id > 0 && pagesData && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {__('Booking URL:', 'Booking URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">{pagesData.find(p => p.id === formData.booking_page_id)?.url || ''}</code>
+                      </p>
+                    )}
+                  </FormField>
+                )}
+              </div>
+            </div>
+
+            {/* Shortcode Dialog */}
+            {showShortcodeDialog && selectedPageForShortcode && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {__('Shortcode Required', 'Shortcode Required')}
+                  </h3>
+                  <div className="mb-6">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                      {__('The page', 'The page')} <strong>"{selectedPageForShortcode.title}"</strong> {__('doesn\'t have the', 'doesn\'t have the')} <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">[yatra_booking]</code> {__('shortcode.', 'shortcode.')}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {__('Would you like to add it automatically, or edit the page manually to place it where you want?', 'Would you like to add it automatically, or edit the page manually to place it where you want?')}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      onClick={handleConfirmInsertShortcode}
+                      disabled={insertShortcodeMutation.isPending}
+                      className="w-full justify-center"
+                    >
+                      {insertShortcodeMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          {__('Adding...', 'Adding...')}
+                        </>
+                      ) : (
+                        __('Add Shortcode Automatically', 'Add Shortcode Automatically')
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const editUrl = pagesData?.find(p => p.id === selectedPageForShortcode.id)?.url;
+                        if (editUrl) {
+                          window.open(`/wp-admin/post.php?post=${selectedPageForShortcode.id}&action=edit`, '_blank');
+                        }
+                        setShowShortcodeDialog(false);
+                        setSelectedPageForShortcode(null);
+                      }}
+                      className="w-full justify-center"
+                    >
+                      {__('Edit Page Manually', 'Edit Page Manually')}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setShowShortcodeDialog(false);
+                        setSelectedPageForShortcode(null);
+                        handleFieldChange({ target: { name: 'booking_page_id', value: 0 } } as any);
+                      }}
+                      className="w-full justify-center"
+                    >
+                      {__('Cancel', 'Cancel')}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
               <div className="flex items-start gap-2">

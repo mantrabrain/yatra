@@ -99,6 +99,9 @@ if (!file_exists($autoloader)) {
     }
 require_once $autoloader;
 
+// Load helper functions
+require_once YATRA_PLUGIN_PATH . 'includes/helpers.php';
+
 // Bootstrap the plugin
 try {
     if (!class_exists('Yatra\Bootstrap')) {

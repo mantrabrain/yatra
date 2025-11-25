@@ -512,13 +512,13 @@ const AvailabilityForm: React.FC = () => {
         }
         actions={
           tripId ? (
-            <Button
-              variant="outline"
-              onClick={() => navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId.toString() })}
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {__('Back', 'Back')}
-            </Button>
+          <Button
+            variant="outline"
+            onClick={() => navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId.toString() })}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {__('Back', 'Back')}
+          </Button>
           ) : null
         }
       />
@@ -840,13 +840,13 @@ const AvailabilityForm: React.FC = () => {
             {/* Traveler Category Pricing */}
             {formData.pricing_type === 'traveler_based' && (
               <div className="space-y-4">
-                <div>
+              <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-red-500">*</span>
                   </label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                    {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'Add pricing for traveler categories. Categories are managed in Traveler Categories page.')}
-                  </p>
+                  {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'Add pricing for traveler categories. Categories are managed in Traveler Categories page.')}
+                </p>
                 </div>
                 
                 {isLoadingCategories ? (
@@ -910,10 +910,10 @@ const AvailabilityForm: React.FC = () => {
                                         ? category.age_min !== undefined && category.age_max !== undefined
                                           ? `${category.age_min}-${category.age_max} ${__('years', 'years')}`
                                           : category.age_min !== undefined
-                                            ? `${category.age_min}+ ${__('years', 'years')}`
-                                            : category.age_max !== undefined
-                                              ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
-                                              : ''
+                                          ? `${category.age_min}+ ${__('years', 'years')}`
+                                          : category.age_max !== undefined
+                                          ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
+                                          : ''
                                         : null;
 
                                       return (
@@ -935,9 +935,9 @@ const AvailabilityForm: React.FC = () => {
                                             )}
                                           </div>
                                           {category.description && (
-                                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                              {category.description}
-                                            </div>
+                                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            {category.description}
+                                          </div>
                                           )}
                                         </button>
                                       );

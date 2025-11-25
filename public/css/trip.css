@@ -638,50 +638,56 @@
    ============================================ */
 .yatra-trip-quick-facts {
     background: #fff;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    border-radius: 16px;
-    padding: 24px 32px;
-    margin: 32px auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 24px auto;
     max-width: 100%;
     position: relative;
     z-index: 10;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 32px;
+    gap: 0;
     border: 1px solid #e5e7eb;
 }
 
 .yatra-quick-fact {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 8px;
-    border-radius: 12px;
-    transition: background-color 0.3s ease;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 16px 12px;
+    position: relative;
 }
 
-.yatra-quick-fact:hover {
-    background: #f9fafb;
+/* Vertical dividers between facts */
+.yatra-quick-fact:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 50%;
+    width: 1px;
+    background: #e5e7eb;
 }
 
 .yatra-quick-fact-icon {
-    width: 48px;
-    height: 48px;
-    background: #f3f4f6;
-    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    background: #f8fafc;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6b7280;
+    color: #64748b;
     flex-shrink: 0;
-    transition: all 0.3s ease;
 }
 
-.yatra-quick-fact:hover .yatra-quick-fact-icon {
-    background: #e5e7eb;
-    color: #4b5563;
-    transform: translateY(-2px);
+.yatra-quick-fact-icon svg {
+    width: 20px;
+    height: 20px;
 }
 
 .yatra-quick-fact-content {
@@ -691,42 +697,39 @@
 }
 
 .yatra-quick-fact-label {
-    font-size: 11px;
-    color: #6b7280;
+    font-size: 10px;
+    color: #94a3b8;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 6px;
-    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    font-weight: 500;
     line-height: 1.2;
     display: block;
 }
 
 .yatra-quick-fact-value {
-    font-size: 18px;
-    font-weight: 700;
-    color: #111827;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
     margin: 0;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
+    line-height: 1.4;
     display: block;
 }
 
 .yatra-quick-fact-price {
-    font-size: 32px;
-    font-weight: 800;
+    font-size: 14px;
+    font-weight: 600;
     color: #3b82f6;
-    line-height: 1.1;
-    margin: 4px 0 0 0;
-    letter-spacing: -0.02em;
+    line-height: 1.4;
+    margin: 0;
     display: block;
 }
 
 .yatra-quick-fact-price-label {
-    font-size: 11px;
-    color: #9ca3af;
-    font-weight: 500;
-    margin-top: 4px;
-    letter-spacing: 0.2px;
+    font-size: 10px;
+    color: #94a3b8;
+    font-weight: 400;
+    margin-top: 2px;
     display: block;
 }
 
@@ -3019,7 +3022,7 @@ input.yatra-datepicker,
     }
 
     .yatra-quick-fact-price {
-        font-size: 32px;
+        font-size: 18px;
     }
 
     .yatra-quick-fact-price-label {

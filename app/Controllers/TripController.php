@@ -142,8 +142,8 @@ class TripController extends BaseController
                 $items = $this->service->search($search, $args);
                 $total = count($items);
             } else {
-                $items = $this->service->getAll($args);
-                $total = $this->service->count($args);
+            $items = $this->service->getAll($args);
+            $total = $this->service->count($args);
             }
 
             return $this->success_response([
@@ -1130,7 +1130,7 @@ class TripController extends BaseController
                                     <?php echo esc_html($format_price($card['sale_price'])); ?>
                                 </div>
                             </div>
-                            <a href="<?php echo esc_url(home_url('/book/' . $trip_slug)); ?>" 
+                            <a href="<?php echo esc_url(yatra_get_booking_url($trip_slug, ['date' => $card['data_date'], 'adults' => $card['min_travelers']])); ?>" 
                                class="yatra-card-book-btn" 
                                data-date="<?php echo esc_attr($card['data_date']); ?>"
                                data-price="<?php echo esc_attr($sale_price); ?>"

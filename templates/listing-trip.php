@@ -555,7 +555,7 @@ get_header();
                                     </div>
                                     <div class="yatra-trip-actions">
                                         <a href="<?php echo esc_url(home_url('/trip/' . sanitize_title($trip['title']))); ?>" class="yatra-view-btn">View Details</a>
-                                        <a href="<?php echo esc_url(home_url('/book/' . sanitize_title($trip['title']))); ?>" class="yatra-book-btn">Book Now</a>
+                                        <a href="<?php echo esc_url(yatra_get_booking_url(sanitize_title($trip['title']))); ?>" class="yatra-book-btn">Book Now</a>
                                     </div>
                                 </div>
                             </div>

@@ -139,6 +139,11 @@ class SettingsController extends BaseController
         'destination_base' => 'destination',
         'activity_base' => 'activity',
         'trip_category_base' => 'trip-category',
+        'booking_base' => 'book',
+        
+        // Booking Page Settings
+        'use_booking_page' => false,
+        'booking_page_id' => 0,
         
         // Advanced Settings
         'debug_mode' => false,
@@ -172,6 +177,33 @@ class SettingsController extends BaseController
             [
                 'methods' => \WP_REST_Server::CREATABLE,
                 'callback' => [$this, 'flush_rewrite_rules'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
+        // Get WordPress pages for booking page selection
+        register_rest_route($namespace, '/' . $base . '/pages', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_pages'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
+        // Check if page has booking shortcode
+        register_rest_route($namespace, '/' . $base . '/check-shortcode/(?P<page_id>\d+)', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'check_booking_shortcode'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
+        // Insert booking shortcode into page
+        register_rest_route($namespace, '/' . $base . '/insert-shortcode/(?P<page_id>\d+)', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'insert_booking_shortcode'],
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
@@ -281,7 +313,10 @@ class SettingsController extends BaseController
             if (in_array('trip_base', $updated, true) || 
                 in_array('destination_base', $updated, true) || 
                 in_array('activity_base', $updated, true) ||
-                in_array('trip_category_base', $updated, true)) {
+                in_array('trip_category_base', $updated, true) ||
+                in_array('booking_base', $updated, true) ||
+                in_array('use_booking_page', $updated, true) ||
+                in_array('booking_page_id', $updated, true)) {
                 // Use hard flush to ensure rules are saved to database
                 flush_rewrite_rules(true);
             }
@@ -494,6 +529,116 @@ class SettingsController extends BaseController
 
             return $this->success_response([
                 'message' => 'Rewrite rules flushed successfully',
+            ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get list of WordPress pages for booking page selection
+     * Note: We don't check for shortcode here - it's checked on-demand when user selects a page
+     */
+    public function get_pages(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $pages = get_pages([
+                'post_status' => 'publish',
+                'sort_column' => 'post_title',
+                'sort_order' => 'ASC',
+            ]);
+
+            $page_list = [];
+            foreach ($pages as $page) {
+                $page_list[] = [
+                    'id' => $page->ID,
+                    'title' => $page->post_title,
+                    'slug' => $page->post_name,
+                    'url' => get_permalink($page->ID),
+                ];
+            }
+
+            return $this->success_response($page_list);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Check if a page has the booking shortcode
+     */
+    public function check_booking_shortcode(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $page_id = (int) $request->get_param('page_id');
+            
+            if ($page_id <= 0) {
+                return $this->error_response('Invalid page ID', 400);
+            }
+
+            $page = get_post($page_id);
+            
+            if (!$page || $page->post_type !== 'page') {
+                return $this->error_response('Page not found', 404);
+            }
+
+            $has_shortcode = has_shortcode($page->post_content, 'yatra_booking');
+            
+            return $this->success_response([
+                'page_id' => $page_id,
+                'has_shortcode' => $has_shortcode,
+                'page_title' => $page->post_title,
+                'page_url' => get_permalink($page_id),
+                'edit_url' => get_edit_post_link($page_id, 'raw'),
+            ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Insert booking shortcode into a page
+     */
+    public function insert_booking_shortcode(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $page_id = (int) $request->get_param('page_id');
+            
+            if ($page_id <= 0) {
+                return $this->error_response('Invalid page ID', 400);
+            }
+
+            $page = get_post($page_id);
+            
+            if (!$page || $page->post_type !== 'page') {
+                return $this->error_response('Page not found', 404);
+            }
+
+            // Check if shortcode already exists
+            if (has_shortcode($page->post_content, 'yatra_booking')) {
+                return $this->success_response([
+                    'message' => 'Shortcode already exists on this page',
+                    'page_id' => $page_id,
+                    'already_exists' => true,
+                ]);
+            }
+
+            // Append shortcode to page content
+            $new_content = $page->post_content . "\n\n[yatra_booking]";
+            
+            $result = wp_update_post([
+                'ID' => $page_id,
+                'post_content' => $new_content,
+            ], true);
+
+            if (is_wp_error($result)) {
+                return $this->error_response($result->get_error_message(), 500);
+            }
+
+            return $this->success_response([
+                'message' => 'Shortcode added successfully',
+                'page_id' => $page_id,
+                'page_url' => get_permalink($page_id),
             ]);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);

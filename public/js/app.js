@@ -16391,6 +16391,9 @@ const Settings = () => {
     destination_base: "destination",
     activity_base: "activity",
     trip_category_base: "trip-category",
+    booking_base: "book",
+    use_booking_page: false,
+    booking_page_id: 0,
     debug_mode: false,
     enable_logging: false,
     cache_enabled: true,
@@ -16477,6 +16480,72 @@ const Settings = () => {
       showToast((error == null ? void 0 : error.message) || __("Failed to flush rewrite rules", "Failed to flush rewrite rules"), "error");
     }
   });
+  const { data: pagesData } = useQuery({
+    queryKey: ["wordpress-pages"],
+    queryFn: async () => {
+      const response = await apiClient.get("/settings/pages");
+      return response;
+    },
+    enabled: can("manage_yatra") && viewingSection === "permalink"
+  });
+  const checkShortcodeMutation = useMutation({
+    mutationFn: async (pageId) => {
+      const response = await apiClient.get(`/settings/check-shortcode/${pageId}`);
+      return response;
+    }
+  });
+  const insertShortcodeMutation = useMutation({
+    mutationFn: async (pageId) => {
+      const response = await apiClient.post(`/settings/insert-shortcode/${pageId}`);
+      return response;
+    },
+    onSuccess: () => {
+      showToast(__("Shortcode added successfully", "Shortcode added successfully"), "success");
+      queryClient2.invalidateQueries({ queryKey: ["wordpress-pages"] });
+    },
+    onError: (error) => {
+      showToast((error == null ? void 0 : error.message) || __("Failed to add shortcode", "Failed to add shortcode"), "error");
+    }
+  });
+  const [showShortcodeDialog, setShowShortcodeDialog] = reactExports.useState(false);
+  const [selectedPageForShortcode, setSelectedPageForShortcode] = reactExports.useState(null);
+  const [isCheckingShortcode, setIsCheckingShortcode] = reactExports.useState(false);
+  const handleBookingPageChange = async (pageId) => {
+    if (pageId === 0) {
+      handleFieldChange({ target: { name: "booking_page_id", value: 0 } });
+      handleFieldChange({ target: { name: "use_booking_page", value: false } });
+      return;
+    }
+    const page = pagesData == null ? void 0 : pagesData.find((p) => p.id === pageId);
+    if (!page) return;
+    setIsCheckingShortcode(true);
+    try {
+      const result = await checkShortcodeMutation.mutateAsync(pageId);
+      if (result.has_shortcode) {
+        handleFieldChange({ target: { name: "booking_page_id", value: pageId } });
+        handleFieldChange({ target: { name: "use_booking_page", value: true } });
+        showToast(__("Booking page selected successfully", "Booking page selected successfully"), "success");
+      } else {
+        setSelectedPageForShortcode({ id: pageId, title: page.title });
+        setShowShortcodeDialog(true);
+      }
+    } catch (error) {
+      showToast((error == null ? void 0 : error.message) || __("Failed to check page", "Failed to check page"), "error");
+    } finally {
+      setIsCheckingShortcode(false);
+    }
+  };
+  const handleConfirmInsertShortcode = async () => {
+    if (!selectedPageForShortcode) return;
+    try {
+      await insertShortcodeMutation.mutateAsync(selectedPageForShortcode.id);
+      handleFieldChange({ target: { name: "booking_page_id", value: selectedPageForShortcode.id } });
+      handleFieldChange({ target: { name: "use_booking_page", value: true } });
+      setShowShortcodeDialog(false);
+      setSelectedPageForShortcode(null);
+    } catch (error) {
+    }
+  };
   const handleSave = () => {
     if (formData) {
       setIsSaving(true);
@@ -16510,6 +16579,7 @@ const Settings = () => {
   ];
   const SectionDivider = ({ title: title2 }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-gray-200 dark:border-gray-700 pt-4 mt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: title2 }) });
   const renderSettingsContent = () => {
+    var _a;
     if (!formData) return null;
     switch (viewingSection) {
       case "general":
@@ -17808,8 +17878,8 @@ const Settings = () => {
                     }
                   ),
                   formData.customer_account_page && (() => {
-                    var _a;
-                    const siteUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || "";
+                    var _a2;
+                    const siteUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || "";
                     const slug = formData.customer_account_page.trim();
                     const accountSlug = slug.startsWith("/") ? slug : "/" + slug;
                     const accountUrl = siteUrl.replace(/\/$/, "") + accountSlug;
@@ -18527,6 +18597,162 @@ const Settings = () => {
               }
             )
           ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-8 pt-6 border-t border-gray-200 dark:border-gray-700", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: __("Booking Page Settings", "Booking Page Settings") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-6", children: __("Configure the booking page URL. By default, bookings use /book/{trip-slug}. You can customize the URL base or use a custom WordPress page.", "Configure the booking page URL. By default, bookings use /book/{trip-slug}. You can customize the URL base or use a custom WordPress page.") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                FormField,
+                {
+                  id: "booking_base",
+                  label: __("Default Booking URL Base", "Default Booking URL Base"),
+                  description: __('URL slug for the booking page (e.g., "book" will create URLs like /book/trip-name)', 'URL slug for the booking page (e.g., "book" will create URLs like /book/trip-name)'),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "booking_base",
+                        name: "booking_base",
+                        value: formData.booking_base || "book",
+                        onChange: handleFieldChange,
+                        placeholder: "book",
+                        className: "font-mono",
+                        disabled: formData.use_booking_page
+                      }
+                    ),
+                    formData.booking_base && !formData.use_booking_page && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: [
+                      __("Example URL:", "Example URL:"),
+                      " ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("code", { className: "bg-gray-100 dark:bg-gray-800 px-1 rounded", children: [
+                        "/",
+                        formData.booking_base || "book",
+                        "/nepal-adventure"
+                      ] })
+                    ] })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "checkbox",
+                    id: "use_booking_page",
+                    checked: formData.use_booking_page,
+                    onChange: (e) => {
+                      handleFieldChange({ target: { name: "use_booking_page", value: e.target.checked } });
+                      if (!e.target.checked) {
+                        handleFieldChange({ target: { name: "booking_page_id", value: 0 } });
+                      }
+                    },
+                    className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "use_booking_page", className: "font-medium cursor-pointer", children: __("Use Custom Page for Booking", "Use Custom Page for Booking") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("Select a WordPress page to use for bookings instead of the default URL. The page must contain the [yatra_booking] shortcode.", "Select a WordPress page to use for bookings instead of the default URL. The page must contain the [yatra_booking] shortcode.") })
+                ] })
+              ] }),
+              formData.use_booking_page && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                FormField,
+                {
+                  id: "booking_page_id",
+                  label: __("Select Booking Page", "Select Booking Page"),
+                  description: __("Choose a page that contains the [yatra_booking] shortcode. If the page doesn't have the shortcode, you'll be prompted to add it.", "Choose a page that contains the [yatra_booking] shortcode. If the page doesn't have the shortcode, you'll be prompted to add it."),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        "select",
+                        {
+                          id: "booking_page_id",
+                          name: "booking_page_id",
+                          value: formData.booking_page_id || 0,
+                          onChange: (e) => handleBookingPageChange(parseInt(e.target.value)),
+                          disabled: isCheckingShortcode,
+                          className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-wait",
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: 0, children: __("-- Select a page --", "-- Select a page --") }),
+                            pagesData == null ? void 0 : pagesData.map((page) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: page.id, children: page.title }, page.id))
+                          ]
+                        }
+                      ),
+                      isCheckingShortcode && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute right-8 top-1/2 -translate-y-1/2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 animate-spin text-blue-500" }) })
+                    ] }),
+                    formData.booking_page_id > 0 && pagesData && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: [
+                      __("Booking URL:", "Booking URL:"),
+                      " ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-gray-100 dark:bg-gray-800 px-1 rounded", children: ((_a = pagesData.find((p) => p.id === formData.booking_page_id)) == null ? void 0 : _a.url) || "" })
+                    ] })
+                  ]
+                }
+              )
+            ] })
+          ] }),
+          showShortcodeDialog && selectedPageForShortcode && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black/50 flex items-center justify-center z-50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-4", children: __("Shortcode Required", "Shortcode Required") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-6", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-300 mb-3", children: [
+                __("The page", "The page"),
+                " ",
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("strong", { children: [
+                  '"',
+                  selectedPageForShortcode.title,
+                  '"'
+                ] }),
+                " ",
+                __("doesn't have the", "doesn't have the"),
+                " ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-gray-100 dark:bg-gray-700 px-1 rounded", children: "[yatra_booking]" }),
+                " ",
+                __("shortcode.", "shortcode.")
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-300", children: __("Would you like to add it automatically, or edit the page manually to place it where you want?", "Would you like to add it automatically, or edit the page manually to place it where you want?") })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  onClick: handleConfirmInsertShortcode,
+                  disabled: insertShortcodeMutation.isPending,
+                  className: "w-full justify-center",
+                  children: insertShortcodeMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 animate-spin mr-2" }),
+                    __("Adding...", "Adding...")
+                  ] }) : __("Add Shortcode Automatically", "Add Shortcode Automatically")
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  variant: "outline",
+                  onClick: () => {
+                    var _a2;
+                    const editUrl = (_a2 = pagesData == null ? void 0 : pagesData.find((p) => p.id === selectedPageForShortcode.id)) == null ? void 0 : _a2.url;
+                    if (editUrl) {
+                      window.open(`/wp-admin/post.php?post=${selectedPageForShortcode.id}&action=edit`, "_blank");
+                    }
+                    setShowShortcodeDialog(false);
+                    setSelectedPageForShortcode(null);
+                  },
+                  className: "w-full justify-center",
+                  children: __("Edit Page Manually", "Edit Page Manually")
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  variant: "ghost",
+                  onClick: () => {
+                    setShowShortcodeDialog(false);
+                    setSelectedPageForShortcode(null);
+                    handleFieldChange({ target: { name: "booking_page_id", value: 0 } });
+                  },
+                  className: "w-full justify-center",
+                  children: __("Cancel", "Cancel")
+                }
+              )
+            ] })
+          ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 text-sm text-blue-800 dark:text-blue-200", children: [

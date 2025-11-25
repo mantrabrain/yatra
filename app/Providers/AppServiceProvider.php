@@ -40,6 +40,9 @@ class AppServiceProvider extends ServiceProvider
         // Add rewrite rules for trip permalinks
         add_action('init', [$this, 'addTripRewriteRules'], 10);
 
+        // Register shortcodes
+        add_action('init', [$this, 'registerShortcodes'], 10);
+
         // Register frontend account page - use early priority to catch before 404
         add_action('template_redirect', [$this, 'handleAccountPage'], 1);
 
@@ -79,6 +82,54 @@ class AppServiceProvider extends ServiceProvider
         }
 
         ModuleManager::initializeDefaults();
+    }
+
+    /**
+     * Register shortcodes
+     */
+    public function registerShortcodes(): void
+    {
+        add_shortcode('yatra_booking', [$this, 'renderBookingShortcode']);
+    }
+
+    /**
+     * Render the booking shortcode
+     */
+    public function renderBookingShortcode(array $atts = []): string
+    {
+        // Parse shortcode attributes
+        $atts = shortcode_atts([
+            'trip_slug' => '',
+        ], $atts, 'yatra_booking');
+
+        // Get trip slug from URL parameter or shortcode attribute
+        $trip_slug = !empty($atts['trip_slug']) ? $atts['trip_slug'] : '';
+        
+        // Try to get from query string if not set
+        if (empty($trip_slug) && isset($_GET['trip'])) {
+            $trip_slug = sanitize_text_field($_GET['trip']);
+        }
+
+        // Enqueue booking assets
+        $this->enqueueBookingPageAssets();
+
+        // Start output buffering
+        ob_start();
+
+        // Set up the trip slug for the template
+        set_query_var('yatra_booking_trip_slug', $trip_slug);
+
+        // Include the booking template
+        $template_path = YATRA_PLUGIN_PATH . 'templates/booking.php';
+        
+        if (file_exists($template_path)) {
+            // We need to render just the booking form, not the full page
+            include YATRA_PLUGIN_PATH . 'templates/booking-form.php';
+        } else {
+            echo '<p>' . esc_html__('Booking form template not found.', 'yatra') . '</p>';
+        }
+
+        return ob_get_clean();
     }
 
     /**
@@ -255,6 +306,10 @@ class AppServiceProvider extends ServiceProvider
         $destination_base = get_option('yatra_destination_base', 'destination');
         $activity_base = get_option('yatra_activity_base', 'activity');
         $trip_category_base = get_option('yatra_trip_category_base', 'trip-category');
+        $booking_base = get_option('yatra_booking_base', 'book');
+        
+        // Check if using custom booking page
+        $use_booking_page = get_option('yatra_use_booking_page', false);
         
         // Sanitize bases (only allow alphanumeric, hyphens, underscores)
         $trip_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_base);
@@ -275,6 +330,11 @@ class AppServiceProvider extends ServiceProvider
         $trip_category_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_category_base);
         if (empty($trip_category_base)) {
             $trip_category_base = 'trip-category';
+        }
+        
+        $booking_base = preg_replace('/[^a-z0-9_-]/i', '', $booking_base);
+        if (empty($booking_base)) {
+            $booking_base = 'book';
         }
 
         // Add query vars first (must be registered before rewrite rules)
@@ -318,17 +378,20 @@ class AppServiceProvider extends ServiceProvider
             'top'
         );
 
-        // Booking page: /book/{trip_slug}
-        add_rewrite_rule(
-            '^book/([^/]+)/?$',
-            'index.php?yatra_booking_page=$matches[1]',
-            'top'
-        );
+        // Only add booking page rewrite rule if NOT using custom booking page
+        if (!$use_booking_page) {
+            // Booking page: /{booking_base}/{trip_slug}
+            add_rewrite_rule(
+                '^' . $booking_base . '/([^/]+)/?$',
+                'index.php?yatra_booking_page=$matches[1]',
+                'top'
+            );
+        }
 
         // Debug logging
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log(sprintf('Yatra: Registered rewrite rules for trip_base: %s, destination_base: %s, activity_base: %s, trip_category_base: %s', 
-                $trip_base, $destination_base, $activity_base, $trip_category_base));
+            error_log(sprintf('Yatra: Registered rewrite rules for trip_base: %s, destination_base: %s, activity_base: %s, trip_category_base: %s, booking_base: %s (custom page: %s)', 
+                $trip_base, $destination_base, $activity_base, $trip_category_base, $booking_base, $use_booking_page ? 'yes' : 'no'));
         }
     }
 
@@ -562,9 +625,58 @@ class AppServiceProvider extends ServiceProvider
      */
     public function handleBookingPage(): void
     {
-        global $wp_query;
+        global $wp_query, $wp;
 
+        // Check if using custom booking page - if so, let WordPress handle it
+        $use_booking_page = get_option('yatra_use_booking_page', false);
+        if ($use_booking_page) {
+            return;
+        }
+
+        // Get booking_base from settings
+        $booking_base = get_option('yatra_booking_base', 'book');
+        $booking_base = preg_replace('/[^a-z0-9_-]/i', '', $booking_base);
+        if (empty($booking_base)) {
+            $booking_base = 'book';
+        }
+
+        // Method 1: Try to get from query var (if rewrite rules are working)
         $booking_trip_slug = get_query_var('yatra_booking_page');
+        
+        // Method 2: If query var is empty, check request path directly
+        if (empty($booking_trip_slug)) {
+            $request_path = '';
+            
+            // Get from $wp->request if available
+            if (isset($wp) && isset($wp->request)) {
+                $request_path = trim((string) $wp->request, '/');
+            }
+            
+            // Fallback: parse from REQUEST_URI
+            if (empty($request_path)) {
+                $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+                $parsed_uri = wp_parse_url($request_uri);
+                $path = $parsed_uri['path'] ?? '';
+                $path = trim($path, '/');
+
+                // Remove site subdirectory (if WordPress is installed in subdir)
+                $home_path = wp_parse_url(home_url('/'), PHP_URL_PATH);
+                $home_path = $home_path ? trim($home_path, '/') : '';
+                if ($home_path && str_starts_with($path, $home_path)) {
+                    $path = trim(substr($path, strlen($home_path)), '/');
+                }
+                $request_path = $path;
+            }
+
+            // Check if request path matches booking pattern: {booking_base}/{slug}
+            if (!empty($request_path)) {
+                $escaped_base = preg_quote($booking_base, '/');
+                $pattern = '/^' . $escaped_base . '\/([^\/]+)\/?$/';
+                if (preg_match($pattern, $request_path, $matches)) {
+                    $booking_trip_slug = $matches[1];
+                }
+            }
+        }
 
         if (empty($booking_trip_slug)) {
             return;

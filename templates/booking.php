@@ -42,10 +42,7 @@ $trip_data = (object) [
     'ending_location' => 'Kathmandu, Nepal',
 ];
 
-// Helper function to format price
-function yatra_format_price($price, $currency = 'USD') {
-    return $currency . ' ' . number_format($price, 0);
-}
+// Helper functions are loaded from includes/helpers.php
 
 get_header();
 ?>
