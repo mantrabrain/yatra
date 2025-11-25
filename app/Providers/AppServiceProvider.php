@@ -379,8 +379,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         // Only add booking page rewrite rule if NOT using custom booking page
-        if (!$use_booking_page) {
-            // Booking page: /{booking_base}/{trip_slug}
+        if (!$use_booking_page) {            // Booking page: /{booking_base}/{trip_slug}
             add_rewrite_rule(
                 '^' . $booking_base . '/([^/]+)/?$',
                 'index.php?yatra_booking_page=$matches[1]',
@@ -627,17 +626,18 @@ class AppServiceProvider extends ServiceProvider
     {
         global $wp_query, $wp;
 
-        // Check if using custom booking page - if so, let WordPress handle it
-        $use_booking_page = get_option('yatra_use_booking_page', false);
-        if ($use_booking_page) {
-            return;
-        }
-
         // Get booking_base from settings
         $booking_base = get_option('yatra_booking_base', 'book');
         $booking_base = preg_replace('/[^a-z0-9_-]/i', '', $booking_base);
         if (empty($booking_base)) {
             $booking_base = 'book';
+        }
+
+        // Check if using custom booking page
+        $use_booking_page = get_option('yatra_use_booking_page', false);
+        
+        if ($use_booking_page) {
+            return;
         }
 
         // Method 1: Try to get from query var (if rewrite rules are working)
