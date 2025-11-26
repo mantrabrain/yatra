@@ -212,9 +212,17 @@ get_header();
                 <?php echo yatra_svg_icon('camera', 'yatra-icon-sm'); ?>
                 <span>Gallery</span>
             </a>
+            <a href="#location" class="yatra-sticky-nav-item">
+                <?php echo yatra_svg_icon('map-pin', 'yatra-icon-sm'); ?>
+                <span>Location</span>
+            </a>
             <a href="#faq" class="yatra-sticky-nav-item">
                 <?php echo yatra_svg_icon('info', 'yatra-icon-sm'); ?>
                 <span>FAQ</span>
+            </a>
+            <a href="#reviews" class="yatra-sticky-nav-item">
+                <?php echo yatra_svg_icon('star', 'yatra-icon-sm'); ?>
+                <span>Reviews</span>
             </a>
             <div class="yatra-sticky-nav-price">
                 <?php echo yatra_svg_icon('dollar', 'yatra-icon-sm'); ?>
@@ -315,6 +323,19 @@ get_header();
                     </div>
                 </div>
             </section>
+
+            <!-- What Makes This Trip Special Section -->
+            <?php if (!empty($trip_data->what_makes_special)): ?>
+            <section class="yatra-trip-section" id="what-makes-special">
+                <h2 class="yatra-trip-section-title">
+                    <?php echo yatra_svg_icon('star', 'yatra-trip-section-title-icon'); ?>
+                    What Makes This Trip Special
+                </h2>
+                <div class="yatra-trip-special">
+                    <p class="yatra-trip-special-text"><?php echo esc_html($trip_data->what_makes_special); ?></p>
+                </div>
+            </section>
+            <?php endif; ?>
 
             <!-- Trip Details Section -->
             <section class="yatra-trip-section" id="trip-details">
@@ -860,107 +881,6 @@ get_header();
                 </div>
             </section>
 
-            <!-- Accommodation & Transportation -->
-            <section class="yatra-trip-section">
-                <h2 class="yatra-trip-section-title">
-                    <?php echo yatra_svg_icon('home', 'yatra-trip-section-title-icon'); ?>
-                    Accommodation & Transportation
-                </h2>
-                <div class="yatra-accommodation-transport">
-                    <div class="yatra-accommodation-card">
-                        <h3 class="yatra-accommodation-title">
-                            <?php echo yatra_svg_icon('home', 'yatra-accommodation-icon'); ?>
-                            Accommodation
-                        </h3>
-                        <div class="yatra-accommodation-details">
-                            <p><strong>Teahouse Lodges:</strong> Clean and comfortable teahouse accommodations throughout the trek. Rooms are basic but warm, typically with twin beds and shared bathroom facilities.</p>
-                            <p><strong>Kathmandu:</strong> 3-star hotel with modern amenities, hot showers, and WiFi.</p>
-                            <p><strong>Meal Plan:</strong> Full board (breakfast, lunch, dinner) included during the trek. Meals are hearty and nutritious, designed to fuel your adventure.</p>
-                        </div>
-                    </div>
-                    <div class="yatra-transport-card">
-                        <h3 class="yatra-transport-title">
-                            <?php echo yatra_svg_icon('truck', 'yatra-transport-icon'); ?>
-                            Transportation
-                        </h3>
-                        <div class="yatra-transport-details">
-                            <p><strong>Flights:</strong> Round-trip flights between Kathmandu and Lukla included. These scenic flights offer stunning mountain views.</p>
-                            <p><strong>Transfers:</strong> All airport transfers in private vehicles included.</p>
-                            <p><strong>During Trek:</strong> All transportation is on foot. Porters carry your main luggage, allowing you to trek with just a daypack.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Booking Information -->
-            <section class="yatra-trip-section">
-                <h2 class="yatra-trip-section-title">
-                    <?php echo yatra_svg_icon('info', 'yatra-trip-section-title-icon'); ?>
-                    Booking Information
-                </h2>
-                <div class="yatra-booking-info-grid">
-                    <div class="yatra-booking-info-card">
-                        <div class="yatra-booking-info-icon">
-                            <?php echo yatra_svg_icon('credit-card', 'yatra-icon-lg'); ?>
-                        </div>
-                        <h3 class="yatra-booking-info-title">Payment Methods</h3>
-                        <p class="yatra-booking-info-desc">We accept Visa, Mastercard, PayPal, and Stripe. Secure payment processing with SSL encryption.</p>
-                    </div>
-                    <div class="yatra-booking-info-card">
-                        <div class="yatra-booking-info-icon">
-                            <?php echo yatra_svg_icon('phone', 'yatra-icon-lg'); ?>
-                        </div>
-                        <h3 class="yatra-booking-info-title">Need Help?</h3>
-                        <p class="yatra-booking-info-desc">Call us at <a href="tel:+1234567890" class="yatra-booking-info-link">+1 (234) 567-890</a> or email <a href="mailto:support@yatra.com" class="yatra-booking-info-link">support@yatra.com</a></p>
-                    </div>
-                    <div class="yatra-booking-info-card">
-                        <div class="yatra-booking-info-icon">
-                            <?php echo yatra_svg_icon('check', 'yatra-icon-lg'); ?>
-                        </div>
-                        <h3 class="yatra-booking-info-title">Instant Confirmation</h3>
-                        <p class="yatra-booking-info-desc">Receive instant booking confirmation via email. Reserve now and pay later for flexible travel planning.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Requirements & Policies -->
-            <section class="yatra-trip-section">
-                <h2 class="yatra-trip-section-title">
-                    <?php echo yatra_svg_icon('info', 'yatra-trip-section-title-icon'); ?>
-                    Requirements & Policies
-                </h2>
-                <div class="yatra-requirements-grid">
-                    <div class="yatra-requirement-card">
-                        <h3 class="yatra-requirement-title">
-                            <?php echo yatra_svg_icon('users', 'yatra-requirement-icon'); ?>
-                            Age Requirements
-                        </h3>
-                        <p class="yatra-requirement-content">Minimum age: <?php echo esc_html($trip_data->age_min); ?> years. Maximum age: <?php echo esc_html($trip_data->age_max); ?> years. Participants should be in good physical condition.</p>
-                    </div>
-                    <div class="yatra-requirement-card">
-                        <h3 class="yatra-requirement-title">
-                            <?php echo yatra_svg_icon('shield', 'yatra-requirement-icon'); ?>
-                            Physical Requirements
-                        </h3>
-                        <p class="yatra-requirement-content">Good physical fitness required. Previous trekking experience recommended but not mandatory. Ability to walk 5-7 hours per day on uneven terrain.</p>
-                    </div>
-                    <div class="yatra-requirement-card">
-                        <h3 class="yatra-requirement-title">
-                            <?php echo yatra_svg_icon('info', 'yatra-requirement-icon'); ?>
-                            Cancellation Policy
-                        </h3>
-                        <p class="yatra-requirement-content">Full refund if cancelled 60+ days before departure. 50% refund for 30-59 days. No refund for cancellations less than 30 days before departure.</p>
-                    </div>
-                    <div class="yatra-requirement-card">
-                        <h3 class="yatra-requirement-title">
-                            <?php echo yatra_svg_icon('shield', 'yatra-requirement-icon'); ?>
-                            Travel Insurance
-                        </h3>
-                        <p class="yatra-requirement-content">Comprehensive travel insurance covering high-altitude trekking (up to 6,000m) is mandatory. Must include emergency evacuation coverage.</p>
-                    </div>
-                </div>
-            </section>
-
             <!-- Gallery Section -->
             <section class="yatra-trip-section" id="gallery">
                 <h2 class="yatra-trip-section-title">
@@ -990,7 +910,7 @@ get_header();
             </section>
 
             <!-- Location/Map Section -->
-            <section class="yatra-trip-section">
+            <section class="yatra-trip-section" id="location">
                 <h2 class="yatra-trip-section-title">
                     <?php echo yatra_svg_icon('map-pin', 'yatra-trip-section-title-icon'); ?>
                     Location
@@ -1001,6 +921,81 @@ get_header();
                 <div style="margin-top: 24px; font-size: 15px; color: #374151;">
                     <p><strong>Starting Point:</strong> <?php echo esc_html($trip_data->starting_location); ?></p>
                     <p><strong>Ending Point:</strong> <?php echo esc_html($trip_data->ending_location); ?></p>
+                </div>
+            </section>
+
+            <!-- Important Information Section -->
+            <section class="yatra-trip-section" id="important-info">
+                <h2 class="yatra-trip-section-title">
+                    <?php echo yatra_svg_icon('info', 'yatra-trip-section-title-icon'); ?>
+                    Important Information
+                </h2>
+                <div class="yatra-important-info-grid">
+                    <?php if (!empty($trip_data->physical_requirements)): ?>
+                    <div class="yatra-important-info-card">
+                        <div class="yatra-important-info-icon">
+                            <?php echo yatra_svg_icon('shield', 'yatra-icon-lg'); ?>
+                        </div>
+                        <h3 class="yatra-important-info-title">Physical Requirements</h3>
+                        <p class="yatra-important-info-content"><?php echo esc_html($trip_data->physical_requirements); ?></p>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($trip_data->visa_requirements)): ?>
+                    <div class="yatra-important-info-card">
+                        <div class="yatra-important-info-icon">
+                            <?php echo yatra_svg_icon('file', 'yatra-icon-lg'); ?>
+                        </div>
+                        <h3 class="yatra-important-info-title">Visa Requirements</h3>
+                        <p class="yatra-important-info-content"><?php echo esc_html($trip_data->visa_requirements); ?></p>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($trip_data->vaccination_requirements)): ?>
+                    <div class="yatra-important-info-card">
+                        <div class="yatra-important-info-icon">
+                            <?php echo yatra_svg_icon('shield', 'yatra-icon-lg'); ?>
+                        </div>
+                        <h3 class="yatra-important-info-title">Vaccination Requirements</h3>
+                        <p class="yatra-important-info-content"><?php echo esc_html($trip_data->vaccination_requirements); ?></p>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($trip_data->cancellation_policy)): ?>
+                    <div class="yatra-important-info-card">
+                        <div class="yatra-important-info-icon">
+                            <?php echo yatra_svg_icon('info', 'yatra-icon-lg'); ?>
+                        </div>
+                        <h3 class="yatra-important-info-title">Cancellation Policy</h3>
+                        <p class="yatra-important-info-content"><?php echo esc_html($trip_data->cancellation_policy); ?></p>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($trip_data->age_min) || !empty($trip_data->age_max)): ?>
+                    <div class="yatra-important-info-card">
+                        <div class="yatra-important-info-icon">
+                            <?php echo yatra_svg_icon('users', 'yatra-icon-lg'); ?>
+                        </div>
+                        <h3 class="yatra-important-info-title">Age Requirements</h3>
+                        <p class="yatra-important-info-content">
+                            Minimum age: <?php echo esc_html($trip_data->age_min ?? 'N/A'); ?> years.
+                            <?php if (!empty($trip_data->age_max)): ?>
+                            Maximum age: <?php echo esc_html($trip_data->age_max); ?> years.
+                            <?php endif; ?>
+                            Participants should be in good physical condition.
+                        </p>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($trip_data->best_season)): ?>
+                    <div class="yatra-important-info-card">
+                        <div class="yatra-important-info-icon">
+                            <?php echo yatra_svg_icon('sun', 'yatra-icon-lg'); ?>
+                        </div>
+                        <h3 class="yatra-important-info-title">Best Time to Visit</h3>
+                        <p class="yatra-important-info-content"><?php echo esc_html($trip_data->best_season); ?></p>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </section>
 
@@ -1068,86 +1063,11 @@ get_header();
                 </ul>
             </section>
 
-            <!-- Weather & Climate Section -->
-            <section class="yatra-trip-section">
-                <h2 class="yatra-trip-section-title">
-                    <?php echo yatra_svg_icon('cloud', 'yatra-trip-section-title-icon'); ?>
-                    Weather & Climate
-                </h2>
-                <div class="yatra-weather-info">
-                    <div class="yatra-weather-card">
-                        <h3 class="yatra-weather-season">Best Time to Visit</h3>
-                        <p class="yatra-weather-desc">The best times for the Everest Base Camp trek are during the pre-monsoon (March to May) and post-monsoon (September to November) seasons. These periods offer clear skies, stable weather, and excellent visibility.</p>
-                    </div>
-                    <div class="yatra-weather-details">
-                        <div class="yatra-weather-detail-item">
-                            <div class="yatra-weather-detail-label">Spring (Mar-May)</div>
-                            <div class="yatra-weather-detail-value">Mild temperatures, clear skies, blooming rhododendrons</div>
-                        </div>
-                        <div class="yatra-weather-detail-item">
-                            <div class="yatra-weather-detail-label">Autumn (Sep-Nov)</div>
-                            <div class="yatra-weather-detail-value">Crisp air, excellent visibility, stable weather</div>
-                        </div>
-                        <div class="yatra-weather-detail-item">
-                            <div class="yatra-weather-detail-label">Temperature Range</div>
-                            <div class="yatra-weather-detail-value">-10°C to 15°C (varies with altitude)</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Packing List Section -->
-            <section class="yatra-trip-section">
-                <h2 class="yatra-trip-section-title">
-                    <?php echo yatra_svg_icon('tag', 'yatra-trip-section-title-icon'); ?>
-                    What to Pack
-                </h2>
-                <div class="yatra-packing-list">
-                    <div class="yatra-packing-category">
-                        <h3 class="yatra-packing-category-title">Essential Clothing</h3>
-                        <ul class="yatra-packing-items">
-                            <li>Base layers (thermal underwear)</li>
-                            <li>Fleece jacket and pants</li>
-                            <li>Down jacket (rated to -20°C)</li>
-                            <li>Waterproof jacket and pants</li>
-                            <li>Trekking pants (2-3 pairs)</li>
-                            <li>Hiking boots (broken in)</li>
-                            <li>Woolen socks (4-5 pairs)</li>
-                            <li>Gloves and warm hat</li>
-                        </ul>
-                    </div>
-                    <div class="yatra-packing-category">
-                        <h3 class="yatra-packing-category-title">Equipment & Accessories</h3>
-                        <ul class="yatra-packing-items">
-                            <li>Sleeping bag (rated to -20°C)</li>
-                            <li>Trekking poles (highly recommended)</li>
-                            <li>Headlamp with extra batteries</li>
-                            <li>Water bottles or hydration system</li>
-                            <li>Daypack (30-40L)</li>
-                            <li>Sunglasses and sunscreen (SPF 50+)</li>
-                            <li>First aid kit and personal medications</li>
-                            <li>Camera and extra memory cards</li>
-                        </ul>
-                    </div>
-                    <div class="yatra-packing-category">
-                        <h3 class="yatra-packing-category-title">Documents & Money</h3>
-                        <ul class="yatra-packing-items">
-                            <li>Valid passport (6 months validity)</li>
-                            <li>Travel insurance documents</li>
-                            <li>Nepal visa (obtainable on arrival)</li>
-                            <li>Cash (USD recommended for tips and extras)</li>
-                            <li>Credit/debit cards</li>
-                            <li>Emergency contact information</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Testimonials Section -->
-            <section class="yatra-trip-section">
+            <!-- Reviews Section -->
+            <section class="yatra-trip-section" id="reviews">
                 <h2 class="yatra-trip-section-title">
                     <?php echo yatra_svg_icon('star', 'yatra-trip-section-title-icon'); ?>
-                    What Our Travelers Say
+                    Reviews
                 </h2>
                 <div class="yatra-trip-testimonials">
                     <div class="yatra-testimonial-card">

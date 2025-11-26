@@ -1022,6 +1022,40 @@
 
 .yatra-itinerary-day-content {
     padding: 24px;
+    display: none; /* Hidden by default */
+}
+
+/* First day is expanded by default */
+.yatra-itinerary-day:first-child .yatra-itinerary-day-content {
+    display: block;
+}
+
+/* Rotate chevron for collapsed state */
+.yatra-itinerary-day .yatra-chevron-icon {
+    transform: rotate(-90deg);
+    transition: transform 0.2s ease;
+}
+
+/* First day chevron is not rotated */
+.yatra-itinerary-day:first-child .yatra-chevron-icon {
+    transform: rotate(0deg);
+}
+
+/* When expanded via JS */
+.yatra-itinerary-day[data-expanded="true"] .yatra-itinerary-day-content {
+    display: block;
+}
+
+.yatra-itinerary-day[data-expanded="true"] .yatra-chevron-icon {
+    transform: rotate(0deg);
+}
+
+.yatra-itinerary-day[data-expanded="false"] .yatra-itinerary-day-content {
+    display: none;
+}
+
+.yatra-itinerary-day[data-expanded="false"] .yatra-chevron-icon {
+    transform: rotate(-90deg);
 }
 
 /* Entry Timeline */

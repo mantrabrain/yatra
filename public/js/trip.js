@@ -1536,6 +1536,37 @@
             this.expandAllBtn = document.getElementById('yatra-expand-all');
             this.collapseAllBtn = document.getElementById('yatra-collapse-all');
             this.attachEventListeners();
+            this.initializeDefaultState();
+        }
+
+        // Initialize default state: collapse all except first day
+        initializeDefaultState() {
+            this.days.forEach((day, index) => {
+                const content = day.querySelector('.yatra-itinerary-day-content');
+                const toggle = day.querySelector('.yatra-day-toggle');
+                
+                if (content) {
+                    if (index === 0) {
+                        // Keep first day expanded
+                        content.style.display = 'block';
+                        day.setAttribute('data-expanded', 'true');
+                        if (toggle) {
+                            toggle.setAttribute('aria-expanded', 'true');
+                            const icon = toggle.querySelector('.yatra-chevron-icon');
+                            if (icon) icon.style.transform = 'rotate(0deg)';
+                        }
+                    } else {
+                        // Collapse all other days
+                        content.style.display = 'none';
+                        day.setAttribute('data-expanded', 'false');
+                        if (toggle) {
+                            toggle.setAttribute('aria-expanded', 'false');
+                            const icon = toggle.querySelector('.yatra-chevron-icon');
+                            if (icon) icon.style.transform = 'rotate(-90deg)';
+                        }
+                    }
+                }
+            });
         }
 
         attachEventListeners() {
