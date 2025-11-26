@@ -21,6 +21,8 @@
         initPriceRange();
         initAdvancedSearch();
         initTravelersSelect();
+        initHorizontalSearchDropdowns();
+        initDurationSlider();
     }
 
     // Advanced search toggle
@@ -230,6 +232,131 @@
                 maxRange.dispatchEvent(event);
             }
         });
+    }
+
+    // Horizontal Search Dropdowns
+    function initHorizontalSearchDropdowns() {
+        const dropdowns = document.querySelectorAll('.yatra-search-dropdown');
+        
+        if (dropdowns.length === 0) return;
+
+        // Close all dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.yatra-search-dropdown')) {
+                dropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('open');
+                });
+            }
+        });
+
+        dropdowns.forEach(dropdown => {
+            const trigger = dropdown.querySelector('.yatra-dropdown-trigger');
+            const menu = dropdown.querySelector('.yatra-dropdown-menu');
+            const options = dropdown.querySelectorAll('.yatra-dropdown-option');
+            const valueSpan = dropdown.querySelector('.yatra-dropdown-value');
+
+            if (trigger) {
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Close other dropdowns
+                    dropdowns.forEach(d => {
+                        if (d !== dropdown) {
+                            d.classList.remove('open');
+                        }
+                    });
+                    
+                    // Toggle current dropdown
+                    dropdown.classList.toggle('open');
+                });
+            }
+
+            // Handle option selection
+            options.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Remove selected from siblings
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected to clicked option
+                    this.classList.add('selected');
+                    
+                    // Update the display value
+                    if (valueSpan) {
+                        valueSpan.textContent = this.textContent;
+                        valueSpan.classList.add('selected');
+                    }
+                    
+                    // Close dropdown
+                    dropdown.classList.remove('open');
+                });
+            });
+
+            // Keep dropdown open when clicking inside (for duration slider)
+            if (menu) {
+                menu.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        });
+    }
+
+    // Duration Slider
+    function initDurationSlider() {
+        const durationDropdown = document.querySelector('[data-dropdown="duration"]');
+        if (!durationDropdown) return;
+
+        const minSlider = durationDropdown.querySelector('#durationMin');
+        const maxSlider = durationDropdown.querySelector('#durationMax');
+        const minBadge = durationDropdown.querySelector('.yatra-duration-min-badge');
+        const maxBadge = durationDropdown.querySelector('.yatra-duration-max-badge');
+        const minLabel = durationDropdown.querySelector('.yatra-duration-labels span:first-child');
+        const maxLabel = durationDropdown.querySelector('.yatra-duration-labels span:last-child');
+        const sliderRange = durationDropdown.querySelector('.yatra-slider-range');
+        const valueSpan = durationDropdown.querySelector('.yatra-dropdown-value');
+
+        if (!minSlider || !maxSlider) return;
+
+        function updateDurationDisplay() {
+            let min = parseInt(minSlider.value);
+            let max = parseInt(maxSlider.value);
+
+            // Ensure min doesn't exceed max
+            if (min > max) {
+                [min, max] = [max, min];
+                minSlider.value = min;
+                maxSlider.value = max;
+            }
+
+            // Update badges
+            if (minBadge) minBadge.textContent = min + ' Days';
+            if (maxBadge) maxBadge.textContent = max + ' Days';
+            
+            // Update labels
+            if (minLabel) minLabel.textContent = min + ' Days';
+            if (maxLabel) maxLabel.textContent = max + ' Days';
+
+            // Update the dropdown value display
+            if (valueSpan) {
+                valueSpan.textContent = min + ' - ' + max + ' Days';
+                valueSpan.classList.add('selected');
+            }
+
+            // Update the slider range track
+            if (sliderRange) {
+                const minPercent = ((min - 1) / 29) * 100;
+                const maxPercent = ((max - 1) / 29) * 100;
+                sliderRange.style.left = minPercent + '%';
+                sliderRange.style.width = (maxPercent - minPercent) + '%';
+            }
+        }
+
+        minSlider.addEventListener('input', updateDurationDisplay);
+        maxSlider.addEventListener('input', updateDurationDisplay);
+
+        // Initial display
+        updateDurationDisplay();
     }
 
 })();

@@ -7,8 +7,15 @@
 
 /* Common Listing Page Styles */
 .yatra-listing-page {
+    width: 100%;
+    max-width: 100%;
     min-height: 100vh;
     background: #f9fafb;
+}
+
+.yatra-listing-page.yatra-trip-listing {
+    width: 100%;
+    max-width: 100%;
 }
 
 .yatra-listing-wrapper {
@@ -16,12 +23,285 @@
 }
 
 .yatra-listing-container {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 24px 20px;
 }
 
-/* Advanced Search Bar */
+/* Horizontal Search Bar */
+.yatra-horizontal-search {
+    background: #f8fafc;
+    padding: 24px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.yatra-horizontal-search-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.yatra-search-bar {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 8px;
+    gap: 0;
+}
+
+.yatra-search-dropdown {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+}
+
+.yatra-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.yatra-dropdown-trigger:hover {
+    background: #f9fafb;
+}
+
+.yatra-dropdown-trigger > svg:first-child {
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.yatra-dropdown-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.yatra-dropdown-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yatra-dropdown-value {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.yatra-dropdown-value.selected {
+    color: #111827;
+    font-weight: 500;
+}
+
+.yatra-dropdown-arrow {
+    color: #9ca3af;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.yatra-search-dropdown.open .yatra-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.yatra-search-dropdown.open .yatra-dropdown-arrow.yatra-arrow-up {
+    transform: rotate(0deg);
+}
+
+.yatra-search-divider {
+    width: 1px;
+    height: 40px;
+    background: #e5e7eb;
+    flex-shrink: 0;
+}
+
+.yatra-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 220px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+}
+
+.yatra-search-dropdown.open .yatra-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.yatra-dropdown-option {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #374151;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.yatra-dropdown-option:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.yatra-dropdown-option.selected {
+    background: #eff6ff;
+    color: #3b82f6;
+    font-weight: 500;
+}
+
+/* Duration Slider Menu */
+.yatra-duration-menu {
+    min-width: 300px;
+    padding: 20px;
+}
+
+.yatra-duration-slider-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.yatra-duration-badges {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.yatra-duration-badge {
+    padding: 6px 14px;
+    background: #10b981;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 20px;
+    position: relative;
+}
+
+.yatra-duration-badge::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #10b981;
+}
+
+.yatra-dual-range-slider {
+    position: relative;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    margin: 12px 0;
+}
+
+.yatra-dual-range-slider input[type="range"] {
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+}
+
+.yatra-dual-range-slider input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #10b981;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: all;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+    border: 3px solid #fff;
+}
+
+.yatra-dual-range-slider input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #10b981;
+    border-radius: 50%;
+    cursor: pointer;
+    pointer-events: all;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
+.yatra-slider-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+}
+
+.yatra-slider-range {
+    position: absolute;
+    top: 0;
+    height: 6px;
+    background: #10b981;
+    border-radius: 3px;
+}
+
+.yatra-duration-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Search Main Button */
+.yatra-search-main-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    margin-left: 8px;
+}
+
+.yatra-search-main-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.yatra-search-main-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Legacy Search Styles - kept for compatibility */
 .yatra-advanced-search {
     background: #fff;
     border-bottom: 1px solid #e5e7eb;
@@ -33,9 +313,9 @@
 }
 
 .yatra-search-container {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 20px;
 }
 
 .yatra-search-header {
@@ -361,37 +641,40 @@
     align-items: start;
 }
 
+/* Full Width Content (no sidebar) */
+.yatra-listing-content-full {
+    width: 100%;
+}
+
+.yatra-listing-content-full .yatra-trip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.yatra-listing-content-full .yatra-trip-grid.list-view {
+    grid-template-columns: 1fr;
+}
+
+.yatra-listing-content-full .yatra-trip-grid.list-view .yatra-trip-card {
+    flex-direction: row;
+    max-height: 280px;
+}
+
+.yatra-listing-content-full .yatra-trip-grid.list-view .yatra-trip-image {
+    width: 350px;
+    height: 100%;
+}
+
 /* Filter Sidebar */
 .yatra-filter-sidebar {
     background: #fff;
     border-radius: 10px;
     padding: 20px;
     height: fit-content;
-    position: sticky;
-    top: 120px;
-    max-height: calc(100vh - 140px);
-    overflow-y: auto;
-    overflow-x: hidden;
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.yatra-filter-sidebar::-webkit-scrollbar {
-    width: 6px;
-}
-
-.yatra-filter-sidebar::-webkit-scrollbar-track {
-    background: #f9fafb;
-    border-radius: 3px;
-}
-
-.yatra-filter-sidebar::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 3px;
-}
-
-.yatra-filter-sidebar::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
 }
 
 .yatra-filter-header {
@@ -811,7 +1094,7 @@
 .yatra-trip-footer {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
     margin-top: auto;
     padding-top: 16px;
     border-top: 1px solid #f3f4f6;
@@ -840,6 +1123,30 @@
     font-size: 11px;
     color: #9ca3af;
     margin-top: 4px;
+}
+
+/* Card View Button */
+.yatra-card-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: #3b82f6;
+    color: #fff !important;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none !important;
+    white-space: nowrap;
+}
+
+.yatra-card-view-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .yatra-view-btn {
@@ -909,9 +1216,52 @@
     }
 }
 
+@media (max-width: 1024px) {
+    .yatra-search-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .yatra-search-dropdown {
+        min-width: calc(50% - 20px);
+        flex: 1 1 calc(50% - 20px);
+    }
+    
+    .yatra-search-divider {
+        display: none;
+    }
+    
+    .yatra-search-main-btn {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+}
+
 @media (max-width: 768px) {
     .yatra-listing-container {
         padding: 16px;
+    }
+
+    .yatra-search-bar {
+        flex-direction: column;
+        padding: 12px;
+    }
+    
+    .yatra-search-dropdown {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    .yatra-dropdown-menu {
+        left: 0;
+        right: 0;
+        min-width: 100%;
+    }
+    
+    .yatra-duration-menu {
+        min-width: 100%;
     }
 
     .yatra-search-form {
@@ -944,20 +1294,22 @@
 
     .yatra-filter-sidebar {
         position: static;
-        max-height: none;
         margin-bottom: 24px;
     }
 
-    .yatra-trip-grid {
+    .yatra-trip-grid,
+    .yatra-listing-content-full .yatra-trip-grid {
         grid-template-columns: 1fr;
     }
 
-    .yatra-trip-grid.list-view .yatra-trip-card {
+    .yatra-trip-grid.list-view .yatra-trip-card,
+    .yatra-listing-content-full .yatra-trip-grid.list-view .yatra-trip-card {
         flex-direction: column;
         max-height: none;
     }
 
-    .yatra-trip-grid.list-view .yatra-trip-image {
+    .yatra-trip-grid.list-view .yatra-trip-image,
+    .yatra-listing-content-full .yatra-trip-grid.list-view .yatra-trip-image {
         width: 100%;
         height: 220px;
     }
@@ -978,6 +1330,16 @@
     .yatra-activity-stats {
         flex-direction: row;
         justify-content: space-around;
+    }
+    
+    .yatra-trip-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .yatra-card-view-btn {
+        width: 100%;
     }
 }
 
