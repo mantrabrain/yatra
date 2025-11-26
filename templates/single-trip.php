@@ -1186,60 +1186,6 @@ get_header();
                 </div>
             </section>
 
-            <!-- Similar Trips Section -->
-            <section class="yatra-trip-section">
-                <h2 class="yatra-trip-section-title">
-                    <?php echo yatra_svg_icon('mountain', 'yatra-trip-section-title-icon'); ?>
-                    Similar Adventures
-                </h2>
-                <div class="yatra-similar-trips">
-                    <div class="yatra-similar-trip-card">
-                        <div class="yatra-similar-trip-image">
-                            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80" alt="Annapurna Base Camp">
-                        </div>
-                        <div class="yatra-similar-trip-content">
-                            <h3 class="yatra-similar-trip-title">Annapurna Base Camp Trek</h3>
-                            <div class="yatra-similar-trip-meta">
-                                <span>12 Days</span>
-                                <span>•</span>
-                                <span>Moderate</span>
-                                <span>•</span>
-                                <span><?php echo yatra_format_price(1450, $trip_data->currency); ?></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="yatra-similar-trip-card">
-                        <div class="yatra-similar-trip-image">
-                            <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80" alt="Langtang Valley">
-                        </div>
-                        <div class="yatra-similar-trip-content">
-                            <h3 class="yatra-similar-trip-title">Langtang Valley Trek</h3>
-                            <div class="yatra-similar-trip-meta">
-                                <span>10 Days</span>
-                                <span>•</span>
-                                <span>Moderate</span>
-                                <span>•</span>
-                                <span><?php echo yatra_format_price(1200, $trip_data->currency); ?></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="yatra-similar-trip-card">
-                        <div class="yatra-similar-trip-image">
-                            <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&q=80" alt="Manaslu Circuit">
-                        </div>
-                        <div class="yatra-similar-trip-content">
-                            <h3 class="yatra-similar-trip-title">Manaslu Circuit Trek</h3>
-                            <div class="yatra-similar-trip-meta">
-                                <span>16 Days</span>
-                                <span>•</span>
-                                <span>Challenging</span>
-                                <span>•</span>
-                                <span><?php echo yatra_format_price(1850, $trip_data->currency); ?></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
 
         <!-- Sidebar - Booking Card -->
@@ -1357,6 +1303,134 @@ get_header();
             </div>
         </aside>
     </div>
+
+    <!-- Similar Adventures Section - Full Width (Same design as /trip page) -->
+    <section class="yatra-similar-section">
+        <div class="yatra-similar-section-container">
+            <h2 class="yatra-similar-section-title">
+                <?php echo yatra_svg_icon('mountain', 'yatra-similar-section-icon'); ?>
+                Similar Adventures
+            </h2>
+            <div class="yatra-similar-trips-grid">
+                <?php
+                // Similar trips data (matching /trip page card structure)
+                $similar_trips = [
+                    [
+                        'title' => 'Annapurna Base Camp Trek',
+                        'image' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
+                        'duration' => '12 Days',
+                        'price' => 1450,
+                        'original_price' => 1650,
+                        'discount' => '12%',
+                        'rating' => 4.9,
+                        'reviews' => 189,
+                        'location' => 'Nepal',
+                        'difficulty' => 'Moderate',
+                        'highlights' => ['Mountain Views', 'Teahouse Stay']
+                    ],
+                    [
+                        'title' => 'Langtang Valley Trek',
+                        'image' => 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop',
+                        'duration' => '10 Days',
+                        'price' => 1200,
+                        'original_price' => null,
+                        'discount' => null,
+                        'rating' => 4.7,
+                        'reviews' => 124,
+                        'location' => 'Nepal',
+                        'difficulty' => 'Moderate',
+                        'highlights' => ['Valley Views', 'Local Culture']
+                    ],
+                    [
+                        'title' => 'Manaslu Circuit Trek',
+                        'image' => 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop',
+                        'duration' => '16 Days',
+                        'price' => 1850,
+                        'original_price' => 2100,
+                        'discount' => '12%',
+                        'rating' => 4.8,
+                        'reviews' => 98,
+                        'location' => 'Nepal',
+                        'difficulty' => 'Challenging',
+                        'highlights' => ['Remote Trail', 'Less Crowded']
+                    ],
+                    [
+                        'title' => 'Gokyo Lakes Trek',
+                        'image' => 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=800&h=600&fit=crop',
+                        'duration' => '14 Days',
+                        'price' => 1550,
+                        'original_price' => null,
+                        'discount' => null,
+                        'rating' => 4.6,
+                        'reviews' => 156,
+                        'location' => 'Nepal',
+                        'difficulty' => 'Moderate',
+                        'highlights' => ['Turquoise Lakes', 'Gokyo Ri']
+                    ],
+                ];
+
+                foreach ($similar_trips as $trip) {
+                ?>
+                <div class="yatra-trip-card">
+                    <div class="yatra-trip-image">
+                        <img src="<?php echo esc_url($trip['image']); ?>" alt="<?php echo esc_attr($trip['title']); ?>">
+                        <?php if ($trip['discount']): ?>
+                        <div class="yatra-discount-badge">
+                            <?php echo esc_html($trip['discount']); ?> OFF
+                        </div>
+                        <?php endif; ?>
+                        <button class="yatra-favorite-btn" title="Add to favorites">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="yatra-trip-content">
+                        <div class="yatra-trip-meta">
+                            <span class="yatra-trip-location"><?php echo esc_html($trip['location']); ?></span>
+                            <span class="yatra-trip-separator">•</span>
+                            <span class="yatra-trip-duration"><?php echo esc_html($trip['duration']); ?></span>
+                            <span class="yatra-trip-separator">•</span>
+                            <span class="yatra-trip-difficulty"><?php echo esc_html($trip['difficulty']); ?></span>
+                        </div>
+                        
+                        <h3 class="yatra-trip-title"><?php echo esc_html($trip['title']); ?></h3>
+                        
+                        <?php if (!empty($trip['highlights'])): ?>
+                        <div class="yatra-trip-highlights">
+                            <?php foreach ($trip['highlights'] as $highlight): ?>
+                            <span class="yatra-highlight-badge"><?php echo esc_html($highlight); ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <div class="yatra-trip-rating">
+                            <div class="yatra-rating-stars">
+                                <svg width="16" height="16" fill="#fbbf24" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                                <span class="yatra-rating-value"><?php echo esc_html($trip['rating']); ?></span>
+                            </div>
+                            <span class="yatra-reviews-count">(<?php echo esc_html($trip['reviews']); ?> reviews)</span>
+                        </div>
+                        
+                        <div class="yatra-trip-footer">
+                            <div class="yatra-trip-price">
+                                <?php if ($trip['original_price']): ?>
+                                <div class="yatra-original-price"><?php echo yatra_format_price($trip['original_price'], $trip_data->currency); ?></div>
+                                <?php endif; ?>
+                                <div class="yatra-current-price"><?php echo yatra_format_price($trip['price'], $trip_data->currency); ?></div>
+                                <div class="yatra-price-note">per person</div>
+                            </div>
+                            <a href="<?php echo esc_url(home_url('/trip/' . sanitize_title($trip['title']))); ?>" class="yatra-card-view-btn">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </section>
 </div>
 
 <!-- Enquiry Modal -->

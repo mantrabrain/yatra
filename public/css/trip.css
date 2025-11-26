@@ -2560,70 +2560,272 @@ input.yatra-datepicker,
 }
 
 /* ============================================
-   SIMILAR TRIPS
+   SIMILAR TRIPS - FULL WIDTH SECTION
    ============================================ */
-.yatra-similar-trips {
+.yatra-similar-section {
+    background: #f8fafc;
+    padding: 60px 0;
+    margin-top: 60px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.yatra-similar-section-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.yatra-similar-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 32px;
+}
+
+.yatra-similar-section-icon {
+    width: 32px;
+    height: 32px;
+    color: #3b82f6;
+}
+
+/* Grid uses same card styles as /trip page */
+.yatra-similar-trips-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 24px;
 }
 
-.yatra-similar-trip-card {
+.yatra-similar-trips-grid .yatra-trip-card {
     background: #fff;
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #e5e7eb;
-    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
 }
 
-.yatra-similar-trip-card:hover {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+.yatra-similar-trips-grid .yatra-trip-card:hover {
     transform: translateY(-4px);
-    border-color: #3b82f6;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
-.yatra-similar-trip-image {
+.yatra-similar-trips-grid .yatra-trip-image {
+    position: relative;
     width: 100%;
-    height: 180px;
+    height: 200px;
     overflow: hidden;
-    background: #f3f4f6;
+    background: #e5e7eb;
+    flex-shrink: 0;
 }
 
-.yatra-similar-trip-image img {
+.yatra-similar-trips-grid .yatra-trip-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s;
 }
 
-.yatra-similar-trip-card:hover .yatra-similar-trip-image img {
+.yatra-similar-trips-grid .yatra-trip-card:hover .yatra-trip-image img {
     transform: scale(1.05);
 }
 
-.yatra-similar-trip-content {
-    padding: 20px;
+.yatra-similar-trips-grid .yatra-discount-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #ef4444;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 2;
 }
 
-.yatra-similar-trip-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 12px;
-    line-height: 1.3;
+.yatra-similar-trips-grid .yatra-favorite-btn {
+    position: absolute !important;
+    top: 12px !important;
+    right: 12px !important;
+    width: 36px !important;
+    height: 36px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #6b7280 !important;
+    transition: all 0.2s !important;
+    z-index: 10 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    padding: 0 !important;
 }
 
-.yatra-similar-trip-meta {
+.yatra-similar-trips-grid .yatra-favorite-btn:hover {
+    background: #ffffff !important;
+    color: #ef4444 !important;
+    transform: scale(1.1) !important;
+}
+
+.yatra-similar-trips-grid .yatra-favorite-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+}
+
+.yatra-similar-trips-grid .yatra-trip-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.yatra-similar-trips-grid .yatra-trip-meta {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: 12px;
     color: #6b7280;
     flex-wrap: wrap;
 }
 
-.yatra-similar-trip-meta span {
-    display: inline-block;
+.yatra-similar-trips-grid .yatra-trip-separator {
+    color: #d1d5db;
+}
+
+.yatra-similar-trips-grid .yatra-trip-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.yatra-similar-trips-grid .yatra-trip-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.yatra-similar-trips-grid .yatra-highlight-badge {
+    padding: 3px 8px;
+    background: #eff6ff;
+    color: #1e40af;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.yatra-similar-trips-grid .yatra-trip-rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.yatra-similar-trips-grid .yatra-rating-stars {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.yatra-similar-trips-grid .yatra-rating-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.yatra-similar-trips-grid .yatra-reviews-count {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.yatra-similar-trips-grid .yatra-trip-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.yatra-similar-trips-grid .yatra-trip-price {
+    display: flex;
+    flex-direction: column;
+}
+
+.yatra-similar-trips-grid .yatra-original-price {
+    font-size: 12px;
+    color: #9ca3af;
+    text-decoration: line-through;
+    margin-bottom: 2px;
+}
+
+.yatra-similar-trips-grid .yatra-current-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #3b82f6;
+    line-height: 1;
+}
+
+.yatra-similar-trips-grid .yatra-price-note {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.yatra-similar-trips-grid .yatra-card-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    background: #3b82f6;
+    color: #fff !important;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none !important;
+    white-space: nowrap;
+}
+
+.yatra-similar-trips-grid .yatra-card-view-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+@media (max-width: 1024px) {
+    .yatra-similar-trips-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .yatra-similar-trips-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .yatra-similar-section {
+        padding: 40px 0;
+        margin-top: 40px;
+    }
+    
+    .yatra-similar-section-title {
+        font-size: 22px;
+        margin-bottom: 24px;
+    }
 }
 
 /* ============================================

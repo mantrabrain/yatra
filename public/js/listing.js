@@ -157,19 +157,19 @@
         });
     }
 
-    // Price range slider
+    // Price range slider - use specific IDs to avoid conflict with duration slider
     function initPriceRange() {
-        const minRange = document.querySelector('.yatra-range-min');
-        const maxRange = document.querySelector('.yatra-range-max');
+        const minRange = document.getElementById('priceRangeMin');
+        const maxRange = document.getElementById('priceRangeMax');
         const priceDisplay = document.querySelector('.yatra-price-display');
-        const minInput = document.querySelector('.yatra-price-inputs input:first-of-type');
-        const maxInput = document.querySelector('.yatra-price-inputs input:last-of-type');
+        const minInput = document.getElementById('priceMin');
+        const maxInput = document.getElementById('priceMax');
 
         if (!minRange || !maxRange || !priceDisplay) return;
 
         function updatePriceDisplay() {
             const min = parseInt(minRange.value) || 0;
-            const max = parseInt(maxRange.value) || 5000;
+            const max = parseInt(maxRange.value) || 10000;
             
             // Format with commas
             const minFormatted = min.toLocaleString();
@@ -204,7 +204,7 @@
 
         if (maxInput) {
             maxInput.addEventListener('input', function() {
-                maxRange.value = this.value || 5000;
+                maxRange.value = this.value || 10000;
                 updatePriceDisplay();
             });
         }
@@ -223,14 +223,17 @@
             });
 
             // Reset price range
-            const minRange = document.querySelector('.yatra-range-min');
-            const maxRange = document.querySelector('.yatra-range-max');
+            const minRange = document.getElementById('priceRangeMin');
+            const maxRange = document.getElementById('priceRangeMax');
+            const minInput = document.getElementById('priceMin');
+            const maxInput = document.getElementById('priceMax');
+            const priceDisplay = document.querySelector('.yatra-price-display');
+            
             if (minRange) minRange.value = 0;
-            if (maxRange) maxRange.value = 5000;
-            if (minRange && maxRange) {
-                const event = new Event('input');
-                maxRange.dispatchEvent(event);
-            }
+            if (maxRange) maxRange.value = 10000;
+            if (minInput) minInput.value = 0;
+            if (maxInput) maxInput.value = 10000;
+            if (priceDisplay) priceDisplay.textContent = '$0 - $10,000';
         });
     }
 
