@@ -1288,29 +1288,68 @@
             // Traveler selector buttons
             this.initTravelerSelectors();
 
-            // Book Now buttons - redirect to booking page with parameters
+            // Book Now buttons - set session and redirect to booking page
             const bookButtons = this.section.querySelectorAll('.yatra-card-book-btn');
             bookButtons.forEach((btn) => {
                 btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
                     // Get booking details
+                    const tripId = btn.getAttribute('data-trip-id') || window.yatraTripData?.tripId;
                     const date = btn.getAttribute('data-date');
-                    const price = btn.getAttribute('data-price');
                     const itemIndex = btn.getAttribute('data-item');
                     const adults = this.getTravelerCount(itemIndex, 'adults');
                     const children = this.getTravelerCount(itemIndex, 'children');
+                    const travelers = parseInt(adults) + parseInt(children);
                     
-                    // Build URL with parameters
-                    const baseUrl = btn.getAttribute('href');
-                    const params = new URLSearchParams({
-                        date: date,
-                        adults: adults,
-                        children: children,
-                        price: price
+                    // Show loading state
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...';
+                    btn.disabled = true;
+                    
+                    // Validate trip ID before making request
+                    if (!tripId || isNaN(parseInt(tripId)) || parseInt(tripId) <= 0) {
+                        console.error('Invalid trip ID:', tripId);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        this.showBookingError(btn, 'Unable to process booking. Invalid trip data.');
+                        return;
+                    }
+                    
+                    // Set booking session via REST API
+                    // credentials: 'same-origin' is required to send cookies for session
+                    fetch(window.yatraTripData.apiUrl + '/booking/session', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': window.yatraTripData.nonce
+                        },
+                        body: JSON.stringify({
+                            trip_id: parseInt(tripId),
+                            travelers: travelers || 1,
+                            travel_date: date || ''
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.redirect_url) {
+                            // Success - redirect to booking page
+                            window.location.href = data.redirect_url;
+                        } else {
+                            // Error - show message and reset button
+                            console.error('Booking session error:', data);
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                            this.showBookingError(btn, data.message || 'Unable to process booking. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error setting booking session:', error);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        this.showBookingError(btn, 'Unable to process booking. Please try again.');
                     });
-                    
-                    // Navigate to booking page with parameters
-                    window.location.href = baseUrl + '?' + params.toString();
-                    e.preventDefault();
                 });
             });
 
@@ -1581,6 +1620,58 @@
                     // In real implementation, this would load more items via AJAX
                 }, 1000);
             }
+        }
+
+        /**
+         * Show booking error message to user just before the Book Now button
+         * @param {HTMLElement} button - The Book Now button that was clicked
+         * @param {string} message - Error message to display
+         */
+        showBookingError(button, message) {
+            // Find the card/row containing this button
+            const card = button.closest('.yatra-availability-card') || button.closest('.yatra-availability-item');
+            if (!card) return;
+
+            // Remove any existing error message in this card
+            const existingError = card.querySelector('.yatra-booking-error-toast');
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Create error toast
+            const toast = document.createElement('div');
+            toast.className = 'yatra-booking-error-toast';
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; margin-top: 12px; margin-bottom: 12px;">
+                    <svg width="20" height="20" fill="none" stroke="#dc2626" viewBox="0 0 24 24" style="flex-shrink: 0;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span style="flex: 1; color: #991b1b; font-size: 13px; font-weight: 500;">${message}</span>
+                    <button type="button" style="background: none; border: none; cursor: pointer; padding: 2px; color: #991b1b; line-height: 1;" onclick="this.parentElement.parentElement.remove()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+
+            // Insert just before the button (or button's parent row)
+            const buttonRow = button.closest('.yatra-card-actions') || button.parentElement;
+            if (buttonRow) {
+                buttonRow.insertAdjacentElement('beforebegin', toast);
+            } else {
+                button.insertAdjacentElement('beforebegin', toast);
+            }
+
+            // Auto-remove after 8 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 8000);
+
+            // Scroll to the error message
+            toast.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
 
@@ -2046,6 +2137,19 @@
     window.itinerarySection = new ItinerarySection();
     window.reviewForm = new ReviewForm();
     window.similarTripsCarousel = new SimilarTripsCarousel();
+
+    // Smooth scroll for hero book now button (scrolls to booking widget)
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('a[href="#yatra-booking-widget"]').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.getElementById('yatra-booking-widget');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    });
 
 })();
 

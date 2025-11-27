@@ -20,9 +20,10 @@ class SettingsService
     private static ?array $settings = null;
 
     /**
-     * Settings option name in database
+     * Settings option prefix in database
+     * Each setting is stored as yatra_{key}
      */
-    private const OPTION_NAME = 'yatra_settings';
+    private const OPTION_PREFIX = 'yatra_';
 
     /**
      * Default settings
@@ -198,17 +199,24 @@ class SettingsService
 
     /**
      * Load settings from database
+     * Settings are stored as individual options with yatra_ prefix
      */
     private static function load(): void
     {
-        $saved = get_option(self::OPTION_NAME, []);
+        self::$settings = [];
         
-        if (!is_array($saved)) {
-            $saved = [];
+        // Load each setting from individual options
+        foreach (self::$defaults as $key => $default_value) {
+            $option_name = self::OPTION_PREFIX . $key;
+            $value = get_option($option_name, $default_value);
+            
+            // Handle serialized arrays
+            if (is_string($value) && is_serialized($value)) {
+                $value = maybe_unserialize($value);
+            }
+            
+            self::$settings[$key] = $value;
         }
-
-        // Merge with defaults
-        self::$settings = array_merge(self::$defaults, $saved);
     }
 
     /**
@@ -313,6 +321,7 @@ class SettingsService
      */
     public static function useCustomBookingPage(): bool
     {
+       // var_dump(self::isEnabled('use_booking_page'));exit;
         return self::isEnabled('use_booking_page') && self::getInt('booking_page_id') > 0;
     }
 

@@ -81,7 +81,7 @@ get_header();
                 <?php else: ?>
                 <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1920&q=80" alt="<?php echo esc_attr($trip->title); ?>" class="yatra-hero-main-img">
                 <?php endif; ?>
-                <a href="<?php echo esc_url(yatra_get_booking_url($trip->slug)); ?>" class="yatra-hero-book-now-btn">
+                <a href="#yatra-booking-widget" class="yatra-hero-book-now-btn">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
@@ -1179,7 +1179,7 @@ get_header();
                     </div>
 
                     <!-- Action Buttons -->
-                    <button type="button" class="yatra-booking-button" id="check-availability-btn" data-trip-id="<?php echo esc_attr($wp_query->get('yatra_trip_id') ?: 1); ?>">
+                    <button type="button" class="yatra-booking-button" id="check-availability-btn" data-trip-id="<?php echo esc_attr($trip->id); ?>">
                         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>

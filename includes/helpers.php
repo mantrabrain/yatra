@@ -195,13 +195,9 @@ function yatra_get_review_edit_time_remaining(object $review): string
  */
 function yatra_get_booking_url(string $trip_slug, array $params = []): string
 {
-    // Check if using custom booking page
-    $use_booking_page = get_option('yatra_use_booking_page', false);
-    $booking_page_id = (int) get_option('yatra_booking_page_id', 0);
-    
-    if ($use_booking_page && $booking_page_id > 0) {
-        // Using custom WordPress page
-        $page_url = get_permalink($booking_page_id);
+    // Check if using custom booking page via SettingsService
+    if (SettingsService::useCustomBookingPage()) {
+        $page_url = get_permalink(SettingsService::getBookingPageId());
         if ($page_url) {
             $params['trip'] = $trip_slug;
             return add_query_arg($params, $page_url);
@@ -209,12 +205,7 @@ function yatra_get_booking_url(string $trip_slug, array $params = []): string
     }
     
     // Using default dynamic URL
-    $booking_base = get_option('yatra_booking_base', 'book');
-    $booking_base = preg_replace('/[^a-z0-9_-]/i', '', $booking_base);
-    if (empty($booking_base)) {
-        $booking_base = 'book';
-    }
-    
+    $booking_base = SettingsService::getBookingBase();
     $url = home_url('/' . $booking_base . '/' . $trip_slug);
     
     if (!empty($params)) {
@@ -238,8 +229,8 @@ if (!function_exists('yatra_format_price')) {
             return 'Contact for pricing';
         }
         
-        $currency_position = get_option('yatra_currency_position', 'left');
-        $currency_decimals = (int) get_option('yatra_currency_decimals', 2);
+        $currency_position = SettingsService::getCurrencyPosition();
+        $currency_decimals = SettingsService::getInt('decimal_places', 2);
         
         $formatted_amount = number_format($amount, $currency_decimals);
         
@@ -315,10 +306,9 @@ if (!function_exists('yatra_svg_icon')) {
  */
 function yatra_get_booking_base(): string
 {
-    $use_booking_page = get_option('yatra_use_booking_page', false);
-    
-    if ($use_booking_page) {
-        $booking_page_id = (int) get_option('yatra_booking_page_id', 0);
+    // Check if using custom booking page
+    if (SettingsService::useCustomBookingPage()) {
+        $booking_page_id = SettingsService::getBookingPageId();
         if ($booking_page_id > 0) {
             $page = get_post($booking_page_id);
             if ($page) {
@@ -327,10 +317,7 @@ function yatra_get_booking_base(): string
         }
     }
     
-    $booking_base = get_option('yatra_booking_base', 'book');
-    $booking_base = preg_replace('/[^a-z0-9_-]/i', '', $booking_base);
-    
-    return !empty($booking_base) ? $booking_base : 'book';
+    return SettingsService::getBookingBase();
 }
 
 /**
@@ -343,9 +330,8 @@ function yatra_is_booking_page(): bool
     global $wp_query;
     
     // Check for custom booking page
-    $use_booking_page = get_option('yatra_use_booking_page', false);
-    if ($use_booking_page) {
-        $booking_page_id = (int) get_option('yatra_booking_page_id', 0);
+    if (SettingsService::useCustomBookingPage()) {
+        $booking_page_id = SettingsService::getBookingPageId();
         if ($booking_page_id > 0 && is_page($booking_page_id)) {
             return true;
         }
@@ -429,5 +415,133 @@ function yatra_trip_field(string $field, string $escape = 'html', $default = '')
         default:
             echo esc_html($value);
     }
+}
+
+/**
+ * ============================================
+ * BOOKING SESSION MANAGEMENT
+ * ============================================
+ */
+
+/**
+ * Start WordPress session if not already started
+ */
+function yatra_start_session(): void
+{
+    // Start output buffering to prevent accidental output from breaking sessions
+    if (!ob_get_level()) {
+        ob_start();
+    }
+    
+    if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+        // Set session cookie parameters for better compatibility
+        if (PHP_VERSION_ID >= 70300) {
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => defined('COOKIEPATH') ? COOKIEPATH : '/',
+                'domain' => defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : '',
+                'secure' => is_ssl(),
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
+        }
+        session_start();
+    }
+}
+
+/**
+ * Set booking session data
+ * 
+ * @param array $data Booking data to store
+ */
+function yatra_set_booking_session(array $data): void
+{
+    yatra_start_session();
+    
+    $_SESSION['yatra_booking'] = array_merge(
+        $_SESSION['yatra_booking'] ?? [],
+        $data,
+        ['timestamp' => time()]
+    );
+    
+    // Ensure session data is written to storage immediately
+    // This is crucial for REST API requests where the session might not auto-save
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_write_close();
+    }
+}
+
+/**
+ * Get booking session data
+ * 
+ * @param string|null $key Specific key to retrieve, or null for all data
+ * @param mixed $default Default value if key not found
+ * @return mixed
+ */
+function yatra_get_booking_session(?string $key = null, $default = null)
+{
+    yatra_start_session();
+    
+    $booking_data = $_SESSION['yatra_booking'] ?? [];
+    
+    // Check if session is expired (30 minutes)
+    if (!empty($booking_data['timestamp'])) {
+        $session_age = time() - $booking_data['timestamp'];
+        if ($session_age > 1800) { // 30 minutes
+            yatra_clear_booking_session();
+            return $key ? $default : [];
+        }
+    }
+    
+    if ($key === null) {
+        return $booking_data;
+    }
+    
+    return $booking_data[$key] ?? $default;
+}
+
+/**
+ * Clear booking session data
+ */
+function yatra_clear_booking_session(): void
+{
+    yatra_start_session();
+    unset($_SESSION['yatra_booking']);
+}
+
+/**
+ * Check if booking session exists and is valid
+ * 
+ * @return bool
+ */
+function yatra_has_booking_session(): bool
+{
+    $booking_data = yatra_get_booking_session();
+    return !empty($booking_data) && !empty($booking_data['trip_id']);
+}
+
+/**
+ * Get booking/checkout URL
+ * 
+ * Logic:
+ * 1. If custom booking page is set → return that page's URL
+ * 2. Otherwise → return dynamic URL using booking_base from settings (e.g., /bookings/)
+ * 
+ * @return string Booking URL
+ */
+function yatra_get_checkout_url(): string
+{
+    // Check if custom booking page is set via SettingsService
+    if (SettingsService::useCustomBookingPage()) {
+        $page_id = SettingsService::getBookingPageId();
+        if ($page_id > 0) {
+            return get_permalink($page_id);
+        }
+    }
+    
+    // Default dynamic URL using booking base from settings
+    $base = SettingsService::getBookingBase();
+    
+    return home_url('/' . $base . '/');
 }
 

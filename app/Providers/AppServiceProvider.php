@@ -8,6 +8,7 @@ use Yatra\Core\ServiceProvider;
 use Yatra\Core\Container;
 use Yatra\Core\Modules\ModuleManager;
 use Yatra\Controllers\SingleTripController;
+use Yatra\Services\SettingsService;
 
 /**
  * Application Service Provider
@@ -34,6 +35,10 @@ class AppServiceProvider extends ServiceProvider
     {
         // Load text domain
         add_action('plugins_loaded', [$this, 'loadTextDomain']);
+
+        // Start session early for booking management (both frontend and REST API)
+        add_action('init', [$this, 'startSession'], 1);
+        add_action('rest_api_init', [$this, 'startSession'], 1);
 
         // Initialize plugin settings
         add_action('init', [$this, 'initSettings'], 5);
@@ -72,6 +77,32 @@ class AppServiceProvider extends ServiceProvider
         // AJAX handler for enquiry submission (allow both logged in and guest users)
         add_action('wp_ajax_yatra_submit_enquiry', [$this, 'handleEnquirySubmission']);
         add_action('wp_ajax_nopriv_yatra_submit_enquiry', [$this, 'handleEnquirySubmission']);
+    }
+
+    /**
+     * Start PHP session for booking management
+     */
+    public function startSession(): void
+    {
+        // Start output buffering to prevent accidental output from breaking sessions
+        if (!ob_get_level()) {
+            ob_start();
+        }
+        
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            // Set session cookie parameters for better compatibility
+            if (PHP_VERSION_ID >= 70300) {
+                session_set_cookie_params([
+                    'lifetime' => 0,
+                    'path' => COOKIEPATH ?: '/',
+                    'domain' => COOKIE_DOMAIN ?: '',
+                    'secure' => is_ssl(),
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ]);
+            }
+            session_start();
+        }
     }
 
     /**
@@ -546,34 +577,27 @@ class AppServiceProvider extends ServiceProvider
      */
     public function renderBookingShortcode(array $atts = []): string
     {
+        global $booking;
+        
         // Parse shortcode attributes
         $atts = shortcode_atts([
             'trip_slug' => '',
         ], $atts, 'yatra_booking');
-
-        // Get trip slug from URL parameter or shortcode attribute
-        $trip_slug = !empty($atts['trip_slug']) ? $atts['trip_slug'] : '';
         
-        // Try to get from query string if not set
-        if (empty($trip_slug) && isset($_GET['trip'])) {
-            $trip_slug = sanitize_text_field($_GET['trip']);
-        }
+        // Prepare booking data from session (uses SettingsService internally)
+        $booking = $this->prepareBookingData();
 
-        // Enqueue booking assets
-        $this->enqueueBookingPageAssets();
+        // Enqueue booking assets with booking data
+        $this->enqueueBookingPageAssets($booking);
 
         // Start output buffering
         ob_start();
 
-        // Set up the trip slug for the template
-        set_query_var('yatra_booking_trip_slug', $trip_slug);
-
-        // Include the booking template
-        $template_path = YATRA_PLUGIN_PATH . 'templates/booking.php';
+        // Include the booking form template
+        $template_path = YATRA_PLUGIN_PATH . 'templates/booking-form.php';
         
         if (file_exists($template_path)) {
-            // We need to render just the booking form, not the full page
-            include YATRA_PLUGIN_PATH . 'templates/booking-form.php';
+            include $template_path;
         } else {
             echo '<p>' . esc_html__('Booking form template not found.', 'yatra') . '</p>';
         }
@@ -750,41 +774,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function addTripRewriteRules(): void
     {
-        // Get permalink bases from settings (stored with yatra_ prefix)
-        $trip_base = get_option('yatra_trip_base', 'trip');
-        $destination_base = get_option('yatra_destination_base', 'destination');
-        $activity_base = get_option('yatra_activity_base', 'activity');
-        $trip_category_base = get_option('yatra_trip_category_base', 'trip-category');
-        $booking_base = get_option('yatra_booking_base', 'book');
+        // Use centralized SettingsService for all settings
+        $trip_base = SettingsService::getTripBase();
+        $booking_base = SettingsService::getBookingBase();
+        $use_booking_page = SettingsService::useCustomBookingPage();
         
-        // Check if using custom booking page
-        $use_booking_page = get_option('yatra_use_booking_page', false);
+        // Get other bases with sanitization
+        $destination_base = SettingsService::getString('destination_base', 'destination');
+        $destination_base = preg_replace('/[^a-z0-9_-]/i', '', $destination_base) ?: 'destination';
         
-        // Sanitize bases (only allow alphanumeric, hyphens, underscores)
-        $trip_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_base);
-        if (empty($trip_base)) {
-            $trip_base = 'trip';
-        }
+        $activity_base = SettingsService::getString('activity_base', 'activity');
+        $activity_base = preg_replace('/[^a-z0-9_-]/i', '', $activity_base) ?: 'activity';
         
-        $destination_base = preg_replace('/[^a-z0-9_-]/i', '', $destination_base);
-        if (empty($destination_base)) {
-            $destination_base = 'destination';
-        }
-        
-        $activity_base = preg_replace('/[^a-z0-9_-]/i', '', $activity_base);
-        if (empty($activity_base)) {
-            $activity_base = 'activity';
-        }
-        
-        $trip_category_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_category_base);
-        if (empty($trip_category_base)) {
-            $trip_category_base = 'trip-category';
-        }
-        
-        $booking_base = preg_replace('/[^a-z0-9_-]/i', '', $booking_base);
-        if (empty($booking_base)) {
-            $booking_base = 'book';
-        }
+        $trip_category_base = SettingsService::getString('trip_category_base', 'trip-category');
+        $trip_category_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_category_base) ?: 'trip-category';
 
         // Add query vars first (must be registered before rewrite rules)
         add_rewrite_tag('%yatra_trip_slug%', '([^&]+)');
@@ -850,12 +853,8 @@ class AppServiceProvider extends ServiceProvider
     {
         global $wp_query, $wp;
 
-        // Get trip_base from settings
-        $trip_base = get_option('yatra_trip_base', 'trip');
-        $trip_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_base);
-        if (empty($trip_base)) {
-            $trip_base = 'trip';
-        }
+        // Use SettingsService for trip_base
+        $trip_base = SettingsService::getTripBase();
 
         // Method 1: Try to get from query var (if rewrite rules are working)
         $trip_slug = get_query_var('yatra_trip_slug');
@@ -985,18 +984,15 @@ class AppServiceProvider extends ServiceProvider
                 $request_path = $path;
             }
 
-            // Check if request path matches listing page patterns
+            // Check if request path matches listing page patterns using SettingsService
             if (!empty($request_path)) {
-                $trip_base = get_option('yatra_trip_base', 'trip');
-                $destination_base = get_option('yatra_destination_base', 'destination');
-                $activity_base = get_option('yatra_activity_base', 'activity');
-                $trip_category_base = get_option('yatra_trip_category_base', 'trip-category');
-                
-                // Sanitize bases
-                $trip_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_base);
-                $destination_base = preg_replace('/[^a-z0-9_-]/i', '', $destination_base);
-                $activity_base = preg_replace('/[^a-z0-9_-]/i', '', $activity_base);
-                $trip_category_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_category_base);
+                $trip_base = SettingsService::getTripBase();
+                $destination_base = SettingsService::getString('destination_base', 'destination');
+                $destination_base = preg_replace('/[^a-z0-9_-]/i', '', $destination_base) ?: 'destination';
+                $activity_base = SettingsService::getString('activity_base', 'activity');
+                $activity_base = preg_replace('/[^a-z0-9_-]/i', '', $activity_base) ?: 'activity';
+                $trip_category_base = SettingsService::getString('trip_category_base', 'trip-category');
+                $trip_category_base = preg_replace('/[^a-z0-9_-]/i', '', $trip_category_base) ?: 'trip-category';
                 
                 // Check if path matches any listing page base (exact match, no trailing slug)
                 if ($request_path === $trip_base) {
@@ -1039,76 +1035,53 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Handle booking page routing
+     * 
+     * Logic:
+     * 1. If "Use Custom Page for Booking" is checked AND page is selected → Don't handle, let WordPress handle the custom page
+     * 2. If NOT using custom page → Use "Default Booking URL Base" from settings (e.g., /bookings/)
+     * 3. If booking base is empty → Fall back to /book/
      */
     public function handleBookingPage(): void
     {
-        global $wp_query, $wp;
+        global $wp_query, $wp, $booking;
 
-        // Get booking_base from settings
-        $booking_base = get_option('yatra_booking_base', 'book');
-        $booking_base = preg_replace('/[^a-z0-9_-]/i', '', $booking_base);
-        if (empty($booking_base)) {
-            $booking_base = 'book';
-        }
-
-        // Check if using custom booking page
-        $use_booking_page = get_option('yatra_use_booking_page', false);
-        
-        if ($use_booking_page) {
+        // Step 1: If custom booking page is set up, don't handle anything here
+        // WordPress will handle the custom page with the [yatra_booking] shortcode
+        if (SettingsService::useCustomBookingPage()) {
             return;
         }
 
-        // Method 1: Try to get from query var (if rewrite rules are working)
-        $booking_trip_slug = get_query_var('yatra_booking_page');
+        // Step 2: Get the booking base from settings (or default to 'book')
+        $booking_base = SettingsService::getBookingBase(); // Returns sanitized base or 'book'
+
+        // Step 3: Get the current request path
+        $request_path = isset($wp->request) ? trim((string) $wp->request, '/') : '';
         
-        // Method 2: If query var is empty, check request path directly
-        if (empty($booking_trip_slug)) {
-            $request_path = '';
-            
-            // Get from $wp->request if available
-            if (isset($wp) && isset($wp->request)) {
-                $request_path = trim((string) $wp->request, '/');
+        if (empty($request_path)) {
+            $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+            $path = trim(wp_parse_url($request_uri, PHP_URL_PATH) ?? '', '/');
+            $home_path = trim(wp_parse_url(home_url('/'), PHP_URL_PATH) ?? '', '/');
+            if ($home_path && str_starts_with($path, $home_path)) {
+                $path = trim(substr($path, strlen($home_path)), '/');
             }
-            
-            // Fallback: parse from REQUEST_URI
-            if (empty($request_path)) {
-                $request_uri = $_SERVER['REQUEST_URI'] ?? '';
-                $parsed_uri = wp_parse_url($request_uri);
-                $path = $parsed_uri['path'] ?? '';
-                $path = trim($path, '/');
-
-                // Remove site subdirectory (if WordPress is installed in subdir)
-                $home_path = wp_parse_url(home_url('/'), PHP_URL_PATH);
-                $home_path = $home_path ? trim($home_path, '/') : '';
-                if ($home_path && str_starts_with($path, $home_path)) {
-                    $path = trim(substr($path, strlen($home_path)), '/');
-                }
-                $request_path = $path;
-            }
-
-            // Check if request path matches booking pattern: {booking_base}/{slug}
-            if (!empty($request_path)) {
-                $escaped_base = preg_quote($booking_base, '/');
-                $pattern = '/^' . $escaped_base . '\/([^\/]+)\/?$/';
-                if (preg_match($pattern, $request_path, $matches)) {
-                    $booking_trip_slug = $matches[1];
-                }
-            }
+            $request_path = $path;
         }
 
-        if (empty($booking_trip_slug)) {
-            return;
+        // Step 4: Check if URL matches our booking base
+        // Match: /bookings or /bookings/ or /bookings/something
+        if ($request_path !== $booking_base && !str_starts_with($request_path, $booking_base . '/')) {
+            return; // Not our URL
         }
 
-        // Prevent 404 handling
+        // Step 5: This IS our booking URL - handle it
         $wp_query->is_404 = false;
         status_header(200);
 
-        // Enqueue booking page assets
-        $this->enqueueBookingPageAssets();
+        // Prepare booking data from session first (needed for localized script data)
+        $booking = $this->prepareBookingData();
 
-        // Set up query vars for template
-        $wp_query->set('yatra_booking_trip_slug', $booking_trip_slug);
+        // Enqueue booking page assets with localized data
+        $this->enqueueBookingPageAssets($booking);
 
         // Load the booking page template
         $template_path = YATRA_PLUGIN_PATH . 'templates/booking.php';
@@ -1117,15 +1090,156 @@ class AppServiceProvider extends ServiceProvider
             include $template_path;
             exit;
         } else {
-            // Fallback: simple message
-            wp_die(sprintf('Booking page template not found for trip: %s', esc_html($booking_trip_slug)));
+            wp_die(__('Booking page template not found.', 'yatra'));
         }
     }
 
     /**
-     * Enqueue booking page assets
+     * Prepare booking page data from session
+     * 
+     * @return object Booking data object
      */
-    private function enqueueBookingPageAssets(): void
+    private function prepareBookingData(): object
+    {
+        global $wpdb;
+
+        // Get booking session
+        $session = yatra_get_booking_session();
+        
+        // Initialize booking data object using SettingsService
+        $booking = (object) [
+            'has_session' => false,
+            'trip' => null,
+            'travel_date' => '',
+            'travelers' => 1,
+            'deposit_required' => SettingsService::isEnabled('deposit_required'),
+            'deposit_percentage' => SettingsService::getInt('deposit_percentage', 20),
+            'partial_payment' => SettingsService::isEnabled('partial_payment'),
+            'partial_payment_percentage' => SettingsService::getInt('partial_payment_percentage', 30),
+            'enabled_gateways' => [],
+            'error' => null,
+        ];
+
+        // Check if we have valid session
+        if (!yatra_has_booking_session()) {
+            $booking->error = 'no_session';
+            return $booking;
+        }
+
+        $booking->has_session = true;
+        $trip_id = (int) ($session['trip_id'] ?? 0);
+        $booking->travel_date = $session['travel_date'] ?? '';
+        $booking->travelers = max(1, (int) ($session['travelers'] ?? 1));
+
+        // Fetch trip from database
+        $trips_table = $wpdb->prefix . 'yatra_trips';
+        $trip = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$trips_table} WHERE id = %d AND status IN ('publish', 'published', 'active') LIMIT 1",
+            $trip_id
+        ));
+
+        if (!$trip) {
+            yatra_clear_booking_session();
+            $booking->has_session = false;
+            $booking->error = 'trip_not_found';
+            return $booking;
+        }
+
+        // Prepare trip data
+        $booking->trip = (object) [
+            'id' => (int) $trip->id,
+            'title' => $trip->title,
+            'slug' => $trip->slug,
+            'featured_image' => $trip->featured_image ?: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80',
+            'duration_days' => (int) $trip->duration_days,
+            'duration_nights' => (int) $trip->duration_nights,
+            'difficulty_level' => $trip->difficulty_level,
+            'min_travelers' => (int) ($trip->min_travelers ?: 1),
+            'max_travelers' => (int) ($trip->max_travelers ?: 20),
+            'original_price' => (float) $trip->original_price,
+            'sale_price' => (float) $trip->sale_price,
+            'price' => !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price,
+            'currency' => $trip->currency ?: 'USD',
+            'starting_location' => $trip->starting_location,
+            'ending_location' => $trip->ending_location,
+        ];
+
+        // Load enabled payment gateways
+        $booking->enabled_gateways = $this->getEnabledGateways();
+
+        return $booking;
+    }
+
+    /**
+     * Get enabled payment gateways
+     * 
+     * @param array $settings Plugin settings
+     * @return array Enabled gateways
+     */
+    private function getEnabledGateways(): array
+    {
+        // Use SettingsService to get gateway configurations
+        $gateway_configs = SettingsService::get('gateway_configs', []);
+        $gateway_order = SettingsService::get('gateway_order', []);
+        $enabled_gateways = [];
+
+        if (class_exists('Yatra\PaymentGateways\PaymentGatewayRegistry')) {
+            $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+            $all_gateways = $registry->getAll();
+            
+            // Sort by gateway_order if available
+            if (!empty($gateway_order)) {
+                $sorted_gateways = [];
+                foreach ($gateway_order as $gateway_id) {
+                    if (isset($all_gateways[$gateway_id])) {
+                        $sorted_gateways[$gateway_id] = $all_gateways[$gateway_id];
+                    }
+                }
+                foreach ($all_gateways as $gateway_id => $gateway) {
+                    if (!isset($sorted_gateways[$gateway_id])) {
+                        $sorted_gateways[$gateway_id] = $gateway;
+                    }
+                }
+                $all_gateways = $sorted_gateways;
+            }
+            
+            foreach ($all_gateways as $gateway_id => $gateway) {
+                $config = $gateway_configs[$gateway_id] ?? [];
+                if (!empty($config['enabled'])) {
+                    $enabled_gateways[$gateway_id] = [
+                        'id' => $gateway_id,
+                        'title' => $gateway->getTitle(),
+                        'description' => $gateway->getDescription(),
+                        'icon' => $gateway->getIcon(),
+                        'is_offline' => $gateway->isOffline(),
+                    ];
+                }
+            }
+        }
+
+        // Fallback if no gateways enabled
+        if (empty($enabled_gateways)) {
+            $enabled_gateways = [
+                'pay_later' => [
+                    'id' => 'pay_later',
+                    'title' => __('Book Now, Pay Later', 'yatra'),
+                    'description' => __('Reserve now and pay before the trip', 'yatra'),
+                    'icon' => '',
+                    'is_offline' => true,
+                ],
+            ];
+        }
+
+        return $enabled_gateways;
+    }
+
+    /**
+     * Enqueue booking page assets
+     * 
+     * @param object|null $booking Booking data object
+     * @param array $settings Plugin settings
+     */
+    private function enqueueBookingPageAssets(?object $booking = null): void
     {
         // Enqueue common CSS first
         $this->enqueueCommonAssets();
@@ -1155,6 +1269,28 @@ class AppServiceProvider extends ServiceProvider
                 $js_version,
                 true
             );
+
+            // Localize script with booking data using SettingsService
+            $localized_data = [
+                'apiUrl' => rest_url('yatra/v1'),
+                'nonce' => wp_create_nonce('wp_rest'),
+                'depositPercentage' => $booking->deposit_percentage ?? SettingsService::getInt('deposit_percentage', 20),
+                'partialPercentage' => $booking->partial_payment_percentage ?? SettingsService::getInt('partial_payment_percentage', 30),
+                'tripPrice' => 0,
+                'currency' => SettingsService::getCurrency(),
+                'minTravelers' => 1,
+                'maxTravelers' => 20,
+            ];
+
+            // Add trip-specific data if available
+            if ($booking && $booking->trip) {
+                $localized_data['tripPrice'] = $booking->trip->price ?? 0;
+                $localized_data['currency'] = $booking->trip->currency ?? SettingsService::getCurrency();
+                $localized_data['minTravelers'] = $booking->trip->min_travelers ?? 1;
+                $localized_data['maxTravelers'] = $booking->trip->max_travelers ?? 20;
+            }
+
+            wp_localize_script('yatra-booking', 'yatraBookingData', $localized_data);
         }
     }
 
@@ -1247,13 +1383,20 @@ class AppServiceProvider extends ServiceProvider
             );
 
             // Localize script with trip data
-            global $wp_query;
-            $trip_id = $wp_query->get('yatra_trip_id') ?: 1;
+            global $trip;
+            
+            // Get trip ID and slug from the global $trip object
+            $trip_id = !empty($trip->id) ? (int) $trip->id : 0;
+            $trip_slug = !empty($trip->slug) ? $trip->slug : '';
+            
             wp_localize_script('yatra-trip', 'yatraTripData', [
                 'tripId' => $trip_id,
+                'tripSlug' => $trip_slug,
+                'apiUrl' => rest_url('yatra/v1'),
                 'restUrl' => rest_url('yatra/v1'),
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('wp_rest'),
+                'bookingUrl' => yatra_get_checkout_url(),
             ]);
         }
     }

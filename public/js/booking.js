@@ -262,38 +262,66 @@
             const formData = new FormData(this);
             formData.append('action', 'yatra_create_booking');
 
-            // Submit via AJAX
-            $.ajax({
-                url: window.yatraBookingData?.ajaxUrl || '/wp-admin/admin-ajax.php',
+            // Collect form data as JSON
+            const bookingData = {
+                trip_id: parseInt($('input[name="trip_id"]').val()) || 0,
+                contact_email: $('#contact-email').val(),
+                contact_phone: $('#contact-phone').val(),
+                contact_country: $('#contact-country').val(),
+                travel_date: $('#travel-date').val(),
+                payment_method: $('input[name="payment_method"]:checked').val() || 'full',
+                payment_gateway: paymentGateway,
+                special_requests: $('#special-requests').val(),
+                travelers: []
+            };
+
+            // Collect traveler data
+            $('.yatra-traveler-form').each(function(index) {
+                const $form = $(this);
+                bookingData.travelers.push({
+                    first_name: $form.find('input[name$="[first_name]"]').val(),
+                    last_name: $form.find('input[name$="[last_name]"]').val(),
+                    email: $form.find('input[name$="[email]"]').val(),
+                    phone: $form.find('input[name$="[phone]"]').val(),
+                    date_of_birth: $form.find('input[name$="[date_of_birth]"]').val(),
+                    gender: $form.find('select[name$="[gender]"]').val(),
+                    passport: $form.find('input[name$="[passport]"]').val()
+                });
+            });
+
+            // Submit via REST API
+            const apiUrl = window.yatraBookingData?.apiUrl || '/wp-json/yatra/v1';
+            
+            fetch(apiUrl + '/booking/create', {
                 method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        if (response.data.payment_url) {
-                            // Redirect to payment gateway
-                            window.location.href = response.data.payment_url;
-                        } else if (response.data.redirect_url) {
-                            // Redirect to thank you page
-                            window.location.href = response.data.redirect_url;
-                        } else {
-                            // Show success message
-                            alert('Booking created successfully!');
-                            if (isOffline) {
-                                window.location.href = response.data.confirmation_url || '/booking-confirmation';
-                            }
-                        }
-                    } else {
-                        alert('Error: ' + (response.data?.message || 'Unknown error occurred'));
-                        $submitBtn.prop('disabled', false).html(originalBtnHtml);
-                    }
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': window.yatraBookingData?.nonce || ''
                 },
-                error: function(xhr) {
-                    const errorMessage = xhr.responseJSON?.data?.message || 'An error occurred. Please try again.';
-                    alert('Error: ' + errorMessage);
+                body: JSON.stringify(bookingData)
+            })
+            .then(response => response.json())
+            .then(response => {
+                if (response.success) {
+                    if (response.data.payment_url) {
+                        // Redirect to payment gateway
+                        window.location.href = response.data.payment_url;
+                    } else if (response.data.redirect_url) {
+                        // Redirect to thank you page
+                        window.location.href = response.data.redirect_url;
+                    } else {
+                        // Show success message
+                        alert('Booking created successfully!');
+                    }
+                } else {
+                    alert('Error: ' + (response.message || 'Unknown error occurred'));
                     $submitBtn.prop('disabled', false).html(originalBtnHtml);
                 }
+            })
+            .catch(error => {
+                console.error('Booking error:', error);
+                alert('Error: An error occurred. Please try again.');
+                $submitBtn.prop('disabled', false).html(originalBtnHtml);
             });
         });
 

@@ -828,6 +828,9 @@ class TripController extends BaseController
         if (empty($trip_slug)) {
             $trip_slug = 'trip';
         }
+        
+        // Get trip ID from the trip data object (always use this)
+        $trip_id = !empty($trip_data->id) ? (int) $trip_data->id : 0;
 
         $format_price = function($price) {
             return 'USD ' . number_format($price, 0);
@@ -1130,13 +1133,14 @@ class TripController extends BaseController
                                     <?php echo esc_html($format_price($card['sale_price'])); ?>
                                 </div>
                             </div>
-                            <a href="<?php echo esc_url(yatra_get_booking_url($trip_slug, ['date' => $card['data_date'], 'adults' => $card['min_travelers']])); ?>" 
+                            <button type="button" 
                                class="yatra-card-book-btn" 
+                               data-trip-id="<?php echo esc_attr($trip_id); ?>"
                                data-date="<?php echo esc_attr($card['data_date']); ?>"
                                data-price="<?php echo esc_attr($sale_price); ?>"
                                data-item="<?php echo esc_attr($item_id); ?>">
                                 Book Now
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>

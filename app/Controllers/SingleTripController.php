@@ -64,7 +64,7 @@ class SingleTripController
             $this->wpdb->prepare(
                 "SELECT * FROM {$this->table_trips} 
                  WHERE slug = %s 
-                 AND status = 'publish' 
+                 AND status IN ('publish', 'published', 'active') 
                  AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00') 
                  LIMIT 1",
                 $slug
@@ -307,7 +307,7 @@ class SingleTripController
                         short_description
                  FROM {$this->table_trips} 
                  WHERE id != %d 
-                 AND status = 'publish' 
+                 AND status IN ('publish', 'published', 'active') 
                  AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
                  AND (trip_category = %s OR difficulty_level = %s)
                  ORDER BY RAND() 
@@ -327,7 +327,7 @@ class SingleTripController
                             short_description
                      FROM {$this->table_trips} 
                      WHERE id != %d 
-                     AND status = 'publish' 
+                     AND status IN ('publish', 'published', 'active') 
                      AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
                      ORDER BY RAND() 
                      LIMIT 4",
