@@ -22,6 +22,7 @@ interface Review {
   id: number;
   trip_id: number;
   trip_title: string;
+  trip_slug: string;
   customer_name: string;
   customer_email: string;
   rating: number;
@@ -80,6 +81,7 @@ const Reviews: React.FC = () => {
         id: item.id,
         trip_id: item.trip_id,
         trip_title: item.trip_title || 'Unknown Trip',
+        trip_slug: item.trip_slug || '',
         customer_name: item.customer_name || item.author_name || 'Anonymous',
         customer_email: item.customer_email || item.author_email || '',
         rating: item.rating,
@@ -256,16 +258,16 @@ const Reviews: React.FC = () => {
       {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
         <CardContent className="p-3">
-          <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
+          <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
             {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className="relative min-w-0 w-full lg:w-12 lg:flex-[2]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
                 placeholder={__('Search reviews...', 'Search reviews...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-10 w-full"
               />
             </div>
 
@@ -273,7 +275,7 @@ const Reviews: React.FC = () => {
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full lg:flex-1"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
               <option value="approved">{__('Approved', 'Approved')}</option>
@@ -286,7 +288,7 @@ const Reviews: React.FC = () => {
             <Select
               value={ratingFilter}
               onChange={(e) => setRatingFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full lg:flex-1"
             >
               <option value="all">{__('All Ratings', 'All Ratings')}</option>
               <option value="5">{__('5 Stars', '5 Stars')}</option>
@@ -300,7 +302,7 @@ const Reviews: React.FC = () => {
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full lg:flex-1"
             >
               <option value="created_at">{__('Date', 'Date')}</option>
               <option value="trip_title">{__('Trip', 'Trip')}</option>
@@ -313,7 +315,7 @@ const Reviews: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-9 px-3 flex items-center gap-1.5"
+              className="h-11 px-4 flex items-center gap-1.5 flex-shrink-0"
               title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
             >
               {sortOrder === 'asc' ? (
@@ -321,7 +323,7 @@ const Reviews: React.FC = () => {
               ) : (
                 <ArrowDown className="w-4 h-4" />
               )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
+              <span className="text-sm">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
             </Button>
 
             {/* Reset Button */}
@@ -329,7 +331,7 @@ const Reviews: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
-                className="flex items-center gap-2 h-9"
+                className="flex items-center gap-2 h-11 flex-shrink-0"
               >
                 <X className="w-4 h-4" />
                 {__('Reset', 'Reset')}
@@ -471,9 +473,18 @@ const Reviews: React.FC = () => {
                   {reviews.map((review) => (
                     <TableRow key={review.id}>
                       <TableCell>
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {review.trip_title}
-                        </div>
+                        {review.trip_id ? (
+                          <a 
+                            href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${review.trip_id}`}
+                            className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+                          >
+                            {review.trip_title}
+                          </a>
+                        ) : (
+                          <span className="font-medium text-gray-500 dark:text-gray-400">
+                            {review.trip_title}
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div>

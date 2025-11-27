@@ -458,7 +458,7 @@ const Bookings: React.FC = () => {
                 placeholder={__('Search bookings...', 'Search bookings...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-10 w-full"
+                className="pl-10 w-full"
               />
             </div>
 
@@ -467,7 +467,7 @@ const Bookings: React.FC = () => {
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full h-10"
+                className="w-full"
               >
                 <option value="all">{__('All Status', 'All Status')}</option>
                 <option value="confirmed">{__('Confirmed', 'Confirmed')}</option>
@@ -482,7 +482,7 @@ const Bookings: React.FC = () => {
               <Select
                 value={paymentFilter}
                 onChange={(e) => setPaymentFilter(e.target.value)}
-                className="w-full h-10"
+                className="w-full"
               >
                 <option value="all">{__('All Payments', 'All Payments')}</option>
                 <option value="paid">{__('Paid', 'Paid')}</option>
@@ -497,7 +497,7 @@ const Bookings: React.FC = () => {
               <Select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full h-10"
+                className="w-full"
               >
                 <option value="booking_date">{__('Booking Date', 'Booking Date')}</option>
                 <option value="travel_date">{__('Travel Date', 'Travel Date')}</option>
@@ -514,7 +514,7 @@ const Bookings: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                className="h-10 px-4 flex items-center gap-2 w-full lg:w-auto"
+                className="px-4 flex items-center gap-2 w-full lg:w-auto"
                 title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
               >
                 {sortOrder === 'asc' ? (
@@ -532,7 +532,7 @@ const Bookings: React.FC = () => {
                 <Button
                   variant="outline"
                   onClick={handleResetFilters}
-                  className="flex items-center gap-2 h-10 w-full lg:w-auto"
+                  className="flex items-center gap-2 w-full lg:w-auto"
                 >
                   <X className="w-4 h-4" />
                   <span className="text-sm">{__('Reset', 'Reset')}</span>

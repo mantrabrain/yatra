@@ -5,18 +5,20 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MessageSquare, MapPin } from 'lucide-react';
+import { Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MessageSquare, MapPin, Send, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Badge } from '../components/ui/badge';
 import { useNavigate } from '../hooks/useNavigate';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { Skeleton } from '../components/ui/skeleton';
 
 interface Enquiry {
   id: number;
@@ -40,6 +42,11 @@ const Enquiries: React.FC = () => {
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
+  const [respondDialogOpen, setRespondDialogOpen] = useState(false);
+  const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null);
+  const [responseMessage, setResponseMessage] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [enquiryToDelete, setEnquiryToDelete] = useState<Enquiry | null>(null);
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { navigate } = useNavigate();
@@ -64,195 +71,35 @@ const Enquiries: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
-  // Fetch enquiries with dummy data
+  // Fetch enquiries from API
   const { data, isLoading, error } = useQuery({
     queryKey: ['enquiries', queryParams],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/enquiries', { params: queryParams });
-      // Dummy data
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0];
-      };
-
-      const allEnquiries: Enquiry[] = [
-        {
-          id: 1,
-          name: 'John Smith',
-          email: 'john.smith@example.com',
-          phone: '+1 234-567-8900',
-          trip_title: 'Everest Base Camp Trek',
-          trip_id: 1,
-          message: 'I am interested in booking the Everest Base Camp Trek for 2 people. Can you provide more details about the itinerary and pricing?',
-          number_of_travelers: 2,
-          preferred_travel_date: '2026-04-15',
-          status: 'new',
-          created_at: getDate(2),
-        },
-        {
-          id: 2,
-          name: 'Sarah Johnson',
-          email: 'sarah.j@example.com',
-          phone: '+1 345-678-9012',
-          trip_title: 'Annapurna Circuit Trek',
-          trip_id: 2,
-          message: 'Looking for information about the Annapurna Circuit Trek. What is the best time to visit?',
-          number_of_travelers: 1,
-          preferred_travel_date: '2026-05-20',
-          status: 'responded',
-          created_at: getDate(5),
-          responded_at: getDate(4),
-          response_notes: 'Sent detailed information about the trek and best seasons.',
-        },
-        {
-          id: 3,
-          name: 'Michael Chen',
-          email: 'm.chen@example.com',
-          phone: '+86 138-0013-8000',
-          trip_title: 'Kathmandu City Tour',
-          trip_id: 9,
-          message: 'I would like to book a single day city tour. What are the available dates?',
-          number_of_travelers: 4,
-          preferred_travel_date: '2026-03-10',
-          status: 'converted',
-          created_at: getDate(10),
-          responded_at: getDate(9),
-          response_notes: 'Customer booked the tour.',
-        },
-        {
-          id: 4,
-          name: 'Emma Williams',
-          email: 'emma.w@example.com',
-          phone: '+44 20-7946-0958',
-          trip_title: 'Langtang Valley Trek',
-          trip_id: 3,
-          message: 'Interested in Langtang Valley Trek for a group of 6 people. Need custom itinerary.',
-          number_of_travelers: 6,
-          preferred_travel_date: '2026-06-01',
-          status: 'new',
-          created_at: getDate(1),
-        },
-        {
-          id: 5,
-          name: 'David Brown',
-          email: 'd.brown@example.com',
-          phone: '+61 2-9374-4000',
-          message: 'General inquiry about Nepal travel packages. Looking for recommendations.',
-          number_of_travelers: 2,
-          preferred_travel_date: '2026-07-15',
-          status: 'responded',
-          created_at: getDate(8),
-          responded_at: getDate(7),
-          response_notes: 'Recommended several packages based on preferences.',
-        },
-        {
-          id: 6,
-          name: 'Lisa Anderson',
-          email: 'lisa.a@example.com',
-          phone: '+1 456-789-0123',
-          trip_title: 'Chitwan National Park Safari',
-          trip_id: 4,
-          message: 'Want to know about the Chitwan Safari package. What animals can we see?',
-          number_of_travelers: 3,
-          preferred_travel_date: '2026-04-20',
-          status: 'closed',
-          created_at: getDate(15),
-          responded_at: getDate(14),
-          response_notes: 'Customer decided to book with another company.',
-        },
-        {
-          id: 7,
-          name: 'Robert Taylor',
-          email: 'r.taylor@example.com',
-          phone: '+1 567-890-1234',
-          trip_title: 'Manaslu Circuit Trek',
-          trip_id: 5,
-          message: 'Interested in Manaslu Circuit Trek. Need permit information and pricing.',
-          number_of_travelers: 2,
-          preferred_travel_date: '2026-05-10',
-          status: 'new',
-          created_at: getDate(0),
-        },
-        {
-          id: 8,
-          name: 'Maria Garcia',
-          email: 'maria.g@example.com',
-          phone: '+34 91-123-4567',
-          trip_title: 'Upper Mustang Trek',
-          trip_id: 6,
-          message: 'Looking for Upper Mustang Trek details. What is included in the package?',
-          number_of_travelers: 1,
-          preferred_travel_date: '2026-08-01',
-          status: 'responded',
-          created_at: getDate(3),
-          responded_at: getDate(2),
-          response_notes: 'Sent complete package details and inclusions.',
-        },
-      ];
-
-      // Apply filters
-      let filtered = allEnquiries;
-      if (searchTerm) {
-        filtered = filtered.filter(enquiry =>
-          enquiry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          enquiry.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          enquiry.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          enquiry.trip_title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          enquiry.message.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(enquiry => enquiry.status === statusFilter);
-      }
-
-      // Apply sorting
-      filtered = [...filtered].sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
-
-        switch (sortBy) {
-          case 'name':
-            aValue = a.name.toLowerCase();
-            bValue = b.name.toLowerCase();
-            break;
-          case 'email':
-            aValue = a.email.toLowerCase();
-            bValue = b.email.toLowerCase();
-            break;
-          case 'trip_title':
-            aValue = a.trip_title?.toLowerCase() || '';
-            bValue = b.trip_title?.toLowerCase() || '';
-            break;
-          case 'status':
-            aValue = a.status;
-            bValue = b.status;
-            break;
-          case 'created_at':
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-            break;
-          default:
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
+      const params = new URLSearchParams();
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, String(value));
         }
-
-        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
       });
-
-      // Apply pagination
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
-
+      
+      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+      const response = await fetch(`${baseUrl}/enquiries?${params.toString()}`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch enquiries');
+      }
+      
+      const result = await response.json();
+      
       return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10,
+        data: result.items || [],
+        total: result.total || 0,
+        page: result.page || 1,
+        per_page: result.per_page || 10,
       };
     },
     enabled: can('yatra_view_bookings'),
@@ -260,16 +107,57 @@ const Enquiries: React.FC = () => {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (_id: number) => {
-      // return await apiClient.delete(`/yatra/v1/enquiries/${_id}`);
-      return { success: true };
+    mutationFn: async (id: number) => {
+      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+      const response = await fetch(`${baseUrl}/enquiries/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete enquiry');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enquiries'] });
+      setDeleteDialogOpen(false);
+      setEnquiryToDelete(null);
     },
   });
 
-  const enquiries = data?.data || [];
+  // Respond mutation - sends email to customer
+  const respondMutation = useMutation({
+    mutationFn: async ({ id, message }: { id: number; message: string }) => {
+      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+      const response = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+        body: JSON.stringify({ message }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to send response');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['enquiries'] });
+      setRespondDialogOpen(false);
+      setSelectedEnquiry(null);
+      setResponseMessage('');
+    },
+  });
+
+  const enquiries: Enquiry[] = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
 
@@ -322,8 +210,28 @@ const Enquiries: React.FC = () => {
   };
 
   const handleDelete = (enquiry: Enquiry) => {
-    if (confirm(__('Are you sure you want to delete this enquiry?', 'Are you sure you want to delete this enquiry?'))) {
-      deleteMutation.mutate(enquiry.id);
+    setEnquiryToDelete(enquiry);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (enquiryToDelete) {
+      deleteMutation.mutate(enquiryToDelete.id);
+    }
+  };
+
+  const handleRespond = (enquiry: Enquiry) => {
+    setSelectedEnquiry(enquiry);
+    setResponseMessage('');
+    setRespondDialogOpen(true);
+  };
+
+  const sendResponse = () => {
+    if (selectedEnquiry && responseMessage.trim()) {
+      respondMutation.mutate({
+        id: selectedEnquiry.id,
+        message: responseMessage,
+      });
     }
   };
 
@@ -374,7 +282,7 @@ const Enquiries: React.FC = () => {
                 placeholder={__('Search enquiries...', 'Search enquiries...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-9"
               />
             </div>
 
@@ -382,7 +290,7 @@ const Enquiries: React.FC = () => {
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
               <option value="new">{__('New', 'New')}</option>
@@ -395,7 +303,7 @@ const Enquiries: React.FC = () => {
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="created_at">{__('Date', 'Date')}</option>
               <option value="name">{__('Name', 'Name')}</option>
@@ -408,7 +316,7 @@ const Enquiries: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-9 px-3 flex items-center gap-1.5"
+              className="px-3 flex items-center gap-1.5"
               title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
             >
               {sortOrder === 'asc' ? (
@@ -424,7 +332,7 @@ const Enquiries: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
-                className="flex items-center gap-2 h-9"
+                className="flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
                 {__('Reset', 'Reset')}
@@ -447,9 +355,47 @@ const Enquiries: React.FC = () => {
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('Loading enquiries...', 'Loading enquiries...')}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[200px]">{__('Customer', 'Customer')}</TableHead>
+                        <TableHead>{__('Trip', 'Trip')}</TableHead>
+                        <TableHead className="w-[300px]">{__('Message', 'Message')}</TableHead>
+                        <TableHead>{__('Travelers', 'Travelers')}</TableHead>
+                        <TableHead>{__('Preferred Date', 'Preferred Date')}</TableHead>
+                        <TableHead>{__('Status', 'Status')}</TableHead>
+                        <TableHead>{__('Date', 'Date')}</TableHead>
+                        <TableHead className="text-right w-[150px]">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...Array(5)].map((_, i) => (
+                        <TableRow key={i}>
+                          <TableCell>
+                            <div className="space-y-2">
+                              <Skeleton className="h-4 w-32" />
+                              <Skeleton className="h-3 w-40" />
+                              <Skeleton className="h-3 w-28" />
+                            </div>
+                          </TableCell>
+                          <TableCell><Skeleton className="h-4 w-36" /></TableCell>
+                          <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                          <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+                          <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
+                          <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                          <TableCell>
+                            <div className="flex justify-end gap-1">
+                              <Skeleton className="h-8 w-8 rounded" />
+                              <Skeleton className="h-8 w-8 rounded" />
+                              <Skeleton className="h-8 w-8 rounded" />
+                              <Skeleton className="h-8 w-8 rounded" />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 ) : enquiries.length === 0 ? (
                   <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                     {__('No enquiries found', 'No enquiries found')}
@@ -578,6 +524,19 @@ const Enquiries: React.FC = () => {
                                 <Button
                                   variant="ghost"
                                   size="icon"
+                                  onClick={() => handleRespond(enquiry)}
+                                  className="h-8 w-8 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                                  aria-label={__('Respond to enquiry', 'Respond to enquiry')}
+                                  title={__('Send response email', 'Send response email')}
+                                >
+                                  <Send className="w-4 h-4" />
+                                </Button>
+                              </ConditionalRender>
+
+                              <ConditionalRender capability="yatra_edit_bookings">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() => handleEdit(enquiry)}
                                   className="h-8 w-8"
                                   aria-label={__('Edit enquiry', 'Edit enquiry')}
@@ -642,6 +601,138 @@ const Enquiries: React.FC = () => {
           </>
         )}
       </ConditionalRender>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setEnquiryToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title={__('Delete Enquiry', 'Delete Enquiry')}
+        message={enquiryToDelete 
+          ? __(`Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`, `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`)
+          : __('Are you sure you want to delete this enquiry?', 'Are you sure you want to delete this enquiry?')
+        }
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
+
+      {/* Respond Dialog */}
+      {respondDialogOpen && selectedEnquiry && (
+        <div
+          className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !respondMutation.isPending) {
+              setRespondDialogOpen(false);
+              setSelectedEnquiry(null);
+            }
+          }}
+        >
+          <Card className="w-full max-w-lg mx-4 shadow-xl">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400">
+                    <Send className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">
+                      {__('Respond to Enquiry', 'Respond to Enquiry')}
+                    </CardTitle>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {__('Send a response to', 'Send a response to')} <strong>{selectedEnquiry.name}</strong>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setRespondDialogOpen(false);
+                    setSelectedEnquiry(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  disabled={respondMutation.isPending}
+                  aria-label={__('Close', 'Close')}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Customer Info */}
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <Mail className="w-4 h-4 text-gray-400" />
+                  <span className="text-gray-600 dark:text-gray-400">{selectedEnquiry.email}</span>
+                </div>
+                {selectedEnquiry.trip_title && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-600 dark:text-gray-400">{selectedEnquiry.trip_title}</span>
+                  </div>
+                )}
+                <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                  <strong>{__('Original Message:', 'Original Message:')}</strong>
+                  <p className="mt-1 text-gray-600 dark:text-gray-400">{selectedEnquiry.message}</p>
+                </div>
+              </div>
+
+              {/* Response Message */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Your Response', 'Your Response')} <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={responseMessage}
+                  onChange={(e) => setResponseMessage(e.target.value)}
+                  placeholder={__('Type your response here...', 'Type your response here...')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  rows={5}
+                  disabled={respondMutation.isPending}
+                />
+              </div>
+
+              {respondMutation.isError && (
+                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+                  {respondMutation.error?.message || __('Failed to send response. Please try again.', 'Failed to send response. Please try again.')}
+                </div>
+              )}
+
+              <div className="flex gap-2 justify-end pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setRespondDialogOpen(false);
+                    setSelectedEnquiry(null);
+                  }}
+                  disabled={respondMutation.isPending}
+                >
+                  {__('Cancel', 'Cancel')}
+                </Button>
+                <Button
+                  onClick={sendResponse}
+                  disabled={respondMutation.isPending || !responseMessage.trim()}
+                >
+                  {respondMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {__('Sending...', 'Sending...')}
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      {__('Send Response', 'Send Response')}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

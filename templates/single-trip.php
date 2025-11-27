@@ -24,7 +24,7 @@ if (!$trip) {
     echo '<div class="yatra-error" style="max-width: 1200px; margin: 80px auto; padding: 40px; text-align: center;">';
     echo '<h1>' . esc_html__('Trip Not Found', 'yatra') . '</h1>';
     echo '<p>' . esc_html__('The trip you are looking for does not exist or has been removed.', 'yatra') . '</p>';
-    echo '<a href="' . esc_url(home_url('/trip/')) . '" class="yatra-btn">' . esc_html__('Browse All Trips', 'yatra') . '</a>';
+    echo '<a href="' . esc_url(home_url('/trip/')) . '" class="yatra-btn"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>' . esc_html__('Browse All Trips', 'yatra') . '</a>';
     echo '</div>';
     get_footer();
     exit;
@@ -82,6 +82,9 @@ get_header();
                 <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1920&q=80" alt="<?php echo esc_attr($trip->title); ?>" class="yatra-hero-main-img">
                 <?php endif; ?>
                 <a href="<?php echo esc_url(yatra_get_booking_url($trip->slug)); ?>" class="yatra-hero-book-now-btn">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
                     <?php echo esc_html__('Book Now', 'yatra'); ?> - <?php echo esc_html(yatra_format_price($trip->sale_price, $trip->currency)); ?>
                 </a>
             </div>
@@ -1177,11 +1180,17 @@ get_header();
 
                     <!-- Action Buttons -->
                     <button type="button" class="yatra-booking-button" id="check-availability-btn" data-trip-id="<?php echo esc_attr($wp_query->get('yatra_trip_id') ?: 1); ?>">
-                        Check availability
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <?php echo esc_html__('Check Availability', 'yatra'); ?>
                     </button>
 
                     <button type="button" class="yatra-booking-enquiry-button" id="open-enquiry-modal" onclick="event.preventDefault(); event.stopPropagation(); const modal = document.getElementById('enquiry-modal'); if(modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; } return false;">
-                        Make Enquiry
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                        <?php echo esc_html__('Make Enquiry', 'yatra'); ?>
                     </button>
 
                     <!-- Single Trust Signal -->
@@ -1639,7 +1648,7 @@ get_header();
                     <?php if (isset($existing_review->status) && $existing_review->status === 'approved'): ?>
                     <p><?php echo esc_html__('Thank you! Your review has been approved and published.', 'yatra'); ?></p>
                     <?php else: ?>
-                    <p><?php echo esc_html__('You have already reviewed this trip. The edit window (24 hours) has passed.', 'yatra'); ?></p>
+                    <p><?php echo esc_html__('You have already reviewed this trip.', 'yatra'); ?></p>
                     <?php endif; ?>
                 </div>
                 <?php elseif ($can_review || ($existing_review && $can_edit_review)): ?>
@@ -1713,6 +1722,12 @@ get_header();
             <p class="yatra-enquiry-modal-subtitle">Fill out the form below and we'll get back to you as soon as possible</p>
         </div>
         <form class="yatra-enquiry-form" id="enquiry-form">
+            <input type="hidden" name="action" value="yatra_submit_enquiry">
+            <input type="hidden" name="trip_id" value="<?php echo esc_attr((int) $trip->id); ?>">
+            <?php wp_nonce_field('yatra_submit_enquiry', 'yatra_enquiry_nonce'); ?>
+            
+            <div class="yatra-enquiry-message" id="enquiry-message-box" style="display: none;"></div>
+            
             <div class="yatra-enquiry-form-grid">
                 <div class="yatra-enquiry-field">
                     <label for="enquiry-name" class="yatra-enquiry-label">Full Name <span class="yatra-enquiry-required">*</span></label>
@@ -1807,8 +1822,18 @@ get_header();
             </div>
             
             <div class="yatra-enquiry-actions">
-                <button type="button" class="yatra-enquiry-cancel" id="close-enquiry-modal">Cancel</button>
-                <button type="submit" class="yatra-enquiry-submit">Send Enquiry</button>
+                <button type="button" class="yatra-enquiry-cancel" id="close-enquiry-modal">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <?php echo esc_html__('Cancel', 'yatra'); ?>
+                </button>
+                <button type="submit" class="yatra-enquiry-submit">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                    <?php echo esc_html__('Send Enquiry', 'yatra'); ?>
+                </button>
             </div>
         </form>
     </div>

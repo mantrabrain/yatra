@@ -290,7 +290,7 @@ const TravelerCategories: React.FC = () => {
                 placeholder={__('Search categories...', 'Search categories...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-9"
               />
             </div>
 
@@ -298,7 +298,7 @@ const TravelerCategories: React.FC = () => {
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
               <option value="draft">{__('Draft', 'Draft')}</option>
@@ -310,7 +310,7 @@ const TravelerCategories: React.FC = () => {
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="label">{__('Label', 'Label')}</option>
               <option value="status">{__('Status', 'Status')}</option>
@@ -322,7 +322,7 @@ const TravelerCategories: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-9 px-3 flex items-center gap-1.5"
+              className="px-3 flex items-center gap-1.5"
               title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
             >
               {sortOrder === 'asc' ? (
@@ -338,7 +338,7 @@ const TravelerCategories: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
-                className="flex items-center gap-2 h-9"
+                className="flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
                 {__('Reset', 'Reset')}

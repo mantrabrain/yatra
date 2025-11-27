@@ -39,6 +39,7 @@ import Availability from './pages/Availability';
 import AvailabilityForm from './pages/AvailabilityForm';
 import Enquiries from './pages/Enquiries';
 import ViewEnquiry from './pages/ViewEnquiry';
+import EnquiryForm from './pages/EnquiryForm';
 import Modules from './pages/Modules';
 
 const App: React.FC = () => {
@@ -151,8 +152,8 @@ const App: React.FC = () => {
         if (action === 'view') {
           return <ViewEnquiry />;
         }
-        if (action === 'edit') {
-          return <ViewEnquiry />;
+        if (action === 'edit' || action === 'new') {
+          return <EnquiryForm />;
         }
         return <Enquiries />;
       case 'reviews':

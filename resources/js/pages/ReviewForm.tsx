@@ -407,7 +407,6 @@ const ReviewForm: React.FC = () => {
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
-                      className="h-9"
                     >
                       <option value="pending">{__('Pending', 'Pending')}</option>
                       <option value="approved">{__('Approved', 'Approved')}</option>

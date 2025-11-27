@@ -3,9 +3,9 @@
  * Display enquiry details in a clean, minimal SaaS-style design
  */
 
-import React, { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Loader2, Mail, Phone, Calendar, MessageSquare, Edit, ExternalLink, MapPin, Users } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Mail, Phone, Calendar, MessageSquare, Edit, ExternalLink, MapPin, Users, Send, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -14,10 +14,31 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Badge } from '../components/ui/badge';
 import { useNavigate } from '../hooks/useNavigate';
+import { Skeleton } from '../components/ui/skeleton';
+
+interface Enquiry {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  trip_id?: number;
+  trip_title?: string;
+  trip_slug?: string;
+  message: string;
+  number_of_travelers?: number;
+  preferred_travel_date?: string;
+  status: 'new' | 'responded' | 'closed' | 'converted';
+  created_at: string;
+  responded_at?: string;
+  response_notes?: string;
+}
 
 const ViewEnquiry: React.FC = () => {
   const { can } = usePermissions();
   const { navigate } = useNavigate();
+  const queryClient = useQueryClient();
+  const [respondDialogOpen, setRespondDialogOpen] = useState(false);
+  const [responseMessage, setResponseMessage] = useState('');
 
   // Get enquiry id from URL
   const enquiryId = useMemo(() => {
@@ -25,37 +46,52 @@ const ViewEnquiry: React.FC = () => {
     return params.get('id') ? parseInt(params.get('id') || '0') : null;
   }, []);
 
-  // Fetch enquiry data
-  const { data: enquiry, isLoading, error } = useQuery({
+  // Fetch enquiry data from API
+  const { data: enquiry, isLoading, error } = useQuery<Enquiry | null>({
     queryKey: ['enquiry', enquiryId],
     queryFn: async () => {
       if (!enquiryId) return null;
-      // return await apiClient.get(`/yatra/v1/enquiries/${enquiryId}`);
-      // Dummy data
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0];
-      };
-
-      return {
-        id: enquiryId,
-        name: 'John Smith',
-        email: 'john.smith@example.com',
-        phone: '+1 234-567-8900',
-        trip_id: 1,
-        trip_title: 'Everest Base Camp Trek',
-        message: 'I am interested in booking the Everest Base Camp Trek for 2 people. Can you provide more details about the itinerary and pricing? I would like to know about the accommodation, meals, and what is included in the package.',
-        number_of_travelers: 2,
-        preferred_travel_date: '2026-04-15',
-        status: 'new',
-        created_at: getDate(2),
-        responded_at: null,
-        response_notes: null,
-      };
+      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+      const response = await fetch(`${baseUrl}/enquiries/${enquiryId}`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch enquiry');
+      }
+      
+      return response.json();
     },
     enabled: !!enquiryId && can('yatra_view_bookings'),
+  });
+
+  // Respond mutation
+  const respondMutation = useMutation({
+    mutationFn: async ({ id, message }: { id: number; message: string }) => {
+      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+      const response = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+        body: JSON.stringify({ message }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to send response');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['enquiry', enquiryId] });
+      setRespondDialogOpen(false);
+      setResponseMessage('');
+    },
   });
 
   const formatDate = (dateString: string) => {
@@ -115,10 +151,83 @@ const ViewEnquiry: React.FC = () => {
     }
   };
 
+  const handleRespond = () => {
+    setResponseMessage('');
+    setRespondDialogOpen(true);
+  };
+
+  const sendResponse = () => {
+    if (enquiryId && responseMessage.trim()) {
+      respondMutation.mutate({
+        id: enquiryId,
+        message: responseMessage,
+      });
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+      <div className="space-y-3">
+        <PageHeader
+          title={__('Enquiry Details', 'Enquiry Details')}
+          actions={
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-10 w-24" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          }
+        />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <div className="lg:col-span-2 space-y-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-5 w-40" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Skeleton className="h-3 w-16 mb-2" />
+                  <Skeleton className="h-24 w-full rounded-lg" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div>
+                    <Skeleton className="h-3 w-32 mb-2" />
+                    <Skeleton className="h-5 w-16" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-3 w-36 mb-2" />
+                    <Skeleton className="h-5 w-40" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="space-y-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-24" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-4 w-36" />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-20" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <Skeleton className="h-3 w-20 mb-2" />
+                  <Skeleton className="h-5 w-40" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -156,6 +265,16 @@ const ViewEnquiry: React.FC = () => {
               {__('Back', 'Back')}
             </Button>
             <ConditionalRender capability="yatra_edit_bookings">
+              {enquiry.status !== 'responded' && enquiry.status !== 'closed' && (
+                <Button 
+                  variant="outline" 
+                  onClick={handleRespond} 
+                  className="flex items-center gap-2 text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20"
+                >
+                  <Send className="w-4 h-4" />
+                  {__('Send Response', 'Send Response')}
+                </Button>
+              )}
               <Button onClick={handleEdit} className="flex items-center gap-2">
                 <Edit className="w-4 h-4" />
                 {__('Edit Enquiry', 'Edit Enquiry')}
@@ -323,6 +442,112 @@ const ViewEnquiry: React.FC = () => {
           </div>
         </div>
       </ConditionalRender>
+
+      {/* Respond Dialog */}
+      {respondDialogOpen && enquiry && (
+        <div
+          className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !respondMutation.isPending) {
+              setRespondDialogOpen(false);
+            }
+          }}
+        >
+          <Card className="w-full max-w-lg mx-4 shadow-xl">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400">
+                    <Send className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">
+                      {__('Respond to Enquiry', 'Respond to Enquiry')}
+                    </CardTitle>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {__('Send a response to', 'Send a response to')} <strong>{enquiry.name}</strong>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setRespondDialogOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  disabled={respondMutation.isPending}
+                  aria-label={__('Close', 'Close')}
+                >
+                  <span className="text-xl">&times;</span>
+                </button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Customer Info */}
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <Mail className="w-4 h-4 text-gray-400" />
+                  <span className="text-gray-600 dark:text-gray-400">{enquiry.email}</span>
+                </div>
+                {enquiry.trip_title && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="text-gray-600 dark:text-gray-400">{enquiry.trip_title}</span>
+                  </div>
+                )}
+                <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                  <strong>{__('Original Message:', 'Original Message:')}</strong>
+                  <p className="mt-1 text-gray-600 dark:text-gray-400">{enquiry.message}</p>
+                </div>
+              </div>
+
+              {/* Response Message */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {__('Your Response', 'Your Response')} <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={responseMessage}
+                  onChange={(e) => setResponseMessage(e.target.value)}
+                  placeholder={__('Type your response here...', 'Type your response here...')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  rows={5}
+                  disabled={respondMutation.isPending}
+                />
+              </div>
+
+              {respondMutation.isError && (
+                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+                  {respondMutation.error?.message || __('Failed to send response. Please try again.', 'Failed to send response. Please try again.')}
+                </div>
+              )}
+
+              <div className="flex gap-2 justify-end pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setRespondDialogOpen(false)}
+                  disabled={respondMutation.isPending}
+                >
+                  {__('Cancel', 'Cancel')}
+                </Button>
+                <Button
+                  onClick={sendResponse}
+                  disabled={respondMutation.isPending || !responseMessage.trim()}
+                >
+                  {respondMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {__('Sending...', 'Sending...')}
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      {__('Send Response', 'Send Response')}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

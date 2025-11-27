@@ -56,6 +56,7 @@ class SettingsController extends BaseController
         'deposit_required' => false,
         'deposit_percentage' => 20,
         'gateway_configs' => [],
+        'gateway_order' => [],
         
         // Email Settings
         'admin_email' => '',

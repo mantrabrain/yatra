@@ -303,6 +303,106 @@
     color: #3b82f6;
 }
 
+/* Gateway Icon Images */
+.yatra-gateway-icon img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+/* Offline Gateway Badge */
+.yatra-gateway-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #059669;
+    background: #d1fae5;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.yatra-gateway-offline {
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.yatra-gateway-offline:hover {
+    background: #dcfce7;
+    border-color: #22c55e;
+}
+
+/* Selected gateway states */
+.yatra-gateway-option input[type="radio"]:checked ~ .yatra-gateway-badge {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+/* No Gateways Message */
+.yatra-no-gateways-message {
+    padding: 20px;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    color: #92400e;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Gateway Info Section in Sidebar */
+.yatra-gateway-info {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.yatra-gateway-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+#yatra-gateway-details {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+#yatra-gateway-details p {
+    margin: 0 0 8px 0;
+}
+
+/* Price Due Row */
+.yatra-price-due {
+    background: #dbeafe;
+    padding: 12px !important;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+.yatra-price-due span {
+    color: #1d4ed8 !important;
+}
+
+/* Deposit Row */
+.yatra-price-deposit {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* Submit Button with Icon */
+.yatra-booking-pay-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.yatra-booking-pay-btn svg {
+    flex-shrink: 0;
+}
+
 /* Traveler Forms */
 #yatra-travelers-container {
     display: flex;

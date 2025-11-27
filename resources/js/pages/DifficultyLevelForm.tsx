@@ -341,7 +341,7 @@ const DifficultyLevelForm: React.FC = () => {
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Status', 'Status')}
                     </label>
-                    <Select id="status" value={formData.status} onChange={(e) => handleFieldChange('status', e.target.value)} className="w-full h-10">
+                    <Select id="status" value={formData.status} onChange={(e) => handleFieldChange('status', e.target.value)} className="w-full">
                       <option value="draft">{__('Draft', 'Draft')}</option>
                       <option value="publish">{__('Publish', 'Publish')}</option>
                       <option value="trash">{__('Trash', 'Trash')}</option>

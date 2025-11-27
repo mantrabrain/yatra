@@ -68,6 +68,10 @@ class AppServiceProvider extends ServiceProvider
         // AJAX handler for review submission
         add_action('wp_ajax_yatra_submit_review', [$this, 'handleReviewSubmission']);
         add_action('wp_ajax_nopriv_yatra_submit_review', [$this, 'handleReviewSubmissionNoPriv']);
+
+        // AJAX handler for enquiry submission (allow both logged in and guest users)
+        add_action('wp_ajax_yatra_submit_enquiry', [$this, 'handleEnquirySubmission']);
+        add_action('wp_ajax_nopriv_yatra_submit_enquiry', [$this, 'handleEnquirySubmission']);
     }
 
     /**
@@ -192,6 +196,230 @@ class AppServiceProvider extends ServiceProvider
     public function handleReviewSubmissionNoPriv(): void
     {
         wp_send_json_error(['message' => __('Please log in to submit a review.', 'yatra')]);
+    }
+
+    /**
+     * Handle enquiry form submission
+     */
+    public function handleEnquirySubmission(): void
+    {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['yatra_enquiry_nonce'] ?? '', 'yatra_submit_enquiry')) {
+            wp_send_json_error(['message' => __('Security check failed. Please refresh the page and try again.', 'yatra')]);
+        }
+
+        // Get and validate form data
+        $trip_id = (int) ($_POST['trip_id'] ?? 0);
+        $name = sanitize_text_field($_POST['name'] ?? '');
+        $email = sanitize_email($_POST['email'] ?? '');
+        $phone = sanitize_text_field($_POST['phone'] ?? '');
+        $message = sanitize_textarea_field($_POST['message'] ?? '');
+        $travel_date = sanitize_text_field($_POST['travel_date'] ?? '');
+        $adults = (int) ($_POST['adults'] ?? 1);
+        $children = (int) ($_POST['children'] ?? 0);
+
+        // Validate required fields
+        if (empty($name)) {
+            wp_send_json_error(['message' => __('Please enter your name.', 'yatra')]);
+        }
+
+        if (empty($email) || !is_email($email)) {
+            wp_send_json_error(['message' => __('Please enter a valid email address.', 'yatra')]);
+        }
+
+        if (empty($message) || strlen($message) < 10) {
+            wp_send_json_error(['message' => __('Please enter a message (at least 10 characters).', 'yatra')]);
+        }
+
+        // Validate adults (at least 1)
+        if ($adults < 1) {
+            $adults = 1;
+        }
+
+        // Validate travel date format if provided
+        $travel_date_formatted = null;
+        if (!empty($travel_date)) {
+            $date = \DateTime::createFromFormat('Y-m-d', $travel_date);
+            if ($date) {
+                $travel_date_formatted = $date->format('Y-m-d');
+            }
+        }
+
+        // Get client IP
+        $ip_address = $this->getClientIp();
+
+        // Get user agent
+        $user_agent = !empty($_SERVER['HTTP_USER_AGENT']) 
+            ? substr(sanitize_text_field($_SERVER['HTTP_USER_AGENT']), 0, 500) 
+            : null;
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_enquiries';
+
+        // Check if table exists, if not the plugin will create it on next activation
+        $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
+        if (!$table_exists) {
+            // Create the table
+            $this->createEnquiriesTable();
+        }
+
+        // Insert enquiry
+        $result = $wpdb->insert(
+            $table,
+            [
+                'trip_id' => $trip_id > 0 ? $trip_id : null,
+                'name' => $name,
+                'email' => $email,
+                'phone' => $phone ?: null,
+                'message' => $message,
+                'adults' => $adults,
+                'children' => $children,
+                'travel_date' => $travel_date_formatted,
+                'status' => 'new',
+                'source' => 'website',
+                'ip_address' => $ip_address,
+                'user_agent' => $user_agent,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql'),
+            ],
+            ['%d', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
+        );
+
+        if ($result === false) {
+            wp_send_json_error(['message' => __('Failed to submit enquiry. Please try again.', 'yatra')]);
+        }
+
+        // Send email notification if enabled
+        $this->sendEnquiryNotificationEmail($wpdb->insert_id, [
+            'trip_id' => $trip_id,
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'message' => $message,
+            'adults' => $adults,
+            'children' => $children,
+            'travel_date' => $travel_date_formatted,
+        ]);
+
+        wp_send_json_success([
+            'message' => __('Thank you for your enquiry! We will get back to you as soon as possible.', 'yatra'),
+        ]);
+    }
+
+    /**
+     * Create enquiries table if it doesn't exist
+     */
+    private function createEnquiriesTable(): void
+    {
+        global $wpdb;
+        $charset_collate = $wpdb->get_charset_collate();
+        $table = $wpdb->prefix . 'yatra_enquiries';
+
+        $sql = "CREATE TABLE IF NOT EXISTS `{$table}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `trip_id` bigint(20) UNSIGNED DEFAULT NULL,
+            `name` varchar(255) NOT NULL,
+            `email` varchar(255) NOT NULL,
+            `phone` varchar(50) DEFAULT NULL,
+            `message` text NOT NULL,
+            `adults` smallint(5) UNSIGNED DEFAULT 1,
+            `children` smallint(5) UNSIGNED DEFAULT 0,
+            `travel_date` date DEFAULT NULL,
+            `status` enum('new','responded','closed','converted','spam') DEFAULT 'new',
+            `response_notes` text DEFAULT NULL,
+            `responded_at` datetime DEFAULT NULL,
+            `responded_by` bigint(20) UNSIGNED DEFAULT NULL,
+            `ip_address` varchar(45) DEFAULT NULL,
+            `user_agent` varchar(500) DEFAULT NULL,
+            `source` varchar(50) DEFAULT 'website',
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_trip_id` (`trip_id`),
+            KEY `idx_email` (`email`),
+            KEY `idx_status` (`status`),
+            KEY `idx_created_at` (`created_at`)
+        ) {$charset_collate};";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        \dbDelta($sql);
+    }
+
+    /**
+     * Send email notification for new enquiry
+     */
+    private function sendEnquiryNotificationEmail(int $enquiry_id, array $data): void
+    {
+        // Get admin email
+        $admin_email = get_option('admin_email');
+        
+        // Get trip title if available
+        $trip_title = '';
+        if (!empty($data['trip_id'])) {
+            global $wpdb;
+            $trips_table = $wpdb->prefix . 'yatra_trips';
+            $trip_title = $wpdb->get_var($wpdb->prepare(
+                "SELECT title FROM {$trips_table} WHERE id = %d",
+                $data['trip_id']
+            ));
+        }
+
+        // Build email subject
+        $subject = sprintf(
+            __('[%s] New Enquiry from %s', 'yatra'),
+            get_bloginfo('name'),
+            $data['name']
+        );
+
+        // Build email body
+        $body = sprintf(__("New enquiry received:\n\n", 'yatra'));
+        $body .= sprintf(__("Name: %s\n", 'yatra'), $data['name']);
+        $body .= sprintf(__("Email: %s\n", 'yatra'), $data['email']);
+        
+        if (!empty($data['phone'])) {
+            $body .= sprintf(__("Phone: %s\n", 'yatra'), $data['phone']);
+        }
+        
+        if (!empty($trip_title)) {
+            $body .= sprintf(__("Trip: %s\n", 'yatra'), $trip_title);
+        }
+        
+        $body .= sprintf(__("Travelers: %d Adults, %d Children\n", 'yatra'), $data['adults'], $data['children']);
+        
+        if (!empty($data['travel_date'])) {
+            $body .= sprintf(__("Preferred Date: %s\n", 'yatra'), $data['travel_date']);
+        }
+        
+        $body .= sprintf(__("\nMessage:\n%s\n", 'yatra'), $data['message']);
+        
+        // Add link to admin
+        $admin_url = admin_url('admin.php?page=yatra&subpage=enquiries&action=view&id=' . $enquiry_id);
+        $body .= sprintf(__("\nView in admin: %s\n", 'yatra'), $admin_url);
+
+        // Send email
+        wp_mail($admin_email, $subject, $body);
+    }
+
+    /**
+     * Get client IP address
+     */
+    private function getClientIp(): string
+    {
+        $ip_keys = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'];
+        
+        foreach ($ip_keys as $key) {
+            if (!empty($_SERVER[$key])) {
+                $ip = sanitize_text_field($_SERVER[$key]);
+                if (strpos($ip, ',') !== false) {
+                    $ip = trim(explode(',', $ip)[0]);
+                }
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+
+        return '0.0.0.0';
     }
 
     /**

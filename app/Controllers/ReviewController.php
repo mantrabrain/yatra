@@ -178,7 +178,7 @@ class ReviewController extends BaseController
         $total = (int) $wpdb->get_var($count_sql);
 
         // Get items
-        $sql = "SELECT r.*, t.title as trip_title 
+        $sql = "SELECT r.*, t.title as trip_title, t.slug as trip_slug 
                 FROM {$this->table} r
                 LEFT JOIN {$this->trips_table} t ON r.trip_id = t.id
                 {$where_sql}
@@ -196,6 +196,7 @@ class ReviewController extends BaseController
                 'id' => (int) $item->id,
                 'trip_id' => (int) $item->trip_id,
                 'trip_title' => $item->trip_title ?? 'Unknown Trip',
+                'trip_slug' => $item->trip_slug ?? '',
                 'user_id' => (int) ($item->user_id ?? 0),
                 'rating' => (int) $item->rating,
                 'title' => $item->title ?? '',
@@ -230,7 +231,7 @@ class ReviewController extends BaseController
         $id = (int) $request->get_param('id');
 
         $item = $wpdb->get_row($wpdb->prepare(
-            "SELECT r.*, t.title as trip_title 
+            "SELECT r.*, t.title as trip_title, t.slug as trip_slug 
              FROM {$this->table} r
              LEFT JOIN {$this->trips_table} t ON r.trip_id = t.id
              WHERE r.id = %d",
@@ -245,6 +246,7 @@ class ReviewController extends BaseController
             'id' => (int) $item->id,
             'trip_id' => (int) $item->trip_id,
             'trip_title' => $item->trip_title ?? 'Unknown Trip',
+            'trip_slug' => $item->trip_slug ?? '',
             'user_id' => (int) ($item->user_id ?? 0),
             'rating' => (int) $item->rating,
             'title' => $item->title ?? '',

@@ -5,13 +5,31 @@
 
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Loader2, Star, Mail, Calendar, Edit } from 'lucide-react';
+import { ArrowLeft, Star, Mail, Calendar, Edit, MapPin } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+
+interface ReviewData {
+  id: number;
+  trip_id: number;
+  trip_title: string;
+  trip_slug?: string;
+  customer_name: string;
+  customer_email: string;
+  customer_location?: string;
+  rating: number;
+  title: string;
+  comment: string;
+  status: string;
+  verified: boolean;
+  created_at: string;
+  updated_at?: string;
+}
 
 const ViewReview: React.FC = () => {
   const { can } = usePermissions();
@@ -22,33 +40,29 @@ const ViewReview: React.FC = () => {
     return params.get('id') ? parseInt(params.get('id') || '0') : null;
   }, []);
 
-  // Fetch review data
-  const { data: review, isLoading, error } = useQuery({
+  // Fetch review data from API
+  const { data: review, isLoading, error } = useQuery<ReviewData | null>({
     queryKey: ['review', reviewId],
     queryFn: async () => {
       if (!reviewId) return null;
-      // return await apiClient.get(`/reviews/${reviewId}`);
-      // Dummy data for now
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0];
-      };
-
+      const response = await apiClient.get(`/reviews/${reviewId}`);
+      // Transform API response
+      const data = response?.data || response;
       return {
-        id: reviewId,
-        trip_id: 1,
-        trip_title: 'Everest Base Camp Trek',
-        customer_name: 'John Smith',
-        customer_email: 'john.smith@example.com',
-        rating: 5,
-        title: 'Amazing Experience!',
-        comment: 'This was the trip of a lifetime. The guides were knowledgeable and the scenery was breathtaking. Every day brought new adventures and unforgettable memories. The team was professional, the accommodations were comfortable, and the food was excellent. I would highly recommend this trip to anyone looking for an authentic mountain trekking experience.',
-        status: 'approved',
-        verified: true,
-        created_at: getDate(5),
-        updated_at: getDate(2),
+        id: data.id,
+        trip_id: data.trip_id,
+        trip_title: data.trip_title || 'Unknown Trip',
+        trip_slug: data.trip_slug || '',
+        customer_name: data.customer_name || data.author_name || 'Anonymous',
+        customer_email: data.customer_email || data.author_email || '',
+        customer_location: data.customer_location || data.author_location || '',
+        rating: data.rating,
+        title: data.title || '',
+        comment: data.comment || data.content || '',
+        status: data.status || 'pending',
+        verified: data.verified || false,
+        created_at: data.created_at || '',
+        updated_at: data.updated_at || '',
       };
     },
     enabled: !!reviewId && can('yatra_view_reviews'),
@@ -123,9 +137,85 @@ const ViewReview: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading review...', 'Loading review...')}</span>
+      <div className="space-y-3">
+        <PageHeader
+          title={__('Review Details', 'Review Details')}
+          description={__('View complete review information', 'View complete review information')}
+          actions={
+            <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              {__('Back', 'Back')}
+            </Button>
+          }
+        />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Main Content Skeleton */}
+          <div className="lg:col-span-2 space-y-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                  <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+                <div>
+                  <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="h-6 w-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                  <div className="h-6 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+                <div>
+                  <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          {/* Sidebar Skeleton */}
+          <div className="space-y-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="h-5 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" />
+                  <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+                <div>
+                  <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" />
+                  <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" />
+                  <div className="h-4 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -202,9 +292,18 @@ const ViewReview: React.FC = () => {
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                     {__('Trip', 'Trip')}
                   </div>
-                  <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {review.trip_title}
-                  </div>
+                  {review.trip_id ? (
+                    <a 
+                      href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${review.trip_id}`}
+                      className="text-lg font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+                    >
+                      {review.trip_title}
+                    </a>
+                  ) : (
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {review.trip_title}
+                    </div>
+                  )}
                 </div>
 
                 {/* Rating */}
@@ -260,9 +359,20 @@ const ViewReview: React.FC = () => {
                     {__('Email Address', 'Email Address')}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
-                    {review.customer_email}
+                    {review.customer_email || <span className="text-gray-400">{__('Not provided', 'Not provided')}</span>}
                   </div>
                 </div>
+                {review.customer_location && (
+                  <div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {__('Location', 'Location')}
+                    </div>
+                    <div className="text-sm text-gray-900 dark:text-white">
+                      {review.customer_location}
+                    </div>
+                  </div>
+                )}
                 {review.verified && (
                   <div>
                     <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">

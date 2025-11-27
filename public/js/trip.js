@@ -972,32 +972,105 @@
             if (!this.form) return;
 
             const formData = new FormData(this.form);
-            const data = Object.fromEntries(formData);
+            const messageBox = document.getElementById('enquiry-message-box');
+            
+            // Get values from hidden inputs for adults/children
+            const adults = document.getElementById('enquiry-adults')?.value || 1;
+            const children = document.getElementById('enquiry-children')?.value || 0;
+            
+            // Add adults and children to formData
+            formData.set('adults', adults);
+            formData.set('children', children);
 
             // Validation
-            if (!data.name || !data.email || !data.message) {
-                alert('Please fill in all required fields');
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const message = formData.get('message');
+            
+            if (!name || !email || !message) {
+                this.showMessage('error', 'Please fill in all required fields.');
+                return;
+            }
+
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                this.showMessage('error', 'Please enter a valid email address.');
+                return;
+            }
+
+            if (message.length < 10) {
+                this.showMessage('error', 'Please enter a message (at least 10 characters).');
                 return;
             }
 
             // Show loading
             const submitBtn = this.form.querySelector('.yatra-enquiry-submit');
-            const originalText = submitBtn ? submitBtn.textContent : 'Submit';
+            const originalText = submitBtn ? submitBtn.textContent : 'Send Enquiry';
             if (submitBtn) {
                 submitBtn.textContent = 'Sending...';
                 submitBtn.disabled = true;
             }
 
-            // Simulate API call (replace with actual implementation)
-            setTimeout(() => {
-                alert('Thank you for your enquiry! We will get back to you soon.');
-                this.form.reset();
-                this.close();
+            // Hide any existing messages
+            if (messageBox) {
+                messageBox.style.display = 'none';
+            }
+
+            // Submit via AJAX
+            fetch(window.yatraAjax?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    this.showMessage('success', result.data.message || 'Thank you for your enquiry! We will get back to you soon.');
+                    this.form.reset();
+                    
+                    // Reset the travelers display
+                    const display = document.getElementById('enquiry-participants-display');
+                    if (display) {
+                        display.textContent = 'Adult x 1';
+                    }
+                    const adultsInput = document.getElementById('enquiry-adults');
+                    const childrenInput = document.getElementById('enquiry-children');
+                    if (adultsInput) adultsInput.value = 1;
+                    if (childrenInput) childrenInput.value = 0;
+                    
+                    // Close modal after delay
+                    setTimeout(() => {
+                        this.close();
+                        if (messageBox) {
+                            messageBox.style.display = 'none';
+                        }
+                    }, 3000);
+                } else {
+                    this.showMessage('error', result.data?.message || 'Failed to submit enquiry. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Enquiry submission error:', error);
+                this.showMessage('error', 'An error occurred. Please try again later.');
+            })
+            .finally(() => {
                 if (submitBtn) {
                     submitBtn.textContent = originalText;
                     submitBtn.disabled = false;
                 }
-            }, 1000);
+            });
+        }
+
+        showMessage(type, text) {
+            const messageBox = document.getElementById('enquiry-message-box');
+            if (!messageBox) return;
+            
+            messageBox.style.display = 'block';
+            messageBox.className = `yatra-enquiry-message yatra-enquiry-message-${type}`;
+            messageBox.innerHTML = `<p>${text}</p>`;
+            
+            // Scroll message into view
+            messageBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 

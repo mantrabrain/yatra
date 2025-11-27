@@ -405,7 +405,7 @@ const Payments: React.FC = () => {
                 placeholder={__('Search payments...', 'Search payments...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-9"
               />
             </div>
 
@@ -413,7 +413,7 @@ const Payments: React.FC = () => {
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
               <option value="completed">{__('Completed', 'Completed')}</option>
@@ -427,7 +427,7 @@ const Payments: React.FC = () => {
             <Select
               value={methodFilter}
               onChange={(e) => setMethodFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="all">{__('All Methods', 'All Methods')}</option>
               <option value="Credit Card">{__('Credit Card', 'Credit Card')}</option>
@@ -440,7 +440,7 @@ const Payments: React.FC = () => {
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="payment_date">{__('Payment Date', 'Payment Date')}</option>
               <option value="payment_number">{__('Payment Number', 'Payment Number')}</option>
@@ -454,7 +454,7 @@ const Payments: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-9 px-3 flex items-center gap-1.5"
+              className="px-3 flex items-center gap-1.5"
               title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
             >
               {sortOrder === 'asc' ? (
@@ -470,7 +470,7 @@ const Payments: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
-                className="flex items-center gap-2 h-9"
+                className="flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
                 {__('Reset', 'Reset')}

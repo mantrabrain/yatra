@@ -470,7 +470,6 @@ const TravelerCategoryForm: React.FC = () => {
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value as 'draft' | 'publish' | 'trash')}
-                      className="h-9"
                     >
                       <option value="draft">{__('Draft', 'Draft')}</option>
                       <option value="publish">{__('Publish', 'Publish')}</option>

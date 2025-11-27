@@ -458,16 +458,16 @@ const Activities: React.FC = () => {
       {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
         <CardContent className="p-3">
-          <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
+          <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
             {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className="relative min-w-0 w-full lg:flex-[2]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
                 placeholder={__('Search activities...', 'Search activities...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-10 w-full"
               />
             </div>
 
@@ -475,7 +475,7 @@ const Activities: React.FC = () => {
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full lg:flex-1"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
               <option value="draft">{__('Draft', 'Draft')}</option>
@@ -487,7 +487,7 @@ const Activities: React.FC = () => {
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full lg:flex-1"
             >
               <option value="name">{__('Name', 'Name')}</option>
               <option value="status">{__('Status', 'Status')}</option>
@@ -499,7 +499,7 @@ const Activities: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-9 px-3 flex items-center gap-1.5"
+              className="h-11 px-4 flex items-center gap-1.5 flex-shrink-0"
               title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
             >
               {sortOrder === 'asc' ? (
@@ -515,7 +515,7 @@ const Activities: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
-                className="flex items-center gap-2 h-9"
+                className="h-11 flex items-center gap-2 flex-shrink-0"
               >
                 <X className="w-4 h-4" />
                 {__('Reset', 'Reset')}

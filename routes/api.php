@@ -31,6 +31,8 @@ use Yatra\Controllers\MaintenanceController;
 use Yatra\Controllers\ModuleController;
 use Yatra\Controllers\CustomerController;
 use Yatra\Controllers\ReviewController;
+use Yatra\Controllers\EnquiryController;
+use Yatra\Controllers\PaymentGatewayController;
 
 // Register Trip routes
 if (class_exists('Yatra\Controllers\TripController')) {
@@ -365,6 +367,48 @@ if (class_exists('Yatra\Controllers\ReviewController')) {
     } catch (\Exception $e) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Yatra: Failed to register Review routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
+
+// Register Enquiry routes
+if (class_exists('Yatra\Controllers\EnquiryController')) {
+    try {
+        $enquiry_controller = new EnquiryController();
+        $enquiry_controller->register_routes();
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $enquiry_routes = array_filter($routes, function($key) {
+                return strpos($key, '/enquiries') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Enquiry routes registered: ' . print_r(array_keys($enquiry_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Enquiry routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
+
+// Register Payment Gateway routes
+if (class_exists('Yatra\Controllers\PaymentGatewayController')) {
+    try {
+        $payment_controller = new PaymentGatewayController();
+        $payment_controller->register_routes();
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $payment_routes = array_filter($routes, function($key) {
+                return strpos($key, '/payment') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Payment Gateway routes registered: ' . print_r(array_keys($payment_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Payment Gateway routes: ' . $e->getMessage());
             error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
         }
     }

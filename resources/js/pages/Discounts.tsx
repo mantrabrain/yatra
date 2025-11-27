@@ -256,7 +256,7 @@ const Discounts: React.FC = () => {
                 placeholder={__('Search by code...', 'Search by code...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-9"
               />
             </div>
 
@@ -264,7 +264,7 @@ const Discounts: React.FC = () => {
             <Select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
               <option value="active">{__('Active', 'Active')}</option>
@@ -276,7 +276,7 @@ const Discounts: React.FC = () => {
             <Select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="all">{__('All Types', 'All Types')}</option>
               <option value="percentage">{__('Percentage', 'Percentage')}</option>
@@ -287,7 +287,7 @@ const Discounts: React.FC = () => {
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40 h-9"
+              className="w-full md:w-40"
             >
               <option value="created_at">{__('Created Date', 'Created Date')}</option>
               <option value="code">{__('Code', 'Code')}</option>
@@ -302,7 +302,7 @@ const Discounts: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-9 px-3 flex items-center gap-1.5"
+              className="px-3 flex items-center gap-1.5"
               title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
             >
               {sortOrder === 'asc' ? (
@@ -318,7 +318,7 @@ const Discounts: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={handleResetFilters}
-                className="flex items-center gap-2 h-9"
+                className="flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
                 {__('Reset', 'Reset')}

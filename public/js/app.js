@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, B as BadgePercent, h as CreditCard, i as Calendar$1, U as Users, k as MessageSquare, S as Star, l as BarChart3, P as Puzzle, m as Settings$1, n as ChevronDown, o as ChevronRight, p as RefreshCw, q as Loader2, s as Sun, t as Moon, v as Bell, w as User, x as Clock, D as DollarSign, y as ArrowRight, I as Info, z as Plane, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Mail, ar as Lightbulb, as as Database, at as History, au as Save, av as Sparkles, aw as ChevronLeft, ax as Box, ay as ChevronUp, az as Upload, aA as Check, aB as ArrowLeft, aC as Pen, aD as React, aE as Phone, aF as Download, aG as TrendingDown, aH as Globe, aI as PieChart, aJ as Receipt, aK as Plug, aL as Shield, aM as MoreVertical, aN as Lock, aO as Ban, aP as Crown, aQ as reactDomExports, aR as Filter, aS as QueryClient, aT as client, aU as QueryClientProvider } from "./react-vendor-hhdpRrBt.js";
-import { u as useToast, _ as __, a as apiClient, T as ToastProvider } from "./index-Ce6YHESX.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, B as BadgePercent, h as CreditCard, i as Calendar$1, U as Users, k as MessageSquare, S as Star, l as BarChart3, P as Puzzle, m as Settings$1, n as ChevronDown, o as ChevronRight, p as RefreshCw, q as Loader2, s as Sun, t as Moon, v as Bell, w as User, x as Clock, D as DollarSign, y as ArrowRight, I as Info, z as Plane, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Mail, ar as Lightbulb, as as Database, at as History, au as Save, av as Sparkles, aw as ChevronLeft, ax as Box, ay as ChevronUp, az as Upload, aA as Check, aB as ArrowLeft, aC as Pen, aD as React, aE as Phone, aF as Download, aG as TrendingDown, aH as Globe, aI as PieChart, aJ as Receipt, aK as Plug, aL as Shield, aM as MoreVertical, aN as Lock, aO as Ban, aP as Send, aQ as Crown, aR as reactDomExports, aS as Filter, aT as QueryClient, aU as client, aV as QueryClientProvider } from "./react-vendor-w_BXJx_V.js";
+import { u as useToast, _ as __, a as apiClient, T as ToastProvider } from "./index-Cw8HVASZ.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -1958,7 +1958,7 @@ const Trips = () => {
                 placeholder: __("Search by trip name...", "Search by trip name..."),
                 value: searchTerm,
                 onChange: (e) => setSearchTerm(e.target.value),
-                className: "pl-10 h-10 w-full",
+                className: "pl-10 w-full",
                 title: __("Type to search for trips by name", "Type to search for trips by name")
               }
             )
@@ -1968,7 +1968,7 @@ const Trips = () => {
             {
               value: statusFilter,
               onChange: (e) => setStatusFilter(e.target.value),
-              className: "w-full h-10",
+              className: "w-full",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "published", children: __("Published", "Published") }),
@@ -1985,7 +1985,7 @@ const Trips = () => {
             {
               value: sortBy,
               onChange: (e) => setSortBy(e.target.value),
-              className: "w-full h-10",
+              className: "w-full",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "title", children: __("Title", "Title") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "price", children: __("Price", "Price") }),
@@ -1999,7 +1999,7 @@ const Trips = () => {
             {
               variant: "outline",
               onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-              className: "h-10 px-4 flex items-center gap-2 w-full lg:w-auto",
+              className: "px-4 flex items-center gap-2 w-full lg:w-auto",
               title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
               children: [
                 sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -2012,7 +2012,7 @@ const Trips = () => {
             {
               variant: "outline",
               onClick: handleResetFilters,
-              className: "flex items-center gap-2 h-10 w-full lg:w-auto",
+              className: "flex items-center gap-2 w-full lg:w-auto",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: __("Reset", "Reset") })
@@ -8552,9 +8552,9 @@ const Activities = () => {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-2 items-stretch lg:items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
@@ -8562,7 +8562,7 @@ const Activities = () => {
             placeholder: __("Search activities...", "Search activities..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-10 w-full"
           }
         )
       ] }),
@@ -8571,7 +8571,7 @@ const Activities = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
@@ -8585,7 +8585,7 @@ const Activities = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "name", children: __("Name", "Name") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: __("Status", "Status") }),
@@ -8599,7 +8599,7 @@ const Activities = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-9 px-3 flex items-center gap-1.5",
+          className: "h-11 px-4 flex items-center gap-1.5 flex-shrink-0",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -8612,7 +8612,7 @@ const Activities = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "h-11 flex items-center gap-2 flex-shrink-0",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -9545,7 +9545,6 @@ const ActivityForm = () => {
                 id: "status",
                 value: formData.status,
                 onChange: (e) => handleFieldChange("status", e.target.value),
-                className: "h-9",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
@@ -9773,9 +9772,9 @@ const Destinations = () => {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-2 items-stretch lg:items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
@@ -9783,7 +9782,7 @@ const Destinations = () => {
             placeholder: __("Search destinations...", "Search destinations..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-10"
+            className: "pl-10 w-full"
           }
         )
       ] }),
@@ -9792,7 +9791,7 @@ const Destinations = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:min-w-[180px] h-10",
+          className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
@@ -9806,7 +9805,7 @@ const Destinations = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:min-w-[170px] h-10",
+          className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "name", children: __("Name", "Name") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: __("Status", "Status") }),
@@ -9820,7 +9819,7 @@ const Destinations = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-10 px-3 flex items-center gap-1.5",
+          className: "h-11 px-4 flex items-center gap-1.5 flex-shrink-0",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -9833,7 +9832,7 @@ const Destinations = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-10",
+          className: "h-11 flex items-center gap-2 flex-shrink-0",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -10631,9 +10630,9 @@ const Categories = () => {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-2 items-stretch lg:items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
@@ -10641,7 +10640,7 @@ const Categories = () => {
             placeholder: __("Search categories...", "Search categories..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-10"
+            className: "pl-10 w-full"
           }
         )
       ] }),
@@ -10650,7 +10649,7 @@ const Categories = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:min-w-[180px] h-10",
+          className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
@@ -10664,7 +10663,7 @@ const Categories = () => {
         {
           value: parentFilter,
           onChange: (e) => setParentFilter(e.target.value),
-          className: "w-full md:min-w-[200px] h-10",
+          className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Categories", "All Categories") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "top-level", children: __("Top Level Only", "Top Level Only") }),
@@ -10677,7 +10676,7 @@ const Categories = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "h-11 flex items-center gap-2 flex-shrink-0",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -11247,9 +11246,9 @@ const DifficultyLevels = () => {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-2 items-stretch lg:items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
@@ -11257,17 +11256,17 @@ const DifficultyLevels = () => {
             placeholder: __("Search difficulty levels...", "Search difficulty levels..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-10 w-full"
           }
         )
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: statusFilter, onChange: (e) => setStatusFilter(e.target.value), className: "w-full md:min-w-[180px] h-10", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: statusFilter, onChange: (e) => setStatusFilter(e.target.value), className: "w-full lg:flex-1", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Trash", "Trash") })
       ] }),
-      hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: handleResetFilters, className: "flex items-center gap-2 h-9", children: [
+      hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: handleResetFilters, className: "h-11 flex items-center gap-2 flex-shrink-0", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
         __("Reset", "Reset")
       ] })
@@ -11632,7 +11631,7 @@ const DifficultyLevelForm = () => {
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "status", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Status", "Status") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { id: "status", value: formData.status, onChange: (e) => handleFieldChange("status", e.target.value), className: "w-full h-10", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { id: "status", value: formData.status, onChange: (e) => handleFieldChange("status", e.target.value), className: "w-full", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Trash", "Trash") })
@@ -12025,7 +12024,7 @@ const Bookings = () => {
             placeholder: __("Search bookings...", "Search bookings..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-10 h-10 w-full"
+            className: "pl-10 w-full"
           }
         )
       ] }),
@@ -12034,7 +12033,7 @@ const Bookings = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full h-10",
+          className: "w-full",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "confirmed", children: __("Confirmed", "Confirmed") }),
@@ -12049,7 +12048,7 @@ const Bookings = () => {
         {
           value: paymentFilter,
           onChange: (e) => setPaymentFilter(e.target.value),
-          className: "w-full h-10",
+          className: "w-full",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Payments", "All Payments") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "paid", children: __("Paid", "Paid") }),
@@ -12064,7 +12063,7 @@ const Bookings = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full h-10",
+          className: "w-full",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booking_date", children: __("Booking Date", "Booking Date") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "travel_date", children: __("Travel Date", "Travel Date") }),
@@ -12081,7 +12080,7 @@ const Bookings = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-10 px-4 flex items-center gap-2 w-full lg:w-auto",
+          className: "px-4 flex items-center gap-2 w-full lg:w-auto",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -12094,7 +12093,7 @@ const Bookings = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-10 w-full lg:w-auto",
+          className: "flex items-center gap-2 w-full lg:w-auto",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: __("Reset", "Reset") })
@@ -13397,7 +13396,7 @@ const Customers = () => {
             placeholder: __("Search customers...", "Search customers..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-9"
           }
         )
       ] }),
@@ -13406,7 +13405,7 @@ const Customers = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "active", children: __("Active", "Active") }),
@@ -13419,7 +13418,7 @@ const Customers = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "registered_at", children: __("Registration Date", "Registration Date") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "name", children: __("Name", "Name") }),
@@ -13437,7 +13436,7 @@ const Customers = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-9 px-3 flex items-center gap-1.5",
+          className: "px-3 flex items-center gap-1.5",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -13450,7 +13449,7 @@ const Customers = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "flex items-center gap-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -14321,6 +14320,7 @@ const Reviews = () => {
         id: item.id,
         trip_id: item.trip_id,
         trip_title: item.trip_title || "Unknown Trip",
+        trip_slug: item.trip_slug || "",
         customer_name: item.customer_name || item.author_name || "Anonymous",
         customer_email: item.customer_email || item.author_email || "",
         rating: item.rating,
@@ -14465,9 +14465,9 @@ const Reviews = () => {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-2 items-stretch lg:items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:w-12 lg:flex-[2]", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
@@ -14475,7 +14475,7 @@ const Reviews = () => {
             placeholder: __("Search reviews...", "Search reviews..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-10 w-full"
           }
         )
       ] }),
@@ -14484,7 +14484,7 @@ const Reviews = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "approved", children: __("Approved", "Approved") }),
@@ -14499,7 +14499,7 @@ const Reviews = () => {
         {
           value: ratingFilter,
           onChange: (e) => setRatingFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Ratings", "All Ratings") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "5", children: __("5 Stars", "5 Stars") }),
@@ -14515,7 +14515,7 @@ const Reviews = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "created_at", children: __("Date", "Date") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trip_title", children: __("Trip", "Trip") }),
@@ -14530,11 +14530,11 @@ const Reviews = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-9 px-3 flex items-center gap-1.5",
+          className: "h-11 px-4 flex items-center gap-1.5 flex-shrink-0",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: sortOrder === "asc" ? __("Asc", "Asc") : __("Desc", "Desc") })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: sortOrder === "asc" ? __("Asc", "Asc") : __("Desc", "Desc") })
           ]
         }
       ),
@@ -14543,7 +14543,7 @@ const Reviews = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "flex items-center gap-2 h-11 flex-shrink-0",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -14552,7 +14552,36 @@ const Reviews = () => {
       )
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_view_reviews", children: [
-      error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading reviews", "Error loading reviews") }) }) : isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-gray-500", children: __("Loading reviews...", "Loading reviews...") }) }) : reviews.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-gray-500", children: __("No reviews found", "No reviews found") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading reviews", "Error loading reviews") }) }) : isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Customer", "Customer") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Rating", "Rating") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Review", "Review") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Date", "Date") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-0.5", children: [...Array(5)].map((_2, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }, i)) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }) })
+        ] }, `skeleton-${index}`)) })
+      ] }) }) }) : reviews.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-gray-500", children: __("No reviews found", "No reviews found") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
@@ -14612,56 +14641,66 @@ const Reviews = () => {
           ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
         ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: reviews.map((review) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: review.trip_title }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: review.customer_name }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: review.customer_email }),
-            review.verified && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 mt-1", children: __("Verified", "Verified") })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: renderStars(review.rating) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white mb-1", children: review.title }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 line-clamp-2", children: review.comment })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(review.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(review.created_at) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: reviews.map((review) => {
+          var _a;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: review.trip_id ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "a",
               {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleView(review),
-                className: "h-8 w-8",
-                "aria-label": __("View review", "View review"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
+                href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${review.trip_id}`,
+                className: "font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline",
+                children: review.trip_title
               }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleEdit(review),
-                className: "h-8 w-8",
-                "aria-label": __("Edit review", "Edit review"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(review),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete review", "Delete review"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, review.id)) })
+            ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-500 dark:text-gray-400", children: review.trip_title }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: review.customer_name }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: review.customer_email }),
+              review.verified && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 mt-1", children: __("Verified", "Verified") })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: renderStars(review.rating) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white mb-1", children: review.title }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 line-clamp-2", children: review.comment })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(review.status) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(review.created_at) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  variant: "ghost",
+                  size: "icon",
+                  onClick: () => handleView(review),
+                  className: "h-8 w-8",
+                  "aria-label": __("View review", "View review"),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  variant: "ghost",
+                  size: "icon",
+                  onClick: () => handleEdit(review),
+                  className: "h-8 w-8",
+                  "aria-label": __("Edit review", "Edit review"),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  variant: "ghost",
+                  size: "icon",
+                  onClick: () => handleDelete(review),
+                  className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
+                  "aria-label": __("Delete review", "Delete review"),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
+                }
+              ) })
+            ] }) })
+          ] }, review.id);
+        }) })
       ] }) }) }),
       total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
@@ -15043,7 +15082,6 @@ const ReviewForm = () => {
                   id: "status",
                   value: formData.status,
                   onChange: (e) => handleFieldChange("status", e.target.value),
-                  className: "h-9",
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "Pending") }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "approved", children: __("Approved", "Approved") }),
@@ -15103,6 +15141,7 @@ const ReviewForm = () => {
   ] });
 };
 const ViewReview = () => {
+  var _a;
   const { can } = usePermissions();
   const reviewId = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -15112,25 +15151,23 @@ const ViewReview = () => {
     queryKey: ["review", reviewId],
     queryFn: async () => {
       if (!reviewId) return null;
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split("T")[0];
-      };
+      const response = await apiClient.get(`/reviews/${reviewId}`);
+      const data = (response == null ? void 0 : response.data) || response;
       return {
-        id: reviewId,
-        trip_id: 1,
-        trip_title: "Everest Base Camp Trek",
-        customer_name: "John Smith",
-        customer_email: "john.smith@example.com",
-        rating: 5,
-        title: "Amazing Experience!",
-        comment: "This was the trip of a lifetime. The guides were knowledgeable and the scenery was breathtaking. Every day brought new adventures and unforgettable memories. The team was professional, the accommodations were comfortable, and the food was excellent. I would highly recommend this trip to anyone looking for an authentic mountain trekking experience.",
-        status: "approved",
-        verified: true,
-        created_at: getDate(5),
-        updated_at: getDate(2)
+        id: data.id,
+        trip_id: data.trip_id,
+        trip_title: data.trip_title || "Unknown Trip",
+        trip_slug: data.trip_slug || "",
+        customer_name: data.customer_name || data.author_name || "Anonymous",
+        customer_email: data.customer_email || data.author_email || "",
+        customer_location: data.customer_location || data.author_location || "",
+        rating: data.rating,
+        title: data.title || "",
+        comment: data.comment || data.content || "",
+        status: data.status || "pending",
+        verified: data.verified || false,
+        created_at: data.created_at || "",
+        updated_at: data.updated_at || ""
       };
     },
     enabled: !!reviewId && can("yatra_view_reviews")
@@ -15185,17 +15222,78 @@ const ViewReview = () => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${statusInfo.className}`, children: statusInfo.label });
   };
   const handleBack = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=reviews`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=reviews`;
   };
   const handleEdit = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=reviews&action=edit&id=${reviewId}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=reviews&action=edit&id=${reviewId}`;
   };
   if (isLoading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-gray-600 dark:text-gray-400", children: __("Loading review...", "Loading review...") })
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PageHeader,
+        {
+          title: __("Review Details", "Review Details"),
+          description: __("View complete review information", "View complete review information"),
+          actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: handleBack, className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
+            __("Back", "Back")
+          ] })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex gap-1", children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }, i)) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] })
+            ] })
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+            ] }) })
+          ] })
+        ] })
+      ] })
     ] });
   }
   if (error || !review) {
@@ -15264,7 +15362,14 @@ const ViewReview = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Trip", "Trip") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: review.trip_title })
+            review.trip_id ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "a",
+              {
+                href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${review.trip_id}`,
+                className: "text-lg font-semibold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline",
+                children: review.trip_title
+              }
+            ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: review.trip_title })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2", children: __("Rating", "Rating") }),
@@ -15293,7 +15398,14 @@ const ViewReview = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3" }),
                 __("Email Address", "Email Address")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: review.customer_email })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: review.customer_email || /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: __("Not provided", "Not provided") }) })
+            ] }),
+            review.customer_location && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3 h-3" }),
+                __("Location", "Location")
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: review.customer_location })
             ] }),
             review.verified && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400", children: __("Verified Purchase", "Verified Purchase") }) })
           ] })
@@ -16104,6 +16216,8 @@ const Settings = () => {
   const [viewingSection, setViewingSection] = reactExports.useState(getInitialActiveSection());
   const [isSaving, setIsSaving] = reactExports.useState(false);
   const [expandedGateways, setExpandedGateways] = reactExports.useState({});
+  const [gatewayOrder, setGatewayOrder] = reactExports.useState([]);
+  const [draggedGateway, setDraggedGateway] = reactExports.useState(null);
   reactExports.useEffect(() => {
     setViewingSection(activeSection);
   }, [activeSection]);
@@ -16125,6 +16239,20 @@ const Settings = () => {
     staleTime: Infinity,
     retry: 1,
     retryDelay: 1e3
+  });
+  const { data: gatewayDefinitions } = useQuery({
+    queryKey: ["payment-gateways-definitions"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/payment/gateways/definitions");
+        return response.gateways || {};
+      } catch (error) {
+        console.error("Failed to load gateway definitions:", error);
+        return {};
+      }
+    },
+    enabled: can("manage_yatra"),
+    staleTime: Infinity
   });
   const defaultSettings = reactExports.useMemo(() => ({
     company_name: "Yatra Travel Agency",
@@ -16200,8 +16328,47 @@ const Settings = () => {
         api_key: "",
         api_secret: "",
         test_mode: true
+      },
+      bank_transfer: {
+        enabled: false,
+        title: "Bank Transfer",
+        description: "Accept manual bank transfer payments",
+        api_key: "",
+        // Used for bank account name
+        api_secret: "",
+        // Used for bank account number
+        public_key: "",
+        // Used for bank name
+        private_key: ""
+        // Used for routing/SWIFT code
+      },
+      esewa: {
+        enabled: false,
+        title: "eSewa",
+        description: "Accept payments via eSewa (Nepal)",
+        api_key: "",
+        api_secret: "",
+        test_mode: true
+      },
+      khalti: {
+        enabled: false,
+        title: "Khalti",
+        description: "Accept payments via Khalti (Nepal)",
+        api_key: "",
+        api_secret: "",
+        test_mode: true
+      },
+      pay_later: {
+        enabled: false,
+        title: "Book Now, Pay Later",
+        description: "Allow customers to reserve now and pay before the trip",
+        api_key: "",
+        // Used for payment deadline days
+        api_secret: ""
+        // Used for auto-cancel days
       }
     },
+    gateway_order: ["pay_later", "stripe", "paypal", "razorpay", "square", "authorize_net", "bank_transfer", "esewa", "khalti"],
     admin_email: "admin@yatra.com",
     from_email: "noreply@yatra.com",
     from_name: "Yatra Travel",
@@ -16282,13 +16449,35 @@ const Settings = () => {
   React.useEffect(() => {
     if (isInitializedRef.current) return;
     if (settings) {
-      setFormData(settings);
+      const mergedSettings = {
+        ...defaultSettings,
+        ...settings,
+        // Ensure gateway_configs from defaults are merged with any saved configs
+        gateway_configs: {
+          ...defaultSettings.gateway_configs,
+          ...settings.gateway_configs || {}
+        }
+      };
+      setFormData(mergedSettings);
       isInitializedRef.current = true;
     } else if (!isLoading && !settings) {
       setFormData(defaultSettings);
       isInitializedRef.current = true;
     }
   }, [settings, isLoading]);
+  React.useEffect(() => {
+    if (gatewayDefinitions && Object.keys(gatewayDefinitions).length > 0 && gatewayOrder.length === 0) {
+      const savedOrder = settings == null ? void 0 : settings.gateway_order;
+      if (savedOrder && Array.isArray(savedOrder) && savedOrder.length > 0) {
+        const allGateways = Object.keys(gatewayDefinitions);
+        const validSavedOrder = savedOrder.filter((id) => allGateways.includes(id));
+        const newGateways = allGateways.filter((id) => !validSavedOrder.includes(id));
+        setGatewayOrder([...validSavedOrder, ...newGateways]);
+      } else {
+        setGatewayOrder(Object.keys(gatewayDefinitions));
+      }
+    }
+  }, [gatewayDefinitions, settings == null ? void 0 : settings.gateway_order, gatewayOrder.length]);
   const handleFieldChange = React.useCallback((e) => {
     const field = e.target.name || e.target.id;
     let value;
@@ -16317,9 +16506,64 @@ const Settings = () => {
       configs[gateway] = { ...existingConfig, [field]: value };
       return { ...prev, gateway_configs: configs };
     });
+    if (field === "enabled" && value === true) {
+      setExpandedGateways((prev) => ({ ...prev, [gateway]: true }));
+    }
+    if (field === "enabled" && value === false) {
+      setExpandedGateways((prev) => ({ ...prev, [gateway]: false }));
+    }
   }, []);
   const toggleGatewayExpanded = (gateway) => {
     setExpandedGateways((prev) => ({ ...prev, [gateway]: !prev[gateway] }));
+  };
+  const moveGatewayUp = (gatewayId) => {
+    setGatewayOrder((prev) => {
+      const index = prev.indexOf(gatewayId);
+      if (index <= 0) return prev;
+      const newOrder = [...prev];
+      [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+      setFormData((current) => current ? { ...current, gateway_order: newOrder } : current);
+      return newOrder;
+    });
+  };
+  const moveGatewayDown = (gatewayId) => {
+    setGatewayOrder((prev) => {
+      const index = prev.indexOf(gatewayId);
+      if (index < 0 || index >= prev.length - 1) return prev;
+      const newOrder = [...prev];
+      [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+      setFormData((current) => current ? { ...current, gateway_order: newOrder } : current);
+      return newOrder;
+    });
+  };
+  const handleDragStart = (e, gatewayId) => {
+    setDraggedGateway(gatewayId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+  const handleDrop = (e, targetGatewayId) => {
+    e.preventDefault();
+    if (!draggedGateway || draggedGateway === targetGatewayId) {
+      setDraggedGateway(null);
+      return;
+    }
+    setGatewayOrder((prev) => {
+      const dragIndex = prev.indexOf(draggedGateway);
+      const dropIndex = prev.indexOf(targetGatewayId);
+      if (dragIndex < 0 || dropIndex < 0) return prev;
+      const newOrder = [...prev];
+      newOrder.splice(dragIndex, 1);
+      newOrder.splice(dropIndex, 0, draggedGateway);
+      setFormData((current) => current ? { ...current, gateway_order: newOrder } : current);
+      return newOrder;
+    });
+    setDraggedGateway(null);
+  };
+  const handleDragEnd = () => {
+    setDraggedGateway(null);
   };
   const saveMutation = useMutation({
     mutationFn: async (data) => {
@@ -16849,330 +17093,162 @@ const Settings = () => {
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Payment Gateways", "Payment Gateways") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: Object.entries(formData.gateway_configs || {}).map(([gateway, config]) => /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border border-gray-200 dark:border-gray-700", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "input",
-                  {
-                    type: "checkbox",
-                    id: `gateway_enable_${gateway}`,
-                    checked: config.enabled,
-                    onChange: (e) => handleGatewayConfigChange(gateway, "enabled", e.target.checked),
-                    className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-sm font-semibold", children: config.title }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: config.description })
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-3.5 h-3.5" }),
+            __("Drag and drop to reorder gateways. Use arrows for precise positioning.", "Drag and drop to reorder gateways. Use arrows for precise positioning.")
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+            gatewayDefinitions && gatewayOrder.filter((id) => gatewayDefinitions[id]).map((gatewayId, index) => {
+              var _a2, _b;
+              const gateway = gatewayDefinitions[gatewayId];
+              const config = ((_a2 = formData.gateway_configs) == null ? void 0 : _a2[gatewayId]) || gateway.config || { enabled: false };
+              const isExpanded = expandedGateways[gatewayId];
+              const isDragging = draggedGateway === gatewayId;
+              return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Card,
                 {
-                  variant: "ghost",
-                  size: "sm",
-                  onClick: () => toggleGatewayExpanded(gateway),
-                  className: "h-8",
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    ChevronRight,
-                    {
-                      className: `w-4 h-4 transition-transform ${expandedGateways[gateway] ? "rotate-90" : ""}`
-                    }
-                  )
-                }
-              )
-            ] }) }),
-            expandedGateways[gateway] && config.enabled && /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "pt-0 space-y-4", children: [
-              gateway === "stripe" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `stripe_api_key`,
-                    label: __("Publishable Key", "Publishable Key"),
-                    description: __("Your Stripe publishable API key", "Your Stripe publishable API key"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "text",
-                        value: config.api_key || "",
-                        onChange: (e) => handleGatewayConfigChange("stripe", "api_key", e.target.value),
-                        placeholder: "pk_test_..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `stripe_api_secret`,
-                    label: __("Secret Key", "Secret Key"),
-                    description: __("Your Stripe secret API key (keep this secure)", "Your Stripe secret API key (keep this secure)"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "password",
-                        value: config.api_secret || "",
-                        onChange: (e) => handleGatewayConfigChange("stripe", "api_secret", e.target.value),
-                        placeholder: "sk_test_..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `stripe_webhook_secret`,
-                    label: __("Webhook Secret", "Webhook Secret"),
-                    description: __("Stripe webhook signing secret for payment verification", "Stripe webhook signing secret for payment verification"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "password",
-                        value: config.webhook_secret || "",
-                        onChange: (e) => handleGatewayConfigChange("stripe", "webhook_secret", e.target.value),
-                        placeholder: "whsec_..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      type: "checkbox",
-                      id: `stripe_test_mode`,
-                      checked: config.test_mode || false,
-                      onChange: (e) => handleGatewayConfigChange("stripe", "test_mode", e.target.checked),
-                      className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(Label, { htmlFor: `stripe_test_mode`, className: "font-normal cursor-pointer", children: [
-                    __("Test Mode", "Test Mode"),
-                    " - ",
-                    __("Use test API keys", "Use test API keys")
-                  ] })
-                ] })
-              ] }),
-              gateway === "paypal" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `paypal_client_id`,
-                    label: __("Client ID", "Client ID"),
-                    description: __("Your PayPal application client ID", "Your PayPal application client ID"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "text",
-                        value: config.client_id || "",
-                        onChange: (e) => handleGatewayConfigChange("paypal", "client_id", e.target.value),
-                        placeholder: "AeA1QIZXiflr1..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `paypal_client_secret`,
-                    label: __("Client Secret", "Client Secret"),
-                    description: __("Your PayPal application client secret (keep this secure)", "Your PayPal application client secret (keep this secure)"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "password",
-                        value: config.client_secret || "",
-                        onChange: (e) => handleGatewayConfigChange("paypal", "client_secret", e.target.value),
-                        placeholder: "EC..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      type: "checkbox",
-                      id: `paypal_sandbox`,
-                      checked: config.sandbox || false,
-                      onChange: (e) => handleGatewayConfigChange("paypal", "sandbox", e.target.checked),
-                      className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs(Label, { htmlFor: `paypal_sandbox`, className: "font-normal cursor-pointer", children: [
-                    __("Sandbox Mode", "Sandbox Mode"),
-                    " - ",
-                    __("Use PayPal sandbox for testing", "Use PayPal sandbox for testing")
-                  ] })
-                ] })
-              ] }),
-              gateway === "razorpay" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `razorpay_api_key`,
-                    label: __("Key ID", "Key ID"),
-                    description: __("Your Razorpay key ID", "Your Razorpay key ID"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "text",
-                        value: config.api_key || "",
-                        onChange: (e) => handleGatewayConfigChange("razorpay", "api_key", e.target.value),
-                        placeholder: "rzp_test_..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `razorpay_api_secret`,
-                    label: __("Key Secret", "Key Secret"),
-                    description: __("Your Razorpay key secret (keep this secure)", "Your Razorpay key secret (keep this secure)"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "password",
-                        value: config.api_secret || "",
-                        onChange: (e) => handleGatewayConfigChange("razorpay", "api_secret", e.target.value),
-                        placeholder: "..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      type: "checkbox",
-                      id: `razorpay_test_mode`,
-                      checked: config.test_mode || false,
-                      onChange: (e) => handleGatewayConfigChange("razorpay", "test_mode", e.target.checked),
-                      className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: `razorpay_test_mode`, className: "font-normal cursor-pointer", children: __("Test Mode", "Test Mode") })
-                ] })
-              ] }),
-              gateway === "square" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `square_api_key`,
-                    label: __("Application ID", "Application ID"),
-                    description: __("Your Square application ID", "Your Square application ID"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "text",
-                        value: config.api_key || "",
-                        onChange: (e) => handleGatewayConfigChange("square", "api_key", e.target.value),
-                        placeholder: "sandbox-sq0idb-..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `square_api_secret`,
-                    label: __("Access Token", "Access Token"),
-                    description: __("Your Square access token (keep this secure)", "Your Square access token (keep this secure)"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "password",
-                        value: config.api_secret || "",
-                        onChange: (e) => handleGatewayConfigChange("square", "api_secret", e.target.value),
-                        placeholder: "EAA..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `square_location_id`,
-                    label: __("Location ID", "Location ID"),
-                    description: __("Your Square location ID", "Your Square location ID"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "text",
-                        value: config.merchant_id || "",
-                        onChange: (e) => handleGatewayConfigChange("square", "merchant_id", e.target.value),
-                        placeholder: "..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      type: "checkbox",
-                      id: `square_sandbox`,
-                      checked: config.sandbox || false,
-                      onChange: (e) => handleGatewayConfigChange("square", "sandbox", e.target.checked),
-                      className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: `square_sandbox`, className: "font-normal cursor-pointer", children: __("Sandbox Mode", "Sandbox Mode") })
-                ] })
-              ] }),
-              gateway === "authorize_net" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `authnet_api_key`,
-                    label: __("API Login ID", "API Login ID"),
-                    description: __("Your Authorize.net API login ID", "Your Authorize.net API login ID"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "text",
-                        value: config.api_key || "",
-                        onChange: (e) => handleGatewayConfigChange("authorize_net", "api_key", e.target.value),
-                        placeholder: "..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  FormField,
-                  {
-                    id: `authnet_api_secret`,
-                    label: __("Transaction Key", "Transaction Key"),
-                    description: __("Your Authorize.net transaction key (keep this secure)", "Your Authorize.net transaction key (keep this secure)"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "password",
-                        value: config.api_secret || "",
-                        onChange: (e) => handleGatewayConfigChange("authorize_net", "api_secret", e.target.value),
-                        placeholder: "..."
-                      }
-                    )
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      type: "checkbox",
-                      id: `authnet_test_mode`,
-                      checked: config.test_mode || false,
-                      onChange: (e) => handleGatewayConfigChange("authorize_net", "test_mode", e.target.checked),
-                      className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: `authnet_test_mode`, className: "font-normal cursor-pointer", children: __("Test Mode", "Test Mode") })
-                ] })
-              ] })
-            ] })
-          ] }, gateway)) })
+                  className: `border transition-all ${isDragging ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20 opacity-75" : config.enabled ? "border-green-200 dark:border-green-800" : "border-gray-200 dark:border-gray-700"}`,
+                  draggable: true,
+                  onDragStart: (e) => handleDragStart(e, gatewayId),
+                  onDragOver: handleDragOver,
+                  onDrop: (e) => handleDrop(e, gatewayId),
+                  onDragEnd: handleDragEnd,
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300", children: /* @__PURE__ */ jsxRuntimeExports.jsx(GripVertical, { className: "w-4 h-4" }) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-0.5", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: () => moveGatewayUp(gatewayId),
+                              disabled: index === 0,
+                              className: "p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed",
+                              title: __("Move up", "Move up"),
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3 h-3" })
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: () => moveGatewayDown(gatewayId),
+                              disabled: index === gatewayOrder.length - 1,
+                              className: "p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed",
+                              title: __("Move down", "Move down"),
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3 h-3" })
+                            }
+                          )
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "input",
+                          {
+                            type: "checkbox",
+                            id: `gateway_enable_${gatewayId}`,
+                            checked: config.enabled || false,
+                            onChange: (e) => handleGatewayConfigChange(gatewayId, "enabled", e.target.checked),
+                            className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                          gateway.icon && /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: gateway.icon, alt: gateway.title, className: "w-6 h-6 object-contain" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-sm font-semibold flex items-center gap-2", children: [
+                              gateway.title,
+                              config.enabled && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-normal px-1.5 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded", children: __("Active", "Active") })
+                            ] }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: gateway.description })
+                          ] })
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Button,
+                        {
+                          variant: "ghost",
+                          size: "sm",
+                          onClick: () => toggleGatewayExpanded(gatewayId),
+                          className: "h-8",
+                          disabled: !((_b = gateway.fields) == null ? void 0 : _b.length),
+                          children: isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4" })
+                        }
+                      )
+                    ] }) }),
+                    isExpanded && gateway.fields && /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "pt-4 space-y-4 border-t border-gray-100 dark:border-gray-700", children: [
+                      gateway.is_offline && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-700 dark:text-blue-300", children: gateway.id === "pay_later" ? __("Allow customers to book now and pay later. Payment must be completed before the trip date.", "Allow customers to book now and pay later. Payment must be completed before the trip date.") : __("This is an offline payment method. Customers will be shown these details after booking.", "This is an offline payment method. Customers will be shown these details after booking.") }) }),
+                      gateway.fields.map((field) => {
+                        if (field.condition && !config[field.condition]) {
+                          return null;
+                        }
+                        if (field.type === "checkbox") {
+                          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "input",
+                              {
+                                type: "checkbox",
+                                id: `${gatewayId}_${field.id}`,
+                                checked: config[field.id] || false,
+                                onChange: (e) => handleGatewayConfigChange(gatewayId, field.id, e.target.checked),
+                                className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              }
+                            ),
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs(Label, { htmlFor: `${gatewayId}_${field.id}`, className: "font-normal cursor-pointer", children: [
+                              field.label,
+                              " ",
+                              field.description && `- ${field.description}`
+                            ] })
+                          ] }, field.id);
+                        }
+                        if (field.type === "textarea") {
+                          return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            FormField,
+                            {
+                              id: `${gatewayId}_${field.id}`,
+                              label: field.label,
+                              description: field.description,
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                "textarea",
+                                {
+                                  value: config[field.id] || field.default || "",
+                                  onChange: (e) => handleGatewayConfigChange(gatewayId, field.id, e.target.value),
+                                  placeholder: field.placeholder,
+                                  className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none",
+                                  rows: 3
+                                }
+                              )
+                            },
+                            field.id
+                          );
+                        }
+                        return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          FormField,
+                          {
+                            id: `${gatewayId}_${field.id}`,
+                            label: field.label,
+                            description: field.description,
+                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              Input,
+                              {
+                                type: field.type,
+                                value: config[field.id] ?? field.default ?? "",
+                                onChange: (e) => handleGatewayConfigChange(gatewayId, field.id, field.type === "number" ? parseFloat(e.target.value) || 0 : e.target.value),
+                                placeholder: field.placeholder,
+                                min: field.min,
+                                max: field.max
+                              }
+                            )
+                          },
+                          field.id
+                        );
+                      })
+                    ] })
+                  ]
+                },
+                gatewayId
+              );
+            }),
+            (!gatewayDefinitions || Object.keys(gatewayDefinitions).length === 0) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500 dark:text-gray-400", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: __("Loading payment gateways...", "Loading payment gateways...") }) })
+          ] })
         ] });
       case "booking":
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
@@ -19095,7 +19171,7 @@ const ItemTypes = () => {
             placeholder: __("Search item types...", "Search item types..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-9"
           }
         )
       ] }),
@@ -19104,7 +19180,7 @@ const ItemTypes = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
@@ -19118,7 +19194,7 @@ const ItemTypes = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "name", children: __("Name", "Name") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: __("Status", "Status") }),
@@ -19132,7 +19208,7 @@ const ItemTypes = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-9 px-3 flex items-center gap-1.5",
+          className: "px-3 flex items-center gap-1.5",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -19145,7 +19221,7 @@ const ItemTypes = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "flex items-center gap-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -19663,7 +19739,6 @@ const ItemTypeForm = () => {
                   id: "status",
                   value: formData.status,
                   onChange: (e) => handleFieldChange("status", e.target.value),
-                  className: "h-9",
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
@@ -19904,7 +19979,7 @@ const Items = () => {
             placeholder: __("Search items...", "Search items..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-9"
           }
         )
       ] }),
@@ -19913,7 +19988,7 @@ const Items = () => {
         {
           value: typeFilter,
           onChange: (e) => setTypeFilter(e.target.value),
-          className: "w-full md:w-48 h-9",
+          className: "w-full md:w-48",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Types", "All Types") }),
             types.map((type) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: type.id, children: type.name }, type.id))
@@ -19925,7 +20000,7 @@ const Items = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
@@ -19939,7 +20014,7 @@ const Items = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "name", children: __("Name", "Name") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "type_id", children: __("Type", "Type") }),
@@ -19954,7 +20029,7 @@ const Items = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-9 px-3 flex items-center gap-1.5",
+          className: "px-3 flex items-center gap-1.5",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -19967,7 +20042,7 @@ const Items = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "flex items-center gap-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -20633,7 +20708,6 @@ const ItemForm = () => {
                 id: "status",
                 value: formData.status,
                 onChange: (e) => handleFieldChange("status", e.target.value),
-                className: "h-9",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
@@ -23677,7 +23751,7 @@ const Discounts = () => {
             placeholder: __("Search by code...", "Search by code..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-9"
           }
         )
       ] }),
@@ -23686,7 +23760,7 @@ const Discounts = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "active", children: __("Active", "Active") }),
@@ -23700,7 +23774,7 @@ const Discounts = () => {
         {
           value: typeFilter,
           onChange: (e) => setTypeFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Types", "All Types") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "percentage", children: __("Percentage", "Percentage") }),
@@ -23713,7 +23787,7 @@ const Discounts = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "created_at", children: __("Created Date", "Created Date") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "code", children: __("Code", "Code") }),
@@ -23730,7 +23804,7 @@ const Discounts = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-9 px-3 flex items-center gap-1.5",
+          className: "px-3 flex items-center gap-1.5",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -23743,7 +23817,7 @@ const Discounts = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "flex items-center gap-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -25138,7 +25212,7 @@ const Payments = () => {
             placeholder: __("Search payments...", "Search payments..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-9"
           }
         )
       ] }),
@@ -25147,7 +25221,7 @@ const Payments = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "completed", children: __("Completed", "Completed") }),
@@ -25163,7 +25237,7 @@ const Payments = () => {
         {
           value: methodFilter,
           onChange: (e) => setMethodFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Methods", "All Methods") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Credit Card", children: __("Credit Card", "Credit Card") }),
@@ -25178,7 +25252,7 @@ const Payments = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "payment_date", children: __("Payment Date", "Payment Date") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "payment_number", children: __("Payment Number", "Payment Number") }),
@@ -25194,7 +25268,7 @@ const Payments = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-9 px-3 flex items-center gap-1.5",
+          className: "px-3 flex items-center gap-1.5",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -25207,7 +25281,7 @@ const Payments = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "flex items-center gap-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -26215,7 +26289,7 @@ const TravelerCategories = () => {
             placeholder: __("Search categories...", "Search categories..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-9"
           }
         )
       ] }),
@@ -26224,7 +26298,7 @@ const TravelerCategories = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
@@ -26238,7 +26312,7 @@ const TravelerCategories = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "label", children: __("Label", "Label") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: __("Status", "Status") }),
@@ -26252,7 +26326,7 @@ const TravelerCategories = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-9 px-3 flex items-center gap-1.5",
+          className: "px-3 flex items-center gap-1.5",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -26265,7 +26339,7 @@ const TravelerCategories = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "flex items-center gap-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -26864,7 +26938,6 @@ const TravelerCategoryForm = () => {
                 id: "status",
                 value: formData.status,
                 onChange: (e) => handleFieldChange("status", e.target.value),
-                className: "h-9",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
@@ -32853,12 +32926,26 @@ const AvailabilityForm = () => {
     ] })
   ] });
 };
+const Skeleton = ({ className = "" }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "div",
+    {
+      className: `animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`
+    }
+  );
+};
 const Enquiries = () => {
+  var _a;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sortBy, setSortBy] = reactExports.useState("created_at");
   const [sortOrder, setSortOrder] = reactExports.useState("desc");
   const [page, setPage] = reactExports.useState(1);
+  const [respondDialogOpen, setRespondDialogOpen] = reactExports.useState(false);
+  const [selectedEnquiry, setSelectedEnquiry] = reactExports.useState(null);
+  const [responseMessage, setResponseMessage] = reactExports.useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = reactExports.useState(false);
+  const [enquiryToDelete, setEnquiryToDelete] = reactExports.useState(null);
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { navigate } = useNavigate();
@@ -32880,189 +32967,76 @@ const Enquiries = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["enquiries", queryParams],
     queryFn: async () => {
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split("T")[0];
-      };
-      const allEnquiries = [
-        {
-          id: 1,
-          name: "John Smith",
-          email: "john.smith@example.com",
-          phone: "+1 234-567-8900",
-          trip_title: "Everest Base Camp Trek",
-          trip_id: 1,
-          message: "I am interested in booking the Everest Base Camp Trek for 2 people. Can you provide more details about the itinerary and pricing?",
-          number_of_travelers: 2,
-          preferred_travel_date: "2026-04-15",
-          status: "new",
-          created_at: getDate(2)
-        },
-        {
-          id: 2,
-          name: "Sarah Johnson",
-          email: "sarah.j@example.com",
-          phone: "+1 345-678-9012",
-          trip_title: "Annapurna Circuit Trek",
-          trip_id: 2,
-          message: "Looking for information about the Annapurna Circuit Trek. What is the best time to visit?",
-          number_of_travelers: 1,
-          preferred_travel_date: "2026-05-20",
-          status: "responded",
-          created_at: getDate(5),
-          responded_at: getDate(4),
-          response_notes: "Sent detailed information about the trek and best seasons."
-        },
-        {
-          id: 3,
-          name: "Michael Chen",
-          email: "m.chen@example.com",
-          phone: "+86 138-0013-8000",
-          trip_title: "Kathmandu City Tour",
-          trip_id: 9,
-          message: "I would like to book a single day city tour. What are the available dates?",
-          number_of_travelers: 4,
-          preferred_travel_date: "2026-03-10",
-          status: "converted",
-          created_at: getDate(10),
-          responded_at: getDate(9),
-          response_notes: "Customer booked the tour."
-        },
-        {
-          id: 4,
-          name: "Emma Williams",
-          email: "emma.w@example.com",
-          phone: "+44 20-7946-0958",
-          trip_title: "Langtang Valley Trek",
-          trip_id: 3,
-          message: "Interested in Langtang Valley Trek for a group of 6 people. Need custom itinerary.",
-          number_of_travelers: 6,
-          preferred_travel_date: "2026-06-01",
-          status: "new",
-          created_at: getDate(1)
-        },
-        {
-          id: 5,
-          name: "David Brown",
-          email: "d.brown@example.com",
-          phone: "+61 2-9374-4000",
-          message: "General inquiry about Nepal travel packages. Looking for recommendations.",
-          number_of_travelers: 2,
-          preferred_travel_date: "2026-07-15",
-          status: "responded",
-          created_at: getDate(8),
-          responded_at: getDate(7),
-          response_notes: "Recommended several packages based on preferences."
-        },
-        {
-          id: 6,
-          name: "Lisa Anderson",
-          email: "lisa.a@example.com",
-          phone: "+1 456-789-0123",
-          trip_title: "Chitwan National Park Safari",
-          trip_id: 4,
-          message: "Want to know about the Chitwan Safari package. What animals can we see?",
-          number_of_travelers: 3,
-          preferred_travel_date: "2026-04-20",
-          status: "closed",
-          created_at: getDate(15),
-          responded_at: getDate(14),
-          response_notes: "Customer decided to book with another company."
-        },
-        {
-          id: 7,
-          name: "Robert Taylor",
-          email: "r.taylor@example.com",
-          phone: "+1 567-890-1234",
-          trip_title: "Manaslu Circuit Trek",
-          trip_id: 5,
-          message: "Interested in Manaslu Circuit Trek. Need permit information and pricing.",
-          number_of_travelers: 2,
-          preferred_travel_date: "2026-05-10",
-          status: "new",
-          created_at: getDate(0)
-        },
-        {
-          id: 8,
-          name: "Maria Garcia",
-          email: "maria.g@example.com",
-          phone: "+34 91-123-4567",
-          trip_title: "Upper Mustang Trek",
-          trip_id: 6,
-          message: "Looking for Upper Mustang Trek details. What is included in the package?",
-          number_of_travelers: 1,
-          preferred_travel_date: "2026-08-01",
-          status: "responded",
-          created_at: getDate(3),
-          responded_at: getDate(2),
-          response_notes: "Sent complete package details and inclusions."
+      var _a2, _b;
+      const params = new URLSearchParams();
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (value !== void 0 && value !== null) {
+          params.append(key, String(value));
         }
-      ];
-      let filtered = allEnquiries;
-      if (searchTerm) {
-        filtered = filtered.filter(
-          (enquiry) => {
-            var _a;
-            return enquiry.name.toLowerCase().includes(searchTerm.toLowerCase()) || enquiry.email.toLowerCase().includes(searchTerm.toLowerCase()) || enquiry.phone.toLowerCase().includes(searchTerm.toLowerCase()) || ((_a = enquiry.trip_title) == null ? void 0 : _a.toLowerCase().includes(searchTerm.toLowerCase())) || enquiry.message.toLowerCase().includes(searchTerm.toLowerCase());
-          }
-        );
-      }
-      if (statusFilter !== "all") {
-        filtered = filtered.filter((enquiry) => enquiry.status === statusFilter);
-      }
-      filtered = [...filtered].sort((a, b) => {
-        var _a, _b;
-        let aValue;
-        let bValue;
-        switch (sortBy) {
-          case "name":
-            aValue = a.name.toLowerCase();
-            bValue = b.name.toLowerCase();
-            break;
-          case "email":
-            aValue = a.email.toLowerCase();
-            bValue = b.email.toLowerCase();
-            break;
-          case "trip_title":
-            aValue = ((_a = a.trip_title) == null ? void 0 : _a.toLowerCase()) || "";
-            bValue = ((_b = b.trip_title) == null ? void 0 : _b.toLowerCase()) || "";
-            break;
-          case "status":
-            aValue = a.status;
-            bValue = b.status;
-            break;
-          case "created_at":
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-            break;
-          default:
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-        }
-        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-        return 0;
       });
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
+      const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const response = await fetch(`${baseUrl}/enquiries?${params.toString()}`, {
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch enquiries");
+      }
+      const result = await response.json();
       return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10
+        data: result.items || [],
+        total: result.total || 0,
+        page: result.page || 1,
+        per_page: result.per_page || 10
       };
     },
     enabled: can("yatra_view_bookings")
   });
   const deleteMutation = useMutation({
-    mutationFn: async (_id) => {
-      return { success: true };
+    mutationFn: async (id) => {
+      var _a2, _b;
+      const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const response = await fetch(`${baseUrl}/enquiries/${id}`, {
+        method: "DELETE",
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete enquiry");
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
+      setDeleteDialogOpen(false);
+      setEnquiryToDelete(null);
+    }
+  });
+  const respondMutation = useMutation({
+    mutationFn: async ({ id, message: message2 }) => {
+      var _a2, _b;
+      const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const response = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        },
+        body: JSON.stringify({ message: message2 })
+      });
+      if (!response.ok) {
+        const error2 = await response.json();
+        throw new Error(error2.message || "Failed to send response");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
+      setRespondDialogOpen(false);
+      setSelectedEnquiry(null);
+      setResponseMessage("");
     }
   });
   const enquiries = (data == null ? void 0 : data.data) || [];
@@ -33107,8 +33081,25 @@ const Enquiries = () => {
     navigate({ subpage: "enquiries", action: "edit", id: enquiry.id });
   };
   const handleDelete = (enquiry) => {
-    if (confirm(__("Are you sure you want to delete this enquiry?", "Are you sure you want to delete this enquiry?"))) {
-      deleteMutation.mutate(enquiry.id);
+    setEnquiryToDelete(enquiry);
+    setDeleteDialogOpen(true);
+  };
+  const confirmDelete = () => {
+    if (enquiryToDelete) {
+      deleteMutation.mutate(enquiryToDelete.id);
+    }
+  };
+  const handleRespond = (enquiry) => {
+    setSelectedEnquiry(enquiry);
+    setResponseMessage("");
+    setRespondDialogOpen(true);
+  };
+  const sendResponse = () => {
+    if (selectedEnquiry && responseMessage.trim()) {
+      respondMutation.mutate({
+        id: selectedEnquiry.id,
+        message: responseMessage
+      });
     }
   };
   const handleSort = (field) => {
@@ -33151,7 +33142,7 @@ const Enquiries = () => {
             placeholder: __("Search enquiries...", "Search enquiries..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9 h-9"
+            className: "pl-9"
           }
         )
       ] }),
@@ -33160,7 +33151,7 @@ const Enquiries = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "new", children: __("New", "New") }),
@@ -33175,7 +33166,7 @@ const Enquiries = () => {
         {
           value: sortBy,
           onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40 h-9",
+          className: "w-full md:w-40",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "created_at", children: __("Date", "Date") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "name", children: __("Name", "Name") }),
@@ -33190,7 +33181,7 @@ const Enquiries = () => {
         {
           variant: "outline",
           onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "h-9 px-3 flex items-center gap-1.5",
+          className: "px-3 flex items-center gap-1.5",
           title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
           children: [
             sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
@@ -33203,7 +33194,7 @@ const Enquiries = () => {
         {
           variant: "outline",
           onClick: handleResetFilters,
-          className: "flex items-center gap-2 h-9",
+          className: "flex items-center gap-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
             __("Reset", "Reset")
@@ -33212,7 +33203,37 @@ const Enquiries = () => {
       )
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading enquiries", "Error loading enquiries") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("Loading enquiries...", "Loading enquiries...") }) : enquiries.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No enquiries found", "No enquiries found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Customer", "Customer") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[300px]", children: __("Message", "Message") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travelers", "Travelers") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Preferred Date", "Preferred Date") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Date", "Date") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[150px]", children: __("Actions", "Actions") })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-40" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-28" })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-36" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-full" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-8" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20 rounded-full" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" })
+          ] }) })
+        ] }, i)) })
+      ] }) : enquiries.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No enquiries found", "No enquiries found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
@@ -33306,6 +33327,18 @@ const Enquiries = () => {
               {
                 variant: "ghost",
                 size: "icon",
+                onClick: () => handleRespond(enquiry),
+                className: "h-8 w-8 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
+                "aria-label": __("Respond to enquiry", "Respond to enquiry"),
+                title: __("Send response email", "Send response email"),
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-4 h-4" })
+              }
+            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "ghost",
+                size: "icon",
                 onClick: () => handleEdit(enquiry),
                 className: "h-8 w-8",
                 "aria-label": __("Edit enquiry", "Edit enquiry"),
@@ -33365,12 +33398,136 @@ const Enquiries = () => {
           )
         ] })
       ] }) }) })
-    ] }) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: deleteDialogOpen,
+        onClose: () => {
+          setDeleteDialogOpen(false);
+          setEnquiryToDelete(null);
+        },
+        onConfirm: confirmDelete,
+        title: __("Delete Enquiry", "Delete Enquiry"),
+        message: enquiryToDelete ? __(`Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`, `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`) : __("Are you sure you want to delete this enquiry?", "Are you sure you want to delete this enquiry?"),
+        confirmText: __("Delete", "Delete"),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "danger",
+        isLoading: deleteMutation.isPending
+      }
+    ),
+    respondDialogOpen && selectedEnquiry && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: "fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm",
+        onClick: (e) => {
+          if (e.target === e.currentTarget && !respondMutation.isPending) {
+            setRespondDialogOpen(false);
+            setSelectedEnquiry(null);
+          }
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-lg mx-4 shadow-xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-6 h-6" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg", children: __("Respond to Enquiry", "Respond to Enquiry") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: [
+                  __("Send a response to", "Send a response to"),
+                  " ",
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: selectedEnquiry.name })
+                ] })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => {
+                  setRespondDialogOpen(false);
+                  setSelectedEnquiry(null);
+                },
+                className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors",
+                disabled: respondMutation.isPending,
+                "aria-label": __("Close", "Close"),
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-5 h-5" })
+              }
+            )
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4 text-gray-400" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: selectedEnquiry.email })
+              ] }),
+              selectedEnquiry.trip_title && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-4 h-4 text-gray-400" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: selectedEnquiry.trip_title })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: __("Original Message:", "Original Message:") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-gray-600 dark:text-gray-400", children: selectedEnquiry.message })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                __("Your Response", "Your Response"),
+                " ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "textarea",
+                {
+                  value: responseMessage,
+                  onChange: (e) => setResponseMessage(e.target.value),
+                  placeholder: __("Type your response here...", "Type your response here..."),
+                  className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none",
+                  rows: 5,
+                  disabled: respondMutation.isPending
+                }
+              )
+            ] }),
+            respondMutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400", children: ((_a = respondMutation.error) == null ? void 0 : _a.message) || __("Failed to send response. Please try again.", "Failed to send response. Please try again.") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 justify-end pt-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  variant: "outline",
+                  onClick: () => {
+                    setRespondDialogOpen(false);
+                    setSelectedEnquiry(null);
+                  },
+                  disabled: respondMutation.isPending,
+                  children: __("Cancel", "Cancel")
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  onClick: sendResponse,
+                  disabled: respondMutation.isPending || !responseMessage.trim(),
+                  children: respondMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 mr-2 animate-spin" }),
+                    __("Sending...", "Sending...")
+                  ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-4 h-4 mr-2" }),
+                    __("Send Response", "Send Response")
+                  ] })
+                }
+              )
+            ] })
+          ] })
+        ] })
+      }
+    )
   ] });
 };
 const ViewEnquiry = () => {
+  var _a;
   const { can } = usePermissions();
   const { navigate } = useNavigate();
+  const queryClient2 = useQueryClient();
+  const [respondDialogOpen, setRespondDialogOpen] = reactExports.useState(false);
+  const [responseMessage, setResponseMessage] = reactExports.useState("");
   const enquiryId = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("id") ? parseInt(params.get("id") || "0") : null;
@@ -33378,30 +33535,44 @@ const ViewEnquiry = () => {
   const { data: enquiry, isLoading, error } = useQuery({
     queryKey: ["enquiry", enquiryId],
     queryFn: async () => {
+      var _a2, _b;
       if (!enquiryId) return null;
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split("T")[0];
-      };
-      return {
-        id: enquiryId,
-        name: "John Smith",
-        email: "john.smith@example.com",
-        phone: "+1 234-567-8900",
-        trip_id: 1,
-        trip_title: "Everest Base Camp Trek",
-        message: "I am interested in booking the Everest Base Camp Trek for 2 people. Can you provide more details about the itinerary and pricing? I would like to know about the accommodation, meals, and what is included in the package.",
-        number_of_travelers: 2,
-        preferred_travel_date: "2026-04-15",
-        status: "new",
-        created_at: getDate(2),
-        responded_at: null,
-        response_notes: null
-      };
+      const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const response = await fetch(`${baseUrl}/enquiries/${enquiryId}`, {
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch enquiry");
+      }
+      return response.json();
     },
     enabled: !!enquiryId && can("yatra_view_bookings")
+  });
+  const respondMutation = useMutation({
+    mutationFn: async ({ id, message: message2 }) => {
+      var _a2, _b;
+      const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const response = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        },
+        body: JSON.stringify({ message: message2 })
+      });
+      if (!response.ok) {
+        const error2 = await response.json();
+        throw new Error(error2.message || "Failed to send response");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["enquiry", enquiryId] });
+      setRespondDialogOpen(false);
+      setResponseMessage("");
+    }
   });
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -33449,8 +33620,72 @@ const ViewEnquiry = () => {
       navigate({ subpage: "trips", tab: "all", action: "edit", id: enquiry.trip_id });
     }
   };
+  const handleRespond = () => {
+    setResponseMessage("");
+    setRespondDialogOpen(true);
+  };
+  const sendResponse = () => {
+    if (enquiryId && responseMessage.trim()) {
+      respondMutation.mutate({
+        id: enquiryId,
+        message: responseMessage
+      });
+    }
+  };
   if (isLoading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }) });
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PageHeader,
+        {
+          title: __("Enquiry Details", "Enquiry Details"),
+          actions: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-24" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-32" })
+          ] })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-40" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-20 rounded-full" })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-16 mb-2" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-24 w-full rounded-lg" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-32 mb-2" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-16" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-36 mb-2" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-40" })
+              ] })
+            ] })
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-24" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-32" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-48" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-36" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-20 mb-2" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-40" })
+            ] }) })
+          ] })
+        ] })
+      ] })
+    ] });
   }
   if (error || !enquiry) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -33478,10 +33713,24 @@ const ViewEnquiry = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
             __("Back", "Back")
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleEdit, className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
-            __("Edit Enquiry", "Edit Enquiry")
-          ] }) })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_edit_bookings", children: [
+            enquiry.status !== "responded" && enquiry.status !== "closed" && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Button,
+              {
+                variant: "outline",
+                onClick: handleRespond,
+                className: "flex items-center gap-2 text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-4 h-4" }),
+                  __("Send Response", "Send Response")
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleEdit, className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+              __("Edit Enquiry", "Edit Enquiry")
+            ] })
+          ] })
         ] })
       }
     ),
@@ -33573,6 +33822,460 @@ const ViewEnquiry = () => {
             enquiry.responded_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Responded", "Responded") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-gray-900 dark:text-white", children: formatDate(enquiry.responded_at) })
+            ] })
+          ] })
+        ] })
+      ] })
+    ] }) }),
+    respondDialogOpen && enquiry && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: "fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm",
+        onClick: (e) => {
+          if (e.target === e.currentTarget && !respondMutation.isPending) {
+            setRespondDialogOpen(false);
+          }
+        },
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-lg mx-4 shadow-xl", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-6 h-6" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg", children: __("Respond to Enquiry", "Respond to Enquiry") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: [
+                  __("Send a response to", "Send a response to"),
+                  " ",
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: enquiry.name })
+                ] })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setRespondDialogOpen(false),
+                className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors",
+                disabled: respondMutation.isPending,
+                "aria-label": __("Close", "Close"),
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xl", children: "×" })
+              }
+            )
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4 text-gray-400" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: enquiry.email })
+              ] }),
+              enquiry.trip_title && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-4 h-4 text-gray-400" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: enquiry.trip_title })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: __("Original Message:", "Original Message:") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-gray-600 dark:text-gray-400", children: enquiry.message })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                __("Your Response", "Your Response"),
+                " ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "textarea",
+                {
+                  value: responseMessage,
+                  onChange: (e) => setResponseMessage(e.target.value),
+                  placeholder: __("Type your response here...", "Type your response here..."),
+                  className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none",
+                  rows: 5,
+                  disabled: respondMutation.isPending
+                }
+              )
+            ] }),
+            respondMutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400", children: ((_a = respondMutation.error) == null ? void 0 : _a.message) || __("Failed to send response. Please try again.", "Failed to send response. Please try again.") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 justify-end pt-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  variant: "outline",
+                  onClick: () => setRespondDialogOpen(false),
+                  disabled: respondMutation.isPending,
+                  children: __("Cancel", "Cancel")
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  onClick: sendResponse,
+                  disabled: respondMutation.isPending || !responseMessage.trim(),
+                  children: respondMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 mr-2 animate-spin" }),
+                    __("Sending...", "Sending...")
+                  ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-4 h-4 mr-2" }),
+                    __("Send Response", "Send Response")
+                  ] })
+                }
+              )
+            ] })
+          ] })
+        ] })
+      }
+    )
+  ] });
+};
+const EnquiryForm = () => {
+  var _a, _b;
+  const { can } = usePermissions();
+  const { navigate } = useNavigate();
+  const queryClient2 = useQueryClient();
+  const [formData, setFormData] = reactExports.useState({
+    name: "",
+    email: "",
+    phone: "",
+    trip_id: void 0,
+    message: "",
+    number_of_travelers: 1,
+    preferred_travel_date: "",
+    status: "new",
+    response_notes: ""
+  });
+  const enquiryId = reactExports.useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    return id ? parseInt(id) : null;
+  }, []);
+  const isEdit = !!enquiryId;
+  const { data: enquiry, isLoading: isLoadingEnquiry } = useQuery({
+    queryKey: ["enquiry", enquiryId],
+    queryFn: async () => {
+      var _a2, _b2;
+      if (!enquiryId) return null;
+      const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const response = await fetch(`${baseUrl}/enquiries/${enquiryId}`, {
+        headers: {
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch enquiry");
+      }
+      return response.json();
+    },
+    enabled: !!enquiryId && can("yatra_edit_bookings")
+  });
+  const { data: tripsData } = useQuery({
+    queryKey: ["trips-select"],
+    queryFn: async () => {
+      var _a2, _b2;
+      const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const response = await fetch(`${baseUrl}/trips?per_page=100`, {
+        headers: {
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch trips");
+      }
+      const data = await response.json();
+      return data.data || [];
+    },
+    enabled: can("yatra_edit_bookings")
+  });
+  const trips = tripsData || [];
+  reactExports.useEffect(() => {
+    if (enquiry) {
+      setFormData({
+        name: enquiry.name || "",
+        email: enquiry.email || "",
+        phone: enquiry.phone || "",
+        trip_id: enquiry.trip_id,
+        message: enquiry.message || "",
+        number_of_travelers: enquiry.number_of_travelers || 1,
+        preferred_travel_date: enquiry.preferred_travel_date || "",
+        status: enquiry.status || "new",
+        response_notes: enquiry.response_notes || ""
+      });
+    }
+  }, [enquiry]);
+  const saveMutation = useMutation({
+    mutationFn: async (data) => {
+      var _a2, _b2;
+      const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const url = isEdit ? `${baseUrl}/enquiries/${enquiryId}` : `${baseUrl}/enquiries`;
+      const method = isEdit ? "PUT" : "POST";
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to save enquiry");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
+      queryClient2.invalidateQueries({ queryKey: ["enquiry", enquiryId] });
+      navigate({ subpage: "enquiries" });
+    }
+  });
+  const handleBack = () => {
+    navigate({ subpage: "enquiries" });
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    saveMutation.mutate(formData);
+  };
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+  if (isEdit && isLoadingEnquiry) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PageHeader,
+        {
+          title: __("Edit Enquiry", "Edit Enquiry"),
+          actions: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-24" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-32" })
+          ] })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-40" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-16 mb-2" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-full" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-16 mb-2" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-full" })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-20 mb-2" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-32 w-full" })
+            ] })
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-24" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-full" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-11 w-full" })
+          ] })
+        ] }) })
+      ] })
+    ] });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: isEdit ? __("Edit Enquiry", "Edit Enquiry") : __("Create Enquiry", "Create Enquiry"),
+        description: isEdit ? __("Update enquiry details", "Update enquiry details") : __("Add a new enquiry", "Add a new enquiry"),
+        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: handleBack, className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
+            __("Back", "Back")
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              onClick: handleSubmit,
+              disabled: saveMutation.isPending,
+              className: "flex items-center gap-2",
+              children: [
+                saveMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { className: "w-4 h-4" }),
+                saveMutation.isPending ? __("Saving...", "Saving...") : __("Save", "Save")
+              ]
+            }
+          )
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleSubmit, children: [
+      saveMutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400", children: ((_a = saveMutation.error) == null ? void 0 : _a.message) || __("Failed to save enquiry. Please try again.", "Failed to save enquiry. Please try again.") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Customer Information", "Customer Information") }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                    __("Name", "Name"),
+                    " ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      value: formData.name || "",
+                      onChange: (e) => handleChange("name", e.target.value),
+                      placeholder: __("Customer name", "Customer name"),
+                      required: true
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                    __("Email", "Email"),
+                    " ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      type: "email",
+                      value: formData.email || "",
+                      onChange: (e) => handleChange("email", e.target.value),
+                      placeholder: __("customer@example.com", "customer@example.com"),
+                      required: true
+                    }
+                  )
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Phone", "Phone") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    type: "tel",
+                    value: formData.phone || "",
+                    onChange: (e) => handleChange("phone", e.target.value),
+                    placeholder: __("Phone number", "Phone number")
+                  }
+                )
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Enquiry Details", "Enquiry Details") }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                  __("Message", "Message"),
+                  " ",
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "textarea",
+                  {
+                    value: formData.message || "",
+                    onChange: (e) => handleChange("message", e.target.value),
+                    placeholder: __("Enquiry message...", "Enquiry message..."),
+                    className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none",
+                    rows: 5,
+                    required: true
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Number of Travelers", "Number of Travelers") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      type: "number",
+                      min: "1",
+                      value: formData.number_of_travelers || "",
+                      onChange: (e) => handleChange("number_of_travelers", parseInt(e.target.value) || 1),
+                      placeholder: "1"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Preferred Travel Date", "Preferred Travel Date") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      type: "date",
+                      value: formData.preferred_travel_date || "",
+                      onChange: (e) => handleChange("preferred_travel_date", e.target.value)
+                    }
+                  )
+                ] })
+              ] })
+            ] })
+          ] }),
+          isEdit && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Response Notes", "Response Notes") }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "textarea",
+              {
+                value: formData.response_notes || "",
+                onChange: (e) => handleChange("response_notes", e.target.value),
+                placeholder: __("Internal notes about responses to this enquiry...", "Internal notes about responses to this enquiry..."),
+                className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none",
+                rows: 4
+              }
+            ) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Status", "Status") }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Select,
+              {
+                value: formData.status || "new",
+                onChange: (e) => handleChange("status", e.target.value),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "new", children: __("New", "New") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "responded", children: __("Responded", "Responded") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "converted", children: __("Converted", "Converted") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "closed", children: __("Closed", "Closed") })
+                ]
+              }
+            ) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Related Trip", "Related Trip") }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Select,
+              {
+                value: ((_b = formData.trip_id) == null ? void 0 : _b.toString()) || "",
+                onChange: (e) => handleChange("trip_id", e.target.value ? parseInt(e.target.value) : void 0),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("No trip selected", "No trip selected") }),
+                  trips.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: trip.id.toString(), children: trip.title }, trip.id))
+                ]
+              }
+            ) })
+          ] }),
+          isEdit && enquiry && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Information", "Information") }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3 text-sm", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400", children: __("Created:", "Created:") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-900 dark:text-white mt-0.5", children: new Date(enquiry.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                }) })
+              ] }),
+              enquiry.responded_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400", children: __("Responded:", "Responded:") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-900 dark:text-white mt-0.5", children: new Date(enquiry.responded_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                }) })
+              ] })
             ] })
           ] })
         ] })
@@ -34188,8 +34891,8 @@ const App = () => {
         if (action === "view") {
           return /* @__PURE__ */ jsxRuntimeExports.jsx(ViewEnquiry, {});
         }
-        if (action === "edit") {
-          return /* @__PURE__ */ jsxRuntimeExports.jsx(ViewEnquiry, {});
+        if (action === "edit" || action === "new") {
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(EnquiryForm, {});
         }
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Enquiries, {});
       case "reviews":

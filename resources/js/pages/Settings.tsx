@@ -23,7 +23,11 @@ import {
   Plug,
   Shield,
   Info,
-  ChevronRight
+  ChevronRight,
+  ChevronDown,
+  GripVertical,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -84,18 +88,32 @@ type SettingsSection =
 
 interface PaymentGatewayConfig {
   enabled: boolean;
+  [key: string]: any;
+}
+
+interface GatewayField {
+  id: string;
+  type: 'text' | 'password' | 'number' | 'checkbox' | 'textarea' | 'select';
+  label: string;
+  description?: string;
+  placeholder?: string;
+  default?: any;
+  min?: number;
+  max?: number;
+  options?: { value: string; label: string }[];
+  condition?: string;
+}
+
+interface GatewayDefinition {
+  id: string;
   title: string;
   description: string;
-  api_key?: string;
-  api_secret?: string;
-  client_id?: string;
-  client_secret?: string;
-  merchant_id?: string;
-  public_key?: string;
-  private_key?: string;
-  webhook_secret?: string;
-  test_mode?: boolean;
-  sandbox?: boolean;
+  icon: string;
+  is_offline: boolean;
+  supports: string[];
+  fields: GatewayField[];
+  config: PaymentGatewayConfig;
+  enabled: boolean;
 }
 
 interface SettingsData {
@@ -137,6 +155,7 @@ interface SettingsData {
   deposit_required: boolean;
   deposit_percentage: number;
   gateway_configs: Record<string, PaymentGatewayConfig>;
+  gateway_order?: string[];
   
   // Email Settings
   admin_email: string;
@@ -256,6 +275,8 @@ const Settings: React.FC = () => {
   const [viewingSection, setViewingSection] = useState<SettingsSection>(getInitialActiveSection());
   const [isSaving, setIsSaving] = useState(false);
   const [expandedGateways, setExpandedGateways] = useState<Record<string, boolean>>({});
+  const [gatewayOrder, setGatewayOrder] = useState<string[]>([]);
+  const [draggedGateway, setDraggedGateway] = useState<string | null>(null);
 
   // Initialize viewingSection from activeSection on mount
   useEffect(() => {
@@ -281,6 +302,22 @@ const Settings: React.FC = () => {
     staleTime: Infinity,
     retry: 1,
     retryDelay: 1000,
+  });
+
+  // Fetch payment gateway definitions from server
+  const { data: gatewayDefinitions } = useQuery<Record<string, GatewayDefinition>>({
+    queryKey: ['payment-gateways-definitions'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/payment/gateways/definitions');
+        return response.gateways || {};
+      } catch (error: any) {
+        console.error('Failed to load gateway definitions:', error);
+        return {};
+      }
+    },
+    enabled: can('manage_yatra'),
+    staleTime: Infinity,
   });
 
   // Default settings fallback
@@ -359,7 +396,40 @@ const Settings: React.FC = () => {
             api_secret: '',
             test_mode: true,
           },
+          bank_transfer: {
+            enabled: false,
+            title: 'Bank Transfer',
+            description: 'Accept manual bank transfer payments',
+            api_key: '', // Used for bank account name
+            api_secret: '', // Used for bank account number
+            public_key: '', // Used for bank name
+            private_key: '', // Used for routing/SWIFT code
+          },
+          esewa: {
+            enabled: false,
+            title: 'eSewa',
+            description: 'Accept payments via eSewa (Nepal)',
+            api_key: '',
+            api_secret: '',
+            test_mode: true,
+          },
+          khalti: {
+            enabled: false,
+            title: 'Khalti',
+            description: 'Accept payments via Khalti (Nepal)',
+            api_key: '',
+            api_secret: '',
+            test_mode: true,
+          },
+          pay_later: {
+            enabled: false,
+            title: 'Book Now, Pay Later',
+            description: 'Allow customers to reserve now and pay before the trip',
+            api_key: '', // Used for payment deadline days
+            api_secret: '', // Used for auto-cancel days
+          },
         },
+        gateway_order: ['pay_later', 'stripe', 'paypal', 'razorpay', 'square', 'authorize_net', 'bank_transfer', 'esewa', 'khalti'],
         admin_email: 'admin@yatra.com',
         from_email: 'noreply@yatra.com',
         from_name: 'Yatra Travel',
@@ -439,12 +509,22 @@ const Settings: React.FC = () => {
   const [formData, setFormData] = useState<SettingsData | null>(null);
   const isInitializedRef = React.useRef(false);
 
-  // Initialize form data only once
+  // Initialize form data only once - merge API settings with defaults
   React.useEffect(() => {
     if (isInitializedRef.current) return;
     
     if (settings) {
-      setFormData(settings);
+      // Merge settings with defaults, especially for gateway_configs
+      const mergedSettings = {
+        ...defaultSettings,
+        ...settings,
+        // Ensure gateway_configs from defaults are merged with any saved configs
+        gateway_configs: {
+          ...defaultSettings.gateway_configs,
+          ...(settings.gateway_configs || {}),
+        },
+      };
+      setFormData(mergedSettings);
       isInitializedRef.current = true;
     } else if (!isLoading && !settings) {
       // Use default settings if API fails or returns empty
@@ -453,6 +533,23 @@ const Settings: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings, isLoading]);
+
+  // Initialize gateway order when gateway definitions are loaded
+  React.useEffect(() => {
+    if (gatewayDefinitions && Object.keys(gatewayDefinitions).length > 0 && gatewayOrder.length === 0) {
+      // Use saved order if available, otherwise use default order from definitions
+      const savedOrder = settings?.gateway_order as string[] | undefined;
+      if (savedOrder && Array.isArray(savedOrder) && savedOrder.length > 0) {
+        // Merge saved order with any new gateways
+        const allGateways = Object.keys(gatewayDefinitions);
+        const validSavedOrder = savedOrder.filter(id => allGateways.includes(id));
+        const newGateways = allGateways.filter(id => !validSavedOrder.includes(id));
+        setGatewayOrder([...validSavedOrder, ...newGateways]);
+      } else {
+        setGatewayOrder(Object.keys(gatewayDefinitions));
+      }
+    }
+  }, [gatewayDefinitions, settings?.gateway_order, gatewayOrder.length]);
 
   // Single stable onChange handler that reads field name from input's name or id attribute
   const handleFieldChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -486,10 +583,82 @@ const Settings: React.FC = () => {
       configs[gateway] = { ...existingConfig, [field]: value };
       return { ...prev, gateway_configs: configs };
     });
+    
+    // Auto-expand when enabling a gateway
+    if (field === 'enabled' && value === true) {
+      setExpandedGateways(prev => ({ ...prev, [gateway]: true }));
+    }
+    // Auto-collapse when disabling a gateway
+    if (field === 'enabled' && value === false) {
+      setExpandedGateways(prev => ({ ...prev, [gateway]: false }));
+    }
   }, []);
 
   const toggleGatewayExpanded = (gateway: string) => {
     setExpandedGateways(prev => ({ ...prev, [gateway]: !prev[gateway] }));
+  };
+
+  // Gateway sorting functions
+  const moveGatewayUp = (gatewayId: string) => {
+    setGatewayOrder(prev => {
+      const index = prev.indexOf(gatewayId);
+      if (index <= 0) return prev;
+      const newOrder = [...prev];
+      [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+      // Save order to formData
+      setFormData(current => current ? { ...current, gateway_order: newOrder } : current);
+      return newOrder;
+    });
+  };
+
+  const moveGatewayDown = (gatewayId: string) => {
+    setGatewayOrder(prev => {
+      const index = prev.indexOf(gatewayId);
+      if (index < 0 || index >= prev.length - 1) return prev;
+      const newOrder = [...prev];
+      [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+      // Save order to formData
+      setFormData(current => current ? { ...current, gateway_order: newOrder } : current);
+      return newOrder;
+    });
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, gatewayId: string) => {
+    setDraggedGateway(gatewayId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, targetGatewayId: string) => {
+    e.preventDefault();
+    if (!draggedGateway || draggedGateway === targetGatewayId) {
+      setDraggedGateway(null);
+      return;
+    }
+
+    setGatewayOrder(prev => {
+      const dragIndex = prev.indexOf(draggedGateway);
+      const dropIndex = prev.indexOf(targetGatewayId);
+      if (dragIndex < 0 || dropIndex < 0) return prev;
+
+      const newOrder = [...prev];
+      newOrder.splice(dragIndex, 1);
+      newOrder.splice(dropIndex, 0, draggedGateway);
+      
+      // Save order to formData
+      setFormData(current => current ? { ...current, gateway_order: newOrder } : current);
+      return newOrder;
+    });
+    setDraggedGateway(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedGateway(null);
   };
 
   const saveMutation = useMutation({
@@ -1000,270 +1169,196 @@ onChange={handleFieldChange}
 
             <SectionDivider title={__('Payment Gateways', 'Payment Gateways')} />
 
-            <div className="space-y-4">
-              {Object.entries(formData.gateway_configs || {}).map(([gateway, config]) => (
-                <Card key={gateway} className="border border-gray-200 dark:border-gray-700">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          id={`gateway_enable_${gateway}`}
-                          checked={config.enabled}
-                          onChange={(e) => handleGatewayConfigChange(gateway, 'enabled', e.target.checked)}
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <div>
-                          <CardTitle className="text-sm font-semibold">{config.title}</CardTitle>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{config.description}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1">
+              <Info className="w-3.5 h-3.5" />
+              {__('Drag and drop to reorder gateways. Use arrows for precise positioning.', 'Drag and drop to reorder gateways. Use arrows for precise positioning.')}
+            </p>
+
+            <div className="space-y-3">
+              {/* Dynamic Payment Gateway Rendering from Server - Sorted */}
+              {gatewayDefinitions && gatewayOrder
+                .filter(id => gatewayDefinitions[id])
+                .map((gatewayId, index) => {
+                const gateway = gatewayDefinitions[gatewayId];
+                const config = formData.gateway_configs?.[gatewayId] || gateway.config || { enabled: false };
+                const isExpanded = expandedGateways[gatewayId];
+                const isDragging = draggedGateway === gatewayId;
+                
+                return (
+                  <Card 
+                    key={gatewayId} 
+                    className={`border transition-all ${
+                      isDragging 
+                        ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 opacity-75' 
+                        : config.enabled 
+                          ? 'border-green-200 dark:border-green-800' 
+                          : 'border-gray-200 dark:border-gray-700'
+                    }`}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, gatewayId)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, gatewayId)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {/* Drag handle */}
+                          <div className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                            <GripVertical className="w-4 h-4" />
+                          </div>
+                          
+                          {/* Sort arrows */}
+                          <div className="flex flex-col gap-0.5">
+                            <button
+                              type="button"
+                              onClick={() => moveGatewayUp(gatewayId)}
+                              disabled={index === 0}
+                              className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                              title={__('Move up', 'Move up')}
+                            >
+                              <ArrowUp className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveGatewayDown(gatewayId)}
+                              disabled={index === gatewayOrder.length - 1}
+                              className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed"
+                              title={__('Move down', 'Move down')}
+                            >
+                              <ArrowDown className="w-3 h-3" />
+                            </button>
+                          </div>
+                          
+                          <input
+                            type="checkbox"
+                            id={`gateway_enable_${gatewayId}`}
+                            checked={config.enabled || false}
+                            onChange={(e) => handleGatewayConfigChange(gatewayId, 'enabled', e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <div className="flex items-center gap-2">
+                            {gateway.icon && (
+                              <img src={gateway.icon} alt={gateway.title} className="w-6 h-6 object-contain" />
+                            )}
+                            <div>
+                              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                                {gateway.title}
+                                {config.enabled && (
+                                  <span className="text-xs font-normal px-1.5 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded">
+                                    {__('Active', 'Active')}
+                                  </span>
+                                )}
+                              </CardTitle>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{gateway.description}</p>
+                            </div>
+                          </div>
                         </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleGatewayExpanded(gatewayId)}
+                          className="h-8"
+                          disabled={!gateway.fields?.length}
+                        >
+                          {isExpanded ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleGatewayExpanded(gateway)}
-                        className="h-8"
-                      >
-                        <ChevronRight
-                          className={`w-4 h-4 transition-transform ${expandedGateways[gateway] ? 'rotate-90' : ''}`}
-                        />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  {expandedGateways[gateway] && config.enabled && (
-                    <CardContent className="pt-0 space-y-4">
-                      {gateway === 'stripe' && (
-                        <>
-                          <FormField
-                            id={`stripe_api_key`}
-                            label={__('Publishable Key', 'Publishable Key')}
-                            description={__('Your Stripe publishable API key', 'Your Stripe publishable API key')}
-                          >
-                            <Input
-                              type="text"
-                              value={config.api_key || ''}
-                              onChange={(e) => handleGatewayConfigChange('stripe', 'api_key', e.target.value)}
-                              placeholder="pk_test_..."
-                            />
-                          </FormField>
-                          <FormField
-                            id={`stripe_api_secret`}
-                            label={__('Secret Key', 'Secret Key')}
-                            description={__('Your Stripe secret API key (keep this secure)', 'Your Stripe secret API key (keep this secure)')}
-                          >
-                            <Input
-                              type="password"
-                              value={config.api_secret || ''}
-                              onChange={(e) => handleGatewayConfigChange('stripe', 'api_secret', e.target.value)}
-                              placeholder="sk_test_..."
-                            />
-                          </FormField>
-                          <FormField
-                            id={`stripe_webhook_secret`}
-                            label={__('Webhook Secret', 'Webhook Secret')}
-                            description={__('Stripe webhook signing secret for payment verification', 'Stripe webhook signing secret for payment verification')}
-                          >
-                            <Input
-                              type="password"
-                              value={config.webhook_secret || ''}
-                              onChange={(e) => handleGatewayConfigChange('stripe', 'webhook_secret', e.target.value)}
-                              placeholder="whsec_..."
-                            />
-                          </FormField>
-                          <div className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                            <input
-                              type="checkbox"
-                              id={`stripe_test_mode`}
-                              checked={config.test_mode || false}
-                              onChange={(e) => handleGatewayConfigChange('stripe', 'test_mode', e.target.checked)}
-                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <Label htmlFor={`stripe_test_mode`} className="font-normal cursor-pointer">
-                              {__('Test Mode', 'Test Mode')} - {__('Use test API keys', 'Use test API keys')}
-                            </Label>
+                    </CardHeader>
+                    {isExpanded && gateway.fields && (
+                      <CardContent className="pt-4 space-y-4 border-t border-gray-100 dark:border-gray-700">
+                        {/* Info banner for offline gateways */}
+                        {gateway.is_offline && (
+                          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md mb-4">
+                            <p className="text-sm text-blue-700 dark:text-blue-300">
+                              {gateway.id === 'pay_later' 
+                                ? __('Allow customers to book now and pay later. Payment must be completed before the trip date.', 'Allow customers to book now and pay later. Payment must be completed before the trip date.')
+                                : __('This is an offline payment method. Customers will be shown these details after booking.', 'This is an offline payment method. Customers will be shown these details after booking.')
+                              }
+                            </p>
                           </div>
-                        </>
-                      )}
+                        )}
+                        
+                        {/* Dynamic field rendering */}
+                        {gateway.fields.map((field: GatewayField) => {
+                          // Check conditional visibility
+                          if (field.condition && !config[field.condition]) {
+                            return null;
+                          }
 
-                      {gateway === 'paypal' && (
-                        <>
-                          <FormField
-                            id={`paypal_client_id`}
-                            label={__('Client ID', 'Client ID')}
-                            description={__('Your PayPal application client ID', 'Your PayPal application client ID')}
-                          >
-                            <Input
-                              type="text"
-                              value={config.client_id || ''}
-                              onChange={(e) => handleGatewayConfigChange('paypal', 'client_id', e.target.value)}
-                              placeholder="AeA1QIZXiflr1..."
-                            />
-                          </FormField>
-                          <FormField
-                            id={`paypal_client_secret`}
-                            label={__('Client Secret', 'Client Secret')}
-                            description={__('Your PayPal application client secret (keep this secure)', 'Your PayPal application client secret (keep this secure)')}
-                          >
-                            <Input
-                              type="password"
-                              value={config.client_secret || ''}
-                              onChange={(e) => handleGatewayConfigChange('paypal', 'client_secret', e.target.value)}
-                              placeholder="EC..."
-                            />
-                          </FormField>
-                          <div className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                            <input
-                              type="checkbox"
-                              id={`paypal_sandbox`}
-                              checked={config.sandbox || false}
-                              onChange={(e) => handleGatewayConfigChange('paypal', 'sandbox', e.target.checked)}
-                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <Label htmlFor={`paypal_sandbox`} className="font-normal cursor-pointer">
-                              {__('Sandbox Mode', 'Sandbox Mode')} - {__('Use PayPal sandbox for testing', 'Use PayPal sandbox for testing')}
-                            </Label>
-                          </div>
-                        </>
-                      )}
+                          // Render checkbox fields differently
+                          if (field.type === 'checkbox') {
+                            return (
+                              <div key={field.id} className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
+                                <input
+                                  type="checkbox"
+                                  id={`${gatewayId}_${field.id}`}
+                                  checked={config[field.id] || false}
+                                  onChange={(e) => handleGatewayConfigChange(gatewayId, field.id, e.target.checked)}
+                                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <Label htmlFor={`${gatewayId}_${field.id}`} className="font-normal cursor-pointer">
+                                  {field.label} {field.description && `- ${field.description}`}
+                                </Label>
+                              </div>
+                            );
+                          }
 
-                      {gateway === 'razorpay' && (
-                        <>
-                          <FormField
-                            id={`razorpay_api_key`}
-                            label={__('Key ID', 'Key ID')}
-                            description={__('Your Razorpay key ID', 'Your Razorpay key ID')}
-                          >
-                            <Input
-                              type="text"
-                              value={config.api_key || ''}
-                              onChange={(e) => handleGatewayConfigChange('razorpay', 'api_key', e.target.value)}
-                              placeholder="rzp_test_..."
-                            />
-                          </FormField>
-                          <FormField
-                            id={`razorpay_api_secret`}
-                            label={__('Key Secret', 'Key Secret')}
-                            description={__('Your Razorpay key secret (keep this secure)', 'Your Razorpay key secret (keep this secure)')}
-                          >
-                            <Input
-                              type="password"
-                              value={config.api_secret || ''}
-                              onChange={(e) => handleGatewayConfigChange('razorpay', 'api_secret', e.target.value)}
-                              placeholder="..."
-                            />
-                          </FormField>
-                          <div className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                            <input
-                              type="checkbox"
-                              id={`razorpay_test_mode`}
-                              checked={config.test_mode || false}
-                              onChange={(e) => handleGatewayConfigChange('razorpay', 'test_mode', e.target.checked)}
-                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <Label htmlFor={`razorpay_test_mode`} className="font-normal cursor-pointer">
-                              {__('Test Mode', 'Test Mode')}
-                            </Label>
-                          </div>
-                        </>
-                      )}
+                          // Render textarea
+                          if (field.type === 'textarea') {
+                            return (
+                              <FormField
+                                key={field.id}
+                                id={`${gatewayId}_${field.id}`}
+                                label={field.label}
+                                description={field.description}
+                              >
+                                <textarea
+                                  value={config[field.id] || field.default || ''}
+                                  onChange={(e) => handleGatewayConfigChange(gatewayId, field.id, e.target.value)}
+                                  placeholder={field.placeholder}
+                                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                  rows={3}
+                                />
+                              </FormField>
+                            );
+                          }
 
-                      {gateway === 'square' && (
-                        <>
-                          <FormField
-                            id={`square_api_key`}
-                            label={__('Application ID', 'Application ID')}
-                            description={__('Your Square application ID', 'Your Square application ID')}
-                          >
-                            <Input
-                              type="text"
-                              value={config.api_key || ''}
-                              onChange={(e) => handleGatewayConfigChange('square', 'api_key', e.target.value)}
-                              placeholder="sandbox-sq0idb-..."
-                            />
-                          </FormField>
-                          <FormField
-                            id={`square_api_secret`}
-                            label={__('Access Token', 'Access Token')}
-                            description={__('Your Square access token (keep this secure)', 'Your Square access token (keep this secure)')}
-                          >
-                            <Input
-                              type="password"
-                              value={config.api_secret || ''}
-                              onChange={(e) => handleGatewayConfigChange('square', 'api_secret', e.target.value)}
-                              placeholder="EAA..."
-                            />
-                          </FormField>
-                          <FormField
-                            id={`square_location_id`}
-                            label={__('Location ID', 'Location ID')}
-                            description={__('Your Square location ID', 'Your Square location ID')}
-                          >
-                            <Input
-                              type="text"
-                              value={config.merchant_id || ''}
-                              onChange={(e) => handleGatewayConfigChange('square', 'merchant_id', e.target.value)}
-                              placeholder="..."
-                            />
-                          </FormField>
-                          <div className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                            <input
-                              type="checkbox"
-                              id={`square_sandbox`}
-                              checked={config.sandbox || false}
-                              onChange={(e) => handleGatewayConfigChange('square', 'sandbox', e.target.checked)}
-                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <Label htmlFor={`square_sandbox`} className="font-normal cursor-pointer">
-                              {__('Sandbox Mode', 'Sandbox Mode')}
-                            </Label>
-                          </div>
-                        </>
-                      )}
-
-                      {gateway === 'authorize_net' && (
-                        <>
-                          <FormField
-                            id={`authnet_api_key`}
-                            label={__('API Login ID', 'API Login ID')}
-                            description={__('Your Authorize.net API login ID', 'Your Authorize.net API login ID')}
-                          >
-                            <Input
-                              type="text"
-                              value={config.api_key || ''}
-                              onChange={(e) => handleGatewayConfigChange('authorize_net', 'api_key', e.target.value)}
-                              placeholder="..."
-                            />
-                          </FormField>
-                          <FormField
-                            id={`authnet_api_secret`}
-                            label={__('Transaction Key', 'Transaction Key')}
-                            description={__('Your Authorize.net transaction key (keep this secure)', 'Your Authorize.net transaction key (keep this secure)')}
-                          >
-                            <Input
-                              type="password"
-                              value={config.api_secret || ''}
-                              onChange={(e) => handleGatewayConfigChange('authorize_net', 'api_secret', e.target.value)}
-                              placeholder="..."
-                            />
-                          </FormField>
-                          <div className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                            <input
-                              type="checkbox"
-                              id={`authnet_test_mode`}
-                              checked={config.test_mode || false}
-                              onChange={(e) => handleGatewayConfigChange('authorize_net', 'test_mode', e.target.checked)}
-                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <Label htmlFor={`authnet_test_mode`} className="font-normal cursor-pointer">
-                              {__('Test Mode', 'Test Mode')}
-                            </Label>
-                          </div>
-                        </>
-                      )}
-                    </CardContent>
-                  )}
-                </Card>
-              ))}
+                          // Render text, password, number inputs
+                          return (
+                            <FormField
+                              key={field.id}
+                              id={`${gatewayId}_${field.id}`}
+                              label={field.label}
+                              description={field.description}
+                            >
+                              <Input
+                                type={field.type}
+                                value={config[field.id] ?? field.default ?? ''}
+                                onChange={(e) => handleGatewayConfigChange(gatewayId, field.id, field.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value)}
+                                placeholder={field.placeholder}
+                                min={field.min}
+                                max={field.max}
+                              />
+                            </FormField>
+                          );
+                        })}
+                      </CardContent>
+                    )}
+                  </Card>
+                );
+              })}
+              
+              {/* Show message if no gateways loaded */}
+              {(!gatewayDefinitions || Object.keys(gatewayDefinitions).length === 0) && (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <p>{__('Loading payment gateways...', 'Loading payment gateways...')}</p>
+                </div>
+              )}
             </div>
           </div>
         );

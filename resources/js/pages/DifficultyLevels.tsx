@@ -233,19 +233,19 @@ const DifficultyLevels: React.FC = () => {
 
       <Card>
         <CardContent className="p-3">
-          <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
-            <div className="flex-1 relative">
-              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
+            <div className="relative min-w-0 w-full lg:flex-[2]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
                 placeholder={__('Search difficulty levels...', 'Search difficulty levels...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-10 w-full"
               />
             </div>
 
-            <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full md:min-w-[180px] h-10">
+            <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full lg:flex-1">
               <option value="all">{__('All Status', 'All Status')}</option>
               <option value="draft">{__('Draft', 'Draft')}</option>
               <option value="publish">{__('Publish', 'Publish')}</option>
@@ -253,7 +253,7 @@ const DifficultyLevels: React.FC = () => {
             </Select>
 
             {hasFilters && (
-              <Button variant="outline" onClick={handleResetFilters} className="flex items-center gap-2 h-9">
+              <Button variant="outline" onClick={handleResetFilters} className="h-11 flex items-center gap-2 flex-shrink-0">
                 <X className="w-4 h-4" />
                 {__('Reset', 'Reset')}
               </Button>

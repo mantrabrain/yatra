@@ -373,7 +373,6 @@ const ItemForm: React.FC = () => {
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
-                      className="h-9"
                     >
                       <option value="draft">{__('Draft', 'Draft')}</option>
                       <option value="publish">{__('Publish', 'Publish')}</option>
