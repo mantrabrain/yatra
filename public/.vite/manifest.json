@@ -3,18 +3,18 @@
     "file": "css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-Cw8HVASZ.js": {
-    "file": "js/index-Cw8HVASZ.js",
+  "_index-C-oyR4ku.js": {
+    "file": "js/index-C-oyR4ku.js",
     "name": "index",
     "imports": [
-      "_react-vendor-w_BXJx_V.js"
+      "_react-vendor-BXPbDqwT.js"
     ],
     "css": [
       "css/index.css"
     ]
   },
-  "_react-vendor-w_BXJx_V.js": {
-    "file": "js/react-vendor-w_BXJx_V.js",
+  "_react-vendor-BXPbDqwT.js": {
+    "file": "js/react-vendor-BXPbDqwT.js",
     "name": "react-vendor"
   },
   "resources/js/account-page.tsx": {
@@ -23,8 +23,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-w_BXJx_V.js",
-      "_index-Cw8HVASZ.js"
+      "_react-vendor-BXPbDqwT.js",
+      "_index-C-oyR4ku.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -33,8 +33,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-w_BXJx_V.js",
-      "_index-Cw8HVASZ.js"
+      "_react-vendor-BXPbDqwT.js",
+      "_index-C-oyR4ku.js"
     ]
   }
 }

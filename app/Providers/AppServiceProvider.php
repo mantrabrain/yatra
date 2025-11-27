@@ -593,13 +593,60 @@ class AppServiceProvider extends ServiceProvider
         // Start output buffering
         ob_start();
 
-        // Include the booking form template
-        $template_path = YATRA_PLUGIN_PATH . 'templates/booking-form.php';
+        // Handle error states (same as booking.php but without header/footer)
+        if (!empty($booking->error)) {
+            ?>
+            <div class="yatra-booking-page">
+                <div class="yatra-booking-container">
+                    <div class="yatra-booking-error" style="max-width: 600px; margin: 40px auto; padding: 40px; text-align: center; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <svg width="64" height="64" fill="none" stroke="#ef4444" viewBox="0 0 24 24" style="margin-bottom: 20px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <?php if ($booking->error === 'no_session') : ?>
+                            <h2 style="font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 12px;">
+                                <?php esc_html_e('No Trip Selected', 'yatra'); ?>
+                            </h2>
+                            <p style="font-size: 16px; color: #6b7280; margin-bottom: 24px;">
+                                <?php esc_html_e('Please select a trip first before proceeding to checkout.', 'yatra'); ?>
+                            </p>
+                        <?php else : ?>
+                            <h2 style="font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 12px;">
+                                <?php esc_html_e('Trip Not Available', 'yatra'); ?>
+                            </h2>
+                            <p style="font-size: 16px; color: #6b7280; margin-bottom: 24px;">
+                                <?php esc_html_e('The selected trip is no longer available. Please choose another trip.', 'yatra'); ?>
+                            </p>
+                        <?php endif; ?>
+                        <a href="<?php echo esc_url(home_url('/trip/')); ?>" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #3b82f6; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <?php esc_html_e('Browse Trips', 'yatra'); ?>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
+        }
+
+        // Extract data from booking object for the template
+        $trip = $booking->trip;
+        $travel_date = $booking->travel_date;
+        $total_travelers = $booking->travelers;
+        $deposit_required = $booking->deposit_required;
+        $deposit_percentage = $booking->deposit_percentage;
+        $partial_payment = $booking->partial_payment;
+        $partial_payment_percentage = $booking->partial_payment_percentage;
+        $enabled_gateways = $booking->enabled_gateways;
+
+        // Include the shared booking content partial (same as booking.php uses)
+        $template_path = YATRA_PLUGIN_PATH . 'templates/partials/booking-content.php';
         
         if (file_exists($template_path)) {
             include $template_path;
         } else {
-            echo '<p>' . esc_html__('Booking form template not found.', 'yatra') . '</p>';
+            echo '<p>' . esc_html__('Booking template not found.', 'yatra') . '</p>';
         }
 
         return ob_get_clean();
@@ -1181,7 +1228,35 @@ class AppServiceProvider extends ServiceProvider
         // Use SettingsService to get gateway configurations
         $gateway_configs = SettingsService::get('gateway_configs', []);
         $gateway_order = SettingsService::get('gateway_order', []);
+        
+        // Fallback: Check database directly if SettingsService returns empty
+        if (empty($gateway_configs)) {
+            $db_configs = get_option('yatra_gateway_configs', []);
+            if (!empty($db_configs)) {
+                if (is_string($db_configs)) {
+                    $db_configs = maybe_unserialize($db_configs);
+                }
+                $gateway_configs = $db_configs;
+            }
+        }
+        
+        if (empty($gateway_order)) {
+            $db_order = get_option('yatra_gateway_order', []);
+            if (!empty($db_order)) {
+                if (is_string($db_order)) {
+                    $db_order = maybe_unserialize($db_order);
+                }
+                $gateway_order = $db_order;
+            }
+        }
+        
         $enabled_gateways = [];
+        
+        // Debug logging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra Gateway Debug - gateway_configs: ' . print_r($gateway_configs, true));
+            error_log('Yatra Gateway Debug - gateway_order: ' . print_r($gateway_order, true));
+        }
 
         if (class_exists('Yatra\PaymentGateways\PaymentGatewayRegistry')) {
             $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
@@ -1205,12 +1280,22 @@ class AppServiceProvider extends ServiceProvider
             
             foreach ($all_gateways as $gateway_id => $gateway) {
                 $config = $gateway_configs[$gateway_id] ?? [];
-                if (!empty($config['enabled'])) {
+                
+                // Check if gateway is enabled (support both 'enabled' and '1' formats)
+                $is_enabled = !empty($config['enabled']) || (isset($config['enabled']) && $config['enabled'] === '1') || $config['enabled'] === true;
+                
+                // Debug logging for each gateway
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log("Yatra Gateway Debug - {$gateway_id}: enabled=" . var_export($config['enabled'] ?? null, true) . ", is_enabled=" . var_export($is_enabled, true));
+                }
+                
+                if ($is_enabled) {
+                    // Use custom values from config if available, otherwise use gateway defaults
                     $enabled_gateways[$gateway_id] = [
                         'id' => $gateway_id,
-                        'title' => $gateway->getTitle(),
-                        'description' => $gateway->getDescription(),
-                        'icon' => $gateway->getIcon(),
+                        'title' => !empty($config['title']) ? $config['title'] : $gateway->getTitle(),
+                        'description' => !empty($config['description']) ? $config['description'] : $gateway->getDescription(),
+                        'icon' => !empty($config['icon']) ? $config['icon'] : $gateway->getIcon(),
                         'is_offline' => $gateway->isOffline(),
                     ];
                 }

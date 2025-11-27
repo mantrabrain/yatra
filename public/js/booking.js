@@ -14,88 +14,200 @@
         const depositPercentage = window.yatraBookingData?.depositPercentage || 20;
         const partialPercentage = window.yatraBookingData?.partialPercentage || 30;
 
-        // Generate initial traveler forms
-        const initialTravelers = parseInt($('#number-of-travelers').val()) || 2;
-        generateTravelerForms(initialTravelers);
+        // Traveler forms are now rendered in PHP, no need to generate on load
 
-        // Quantity selector
+        // Quantity selector - add/remove traveler forms dynamically
         $('.yatra-quantity-btn').on('click', function() {
             const $btn = $(this);
             const $input = $('#number-of-travelers');
-            let currentValue = parseInt($input.val()) || 2;
+            let currentValue = parseInt($input.val()) || 1;
             const min = parseInt($input.attr('min')) || 1;
             const max = parseInt($input.attr('max')) || 20;
 
             if ($btn.hasClass('plus')) {
                 if (currentValue < max) {
                     currentValue++;
+                    // Add a new traveler form
+                    addTravelerForm(currentValue);
                 }
             } else if ($btn.hasClass('minus')) {
                 if (currentValue > min) {
+                    // Remove the last traveler form
+                    removeTravelerForm(currentValue);
                     currentValue--;
                 }
             }
 
             $input.val(currentValue);
-            generateTravelerForms(currentValue);
             updateBookingSummary();
         });
 
-        // Generate traveler forms
-        function generateTravelerForms(count) {
+        // Add a new traveler form
+        function addTravelerForm(index) {
             const $container = $('#yatra-travelers-container');
-            $container.empty();
+            const travelerHtml = getTravelerFormHtml(index);
+            $container.append(travelerHtml);
+        }
 
-            for (let i = 1; i <= count; i++) {
-                const travelerHtml = `
-                    <div class="yatra-traveler-form" data-traveler-index="${i}">
-                        <div class="yatra-traveler-header">
-                            <h3 class="yatra-traveler-title">Traveler ${i}</h3>
-                        </div>
-                        <div class="yatra-form-row">
-                            <div class="yatra-form-group">
-                                <label for="traveler-${i}-first-name">First Name <span class="required">*</span></label>
-                                <input type="text" id="traveler-${i}-first-name" name="travelers[${i}][first_name]" required>
-                            </div>
-                            <div class="yatra-form-group">
-                                <label for="traveler-${i}-last-name">Last Name <span class="required">*</span></label>
-                                <input type="text" id="traveler-${i}-last-name" name="travelers[${i}][last_name]" required>
-                            </div>
-                        </div>
-                        <div class="yatra-form-row">
-                            <div class="yatra-form-group">
-                                <label for="traveler-${i}-email">Email Address <span class="required">*</span></label>
-                                <input type="email" id="traveler-${i}-email" name="travelers[${i}][email]" required>
-                            </div>
-                            <div class="yatra-form-group">
-                                <label for="traveler-${i}-phone">Phone Number <span class="required">*</span></label>
-                                <input type="tel" id="traveler-${i}-phone" name="travelers[${i}][phone]" required>
-                            </div>
-                        </div>
-                        <div class="yatra-form-row">
-                            <div class="yatra-form-group">
-                                <label for="traveler-${i}-date-of-birth">Date of Birth <span class="required">*</span></label>
-                                <input type="date" id="traveler-${i}-date-of-birth" name="travelers[${i}][date_of_birth]" required>
-                            </div>
-                            <div class="yatra-form-group">
-                                <label for="traveler-${i}-gender">Gender</label>
-                                <select id="traveler-${i}-gender" name="travelers[${i}][gender]">
-                                    <option value="">Select</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
+        // Remove the last traveler form
+        function removeTravelerForm(index) {
+            const $container = $('#yatra-travelers-container');
+            $container.find(`.yatra-traveler-form[data-traveler-index="${index}"]`).remove();
+        }
+
+        // Get HTML for a traveler form
+        function getTravelerFormHtml(index) {
+            return `
+                <div class="yatra-traveler-form" data-traveler-index="${index}">
+                    <div class="yatra-traveler-header">
+                        <h3 class="yatra-traveler-title">Traveler ${index}</h3>
+                        <span class="yatra-traveler-note">Additional traveler</span>
+                    </div>
+                    
+                    <div class="yatra-form-row">
+                        <div class="yatra-form-group">
+                            <label for="traveler-${index}-first-name">First Name <span class="required">*</span></label>
+                            <input type="text" id="traveler-${index}-first-name" name="travelers[${index}][first_name]" required placeholder="As in passport">
                         </div>
                         <div class="yatra-form-group">
-                            <label for="traveler-${i}-passport">Passport Number</label>
-                            <input type="text" id="traveler-${i}-passport" name="travelers[${i}][passport]" placeholder="Optional">
+                            <label for="traveler-${index}-last-name">Last Name <span class="required">*</span></label>
+                            <input type="text" id="traveler-${index}-last-name" name="travelers[${index}][last_name]" required placeholder="As in passport">
                         </div>
                     </div>
-                `;
-                $container.append(travelerHtml);
-            }
+                    
+                    <div class="yatra-form-row">
+                        <div class="yatra-form-group">
+                            <label for="traveler-${index}-date-of-birth">Date of Birth <span class="required">*</span></label>
+                            <input type="date" id="traveler-${index}-date-of-birth" name="travelers[${index}][date_of_birth]" required>
+                        </div>
+                        <div class="yatra-form-group">
+                            <label for="traveler-${index}-gender">Gender <span class="required">*</span></label>
+                            <select id="traveler-${index}-gender" name="travelers[${index}][gender]" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="yatra-form-group">
+                        <label for="traveler-${index}-nationality">Nationality <span class="required">*</span></label>
+                        <select id="traveler-${index}-nationality" name="travelers[${index}][nationality]" required>
+                            ${countryOptions}
+                        </select>
+                    </div>
+                    
+                    <div class="yatra-traveler-subsection">
+                        <h4 class="yatra-subsection-title">Passport Details</h4>
+                        <div class="yatra-form-row">
+                            <div class="yatra-form-group">
+                                <label for="traveler-${index}-passport">Passport Number <span class="required">*</span></label>
+                                <input type="text" id="traveler-${index}-passport" name="travelers[${index}][passport]" required placeholder="Enter passport number">
+                            </div>
+                            <div class="yatra-form-group">
+                                <label for="traveler-${index}-passport-expiry">Passport Expiry <span class="required">*</span></label>
+                                <input type="date" id="traveler-${index}-passport-expiry" name="travelers[${index}][passport_expiry]" required min="${getMinPassportExpiry()}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="yatra-traveler-subsection">
+                        <h4 class="yatra-subsection-title">Dietary & Medical Requirements</h4>
+                        <div class="yatra-form-row">
+                            <div class="yatra-form-group">
+                                <label for="traveler-${index}-dietary">Dietary Requirements</label>
+                                <select id="traveler-${index}-dietary" name="travelers[${index}][dietary]">
+                                    <option value="none">No special requirements</option>
+                                    <option value="vegetarian">Vegetarian</option>
+                                    <option value="vegan">Vegan</option>
+                                    <option value="halal">Halal</option>
+                                    <option value="kosher">Kosher</option>
+                                    <option value="gluten_free">Gluten Free</option>
+                                    <option value="lactose_free">Lactose Free</option>
+                                    <option value="other">Other (specify in notes)</option>
+                                </select>
+                            </div>
+                            <div class="yatra-form-group">
+                                <label for="traveler-${index}-medical">Medical Conditions / Allergies</label>
+                                <input type="text" id="traveler-${index}-medical" name="travelers[${index}][medical]" placeholder="Any allergies or conditions we should know">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
+
+        // Get minimum passport expiry date (6 months from now)
+        function getMinPassportExpiry() {
+            const date = new Date();
+            date.setMonth(date.getMonth() + 6);
+            return date.toISOString().split('T')[0];
+        }
+
+        // Country options for traveler nationality
+        const countryOptions = `
+            <option value="">Select Nationality</option>
+            <option value="AF">Afghanistan</option>
+            <option value="AL">Albania</option>
+            <option value="DZ">Algeria</option>
+            <option value="AR">Argentina</option>
+            <option value="AU">Australia</option>
+            <option value="AT">Austria</option>
+            <option value="BD">Bangladesh</option>
+            <option value="BE">Belgium</option>
+            <option value="BR">Brazil</option>
+            <option value="BT">Bhutan</option>
+            <option value="CA">Canada</option>
+            <option value="CN">China</option>
+            <option value="CO">Colombia</option>
+            <option value="CZ">Czech Republic</option>
+            <option value="DK">Denmark</option>
+            <option value="EG">Egypt</option>
+            <option value="FI">Finland</option>
+            <option value="FR">France</option>
+            <option value="DE">Germany</option>
+            <option value="GR">Greece</option>
+            <option value="HK">Hong Kong</option>
+            <option value="HU">Hungary</option>
+            <option value="IS">Iceland</option>
+            <option value="IN">India</option>
+            <option value="ID">Indonesia</option>
+            <option value="IE">Ireland</option>
+            <option value="IL">Israel</option>
+            <option value="IT">Italy</option>
+            <option value="JP">Japan</option>
+            <option value="KE">Kenya</option>
+            <option value="KR">South Korea</option>
+            <option value="MY">Malaysia</option>
+            <option value="MV">Maldives</option>
+            <option value="MX">Mexico</option>
+            <option value="NL">Netherlands</option>
+            <option value="NZ">New Zealand</option>
+            <option value="NP">Nepal</option>
+            <option value="NO">Norway</option>
+            <option value="PK">Pakistan</option>
+            <option value="PE">Peru</option>
+            <option value="PH">Philippines</option>
+            <option value="PL">Poland</option>
+            <option value="PT">Portugal</option>
+            <option value="RO">Romania</option>
+            <option value="RU">Russia</option>
+            <option value="SA">Saudi Arabia</option>
+            <option value="SG">Singapore</option>
+            <option value="ZA">South Africa</option>
+            <option value="ES">Spain</option>
+            <option value="LK">Sri Lanka</option>
+            <option value="SE">Sweden</option>
+            <option value="CH">Switzerland</option>
+            <option value="TW">Taiwan</option>
+            <option value="TH">Thailand</option>
+            <option value="TR">Turkey</option>
+            <option value="AE">United Arab Emirates</option>
+            <option value="GB">United Kingdom</option>
+            <option value="US">United States</option>
+            <option value="VN">Vietnam</option>
+        `;
 
         // Format currency
         function formatCurrency(amount, currencyCode) {
@@ -265,9 +377,22 @@
             // Collect form data as JSON
             const bookingData = {
                 trip_id: parseInt($('input[name="trip_id"]').val()) || 0,
-                contact_email: $('#contact-email').val(),
-                contact_phone: $('#contact-phone').val(),
-                contact_country: $('#contact-country').val(),
+                // Lead traveler / Contact information
+                contact: {
+                    first_name: $('#contact-first-name').val(),
+                    last_name: $('#contact-last-name').val(),
+                    email: $('#contact-email').val(),
+                    phone: $('#contact-phone').val(),
+                    country: $('#contact-country').val(),
+                    nationality: $('#contact-nationality').val(),
+                    address: $('#contact-address').val()
+                },
+                // Emergency contact
+                emergency_contact: {
+                    name: $('#emergency-name').val(),
+                    phone: $('#emergency-phone').val(),
+                    relationship: $('#emergency-relationship').val()
+                },
                 travel_date: $('#travel-date').val(),
                 payment_method: $('input[name="payment_method"]:checked').val() || 'full',
                 payment_gateway: paymentGateway,
@@ -281,11 +406,13 @@
                 bookingData.travelers.push({
                     first_name: $form.find('input[name$="[first_name]"]').val(),
                     last_name: $form.find('input[name$="[last_name]"]').val(),
-                    email: $form.find('input[name$="[email]"]').val(),
-                    phone: $form.find('input[name$="[phone]"]').val(),
                     date_of_birth: $form.find('input[name$="[date_of_birth]"]').val(),
                     gender: $form.find('select[name$="[gender]"]').val(),
-                    passport: $form.find('input[name$="[passport]"]').val()
+                    nationality: $form.find('select[name$="[nationality]"]').val(),
+                    passport: $form.find('input[name$="[passport]"]').val(),
+                    passport_expiry: $form.find('input[name$="[passport_expiry]"]').val(),
+                    dietary: $form.find('select[name$="[dietary]"]').val(),
+                    medical: $form.find('input[name$="[medical]"]').val()
                 });
             });
 
@@ -337,3 +464,4 @@
     });
 
 })(jQuery);
+

@@ -27,7 +27,14 @@ import {
   ChevronDown,
   GripVertical,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  ClipboardList,
+  Plus,
+  Trash2,
+  Eye,
+  EyeOff,
+  Edit2,
+  Lock
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -40,6 +47,7 @@ import { Label } from '../components/ui/label';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 
 // Helper component for form field with description - MUST be outside component to prevent remounts
 const FormField = React.memo(({ 
@@ -74,6 +82,7 @@ FormField.displayName = 'FormField';
 type SettingsSection = 
   | 'general'
   | 'booking'
+  | 'booking_form'
   | 'payment'
   | 'email'
   | 'trip'
@@ -86,8 +95,39 @@ type SettingsSection =
   | 'permalink'
   | 'advanced';
 
+// Form Builder Types
+interface FormFieldConfig {
+  id: string;
+  type: 'text' | 'email' | 'tel' | 'date' | 'select' | 'country' | 'textarea' | 'checkbox' | 'number';
+  label: string;
+  placeholder: string;
+  required: boolean;
+  enabled: boolean;
+  order: number;
+  width: 'full' | 'half' | 'third';
+  section?: string;
+  options?: { value: string; label: string }[];
+  locked?: boolean; // If true, field cannot be deleted and required cannot be changed
+}
+
+interface FormSectionConfig {
+  title: string;
+  description: string;
+  enabled?: boolean;
+  fields: FormFieldConfig[];
+}
+
+interface BookingFormConfig {
+  contact_form: FormSectionConfig;
+  emergency_contact_form: FormSectionConfig;
+  traveler_form: FormSectionConfig;
+}
+
 interface PaymentGatewayConfig {
   enabled: boolean;
+  icon?: string;
+  title?: string;
+  description?: string;
   [key: string]: any;
 }
 
@@ -252,7 +292,798 @@ interface SettingsData {
   api_key: string;
   api_rate_limit: number;
   session_timeout: number;
+  
+  // Booking Form Builder
+  booking_form_config: BookingFormConfig;
 }
+
+// Form Builder Component
+type BookingFormSubTab = 'contact_form' | 'emergency_contact_form' | 'traveler_form';
+
+interface BookingFormBuilderProps {
+  formData: SettingsData;
+  setFormData: React.Dispatch<React.SetStateAction<SettingsData | null>>;
+}
+
+// Get initial sub-tab from localStorage
+const getInitialFormSubTab = (): BookingFormSubTab => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('yatra_settings_booking_form_subtab');
+    if (saved && ['contact_form', 'emergency_contact_form', 'traveler_form'].includes(saved)) {
+      return saved as BookingFormSubTab;
+    }
+  }
+  return 'contact_form';
+};
+
+const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFormData }) => {
+  const [activeFormTab, setActiveFormTab] = useState<BookingFormSubTab>(getInitialFormSubTab);
+  
+  // Save sub-tab to localStorage when it changes
+  const handleSubTabChange = (tab: BookingFormSubTab) => {
+    setActiveFormTab(tab);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('yatra_settings_booking_form_subtab', tab);
+    }
+  };
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [showAddField, setShowAddField] = useState(false);
+  const [newField, setNewField] = useState<Partial<FormFieldConfig>>({
+    id: '',
+    type: 'text',
+    label: '',
+    placeholder: '',
+    required: false,
+    enabled: true,
+    width: 'full',
+    options: [],
+  });
+  
+  // Delete confirmation state
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; fieldId: string | null; fieldLabel: string }>({
+    isOpen: false,
+    fieldId: null,
+    fieldLabel: '',
+  });
+  
+  // Drag and drop state
+  const [draggedFieldId, setDraggedFieldId] = useState<string | null>(null);
+  const [dragOverFieldId, setDragOverFieldId] = useState<string | null>(null);
+
+  // Helper to generate ID from label
+  const generateIdFromLabel = (label: string): string => {
+    return label.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+  };
+
+  // Helper to sanitize ID input
+  const sanitizeId = (id: string): string => {
+    return id.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+  };
+  
+  // Handle label change with auto ID generation
+  const handleNewFieldLabelChange = (label: string) => {
+    const autoId = generateIdFromLabel(label);
+    setNewField(prev => ({
+      ...prev,
+      label,
+      // Only auto-generate ID if it hasn't been manually edited
+      id: prev.id === '' || prev.id === generateIdFromLabel(prev.label || '') ? autoId : prev.id,
+    }));
+  };
+
+  const formTabs = [
+    { id: 'contact_form' as const, label: __('Contact Form', 'Contact Form'), description: 'Lead traveler contact details' },
+    { id: 'emergency_contact_form' as const, label: __('Emergency Contact', 'Emergency Contact'), description: 'Emergency contact information' },
+    { id: 'traveler_form' as const, label: __('Traveler Form', 'Traveler Form'), description: 'Individual traveler details' },
+  ];
+
+  const fieldTypes = [
+    { value: 'text', label: 'Text' },
+    { value: 'email', label: 'Email' },
+    { value: 'tel', label: 'Phone' },
+    { value: 'date', label: 'Date' },
+    { value: 'select', label: 'Dropdown' },
+    { value: 'country', label: 'Country Selector' },
+    { value: 'textarea', label: 'Text Area' },
+    { value: 'number', label: 'Number' },
+  ];
+
+  const widthOptions = [
+    { value: 'full', label: 'Full Width' },
+    { value: 'half', label: 'Half Width' },
+    { value: 'third', label: 'One Third' },
+  ];
+
+  const getCurrentFormConfig = () => {
+    return formData?.booking_form_config?.[activeFormTab] || { title: '', description: '', enabled: true, fields: [] };
+  };
+
+  const updateFormConfig = (updates: Partial<FormSectionConfig>) => {
+    setFormData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        booking_form_config: {
+          ...prev.booking_form_config,
+          [activeFormTab]: {
+            ...prev.booking_form_config[activeFormTab],
+            ...updates,
+          },
+        },
+      };
+    });
+  };
+
+  const updateField = (fieldId: string, updates: Partial<FormFieldConfig>) => {
+    const currentConfig = getCurrentFormConfig();
+    const updatedFields = currentConfig.fields.map(field =>
+      field.id === fieldId ? { ...field, ...updates } : field
+    );
+    updateFormConfig({ fields: updatedFields });
+  };
+
+  const toggleFieldEnabled = (fieldId: string) => {
+    const currentConfig = getCurrentFormConfig();
+    const field = currentConfig.fields.find(f => f.id === fieldId);
+    // Locked fields cannot be disabled
+    if (field && !field.locked) {
+      updateField(fieldId, { enabled: !field.enabled });
+    }
+  };
+
+  const toggleFieldRequired = (fieldId: string) => {
+    const currentConfig = getCurrentFormConfig();
+    const field = currentConfig.fields.find(f => f.id === fieldId);
+    if (field) {
+      updateField(fieldId, { required: !field.required });
+    }
+  };
+
+  const moveField = (fieldId: string, direction: 'up' | 'down') => {
+    const currentConfig = getCurrentFormConfig();
+    const fields = [...currentConfig.fields];
+    const index = fields.findIndex(f => f.id === fieldId);
+    
+    if (direction === 'up' && index > 0) {
+      [fields[index - 1], fields[index]] = [fields[index], fields[index - 1]];
+    } else if (direction === 'down' && index < fields.length - 1) {
+      [fields[index], fields[index + 1]] = [fields[index + 1], fields[index]];
+    }
+    
+    // Update order values
+    fields.forEach((field, i) => {
+      field.order = i + 1;
+    });
+    
+    updateFormConfig({ fields });
+  };
+  
+  // Drag and Drop handlers
+  const handleDragStart = (e: React.DragEvent, fieldId: string) => {
+    setDraggedFieldId(fieldId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, fieldId: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (fieldId !== draggedFieldId) {
+      setDragOverFieldId(fieldId);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverFieldId(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetFieldId: string) => {
+    e.preventDefault();
+    if (!draggedFieldId || draggedFieldId === targetFieldId) {
+      setDraggedFieldId(null);
+      setDragOverFieldId(null);
+      return;
+    }
+
+    const currentConfig = getCurrentFormConfig();
+    const fields = [...currentConfig.fields];
+    const draggedIndex = fields.findIndex(f => f.id === draggedFieldId);
+    const targetIndex = fields.findIndex(f => f.id === targetFieldId);
+
+    if (draggedIndex !== -1 && targetIndex !== -1) {
+      const [draggedField] = fields.splice(draggedIndex, 1);
+      fields.splice(targetIndex, 0, draggedField);
+      
+      // Update order values
+      fields.forEach((field, i) => {
+        field.order = i + 1;
+      });
+      
+      updateFormConfig({ fields });
+    }
+
+    setDraggedFieldId(null);
+    setDragOverFieldId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedFieldId(null);
+    setDragOverFieldId(null);
+  };
+
+  const deleteField = (fieldId: string) => {
+    const currentConfig = getCurrentFormConfig();
+    const updatedFields = currentConfig.fields.filter(f => f.id !== fieldId);
+    updatedFields.forEach((field, i) => {
+      field.order = i + 1;
+    });
+    updateFormConfig({ fields: updatedFields });
+    setDeleteConfirm({ isOpen: false, fieldId: null, fieldLabel: '' });
+  };
+
+  const addNewField = () => {
+    if (!newField.label || !newField.id) return;
+    
+    const currentConfig = getCurrentFormConfig();
+    const fieldId = sanitizeId(newField.id);
+    
+    // Check if ID already exists
+    if (currentConfig.fields.some(f => f.id === fieldId)) {
+      alert('A field with this ID already exists. Please use a different ID.');
+      return;
+    }
+    
+    const newFieldConfig: FormFieldConfig = {
+      id: fieldId,
+      type: (newField.type as FormFieldConfig['type']) || 'text',
+      label: newField.label || '',
+      placeholder: newField.placeholder || '',
+      required: newField.required || false,
+      enabled: true,
+      order: currentConfig.fields.length + 1,
+      width: (newField.width as FormFieldConfig['width']) || 'full',
+    };
+    
+    // Add options if field type is select
+    if (newField.type === 'select' && newField.options && newField.options.length > 0) {
+      newFieldConfig.options = newField.options.filter(opt => opt.value && opt.label);
+    }
+    
+    updateFormConfig({ fields: [...currentConfig.fields, newFieldConfig] });
+    setNewField({ id: '', type: 'text', label: '', placeholder: '', required: false, enabled: true, width: 'full', options: [] });
+    setShowAddField(false);
+  };
+
+  const currentConfig = getCurrentFormConfig();
+
+  return (
+    <div className="space-y-6">
+      {/* Form Type Tabs */}
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <nav className="flex gap-4" aria-label="Form Types">
+          {formTabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => handleSubTabChange(tab.id)}
+              className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeFormTab === tab.id
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Form Section Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{__('Form Section Settings', 'Form Section Settings')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+            <input
+              type="checkbox"
+              id="form_section_enabled"
+              checked={currentConfig.enabled !== false}
+              onChange={(e) => updateFormConfig({ enabled: e.target.checked })}
+              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <Label htmlFor="form_section_enabled" className="font-medium cursor-pointer">
+              {__('Enable this form section', 'Enable this form section')}
+            </Label>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="form_title">{__('Section Title', 'Section Title')}</Label>
+              <Input
+                id="form_title"
+                value={currentConfig.title || ''}
+                onChange={(e) => updateFormConfig({ title: e.target.value })}
+                placeholder="Enter section title"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="form_description">{__('Section Description', 'Section Description')}</Label>
+              <Input
+                id="form_description"
+                value={currentConfig.description || ''}
+                onChange={(e) => updateFormConfig({ description: e.target.value })}
+                placeholder="Enter description"
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Form Fields */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base">{__('Form Fields', 'Form Fields')}</CardTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAddField(!showAddField)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            {__('Add Field', 'Add Field')}
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {/* Add New Field Form */}
+          {showAddField && (
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
+              <h4 className="font-medium text-sm mb-3">{__('Add New Field', 'Add New Field')}</h4>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <div>
+                  <Label className="text-xs">{__('Field Type', 'Field Type')}</Label>
+                  <Select
+                    value={newField.type || 'text'}
+                    onChange={(e) => setNewField(prev => ({ ...prev, type: e.target.value as FormFieldConfig['type'] }))}
+                    className="mt-1"
+                  >
+                    {fieldTypes.map(type => (
+                      <option key={type.value} value={type.value}>{type.label}</option>
+                    ))}
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs">{__('Label', 'Label')} *</Label>
+                  <Input
+                    value={newField.label || ''}
+                    onChange={(e) => handleNewFieldLabelChange(e.target.value)}
+                    placeholder="Field label"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">{__('Field ID', 'Field ID')} *</Label>
+                  <Input
+                    value={newField.id || ''}
+                    onChange={(e) => setNewField(prev => ({ ...prev, id: sanitizeId(e.target.value) }))}
+                    placeholder="field_id"
+                    className="mt-1 font-mono text-xs"
+                  />
+                  <p className="text-[10px] text-gray-400 mt-0.5">{__('Lowercase, no spaces', 'Lowercase, no spaces')}</p>
+                </div>
+                <div>
+                  <Label className="text-xs">{__('Placeholder', 'Placeholder')}</Label>
+                  <Input
+                    value={newField.placeholder || ''}
+                    onChange={(e) => setNewField(prev => ({ ...prev, placeholder: e.target.value }))}
+                    placeholder="Placeholder text"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">{__('Width', 'Width')}</Label>
+                  <Select
+                    value={newField.width || 'full'}
+                    onChange={(e) => setNewField(prev => ({ ...prev, width: e.target.value as FormFieldConfig['width'] }))}
+                    className="mt-1"
+                  >
+                    {widthOptions.map(w => (
+                      <option key={w.value} value={w.value}>{w.label}</option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+              {/* Options editor for select fields */}
+              {newField.type === 'select' && (
+                <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-blue-900">
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-xs font-medium">{__('Dropdown Options', 'Dropdown Options')}</Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const currentOptions = newField.options || [];
+                        setNewField(prev => ({ ...prev, options: [...currentOptions, { value: '', label: '' }] }));
+                      }}
+                      className="h-6 text-xs"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      {__('Add Option', 'Add Option')}
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {(newField.options || []).map((option, optIndex) => (
+                      <div key={optIndex} className="flex items-center gap-2">
+                        <Input
+                          value={option.value}
+                          onChange={(e) => {
+                            const newOptions = [...(newField.options || [])];
+                            newOptions[optIndex] = { ...newOptions[optIndex], value: e.target.value };
+                            setNewField(prev => ({ ...prev, options: newOptions }));
+                          }}
+                          placeholder="Value (e.g., option1)"
+                          className="text-xs flex-1"
+                        />
+                        <Input
+                          value={option.label}
+                          onChange={(e) => {
+                            const newOptions = [...(newField.options || [])];
+                            newOptions[optIndex] = { ...newOptions[optIndex], label: e.target.value };
+                            setNewField(prev => ({ ...prev, options: newOptions }));
+                          }}
+                          placeholder="Label (e.g., Option 1)"
+                          className="text-xs flex-1"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newOptions = (newField.options || []).filter((_, i) => i !== optIndex);
+                            setNewField(prev => ({ ...prev, options: newOptions }));
+                          }}
+                          className="p-1 text-gray-400 hover:text-red-500"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {(!newField.options || newField.options.length === 0) && (
+                      <p className="text-xs text-gray-400 italic">{__('Click "Add Option" to add dropdown choices.', 'No options')}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center gap-4 mt-3">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={newField.required || false}
+                    onChange={(e) => setNewField(prev => ({ ...prev, required: e.target.checked }))}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600"
+                  />
+                  {__('Required', 'Required')}
+                </label>
+                <div className="flex-1"></div>
+                <Button variant="ghost" size="sm" onClick={() => setShowAddField(false)}>
+                  {__('Cancel', 'Cancel')}
+                </Button>
+                <Button size="sm" onClick={addNewField} disabled={!newField.label || !newField.id}>
+                  {__('Add Field', 'Add Field')}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Field List */}
+          {currentConfig.fields?.length === 0 ? (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <p>{__('No fields configured. Click "Add Field" to get started.', 'No fields configured.')}</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {currentConfig.fields?.map((field, index) => (
+                <div
+                  key={field.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, field.id)}
+                  onDragOver={(e) => handleDragOver(e, field.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, field.id)}
+                  onDragEnd={handleDragEnd}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-grab active:cursor-grabbing ${
+                    draggedFieldId === field.id ? 'opacity-50 border-dashed' : ''
+                  } ${
+                    dragOverFieldId === field.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : ''
+                  } ${
+                    field.enabled
+                      ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                      : 'bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800 opacity-60'
+                  }`}
+                >
+                  {/* Drag Handle & Order */}
+                  <div className="flex items-center gap-1">
+                    <GripVertical className="w-4 h-4 text-gray-400" />
+                    <div className="flex flex-col gap-0.5">
+                      <button
+                        type="button"
+                        onClick={() => moveField(field.id, 'up')}
+                        disabled={index === 0}
+                        className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        <ArrowUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveField(field.id, 'down')}
+                        disabled={index === currentConfig.fields.length - 1}
+                        className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        <ArrowDown className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Field Info */}
+                  <div className="flex-1 min-w-0">
+                    {editingField === field.id ? (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-4 gap-2">
+                          <Input
+                            value={field.label}
+                            onChange={(e) => updateField(field.id, { label: e.target.value })}
+                            placeholder="Label"
+                            className="text-sm"
+                          />
+                          <Input
+                            value={field.placeholder}
+                            onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
+                            placeholder="Placeholder"
+                            className="text-sm"
+                          />
+                          <Select
+                            value={field.type}
+                            onChange={(e) => updateField(field.id, { type: e.target.value as FormFieldConfig['type'] })}
+                            className="text-sm"
+                          >
+                            {fieldTypes.map(type => (
+                              <option key={type.value} value={type.value}>{type.label}</option>
+                            ))}
+                          </Select>
+                          <Select
+                            value={field.width}
+                            onChange={(e) => updateField(field.id, { width: e.target.value as FormFieldConfig['width'] })}
+                            className="text-sm"
+                          >
+                            {widthOptions.map(w => (
+                              <option key={w.value} value={w.value}>{w.label}</option>
+                            ))}
+                          </Select>
+                        </div>
+                        
+                        {/* Field ID - Below other fields */}
+                        <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
+                          <Label className="text-xs text-gray-500 whitespace-nowrap">{__('Field ID:', 'Field ID:')}</Label>
+                          <Input
+                            value={field.id}
+                            onChange={(e) => {
+                              if (!field.locked) {
+                                updateField(field.id, { id: sanitizeId(e.target.value) });
+                              }
+                            }}
+                            placeholder="field_id"
+                            className="text-sm font-mono flex-1 max-w-xs"
+                            disabled={field.locked}
+                            title={field.locked ? 'Locked fields cannot change ID' : 'Field ID (lowercase, no spaces)'}
+                          />
+                          {field.locked && (
+                            <span className="text-xs text-amber-600">{__('(locked)', '(locked)')}</span>
+                          )}
+                        </div>
+                        
+                        {/* Dropdown Options Editor */}
+                        {field.type === 'select' && (
+                          <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-between mb-2">
+                              <Label className="text-xs font-medium">{__('Dropdown Options', 'Dropdown Options')}</Label>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  const newOptions = [...(field.options || []), { value: '', label: '' }];
+                                  updateField(field.id, { options: newOptions });
+                                }}
+                                className="h-6 text-xs"
+                              >
+                                <Plus className="w-3 h-3 mr-1" />
+                                {__('Add Option', 'Add Option')}
+                              </Button>
+                            </div>
+                            <div className="space-y-2">
+                              {(field.options || []).map((option, optIndex) => (
+                                <div key={optIndex} className="flex items-center gap-2">
+                                  <Input
+                                    value={option.value}
+                                    onChange={(e) => {
+                                      const newOptions = [...(field.options || [])];
+                                      newOptions[optIndex] = { ...newOptions[optIndex], value: e.target.value };
+                                      updateField(field.id, { options: newOptions });
+                                    }}
+                                    placeholder="Value (e.g., spouse)"
+                                    className="text-xs flex-1"
+                                  />
+                                  <Input
+                                    value={option.label}
+                                    onChange={(e) => {
+                                      const newOptions = [...(field.options || [])];
+                                      newOptions[optIndex] = { ...newOptions[optIndex], label: e.target.value };
+                                      updateField(field.id, { options: newOptions });
+                                    }}
+                                    placeholder="Label (e.g., Spouse/Partner)"
+                                    className="text-xs flex-1"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const newOptions = (field.options || []).filter((_, i) => i !== optIndex);
+                                      updateField(field.id, { options: newOptions });
+                                    }}
+                                    className="p-1 text-gray-400 hover:text-red-500"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              ))}
+                              {(!field.options || field.options.length === 0) && (
+                                <p className="text-xs text-gray-400 italic">{__('No options. Click "Add Option" to add dropdown choices.', 'No options')}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="font-medium text-sm">{field.label}</span>
+                        <code className="text-xs text-gray-500 dark:text-gray-400 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded font-mono">
+                          {field.id}
+                        </code>
+                        <span className="text-xs text-gray-400 dark:text-gray-500 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded">
+                          {fieldTypes.find(t => t.value === field.type)?.label || field.type}
+                        </span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                          {widthOptions.find(w => w.value === field.width)?.label || 'Full'}
+                        </span>
+                        {field.type === 'select' && field.options && field.options.length > 0 && (
+                          <span className="text-xs text-blue-500 dark:text-blue-400">
+                            ({field.options.length} {field.options.length === 1 ? 'option' : 'options'})
+                          </span>
+                        )}
+                        {field.required && (
+                          <span className="text-xs text-red-500 font-medium">Required</span>
+                        )}
+                        {field.locked && (
+                          <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 px-1.5 py-0.5 bg-amber-50 dark:bg-amber-900/20 rounded" title="This field is protected and cannot be deleted">
+                            <Lock className="w-3 h-3" />
+                            Locked
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => !field.locked && toggleFieldRequired(field.id)}
+                      disabled={field.locked}
+                      className={`p-1.5 rounded ${field.locked ? 'cursor-not-allowed opacity-50' : ''} ${field.required ? 'text-red-500 bg-red-50 dark:bg-red-900/20' : 'text-gray-400 hover:text-gray-600'}`}
+                      title={field.locked ? 'This field is required and cannot be changed' : (field.required ? 'Make optional' : 'Make required')}
+                    >
+                      <Star className="w-4 h-4" fill={field.required ? 'currentColor' : 'none'} />
+                    </button>
+                    {/* Show enable/disable toggle only for non-locked fields */}
+                    {!field.locked && (
+                      <button
+                        type="button"
+                        onClick={() => toggleFieldEnabled(field.id)}
+                        className={`p-1.5 rounded ${field.enabled ? 'text-green-500' : 'text-gray-400'}`}
+                        title={field.enabled ? 'Disable field' : 'Enable field'}
+                      >
+                        {field.enabled ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setEditingField(editingField === field.id ? null : field.id)}
+                      className="p-1.5 rounded text-gray-400 hover:text-blue-500"
+                      title="Edit field"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    {/* Show delete button only for non-locked fields */}
+                    {!field.locked && (
+                      <button
+                        type="button"
+                        onClick={() => setDeleteConfirm({ isOpen: true, fieldId: field.id, fieldLabel: field.label })}
+                        className="p-1.5 rounded text-gray-400 hover:text-red-500"
+                        title="Delete field"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, fieldId: null, fieldLabel: '' })}
+        onConfirm={() => {
+          if (deleteConfirm.fieldId) {
+            deleteField(deleteConfirm.fieldId);
+          }
+        }}
+        title={__('Delete Field', 'Delete Field')}
+        message={`Are you sure you want to delete the field "${deleteConfirm.fieldLabel}"? This action cannot be undone.`}
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+      />
+
+      {/* Preview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{__('Preview', 'Preview')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <h3 className="font-semibold text-lg mb-1">{currentConfig.title || 'Form Section'}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{currentConfig.description}</p>
+            <div className="grid grid-cols-2 gap-4">
+              {currentConfig.fields?.filter(f => f.enabled).map(field => (
+                <div
+                  key={field.id}
+                  className={field.width === 'full' ? 'col-span-2' : field.width === 'third' ? 'col-span-1' : 'col-span-1'}
+                >
+                  <Label className="text-sm">
+                    {field.label}
+                    {field.required && <span className="text-red-500 ml-1">*</span>}
+                  </Label>
+                  {field.type === 'select' || field.type === 'country' ? (
+                    <Select disabled className="mt-1 w-full">
+                      <option>{field.placeholder || 'Select...'}</option>
+                    </Select>
+                  ) : field.type === 'textarea' ? (
+                    <textarea
+                      disabled
+                      placeholder={field.placeholder}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-700 text-sm"
+                      rows={2}
+                    />
+                  ) : (
+                    <Input
+                      disabled
+                      type={field.type}
+                      placeholder={field.placeholder}
+                      className="mt-1"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient();
@@ -263,7 +1094,7 @@ const Settings: React.FC = () => {
   const getInitialActiveSection = (): SettingsSection => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('yatra_settings_active_section');
-      if (saved && ['general', 'booking', 'payment', 'email', 'trip', 'customer', 'review', 'tax', 'currency', 'notification', 'integration', 'permalink', 'advanced'].includes(saved)) {
+      if (saved && ['general', 'booking', 'booking_form', 'payment', 'email', 'trip', 'customer', 'review', 'tax', 'currency', 'notification', 'integration', 'permalink', 'advanced'].includes(saved)) {
         return saved as SettingsSection;
       }
     }
@@ -504,6 +1335,70 @@ const Settings: React.FC = () => {
         api_key: '',
         api_rate_limit: 100,
         session_timeout: 3600,
+        
+        // Booking Form Builder
+        booking_form_config: {
+          contact_form: {
+            title: 'Lead Traveler / Contact Information',
+            description: 'Primary contact person for this booking',
+            enabled: true,
+            fields: [
+              { id: 'first_name', type: 'text', label: 'First Name', placeholder: 'Enter first name', required: true, enabled: true, order: 1, width: 'half', locked: true },
+              { id: 'last_name', type: 'text', label: 'Last Name', placeholder: 'Enter last name', required: true, enabled: true, order: 2, width: 'half', locked: true },
+              { id: 'email', type: 'email', label: 'Email Address', placeholder: 'your@email.com', required: true, enabled: true, order: 3, width: 'half', locked: true },
+              { id: 'phone', type: 'tel', label: 'Phone Number', placeholder: '+1 234 567 8900', required: true, enabled: true, order: 4, width: 'half', locked: true },
+              { id: 'country', type: 'country', label: 'Country', placeholder: 'Select Country', required: true, enabled: true, order: 5, width: 'half', locked: true },
+              { id: 'nationality', type: 'country', label: 'Nationality', placeholder: 'Select Nationality', required: false, enabled: true, order: 6, width: 'half' },
+              { id: 'address', type: 'text', label: 'Address', placeholder: 'Street address (optional)', required: false, enabled: true, order: 7, width: 'full' },
+            ],
+          },
+          emergency_contact_form: {
+            title: 'Emergency Contact',
+            description: 'Person to contact in case of emergency',
+            enabled: true,
+            fields: [
+              { id: 'name', type: 'text', label: 'Contact Name', placeholder: 'Full name', required: true, enabled: true, order: 1, width: 'half' },
+              { id: 'phone', type: 'tel', label: 'Contact Phone', placeholder: '+1 234 567 8900', required: true, enabled: true, order: 2, width: 'half' },
+              { id: 'relationship', type: 'select', label: 'Relationship', placeholder: 'Select Relationship', required: false, enabled: true, order: 3, width: 'full', options: [
+                { value: 'spouse', label: 'Spouse/Partner' },
+                { value: 'parent', label: 'Parent' },
+                { value: 'sibling', label: 'Sibling' },
+                { value: 'child', label: 'Child' },
+                { value: 'friend', label: 'Friend' },
+                { value: 'other', label: 'Other' },
+              ]},
+            ],
+          },
+          traveler_form: {
+            title: 'Traveler Information',
+            description: 'Please provide details for each traveler',
+            enabled: true,
+            fields: [
+              { id: 'first_name', type: 'text', label: 'First Name', placeholder: 'As in passport', required: true, enabled: true, order: 1, width: 'half' },
+              { id: 'last_name', type: 'text', label: 'Last Name', placeholder: 'As in passport', required: true, enabled: true, order: 2, width: 'half' },
+              { id: 'date_of_birth', type: 'date', label: 'Date of Birth', placeholder: '', required: true, enabled: true, order: 3, width: 'half' },
+              { id: 'gender', type: 'select', label: 'Gender', placeholder: 'Select Gender', required: true, enabled: true, order: 4, width: 'half', options: [
+                { value: 'male', label: 'Male' },
+                { value: 'female', label: 'Female' },
+                { value: 'other', label: 'Other' },
+              ]},
+              { id: 'nationality', type: 'country', label: 'Nationality', placeholder: 'Select Nationality', required: true, enabled: true, order: 5, width: 'full' },
+              { id: 'passport', type: 'text', label: 'Passport Number', placeholder: 'Enter passport number', required: true, enabled: true, order: 6, width: 'half', section: 'passport' },
+              { id: 'passport_expiry', type: 'date', label: 'Passport Expiry', placeholder: '', required: true, enabled: true, order: 7, width: 'half', section: 'passport' },
+              { id: 'dietary', type: 'select', label: 'Dietary Requirements', placeholder: 'Select', required: false, enabled: true, order: 8, width: 'half', section: 'dietary_medical', options: [
+                { value: 'none', label: 'No special requirements' },
+                { value: 'vegetarian', label: 'Vegetarian' },
+                { value: 'vegan', label: 'Vegan' },
+                { value: 'halal', label: 'Halal' },
+                { value: 'kosher', label: 'Kosher' },
+                { value: 'gluten_free', label: 'Gluten Free' },
+                { value: 'lactose_free', label: 'Lactose Free' },
+                { value: 'other', label: 'Other (specify in notes)' },
+              ]},
+              { id: 'medical', type: 'text', label: 'Medical Conditions / Allergies', placeholder: 'Any allergies or conditions', required: false, enabled: true, order: 9, width: 'half', section: 'dietary_medical' },
+            ],
+          },
+        },
       }), []);
 
   const [formData, setFormData] = useState<SettingsData | null>(null);
@@ -806,6 +1701,7 @@ const Settings: React.FC = () => {
   const settingsSections = [
     { id: 'general' as SettingsSection, label: __('General', 'General'), icon: Building2 },
     { id: 'booking' as SettingsSection, label: __('Booking', 'Booking'), icon: Calendar },
+    { id: 'booking_form' as SettingsSection, label: __('Booking Form', 'Booking Form'), icon: ClipboardList },
     { id: 'payment' as SettingsSection, label: __('Payment', 'Payment'), icon: DollarSign },
     { id: 'email' as SettingsSection, label: __('Email', 'Email'), icon: Mail },
     { id: 'trip' as SettingsSection, label: __('Trip', 'Trip'), icon: MapPin },
@@ -1053,6 +1949,14 @@ onChange={handleFieldChange}
           </div>
         );
 
+      case 'booking_form':
+        return (
+          <BookingFormBuilder
+            formData={formData}
+            setFormData={setFormData}
+          />
+        );
+
       case 'payment':
         return (
           <div className="space-y-6">
@@ -1269,7 +2173,7 @@ onChange={handleFieldChange}
                         </Button>
                       </div>
                     </CardHeader>
-                    {isExpanded && gateway.fields && (
+                    {isExpanded && (
                       <CardContent className="pt-4 space-y-4 border-t border-gray-100 dark:border-gray-700">
                         {/* Info banner for offline gateways */}
                         {gateway.is_offline && (
@@ -1283,8 +2187,70 @@ onChange={handleFieldChange}
                           </div>
                         )}
                         
+                        {/* Frontend Display Settings */}
+                        <div className="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {__('Frontend Display Settings', 'Frontend Display Settings')}
+                          </h4>
+                          
+                          <FormField
+                            id={`${gatewayId}_icon`}
+                            label={__('Gateway Icon', 'Gateway Icon')}
+                            description={__('Icon URL or path displayed on the booking page', 'Icon URL or path displayed on the booking page')}
+                          >
+                            <div className="flex items-center gap-3">
+                              <Input
+                                type="text"
+                                value={config.icon || gateway.icon || ''}
+                                onChange={(e) => handleGatewayConfigChange(gatewayId, 'icon', e.target.value)}
+                                placeholder={__('Enter icon URL or leave empty to use default', 'Enter icon URL or leave empty to use default')}
+                                className="flex-1"
+                              />
+                              {config.icon || gateway.icon ? (
+                                <img 
+                                  src={config.icon || gateway.icon} 
+                                  alt={gateway.title} 
+                                  className="w-10 h-10 object-contain border border-gray-300 dark:border-gray-600 rounded p-1 bg-white dark:bg-gray-800"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                  }}
+                                />
+                              ) : null}
+                            </div>
+                          </FormField>
+                          
+                          <FormField
+                            id={`${gatewayId}_title`}
+                            label={__('Gateway Title', 'Gateway Title')}
+                            description={__('Title displayed on the booking page', 'Title displayed on the booking page')}
+                          >
+                            <Input
+                              type="text"
+                              value={config.title || gateway.title || ''}
+                              onChange={(e) => handleGatewayConfigChange(gatewayId, 'title', e.target.value)}
+                              placeholder={gateway.title || __('Enter gateway title', 'Enter gateway title')}
+                            />
+                          </FormField>
+                          
+                          <FormField
+                            id={`${gatewayId}_description`}
+                            label={__('Gateway Description', 'Gateway Description')}
+                            description={__('Description displayed below the title on the booking page', 'Description displayed below the title on the booking page')}
+                          >
+                            <textarea
+                              value={config.description || gateway.description || ''}
+                              onChange={(e) => handleGatewayConfigChange(gatewayId, 'description', e.target.value)}
+                              placeholder={gateway.description || __('Enter gateway description', 'Enter gateway description')}
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                              rows={2}
+                            />
+                          </FormField>
+                        </div>
+                        
                         {/* Dynamic field rendering */}
-                        {gateway.fields.map((field: GatewayField) => {
+                        {gateway.fields && gateway.fields.length > 0 && (
+                          <div className="space-y-4">
+                            {gateway.fields.map((field: GatewayField) => {
                           // Check conditional visibility
                           if (field.condition && !config[field.condition]) {
                             return null;
@@ -1347,6 +2313,8 @@ onChange={handleFieldChange}
                             </FormField>
                           );
                         })}
+                          </div>
+                        )}
                       </CardContent>
                     )}
                   </Card>

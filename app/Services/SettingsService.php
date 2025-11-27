@@ -54,6 +54,12 @@ class SettingsService
         'enable_deposit' => false,
         'deposit_type' => 'percentage',
         'deposit_amount' => 20,
+        'deposit_required' => false,
+        'deposit_percentage' => 20,
+        'partial_payment' => false,
+        'partial_payment_percentage' => 30,
+        'gateway_configs' => [],
+        'gateway_order' => [],
         
         // Email
         'email_from_name' => '',
@@ -104,7 +110,125 @@ class SettingsService
         // Advanced
         'enable_debug_mode' => false,
         'delete_data_on_uninstall' => false,
+        
+        // Booking Form Builder
+        'booking_form_config' => [],
     ];
+    
+    /**
+     * Get default booking form configuration
+     * 
+     * @return array
+     */
+    public static function getDefaultBookingFormConfig(): array
+    {
+        return [
+            'contact_form' => [
+                'title' => 'Lead Traveler / Contact Information',
+                'description' => 'Primary contact person for this booking',
+                'fields' => [
+                    ['id' => 'first_name', 'type' => 'text', 'label' => 'First Name', 'placeholder' => 'Enter first name', 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half', 'locked' => true],
+                    ['id' => 'last_name', 'type' => 'text', 'label' => 'Last Name', 'placeholder' => 'Enter last name', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half', 'locked' => true],
+                    ['id' => 'email', 'type' => 'email', 'label' => 'Email Address', 'placeholder' => 'your@email.com', 'required' => true, 'enabled' => true, 'order' => 3, 'width' => 'half', 'locked' => true],
+                    ['id' => 'phone', 'type' => 'tel', 'label' => 'Phone Number', 'placeholder' => '+1 234 567 8900', 'required' => true, 'enabled' => true, 'order' => 4, 'width' => 'half', 'locked' => true],
+                    ['id' => 'country', 'type' => 'country', 'label' => 'Country', 'placeholder' => 'Select Country', 'required' => true, 'enabled' => true, 'order' => 5, 'width' => 'half', 'locked' => true],
+                    ['id' => 'nationality', 'type' => 'country', 'label' => 'Nationality', 'placeholder' => 'Select Nationality', 'required' => false, 'enabled' => true, 'order' => 6, 'width' => 'half'],
+                    ['id' => 'address', 'type' => 'text', 'label' => 'Address', 'placeholder' => 'Street address (optional)', 'required' => false, 'enabled' => true, 'order' => 7, 'width' => 'full'],
+                ],
+            ],
+            'emergency_contact_form' => [
+                'title' => 'Emergency Contact',
+                'description' => 'Person to contact in case of emergency',
+                'enabled' => true,
+                'fields' => [
+                    ['id' => 'name', 'type' => 'text', 'label' => 'Contact Name', 'placeholder' => 'Full name', 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half'],
+                    ['id' => 'phone', 'type' => 'tel', 'label' => 'Contact Phone', 'placeholder' => '+1 234 567 8900', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half'],
+                    ['id' => 'relationship', 'type' => 'select', 'label' => 'Relationship', 'placeholder' => 'Select Relationship', 'required' => false, 'enabled' => true, 'order' => 3, 'width' => 'full', 'options' => [
+                        ['value' => 'spouse', 'label' => 'Spouse/Partner'],
+                        ['value' => 'parent', 'label' => 'Parent'],
+                        ['value' => 'sibling', 'label' => 'Sibling'],
+                        ['value' => 'child', 'label' => 'Child'],
+                        ['value' => 'friend', 'label' => 'Friend'],
+                        ['value' => 'other', 'label' => 'Other'],
+                    ]],
+                ],
+            ],
+            'traveler_form' => [
+                'title' => 'Traveler Information',
+                'description' => 'Please provide details for each traveler (passport details required for international trips)',
+                'fields' => [
+                    ['id' => 'first_name', 'type' => 'text', 'label' => 'First Name', 'placeholder' => 'As in passport', 'required' => true, 'enabled' => true, 'order' => 1, 'width' => 'half'],
+                    ['id' => 'last_name', 'type' => 'text', 'label' => 'Last Name', 'placeholder' => 'As in passport', 'required' => true, 'enabled' => true, 'order' => 2, 'width' => 'half'],
+                    ['id' => 'date_of_birth', 'type' => 'date', 'label' => 'Date of Birth', 'placeholder' => '', 'required' => true, 'enabled' => true, 'order' => 3, 'width' => 'half'],
+                    ['id' => 'gender', 'type' => 'select', 'label' => 'Gender', 'placeholder' => 'Select Gender', 'required' => true, 'enabled' => true, 'order' => 4, 'width' => 'half', 'options' => [
+                        ['value' => 'male', 'label' => 'Male'],
+                        ['value' => 'female', 'label' => 'Female'],
+                        ['value' => 'other', 'label' => 'Other'],
+                    ]],
+                    ['id' => 'nationality', 'type' => 'country', 'label' => 'Nationality', 'placeholder' => 'Select Nationality', 'required' => true, 'enabled' => true, 'order' => 5, 'width' => 'full'],
+                    ['id' => 'passport', 'type' => 'text', 'label' => 'Passport Number', 'placeholder' => 'Enter passport number', 'required' => true, 'enabled' => true, 'order' => 6, 'width' => 'half', 'section' => 'passport'],
+                    ['id' => 'passport_expiry', 'type' => 'date', 'label' => 'Passport Expiry', 'placeholder' => '', 'required' => true, 'enabled' => true, 'order' => 7, 'width' => 'half', 'section' => 'passport'],
+                    ['id' => 'dietary', 'type' => 'select', 'label' => 'Dietary Requirements', 'placeholder' => 'Select', 'required' => false, 'enabled' => true, 'order' => 8, 'width' => 'half', 'section' => 'dietary_medical', 'options' => [
+                        ['value' => 'none', 'label' => 'No special requirements'],
+                        ['value' => 'vegetarian', 'label' => 'Vegetarian'],
+                        ['value' => 'vegan', 'label' => 'Vegan'],
+                        ['value' => 'halal', 'label' => 'Halal'],
+                        ['value' => 'kosher', 'label' => 'Kosher'],
+                        ['value' => 'gluten_free', 'label' => 'Gluten Free'],
+                        ['value' => 'lactose_free', 'label' => 'Lactose Free'],
+                        ['value' => 'other', 'label' => 'Other (specify in notes)'],
+                    ]],
+                    ['id' => 'medical', 'type' => 'text', 'label' => 'Medical Conditions / Allergies', 'placeholder' => 'Any allergies or conditions we should know', 'required' => false, 'enabled' => true, 'order' => 9, 'width' => 'half', 'section' => 'dietary_medical'],
+                ],
+            ],
+        ];
+    }
+    
+    /**
+     * Get booking form configuration (merged with defaults)
+     * 
+     * @return array
+     */
+    public static function getBookingFormConfig(): array
+    {
+        $saved_config = self::get('booking_form_config', []);
+        $default_config = self::getDefaultBookingFormConfig();
+        
+        // If no saved config, return defaults
+        if (empty($saved_config)) {
+            return $default_config;
+        }
+        
+        // Build a map of locked field IDs from defaults
+        $locked_fields = [];
+        foreach ($default_config as $form_type => $form_config) {
+            if (!empty($form_config['fields'])) {
+                foreach ($form_config['fields'] as $field) {
+                    if (!empty($field['locked'])) {
+                        $locked_fields[$form_type][$field['id']] = true;
+                    }
+                }
+            }
+        }
+        
+        // Merge saved with defaults
+        $merged = array_replace_recursive($default_config, $saved_config);
+        
+        // Ensure locked status is preserved from defaults (locked cannot be overridden)
+        foreach ($merged as $form_type => &$form_config) {
+            if (!empty($form_config['fields']) && is_array($form_config['fields'])) {
+                foreach ($form_config['fields'] as &$field) {
+                    // If this field ID is in the locked list, force locked=true and required=true
+                    if (isset($locked_fields[$form_type][$field['id']])) {
+                        $field['locked'] = true;
+                        $field['required'] = true;
+                    }
+                }
+            }
+        }
+        
+        return $merged;
+    }
 
     /**
      * Get all settings
@@ -146,7 +270,26 @@ class SettingsService
             return $value;
         }
 
-        return self::$settings[$key] ?? $default ?? (self::$defaults[$key] ?? null);
+        // If setting exists in cache, return it
+        if (isset(self::$settings[$key])) {
+            return self::$settings[$key];
+        }
+        
+        // Try to fetch from database directly for settings not in defaults
+        $option_name = self::OPTION_PREFIX . $key;
+        $value = get_option($option_name, null);
+        
+        if ($value !== null) {
+            // Handle serialized arrays
+            if (is_string($value) && is_serialized($value)) {
+                $value = maybe_unserialize($value);
+            }
+            // Cache the value
+            self::$settings[$key] = $value;
+            return $value;
+        }
+        
+        return $default ?? (self::$defaults[$key] ?? null);
     }
 
     /**

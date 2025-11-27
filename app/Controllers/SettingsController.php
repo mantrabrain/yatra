@@ -153,6 +153,9 @@ class SettingsController extends BaseController
         'api_key' => '',
         'api_rate_limit' => 100,
         'session_timeout' => 3600,
+        
+        // Booking Form Builder
+        'booking_form_config' => [],
     ];
 
     public function register_routes(): void
@@ -245,6 +248,9 @@ class SettingsController extends BaseController
                 
                 $settings[$key] = $value;
             }
+            
+            // Special handling for booking_form_config - always use getBookingFormConfig which handles locked fields
+            $settings['booking_form_config'] = \Yatra\Services\SettingsService::getBookingFormConfig();
 
             return $this->success_response($settings);
         } catch (\Exception $e) {
@@ -435,6 +441,13 @@ class SettingsController extends BaseController
                 }
                 return [];
             }
+            if ($key === 'booking_form_config') {
+                // Handle nested array structure for booking form config
+                if (is_array($value)) {
+                    return $this->sanitize_booking_form_config($value);
+                }
+                return [];
+            }
             if ($key === 'tax_rates') {
                 // Handle nested array structure for tax rates
                 if (is_array($value)) {
@@ -484,6 +497,7 @@ class SettingsController extends BaseController
             $sanitized_gateway = sanitize_key($gateway);
             $sanitized[$sanitized_gateway] = [
                 'enabled' => isset($config['enabled']) ? (bool) $config['enabled'] : false,
+                'icon' => isset($config['icon']) ? esc_url_raw($config['icon']) : '',
                 'title' => isset($config['title']) ? sanitize_text_field($config['title']) : '',
                 'description' => isset($config['description']) ? sanitize_textarea_field($config['description']) : '',
                 'api_key' => isset($config['api_key']) ? sanitize_text_field($config['api_key']) : '',
@@ -516,6 +530,77 @@ class SettingsController extends BaseController
                 }
             }
         }
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize booking form configuration
+     */
+    private function sanitize_booking_form_config(array $config): array
+    {
+        $sanitized = [];
+        $allowed_form_types = ['contact_form', 'emergency_contact_form', 'traveler_form'];
+        $allowed_field_types = ['text', 'email', 'tel', 'date', 'select', 'country', 'textarea', 'checkbox', 'number'];
+        $allowed_widths = ['full', 'half', 'third'];
+        
+        foreach ($config as $form_type => $form_config) {
+            if (!in_array($form_type, $allowed_form_types, true)) {
+                continue;
+            }
+            
+            $sanitized[$form_type] = [
+                'title' => isset($form_config['title']) ? sanitize_text_field($form_config['title']) : '',
+                'description' => isset($form_config['description']) ? sanitize_text_field($form_config['description']) : '',
+                'enabled' => isset($form_config['enabled']) ? (bool) $form_config['enabled'] : true,
+                'fields' => [],
+            ];
+            
+            if (!empty($form_config['fields']) && is_array($form_config['fields'])) {
+                foreach ($form_config['fields'] as $field) {
+                    if (!is_array($field) || empty($field['id'])) {
+                        continue;
+                    }
+                    
+                    $sanitized_field = [
+                        'id' => sanitize_key($field['id']),
+                        'type' => in_array($field['type'] ?? 'text', $allowed_field_types, true) ? $field['type'] : 'text',
+                        'label' => isset($field['label']) ? sanitize_text_field($field['label']) : '',
+                        'placeholder' => isset($field['placeholder']) ? sanitize_text_field($field['placeholder']) : '',
+                        'required' => isset($field['required']) ? (bool) $field['required'] : false,
+                        'enabled' => isset($field['enabled']) ? (bool) $field['enabled'] : true,
+                        'order' => isset($field['order']) ? (int) $field['order'] : 0,
+                        'width' => in_array($field['width'] ?? 'full', $allowed_widths, true) ? $field['width'] : 'full',
+                        'locked' => isset($field['locked']) ? (bool) $field['locked'] : false,
+                    ];
+                    
+                    // Handle optional section
+                    if (!empty($field['section'])) {
+                        $sanitized_field['section'] = sanitize_key($field['section']);
+                    }
+                    
+                    // Handle options for select fields
+                    if ($sanitized_field['type'] === 'select' && !empty($field['options']) && is_array($field['options'])) {
+                        $sanitized_field['options'] = [];
+                        foreach ($field['options'] as $option) {
+                            if (is_array($option) && isset($option['value'])) {
+                                $sanitized_field['options'][] = [
+                                    'value' => sanitize_key($option['value']),
+                                    'label' => isset($option['label']) ? sanitize_text_field($option['label']) : $option['value'],
+                                ];
+                            }
+                        }
+                    }
+                    
+                    $sanitized[$form_type]['fields'][] = $sanitized_field;
+                }
+                
+                // Sort fields by order
+                usort($sanitized[$form_type]['fields'], function($a, $b) {
+                    return ($a['order'] ?? 0) - ($b['order'] ?? 0);
+                });
+            }
+        }
+        
         return $sanitized;
     }
 

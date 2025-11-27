@@ -46,6 +46,16 @@ function yatra_reviews_enabled(): bool
 }
 
 /**
+ * Get booking form configuration
+ * 
+ * @return array
+ */
+function yatra_get_booking_form_config(): array
+{
+    return SettingsService::getBookingFormConfig();
+}
+
+/**
  * Check if user can leave a review for a trip
  * 
  * @param int      $trip_id Trip ID
