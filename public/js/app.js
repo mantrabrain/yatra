@@ -14289,6 +14289,10 @@ const Reviews = () => {
   const [sortBy, setSortBy] = reactExports.useState("created_at");
   const [sortOrder, setSortOrder] = reactExports.useState("desc");
   const [page, setPage] = reactExports.useState(1);
+  const [deleteConfirm, setDeleteConfirm] = reactExports.useState({
+    isOpen: false,
+    review: null
+  });
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const queryParams = reactExports.useMemo(() => {
@@ -14312,178 +14316,32 @@ const Reviews = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["reviews", queryParams],
     queryFn: async () => {
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split("T")[0];
-      };
-      const allReviews = [
-        {
-          id: 1,
-          trip_id: 1,
-          trip_title: "Everest Base Camp Trek",
-          customer_name: "John Smith",
-          customer_email: "john.smith@example.com",
-          rating: 5,
-          title: "Amazing Experience!",
-          comment: "This was the trip of a lifetime. The guides were knowledgeable and the scenery was breathtaking.",
-          status: "approved",
-          verified: true,
-          created_at: getDate(5)
-        },
-        {
-          id: 2,
-          trip_id: 2,
-          trip_title: "Annapurna Circuit Adventure",
-          customer_name: "Sarah Johnson",
-          customer_email: "sarah.j@example.com",
-          rating: 4,
-          title: "Great Adventure",
-          comment: "Beautiful landscapes and well-organized tour. Would recommend to anyone looking for an adventure.",
-          status: "approved",
-          verified: true,
-          created_at: getDate(8)
-        },
-        {
-          id: 3,
-          trip_id: 1,
-          trip_title: "Everest Base Camp Trek",
-          customer_name: "Michael Brown",
-          customer_email: "michael.b@example.com",
-          rating: 5,
-          title: "Unforgettable Journey",
-          comment: "Everything exceeded expectations. The team was professional and the experience was incredible.",
-          status: "approved",
-          verified: false,
-          created_at: getDate(12)
-        },
-        {
-          id: 4,
-          trip_id: 3,
-          trip_title: "Golden Triangle Tour",
-          customer_name: "Emily Davis",
-          customer_email: "emily.d@example.com",
-          rating: 3,
-          title: "Good but could be better",
-          comment: "The tour was good overall, but some accommodations could have been better.",
-          status: "pending",
-          verified: false,
-          created_at: getDate(15)
-        },
-        {
-          id: 5,
-          trip_id: 2,
-          trip_title: "Annapurna Circuit Adventure",
-          customer_name: "David Wilson",
-          customer_email: "david.w@example.com",
-          rating: 5,
-          title: "Perfect Trip",
-          comment: "Absolutely loved every moment. The guides were amazing and the itinerary was perfect.",
-          status: "approved",
-          verified: true,
-          created_at: getDate(18)
-        },
-        {
-          id: 6,
-          trip_id: 4,
-          trip_title: "Bhutan Cultural Journey",
-          customer_name: "Lisa Anderson",
-          customer_email: "lisa.a@example.com",
-          rating: 4,
-          title: "Cultural Delight",
-          comment: "Great cultural experience. Learned a lot about Bhutanese traditions and history.",
-          status: "approved",
-          verified: true,
-          created_at: getDate(22)
-        },
-        {
-          id: 7,
-          trip_id: 1,
-          trip_title: "Everest Base Camp Trek",
-          customer_name: "Robert Taylor",
-          customer_email: "robert.t@example.com",
-          rating: 2,
-          title: "Disappointing",
-          comment: "The trip did not meet my expectations. Several issues with accommodations and logistics.",
-          status: "pending",
-          verified: false,
-          created_at: getDate(25)
-        },
-        {
-          id: 8,
-          trip_id: 5,
-          trip_title: "Tibet Spiritual Tour",
-          customer_name: "Jennifer Martinez",
-          customer_email: "jennifer.m@example.com",
-          rating: 5,
-          title: "Spiritual Awakening",
-          comment: "A truly transformative experience. The spiritual aspects of the tour were deeply moving.",
-          status: "approved",
-          verified: true,
-          created_at: getDate(30)
-        }
-      ];
-      let filtered = [...allReviews];
-      if (searchTerm) {
-        const search = searchTerm.toLowerCase();
-        filtered = filtered.filter(
-          (review) => review.trip_title.toLowerCase().includes(search) || review.customer_name.toLowerCase().includes(search) || review.customer_email.toLowerCase().includes(search) || review.title.toLowerCase().includes(search) || review.comment.toLowerCase().includes(search)
-        );
-      }
-      if (statusFilter !== "all") {
-        filtered = filtered.filter((review) => review.status === statusFilter);
-      }
-      if (ratingFilter !== "all") {
-        filtered = filtered.filter((review) => review.rating === parseInt(ratingFilter));
-      }
-      filtered.sort((a, b) => {
-        let aValue;
-        let bValue;
-        switch (sortBy) {
-          case "trip_title":
-            aValue = a.trip_title.toLowerCase();
-            bValue = b.trip_title.toLowerCase();
-            break;
-          case "customer_name":
-            aValue = a.customer_name.toLowerCase();
-            bValue = b.customer_name.toLowerCase();
-            break;
-          case "rating":
-            aValue = a.rating;
-            bValue = b.rating;
-            break;
-          case "status":
-            aValue = a.status;
-            bValue = b.status;
-            break;
-          case "created_at":
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-            break;
-          default:
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-        }
-        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-        return 0;
-      });
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
+      const response = await apiClient.get("/reviews", { params: queryParams });
+      const reviews2 = ((response == null ? void 0 : response.data) || []).map((item) => ({
+        id: item.id,
+        trip_id: item.trip_id,
+        trip_title: item.trip_title || "Unknown Trip",
+        customer_name: item.customer_name || item.author_name || "Anonymous",
+        customer_email: item.customer_email || item.author_email || "",
+        rating: item.rating,
+        title: item.title || "",
+        comment: item.comment || item.content || "",
+        status: item.status || "pending",
+        verified: item.verified || false,
+        created_at: item.created_at || ""
+      }));
       return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10
+        data: reviews2,
+        total: (response == null ? void 0 : response.total) || 0,
+        page: (response == null ? void 0 : response.page) || page,
+        per_page: (response == null ? void 0 : response.per_page) || 10
       };
     },
     enabled: can("yatra_view_reviews")
   });
   const deleteMutation = useMutation({
-    mutationFn: async (_id) => {
-      return { success: true };
+    mutationFn: async (id) => {
+      return await apiClient.delete(`/reviews/${id}`);
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["reviews"] });
@@ -14541,8 +14399,12 @@ const Reviews = () => {
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=reviews&action=edit&id=${review.id}`;
   };
   const handleDelete = (review) => {
-    if (confirm(__("Are you sure you want to delete this review?", "Are you sure you want to delete this review?"))) {
-      deleteMutation.mutate(review.id);
+    setDeleteConfirm({ isOpen: true, review });
+  };
+  const confirmDelete = () => {
+    if (deleteConfirm.review) {
+      deleteMutation.mutate(deleteConfirm.review.id);
+      setDeleteConfirm({ isOpen: false, review: null });
     }
   };
   const handleView = (review) => {
@@ -14577,6 +14439,20 @@ const Reviews = () => {
   };
   const hasFilters = searchTerm || statusFilter !== "all" || ratingFilter !== "all" || sortBy !== "created_at" || sortOrder !== "desc";
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: deleteConfirm.isOpen,
+        onClose: () => setDeleteConfirm({ isOpen: false, review: null }),
+        onConfirm: confirmDelete,
+        title: __("Delete Review", "Delete Review"),
+        message: deleteConfirm.review ? __('Are you sure you want to delete this review by "{name}"? This action cannot be undone.', 'Are you sure you want to delete this review by "{name}"? This action cannot be undone.').replace("{name}", deleteConfirm.review.customer_name) : __("Are you sure you want to delete this review? This action cannot be undone.", "Are you sure you want to delete this review? This action cannot be undone."),
+        confirmText: __("Delete", "Delete"),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "danger",
+        isLoading: deleteMutation.isPending
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
@@ -14856,18 +14732,18 @@ const ReviewForm = () => {
   const { data: tripsData } = useQuery({
     queryKey: ["trips-list"],
     queryFn: async () => {
-      return {
-        data: [
-          { id: 1, title: "Everest Base Camp Trek" },
-          { id: 2, title: "Annapurna Circuit Adventure" },
-          { id: 3, title: "Golden Triangle Tour" },
-          { id: 4, title: "Bhutan Cultural Journey" },
-          { id: 5, title: "Tibet Spiritual Tour" },
-          { id: 6, title: "Langtang Valley Trek" },
-          { id: 7, title: "Manaslu Circuit Trek" },
-          { id: 8, title: "Upper Mustang Trek" }
-        ]
-      };
+      const response = await apiClient.get("/trips", {
+        params: {
+          per_page: 100,
+          status: "all"
+          // Get all trips including drafts
+        }
+      });
+      const trips2 = ((response == null ? void 0 : response.data) || []).map((trip) => ({
+        id: trip.id,
+        title: trip.title || "Untitled Trip"
+      }));
+      return { data: trips2 };
     },
     enabled: can("yatra_view_trips")
   });
@@ -14875,16 +14751,18 @@ const ReviewForm = () => {
     queryKey: ["review", reviewId],
     queryFn: async () => {
       if (!reviewId) return null;
+      const response = await apiClient.get(`/reviews/${reviewId}`);
+      const review = (response == null ? void 0 : response.data) || response;
       return {
-        id: reviewId,
-        trip_id: 1,
-        customer_name: "John Smith",
-        customer_email: "john.smith@example.com",
-        rating: 5,
-        title: "Amazing Experience!",
-        comment: "This was the trip of a lifetime. The guides were knowledgeable and the scenery was breathtaking.",
-        status: "approved",
-        verified: true
+        id: review.id,
+        trip_id: review.trip_id,
+        customer_name: review.customer_name || review.author_name || "",
+        customer_email: review.customer_email || review.author_email || "",
+        rating: review.rating,
+        title: review.title || "",
+        comment: review.comment || review.content || "",
+        status: review.status || "pending",
+        verified: review.verified || false
       };
     },
     enabled: isEditMode && can("yatra_view_reviews")
@@ -14972,11 +14850,9 @@ const ReviewForm = () => {
         verified: data.verified
       };
       if (isEditMode && reviewId) {
-        console.log("Updating review:", reviewId, payload);
-        return { success: true, id: reviewId };
+        return await apiClient.put(`/reviews/${reviewId}`, payload);
       } else {
-        console.log("Creating review:", payload);
-        return { success: true, id: Math.floor(Math.random() * 1e3) };
+        return await apiClient.post("/reviews", payload);
       }
     },
     onSuccess: () => {

@@ -10,6 +10,182 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use Yatra\Services\SettingsService;
+
+/**
+ * Get a plugin setting value
+ * 
+ * @param string $key     Setting key
+ * @param mixed  $default Default value
+ * @return mixed
+ */
+function yatra_get_setting(string $key, $default = null)
+{
+    return SettingsService::get($key, $default);
+}
+
+/**
+ * Check if a setting is enabled
+ * 
+ * @param string $key Setting key
+ * @return bool
+ */
+function yatra_setting_enabled(string $key): bool
+{
+    return SettingsService::isEnabled($key);
+}
+
+/**
+ * Check if reviews are enabled
+ * 
+ * @return bool
+ */
+function yatra_reviews_enabled(): bool
+{
+    return SettingsService::reviewsEnabled();
+}
+
+/**
+ * Check if user can leave a review for a trip
+ * 
+ * @param int      $trip_id Trip ID
+ * @param int|null $user_id User ID (defaults to current user)
+ * @return bool
+ */
+function yatra_can_review(int $trip_id, ?int $user_id = null): bool
+{
+    // Reviews must be enabled
+    if (!SettingsService::reviewsEnabled()) {
+        return false;
+    }
+
+    // Get user ID
+    if ($user_id === null) {
+        $user_id = get_current_user_id();
+    }
+
+    // If booking required, check if user has booked this trip
+    if (SettingsService::requireBookingForReview()) {
+        if ($user_id === 0) {
+            return false; // Guest can't review if booking required
+        }
+        
+        // Check if user has a completed booking for this trip
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_bookings';
+        $has_booking = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$table} 
+             WHERE trip_id = %d AND customer_id = %d AND status = 'completed'",
+            $trip_id,
+            $user_id
+        ));
+        
+        if (!$has_booking) {
+            return false;
+        }
+    }
+
+    // Check if user already reviewed this trip (but allow if within edit window)
+    if ($user_id > 0) {
+        $existing_review = yatra_get_user_review($trip_id, $user_id);
+        if ($existing_review && !yatra_can_edit_review($existing_review)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Get user's existing review for a trip
+ * 
+ * @param int      $trip_id Trip ID
+ * @param int|null $user_id User ID (defaults to current user)
+ * @return object|null Review object or null
+ */
+function yatra_get_user_review(int $trip_id, ?int $user_id = null): ?object
+{
+    if ($user_id === null) {
+        $user_id = get_current_user_id();
+    }
+    
+    if ($user_id === 0) {
+        return null;
+    }
+    
+    global $wpdb;
+    $table = $wpdb->prefix . 'yatra_reviews';
+    $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
+    
+    if (!$table_exists) {
+        return null;
+    }
+    
+    $review = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$table} WHERE trip_id = %d AND user_id = %d ORDER BY created_at DESC LIMIT 1",
+        $trip_id,
+        $user_id
+    ));
+    
+    return $review ?: null;
+}
+
+/**
+ * Check if a review can be edited (within 24 hours of creation and not approved)
+ * 
+ * @param object $review Review object with created_at and status fields
+ * @return bool
+ */
+function yatra_can_edit_review(object $review): bool
+{
+    if (empty($review->created_at)) {
+        return false;
+    }
+    
+    // Don't allow editing if review is approved
+    if (isset($review->status) && $review->status === 'approved') {
+        return false;
+    }
+    
+    $created_time = strtotime($review->created_at);
+    $current_time = current_time('timestamp');
+    $hours_since_creation = ($current_time - $created_time) / 3600;
+    
+    // Allow editing within 24 hours (only for pending/rejected reviews)
+    return $hours_since_creation <= 24;
+}
+
+/**
+ * Get time remaining to edit a review
+ * 
+ * @param object $review Review object with created_at field
+ * @return string Human-readable time remaining (e.g., "5 hours", "30 minutes")
+ */
+function yatra_get_review_edit_time_remaining(object $review): string
+{
+    if (empty($review->created_at)) {
+        return '';
+    }
+    
+    $created_time = strtotime($review->created_at);
+    $current_time = current_time('timestamp');
+    $seconds_since_creation = $current_time - $created_time;
+    $seconds_remaining = (24 * 3600) - $seconds_since_creation;
+    
+    if ($seconds_remaining <= 0) {
+        return '';
+    }
+    
+    $hours = floor($seconds_remaining / 3600);
+    $minutes = floor(($seconds_remaining % 3600) / 60);
+    
+    if ($hours > 0) {
+        return sprintf(_n('%d hour', '%d hours', $hours, 'yatra'), $hours);
+    }
+    
+    return sprintf(_n('%d minute', '%d minutes', $minutes, 'yatra'), $minutes);
+}
+
 /**
  * Get the booking URL for a trip
  * 
@@ -124,6 +300,8 @@ if (!function_exists('yatra_svg_icon')) {
             'plane' => '<svg class="' . esc_attr($class) . '" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
             'hiking' => '<svg class="' . esc_attr($class) . '" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
             'binoculars' => '<svg class="' . esc_attr($class) . '" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>',
+            'message' => '<svg class="' . esc_attr($class) . '" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>',
+            'filter' => '<svg class="' . esc_attr($class) . '" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>',
         ];
         
         return $icons[$icon_name] ?? '';
@@ -175,5 +353,81 @@ function yatra_is_booking_page(): bool
     
     // Check for dynamic booking URL
     return !empty($wp_query->get('yatra_booking_trip_slug'));
+}
+
+/**
+ * Get the global trip object
+ * 
+ * Similar to WordPress get_post(), this function returns the current trip object
+ * when on a single trip page.
+ * 
+ * @return object|null The trip object or null if not on a trip page
+ */
+function yatra_get_trip(): ?object
+{
+    global $trip;
+    return $trip ?? null;
+}
+
+/**
+ * Check if we're on a single trip page
+ * 
+ * @return bool True if on a single trip page
+ */
+function yatra_is_single_trip(): bool
+{
+    global $wp_query;
+    return !empty($wp_query->get('yatra_trip_id'));
+}
+
+/**
+ * Get a trip field value with default fallback
+ * 
+ * @param string $field   The field name
+ * @param mixed  $default Default value if field is empty
+ * @return mixed The field value or default
+ */
+function yatra_get_trip_field(string $field, $default = '')
+{
+    global $trip;
+    
+    if (!$trip || !isset($trip->$field)) {
+        return $default;
+    }
+    
+    return $trip->$field ?: $default;
+}
+
+/**
+ * Echo a trip field value with escaping
+ * 
+ * @param string $field   The field name
+ * @param string $escape  Escape function: 'html', 'attr', 'url', 'js', 'none'
+ * @param mixed  $default Default value if field is empty
+ */
+function yatra_trip_field(string $field, string $escape = 'html', $default = ''): void
+{
+    $value = yatra_get_trip_field($field, $default);
+    
+    switch ($escape) {
+        case 'html':
+            echo esc_html($value);
+            break;
+        case 'attr':
+            echo esc_attr($value);
+            break;
+        case 'url':
+            echo esc_url($value);
+            break;
+        case 'js':
+            echo esc_js($value);
+            break;
+        case 'none':
+        case 'kses':
+            echo wp_kses_post($value);
+            break;
+        default:
+            echo esc_html($value);
+    }
 }
 

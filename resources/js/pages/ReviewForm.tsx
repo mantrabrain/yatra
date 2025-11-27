@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2, Star } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -59,20 +60,18 @@ const ReviewForm: React.FC = () => {
   const { data: tripsData } = useQuery({
     queryKey: ['trips-list'],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/trips', { params: { per_page: 100 } });
-      // Dummy trips data
-      return {
-        data: [
-          { id: 1, title: 'Everest Base Camp Trek' },
-          { id: 2, title: 'Annapurna Circuit Adventure' },
-          { id: 3, title: 'Golden Triangle Tour' },
-          { id: 4, title: 'Bhutan Cultural Journey' },
-          { id: 5, title: 'Tibet Spiritual Tour' },
-          { id: 6, title: 'Langtang Valley Trek' },
-          { id: 7, title: 'Manaslu Circuit Trek' },
-          { id: 8, title: 'Upper Mustang Trek' },
-        ],
-      };
+      const response = await apiClient.get('/trips', { 
+        params: { 
+          per_page: 100,
+          status: 'all' // Get all trips including drafts
+        } 
+      });
+      // Transform API response
+      const trips = (response?.data || []).map((trip: any) => ({
+        id: trip.id,
+        title: trip.title || 'Untitled Trip',
+      }));
+      return { data: trips };
     },
     enabled: can('yatra_view_trips'),
   });
@@ -82,18 +81,19 @@ const ReviewForm: React.FC = () => {
     queryKey: ['review', reviewId],
     queryFn: async () => {
       if (!reviewId) return null;
-      // return await apiClient.get(`/reviews/${reviewId}`);
-      // Dummy data for now
+      const response = await apiClient.get(`/reviews/${reviewId}`);
+      // Transform API response - WordPress REST API may wrap response
+      const review = response?.data || response;
       return {
-        id: reviewId,
-        trip_id: 1,
-        customer_name: 'John Smith',
-        customer_email: 'john.smith@example.com',
-        rating: 5,
-        title: 'Amazing Experience!',
-        comment: 'This was the trip of a lifetime. The guides were knowledgeable and the scenery was breathtaking.',
-        status: 'approved',
-        verified: true,
+        id: review.id,
+        trip_id: review.trip_id,
+        customer_name: review.customer_name || review.author_name || '',
+        customer_email: review.customer_email || review.author_email || '',
+        rating: review.rating,
+        title: review.title || '',
+        comment: review.comment || review.content || '',
+        status: review.status || 'pending',
+        verified: review.verified || false,
       };
     },
     enabled: isEditMode && can('yatra_view_reviews'),
@@ -194,13 +194,9 @@ const ReviewForm: React.FC = () => {
       };
 
       if (isEditMode && reviewId) {
-        // return await apiClient.put(`/reviews/${reviewId}`, payload);
-        console.log('Updating review:', reviewId, payload);
-        return { success: true, id: reviewId };
+        return await apiClient.put(`/reviews/${reviewId}`, payload);
       } else {
-        // return await apiClient.post('/reviews', payload);
-        console.log('Creating review:', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+        return await apiClient.post('/reviews', payload);
       }
     },
     onSuccess: () => {

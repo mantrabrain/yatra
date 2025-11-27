@@ -1,19 +1,24 @@
 /**
  * Booking Page Styles
+ * Uses common.css variables for consistency
  * 
  * @package Yatra
  */
 
 .yatra-booking-page {
+    width: 100%;
     min-height: 100vh;
-    background: #f9fafb;
+    background: var(--yatra-bg-page, #f9fafb);
     padding: 40px 0 80px;
 }
 
 .yatra-booking-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+    width: 100%;
+    max-width: var(--yatra-container-max-width, 1200px);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--yatra-container-padding, 20px);
+    padding-right: var(--yatra-container-padding, 20px);
 }
 
 /* Layout */

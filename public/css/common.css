@@ -1,0 +1,377 @@
+/**
+ * Yatra Common Styles
+ * Base styles and wrapper system for all Yatra pages
+ * 
+ * Design System:
+ * - Max content width: 1200px
+ * - Side padding: 20px (mobile) / 24px (tablet) / 32px (desktop)
+ * - Page background: #f9fafb
+ * 
+ * @package Yatra
+ */
+
+/* ============================================
+   CSS VARIABLES (Design Tokens)
+   ============================================ */
+:root {
+    /* Layout */
+    --yatra-container-max-width: 1300px;
+    --yatra-container-padding: 20px;
+    --yatra-container-padding-md: 24px;
+    --yatra-container-padding-lg: 32px;
+    
+    /* Colors */
+    --yatra-bg-page: #f9fafb;
+    --yatra-bg-white: #ffffff;
+    --yatra-bg-gray-50: #f9fafb;
+    --yatra-bg-gray-100: #f3f4f6;
+    
+    --yatra-text-primary: #1f2937;
+    --yatra-text-secondary: #4b5563;
+    --yatra-text-muted: #6b7280;
+    --yatra-text-light: #9ca3af;
+    
+    --yatra-border-color: #e5e7eb;
+    --yatra-border-light: #f3f4f6;
+    
+    --yatra-primary: #3b82f6;
+    --yatra-primary-dark: #2563eb;
+    --yatra-primary-light: #60a5fa;
+    
+    --yatra-success: #10b981;
+    --yatra-warning: #f59e0b;
+    --yatra-error: #ef4444;
+    --yatra-star: #fbbf24;
+    
+    /* Shadows */
+    --yatra-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --yatra-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --yatra-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --yatra-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    
+    /* Border Radius */
+    --yatra-radius-sm: 6px;
+    --yatra-radius: 8px;
+    --yatra-radius-md: 12px;
+    --yatra-radius-lg: 16px;
+    --yatra-radius-xl: 24px;
+    
+    /* Spacing */
+    --yatra-space-xs: 4px;
+    --yatra-space-sm: 8px;
+    --yatra-space-md: 16px;
+    --yatra-space-lg: 24px;
+    --yatra-space-xl: 32px;
+    --yatra-space-2xl: 48px;
+    
+    /* Typography */
+    --yatra-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --yatra-font-size-xs: 12px;
+    --yatra-font-size-sm: 13px;
+    --yatra-font-size-base: 15px;
+    --yatra-font-size-md: 16px;
+    --yatra-font-size-lg: 18px;
+    --yatra-font-size-xl: 20px;
+    --yatra-font-size-2xl: 24px;
+    --yatra-font-size-3xl: 30px;
+    --yatra-font-size-4xl: 36px;
+}
+
+/* ============================================
+   BASE PAGE WRAPPER
+   ============================================ */
+.yatra-page {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--yatra-bg-page);
+    font-family: var(--yatra-font-family);
+    color: var(--yatra-text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   CONTAINER SYSTEM
+   ============================================ */
+.yatra-container {
+    width: 100%;
+    max-width: var(--yatra-container-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--yatra-container-padding);
+    padding-right: var(--yatra-container-padding);
+}
+
+/* Full-width container with max-width inner content */
+.yatra-container-fluid {
+    width: 100%;
+    padding-left: var(--yatra-container-padding);
+    padding-right: var(--yatra-container-padding);
+}
+
+.yatra-container-fluid > .yatra-container-inner {
+    max-width: var(--yatra-container-max-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Narrow container for content-focused pages */
+.yatra-container-narrow {
+    max-width: 900px;
+}
+
+/* Wide container for dashboard/admin pages */
+.yatra-container-wide {
+    max-width: 1400px;
+}
+
+/* ============================================
+   SECTION SYSTEM
+   ============================================ */
+.yatra-section {
+    padding-top: var(--yatra-space-xl);
+    padding-bottom: var(--yatra-space-xl);
+}
+
+.yatra-section-sm {
+    padding-top: var(--yatra-space-lg);
+    padding-bottom: var(--yatra-space-lg);
+}
+
+.yatra-section-lg {
+    padding-top: var(--yatra-space-2xl);
+    padding-bottom: var(--yatra-space-2xl);
+}
+
+/* ============================================
+   PAGE HEADER
+   ============================================ */
+.yatra-page-header {
+    background: var(--yatra-bg-white);
+    border-bottom: 1px solid var(--yatra-border-color);
+    padding: var(--yatra-space-lg) 0;
+}
+
+.yatra-page-title {
+    font-size: var(--yatra-font-size-3xl);
+    font-weight: 700;
+    color: var(--yatra-text-primary);
+    margin: 0 0 var(--yatra-space-sm) 0;
+}
+
+.yatra-page-subtitle {
+    font-size: var(--yatra-font-size-base);
+    color: var(--yatra-text-muted);
+    margin: 0;
+}
+
+/* ============================================
+   CONTENT AREA
+   ============================================ */
+.yatra-content {
+    padding: var(--yatra-space-lg) 0;
+}
+
+/* Two-column layout with sidebar */
+.yatra-content-with-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--yatra-space-xl);
+}
+
+.yatra-content-main {
+    min-width: 0;
+}
+
+.yatra-content-sidebar {
+    position: relative;
+}
+
+.yatra-sidebar-sticky {
+    position: sticky;
+    top: 100px;
+}
+
+/* Reversed layout (sidebar on left) */
+.yatra-content-with-sidebar.yatra-sidebar-left {
+    grid-template-columns: 280px 1fr;
+}
+
+/* ============================================
+   CARD SYSTEM
+   ============================================ */
+.yatra-card {
+    background: var(--yatra-bg-white);
+    border-radius: var(--yatra-radius-md);
+    box-shadow: var(--yatra-shadow);
+    overflow: hidden;
+}
+
+.yatra-card-bordered {
+    box-shadow: none;
+    border: 1px solid var(--yatra-border-color);
+}
+
+.yatra-card-header {
+    padding: var(--yatra-space-lg);
+    border-bottom: 1px solid var(--yatra-border-color);
+}
+
+.yatra-card-body {
+    padding: var(--yatra-space-lg);
+}
+
+.yatra-card-footer {
+    padding: var(--yatra-space-lg);
+    border-top: 1px solid var(--yatra-border-color);
+    background: var(--yatra-bg-gray-50);
+}
+
+/* ============================================
+   GRID SYSTEM
+   ============================================ */
+.yatra-grid {
+    display: grid;
+    gap: var(--yatra-space-lg);
+}
+
+.yatra-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.yatra-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.yatra-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.yatra-grid-auto {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+@media (min-width: 640px) {
+    :root {
+        --yatra-container-padding: var(--yatra-container-padding-md);
+    }
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --yatra-container-padding: var(--yatra-container-padding-lg);
+    }
+}
+
+@media (max-width: 1024px) {
+    .yatra-content-with-sidebar {
+        grid-template-columns: 1fr;
+    }
+
+    .yatra-content-with-sidebar.yatra-sidebar-left {
+        grid-template-columns: 1fr;
+    }
+
+    .yatra-content-sidebar {
+        order: -1;
+    }
+
+    .yatra-grid-4 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .yatra-grid-3,
+    .yatra-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .yatra-page-title {
+        font-size: var(--yatra-font-size-2xl);
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-grid-2,
+    .yatra-grid-3,
+    .yatra-grid-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.yatra-text-center { text-align: center; }
+.yatra-text-left { text-align: left; }
+.yatra-text-right { text-align: right; }
+
+.yatra-mb-0 { margin-bottom: 0; }
+.yatra-mb-sm { margin-bottom: var(--yatra-space-sm); }
+.yatra-mb-md { margin-bottom: var(--yatra-space-md); }
+.yatra-mb-lg { margin-bottom: var(--yatra-space-lg); }
+.yatra-mb-xl { margin-bottom: var(--yatra-space-xl); }
+
+.yatra-mt-0 { margin-top: 0; }
+.yatra-mt-sm { margin-top: var(--yatra-space-sm); }
+.yatra-mt-md { margin-top: var(--yatra-space-md); }
+.yatra-mt-lg { margin-top: var(--yatra-space-lg); }
+.yatra-mt-xl { margin-top: var(--yatra-space-xl); }
+
+.yatra-hidden { display: none !important; }
+.yatra-visible { display: block !important; }
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+.yatra-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.yatra-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 2px solid var(--yatra-border-color);
+    border-top-color: var(--yatra-primary);
+    border-radius: 50%;
+    animation: yatra-spinner 0.8s linear infinite;
+}
+
+@keyframes yatra-spinner {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   LEGACY COMPATIBILITY
+   Keep old class names working while transitioning
+   ============================================ */
+.yatra-listing-page,
+.yatra-single-trip,
+.yatra-booking-page {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--yatra-bg-page);
+}
+
+.yatra-listing-container,
+.yatra-booking-container,
+.yatra-trip-container,
+.yatra-horizontal-search-container,
+.yatra-similar-section-container {
+    width: 100%;
+    max-width: var(--yatra-container-max-width, 1300px);
+    margin-left: auto;
+    margin-right: auto;
+}
+

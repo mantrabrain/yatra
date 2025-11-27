@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Star } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -15,6 +16,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 
 interface Review {
   id: number;
@@ -37,6 +39,10 @@ const Reviews: React.FC = () => {
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; review: Review | null }>({
+    isOpen: false,
+    review: null,
+  });
   const queryClient = useQueryClient();
   const { can } = usePermissions();
 
@@ -64,195 +70,31 @@ const Reviews: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, ratingFilter, sortBy, sortOrder, page]);
 
-  // Fetch reviews with dummy data
+  // Fetch reviews from API
   const { data, isLoading, error } = useQuery({
     queryKey: ['reviews', queryParams],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/reviews', { params: queryParams });
-      // Dummy data
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0];
-      };
-
-      const allReviews: Review[] = [
-        {
-          id: 1,
-          trip_id: 1,
-          trip_title: 'Everest Base Camp Trek',
-          customer_name: 'John Smith',
-          customer_email: 'john.smith@example.com',
-          rating: 5,
-          title: 'Amazing Experience!',
-          comment: 'This was the trip of a lifetime. The guides were knowledgeable and the scenery was breathtaking.',
-          status: 'approved',
-          verified: true,
-          created_at: getDate(5),
-        },
-        {
-          id: 2,
-          trip_id: 2,
-          trip_title: 'Annapurna Circuit Adventure',
-          customer_name: 'Sarah Johnson',
-          customer_email: 'sarah.j@example.com',
-          rating: 4,
-          title: 'Great Adventure',
-          comment: 'Beautiful landscapes and well-organized tour. Would recommend to anyone looking for an adventure.',
-          status: 'approved',
-          verified: true,
-          created_at: getDate(8),
-        },
-        {
-          id: 3,
-          trip_id: 1,
-          trip_title: 'Everest Base Camp Trek',
-          customer_name: 'Michael Brown',
-          customer_email: 'michael.b@example.com',
-          rating: 5,
-          title: 'Unforgettable Journey',
-          comment: 'Everything exceeded expectations. The team was professional and the experience was incredible.',
-          status: 'approved',
-          verified: false,
-          created_at: getDate(12),
-        },
-        {
-          id: 4,
-          trip_id: 3,
-          trip_title: 'Golden Triangle Tour',
-          customer_name: 'Emily Davis',
-          customer_email: 'emily.d@example.com',
-          rating: 3,
-          title: 'Good but could be better',
-          comment: 'The tour was good overall, but some accommodations could have been better.',
-          status: 'pending',
-          verified: false,
-          created_at: getDate(15),
-        },
-        {
-          id: 5,
-          trip_id: 2,
-          trip_title: 'Annapurna Circuit Adventure',
-          customer_name: 'David Wilson',
-          customer_email: 'david.w@example.com',
-          rating: 5,
-          title: 'Perfect Trip',
-          comment: 'Absolutely loved every moment. The guides were amazing and the itinerary was perfect.',
-          status: 'approved',
-          verified: true,
-          created_at: getDate(18),
-        },
-        {
-          id: 6,
-          trip_id: 4,
-          trip_title: 'Bhutan Cultural Journey',
-          customer_name: 'Lisa Anderson',
-          customer_email: 'lisa.a@example.com',
-          rating: 4,
-          title: 'Cultural Delight',
-          comment: 'Great cultural experience. Learned a lot about Bhutanese traditions and history.',
-          status: 'approved',
-          verified: true,
-          created_at: getDate(22),
-        },
-        {
-          id: 7,
-          trip_id: 1,
-          trip_title: 'Everest Base Camp Trek',
-          customer_name: 'Robert Taylor',
-          customer_email: 'robert.t@example.com',
-          rating: 2,
-          title: 'Disappointing',
-          comment: 'The trip did not meet my expectations. Several issues with accommodations and logistics.',
-          status: 'pending',
-          verified: false,
-          created_at: getDate(25),
-        },
-        {
-          id: 8,
-          trip_id: 5,
-          trip_title: 'Tibet Spiritual Tour',
-          customer_name: 'Jennifer Martinez',
-          customer_email: 'jennifer.m@example.com',
-          rating: 5,
-          title: 'Spiritual Awakening',
-          comment: 'A truly transformative experience. The spiritual aspects of the tour were deeply moving.',
-          status: 'approved',
-          verified: true,
-          created_at: getDate(30),
-        },
-      ];
-
-      // Apply filters
-      let filtered = [...allReviews];
-
-      if (searchTerm) {
-        const search = searchTerm.toLowerCase();
-        filtered = filtered.filter(
-          review =>
-            review.trip_title.toLowerCase().includes(search) ||
-            review.customer_name.toLowerCase().includes(search) ||
-            review.customer_email.toLowerCase().includes(search) ||
-            review.title.toLowerCase().includes(search) ||
-            review.comment.toLowerCase().includes(search)
-        );
-      }
-
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(review => review.status === statusFilter);
-      }
-
-      if (ratingFilter !== 'all') {
-        filtered = filtered.filter(review => review.rating === parseInt(ratingFilter));
-      }
-
-      // Apply sorting
-      filtered.sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
-
-        switch (sortBy) {
-          case 'trip_title':
-            aValue = a.trip_title.toLowerCase();
-            bValue = b.trip_title.toLowerCase();
-            break;
-          case 'customer_name':
-            aValue = a.customer_name.toLowerCase();
-            bValue = b.customer_name.toLowerCase();
-            break;
-          case 'rating':
-            aValue = a.rating;
-            bValue = b.rating;
-            break;
-          case 'status':
-            aValue = a.status;
-            bValue = b.status;
-            break;
-          case 'created_at':
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-            break;
-          default:
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-        }
-
-        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
-      });
-
-      // Apply pagination
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
-
+      const response = await apiClient.get('/reviews', { params: queryParams });
+      // Transform API response to match our interface
+      const reviews = (response?.data || []).map((item: any) => ({
+        id: item.id,
+        trip_id: item.trip_id,
+        trip_title: item.trip_title || 'Unknown Trip',
+        customer_name: item.customer_name || item.author_name || 'Anonymous',
+        customer_email: item.customer_email || item.author_email || '',
+        rating: item.rating,
+        title: item.title || '',
+        comment: item.comment || item.content || '',
+        status: item.status || 'pending',
+        verified: item.verified || false,
+        created_at: item.created_at || '',
+      }));
+      
       return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10,
+        data: reviews,
+        total: response?.total || 0,
+        page: response?.page || page,
+        per_page: response?.per_page || 10,
       };
     },
     enabled: can('yatra_view_reviews'),
@@ -260,16 +102,15 @@ const Reviews: React.FC = () => {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (_id: number) => {
-      // return await apiClient.delete(`/yatra/v1/reviews/${_id}`);
-      return { success: true };
+    mutationFn: async (id: number) => {
+      return await apiClient.delete(`/reviews/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
     },
   });
 
-  const reviews = data?.data || [];
+  const reviews: Review[] = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
 
@@ -336,8 +177,13 @@ const Reviews: React.FC = () => {
   };
 
   const handleDelete = (review: Review) => {
-    if (confirm(__('Are you sure you want to delete this review?', 'Are you sure you want to delete this review?'))) {
-      deleteMutation.mutate(review.id);
+    setDeleteConfirm({ isOpen: true, review });
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirm.review) {
+      deleteMutation.mutate(deleteConfirm.review.id);
+      setDeleteConfirm({ isOpen: false, review: null });
     }
   };
 
@@ -380,6 +226,21 @@ const Reviews: React.FC = () => {
 
   return (
     <div className="space-y-3">
+      <ConfirmationDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, review: null })}
+        onConfirm={confirmDelete}
+        title={__('Delete Review', 'Delete Review')}
+        message={deleteConfirm.review 
+          ? __('Are you sure you want to delete this review by "{name}"? This action cannot be undone.', 'Are you sure you want to delete this review by "{name}"? This action cannot be undone.').replace('{name}', deleteConfirm.review.customer_name)
+          : __('Are you sure you want to delete this review? This action cannot be undone.', 'Are you sure you want to delete this review? This action cannot be undone.')
+        }
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
+
       <PageHeader
         title={__('Reviews', 'Reviews')}
         description={__('Manage customer reviews and ratings', 'Manage customer reviews and ratings')}
@@ -488,8 +349,61 @@ const Reviews: React.FC = () => {
           </Card>
         ) : isLoading ? (
           <Card>
-            <CardContent className="p-8 text-center text-gray-500">
-              {__('Loading reviews...', 'Loading reviews...')}
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{__('Trip', 'Trip')}</TableHead>
+                    <TableHead>{__('Customer', 'Customer')}</TableHead>
+                    <TableHead>{__('Rating', 'Rating')}</TableHead>
+                    <TableHead>{__('Review', 'Review')}</TableHead>
+                    <TableHead>{__('Status', 'Status')}</TableHead>
+                    <TableHead>{__('Date', 'Date')}</TableHead>
+                    <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[...Array(5)].map((_, index) => (
+                    <TableRow key={`skeleton-${index}`}>
+                      <TableCell>
+                        <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <div className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          <div className="h-3 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <div key={i} className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          <div className="h-3 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         ) : reviews.length === 0 ? (

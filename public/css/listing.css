@@ -1,44 +1,51 @@
 /**
  * Listing Pages CSS
  * Styles for trip, destination, activity, and trip-category listing pages
+ * Uses common.css variables for consistency
  * 
  * @package Yatra
  */
 
-/* Common Listing Page Styles */
+/* ============================================
+   LISTING PAGE BASE STYLES
+   Uses consistent container widths from common.css
+   ============================================ */
+
+/* All listing pages use the same wrapper */
 .yatra-listing-page {
     width: 100%;
-    max-width: 100%;
     min-height: 100vh;
-    background: #f9fafb;
-}
-
-.yatra-listing-page.yatra-trip-listing {
-    width: 100%;
-    max-width: 100%;
+    background: var(--yatra-bg-page, #f9fafb);
 }
 
 .yatra-listing-wrapper {
     padding-top: 0;
 }
 
+/* Consistent container width across all listing pages */
 .yatra-listing-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px 20px;
+    width: 100%;
+    max-width: var(--yatra-container-max-width, 1200px);
+    margin-left: auto;
+    margin-right: auto;
+    padding: var(--yatra-space-lg, 24px) var(--yatra-container-padding, 20px);
 }
 
-/* Horizontal Search Bar */
+/* ============================================
+   HORIZONTAL SEARCH BAR
+   ============================================ */
 .yatra-horizontal-search {
     background: #f8fafc;
-    padding: 24px 0;
-    border-bottom: 1px solid #e5e7eb;
+    padding: var(--yatra-space-lg, 24px) 0;
+    border-bottom: 1px solid var(--yatra-border-color, #e5e7eb);
 }
 
 .yatra-horizontal-search-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+    width: 100%;
+    max-width: var(--yatra-container-max-width, 1200px);
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 var(--yatra-container-padding, 20px);
 }
 
 .yatra-search-bar {

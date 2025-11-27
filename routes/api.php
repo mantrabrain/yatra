@@ -30,6 +30,7 @@ use Yatra\Controllers\ItineraryController;
 use Yatra\Controllers\MaintenanceController;
 use Yatra\Controllers\ModuleController;
 use Yatra\Controllers\CustomerController;
+use Yatra\Controllers\ReviewController;
 
 // Register Trip routes
 if (class_exists('Yatra\Controllers\TripController')) {
@@ -343,6 +344,27 @@ if (class_exists('Yatra\Controllers\CustomerController')) {
     } catch (\Exception $e) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Yatra: Failed to register Customer routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
+
+// Register Review routes
+if (class_exists('Yatra\Controllers\ReviewController')) {
+    try {
+        $review_controller = new ReviewController();
+        $review_controller->register_routes();
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $review_routes = array_filter($routes, function($key) {
+                return strpos($key, '/reviews') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Review routes registered: ' . print_r(array_keys($review_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Review routes: ' . $e->getMessage());
             error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
         }
     }

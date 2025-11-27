@@ -7,6 +7,7 @@ namespace Yatra\Providers;
 use Yatra\Core\ServiceProvider;
 use Yatra\Core\Container;
 use Yatra\Core\Modules\ModuleManager;
+use Yatra\Controllers\SingleTripController;
 
 /**
  * Application Service Provider
@@ -57,6 +58,226 @@ class AppServiceProvider extends ServiceProvider
 
         // Ensure frontend bundles are marked as ES modules
         add_filter('script_loader_tag', [$this, 'addFrontendModuleType'], 10, 2);
+
+        // Add "Edit Trip" to admin bar on single trip page
+        add_action('admin_bar_menu', [$this, 'addEditTripAdminBarLink'], 80);
+        
+        // Add admin bar CSS for trip edit link
+        add_action('wp_head', [$this, 'addAdminBarTripEditCSS']);
+
+        // AJAX handler for review submission
+        add_action('wp_ajax_yatra_submit_review', [$this, 'handleReviewSubmission']);
+        add_action('wp_ajax_nopriv_yatra_submit_review', [$this, 'handleReviewSubmissionNoPriv']);
+    }
+
+    /**
+     * Handle review submission for logged-in users
+     */
+    public function handleReviewSubmission(): void
+    {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['yatra_review_nonce'] ?? '', 'yatra_submit_review')) {
+            wp_send_json_error(['message' => __('Security check failed.', 'yatra')]);
+        }
+
+        $trip_id = (int) ($_POST['trip_id'] ?? 0);
+        $rating = (int) ($_POST['rating'] ?? 0);
+        $title = sanitize_text_field($_POST['title'] ?? '');
+        $content = sanitize_textarea_field($_POST['content'] ?? '');
+
+        // Validate trip ID
+        if ($trip_id <= 0) {
+            wp_send_json_error(['message' => __('Invalid trip.', 'yatra')]);
+        }
+
+        // Validate rating
+        $min_rating = (int) \Yatra\Services\SettingsService::getMinimumRating();
+        if ($rating < $min_rating || $rating > 5) {
+            wp_send_json_error(['message' => sprintf(__('Rating must be between %d and 5.', 'yatra'), $min_rating)]);
+        }
+
+        // Validate content
+        if (strlen($content) < 20) {
+            wp_send_json_error(['message' => __('Review must be at least 20 characters.', 'yatra')]);
+        }
+
+        // Get user ID and check permissions
+        $user_id = get_current_user_id();
+        
+        // Check if this is an edit request
+        $action_type = sanitize_text_field($_POST['action_type'] ?? 'create');
+        $review_id = (int) ($_POST['review_id'] ?? 0);
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_reviews';
+
+        // Check if table exists, if not create it
+        $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
+        if (!$table_exists) {
+            $this->createReviewsTable();
+        }
+        
+        if ($action_type === 'edit' && $review_id > 0) {
+            // Editing existing review
+            $existing_review = yatra_get_user_review($trip_id, $user_id);
+            
+            if (!$existing_review || (int) $existing_review->id !== $review_id) {
+                wp_send_json_error(['message' => __('Review not found or you do not have permission to edit it.', 'yatra')]);
+            }
+            
+            if (!yatra_can_edit_review($existing_review)) {
+                wp_send_json_error(['message' => __('The edit window (24 hours) for this review has passed.', 'yatra')]);
+            }
+            
+            // Update the review
+            $result = $wpdb->update(
+                $table,
+                [
+                    'rating' => $rating,
+                    'title' => $title,
+                    'content' => $content,
+                    'updated_at' => current_time('mysql'),
+                ],
+                ['id' => $review_id, 'user_id' => $user_id],
+                ['%d', '%s', '%s', '%s'],
+                ['%d', '%d']
+            );
+            
+            if ($result === false) {
+                wp_send_json_error(['message' => __('Failed to update review. Please try again.', 'yatra')]);
+            }
+            
+            wp_send_json_success(['message' => __('Your review has been updated!', 'yatra')]);
+        } else {
+            // Creating new review
+            if (!yatra_can_review($trip_id, $user_id)) {
+                wp_send_json_error(['message' => __('You cannot review this trip.', 'yatra')]);
+            }
+
+            // Get user info
+            $user = wp_get_current_user();
+            $author_name = $user->display_name ?: $user->user_login;
+            $author_email = $user->user_email;
+
+            // Determine status based on settings
+            $status = \Yatra\Services\SettingsService::autoApproveReviews() ? 'approved' : 'pending';
+
+            $result = $wpdb->insert($table, [
+                'trip_id' => $trip_id,
+                'user_id' => $user_id,
+                'rating' => $rating,
+                'title' => $title,
+                'content' => $content,
+                'author_name' => $author_name,
+                'author_email' => $author_email,
+                'status' => $status,
+                'created_at' => current_time('mysql'),
+            ], ['%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s']);
+
+            if ($result === false) {
+                wp_send_json_error(['message' => __('Failed to save review. Please try again.', 'yatra')]);
+            }
+
+            $message = $status === 'approved' 
+                ? __('Thank you for your review!', 'yatra')
+                : __('Thank you! Your review will be published after moderation.', 'yatra');
+
+            wp_send_json_success(['message' => $message]);
+        }
+    }
+
+    /**
+     * Handle review submission for non-logged-in users
+     */
+    public function handleReviewSubmissionNoPriv(): void
+    {
+        wp_send_json_error(['message' => __('Please log in to submit a review.', 'yatra')]);
+    }
+
+    /**
+     * Create reviews table if it doesn't exist
+     */
+    private function createReviewsTable(): void
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_reviews';
+        $charset = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS {$table} (
+            id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            trip_id bigint(20) UNSIGNED NOT NULL,
+            user_id bigint(20) UNSIGNED DEFAULT 0,
+            rating tinyint(1) UNSIGNED NOT NULL,
+            title varchar(255) DEFAULT NULL,
+            content text NOT NULL,
+            author_name varchar(100) NOT NULL,
+            author_email varchar(100) DEFAULT NULL,
+            author_location varchar(100) DEFAULT NULL,
+            status enum('pending','approved','rejected') DEFAULT 'pending',
+            helpful_count int(11) UNSIGNED DEFAULT 0,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY idx_trip_id (trip_id),
+            KEY idx_user_id (user_id),
+            KEY idx_status (status),
+            KEY idx_rating (rating)
+        ) {$charset};";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta($sql);
+    }
+
+    /**
+     * Add CSS for the Edit Trip admin bar link
+     */
+    public function addAdminBarTripEditCSS(): void
+    {
+        // Only output CSS if we're on a single trip page and user can see admin bar
+        global $trip;
+        if (empty($trip) || !is_user_logged_in() || !is_admin_bar_showing()) {
+            return;
+        }
+
+        echo '<style>
+            #wpadminbar #wp-admin-bar-yatra-edit-trip > .ab-item:before {
+                content: "\f464";
+                font-family: dashicons;
+                top: 2px;
+            }
+        </style>';
+    }
+
+    /**
+     * Add "Edit Trip" link to admin bar on single trip page
+     *
+     * @param \WP_Admin_Bar $admin_bar
+     */
+    public function addEditTripAdminBarLink($admin_bar): void
+    {
+        // Only for logged-in users who can edit trips
+        if (!is_user_logged_in() || !current_user_can('edit_posts')) {
+            return;
+        }
+
+        // Check if we're on a single trip page
+        global $trip;
+        if (empty($trip) || empty($trip->id)) {
+            return;
+        }
+
+        // Build the edit URL for the trip
+        $edit_url = admin_url('admin.php?page=yatra&subpage=trips&action=edit&id=' . (int) $trip->id);
+
+        // Add the Edit Trip node
+        $admin_bar->add_node([
+            'id'    => 'yatra-edit-trip',
+            'title' => __('Edit Trip', 'yatra'),
+            'href'  => $edit_url,
+            'meta'  => [
+                'title' => __('Edit this trip in Yatra admin', 'yatra'),
+            ],
+        ]);
     }
 
     /**
@@ -461,49 +682,13 @@ class AppServiceProvider extends ServiceProvider
             return;
         }
 
-        // Get trip from database by slug
-        global $wpdb;
-        $table_trips = $wpdb->prefix . 'yatra_trips';
-        
-        // First try with publish status
-        $trip = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$table_trips} WHERE slug = %s AND status = 'publish' AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00') LIMIT 1",
-            $trip_slug
-        ));
+        // Use SingleTripController to get prepared trip data
+        $controller = new SingleTripController();
+        $trip_data = $controller->getBySlug($trip_slug);
 
-        // If not found, try without status check (for draft trips during development)
-        if (!$trip) {
-            $trip = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM {$table_trips} WHERE slug = %s AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00') LIMIT 1",
-                $trip_slug
-            ));
-            
-            if ($trip && defined('WP_DEBUG') && WP_DEBUG) {
-                error_log(sprintf('Yatra: Trip found but status is "%s" (not publish) for slug: %s', $trip->status ?? 'unknown', $trip_slug));
-            }
-        }
-
-        if (!$trip) {
+        if (!$trip_data) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                // Check if trip exists at all
-                $exists = $wpdb->get_var($wpdb->prepare(
-                    "SELECT COUNT(*) FROM {$table_trips} WHERE slug = %s",
-                    $trip_slug
-                ));
-                if ($exists > 0) {
-                    $status_info = $wpdb->get_row($wpdb->prepare(
-                        "SELECT status, deleted_at FROM {$table_trips} WHERE slug = %s LIMIT 1",
-                        $trip_slug
-                    ));
-                    error_log(sprintf(
-                        'Yatra: Trip exists but not accessible - Slug: %s, Status: %s, Deleted: %s',
-                        $trip_slug,
-                        $status_info->status ?? 'unknown',
-                        $status_info->deleted_at ?? 'NULL'
-                    ));
-                } else {
-                    error_log(sprintf('Yatra: Trip not found in database for slug: %s', $trip_slug));
-                }
+                error_log(sprintf('Yatra: Trip not found for slug: %s', $trip_slug));
             }
             return; // Let WordPress handle 404
         }
@@ -512,9 +697,14 @@ class AppServiceProvider extends ServiceProvider
         $wp_query->is_404 = false;
         status_header(200);
 
-        // Set up query vars for template
+        // Set up global $trip object (similar to WordPress $post)
+        global $trip;
+        $trip = $trip_data;
+
+        // Also set up query vars for backward compatibility
         $wp_query->set('yatra_trip_id', $trip->id);
         $wp_query->set('yatra_trip', $trip);
+        $wp_query->set('yatra_trip_slug', $trip_slug);
 
         // Enqueue trip page assets
         $this->enqueueTripPageAssets();
@@ -709,7 +899,10 @@ class AppServiceProvider extends ServiceProvider
      */
     private function enqueueBookingPageAssets(): void
     {
-        // Enqueue CSS
+        // Enqueue common CSS first
+        $this->enqueueCommonAssets();
+
+        // Enqueue booking CSS
         $css_file = YATRA_PLUGIN_PATH . 'public/css/booking.css';
         if (file_exists($css_file)) {
             $css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $css_file);
@@ -717,7 +910,7 @@ class AppServiceProvider extends ServiceProvider
             wp_enqueue_style(
                 'yatra-booking',
                 $css_url,
-                [],
+                ['yatra-common'],
                 $css_version
             );
         }
@@ -740,9 +933,30 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Enqueue listing page assets
      */
+    /**
+     * Enqueue common CSS (loaded as dependency for all page styles)
+     */
+    private function enqueueCommonAssets(): void
+    {
+        $css_file = YATRA_PLUGIN_PATH . 'public/css/common.css';
+        if (file_exists($css_file)) {
+            $css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $css_file);
+            $css_version = YATRA_VERSION . '.' . filemtime($css_file);
+            wp_enqueue_style(
+                'yatra-common',
+                $css_url,
+                [],
+                $css_version
+            );
+        }
+    }
+
     private function enqueueListingPageAssets(): void
     {
-        // Enqueue CSS
+        // Enqueue common CSS first
+        $this->enqueueCommonAssets();
+
+        // Enqueue listing CSS
         $css_file = YATRA_PLUGIN_PATH . 'public/css/listing.css';
         if (file_exists($css_file)) {
             $css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $css_file);
@@ -750,7 +964,7 @@ class AppServiceProvider extends ServiceProvider
             wp_enqueue_style(
                 'yatra-listing',
                 $css_url,
-                [],
+                ['yatra-common'],
                 $css_version
             );
         }
@@ -775,7 +989,10 @@ class AppServiceProvider extends ServiceProvider
      */
     private function enqueueTripPageAssets(): void
     {
-        // Enqueue CSS
+        // Enqueue common CSS first
+        $this->enqueueCommonAssets();
+
+        // Enqueue trip CSS
         $css_file = YATRA_PLUGIN_PATH . 'public/css/trip.css';
         if (file_exists($css_file)) {
             $css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $css_file);
@@ -783,7 +1000,7 @@ class AppServiceProvider extends ServiceProvider
             wp_enqueue_style(
                 'yatra-trip',
                 $css_url,
-                [],
+                ['yatra-common'],
                 $css_version
             );
         }
@@ -807,6 +1024,7 @@ class AppServiceProvider extends ServiceProvider
             wp_localize_script('yatra-trip', 'yatraTripData', [
                 'tripId' => $trip_id,
                 'restUrl' => rest_url('yatra/v1'),
+                'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('wp_rest'),
             ]);
         }

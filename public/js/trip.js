@@ -1650,6 +1650,320 @@
         }
     }
 
+    // ============================================
+    // REVIEW FORM
+    // ============================================
+    class ReviewForm {
+        constructor() {
+            this.form = document.getElementById('yatra-review-form');
+            if (this.form) {
+                this.init();
+            }
+        }
+
+        init() {
+            this.setupStarRating();
+            this.setupFormSubmission();
+        }
+
+        setupStarRating() {
+            const ratingContainer = this.form.querySelector('.yatra-star-rating-input');
+            if (!ratingContainer) return;
+
+            const ratingInputs = Array.from(ratingContainer.querySelectorAll('input[type="radio"]'));
+            const ratingLabels = Array.from(ratingContainer.querySelectorAll('.yatra-star-label'));
+
+            // Get the rating value for a label by its associated input
+            const getLabelRating = (label) => {
+                const forAttr = label.getAttribute('for');
+                if (forAttr) {
+                    const input = document.getElementById(forAttr);
+                    return input ? parseInt(input.value) : 0;
+                }
+                return 0;
+            };
+
+            // Function to update visual state
+            const updateStars = (rating) => {
+                ratingLabels.forEach((label) => {
+                    const labelRating = getLabelRating(label);
+                    if (labelRating <= rating) {
+                        label.classList.add('selected');
+                    } else {
+                        label.classList.remove('selected');
+                    }
+                });
+            };
+
+            // Initialize visual state based on currently checked rating
+            const checkedInput = ratingContainer.querySelector('input:checked');
+            if (checkedInput) {
+                updateStars(parseInt(checkedInput.value));
+            }
+
+            // Handle rating changes via input change event
+            ratingInputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    updateStars(parseInt(input.value));
+                });
+            });
+
+            // Handle direct clicks on labels
+            ratingLabels.forEach((label) => {
+                label.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const forAttr = label.getAttribute('for');
+                    if (!forAttr) return;
+                    
+                    const targetInput = document.getElementById(forAttr);
+                    if (targetInput && !targetInput.disabled) {
+                        targetInput.checked = true;
+                        const ratingValue = parseInt(targetInput.value);
+                        updateStars(ratingValue);
+                        // Trigger change event for any other listeners
+                        targetInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+
+                // Hover effect
+                label.addEventListener('mouseenter', () => {
+                    const hoverRating = getLabelRating(label);
+                    ratingLabels.forEach((l) => {
+                        const lRating = getLabelRating(l);
+                        if (lRating <= hoverRating) {
+                            l.classList.add('hover');
+                        } else {
+                            l.classList.remove('hover');
+                        }
+                    });
+                });
+            });
+
+            // Remove hover effect when leaving the container
+            ratingContainer.addEventListener('mouseleave', () => {
+                ratingLabels.forEach(l => l.classList.remove('hover'));
+            });
+        }
+
+        setupFormSubmission() {
+            this.form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const submitBtn = this.form.querySelector('.yatra-review-submit-btn');
+                const originalText = submitBtn.innerHTML;
+
+                // Disable button and show loading
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="yatra-loading-spinner"></span> Submitting...';
+
+                try {
+                    const formData = new FormData(this.form);
+                    formData.append('action', 'yatra_submit_review');
+
+                    const response = await fetch(yatraTripData?.ajaxUrl || '/wp-admin/admin-ajax.php', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Show success message
+                        this.showMessage('success', result.data?.message || 'Thank you for your review!');
+                        
+                        // Check if this was an edit or new submission
+                        const isEdit = this.form.querySelector('input[name="action_type"]')?.value === 'edit';
+                        
+                        if (!isEdit) {
+                            // Only reset form for new submissions, not edits
+                            this.form.reset();
+                            
+                            // Reset star rating to 5 stars
+                            const fiveStarInput = this.form.querySelector('input[name="rating"][value="5"]');
+                            if (fiveStarInput) {
+                                fiveStarInput.checked = true;
+                                // Also update the visual display
+                                const ratingLabels = this.form.querySelectorAll('.yatra-star-label');
+                                ratingLabels.forEach(label => label.classList.add('selected'));
+                            }
+                        }
+                    } else {
+                        this.showMessage('error', result.data?.message || 'Failed to submit review. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Review submission error:', error);
+                    this.showMessage('error', 'An error occurred. Please try again.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            });
+        }
+
+        showMessage(type, message) {
+            // Remove any existing messages
+            const existingMsg = this.form.querySelector('.yatra-review-message');
+            if (existingMsg) existingMsg.remove();
+
+            const msgEl = document.createElement('div');
+            msgEl.className = `yatra-review-message yatra-review-message-${type}`;
+            msgEl.innerHTML = `<p>${message}</p>`;
+
+            this.form.insertBefore(msgEl, this.form.firstChild);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                msgEl.remove();
+            }, 5000);
+        }
+    }
+
+    /**
+     * Similar Adventures Carousel
+     * Handles carousel navigation for similar trips section
+     */
+    class SimilarTripsCarousel {
+        constructor() {
+            this.track = null;
+            this.prevBtn = null;
+            this.nextBtn = null;
+            this.items = [];
+            this.currentPosition = 0;
+            this.itemWidth = 0;
+            this.visibleItems = 4;
+            this.gap = 24;
+            this.init();
+        }
+
+        init() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.setup());
+            } else {
+                this.setup();
+            }
+        }
+
+        setup() {
+            this.track = document.getElementById('similar-carousel');
+            this.prevBtn = document.getElementById('similar-prev');
+            this.nextBtn = document.getElementById('similar-next');
+            
+            if (!this.track || !this.prevBtn || !this.nextBtn) return;
+            
+            this.items = Array.from(this.track.querySelectorAll('.yatra-carousel-item'));
+            if (this.items.length === 0) return;
+            
+            this.calculateDimensions();
+            this.attachEventListeners();
+            this.updateButtonStates();
+            
+            // Recalculate on resize
+            window.addEventListener('resize', () => {
+                this.calculateDimensions();
+                this.updateButtonStates();
+            });
+        }
+
+        calculateDimensions() {
+            const wrapper = this.track.parentElement;
+            const wrapperWidth = wrapper.offsetWidth;
+            
+            // Determine visible items based on screen width
+            if (window.innerWidth <= 600) {
+                this.visibleItems = 1;
+            } else if (window.innerWidth <= 900) {
+                this.visibleItems = 2;
+            } else if (window.innerWidth <= 1200) {
+                this.visibleItems = 3;
+            } else {
+                this.visibleItems = 4;
+            }
+            
+            // Calculate item width
+            this.itemWidth = (wrapperWidth - (this.gap * (this.visibleItems - 1))) / this.visibleItems;
+            
+            // Apply width to items
+            this.items.forEach(item => {
+                item.style.flex = `0 0 ${this.itemWidth}px`;
+                item.style.minWidth = `${this.itemWidth}px`;
+            });
+            
+            // Reset position if out of bounds
+            const maxPosition = Math.max(0, this.items.length - this.visibleItems);
+            if (this.currentPosition > maxPosition) {
+                this.currentPosition = maxPosition;
+                this.updateTrackPosition();
+            }
+        }
+
+        attachEventListeners() {
+            this.prevBtn.addEventListener('click', () => this.slide('prev'));
+            this.nextBtn.addEventListener('click', () => this.slide('next'));
+            
+            // Touch/swipe support for mobile
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+            
+            this.track.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                isDragging = true;
+            }, { passive: true });
+            
+            this.track.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                currentX = e.touches[0].clientX;
+            }, { passive: true });
+            
+            this.track.addEventListener('touchend', () => {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                const diff = startX - currentX;
+                const threshold = 50;
+                
+                if (diff > threshold) {
+                    this.slide('next');
+                } else if (diff < -threshold) {
+                    this.slide('prev');
+                }
+            });
+        }
+
+        slide(direction) {
+            const maxPosition = Math.max(0, this.items.length - this.visibleItems);
+            
+            if (direction === 'next' && this.currentPosition < maxPosition) {
+                this.currentPosition++;
+            } else if (direction === 'prev' && this.currentPosition > 0) {
+                this.currentPosition--;
+            }
+            
+            this.updateTrackPosition();
+            this.updateButtonStates();
+        }
+
+        updateTrackPosition() {
+            const offset = this.currentPosition * (this.itemWidth + this.gap);
+            this.track.style.transform = `translateX(-${offset}px)`;
+        }
+
+        updateButtonStates() {
+            const maxPosition = Math.max(0, this.items.length - this.visibleItems);
+            
+            this.prevBtn.disabled = this.currentPosition <= 0;
+            this.nextBtn.disabled = this.currentPosition >= maxPosition;
+            
+            // Hide navigation if all items are visible
+            const shouldHideNav = this.items.length <= this.visibleItems;
+            this.prevBtn.style.display = shouldHideNav ? 'none' : 'flex';
+            this.nextBtn.style.display = shouldHideNav ? 'none' : 'flex';
+        }
+    }
+
     // Initialize all classes
     window.galleryModal = new GalleryModal();
     window.bookingSidebar = new BookingSidebar();
@@ -1657,6 +1971,8 @@
     window.stickyNav = new StickyNav();
     window.availabilitySection = new AvailabilitySection();
     window.itinerarySection = new ItinerarySection();
+    window.reviewForm = new ReviewForm();
+    window.similarTripsCarousel = new SimilarTripsCarousel();
 
 })();
 
