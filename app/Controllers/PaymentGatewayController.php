@@ -8,6 +8,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use Yatra\PaymentGateways\PaymentGatewayRegistry;
+use Yatra\Repositories\BookingRepository;
+use Yatra\Repositories\PaymentRepository;
+use Yatra\Repositories\ScheduledPaymentRepository;
 
 /**
  * Payment Gateway REST API Controller
@@ -17,15 +20,16 @@ use Yatra\PaymentGateways\PaymentGatewayRegistry;
 class PaymentGatewayController extends BaseController
 {
     private PaymentGatewayRegistry $registry;
-    private string $payments_table;
-    private string $bookings_table;
+    private BookingRepository $bookingRepository;
+    private PaymentRepository $paymentRepository;
+    private ScheduledPaymentRepository $scheduledPaymentRepository;
 
     public function __construct()
     {
-        global $wpdb;
-        $this->payments_table = $wpdb->prefix . 'yatra_payments';
-        $this->bookings_table = $wpdb->prefix . 'yatra_bookings';
         $this->registry = PaymentGatewayRegistry::getInstance();
+        $this->bookingRepository = new BookingRepository();
+        $this->paymentRepository = new PaymentRepository();
+        $this->scheduledPaymentRepository = new ScheduledPaymentRepository();
     }
 
     public function register_routes(): void
@@ -285,14 +289,9 @@ class PaymentGatewayController extends BaseController
      */
     public function get_payment_status(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        global $wpdb;
-
         $bookingId = (int) $request->get_param('booking_id');
 
-        $payment = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$this->payments_table} WHERE booking_id = %d ORDER BY id DESC LIMIT 1",
-            $bookingId
-        ));
+        $payment = $this->paymentRepository->findLatestByBookingId($bookingId);
 
         if (!$payment) {
             return new WP_Error('payment_not_found', __('Payment not found', 'yatra'), ['status' => 404]);
@@ -302,7 +301,7 @@ class PaymentGatewayController extends BaseController
             'status' => $payment->status,
             'amount' => (float) $payment->amount,
             'currency' => $payment->currency,
-            'gateway' => $payment->payment_gateway,
+            'gateway' => $payment->payment_gateway ?? $payment->gateway ?? '',
             'transaction_id' => $payment->transaction_id,
             'created_at' => $payment->created_at,
         ], 200);
@@ -320,57 +319,36 @@ class PaymentGatewayController extends BaseController
         ?string $customerId = null,
         ?string $paymentMethodId = null
     ): void {
-        global $wpdb;
-
         if ($bookingId <= 0) {
             return;
         }
 
         // Get booking details
-        $booking = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$this->bookings_table} WHERE id = %d",
-            $bookingId
-        ));
+        $booking = $this->bookingRepository->find($bookingId);
 
         if (!$booking) {
             return;
         }
 
-        $existing = $wpdb->get_row($wpdb->prepare(
-            "SELECT id FROM {$this->payments_table} WHERE booking_id = %d AND payment_gateway = %s AND status = 'completed'",
-            $bookingId, $gateway
-        ));
-
         $paid_amount = $amount ?? (float) $booking->amount_due;
         $payment_currency = $currency ?? $booking->currency;
 
         $payment_data = [
-            'status' => 'completed',
+            'booking_id' => $bookingId,
+            'gateway' => $gateway,
             'transaction_id' => $transactionId,
-            'paid_at' => current_time('mysql'),
-            'updated_at' => current_time('mysql'),
+            'amount' => $paid_amount,
+            'currency' => $payment_currency,
+            'status' => 'completed',
         ];
 
-        if ($amount !== null) {
-            $payment_data['amount'] = $amount;
-        }
-        if ($currency !== null) {
-            $payment_data['currency'] = $currency;
-        }
-
-        if ($existing) {
-            $wpdb->update($this->payments_table, $payment_data, ['id' => $existing->id]);
-        } else {
-            $payment_data['booking_id'] = $bookingId;
-            $payment_data['payment_gateway'] = $gateway;
-            $payment_data['created_at'] = current_time('mysql');
-            $wpdb->insert($this->payments_table, $payment_data);
-        }
+        // Create or update payment record
+        $this->paymentRepository->create($payment_data);
 
         // Calculate new amounts
         $new_amount_paid = (float) $booking->amount_paid + $paid_amount;
         $new_amount_due = max(0, (float) $booking->total_amount - $new_amount_paid);
-        
+
         // Determine payment status
         $payment_status = 'paid';
         if ($new_amount_due > 0) {
@@ -378,17 +356,12 @@ class PaymentGatewayController extends BaseController
         }
 
         // Update booking
-        $wpdb->update(
-            $this->bookings_table,
-            [
-                'amount_paid' => $new_amount_paid,
-                'amount_due' => $new_amount_due,
-                'payment_status' => $payment_status,
-                'status' => 'confirmed',
-                'updated_at' => current_time('mysql'),
-            ],
-            ['id' => $bookingId]
-        );
+        $this->bookingRepository->update($bookingId, [
+            'amount_paid' => $new_amount_paid,
+            'amount_due' => $new_amount_due,
+            'payment_status' => $payment_status,
+            'status' => 'confirmed',
+        ]);
 
         // Handle scheduled payments for remaining balance
         if ($new_amount_due > 0 && $customerId && $paymentMethodId) {
@@ -465,36 +438,19 @@ class PaymentGatewayController extends BaseController
         string $customerId,
         string $paymentMethodId
     ): ?int {
-        global $wpdb;
-
         // Get booking for customer info
-        $booking = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$this->bookings_table} WHERE id = %d",
-            $bookingId
-        ));
+        $booking = $this->bookingRepository->find($bookingId);
 
         if (!$booking) {
             return null;
         }
 
-        $tokens_table = $wpdb->prefix . 'yatra_payment_tokens';
         $userId = get_current_user_id() ?: 0;
-
-        // Check if token already exists
-        $existing = $wpdb->get_row($wpdb->prepare(
-            "SELECT id FROM {$tokens_table} 
-             WHERE gateway = %s AND gateway_customer_id = %s AND gateway_payment_method_id = %s",
-            $gateway, $customerId, $paymentMethodId
-        ));
-
-        if ($existing) {
-            return (int) $existing->id;
-        }
 
         // Get payment method details from gateway
         $gatewayInstance = $this->registry->get($gateway);
         $cardInfo = [];
-        
+
         if ($gatewayInstance) {
             $methods = $gatewayInstance->getPaymentMethods($customerId);
             foreach ($methods as $method) {
@@ -505,30 +461,20 @@ class PaymentGatewayController extends BaseController
             }
         }
 
-        // Insert token
-        $result = $wpdb->insert(
-            $tokens_table,
-            [
-                'customer_id' => $userId,
-                'gateway' => $gateway,
-                'gateway_customer_id' => $customerId,
-                'gateway_payment_method_id' => $paymentMethodId,
-                'token_type' => $cardInfo['type'] ?? 'card',
-                'card_brand' => $cardInfo['brand'] ?? null,
-                'card_last4' => $cardInfo['last4'] ?? null,
-                'card_exp_month' => $cardInfo['exp_month'] ?? null,
-                'card_exp_year' => $cardInfo['exp_year'] ?? null,
-                'is_default' => 1,
-                'is_active' => 1,
-                'created_at' => current_time('mysql'),
-            ],
-            ['%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s']
-        );
+        // Create token via repository
+        $tokenId = $this->scheduledPaymentRepository->createPaymentToken([
+            'customer_id' => $userId,
+            'user_id' => $userId,
+            'gateway' => $gateway,
+            'token' => $paymentMethodId,
+            'payment_method_id' => $paymentMethodId,
+            'card_brand' => $cardInfo['brand'] ?? null,
+            'card_last4' => $cardInfo['last4'] ?? null,
+            'card_exp_month' => $cardInfo['exp_month'] ?? null,
+            'card_exp_year' => $cardInfo['exp_year'] ?? null,
+            'is_default' => 1,
+        ]);
 
-        if ($result === false) {
-            return null;
-        }
-
-        return (int) $wpdb->insert_id;
+        return $tokenId ?: null;
     }
 }

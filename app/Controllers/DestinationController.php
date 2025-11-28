@@ -11,379 +11,171 @@ use Yatra\Services\DestinationService;
 
 /**
  * Destination REST API Controller
+ * 
+ * Endpoints:
+ * - GET    /destinations       - List destinations
+ * - POST   /destinations       - Create destination
+ * - GET    /destinations/{id}  - Get single destination
+ * - PUT    /destinations/{id}  - Update destination
+ * - DELETE /destinations/{id}  - Delete destination
  */
 class DestinationController extends BaseController
 {
-    /**
-     * @var DestinationService
-     */
+    protected string $rest_base = 'destinations';
+
     private DestinationService $service;
 
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         $this->service = new DestinationService();
     }
 
-    /**
-     * Register routes
-     */
     public function register_routes(): void
     {
-        $namespace = 'yatra/v1';
-        $base = 'destinations';
-
-        // Register collection route (GET /destinations, POST /destinations)
-        $result1 = register_rest_route($namespace, '/' . $base, [
-            [
-                'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_items'],
-                'permission_callback' => [$this, 'check_permission'],
-                'args' => [
-                    'page' => [
-                        'default' => 1,
-                        'sanitize_callback' => 'absint',
-                    ],
-                    'per_page' => [
-                        'default' => 10,
-                        'sanitize_callback' => 'absint',
-                    ],
-                    'orderby' => [
-                        'default' => 'id',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'order' => [
-                        'default' => 'DESC',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'search' => [
-                        'default' => '',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'status' => [
-                        'default' => 'all',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                ],
-            ],
-            [
-                'methods' => \WP_REST_Server::CREATABLE,
-                'callback' => [$this, 'create_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-        ]);
-
-        // Register single item route (GET /destinations/{id}, PUT /destinations/{id}, DELETE /destinations/{id})
-        $result2 = register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
-            [
-                'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-            [
-                'methods' => \WP_REST_Server::EDITABLE,
-                'callback' => [$this, 'update_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-            [
-                'methods' => \WP_REST_Server::DELETABLE,
-                'callback' => [$this, 'delete_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-        ]);
-
-        // Debug: Log registration results
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra: Destination routes registration - Collection: ' . ($result1 ? 'SUCCESS' : 'FAILED'));
-            error_log('Yatra: Destination routes registration - Single: ' . ($result2 ? 'SUCCESS' : 'FAILED'));
-        }
+        $this->registerCrudRoutes($this->getStatusArg());
     }
 
-    /**
-     * Check permissions for destination endpoints
-     */
     public function check_permission(?WP_REST_Request $request = null): bool
     {
-        // During route registration, $request might be null - allow registration to proceed
         if ($request === null) {
             return true;
         }
 
-        // Debug: Log all permission checks
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            $route = $request->get_route();
-            // Clean route - remove query parameters if they're in the route string
-            $cleanRoute = strtok($route, '?');
-            error_log(sprintf(
-                'Yatra: Permission check for %s %s (clean: %s) - User ID: %d, Logged in: %s',
-                $request->get_method(),
-                $route,
-                $cleanRoute,
-                get_current_user_id(),
-                is_user_logged_in() ? 'yes' : 'no'
-            ));
-        }
-
-        // Check if user is logged in
         if (!is_user_logged_in()) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra: Permission denied - user not logged in');
-            }
             return false;
         }
 
-        // Always allow users with manage_options (admins)
         if (current_user_can('manage_options')) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra: Permission granted - user has manage_options');
-            }
             return true;
         }
 
-        // Get the request method to determine required capability
-        $method = $request->get_method();
-        $has_permission = false;
-
-        switch ($method) {
-            case 'GET':
-                // View destinations requires yatra_view_trips capability
-                $has_permission = current_user_can('yatra_view_trips');
-                break;
-            
-            case 'POST':
-                // Create destination requires yatra_edit_trips capability
-                $has_permission = current_user_can('yatra_edit_trips');
-                break;
-            
-            case 'PUT':
-            case 'PATCH':
-                // Update destination requires yatra_edit_trips capability
-                $has_permission = current_user_can('yatra_edit_trips');
-                break;
-            
-            case 'DELETE':
-                // Delete destination requires yatra_edit_trips capability
-                $has_permission = current_user_can('yatra_edit_trips');
-                break;
-            
-            default:
-                // Default to manage_options for unknown methods
-                $has_permission = current_user_can('manage_options');
-        }
-
-        // Debug logging
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log(sprintf(
-                'Yatra: Permission %s for %s %s - User ID: %d, Has yatra_edit_trips: %s, Has yatra_view_trips: %s, Has manage_options: %s',
-                $has_permission ? 'granted' : 'denied',
-                $method,
-                $request->get_route(),
-                get_current_user_id(),
-                current_user_can('yatra_edit_trips') ? 'yes' : 'no',
-                current_user_can('yatra_view_trips') ? 'yes' : 'no',
-                current_user_can('manage_options') ? 'yes' : 'no'
-            ));
-        }
-
-        return $has_permission;
+        return match ($request->get_method()) {
+            'GET' => current_user_can('yatra_view_trips'),
+            'POST', 'PUT', 'PATCH', 'DELETE' => current_user_can('yatra_edit_trips'),
+            default => current_user_can('manage_options'),
+        };
     }
 
-    /**
-     * Get items
-     */
     public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        // Debug: Log that get_items is being called
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra: get_items called for route: ' . $request->get_route());
-        }
-
         try {
-            // Sanitize pagination parameters
-            $per_page = absint($request->get_param('per_page') ?: 10);
-            $page = absint($request->get_param('page') ?: 1);
-            
-            // Sanitize order_by - only allow safe column names
-            $allowed_order_by = ['id', 'name', 'slug', 'status', 'created_at', 'updated_at'];
-            $orderby = $request->get_param('orderby') ?: 'id';
-            $orderby = in_array($orderby, $allowed_order_by, true) ? $orderby : 'id';
-            
-            // Sanitize order direction
-            $order = strtoupper($request->get_param('order') ?: 'DESC');
-            $order = in_array($order, ['ASC', 'DESC'], true) ? $order : 'DESC';
-            
+            $params = $this->getPaginationParams($request);
+
             $args = [
-                'limit' => $per_page,
-                'offset' => ($page - 1) * $per_page,
-                'order_by' => $orderby,
-                'order' => $order,
+                'limit' => $params['per_page'],
+                'offset' => ($params['page'] - 1) * $params['per_page'],
+                'order_by' => $params['orderby'],
+                'order' => $params['order'],
             ];
 
-            // Sanitize and add search
-            $search = $request->get_param('search');
-            if ($search) {
-                $args['search'] = sanitize_text_field($search);
+            if (!empty($params['search'])) {
+                $args['search'] = $params['search'];
             }
 
-            // Sanitize and add status filter
             $status = $request->get_param('status');
-            if ($status) {
-                $allowed_statuses = ['all', 'draft', 'publish', 'trash'];
-                if (in_array($status, $allowed_statuses, true)) {
-                    $args['status'] = $status;
-                }
+            if ($status && $status !== 'all') {
+                $args['status'] = sanitize_text_field($status);
             }
 
             $items = $this->service->getAll($args);
             $total = $this->service->count($args);
 
-            // Prepare items with user names
-            $prepared_items = array_map(function ($item) {
-                $prepared = (array) $item;
-                
-                // Unserialize icon if needed
-                if (isset($prepared['icon']) && is_string($prepared['icon'])) {
-                    $prepared['icon'] = maybe_unserialize($prepared['icon']);
-                }
-                
-                // Convert attachment ID to URL for images
-                if (isset($prepared['icon'])) {
-                    $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
-                }
+            $prepared = array_map([$this, 'prepareItem'], $items);
 
-                // Add user names (escaped for output)
-                if (!empty($prepared['created_by'])) {
-                    $user = get_userdata((int) $prepared['created_by']);
-                    $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;
-                }
-
-                if (!empty($prepared['updated_by'])) {
-                    $user = get_userdata((int) $prepared['updated_by']);
-                    $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
-                }
-
-                return $prepared;
-            }, $items);
-
-            return $this->success_response([
-                'data' => $prepared_items,
-                'total' => $total,
-                'page' => (int) ($request->get_param('page') ?: 1),
-                'per_page' => (int) ($request->get_param('per_page') ?: 10),
-            ]);
+            return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
 
-    /**
-     * Get single item
-     */
     public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = (int) $request->get_param('id');
-            $item = $this->service->getById($id);
+            $item = $this->service->getById($this->getId($request));
 
             if (!$item) {
-                return $this->error_response('Destination not found', 404);
+                return $this->not_found(__('Destination not found', 'yatra'));
             }
 
-            $prepared = (array) $item;
-
-            // Unserialize icon if needed
-            if (isset($prepared['icon']) && is_string($prepared['icon'])) {
-                $prepared['icon'] = maybe_unserialize($prepared['icon']);
-            }
-            
-            // Convert attachment ID to URL for images
-            if (isset($prepared['icon'])) {
-                $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
-            }
-
-            // Add user names (escaped for output)
-            if (!empty($prepared['created_by'])) {
-                $user = get_userdata((int) $prepared['created_by']);
-                $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;
-            }
-
-            if (!empty($prepared['updated_by'])) {
-                $user = get_userdata((int) $prepared['updated_by']);
-                $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
-            }
-
-            return $this->success_response($prepared);
+            return $this->success_response($this->prepareItem($item));
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
 
-    /**
-     * Create item
-     */
     public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $data = $request->get_json_params();
-            $id = $this->service->create($data);
+            $id = $this->service->create($this->getBody($request));
 
             return $this->success_response([
                 'id' => $id,
-                'message' => 'Destination created successfully',
+                'message' => __('Destination created successfully', 'yatra'),
             ], 201);
         } catch (\InvalidArgumentException $e) {
-            return $this->error_response($e->getMessage(), 400);
+            return $this->validation_error($e->getMessage());
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
 
-    /**
-     * Update item
-     */
     public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = (int) $request->get_param('id');
-            $data = $request->get_json_params();
-
-            $result = $this->service->update($id, $data);
+            $result = $this->service->update($this->getId($request), $this->getBody($request));
 
             if (!$result) {
-                return $this->error_response('Failed to update destination', 500);
+                return $this->error_response(__('Failed to update destination', 'yatra'), 500);
             }
 
             return $this->success_response([
-                'message' => 'Destination updated successfully',
+                'message' => __('Destination updated successfully', 'yatra'),
             ]);
         } catch (\InvalidArgumentException $e) {
-            return $this->error_response($e->getMessage(), 400);
+            return $this->validation_error($e->getMessage());
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
 
-    /**
-     * Delete item
-     */
     public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = (int) $request->get_param('id');
-            $result = $this->service->delete($id);
+            $result = $this->service->delete($this->getId($request));
 
             if (!$result) {
-                return $this->error_response('Failed to delete destination', 500);
+                return $this->error_response(__('Failed to delete destination', 'yatra'), 500);
             }
 
             return $this->success_response([
-                'message' => 'Destination deleted successfully',
+                'message' => __('Destination deleted successfully', 'yatra'),
             ]);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
-}
 
+    private function prepareItem($item): array
+    {
+        $prepared = (array) $item;
+
+        if (isset($prepared['icon']) && is_string($prepared['icon'])) {
+            $prepared['icon'] = maybe_unserialize($prepared['icon']);
+        }
+        if (isset($prepared['icon'])) {
+            $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
+        }
+
+        if (!empty($prepared['created_by'])) {
+            $user = get_userdata((int) $prepared['created_by']);
+            $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;
+        }
+
+        if (!empty($prepared['updated_by'])) {
+            $user = get_userdata((int) $prepared['updated_by']);
+            $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
+        }
+
+        return $prepared;
+    }
+}

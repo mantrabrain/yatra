@@ -28,6 +28,28 @@ class TripRepository extends BaseRepository
     }
 
     /**
+     * Find published/active trip by ID
+     *
+     * @param int $id Trip ID
+     * @return \stdClass|null
+     */
+    public function findPublished(int $id): ?\stdClass
+    {
+        $table = esc_sql($this->table);
+        $query = "SELECT * FROM `{$table}` WHERE id = %d AND status IN ('publish', 'published', 'active')";
+
+        if ($this->hasSoftDelete()) {
+            $query .= " AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')";
+        }
+
+        $result = $this->wpdb->get_row(
+            $this->wpdb->prepare($query, $id)
+        );
+
+        return $result ?: null;
+    }
+
+    /**
      * Find by slug
      */
     public function findBySlug(string $slug): ?\stdClass

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Repositories\ItemRepository;
+use Yatra\Repositories\ItemTypeRepository;
 use Yatra\Helpers\SlugHelper;
 
 /**
@@ -19,11 +20,17 @@ class ItemService extends BaseService
     private ItemRepository $repository;
 
     /**
+     * @var ItemTypeRepository
+     */
+    private ItemTypeRepository $itemTypeRepository;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->repository = new ItemRepository();
+        $this->itemTypeRepository = new ItemTypeRepository();
     }
 
     /**
@@ -48,16 +55,8 @@ class ItemService extends BaseService
         }
 
         // Validate type_id exists
-        global $wpdb;
-        $type_table = $wpdb->prefix . 'yatra_item_types';
-        $type_exists = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(*) FROM `{$type_table}` WHERE id = %d",
-                (int) $data['type_id']
-            )
-        );
-
-        if (!$type_exists) {
+        $itemType = $this->itemTypeRepository->find((int) $data['type_id']);
+        if (!$itemType) {
             throw new \InvalidArgumentException('Invalid item type selected');
         }
 

@@ -11,9 +11,18 @@ use Yatra\Services\DiscountService;
 
 /**
  * Discount REST API Controller
+ * 
+ * Endpoints:
+ * - GET    /discounts       - List discounts
+ * - POST   /discounts       - Create discount
+ * - GET    /discounts/{id}  - Get single discount
+ * - PUT    /discounts/{id}  - Update discount
+ * - DELETE /discounts/{id}  - Delete discount
  */
 class DiscountController extends BaseController
 {
+    protected string $rest_base = 'discounts';
+
     private DiscountService $service;
 
     public function __construct()
@@ -23,69 +32,15 @@ class DiscountController extends BaseController
 
     public function register_routes(): void
     {
-        $namespace = 'yatra/v1';
-        $base = 'discounts';
-
-        register_rest_route($namespace, '/' . $base, [
+        $this->registerCrudRoutes(array_merge(
+            $this->getStatusArg(),
             [
-                'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_items'],
-                'permission_callback' => [$this, 'check_permission'],
-                'args' => [
-                    'page' => [
-                        'default' => 1,
-                        'sanitize_callback' => 'absint',
-                    ],
-                    'per_page' => [
-                        'default' => 10,
-                        'sanitize_callback' => 'absint',
-                    ],
-                    'orderby' => [
-                        'default' => 'created_at',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'order' => [
-                        'default' => 'DESC',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'search' => [
-                        'default' => '',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'status' => [
-                        'default' => 'all',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'type' => [
-                        'default' => 'all',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
+                'type' => [
+                    'default' => 'all',
+                    'sanitize_callback' => 'sanitize_text_field',
                 ],
-            ],
-            [
-                'methods' => \WP_REST_Server::CREATABLE,
-                'callback' => [$this, 'create_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-        ]);
-
-        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
-            [
-                'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-            [
-                'methods' => \WP_REST_Server::EDITABLE,
-                'callback' => [$this, 'update_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-            [
-                'methods' => \WP_REST_Server::DELETABLE,
-                'callback' => [$this, 'delete_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-        ]);
+            ]
+        ));
     }
 
     public function check_permission(?WP_REST_Request $request = null): bool
@@ -102,111 +57,48 @@ class DiscountController extends BaseController
             return true;
         }
 
-        $method = $request->get_method();
-        $has_permission = false;
-
-        switch ($method) {
-            case 'GET':
-                $has_permission = current_user_can('yatra_view_bookings');
-                break;
-            
-            case 'POST':
-            case 'PUT':
-            case 'PATCH':
-            case 'DELETE':
-                $has_permission = current_user_can('yatra_edit_bookings');
-                break;
-            
-            default:
-                $has_permission = current_user_can('manage_options');
-        }
-
-        return $has_permission;
+        return match ($request->get_method()) {
+            'GET' => current_user_can('yatra_view_bookings'),
+            'POST', 'PUT', 'PATCH', 'DELETE' => current_user_can('yatra_edit_bookings'),
+            default => current_user_can('manage_options'),
+        };
     }
 
     public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $per_page = absint($request->get_param('per_page') ?: 10);
-            $page = absint($request->get_param('page') ?: 1);
-            
-            $allowed_order_by = ['id', 'code', 'type', 'amount', 'usage_count', 'expiry_date', 'status', 'created_at', 'updated_at'];
+            $params = $this->getPaginationParams($request);
+
+            // Override default orderby
             $orderby = $request->get_param('orderby') ?: 'created_at';
-            $orderby = in_array($orderby, $allowed_order_by, true) ? $orderby : 'created_at';
-            
-            $order = strtoupper($request->get_param('order') ?: 'DESC');
-            $order = in_array($order, ['ASC', 'DESC'], true) ? $order : 'DESC';
-            
+
             $args = [
-                'limit' => $per_page,
-                'offset' => ($page - 1) * $per_page,
+                'limit' => $params['per_page'],
+                'offset' => ($params['page'] - 1) * $params['per_page'],
                 'order_by' => $orderby,
-                'order' => $order,
+                'order' => $params['order'],
             ];
 
-            $search = $request->get_param('search');
-            if ($search) {
-                $args['search'] = sanitize_text_field($search);
+            if (!empty($params['search'])) {
+                $args['search'] = $params['search'];
             }
 
             $status = $request->get_param('status');
-            if ($status) {
-                $allowed_statuses = ['all', 'draft', 'publish', 'trash'];
-                if (in_array($status, $allowed_statuses, true)) {
-                    $args['status'] = $status;
-                }
+            if ($status && $status !== 'all') {
+                $args['status'] = sanitize_text_field($status);
             }
 
             $type = $request->get_param('type');
-            if ($type) {
-                $allowed_types = ['all', 'percentage', 'fixed'];
-                if (in_array($type, $allowed_types, true)) {
-                    $args['type'] = $type;
-                }
+            if ($type && $type !== 'all' && in_array($type, ['percentage', 'fixed'], true)) {
+                $args['type'] = $type;
             }
 
             $items = $this->service->getAll($args);
             $total = $this->service->count($args);
 
-            $prepared_items = array_map(function ($item) {
-                $prepared = (array) $item;
-                
-                // Unserialize trip_ids
-                if (isset($prepared['trip_ids']) && is_string($prepared['trip_ids'])) {
-                    $prepared['trip_ids'] = maybe_unserialize($prepared['trip_ids']);
-                }
+            $prepared = array_map([$this, 'prepareItem'], $items);
 
-                // Ensure boolean fields are properly converted
-                $prepared['first_time_customer_only'] = (bool) ($prepared['first_time_customer_only'] ?? false);
-                $prepared['is_group_discount'] = (bool) ($prepared['is_group_discount'] ?? false);
-                
-                // If group discount is disabled, ensure related fields are null
-                if (!$prepared['is_group_discount']) {
-                    $prepared['min_group_size'] = null;
-                    $prepared['group_discount_type'] = null;
-                    $prepared['group_discount_amount'] = null;
-                }
-
-                // Add user names
-                if (!empty($prepared['created_by'])) {
-                    $user = get_userdata((int) $prepared['created_by']);
-                    $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;
-                }
-
-                if (!empty($prepared['updated_by'])) {
-                    $user = get_userdata((int) $prepared['updated_by']);
-                    $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
-                }
-
-                return $prepared;
-            }, $items);
-
-            return $this->success_response([
-                'data' => $prepared_items,
-                'total' => $total,
-                'page' => (int) ($request->get_param('page') ?: 1),
-                'per_page' => (int) ($request->get_param('per_page') ?: 10),
-            ]);
+            return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
@@ -215,43 +107,13 @@ class DiscountController extends BaseController
     public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = (int) $request->get_param('id');
-            $item = $this->service->getById($id);
+            $item = $this->service->getById($this->getId($request));
 
             if (!$item) {
-                return $this->error_response('Discount not found', 404);
+                return $this->not_found(__('Discount not found', 'yatra'));
             }
 
-            $prepared = (array) $item;
-
-            // Unserialize trip_ids
-            if (isset($prepared['trip_ids']) && is_string($prepared['trip_ids'])) {
-                $prepared['trip_ids'] = maybe_unserialize($prepared['trip_ids']);
-            }
-
-            // Ensure boolean fields are properly converted
-            $prepared['first_time_customer_only'] = (bool) ($prepared['first_time_customer_only'] ?? false);
-            $prepared['is_group_discount'] = (bool) ($prepared['is_group_discount'] ?? false);
-            
-            // If group discount is disabled, ensure related fields are null
-            if (!$prepared['is_group_discount']) {
-                $prepared['min_group_size'] = null;
-                $prepared['group_discount_type'] = null;
-                $prepared['group_discount_amount'] = null;
-            }
-
-            // Add user names
-            if (!empty($prepared['created_by'])) {
-                $user = get_userdata((int) $prepared['created_by']);
-                $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;
-            }
-
-            if (!empty($prepared['updated_by'])) {
-                $user = get_userdata((int) $prepared['updated_by']);
-                $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
-            }
-
-            return $this->success_response($prepared);
+            return $this->success_response($this->prepareItem($item));
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
@@ -260,15 +122,14 @@ class DiscountController extends BaseController
     public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $data = $request->get_json_params();
-            $id = $this->service->create($data);
+            $id = $this->service->create($this->getBody($request));
 
             return $this->success_response([
                 'id' => $id,
-                'message' => 'Discount created successfully',
+                'message' => __('Discount created successfully', 'yatra'),
             ], 201);
         } catch (\InvalidArgumentException $e) {
-            return $this->error_response($e->getMessage(), 400);
+            return $this->validation_error($e->getMessage());
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
@@ -277,20 +138,17 @@ class DiscountController extends BaseController
     public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = (int) $request->get_param('id');
-            $data = $request->get_json_params();
-
-            $result = $this->service->update($id, $data);
+            $result = $this->service->update($this->getId($request), $this->getBody($request));
 
             if (!$result) {
-                return $this->error_response('Failed to update discount', 500);
+                return $this->error_response(__('Failed to update discount', 'yatra'), 500);
             }
 
             return $this->success_response([
-                'message' => 'Discount updated successfully',
+                'message' => __('Discount updated successfully', 'yatra'),
             ]);
         } catch (\InvalidArgumentException $e) {
-            return $this->error_response($e->getMessage(), 400);
+            return $this->validation_error($e->getMessage());
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
@@ -299,19 +157,47 @@ class DiscountController extends BaseController
     public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = (int) $request->get_param('id');
-            $result = $this->service->delete($id);
+            $result = $this->service->delete($this->getId($request));
 
             if (!$result) {
-                return $this->error_response('Failed to delete discount', 500);
+                return $this->error_response(__('Failed to delete discount', 'yatra'), 500);
             }
 
             return $this->success_response([
-                'message' => 'Discount deleted successfully',
+                'message' => __('Discount deleted successfully', 'yatra'),
             ]);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
-}
 
+    private function prepareItem($item): array
+    {
+        $prepared = (array) $item;
+
+        if (isset($prepared['trip_ids']) && is_string($prepared['trip_ids'])) {
+            $prepared['trip_ids'] = maybe_unserialize($prepared['trip_ids']);
+        }
+
+        $prepared['first_time_customer_only'] = (bool) ($prepared['first_time_customer_only'] ?? false);
+        $prepared['is_group_discount'] = (bool) ($prepared['is_group_discount'] ?? false);
+
+        if (!$prepared['is_group_discount']) {
+            $prepared['min_group_size'] = null;
+            $prepared['group_discount_type'] = null;
+            $prepared['group_discount_amount'] = null;
+        }
+
+        if (!empty($prepared['created_by'])) {
+            $user = get_userdata((int) $prepared['created_by']);
+            $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;
+        }
+
+        if (!empty($prepared['updated_by'])) {
+            $user = get_userdata((int) $prepared['updated_by']);
+            $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
+        }
+
+        return $prepared;
+    }
+}

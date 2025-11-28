@@ -688,6 +688,35 @@ class Database
 
         \dbDelta($sql_enquiries);
 
+        // ============================================
+        // REVIEWS
+        // ============================================
+        $table_reviews = $wpdb->prefix . 'yatra_reviews';
+
+        $sql_reviews = "CREATE TABLE IF NOT EXISTS `{$table_reviews}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `trip_id` bigint(20) UNSIGNED NOT NULL,
+            `user_id` bigint(20) UNSIGNED DEFAULT 0,
+            `rating` tinyint(1) UNSIGNED NOT NULL,
+            `title` varchar(255) DEFAULT NULL,
+            `content` text NOT NULL,
+            `author_name` varchar(100) NOT NULL,
+            `author_email` varchar(100) DEFAULT NULL,
+            `author_location` varchar(100) DEFAULT NULL,
+            `status` enum('pending','approved','rejected') DEFAULT 'pending',
+            `helpful_count` int(11) UNSIGNED DEFAULT 0,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_trip_id` (`trip_id`),
+            KEY `idx_user_id` (`user_id`),
+            KEY `idx_status` (`status`),
+            KEY `idx_rating` (`rating`),
+            KEY `idx_created_at` (`created_at`)
+        ) {$charset_collate} COMMENT='Trip reviews and ratings';";
+
+        \dbDelta($sql_reviews);
+
         // Trip Revisions table
         $table_trip_revisions = $wpdb->prefix . 'yatra_trip_revisions';
         

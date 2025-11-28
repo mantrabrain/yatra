@@ -11,93 +11,30 @@ use Yatra\Services\DifficultyLevelService;
 
 /**
  * Difficulty Level REST API Controller
+ * 
+ * Endpoints:
+ * - GET    /difficulty-levels       - List difficulty levels
+ * - POST   /difficulty-levels       - Create difficulty level
+ * - GET    /difficulty-levels/{id}  - Get single difficulty level
+ * - PUT    /difficulty-levels/{id}  - Update difficulty level
+ * - DELETE /difficulty-levels/{id}  - Delete difficulty level
  */
 class DifficultyLevelController extends BaseController
 {
-    /**
-     * @var DifficultyLevelService
-     */
+    protected string $rest_base = 'difficulty-levels';
+
     private DifficultyLevelService $service;
 
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         $this->service = new DifficultyLevelService();
     }
 
-    /**
-     * Register routes
-     */
     public function register_routes(): void
     {
-        $namespace = 'yatra/v1';
-        $base = 'difficulty-levels';
-
-        // Register collection route (GET /difficulty-levels, POST /difficulty-levels)
-        register_rest_route($namespace, '/' . $base, [
-            [
-                'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_items'],
-                'permission_callback' => [$this, 'check_permission'],
-                'args' => [
-                    'page' => [
-                        'default' => 1,
-                        'sanitize_callback' => 'absint',
-                    ],
-                    'per_page' => [
-                        'default' => 10,
-                        'sanitize_callback' => 'absint',
-                    ],
-                    'orderby' => [
-                        'default' => 'level_order',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'order' => [
-                        'default' => 'ASC',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'search' => [
-                        'default' => '',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                    'status' => [
-                        'default' => 'all',
-                        'sanitize_callback' => 'sanitize_text_field',
-                    ],
-                ],
-            ],
-            [
-                'methods' => \WP_REST_Server::CREATABLE,
-                'callback' => [$this, 'create_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-        ]);
-
-        // Register single item route (GET /difficulty-levels/{id}, PUT /difficulty-levels/{id}, DELETE /difficulty-levels/{id})
-        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
-            [
-                'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-            [
-                'methods' => \WP_REST_Server::EDITABLE,
-                'callback' => [$this, 'update_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-            [
-                'methods' => \WP_REST_Server::DELETABLE,
-                'callback' => [$this, 'delete_item'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-        ]);
+        $this->registerCrudRoutes($this->getStatusArg());
     }
 
-    /**
-     * Check permissions for difficulty level endpoints
-     */
     public function check_permission(?WP_REST_Request $request = null): bool
     {
         if ($request === null) {
@@ -112,218 +49,137 @@ class DifficultyLevelController extends BaseController
             return true;
         }
 
-        $method = $request->get_method();
-        $has_permission = false;
-
-        switch ($method) {
-            case 'GET':
-                $has_permission = current_user_can('yatra_view_trips');
-                break;
-            
-            case 'POST':
-                $has_permission = current_user_can('yatra_edit_trips');
-                break;
-            
-            case 'PUT':
-            case 'PATCH':
-                $has_permission = current_user_can('yatra_edit_trips');
-                break;
-            
-            case 'DELETE':
-                $has_permission = current_user_can('yatra_edit_trips');
-                break;
-            
-            default:
-                $has_permission = current_user_can('manage_options');
-        }
-
-        return $has_permission;
+        return match ($request->get_method()) {
+            'GET' => current_user_can('yatra_view_trips'),
+            'POST', 'PUT', 'PATCH', 'DELETE' => current_user_can('yatra_edit_trips'),
+            default => current_user_can('manage_options'),
+        };
     }
 
-    /**
-     * Get items
-     */
     public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $per_page = absint($request->get_param('per_page') ?: 10);
-            $page = absint($request->get_param('page') ?: 1);
-            
-            $allowed_order_by = ['id', 'name', 'slug', 'status', 'level_order', 'created_at', 'updated_at'];
+            $params = $this->getPaginationParams($request);
+
+            // Override default orderby for difficulty levels
             $orderby = $request->get_param('orderby') ?: 'level_order';
-            $orderby = in_array($orderby, $allowed_order_by, true) ? $orderby : 'level_order';
-            
             $order = strtoupper($request->get_param('order') ?: 'ASC');
-            $order = in_array($order, ['ASC', 'DESC'], true) ? $order : 'ASC';
-            
+
             $args = [
-                'limit' => $per_page,
-                'offset' => ($page - 1) * $per_page,
+                'limit' => $params['per_page'],
+                'offset' => ($params['page'] - 1) * $params['per_page'],
                 'order_by' => $orderby,
                 'order' => $order,
             ];
 
-            $search = $request->get_param('search');
-            if ($search) {
-                $args['search'] = sanitize_text_field($search);
+            if (!empty($params['search'])) {
+                $args['search'] = $params['search'];
             }
 
             $status = $request->get_param('status');
-            if ($status) {
-                $allowed_statuses = ['all', 'draft', 'publish', 'trash'];
-                if (in_array($status, $allowed_statuses, true)) {
-                    $args['status'] = $status;
-                }
+            if ($status && $status !== 'all') {
+                $args['status'] = sanitize_text_field($status);
             }
 
             $items = $this->service->getAll($args);
             $total = $this->service->count($args);
 
-            // Prepare items with user names
-            $prepared_items = array_map(function ($item) {
-                $prepared = (array) $item;
-                
-                // Unserialize icon if needed
-                if (isset($prepared['icon']) && is_string($prepared['icon'])) {
-                    $prepared['icon'] = maybe_unserialize($prepared['icon']);
-                }
-                
-                // Convert attachment ID to URL for images
-                if (isset($prepared['icon'])) {
-                    $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
-                }
-                
-                // Add user names
-                if (!empty($prepared['created_by'])) {
-                    $user = get_userdata((int) $prepared['created_by']);
-                    $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;
-                }
+            $prepared = array_map([$this, 'prepareItem'], $items);
 
-                if (!empty($prepared['updated_by'])) {
-                    $user = get_userdata((int) $prepared['updated_by']);
-                    $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
-                }
-
-                return $prepared;
-            }, $items);
-
-            return $this->success_response([
-                'data' => $prepared_items,
-                'total' => $total,
-                'page' => (int) ($request->get_param('page') ?: 1),
-                'per_page' => (int) ($request->get_param('per_page') ?: 10),
-            ]);
+            return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
 
-    /**
-     * Get single item
-     */
     public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = (int) $request->get_param('id');
-            $item = $this->service->getById($id);
+            $item = $this->service->getById($this->getId($request));
 
             if (!$item) {
-                return $this->error_response('Difficulty level not found', 404);
+                return $this->not_found(__('Difficulty level not found', 'yatra'));
             }
 
-            $prepared = (array) $item;
-
-            // Unserialize icon if needed
-            if (isset($prepared['icon']) && is_string($prepared['icon'])) {
-                $prepared['icon'] = maybe_unserialize($prepared['icon']);
-            }
-            
-            // Convert attachment ID to URL for images
-            if (isset($prepared['icon'])) {
-                $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
-            }
-
-            // Add user names
-            if (!empty($prepared['created_by'])) {
-                $user = get_userdata((int) $prepared['created_by']);
-                $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;
-            }
-
-            if (!empty($prepared['updated_by'])) {
-                $user = get_userdata((int) $prepared['updated_by']);
-                $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
-            }
-
-            return $this->success_response($prepared);
+            return $this->success_response($this->prepareItem($item));
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
 
-    /**
-     * Create item
-     */
     public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $data = $request->get_json_params();
-            $id = $this->service->create($data);
+            $id = $this->service->create($this->getBody($request));
 
             return $this->success_response([
                 'id' => $id,
-                'message' => 'Difficulty level created successfully',
+                'message' => __('Difficulty level created successfully', 'yatra'),
             ], 201);
         } catch (\InvalidArgumentException $e) {
-            return $this->error_response($e->getMessage(), 400);
+            return $this->validation_error($e->getMessage());
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
 
-    /**
-     * Update item
-     */
     public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = (int) $request->get_param('id');
-            $data = $request->get_json_params();
-
-            $result = $this->service->update($id, $data);
+            $result = $this->service->update($this->getId($request), $this->getBody($request));
 
             if (!$result) {
-                return $this->error_response('Failed to update difficulty level', 500);
+                return $this->error_response(__('Failed to update difficulty level', 'yatra'), 500);
             }
 
             return $this->success_response([
-                'message' => 'Difficulty level updated successfully',
+                'message' => __('Difficulty level updated successfully', 'yatra'),
             ]);
         } catch (\InvalidArgumentException $e) {
-            return $this->error_response($e->getMessage(), 400);
+            return $this->validation_error($e->getMessage());
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
 
-    /**
-     * Delete item
-     */
     public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = (int) $request->get_param('id');
-            $result = $this->service->delete($id);
+            $result = $this->service->delete($this->getId($request));
 
             if (!$result) {
-                return $this->error_response('Failed to delete difficulty level', 500);
+                return $this->error_response(__('Failed to delete difficulty level', 'yatra'), 500);
             }
 
             return $this->success_response([
-                'message' => 'Difficulty level deleted successfully',
+                'message' => __('Difficulty level deleted successfully', 'yatra'),
             ]);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
     }
-}
 
+    private function prepareItem($item): array
+    {
+        $prepared = (array) $item;
+
+        if (isset($prepared['icon']) && is_string($prepared['icon'])) {
+            $prepared['icon'] = maybe_unserialize($prepared['icon']);
+        }
+        if (isset($prepared['icon'])) {
+            $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
+        }
+
+        if (!empty($prepared['created_by'])) {
+            $user = get_userdata((int) $prepared['created_by']);
+            $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;
+        }
+
+        if (!empty($prepared['updated_by'])) {
+            $user = get_userdata((int) $prepared['updated_by']);
+            $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
+        }
+
+        return $prepared;
+    }
+}

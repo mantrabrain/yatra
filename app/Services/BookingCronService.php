@@ -2,6 +2,9 @@
 
 namespace Yatra\Services;
 
+use Yatra\Repositories\BookingRepository;
+use Yatra\Repositories\TripRepository;
+
 /**
  * Handles scheduled booking tasks:
  * - Sending reminder emails before departure
@@ -9,6 +12,34 @@ namespace Yatra\Services;
  */
 class BookingCronService
 {
+    /**
+     * Get BookingRepository instance
+     *
+     * @return BookingRepository
+     */
+    private static function getBookingRepository(): BookingRepository
+    {
+        static $repository = null;
+        if ($repository === null) {
+            $repository = new BookingRepository();
+        }
+        return $repository;
+    }
+
+    /**
+     * Get TripRepository instance
+     *
+     * @return TripRepository
+     */
+    private static function getTripRepository(): TripRepository
+    {
+        static $repository = null;
+        if ($repository === null) {
+            $repository = new TripRepository();
+        }
+        return $repository;
+    }
+
     /**
      * Register cron hooks
      */
@@ -59,30 +90,19 @@ class BookingCronService
      */
     public static function sendBookingReminders(): void
     {
-        global $wpdb;
-        
         $reminder_days = (int) SettingsService::get('booking_reminder_days', 3);
-        
+
         if ($reminder_days <= 0) {
             return; // Reminders disabled
         }
 
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        $trips_table = $wpdb->prefix . 'yatra_trips';
-        
+        $bookingRepository = self::getBookingRepository();
+
         // Calculate the target date (X days from now)
         $target_date = date('Y-m-d', strtotime("+{$reminder_days} days"));
-        
+
         // Get confirmed bookings with travel date matching the target
-        $bookings = $wpdb->get_results($wpdb->prepare(
-            "SELECT b.*, t.title as trip_title, t.currency
-             FROM {$bookings_table} b
-             LEFT JOIN {$trips_table} t ON b.trip_id = t.id
-             WHERE b.status = 'confirmed'
-             AND b.travel_date = %s
-             AND b.reminder_sent = 0",
-            $target_date
-        ));
+        $bookings = $bookingRepository->getBookingsForReminder($target_date);
 
         if (empty($bookings)) {
             return;
@@ -90,15 +110,9 @@ class BookingCronService
 
         foreach ($bookings as $booking) {
             self::sendReminderEmail($booking);
-            
+
             // Mark reminder as sent
-            $wpdb->update(
-                $bookings_table,
-                ['reminder_sent' => 1, 'reminder_sent_at' => current_time('mysql')],
-                ['id' => $booking->id],
-                ['%d', '%s'],
-                ['%d']
-            );
+            $bookingRepository->markReminderSent($booking->id);
         }
 
         // Log the operation
@@ -170,56 +184,34 @@ class BookingCronService
      */
     public static function expirePendingBookings(): void
     {
-        global $wpdb;
-        
         $expiry_hours = (int) SettingsService::get('booking_expiry_hours', 24);
-        
+
         if ($expiry_hours <= 0) {
             return; // Expiry disabled
         }
 
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        
+        $bookingRepository = self::getBookingRepository();
+        $tripRepository = self::getTripRepository();
+
         // Calculate the expiry threshold
         $expiry_threshold = date('Y-m-d H:i:s', strtotime("-{$expiry_hours} hours"));
-        
+
         // Get pending bookings that are older than the expiry threshold
-        // Only expire bookings where payment_status is 'pending' (not paid)
-        $expired_bookings = $wpdb->get_results($wpdb->prepare(
-            "SELECT id, reference, contact_email, contact_first_name, contact_last_name, trip_id
-             FROM {$bookings_table}
-             WHERE status = 'pending'
-             AND payment_status = 'pending'
-             AND created_at < %s",
-            $expiry_threshold
-        ));
+        $expired_bookings = $bookingRepository->getExpiredPendingBookings($expiry_threshold);
 
         if (empty($expired_bookings)) {
             return;
         }
 
-        $trips_table = $wpdb->prefix . 'yatra_trips';
-
         foreach ($expired_bookings as $booking) {
             // Update booking status to expired/cancelled
-            $wpdb->update(
-                $bookings_table,
-                [
-                    'status' => 'cancelled',
-                    'cancellation_reason' => __('Booking expired due to non-payment', 'yatra'),
-                    'cancelled_at' => current_time('mysql'),
-                    'updated_at' => current_time('mysql'),
-                ],
-                ['id' => $booking->id],
-                ['%s', '%s', '%s', '%s'],
-                ['%d']
+            $bookingRepository->expireBooking(
+                $booking->id,
+                __('Booking expired due to non-payment', 'yatra')
             );
 
             // Get trip title for email
-            $trip = $wpdb->get_row($wpdb->prepare(
-                "SELECT title FROM {$trips_table} WHERE id = %d",
-                $booking->trip_id
-            ));
+            $trip = $tripRepository->find($booking->trip_id);
 
             // Send expiry notification email
             self::sendExpiryEmail($booking, $trip);

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\PaymentGateways\PaymentGatewayRegistry;
+use Yatra\Repositories\ScheduledPaymentRepository;
+use Yatra\Repositories\BookingRepository;
 
 /**
  * Scheduled Payment Service
@@ -19,6 +21,34 @@ class ScheduledPaymentService
 {
     private const CRON_HOOK = 'yatra_sync_scheduled_payments';
     private const REMINDER_HOOK = 'yatra_send_payment_reminders';
+
+    /**
+     * Get the scheduled payment repository instance
+     *
+     * @return ScheduledPaymentRepository
+     */
+    private static function getRepository(): ScheduledPaymentRepository
+    {
+        static $repository = null;
+        if ($repository === null) {
+            $repository = new ScheduledPaymentRepository();
+        }
+        return $repository;
+    }
+
+    /**
+     * Get the booking repository instance
+     *
+     * @return BookingRepository
+     */
+    private static function getBookingRepository(): BookingRepository
+    {
+        static $repository = null;
+        if ($repository === null) {
+            $repository = new BookingRepository();
+        }
+        return $repository;
+    }
     
     /**
      * Register cron jobs
@@ -56,18 +86,11 @@ class ScheduledPaymentService
      */
     public static function syncScheduledPaymentStatus(): void
     {
-        global $wpdb;
-        
-        $table = $wpdb->prefix . 'yatra_scheduled_payments';
-        
+        $repository = self::getRepository();
+
         // Get processing payments that might have been updated by gateway webhook
-        $processing_payments = $wpdb->get_results(
-            "SELECT * FROM {$table} 
-             WHERE status = 'processing' 
-             ORDER BY scheduled_date ASC 
-             LIMIT 50"
-        );
-        
+        $processing_payments = $repository->getProcessingPayments();
+
         // For each, check gateway status if we have a gateway reference
         foreach ($processing_payments as $payment) {
             if (!empty($payment->gateway_subscription_id)) {
@@ -101,41 +124,18 @@ class ScheduledPaymentService
      */
     public static function sendPaymentReminders(): void
     {
-        global $wpdb;
-        
-        $table = $wpdb->prefix . 'yatra_scheduled_payments';
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        
+        $repository = self::getRepository();
+
         $reminder_days = (int) SettingsService::get('scheduled_payment_reminder_days', 3);
-        $reminder_date = date('Y-m-d H:i:s', strtotime("+{$reminder_days} days"));
-        $now = current_time('mysql');
-        
+
         // Get pending payments coming up that haven't had reminders sent
-        $upcoming = $wpdb->get_results($wpdb->prepare(
-            "SELECT sp.*, b.reference, b.contact_email, b.contact_first_name, b.contact_last_name
-             FROM {$table} sp
-             LEFT JOIN {$bookings_table} b ON sp.booking_id = b.id
-             WHERE sp.status = 'pending' 
-             AND sp.scheduled_date <= %s 
-             AND sp.scheduled_date > %s
-             AND (sp.reminder_sent IS NULL OR sp.reminder_sent = 0)
-             ORDER BY sp.scheduled_date ASC 
-             LIMIT 50",
-            $reminder_date,
-            $now
-        ));
-        
+        $upcoming = $repository->getPendingForReminders($reminder_days);
+
         foreach ($upcoming as $payment) {
             self::sendPaymentReminder($payment);
-            
+
             // Mark reminder as sent
-            $wpdb->update(
-                $table,
-                ['reminder_sent' => 1, 'updated_at' => current_time('mysql')],
-                ['id' => $payment->id],
-                ['%d', '%s'],
-                ['%d']
-            );
+            $repository->markReminded($payment->id);
         }
     }
     
@@ -699,23 +699,8 @@ class ScheduledPaymentService
      */
     public static function cancelScheduledPayments(int $bookingId): int
     {
-        global $wpdb;
-        
-        $table = $wpdb->prefix . 'yatra_scheduled_payments';
-        
-        return (int) $wpdb->update(
-            $table,
-            [
-                'status' => 'cancelled',
-                'updated_at' => current_time('mysql'),
-            ],
-            [
-                'booking_id' => $bookingId,
-                'status' => 'pending',
-            ],
-            ['%s', '%s'],
-            ['%d', '%s']
-        );
+        $repository = self::getRepository();
+        return $repository->cancelByBookingId($bookingId);
     }
     
     /**
@@ -723,62 +708,42 @@ class ScheduledPaymentService
      */
     public static function getScheduledPayments(int $bookingId): array
     {
-        global $wpdb;
-        
-        $table = $wpdb->prefix . 'yatra_scheduled_payments';
-        
-        return $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM {$table} WHERE booking_id = %d ORDER BY scheduled_date ASC",
-            $bookingId
-        ), ARRAY_A) ?: [];
+        $repository = self::getRepository();
+        $results = $repository->getByBookingId($bookingId);
+
+        return array_map(function ($item) {
+            return (array) $item;
+        }, $results);
     }
-    
+
     /**
      * Get upcoming scheduled payments (for admin dashboard)
      */
     public static function getUpcomingPayments(int $days = 7, int $limit = 20): array
     {
-        global $wpdb;
-        
-        $table = $wpdb->prefix . 'yatra_scheduled_payments';
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        
-        $future_date = date('Y-m-d H:i:s', strtotime("+{$days} days"));
-        
-        return $wpdb->get_results($wpdb->prepare(
-            "SELECT sp.*, b.reference as booking_reference, b.contact_email, 
-                    b.contact_first_name, b.contact_last_name
-             FROM {$table} sp
-             LEFT JOIN {$bookings_table} b ON sp.booking_id = b.id
-             WHERE sp.status = 'pending' 
-             AND sp.scheduled_date <= %s
-             ORDER BY sp.scheduled_date ASC
-             LIMIT %d",
-            $future_date,
-            $limit
-        ), ARRAY_A) ?: [];
+        $repository = self::getRepository();
+        $results = $repository->getUpcoming($days, $limit);
+
+        return array_map(function ($item) {
+            return (array) $item;
+        }, $results);
     }
-    
+
     /**
      * Notify customer of successful payment
      */
     private static function notifyPaymentSuccess(object $scheduled_payment, array $result): void
     {
-        global $wpdb;
-        
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        $booking = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$bookings_table} WHERE id = %d",
-            $scheduled_payment->booking_id
-        ));
-        
+        $bookingRepository = self::getBookingRepository();
+        $booking = $bookingRepository->find($scheduled_payment->booking_id);
+
         if (!$booking || empty($booking->contact_email)) {
             return;
         }
-        
+
         $site_name = get_bloginfo('name');
         $subject = sprintf(__('[%s] Payment Successful - %s', 'yatra'), $site_name, $booking->reference);
-        
+
         $message = sprintf(
             __("Hello %s,\n\nYour scheduled payment has been processed successfully.\n\nBooking Reference: %s\nAmount: %s %s\nPayment Type: %s\n\nYour remaining balance is now: %s %s\n\nThank you for your payment!\n\nBest regards,\n%s", 'yatra'),
             $booking->contact_first_name,
@@ -790,23 +755,18 @@ class ScheduledPaymentService
             $scheduled_payment->currency,
             $site_name
         );
-        
+
         $headers = ['Content-Type: text/plain; charset=UTF-8'];
         wp_mail($booking->contact_email, $subject, $message, $headers);
     }
-    
+
     /**
      * Notify customer of failed payment
      */
     private static function notifyPaymentFailed(object $scheduled_payment, string $error, bool $permanent = false): void
     {
-        global $wpdb;
-        
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        $booking = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$bookings_table} WHERE id = %d",
-            $scheduled_payment->booking_id
-        ));
+        $bookingRepository = self::getBookingRepository();
+        $booking = $bookingRepository->find($scheduled_payment->booking_id);
         
         if (!$booking || empty($booking->contact_email)) {
             return;

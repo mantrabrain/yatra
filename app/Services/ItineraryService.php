@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Repositories\ItineraryRepository;
+use Yatra\Repositories\TripRepository;
 use InvalidArgumentException;
 
 /**
@@ -14,10 +15,12 @@ use InvalidArgumentException;
 class ItineraryService
 {
     private ItineraryRepository $repository;
+    private TripRepository $tripRepository;
 
-    public function __construct(ItineraryRepository $repository)
+    public function __construct(ItineraryRepository $repository, ?TripRepository $tripRepository = null)
     {
         $this->repository = $repository;
+        $this->tripRepository = $tripRepository ?? new TripRepository();
     }
 
     /**
@@ -48,13 +51,8 @@ class ItineraryService
         }
 
         // Validate trip exists
-        global $wpdb;
-        $tripTable = $wpdb->prefix . 'yatra_trips';
-        $tripExists = $wpdb->get_var(
-            $wpdb->prepare("SELECT COUNT(*) FROM `{$tripTable}` WHERE id = %d", (int) $data['trip_id'])
-        );
-
-        if (!$tripExists) {
+        $trip = $this->tripRepository->find((int) $data['trip_id']);
+        if (!$trip) {
             throw new InvalidArgumentException(__('Trip not found', 'yatra'));
         }
 

@@ -9,6 +9,10 @@ use Yatra\Core\Container;
 use Yatra\Core\Modules\ModuleManager;
 use Yatra\Controllers\SingleTripController;
 use Yatra\Services\SettingsService;
+use Yatra\Repositories\ReviewRepository;
+use Yatra\Repositories\EnquiryRepository;
+use Yatra\Repositories\TripRepository;
+use Yatra\Repositories\BookingRepository;
 
 /**
  * Application Service Provider
@@ -162,50 +166,37 @@ class AppServiceProvider extends ServiceProvider
 
         // Get user ID and check permissions
         $user_id = get_current_user_id();
-        
+
         // Check if this is an edit request
         $action_type = sanitize_text_field($_POST['action_type'] ?? 'create');
         $review_id = (int) ($_POST['review_id'] ?? 0);
-        
-        global $wpdb;
-        $table = $wpdb->prefix . 'yatra_reviews';
 
-        // Check if table exists, if not create it
-        $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
-        if (!$table_exists) {
-            $this->createReviewsTable();
-        }
-        
+        // Use ReviewRepository
+        $reviewRepository = new ReviewRepository();
+
         if ($action_type === 'edit' && $review_id > 0) {
             // Editing existing review
             $existing_review = yatra_get_user_review($trip_id, $user_id);
-            
+
             if (!$existing_review || (int) $existing_review->id !== $review_id) {
                 wp_send_json_error(['message' => __('Review not found or you do not have permission to edit it.', 'yatra')]);
             }
-            
+
             if (!yatra_can_edit_review($existing_review)) {
                 wp_send_json_error(['message' => __('The edit window (24 hours) for this review has passed.', 'yatra')]);
             }
-            
+
             // Update the review
-            $result = $wpdb->update(
-                $table,
-                [
-                    'rating' => $rating,
-                    'title' => $title,
-                    'content' => $content,
-                    'updated_at' => current_time('mysql'),
-                ],
-                ['id' => $review_id, 'user_id' => $user_id],
-                ['%d', '%s', '%s', '%s'],
-                ['%d', '%d']
-            );
-            
-            if ($result === false) {
+            $result = $reviewRepository->update($review_id, [
+                'rating' => $rating,
+                'title' => $title,
+                'content' => $content,
+            ]);
+
+            if (!$result) {
                 wp_send_json_error(['message' => __('Failed to update review. Please try again.', 'yatra')]);
             }
-            
+
             wp_send_json_success(['message' => __('Your review has been updated!', 'yatra')]);
         } else {
             // Creating new review
@@ -221,7 +212,7 @@ class AppServiceProvider extends ServiceProvider
             // Determine status based on settings
             $status = \Yatra\Services\SettingsService::autoApproveReviews() ? 'approved' : 'pending';
 
-            $result = $wpdb->insert($table, [
+            $result = $reviewRepository->create([
                 'trip_id' => $trip_id,
                 'user_id' => $user_id,
                 'rating' => $rating,
@@ -230,8 +221,7 @@ class AppServiceProvider extends ServiceProvider
                 'author_name' => $author_name,
                 'author_email' => $author_email,
                 'status' => $status,
-                'created_at' => current_time('mysql'),
-            ], ['%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s']);
+            ]);
 
             if ($result === false) {
                 wp_send_json_error(['message' => __('Failed to save review. Please try again.', 'yatra')]);
@@ -308,44 +298,31 @@ class AppServiceProvider extends ServiceProvider
             ? substr(sanitize_text_field($_SERVER['HTTP_USER_AGENT']), 0, 500) 
             : null;
 
-        global $wpdb;
-        $table = $wpdb->prefix . 'yatra_enquiries';
-
-        // Check if table exists, if not the plugin will create it on next activation
-        $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
-        if (!$table_exists) {
-            // Create the table
-            $this->createEnquiriesTable();
-        }
+        // Use EnquiryRepository
+        $enquiryRepository = new EnquiryRepository();
 
         // Insert enquiry
-        $result = $wpdb->insert(
-            $table,
-            [
-                'trip_id' => $trip_id > 0 ? $trip_id : null,
-                'name' => $name,
-                'email' => $email,
-                'phone' => $phone ?: null,
-                'message' => $message,
-                'adults' => $adults,
-                'children' => $children,
-                'travel_date' => $travel_date_formatted,
-                'status' => 'new',
-                'source' => 'website',
-                'ip_address' => $ip_address,
-                'user_agent' => $user_agent,
-                'created_at' => current_time('mysql'),
-                'updated_at' => current_time('mysql'),
-            ],
-            ['%d', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
-        );
+        $enquiry_id = $enquiryRepository->create([
+            'trip_id' => $trip_id > 0 ? $trip_id : null,
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone ?: null,
+            'message' => $message,
+            'adults' => $adults,
+            'children' => $children,
+            'travel_date' => $travel_date_formatted,
+            'status' => 'new',
+            'source' => 'website',
+            'ip_address' => $ip_address,
+            'user_agent' => $user_agent,
+        ]);
 
-        if ($result === false) {
+        if (!$enquiry_id) {
             wp_send_json_error(['message' => __('Failed to submit enquiry. Please try again.', 'yatra')]);
         }
 
         // Send email notification if enabled
-        $this->sendEnquiryNotificationEmail($wpdb->insert_id, [
+        $this->sendEnquiryNotificationEmail($enquiry_id, [
             'trip_id' => $trip_id,
             'name' => $name,
             'email' => $email,
@@ -362,45 +339,6 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Create enquiries table if it doesn't exist
-     */
-    private function createEnquiriesTable(): void
-    {
-        global $wpdb;
-        $charset_collate = $wpdb->get_charset_collate();
-        $table = $wpdb->prefix . 'yatra_enquiries';
-
-        $sql = "CREATE TABLE IF NOT EXISTS `{$table}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `trip_id` bigint(20) UNSIGNED DEFAULT NULL,
-            `name` varchar(255) NOT NULL,
-            `email` varchar(255) NOT NULL,
-            `phone` varchar(50) DEFAULT NULL,
-            `message` text NOT NULL,
-            `adults` smallint(5) UNSIGNED DEFAULT 1,
-            `children` smallint(5) UNSIGNED DEFAULT 0,
-            `travel_date` date DEFAULT NULL,
-            `status` enum('new','responded','closed','converted','spam') DEFAULT 'new',
-            `response_notes` text DEFAULT NULL,
-            `responded_at` datetime DEFAULT NULL,
-            `responded_by` bigint(20) UNSIGNED DEFAULT NULL,
-            `ip_address` varchar(45) DEFAULT NULL,
-            `user_agent` varchar(500) DEFAULT NULL,
-            `source` varchar(50) DEFAULT 'website',
-            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            KEY `idx_trip_id` (`trip_id`),
-            KEY `idx_email` (`email`),
-            KEY `idx_status` (`status`),
-            KEY `idx_created_at` (`created_at`)
-        ) {$charset_collate};";
-
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        \dbDelta($sql);
-    }
-
-    /**
      * Send email notification for new enquiry
      */
     private function sendEnquiryNotificationEmail(int $enquiry_id, array $data): void
@@ -411,12 +349,9 @@ class AppServiceProvider extends ServiceProvider
         // Get trip title if available
         $trip_title = '';
         if (!empty($data['trip_id'])) {
-            global $wpdb;
-            $trips_table = $wpdb->prefix . 'yatra_trips';
-            $trip_title = $wpdb->get_var($wpdb->prepare(
-                "SELECT title FROM {$trips_table} WHERE id = %d",
-                $data['trip_id']
-            ));
+            $tripRepository = new TripRepository();
+            $trip = $tripRepository->find((int) $data['trip_id']);
+            $trip_title = $trip ? $trip->title : '';
         }
 
         // Build email subject
@@ -475,40 +410,6 @@ class AppServiceProvider extends ServiceProvider
         }
 
         return '0.0.0.0';
-    }
-
-    /**
-     * Create reviews table if it doesn't exist
-     */
-    private function createReviewsTable(): void
-    {
-        global $wpdb;
-        $table = $wpdb->prefix . 'yatra_reviews';
-        $charset = $wpdb->get_charset_collate();
-
-        $sql = "CREATE TABLE IF NOT EXISTS {$table} (
-            id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            trip_id bigint(20) UNSIGNED NOT NULL,
-            user_id bigint(20) UNSIGNED DEFAULT 0,
-            rating tinyint(1) UNSIGNED NOT NULL,
-            title varchar(255) DEFAULT NULL,
-            content text NOT NULL,
-            author_name varchar(100) NOT NULL,
-            author_email varchar(100) DEFAULT NULL,
-            author_location varchar(100) DEFAULT NULL,
-            status enum('pending','approved','rejected') DEFAULT 'pending',
-            helpful_count int(11) UNSIGNED DEFAULT 0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            KEY idx_trip_id (trip_id),
-            KEY idx_user_id (user_id),
-            KEY idx_status (status),
-            KEY idx_rating (rating)
-        ) {$charset};";
-
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        dbDelta($sql);
     }
 
     /**
@@ -591,13 +492,16 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Ensure required database tables exist
      * Creates missing tables if they don't exist
+     * 
+     * All table definitions are centralized in \Yatra\Core\Database
      */
     public function ensureTablesExist(): void
     {
         global $wpdb;
-        
-        // Tables that must exist
+
+        // Critical tables that must exist
         $required_tables = [
+            $wpdb->prefix . 'yatra_trips',
             $wpdb->prefix . 'yatra_customers',
             $wpdb->prefix . 'yatra_bookings',
             $wpdb->prefix . 'yatra_booking_payments',
@@ -605,8 +509,10 @@ class AppServiceProvider extends ServiceProvider
             $wpdb->prefix . 'yatra_booking_traveller_meta',
             $wpdb->prefix . 'yatra_scheduled_payments',
             $wpdb->prefix . 'yatra_payment_tokens',
+            $wpdb->prefix . 'yatra_reviews',
+            $wpdb->prefix . 'yatra_enquiries',
         ];
-        
+
         $missing_table = false;
         foreach ($required_tables as $table_name) {
             $table_exists = $wpdb->get_var($wpdb->prepare(
@@ -614,153 +520,18 @@ class AppServiceProvider extends ServiceProvider
                 DB_NAME,
                 $table_name
             ));
-            
+
             if (!$table_exists) {
                 $missing_table = true;
                 break;
             }
         }
-        
+
         if ($missing_table) {
-            // Use Database class to create ALL tables including customers
+            // Use centralized Database class to create ALL tables
             \Yatra\Core\Database::createTables();
         }
     }
-    
-    /**
-     * Create bookings tables (legacy - now using Database::createTables())
-     */
-    private function createBookingsTables(): void
-    {
-        global $wpdb;
-        
-        $charset_collate = $wpdb->get_charset_collate();
-        
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        
-        // Bookings table
-        $table_bookings = $wpdb->prefix . 'yatra_bookings';
-        
-        $sql_bookings = "CREATE TABLE IF NOT EXISTS `{$table_bookings}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `reference` varchar(50) NOT NULL COMMENT 'Booking reference code',
-            `trip_id` bigint(20) UNSIGNED NOT NULL,
-            `user_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'WordPress user ID if logged in',
-            `contact_first_name` varchar(100) DEFAULT NULL,
-            `contact_last_name` varchar(100) DEFAULT NULL,
-            `contact_email` varchar(255) NOT NULL,
-            `contact_phone` varchar(50) NOT NULL,
-            `contact_country` varchar(100) DEFAULT NULL,
-            `contact_data` text COMMENT 'JSON with full contact details',
-            `emergency_contact` text COMMENT 'JSON with emergency contact details',
-            `travel_date` date NOT NULL,
-            `travelers_count` smallint(5) UNSIGNED NOT NULL DEFAULT 1,
-            `travelers_data` longtext NOT NULL COMMENT 'JSON array of traveler details',
-            `total_amount` decimal(12,2) NOT NULL,
-            `amount_paid` decimal(12,2) DEFAULT 0,
-            `amount_due` decimal(12,2) NOT NULL,
-            `currency` char(3) DEFAULT 'USD',
-            `discount_amount` decimal(12,2) DEFAULT 0,
-            `discount_code` varchar(100) DEFAULT NULL,
-            `payment_method` enum('full','deposit','partial') DEFAULT 'full',
-            `payment_gateway` varchar(50) DEFAULT 'pay_later',
-            `payment_status` enum('pending','partial','paid','refunded','failed') DEFAULT 'pending',
-            `payment_session_id` varchar(255) DEFAULT NULL COMMENT 'External payment session/order ID',
-            `payment_transaction_id` varchar(255) DEFAULT NULL,
-            `payment_date` datetime DEFAULT NULL,
-            `payment_notes` text,
-            `status` enum('pending','confirmed','processing','completed','cancelled','refunded','failed','on_hold') DEFAULT 'pending',
-            `cancellation_reason` text,
-            `cancelled_at` datetime DEFAULT NULL,
-            `cancelled_by` bigint(20) UNSIGNED DEFAULT NULL,
-            `special_requests` text,
-            `internal_notes` text COMMENT 'Admin-only notes',
-            `newsletter_optin` tinyint(1) DEFAULT 0,
-            `terms_accepted` tinyint(1) DEFAULT 1,
-            `ip_address` varchar(45) DEFAULT NULL,
-            `user_agent` text,
-            `referral_source` varchar(255) DEFAULT NULL,
-            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            `confirmed_at` datetime DEFAULT NULL,
-            `completed_at` datetime DEFAULT NULL,
-            PRIMARY KEY (`id`),
-            UNIQUE KEY `reference` (`reference`),
-            KEY `idx_trip_id` (`trip_id`),
-            KEY `idx_user_id` (`user_id`),
-            KEY `idx_email` (`contact_email`),
-            KEY `idx_status` (`status`),
-            KEY `idx_payment_status` (`payment_status`),
-            KEY `idx_travel_date` (`travel_date`),
-            KEY `idx_created` (`created_at`)
-        ) {$charset_collate} COMMENT='Trip bookings';";
-
-        dbDelta($sql_bookings);
-        
-        // Booking payments table
-        $table_booking_payments = $wpdb->prefix . 'yatra_booking_payments';
-        
-        $sql_booking_payments = "CREATE TABLE IF NOT EXISTS `{$table_booking_payments}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `booking_id` bigint(20) UNSIGNED NOT NULL,
-            `transaction_id` varchar(255) DEFAULT NULL,
-            `gateway` varchar(50) NOT NULL,
-            `amount` decimal(12,2) NOT NULL,
-            `currency` char(3) DEFAULT 'USD',
-            `status` enum('pending','completed','failed','refunded','cancelled') DEFAULT 'pending',
-            `payment_type` enum('initial','partial','final','refund') DEFAULT 'initial',
-            `gateway_response` longtext COMMENT 'JSON gateway response data',
-            `notes` text,
-            `processed_at` datetime DEFAULT NULL,
-            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            KEY `idx_booking_id` (`booking_id`),
-            KEY `idx_transaction_id` (`transaction_id`),
-            KEY `idx_status` (`status`),
-            KEY `idx_created` (`created_at`)
-        ) {$charset_collate} COMMENT='Booking payment history';";
-
-        dbDelta($sql_booking_payments);
-        
-        // ============================================
-        // BOOKING TRAVELLERS (Individual Traveller Records)
-        // ============================================
-        $table_booking_travellers = $wpdb->prefix . 'yatra_booking_travellers';
-        
-        $sql_booking_travellers = "CREATE TABLE IF NOT EXISTS `{$table_booking_travellers}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `booking_id` bigint(20) UNSIGNED NOT NULL COMMENT 'Reference to yatra_bookings.id',
-            `traveller_index` smallint(5) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Position in booking (0-based)',
-            `is_lead` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Is this the lead/primary traveller',
-            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (`id`),
-            KEY `idx_booking_id` (`booking_id`),
-            KEY `idx_is_lead` (`is_lead`),
-            KEY `idx_booking_index` (`booking_id`, `traveller_index`)
-        ) {$charset_collate} COMMENT='Individual travellers for each booking';";
-
-        dbDelta($sql_booking_travellers);
-        
-        // ============================================
-        // BOOKING TRAVELLER META (Dynamic Fields as Key-Value Pairs)
-        // ============================================
-        $table_booking_traveller_meta = $wpdb->prefix . 'yatra_booking_traveller_meta';
-        
-        $sql_booking_traveller_meta = "CREATE TABLE IF NOT EXISTS `{$table_booking_traveller_meta}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `traveller_id` bigint(20) UNSIGNED NOT NULL COMMENT 'Reference to yatra_booking_travellers.id',
-            `meta_key` varchar(255) NOT NULL,
-            `meta_value` longtext,
-            PRIMARY KEY (`id`),
-            KEY `idx_traveller_id` (`traveller_id`),
-            KEY `idx_meta_key` (`meta_key`(191)),
-            UNIQUE KEY `idx_traveller_meta` (`traveller_id`, `meta_key`(191))
-        ) {$charset_collate} COMMENT='Dynamic traveller fields as key-value pairs';";
-
-        dbDelta($sql_booking_traveller_meta);
-    }
-
     /**
      * Register shortcodes
      */
@@ -1382,11 +1153,9 @@ class AppServiceProvider extends ServiceProvider
      */
     private function prepareBookingData(): object
     {
-        global $wpdb;
-
         // Get booking session
         $session = yatra_get_booking_session();
-        
+
         // Initialize booking data object using SettingsService
         $booking = (object) [
             'has_session' => false,
@@ -1419,12 +1188,9 @@ class AppServiceProvider extends ServiceProvider
         $booking->travel_date = $session['travel_date'] ?? '';
         $booking->travelers = max(1, (int) ($session['travelers'] ?? 1));
 
-        // Fetch trip from database
-        $trips_table = $wpdb->prefix . 'yatra_trips';
-        $trip = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$trips_table} WHERE id = %d AND status IN ('publish', 'published', 'active') LIMIT 1",
-            $trip_id
-        ));
+        // Fetch trip from database using TripRepository
+        $tripRepository = new TripRepository();
+        $trip = $tripRepository->findPublished($trip_id);
 
         if (!$trip) {
             yatra_clear_booking_session();
@@ -1775,21 +1541,10 @@ class AppServiceProvider extends ServiceProvider
             return;
         }
 
-        // Fetch booking from database
-        global $wpdb, $booking_data;
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        $trips_table = $wpdb->prefix . 'yatra_trips';
-
-        $booking = $wpdb->get_row($wpdb->prepare(
-            "SELECT b.*, t.title as trip_title, t.slug as trip_slug, t.featured_image, 
-                    t.duration_days, t.duration_nights, t.difficulty_level,
-                    t.starting_location, t.ending_location
-             FROM {$bookings_table} b
-             LEFT JOIN {$trips_table} t ON b.trip_id = t.id
-             WHERE b.reference = %s
-             LIMIT 1",
-            $booking_reference
-        ));
+        // Fetch booking from database using BookingRepository
+        global $booking_data;
+        $bookingRepository = new BookingRepository();
+        $booking = $bookingRepository->findByReferenceWithTrip($booking_reference);
 
         if (!$booking) {
             // Show 404 for invalid booking reference

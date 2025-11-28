@@ -7,34 +7,30 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use Yatra\Services\ReviewService;
 
 /**
  * Review REST API Controller
  * 
- * Handles CRUD operations for trip reviews
+ * Handles HTTP requests only - delegates business logic to ReviewService.
  * 
- * @package Yatra
+ * NO DATABASE QUERIES OR BUSINESS LOGIC IN THIS FILE.
+ * 
+ * @package Yatra\Controllers
  */
 class ReviewController extends BaseController
 {
     /**
-     * @var string Table name
+     * Review service instance
      */
-    private string $table;
-
-    /**
-     * @var string Trips table name
-     */
-    private string $trips_table;
+    private ReviewService $reviewService;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        global $wpdb;
-        $this->table = $wpdb->prefix . 'yatra_reviews';
-        $this->trips_table = $wpdb->prefix . 'yatra_trips';
+        $this->reviewService = new ReviewService();
     }
 
     /**
@@ -45,525 +41,333 @@ class ReviewController extends BaseController
         $namespace = 'yatra/v1';
         $base = 'reviews';
 
+        // =====================
+        // ADMIN ROUTES
+        // =====================
+        
+        // List reviews
         register_rest_route($namespace, '/' . $base, [
             [
                 'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_items'],
-                'permission_callback' => [$this, 'check_permission'],
-            ],
-            [
-                'methods' => \WP_REST_Server::CREATABLE,
-                'callback' => [$this, 'create_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'callback' => [$this, 'getReviews'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
             ],
         ]);
 
+        // Get single review
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
             [
                 'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'callback' => [$this, 'getReview'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
             ],
             [
                 'methods' => \WP_REST_Server::EDITABLE,
-                'callback' => [$this, 'update_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'callback' => [$this, 'updateReview'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
             ],
             [
                 'methods' => \WP_REST_Server::DELETABLE,
-                'callback' => [$this, 'delete_item'],
-                'permission_callback' => [$this, 'check_permission'],
+                'callback' => [$this, 'deleteReview'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
             ],
         ]);
 
-        // Bulk actions
-        register_rest_route($namespace, '/' . $base . '/bulk', [
+        // Update review status
+        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/status', [
             [
                 'methods' => \WP_REST_Server::EDITABLE,
-                'callback' => [$this, 'bulk_action'],
-                'permission_callback' => [$this, 'check_permission'],
+                'callback' => [$this, 'updateStatus'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
             ],
         ]);
 
-        // Stats endpoint
+        // Stats
         register_rest_route($namespace, '/' . $base . '/stats', [
             [
                 'methods' => \WP_REST_Server::READABLE,
-                'callback' => [$this, 'get_stats'],
-                'permission_callback' => [$this, 'check_permission'],
+                'callback' => [$this, 'getStats'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
+            ],
+        ]);
+
+        // =====================
+        // PUBLIC ROUTES
+        // =====================
+        
+        // Get trip reviews (public)
+        register_rest_route($namespace, '/trips/(?P<trip_id>[\d]+)/reviews', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getTripReviews'],
+                'permission_callback' => '__return_true',
+            ],
+        ]);
+
+        // Submit review (authenticated)
+        register_rest_route($namespace, '/trips/(?P<trip_id>[\d]+)/reviews', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'submitReview'],
+                'permission_callback' => [$this, 'checkReviewPermission'],
+            ],
+        ]);
+
+        // Check if user can review
+        register_rest_route($namespace, '/trips/(?P<trip_id>[\d]+)/can-review', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'canReview'],
+                'permission_callback' => '__return_true',
+            ],
+        ]);
+
+        // User's own review operations
+        register_rest_route($namespace, '/my-reviews/(?P<id>[\d]+)', [
+            [
+                'methods' => \WP_REST_Server::EDITABLE,
+                'callback' => [$this, 'updateMyReview'],
+                'permission_callback' => [$this, 'checkUserPermission'],
             ],
         ]);
     }
 
     /**
-     * Get all reviews with filtering and pagination
+     * Check admin permission
      */
-    public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function checkAdminPermission(): bool
     {
-        global $wpdb;
-
-        $this->ensureTableExists();
-
-        $page = (int) ($request->get_param('page') ?: 1);
-        $per_page = (int) ($request->get_param('per_page') ?: 10);
-        $offset = ($page - 1) * $per_page;
-
-        $orderby = $request->get_param('orderby') ?: 'created_at';
-        $order = strtoupper($request->get_param('order') ?: 'DESC');
-        $order = in_array($order, ['ASC', 'DESC']) ? $order : 'DESC';
-
-        // Whitelist orderby columns and handle special cases
-        $allowed_orderby = ['id', 'rating', 'status', 'created_at', 'author_name', 'trip_title', 'customer_name'];
-        
-        // Map frontend field names to database columns
-        $orderby_map = [
-            'trip_title' => 't.title',
-            'customer_name' => 'r.author_name',
-        ];
-        
-        if (isset($orderby_map[$orderby])) {
-            $orderby = $orderby_map[$orderby];
-        } elseif (in_array($orderby, $allowed_orderby)) {
-            $orderby = 'r.' . $orderby;
-        } else {
-            $orderby = 'r.created_at';
-        }
-
-        // Build WHERE clause
-        $where = [];
-        $params = [];
-
-        // Status filter
-        $status = $request->get_param('status');
-        if ($status && $status !== 'all') {
-            $where[] = 'r.status = %s';
-            $params[] = $status;
-        }
-
-        // Rating filter
-        $rating = $request->get_param('rating');
-        if ($rating && $rating !== 'all') {
-            $where[] = 'r.rating = %d';
-            $params[] = (int) $rating;
-        }
-
-        // Trip filter
-        $trip_id = $request->get_param('trip_id');
-        if ($trip_id) {
-            $where[] = 'r.trip_id = %d';
-            $params[] = (int) $trip_id;
-        }
-
-        // Search
-        $search = $request->get_param('search');
-        if ($search) {
-            $like = '%' . $wpdb->esc_like($search) . '%';
-            $where[] = '(r.author_name LIKE %s OR r.title LIKE %s OR r.content LIKE %s OR t.title LIKE %s)';
-            $params[] = $like;
-            $params[] = $like;
-            $params[] = $like;
-            $params[] = $like;
-        }
-
-        $where_sql = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
-
-        // Get total count
-        $count_sql = "SELECT COUNT(*) FROM {$this->table} r 
-                      LEFT JOIN {$this->trips_table} t ON r.trip_id = t.id
-                      {$where_sql}";
-        
-        if (!empty($params)) {
-            $count_sql = $wpdb->prepare($count_sql, ...$params);
-        }
-        $total = (int) $wpdb->get_var($count_sql);
-
-        // Get items
-        $sql = "SELECT r.*, t.title as trip_title, t.slug as trip_slug 
-                FROM {$this->table} r
-                LEFT JOIN {$this->trips_table} t ON r.trip_id = t.id
-                {$where_sql}
-                ORDER BY {$orderby} {$order}
-                LIMIT %d OFFSET %d";
-
-        $params[] = $per_page;
-        $params[] = $offset;
-
-        $items = $wpdb->get_results($wpdb->prepare($sql, ...$params));
-
-        // Format items
-        $formatted = array_map(function ($item) {
-            return [
-                'id' => (int) $item->id,
-                'trip_id' => (int) $item->trip_id,
-                'trip_title' => $item->trip_title ?? 'Unknown Trip',
-                'trip_slug' => $item->trip_slug ?? '',
-                'user_id' => (int) ($item->user_id ?? 0),
-                'rating' => (int) $item->rating,
-                'title' => $item->title ?? '',
-                'comment' => $item->content ?? '',
-                'customer_name' => $item->author_name ?? 'Anonymous',
-                'customer_email' => $item->author_email ?? '',
-                'customer_location' => $item->author_location ?? '',
-                'status' => $item->status ?? 'pending',
-                'verified' => (bool) ($item->user_id > 0),
-                'helpful_count' => (int) ($item->helpful_count ?? 0),
-                'created_at' => $item->created_at ?? '',
-                'updated_at' => $item->updated_at ?? '',
-            ];
-        }, $items ?: []);
-
-        return $this->success_response([
-            'data' => $formatted,
-            'total' => $total,
-            'page' => $page,
-            'per_page' => $per_page,
-            'total_pages' => ceil($total / $per_page),
-        ]);
+        return current_user_can('manage_options');
     }
 
     /**
-     * Get single review
+     * Check if user is logged in
      */
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function checkUserPermission(): bool
     {
-        global $wpdb;
-
-        $id = (int) $request->get_param('id');
-
-        $item = $wpdb->get_row($wpdb->prepare(
-            "SELECT r.*, t.title as trip_title, t.slug as trip_slug 
-             FROM {$this->table} r
-             LEFT JOIN {$this->trips_table} t ON r.trip_id = t.id
-             WHERE r.id = %d",
-            $id
-        ));
-
-        if (!$item) {
-            return new WP_Error('not_found', __('Review not found.', 'yatra'), ['status' => 404]);
-        }
-
-        return $this->success_response([
-            'id' => (int) $item->id,
-            'trip_id' => (int) $item->trip_id,
-            'trip_title' => $item->trip_title ?? 'Unknown Trip',
-            'trip_slug' => $item->trip_slug ?? '',
-            'user_id' => (int) ($item->user_id ?? 0),
-            'rating' => (int) $item->rating,
-            'title' => $item->title ?? '',
-            'comment' => $item->content ?? '',
-            'customer_name' => $item->author_name ?? 'Anonymous',
-            'customer_email' => $item->author_email ?? '',
-            'customer_location' => $item->author_location ?? '',
-            'status' => $item->status ?? 'pending',
-            'verified' => (bool) ($item->user_id > 0),
-            'helpful_count' => (int) ($item->helpful_count ?? 0),
-            'created_at' => $item->created_at ?? '',
-            'updated_at' => $item->updated_at ?? '',
-        ]);
+        return is_user_logged_in();
     }
 
     /**
-     * Create new review
+     * Check review submission permission
      */
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function checkReviewPermission(): bool
     {
-        global $wpdb;
+        $settings = \Yatra\Services\SettingsService::getSettings();
+        $requireLogin = $settings['reviews']['require_login'] ?? true;
 
-        $this->ensureTableExists();
-
-        $data = $request->get_json_params();
-
-        // Validate required fields
-        if (empty($data['trip_id'])) {
-            return new WP_Error('missing_trip_id', __('Trip ID is required.', 'yatra'), ['status' => 400]);
+        if ($requireLogin) {
+            return is_user_logged_in();
         }
 
-        if (empty($data['customer_name'])) {
-            return new WP_Error('missing_customer_name', __('Customer name is required.', 'yatra'), ['status' => 400]);
-        }
+        return true;
+    }
 
-        if (empty($data['rating']) || (int) $data['rating'] < 1 || (int) $data['rating'] > 5) {
-            return new WP_Error('invalid_rating', __('Rating must be between 1 and 5.', 'yatra'), ['status' => 400]);
-        }
+    // =========================================================================
+    // ADMIN ENDPOINTS
+    // =========================================================================
 
-        if (empty($data['comment'])) {
-            return new WP_Error('missing_comment', __('Review comment is required.', 'yatra'), ['status' => 400]);
-        }
-
-        // Prepare insert data
-        $insert_data = [
-            'trip_id' => (int) $data['trip_id'],
-            'user_id' => isset($data['user_id']) ? (int) $data['user_id'] : 0,
-            'rating' => (int) $data['rating'],
-            'title' => sanitize_text_field($data['title'] ?? ''),
-            'content' => sanitize_textarea_field($data['comment']),
-            'author_name' => sanitize_text_field($data['customer_name']),
-            'author_email' => sanitize_email($data['customer_email'] ?? ''),
-            'author_location' => sanitize_text_field($data['customer_location'] ?? ''),
-            'status' => in_array($data['status'] ?? 'pending', ['pending', 'approved', 'rejected']) ? $data['status'] : 'pending',
-            'created_at' => current_time('mysql'),
+    /**
+     * GET /reviews - List all reviews (admin)
+     */
+    public function getReviews(WP_REST_Request $request): WP_REST_Response
+    {
+        $filters = [
+            'page' => (int) ($request->get_param('page') ?: 1),
+            'per_page' => (int) ($request->get_param('per_page') ?: 20),
+            'status' => $request->get_param('status') ?: '',
+            'trip_id' => (int) $request->get_param('trip_id'),
+            'rating' => (int) $request->get_param('rating'),
+            'search' => $request->get_param('search') ?: '',
         ];
 
-        $format = ['%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s'];
+        $result = $this->reviewService->getReviews($filters);
 
-        $result = $wpdb->insert($this->table, $insert_data, $format);
-
-        if ($result === false) {
-            return new WP_Error('create_failed', __('Failed to create review.', 'yatra'), ['status' => 500]);
-        }
-
-        $review_id = $wpdb->insert_id;
-
-        // Return the created review
-        $request->set_param('id', $review_id);
-        return $this->get_item($request);
-    }
-
-    /**
-     * Update review (approve, reject, edit)
-     */
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
-    {
-        global $wpdb;
-
-        $id = (int) $request->get_param('id');
-        $data = $request->get_json_params();
-
-        // Check if review exists
-        $exists = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM {$this->table} WHERE id = %d",
-            $id
-        ));
-
-        if (!$exists) {
-            return new WP_Error('not_found', __('Review not found.', 'yatra'), ['status' => 404]);
-        }
-
-        // Build update data
-        $update = [];
-        $format = [];
-
-        if (isset($data['status'])) {
-            $allowed_status = ['pending', 'approved', 'rejected', 'spam', 'trash'];
-            if (in_array($data['status'], $allowed_status)) {
-                $update['status'] = $data['status'];
-                $format[] = '%s';
-            }
-        }
-
-        if (isset($data['rating'])) {
-            $update['rating'] = max(1, min(5, (int) $data['rating']));
-            $format[] = '%d';
-        }
-
-        if (isset($data['title'])) {
-            $update['title'] = sanitize_text_field($data['title']);
-            $format[] = '%s';
-        }
-
-        if (isset($data['comment'])) {
-            $update['content'] = sanitize_textarea_field($data['comment']);
-            $format[] = '%s';
-        }
-
-        if (isset($data['customer_name'])) {
-            $update['author_name'] = sanitize_text_field($data['customer_name']);
-            $format[] = '%s';
-        }
-
-        if (isset($data['customer_email'])) {
-            $update['author_email'] = sanitize_email($data['customer_email']);
-            $format[] = '%s';
-        }
-
-        if (isset($data['customer_location'])) {
-            $update['author_location'] = sanitize_text_field($data['customer_location']);
-            $format[] = '%s';
-        }
-
-        if (isset($data['trip_id'])) {
-            $update['trip_id'] = (int) $data['trip_id'];
-            $format[] = '%d';
-        }
-
-        if (empty($update)) {
-            return new WP_Error('no_data', __('No valid data to update.', 'yatra'), ['status' => 400]);
-        }
-
-        $update['updated_at'] = current_time('mysql');
-        $format[] = '%s';
-
-        $result = $wpdb->update($this->table, $update, ['id' => $id], $format, ['%d']);
-
-        if ($result === false) {
-            return new WP_Error('update_failed', __('Failed to update review.', 'yatra'), ['status' => 500]);
-        }
-
-        return $this->get_item($request);
-    }
-
-    /**
-     * Delete review
-     */
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
-    {
-        global $wpdb;
-
-        $id = (int) $request->get_param('id');
-
-        $result = $wpdb->delete($this->table, ['id' => $id], ['%d']);
-
-        if ($result === false) {
-            return new WP_Error('delete_failed', __('Failed to delete review.', 'yatra'), ['status' => 500]);
-        }
-
-        return $this->success_response(['message' => __('Review deleted successfully.', 'yatra')]);
-    }
-
-    /**
-     * Bulk actions (approve, reject, delete)
-     */
-    public function bulk_action(WP_REST_Request $request): WP_REST_Response|WP_Error
-    {
-        global $wpdb;
-
-        $data = $request->get_json_params();
-        $action = $data['action'] ?? '';
-        $ids = $data['ids'] ?? [];
-
-        if (empty($ids) || !is_array($ids)) {
-            return new WP_Error('invalid_ids', __('No reviews selected.', 'yatra'), ['status' => 400]);
-        }
-
-        $ids = array_map('intval', $ids);
-        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
-
-        switch ($action) {
-            case 'approve':
-                $result = $wpdb->query($wpdb->prepare(
-                    "UPDATE {$this->table} SET status = 'approved', updated_at = %s WHERE id IN ($placeholders)",
-                    current_time('mysql'),
-                    ...$ids
-                ));
-                $message = __('Reviews approved successfully.', 'yatra');
-                break;
-
-            case 'reject':
-                $result = $wpdb->query($wpdb->prepare(
-                    "UPDATE {$this->table} SET status = 'rejected', updated_at = %s WHERE id IN ($placeholders)",
-                    current_time('mysql'),
-                    ...$ids
-                ));
-                $message = __('Reviews rejected successfully.', 'yatra');
-                break;
-
-            case 'delete':
-                $result = $wpdb->query($wpdb->prepare(
-                    "DELETE FROM {$this->table} WHERE id IN ($placeholders)",
-                    ...$ids
-                ));
-                $message = __('Reviews deleted successfully.', 'yatra');
-                break;
-
-            default:
-                return new WP_Error('invalid_action', __('Invalid action.', 'yatra'), ['status' => 400]);
-        }
-
-        if ($result === false) {
-            return new WP_Error('action_failed', __('Action failed.', 'yatra'), ['status' => 500]);
-        }
-
-        return $this->success_response(['message' => $message, 'affected' => $result]);
-    }
-
-    /**
-     * Get review statistics
-     */
-    public function get_stats(WP_REST_Request $request): WP_REST_Response|WP_Error
-    {
-        global $wpdb;
-
-        $this->ensureTableExists();
-
-        $stats = [
-            'total' => 0,
-            'pending' => 0,
-            'approved' => 0,
-            'rejected' => 0,
-            'average_rating' => 0,
-            'by_rating' => [
-                '5' => 0,
-                '4' => 0,
-                '3' => 0,
-                '2' => 0,
-                '1' => 0,
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $result['data'],
+            'meta' => [
+                'total' => $result['total'],
+                'page' => $result['page'],
+                'per_page' => $result['per_page'],
+                'total_pages' => $result['total_pages'],
             ],
-        ];
-
-        // Total counts by status
-        $counts = $wpdb->get_results(
-            "SELECT status, COUNT(*) as count FROM {$this->table} GROUP BY status"
-        );
-
-        foreach ($counts as $row) {
-            $stats[$row->status] = (int) $row->count;
-            $stats['total'] += (int) $row->count;
-        }
-
-        // Average rating (approved only)
-        $avg = $wpdb->get_var(
-            "SELECT AVG(rating) FROM {$this->table} WHERE status = 'approved'"
-        );
-        $stats['average_rating'] = round((float) $avg, 1);
-
-        // Rating distribution
-        $ratings = $wpdb->get_results(
-            "SELECT rating, COUNT(*) as count FROM {$this->table} WHERE status = 'approved' GROUP BY rating"
-        );
-
-        foreach ($ratings as $row) {
-            $stats['by_rating'][(string) $row->rating] = (int) $row->count;
-        }
-
-        return $this->success_response($stats);
+        ]);
     }
 
     /**
-     * Ensure the reviews table exists
+     * GET /reviews/{id} - Get single review
      */
-    private function ensureTableExists(): void
+    public function getReview(WP_REST_Request $request): WP_REST_Response
     {
-        global $wpdb;
+        $id = (int) $request->get_param('id');
 
-        $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $this->table));
+        $review = $this->reviewService->getReview($id);
 
-        if (!$table_exists) {
-            $charset = $wpdb->get_charset_collate();
-
-            $sql = "CREATE TABLE IF NOT EXISTS {$this->table} (
-                id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-                trip_id bigint(20) UNSIGNED NOT NULL,
-                user_id bigint(20) UNSIGNED DEFAULT 0,
-                rating tinyint(1) UNSIGNED NOT NULL,
-                title varchar(255) DEFAULT NULL,
-                content text NOT NULL,
-                author_name varchar(100) NOT NULL,
-                author_email varchar(100) DEFAULT NULL,
-                author_location varchar(100) DEFAULT NULL,
-                status enum('pending','approved','rejected') DEFAULT 'pending',
-                helpful_count int(11) UNSIGNED DEFAULT 0,
-                created_at datetime DEFAULT CURRENT_TIMESTAMP,
-                updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (id),
-                KEY idx_trip_id (trip_id),
-                KEY idx_user_id (user_id),
-                KEY idx_status (status),
-                KEY idx_rating (rating)
-            ) {$charset};";
-
-            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-            dbDelta($sql);
+        if (!$review) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Review not found.', 'yatra'),
+            ], 404);
         }
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $review,
+        ]);
+    }
+
+    /**
+     * PUT /reviews/{id} - Update review
+     */
+    public function updateReview(WP_REST_Request $request): WP_REST_Response
+    {
+        $id = (int) $request->get_param('id');
+        $data = $request->get_json_params();
+
+        $result = $this->reviewService->updateReview($id, $data);
+
+        if (!$result['success']) {
+            return new WP_REST_Response($result, 400);
+        }
+
+        return new WP_REST_Response($result);
+    }
+
+    /**
+     * DELETE /reviews/{id} - Delete review
+     */
+    public function deleteReview(WP_REST_Request $request): WP_REST_Response
+    {
+        $id = (int) $request->get_param('id');
+
+        $result = $this->reviewService->deleteReview($id);
+
+        if (!$result['success']) {
+            return new WP_REST_Response($result, 400);
+        }
+
+        return new WP_REST_Response($result);
+    }
+
+    /**
+     * PUT /reviews/{id}/status - Update status
+     */
+    public function updateStatus(WP_REST_Request $request): WP_REST_Response
+    {
+        $id = (int) $request->get_param('id');
+        $data = $request->get_json_params();
+        $status = $data['status'] ?? '';
+
+        if (empty($status)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Status is required.', 'yatra'),
+            ], 400);
+        }
+
+        $result = $this->reviewService->updateStatus($id, $status);
+
+        if (!$result['success']) {
+            return new WP_REST_Response($result, 400);
+        }
+
+        return new WP_REST_Response($result);
+    }
+
+    /**
+     * GET /reviews/stats - Get statistics
+     */
+    public function getStats(WP_REST_Request $request): WP_REST_Response
+    {
+        $stats = $this->reviewService->getStats();
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $stats,
+        ]);
+    }
+
+    // =========================================================================
+    // PUBLIC ENDPOINTS
+    // =========================================================================
+
+    /**
+     * GET /trips/{trip_id}/reviews - Get trip reviews (public)
+     */
+    public function getTripReviews(WP_REST_Request $request): WP_REST_Response
+    {
+        $tripId = (int) $request->get_param('trip_id');
+        $limit = (int) ($request->get_param('limit') ?: 10);
+
+        $reviews = $this->reviewService->getTripReviews($tripId, $limit);
+        $summary = $this->reviewService->getTripRatingSummary($tripId);
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => [
+                'reviews' => $reviews,
+                'summary' => $summary,
+            ],
+        ]);
+    }
+
+    /**
+     * POST /trips/{trip_id}/reviews - Submit review
+     */
+    public function submitReview(WP_REST_Request $request): WP_REST_Response
+    {
+        $tripId = (int) $request->get_param('trip_id');
+        $data = $request->get_json_params();
+
+        // Handle both JSON and form data
+        if (empty($data)) {
+            $data = $request->get_params();
+        }
+
+        $data['trip_id'] = $tripId;
+
+        $result = $this->reviewService->submitReview($data);
+
+        if (!$result['success']) {
+            return new WP_REST_Response($result, 400);
+        }
+
+        return new WP_REST_Response($result, 201);
+    }
+
+    /**
+     * GET /trips/{trip_id}/can-review - Check if user can review
+     */
+    public function canReview(WP_REST_Request $request): WP_REST_Response
+    {
+        $tripId = (int) $request->get_param('trip_id');
+
+        $result = $this->reviewService->canUserReview($tripId);
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $result,
+        ]);
+    }
+
+    /**
+     * PUT /my-reviews/{id} - Update own review
+     */
+    public function updateMyReview(WP_REST_Request $request): WP_REST_Response
+    {
+        $id = (int) $request->get_param('id');
+        $data = $request->get_json_params();
+
+        // Set user_id to enforce ownership check in service
+        $data['user_id'] = get_current_user_id();
+
+        $result = $this->reviewService->updateReview($id, $data);
+
+        if (!$result['success']) {
+            return new WP_REST_Response($result, 400);
+        }
+
+        return new WP_REST_Response($result);
     }
 }
-

@@ -636,5 +636,96 @@ class TravellerRepository
 
         return $result;
     }
+
+    /**
+     * Get paginated travelers with filters
+     * 
+     * @param array $filters Filter options
+     * @return array {data: array, meta: array}
+     */
+    public function paginate(array $filters = []): array
+    {
+        $bookings_table = $this->wpdb->prefix . 'yatra_bookings';
+        $trips_table = $this->wpdb->prefix . 'yatra_trips';
+
+        // Pagination
+        $page = max(1, (int) ($filters['page'] ?? 1));
+        $per_page = max(1, min(100, (int) ($filters['per_page'] ?? 20)));
+        $offset = ($page - 1) * $per_page;
+
+        // Build WHERE clause
+        $where_clauses = ['1=1'];
+        $where_values = [];
+
+        if (!empty($filters['trip_id'])) {
+            $where_clauses[] = 'b.trip_id = %d';
+            $where_values[] = (int) $filters['trip_id'];
+        }
+
+        if (!empty($filters['search'])) {
+            // Search in meta values
+            $search_like = '%' . $this->wpdb->esc_like(sanitize_text_field($filters['search'])) . '%';
+            $where_clauses[] = "EXISTS (
+                SELECT 1 FROM {$this->meta_table} m 
+                WHERE m.traveller_id = t.id 
+                AND m.meta_value LIKE %s
+            )";
+            $where_values[] = $search_like;
+        }
+
+        $where_sql = implode(' AND ', $where_clauses);
+
+        // Get total count
+        $count_query = "SELECT COUNT(DISTINCT t.id) 
+                        FROM {$this->travellers_table} t
+                        INNER JOIN {$bookings_table} b ON t.booking_id = b.id
+                        WHERE {$where_sql}";
+        
+        if (!empty($where_values)) {
+            $count_query = $this->wpdb->prepare($count_query, ...$where_values);
+        }
+        $total = (int) $this->wpdb->get_var($count_query);
+
+        // Get travellers with booking info
+        $query = "SELECT t.id, t.booking_id, t.traveller_index, t.is_lead, t.created_at,
+                         b.reference as booking_reference, b.trip_id, b.travel_date,
+                         tr.title as trip_title
+                  FROM {$this->travellers_table} t
+                  INNER JOIN {$bookings_table} b ON t.booking_id = b.id
+                  LEFT JOIN {$trips_table} tr ON b.trip_id = tr.id
+                  WHERE {$where_sql}
+                  ORDER BY t.created_at DESC
+                  LIMIT %d OFFSET %d";
+
+        $query_values = array_merge($where_values, [$per_page, $offset]);
+        $travellers = $this->wpdb->get_results($this->wpdb->prepare($query, ...$query_values));
+
+        // Get meta for each traveller
+        $data = [];
+        foreach ($travellers as $traveller) {
+            $meta = $this->getMeta((int) $traveller->id);
+            
+            $data[] = array_merge([
+                'id' => (int) $traveller->id,
+                'booking_id' => (int) $traveller->booking_id,
+                'booking_reference' => $traveller->booking_reference,
+                'trip_id' => (int) $traveller->trip_id,
+                'trip_title' => $traveller->trip_title,
+                'travel_date' => $traveller->travel_date,
+                'traveler_index' => (int) $traveller->traveller_index,
+                'is_lead' => (bool) $traveller->is_lead,
+            ], $meta);
+        }
+
+        return [
+            'data' => $data,
+            'meta' => [
+                'total' => $total,
+                'page' => $page,
+                'per_page' => $per_page,
+                'total_pages' => (int) ceil($total / $per_page),
+            ],
+        ];
+    }
 }
 

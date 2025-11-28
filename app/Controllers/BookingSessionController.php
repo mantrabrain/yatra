@@ -9,6 +9,8 @@ use WP_REST_Response;
 use WP_Error;
 use Yatra\Repositories\TravellerRepository;
 use Yatra\Repositories\CustomerRepository;
+use Yatra\Repositories\TripRepository;
+use Yatra\Repositories\BookingRepository;
 
 /**
  * Booking Session REST API Controller
@@ -27,12 +29,24 @@ class BookingSessionController extends BaseController
     private CustomerRepository $customerRepository;
 
     /**
+     * @var TripRepository
+     */
+    private TripRepository $tripRepository;
+
+    /**
+     * @var BookingRepository
+     */
+    private BookingRepository $bookingRepository;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->travellerRepository = new TravellerRepository();
         $this->customerRepository = new CustomerRepository();
+        $this->tripRepository = new TripRepository();
+        $this->bookingRepository = new BookingRepository();
     }
 
     /**
@@ -106,16 +120,7 @@ class BookingSessionController extends BaseController
         }
 
         // Validate trip exists
-        global $wpdb;
-        $trips_table = $wpdb->prefix . 'yatra_trips';
-        
-        // Query for published/active trips
-        $trip = $wpdb->get_row($wpdb->prepare(
-            "SELECT id, title, slug, sale_price, original_price, currency, min_travelers, max_travelers, duration_days, status 
-             FROM {$trips_table} 
-             WHERE id = %d AND status IN ('publish', 'published', 'active')",
-            (int) $data['trip_id']
-        ));
+        $trip = $this->tripRepository->findPublished((int) $data['trip_id']);
 
         if (!$trip) {
             return new WP_REST_Response([
@@ -194,13 +199,7 @@ class BookingSessionController extends BaseController
     {
         $trip_id = (int) $request->get_param('id');
 
-        global $wpdb;
-        $trips_table = $wpdb->prefix . 'yatra_trips';
-        
-        $trip = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$trips_table} WHERE id = %d AND status IN ('publish', 'published', 'active')",
-            $trip_id
-        ));
+        $trip = $this->tripRepository->findPublished($trip_id);
 
         if (!$trip) {
             return new WP_REST_Response([
@@ -346,12 +345,7 @@ class BookingSessionController extends BaseController
         }
 
         // Get trip data
-        global $wpdb;
-        $trips_table = $wpdb->prefix . 'yatra_trips';
-        $trip = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$trips_table} WHERE id = %d AND status IN ('publish', 'published', 'active')",
-            $trip_id
-        ));
+        $trip = $this->tripRepository->findPublished($trip_id);
 
         if (!$trip) {
             return new WP_REST_Response([
@@ -735,15 +729,11 @@ class BookingSessionController extends BaseController
             
             if (!empty($body['url'])) {
                 // Save session ID for webhook verification
-                global $wpdb;
-                $wpdb->update(
-                    $wpdb->prefix . 'yatra_bookings',
-                    ['payment_session_id' => $body['id'] ?? ''],
-                    ['id' => $params['booking_id']],
-                    ['%s'],
-                    ['%d']
+                $this->bookingRepository->updatePaymentSessionId(
+                    (int) $params['booking_id'],
+                    $body['id'] ?? ''
                 );
-                
+
                 return ['success' => true, 'payment_url' => $body['url']];
             }
             
@@ -821,15 +811,11 @@ class BookingSessionController extends BaseController
             foreach ($order_body['links'] ?? [] as $link) {
                 if ($link['rel'] === 'approve') {
                     // Save order ID for capture later
-                    global $wpdb;
-                    $wpdb->update(
-                        $wpdb->prefix . 'yatra_bookings',
-                        ['payment_session_id' => $order_body['id'] ?? ''],
-                        ['id' => $params['booking_id']],
-                        ['%s'],
-                        ['%d']
+                    $this->bookingRepository->updatePaymentSessionId(
+                        (int) $params['booking_id'],
+                        $order_body['id'] ?? ''
                     );
-                    
+
                     return ['success' => true, 'payment_url' => $link['href']];
                 }
             }
@@ -878,15 +864,11 @@ class BookingSessionController extends BaseController
             
             if (!empty($body['id'])) {
                 // Save order ID
-                global $wpdb;
-                $wpdb->update(
-                    $wpdb->prefix . 'yatra_bookings',
-                    ['payment_session_id' => $body['id']],
-                    ['id' => $params['booking_id']],
-                    ['%s'],
-                    ['%d']
+                $this->bookingRepository->updatePaymentSessionId(
+                    (int) $params['booking_id'],
+                    $body['id']
                 );
-                
+
                 // Razorpay requires client-side integration, return data for JS
                 // Store order details and redirect to a payment page
                 $payment_url = add_query_arg([
@@ -978,15 +960,11 @@ class BookingSessionController extends BaseController
             
             if (!empty($body['payment_url'])) {
                 // Save pidx for verification
-                global $wpdb;
-                $wpdb->update(
-                    $wpdb->prefix . 'yatra_bookings',
-                    ['payment_session_id' => $body['pidx'] ?? ''],
-                    ['id' => $params['booking_id']],
-                    ['%s'],
-                    ['%d']
+                $this->bookingRepository->updatePaymentSessionId(
+                    (int) $params['booking_id'],
+                    $body['pidx'] ?? ''
                 );
-                
+
                 return ['success' => true, 'payment_url' => $body['payment_url']];
             }
             
