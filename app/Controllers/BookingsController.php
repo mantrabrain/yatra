@@ -7,6 +7,7 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use Yatra\Repositories\TravellerRepository;
 
 /**
  * Bookings REST API Controller
@@ -18,6 +19,19 @@ class BookingsController extends BaseController
      * REST API namespace
      */
     protected string $namespace = 'yatra/v1';
+
+    /**
+     * @var TravellerRepository
+     */
+    private TravellerRepository $travellerRepository;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->travellerRepository = new TravellerRepository();
+    }
 
     /**
      * Register REST API routes
@@ -98,6 +112,13 @@ class BookingsController extends BaseController
         register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/send-email', [
             'methods' => 'POST',
             'callback' => [$this, 'send_booking_email'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        // Get all travelers from bookings
+        register_rest_route($this->namespace, '/travelers', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_travelers'],
             'permission_callback' => [$this, 'check_admin_permission'],
         ]);
     }
@@ -327,11 +348,41 @@ class BookingsController extends BaseController
             $update_format[] = '%s';
         }
         
-        if (isset($data['travelers_data'])) {
-            $update_data['travelers_data'] = wp_json_encode($data['travelers_data']);
-            $update_format[] = '%s';
-            $update_data['travelers_count'] = count($data['travelers_data']);
-            $update_format[] = '%d';
+        // Handle travelers update using repository
+        $travelers_updated = false;
+        if (isset($data['travelers_data']) && is_array($data['travelers_data'])) {
+            // Sanitize travelers data
+            $sanitized_travelers = [];
+            foreach ($data['travelers_data'] as $traveler) {
+                if (is_array($traveler)) {
+                    $sanitized_traveler = [];
+                    foreach ($traveler as $key => $value) {
+                        // Skip internal metadata fields
+                        if (strpos($key, '_') === 0) {
+                            continue;
+                        }
+                        $sanitized_traveler[sanitize_key($key)] = sanitize_text_field((string) $value);
+                    }
+                    $sanitized_travelers[] = $sanitized_traveler;
+                }
+            }
+            
+            // Save travelers using repository (replaces all existing travelers)
+            if (!empty($sanitized_travelers)) {
+                $travelers_with_lead = [];
+                foreach ($sanitized_travelers as $index => $fields) {
+                    $travelers_with_lead[] = [
+                        'is_lead' => ($index === 0),
+                        'fields' => $fields,
+                    ];
+                }
+                $this->travellerRepository->saveTravellersForBooking($booking_id, $travelers_with_lead);
+                $travelers_updated = true;
+                
+                // Update travelers count
+                $update_data['travelers_count'] = count($sanitized_travelers);
+                $update_format[] = '%d';
+            }
         }
         
         // Update timestamps based on status
@@ -399,7 +450,10 @@ class BookingsController extends BaseController
             ], 404);
         }
         
-        // Delete payments first
+        // Delete travelers first (this also deletes their meta)
+        $this->travellerRepository->deleteByBookingId($booking_id);
+        
+        // Delete payments
         $wpdb->delete($payments_table, ['booking_id' => $booking_id], ['%d']);
         
         // Delete booking
@@ -867,7 +921,28 @@ class BookingsController extends BaseController
             $formatted['contact_country'] = $booking->contact_country;
             $formatted['contact_data'] = json_decode($booking->contact_data ?? '{}', true);
             $formatted['emergency_contact'] = json_decode($booking->emergency_contact ?? '{}', true);
-            $formatted['travelers'] = json_decode($booking->travelers_data ?? '[]', true);
+            
+            // Fetch travelers from normalized tables using repository
+            $travellers = $this->travellerRepository->getByBookingId((int) $booking->id);
+            
+            // Format travelers for API response
+            $formatted['travelers_data'] = array_map(function($traveller) {
+                $fields = $traveller['fields'] ?? [];
+                // Include traveller metadata
+                $fields['_traveller_id'] = (int) $traveller['id'];
+                $fields['_is_lead'] = (bool) $traveller['is_lead'];
+                $fields['_traveller_index'] = (int) $traveller['traveller_index'];
+                return $fields;
+            }, $travellers);
+            
+            // Also provide the raw travellers with full metadata
+            $formatted['travellers'] = $travellers;
+            
+            // Legacy support: provide flat array as 'travelers' (backward compatible)
+            $formatted['travelers'] = array_map(function($traveller) {
+                return $traveller['fields'] ?? [];
+            }, $travellers);
+            
             $formatted['special_requests'] = $booking->special_requests;
             $formatted['internal_notes'] = $booking->internal_notes;
             $formatted['discount_amount'] = (float) $booking->discount_amount;
@@ -896,6 +971,47 @@ class BookingsController extends BaseController
         }
         
         return $formatted;
+    }
+
+    /**
+     * Get all travelers from bookings using normalized tables
+     */
+    public function get_travelers(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $page = max(1, (int) $request->get_param('page') ?: 1);
+        $per_page = max(1, min(100, (int) $request->get_param('per_page') ?: 20));
+        $search = sanitize_text_field($request->get_param('search') ?: '');
+        $trip_id = (int) $request->get_param('trip_id') ?: 0;
+
+        // Use repository to search travelers
+        $result = $this->travellerRepository->search($search, $trip_id, $page, $per_page);
+
+        // Format travelers for API response
+        $formatted_travelers = array_map(function($traveller) {
+            $fields = $traveller['fields'] ?? [];
+            
+            return array_merge([
+                'id' => (int) $traveller['id'],
+                'booking_id' => (int) $traveller['booking_id'],
+                'booking_reference' => $traveller['booking_reference'] ?? '',
+                'trip_id' => (int) ($traveller['trip_id'] ?? 0),
+                'trip_title' => $traveller['trip_title'] ?? '',
+                'travel_date' => $traveller['travel_date'] ?? '',
+                'traveler_index' => (int) $traveller['traveller_index'],
+                'is_lead' => (bool) $traveller['is_lead'],
+            ], $fields);
+        }, $result['data']);
+
+        return new \WP_REST_Response([
+            'success' => true,
+            'data' => $formatted_travelers,
+            'meta' => [
+                'total' => $result['total'],
+                'page' => $page,
+                'per_page' => $per_page,
+                'total_pages' => ceil($result['total'] / $per_page),
+            ],
+        ]);
     }
 }
 

@@ -415,6 +415,146 @@ if (!empty($traveler_config)) :
     </div>
 </div>
 
+<!-- Account Creation Section (only for guests) -->
+<?php 
+$allow_guest_checkout = \Yatra\Services\SettingsService::isEnabled('allow_guest_checkout');
+$require_login = \Yatra\Services\SettingsService::isEnabled('require_login');
+
+// Show account section if user is not logged in
+if (!is_user_logged_in()) : 
+?>
+<div class="yatra-booking-section yatra-account-section">
+    <h2 class="yatra-section-title"><?php esc_html_e('Account', 'yatra'); ?></h2>
+    
+    <?php if ($require_login) : ?>
+        <!-- Login Required Message -->
+        <div class="yatra-login-required-notice" style="background: #fef3c7; border: 1px solid #f59e0b; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="flex-shrink: 0;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div>
+                    <p style="font-weight: 600; color: #92400e; margin: 0 0 8px 0;"><?php esc_html_e('Login Required', 'yatra'); ?></p>
+                    <p style="color: #a16207; margin: 0 0 12px 0; font-size: 14px;">
+                        <?php esc_html_e('You must be logged in to complete this booking. Please log in or create an account.', 'yatra'); ?>
+                    </p>
+                    <a href="<?php echo esc_url(wp_login_url(get_permalink())); ?>" class="yatra-login-btn" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #3b82f6; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 14px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        <?php esc_html_e('Log In', 'yatra'); ?>
+                    </a>
+                    <span style="margin: 0 12px; color: #a16207;"><?php esc_html_e('or', 'yatra'); ?></span>
+                    <a href="<?php echo esc_url(wp_registration_url()); ?>" style="color: #3b82f6; text-decoration: none; font-weight: 500;">
+                        <?php esc_html_e('Create an Account', 'yatra'); ?>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="login_required" value="1">
+        
+    <?php elseif (!$allow_guest_checkout) : ?>
+        <!-- Account Required - Must Create Account -->
+        <p class="yatra-section-description" style="margin-bottom: 16px;">
+            <?php esc_html_e('Please create an account to complete your booking. This allows you to manage your bookings and receive important updates.', 'yatra'); ?>
+        </p>
+        
+        <div class="yatra-form-row">
+            <div class="yatra-form-group yatra-field-half">
+                <label for="account_password">
+                    <?php esc_html_e('Password', 'yatra'); ?> <span class="required">*</span>
+                </label>
+                <input type="password" id="account_password" name="account_password" required minlength="8" 
+                       placeholder="<?php esc_attr_e('Minimum 8 characters', 'yatra'); ?>">
+            </div>
+            <div class="yatra-form-group yatra-field-half">
+                <label for="account_password_confirm">
+                    <?php esc_html_e('Confirm Password', 'yatra'); ?> <span class="required">*</span>
+                </label>
+                <input type="password" id="account_password_confirm" name="account_password_confirm" required minlength="8"
+                       placeholder="<?php esc_attr_e('Re-enter password', 'yatra'); ?>">
+            </div>
+        </div>
+        <p class="yatra-field-hint" style="font-size: 13px; color: #6b7280; margin-top: 8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 16v-4"></path>
+                <path d="M12 8h.01"></path>
+            </svg>
+            <?php esc_html_e('Your email address will be used as your username.', 'yatra'); ?>
+        </p>
+        <input type="hidden" name="create_account" value="1">
+        
+    <?php else : ?>
+        <!-- Guest Checkout Allowed - Optional Account Creation -->
+        <p class="yatra-section-description" style="margin-bottom: 16px;">
+            <?php esc_html_e('Create an account to easily manage your bookings and receive travel updates.', 'yatra'); ?>
+        </p>
+        
+        <label class="yatra-checkbox-label" style="margin-bottom: 16px;">
+            <input type="checkbox" name="create_account" id="create-account" value="1">
+            <span><?php esc_html_e('Create an account for easier booking management', 'yatra'); ?></span>
+        </label>
+        
+        <div class="yatra-account-fields" id="yatra-account-fields" style="display: none;">
+            <div class="yatra-form-row">
+                <div class="yatra-form-group yatra-field-half">
+                    <label for="account_password">
+                        <?php esc_html_e('Password', 'yatra'); ?> <span class="required">*</span>
+                    </label>
+                    <input type="password" id="account_password" name="account_password" minlength="8"
+                           placeholder="<?php esc_attr_e('Minimum 8 characters', 'yatra'); ?>">
+                </div>
+                <div class="yatra-form-group yatra-field-half">
+                    <label for="account_password_confirm">
+                        <?php esc_html_e('Confirm Password', 'yatra'); ?> <span class="required">*</span>
+                    </label>
+                    <input type="password" id="account_password_confirm" name="account_password_confirm" minlength="8"
+                           placeholder="<?php esc_attr_e('Re-enter password', 'yatra'); ?>">
+                </div>
+            </div>
+            <p class="yatra-field-hint" style="font-size: 13px; color: #6b7280; margin-top: 8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 16v-4"></path>
+                    <path d="M12 8h.01"></path>
+                </svg>
+                <?php esc_html_e('Your email address will be used as your username.', 'yatra'); ?>
+            </p>
+        </div>
+    <?php endif; ?>
+</div>
+<?php else : ?>
+    <!-- User is logged in -->
+    <div class="yatra-booking-section yatra-logged-in-notice">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <div>
+                <span style="font-weight: 500; color: #065f46;">
+                    <?php 
+                    $current_user = wp_get_current_user();
+                    printf(
+                        /* translators: %s: User display name */
+                        esc_html__('Logged in as %s', 'yatra'),
+                        '<strong>' . esc_html($current_user->display_name) . '</strong>'
+                    ); 
+                    ?>
+                </span>
+                <a href="<?php echo esc_url(wp_logout_url(get_permalink())); ?>" style="margin-left: 12px; color: #059669; font-size: 13px;">
+                    <?php esc_html_e('Log out', 'yatra'); ?>
+                </a>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <!-- Terms & Conditions -->
 <div class="yatra-booking-section">
     <div class="yatra-terms-container">

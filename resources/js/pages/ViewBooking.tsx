@@ -5,7 +5,7 @@
 
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Mail, Phone, Calendar, Users, DollarSign, CreditCard, FileText } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Calendar, Users, DollarSign, CreditCard, FileText, AlertCircle } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -13,6 +13,27 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
+
+interface FormFieldConfig {
+  id: string;
+  type: string;
+  label: string;
+  enabled: boolean;
+  order: number;
+  section?: string;
+}
+
+interface FormSectionConfig {
+  title: string;
+  enabled: boolean;
+  fields: FormFieldConfig[];
+}
+
+interface BookingFormConfig {
+  contact_form: FormSectionConfig;
+  emergency_contact_form: FormSectionConfig;
+  traveler_form: FormSectionConfig;
+}
 
 const ViewBooking: React.FC = () => {
   const { can } = usePermissions();
@@ -22,6 +43,45 @@ const ViewBooking: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     return params.get('id') ? parseInt(params.get('id') || '0') : null;
   }, []);
+
+  // Fetch booking form configuration for dynamic field labels
+  const { data: formConfig } = useQuery<BookingFormConfig>({
+    queryKey: ['booking-form-config'],
+    queryFn: async () => {
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/settings`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch settings');
+      }
+      const result = await response.json();
+      return result.data?.booking_form_config || result.booking_form_config || null;
+    },
+  });
+
+  // Get enabled traveler fields from config
+  const travelerFields = useMemo(() => {
+    if (!formConfig?.traveler_form?.fields) return [];
+    return formConfig.traveler_form.fields
+      .filter(field => field.enabled)
+      .sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+
+  // Get enabled emergency contact fields
+  const emergencyFields = useMemo(() => {
+    if (!formConfig?.emergency_contact_form?.fields) return [];
+    return formConfig.emergency_contact_form.fields
+      .filter(field => field.enabled)
+      .sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+
+  // Helper to get field label by ID
+  const getFieldLabel = (fieldId: string, fields: FormFieldConfig[]): string => {
+    const field = fields.find(f => f.id === fieldId);
+    return field?.label || fieldId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
 
   // Fetch booking data from API
   const { data: booking, isLoading, error } = useQuery({
@@ -441,138 +501,115 @@ const ViewBooking: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Travelers Information */}
+            {/* Travelers Information - Dynamic Fields */}
             {booking.travelers_data && booking.travelers_data.length > 0 && (
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <Users className="w-4 h-4" />
-                    {__('Travelers Information', 'Travelers Information')}
+                    {formConfig?.traveler_form?.title || __('Travelers Information', 'Travelers Information')}
                     <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
                       ({booking.travelers_data.length} {booking.travelers_data.length === 1 ? __('traveler', 'traveler') : __('travelers', 'travelers')})
                     </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {booking.travelers_data.map((traveler: any, index: number) => (
-                    <div 
-                      key={index} 
-                      className={`p-4 rounded-lg ${index === 0 ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'}`}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {index === 0 ? __('Lead Traveler', 'Lead Traveler') : `${__('Traveler', 'Traveler')} ${index + 1}`}
-                        </h4>
-                        {index === 0 && (
-                          <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded">
-                            {__('Primary Contact', 'Primary Contact')}
-                          </span>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {/* Name */}
-                        <div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Full Name', 'Full Name')}</div>
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            {[traveler.first_name, traveler.last_name].filter(Boolean).join(' ') || '-'}
-                          </div>
+                  {booking.travelers_data.map((traveler: any, index: number) => {
+                    // Get all non-empty fields from the traveler data
+                    const travelerEntries = Object.entries(traveler).filter(([_, value]) => value && String(value).trim() !== '');
+                    
+                    return (
+                      <div 
+                        key={index} 
+                        className={`p-4 rounded-lg ${index === 0 ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'}`}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {index === 0 ? __('Lead Traveler', 'Lead Traveler') : `${__('Traveler', 'Traveler')} ${index + 1}`}
+                            {/* Show name if available */}
+                            {(traveler.first_name || traveler.last_name) && (
+                              <span className="font-normal text-gray-500 dark:text-gray-400 ml-2">
+                                - {[traveler.first_name, traveler.last_name].filter(Boolean).join(' ')}
+                              </span>
+                            )}
+                          </h4>
+                          {index === 0 && (
+                            <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded">
+                              {__('Primary Contact', 'Primary Contact')}
+                            </span>
+                          )}
                         </div>
                         
-                        {/* Gender */}
-                        {traveler.gender && (
-                          <div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Gender', 'Gender')}</div>
-                            <div className="text-sm text-gray-900 dark:text-white capitalize">{traveler.gender}</div>
-                          </div>
-                        )}
+                        {/* Dynamic Fields Display */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {travelerEntries.map(([fieldId, fieldValue]) => {
+                            // Skip first_name and last_name as they're shown in header
+                            if (fieldId === 'first_name' || fieldId === 'last_name') return null;
+                            
+                            const fieldConfig = travelerFields.find(f => f.id === fieldId);
+                            const label = fieldConfig?.label || getFieldLabel(fieldId, travelerFields);
+                            const isLongField = fieldConfig?.type === 'textarea' || String(fieldValue).length > 50;
+                            
+                            // Format date fields
+                            let displayValue = String(fieldValue);
+                            if (fieldConfig?.type === 'date' || fieldId.includes('date') || fieldId.includes('expiry')) {
+                              try {
+                                displayValue = new Date(fieldValue as string).toLocaleDateString();
+                              } catch {
+                                displayValue = String(fieldValue);
+                              }
+                            }
+                            
+                            return (
+                              <div 
+                                key={fieldId}
+                                className={isLongField ? 'col-span-2 md:col-span-3' : ''}
+                              >
+                                <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{label}</div>
+                                <div className={`text-sm text-gray-900 dark:text-white ${fieldId === 'passport' ? 'font-mono' : ''} capitalize`}>
+                                  {displayValue}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                         
-                        {/* Date of Birth */}
-                        {traveler.date_of_birth && (
-                          <div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Date of Birth', 'Date of Birth')}</div>
-                            <div className="text-sm text-gray-900 dark:text-white">
-                              {new Date(traveler.date_of_birth).toLocaleDateString()}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Nationality */}
-                        {traveler.nationality && (
-                          <div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Nationality', 'Nationality')}</div>
-                            <div className="text-sm text-gray-900 dark:text-white">{traveler.nationality}</div>
-                          </div>
-                        )}
-                        
-                        {/* Passport Number */}
-                        {traveler.passport && (
-                          <div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Passport No.', 'Passport No.')}</div>
-                            <div className="text-sm text-gray-900 dark:text-white font-mono">{traveler.passport}</div>
-                          </div>
-                        )}
-                        
-                        {/* Passport Expiry */}
-                        {traveler.passport_expiry && (
-                          <div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Passport Expiry', 'Passport Expiry')}</div>
-                            <div className="text-sm text-gray-900 dark:text-white">
-                              {new Date(traveler.passport_expiry).toLocaleDateString()}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Dietary Requirements */}
-                        {traveler.dietary && (
-                          <div className="col-span-2 md:col-span-3">
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Dietary Requirements', 'Dietary Requirements')}</div>
-                            <div className="text-sm text-gray-900 dark:text-white">{traveler.dietary}</div>
-                          </div>
-                        )}
-                        
-                        {/* Medical Conditions */}
-                        {traveler.medical && (
-                          <div className="col-span-2 md:col-span-3">
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Medical Conditions', 'Medical Conditions')}</div>
-                            <div className="text-sm text-gray-900 dark:text-white">{traveler.medical}</div>
+                        {travelerEntries.length <= 2 && (
+                          <div className="text-sm text-gray-400 dark:text-gray-500 italic mt-2">
+                            {__('Limited traveler information provided', 'Limited traveler information provided')}
                           </div>
                         )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </CardContent>
               </Card>
             )}
 
-            {/* Emergency Contact */}
-            {booking.emergency_contact && (booking.emergency_contact.name || booking.emergency_contact.phone) && (
+            {/* Emergency Contact - Dynamic Fields */}
+            {booking.emergency_contact && Object.values(booking.emergency_contact).some(v => v && String(v).trim() !== '') && (
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    {__('Emergency Contact', 'Emergency Contact')}
+                    <AlertCircle className="w-4 h-4" />
+                    {formConfig?.emergency_contact_form?.title || __('Emergency Contact', 'Emergency Contact')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {booking.emergency_contact.name && (
-                      <div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Contact Name', 'Contact Name')}</div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">{booking.emergency_contact.name}</div>
-                      </div>
-                    )}
-                    {booking.emergency_contact.phone && (
-                      <div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Phone Number', 'Phone Number')}</div>
-                        <div className="text-sm text-gray-900 dark:text-white">{booking.emergency_contact.phone}</div>
-                      </div>
-                    )}
-                    {booking.emergency_contact.relationship && (
-                      <div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Relationship', 'Relationship')}</div>
-                        <div className="text-sm text-gray-900 dark:text-white capitalize">{booking.emergency_contact.relationship}</div>
-                      </div>
-                    )}
+                    {Object.entries(booking.emergency_contact)
+                      .filter(([_, value]) => value && String(value).trim() !== '')
+                      .map(([fieldId, fieldValue]) => {
+                        const label = getFieldLabel(fieldId, emergencyFields);
+                        return (
+                          <div key={fieldId}>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{label}</div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                              {String(fieldValue)}
+                            </div>
+                          </div>
+                        );
+                      })}
                   </div>
                 </CardContent>
               </Card>

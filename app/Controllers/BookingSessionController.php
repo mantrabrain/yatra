@@ -7,6 +7,7 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use Yatra\Repositories\TravellerRepository;
 
 /**
  * Booking Session REST API Controller
@@ -14,6 +15,19 @@ use WP_Error;
  */
 class BookingSessionController extends BaseController
 {
+    /**
+     * @var TravellerRepository
+     */
+    private TravellerRepository $travellerRepository;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->travellerRepository = new TravellerRepository();
+    }
+
     /**
      * REST API namespace
      */
@@ -410,7 +424,7 @@ class BookingSessionController extends BaseController
                 'emergency_contact' => wp_json_encode($emergency_data),
                 'travel_date' => sanitize_text_field($travel_date),
                 'travelers_count' => $travelers_count,
-                'travelers_data' => wp_json_encode($sanitized_travelers),
+                'travelers_data' => '', // Legacy field - travellers now stored in separate table
                 'total_amount' => $total_amount,
                 'amount_paid' => 0,
                 'amount_due' => $amount_due,
@@ -436,6 +450,24 @@ class BookingSessionController extends BaseController
         }
 
         $booking_id = $wpdb->insert_id;
+
+        // ========================================
+        // SAVE TRAVELLERS TO NORMALIZED TABLES
+        // ========================================
+        // Each traveller is saved to yatra_booking_travellers table
+        // Their dynamic fields are saved to yatra_booking_traveller_meta table
+        foreach ($sanitized_travelers as $index => $traveler_fields) {
+            // First traveller (index 0) is always the lead traveller
+            $is_lead = ($index === 0);
+            
+            // Create traveller record with all their fields stored in meta
+            $this->travellerRepository->create(
+                $booking_id,
+                $index,
+                $is_lead,
+                $traveler_fields
+            );
+        }
 
         // Clear booking session
         yatra_clear_booking_session();

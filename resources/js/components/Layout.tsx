@@ -229,6 +229,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { subpage: 'payments', label: 'Payments', icon: CreditCard },
     { subpage: 'bookings', label: 'Bookings', icon: Calendar },
     { subpage: 'customers', label: 'Customers', icon: Users },
+    { subpage: 'travelers', label: 'Travelers', icon: Users },
     { subpage: 'enquiries', label: 'Enquiries', icon: MessageSquare },
     { subpage: 'reviews', label: 'Reviews', icon: Star },
     { subpage: 'reports', label: 'Reports', icon: BarChart3 },

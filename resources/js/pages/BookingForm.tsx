@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Plus, Trash2, Users, ChevronDown, ChevronUp } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -15,6 +15,37 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
+
+// Dynamic traveler data - keys are field IDs from form config
+interface TravelerData {
+  [key: string]: string;
+}
+
+interface FormFieldConfig {
+  id: string;
+  type: string;
+  label: string;
+  placeholder?: string;
+  required: boolean;
+  enabled: boolean;
+  order: number;
+  width?: string;
+  options?: { value: string; label: string }[];
+  section?: string;
+}
+
+interface FormSectionConfig {
+  title: string;
+  description?: string;
+  enabled: boolean;
+  fields: FormFieldConfig[];
+}
+
+interface BookingFormConfig {
+  contact_form: FormSectionConfig;
+  emergency_contact_form: FormSectionConfig;
+  traveler_form: FormSectionConfig;
+}
 
 interface BookingFormData {
   customer_name: string;
@@ -30,6 +61,40 @@ interface BookingFormData {
   payment_method: string;
   notes: string;
 }
+
+// Country list for country fields
+const countryList = [
+  { code: 'US', name: 'United States' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'IN', name: 'India' },
+  { code: 'NP', name: 'Nepal' },
+  { code: 'CN', name: 'China' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'ES', name: 'Spain' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'NL', name: 'Netherlands' },
+  { code: 'CH', name: 'Switzerland' },
+  { code: 'SE', name: 'Sweden' },
+  { code: 'NO', name: 'Norway' },
+  { code: 'DK', name: 'Denmark' },
+  { code: 'FI', name: 'Finland' },
+  { code: 'NZ', name: 'New Zealand' },
+  { code: 'SG', name: 'Singapore' },
+  { code: 'AE', name: 'United Arab Emirates' },
+  { code: 'TH', name: 'Thailand' },
+  { code: 'MY', name: 'Malaysia' },
+  { code: 'ID', name: 'Indonesia' },
+  { code: 'PH', name: 'Philippines' },
+  { code: 'VN', name: 'Vietnam' },
+  { code: 'KR', name: 'South Korea' },
+  { code: 'ZA', name: 'South Africa' },
+];
 
 const BookingForm: React.FC = () => {
   const queryClient = useQueryClient();
@@ -48,8 +113,44 @@ const BookingForm: React.FC = () => {
     payment_method: '',
     notes: '',
   });
+  const [travelersData, setTravelersData] = useState<TravelerData[]>([{}]);
+  const [expandedTravelers, setExpandedTravelers] = useState<number[]>([0]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch booking form configuration
+  const { data: formConfig } = useQuery<BookingFormConfig>({
+    queryKey: ['booking-form-config'],
+    queryFn: async () => {
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/settings`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch settings');
+      }
+      const result = await response.json();
+      return result.data?.booking_form_config || result.booking_form_config || null;
+    },
+  });
+
+  // Get enabled traveler fields from config
+  const travelerFields = useMemo(() => {
+    if (!formConfig?.traveler_form?.fields) return [];
+    return formConfig.traveler_form.fields
+      .filter(field => field.enabled)
+      .sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+
+  // Create empty traveler based on enabled fields
+  const createEmptyTraveler = (): TravelerData => {
+    const empty: TravelerData = {};
+    travelerFields.forEach(field => {
+      empty[field.id] = '';
+    });
+    return empty;
+  };
 
   // Get action and id from URL
   const action = useMemo(() => {
@@ -146,6 +247,24 @@ const BookingForm: React.FC = () => {
         const customerName = booking.customer_name || 
           `${booking.contact_first_name || ''} ${booking.contact_last_name || ''}`.trim();
         
+        // Parse travelers data - dynamic fields based on stored data
+        let travelers: TravelerData[] = [];
+        if (booking.travelers && Array.isArray(booking.travelers)) {
+          // Map all stored fields dynamically (keys are field IDs from form builder)
+          travelers = booking.travelers.map((t: any) => {
+            const traveler: TravelerData = {};
+            Object.entries(t).forEach(([key, value]) => {
+              traveler[key] = String(value || '');
+            });
+            return traveler;
+          });
+        }
+        
+        // Ensure at least one traveler exists
+        if (travelers.length === 0) {
+          travelers = [{}]; // Empty object - fields will be populated from form config
+        }
+        
         const mappedData = {
           id: booking.id,
           customer_name: customerName,
@@ -160,6 +279,7 @@ const BookingForm: React.FC = () => {
           booking_status: booking.status || 'pending',
           payment_method: booking.payment_gateway || '',
           notes: booking.special_requests || '',
+          travelers_data: travelers,
         };
         console.log('Mapped booking data:', mappedData);
         return mappedData;
@@ -190,6 +310,14 @@ const BookingForm: React.FC = () => {
         payment_method: bookingData.payment_method || '',
         notes: bookingData.notes || '',
       });
+      
+      // Set travelers data
+      if (bookingData.travelers_data && bookingData.travelers_data.length > 0) {
+        setTravelersData(bookingData.travelers_data);
+        // Expand first traveler by default
+        setExpandedTravelers([0]);
+      }
+      
       setIsDataLoaded(true);
     }
   }, [bookingData, isEditMode]);
@@ -213,6 +341,37 @@ const BookingForm: React.FC = () => {
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
+  };
+
+  // Traveler management functions
+  const handleTravelerChange = (index: number, field: keyof TravelerData, value: string) => {
+    setTravelersData(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const addTraveler = () => {
+    const newTraveler = createEmptyTraveler();
+    setTravelersData(prev => [...prev, newTraveler]);
+    setFormData(prev => ({ ...prev, travelers: String(travelersData.length + 1) }));
+    setExpandedTravelers(prev => [...prev, travelersData.length]);
+  };
+
+  const removeTraveler = (index: number) => {
+    if (travelersData.length <= 1) return;
+    setTravelersData(prev => prev.filter((_, i) => i !== index));
+    setFormData(prev => ({ ...prev, travelers: String(travelersData.length - 1) }));
+    setExpandedTravelers(prev => prev.filter(i => i !== index).map(i => i > index ? i - 1 : i));
+  };
+
+  const toggleTravelerExpanded = (index: number) => {
+    setExpandedTravelers(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
   };
 
   const validateForm = (): boolean => {
@@ -260,19 +419,21 @@ const BookingForm: React.FC = () => {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      const payload = {
+      const payload: any = {
         contact_first_name: firstName,
         contact_last_name: lastName,
         contact_email: data.customer_email.trim(),
         contact_phone: data.customer_phone.trim(),
         trip_id: parseInt(data.trip_id),
         travel_date: data.travel_date,
-        travelers_count: parseInt(data.travelers),
+        travelers_count: travelersData.length,
         total_amount: parseFloat(data.total_amount),
         payment_status: data.payment_status,
         status: data.booking_status,
         payment_gateway: data.payment_method.trim(),
         special_requests: data.notes.trim(),
+        // Include travelers data
+        travelers_data: travelersData,
       };
 
       const url = isEditMode && bookingId
@@ -648,6 +809,182 @@ const BookingForm: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Travelers Information - Dynamic Fields */}
+              {formConfig?.traveler_form?.enabled !== false && travelerFields.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        {formConfig?.traveler_form?.title || __('Travelers Information', 'Travelers Information')}
+                        <span className="text-xs font-normal text-gray-500 dark:text-gray-400">
+                          ({travelersData.length} {travelersData.length === 1 ? __('traveler', 'traveler') : __('travelers', 'travelers')})
+                        </span>
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        {travelersData.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setExpandedTravelers(
+                              expandedTravelers.length === travelersData.length 
+                                ? [] 
+                                : travelersData.map((_, i) => i)
+                            )}
+                            className="text-gray-500 text-xs"
+                          >
+                            {expandedTravelers.length === travelersData.length 
+                              ? __('Collapse All', 'Collapse All')
+                              : __('Expand All', 'Expand All')
+                            }
+                          </Button>
+                        )}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={addTraveler}
+                          className="flex items-center gap-1"
+                        >
+                          <Plus className="w-3 h-3" />
+                          {__('Add Traveler', 'Add Traveler')}
+                        </Button>
+                      </div>
+                    </div>
+                    {formConfig?.traveler_form?.description && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        {formConfig.traveler_form.description}
+                      </p>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {travelersData.map((traveler, travelerIndex) => (
+                      <div 
+                        key={travelerIndex}
+                        className={`border rounded-lg ${travelerIndex === 0 ? 'border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-200 dark:border-gray-700'}`}
+                      >
+                        {/* Traveler Header - Collapsible */}
+                        <div 
+                          className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-t-lg"
+                          onClick={() => toggleTravelerExpanded(travelerIndex)}
+                        >
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="font-medium text-sm text-gray-900 dark:text-white whitespace-nowrap">
+                              {travelerIndex === 0 
+                                ? __('Lead Traveler', 'Lead Traveler')
+                                : `${__('Traveler', 'Traveler')} ${travelerIndex + 1}`
+                              }
+                            </span>
+                            {traveler.first_name || traveler.last_name ? (
+                              <span className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                - {[traveler.first_name, traveler.last_name].filter(Boolean).join(' ')}
+                              </span>
+                            ) : null}
+                            {travelerIndex === 0 && (
+                              <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded whitespace-nowrap">
+                                {__('Primary', 'Primary')}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 ml-2">
+                            {/* Remove button - show for all travelers if more than 1 exists */}
+                            {travelersData.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeTraveler(travelerIndex);
+                                }}
+                                className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-8 px-2 flex items-center gap-1"
+                                title={__('Remove Traveler', 'Remove Traveler')}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                <span className="text-xs hidden sm:inline">{__('Remove', 'Remove')}</span>
+                              </Button>
+                            )}
+                            {/* Expand/Collapse toggle */}
+                            <div className="w-6 h-6 flex items-center justify-center">
+                              {expandedTravelers.includes(travelerIndex) ? (
+                                <ChevronUp className="w-4 h-4 text-gray-500" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4 text-gray-500" />
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Traveler Fields - Collapsible Content */}
+                        {expandedTravelers.includes(travelerIndex) && (
+                          <div className="p-3 pt-0 border-t border-gray-100 dark:border-gray-700/50">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                              {travelerFields.map((field) => (
+                                <div 
+                                  key={field.id} 
+                                  className={field.width === 'full' ? 'md:col-span-2' : ''}
+                                >
+                                  <label 
+                                    htmlFor={`traveler-${travelerIndex}-${field.id}`}
+                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                  >
+                                    {field.label}
+                                    {field.required && <span className="text-red-500 ml-1">*</span>}
+                                  </label>
+                                  
+                                  {/* Render field based on type */}
+                                  {field.type === 'select' ? (
+                                    <Select
+                                      id={`traveler-${travelerIndex}-${field.id}`}
+                                      value={traveler[field.id] || ''}
+                                      onChange={(e) => handleTravelerChange(travelerIndex, field.id, e.target.value)}
+                                    >
+                                      <option value="">{field.placeholder || `Select ${field.label}`}</option>
+                                      {field.options?.map((opt) => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                      ))}
+                                    </Select>
+                                  ) : field.type === 'country' ? (
+                                    <Select
+                                      id={`traveler-${travelerIndex}-${field.id}`}
+                                      value={traveler[field.id] || ''}
+                                      onChange={(e) => handleTravelerChange(travelerIndex, field.id, e.target.value)}
+                                    >
+                                      <option value="">{field.placeholder || 'Select Country'}</option>
+                                      {countryList.map((country) => (
+                                        <option key={country.code} value={country.code}>{country.name}</option>
+                                      ))}
+                                    </Select>
+                                  ) : field.type === 'textarea' ? (
+                                    <textarea
+                                      id={`traveler-${travelerIndex}-${field.id}`}
+                                      value={traveler[field.id] || ''}
+                                      onChange={(e) => handleTravelerChange(travelerIndex, field.id, e.target.value)}
+                                      placeholder={field.placeholder}
+                                      rows={2}
+                                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:placeholder:text-gray-400 resize-none"
+                                    />
+                                  ) : (
+                                    <Input
+                                      id={`traveler-${travelerIndex}-${field.id}`}
+                                      type={field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : field.type === 'date' ? 'date' : field.type === 'number' ? 'number' : 'text'}
+                                      value={traveler[field.id] || ''}
+                                      onChange={(e) => handleTravelerChange(travelerIndex, field.id, e.target.value)}
+                                      placeholder={field.placeholder}
+                                    />
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar */}

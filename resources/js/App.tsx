@@ -41,6 +41,7 @@ import Enquiries from './pages/Enquiries';
 import ViewEnquiry from './pages/ViewEnquiry';
 import EnquiryForm from './pages/EnquiryForm';
 import Modules from './pages/Modules';
+import Travelers from './pages/Travelers';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -147,6 +148,8 @@ const App: React.FC = () => {
           return <CustomerForm />;
         }
         return <Customers />;
+      case 'travelers':
+        return <Travelers />;
       case 'enquiries':
         // Check if we're viewing or editing an enquiry
         if (action === 'view') {

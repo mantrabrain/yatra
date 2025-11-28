@@ -581,15 +581,29 @@ class AppServiceProvider extends ServiceProvider
     {
         global $wpdb;
         
-        // Check if bookings table exists
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        $table_exists = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
-            DB_NAME,
-            $bookings_table
-        ));
+        // Tables that must exist
+        $required_tables = [
+            $wpdb->prefix . 'yatra_bookings',
+            $wpdb->prefix . 'yatra_booking_payments',
+            $wpdb->prefix . 'yatra_booking_travellers',
+            $wpdb->prefix . 'yatra_booking_traveller_meta',
+        ];
         
-        if (!$table_exists) {
+        $missing_table = false;
+        foreach ($required_tables as $table_name) {
+            $table_exists = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
+                DB_NAME,
+                $table_name
+            ));
+            
+            if (!$table_exists) {
+                $missing_table = true;
+                break;
+            }
+        }
+        
+        if ($missing_table) {
             $this->createBookingsTables();
         }
     }
@@ -688,6 +702,44 @@ class AppServiceProvider extends ServiceProvider
         ) {$charset_collate} COMMENT='Booking payment history';";
 
         dbDelta($sql_booking_payments);
+        
+        // ============================================
+        // BOOKING TRAVELLERS (Individual Traveller Records)
+        // ============================================
+        $table_booking_travellers = $wpdb->prefix . 'yatra_booking_travellers';
+        
+        $sql_booking_travellers = "CREATE TABLE IF NOT EXISTS `{$table_booking_travellers}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `booking_id` bigint(20) UNSIGNED NOT NULL COMMENT 'Reference to yatra_bookings.id',
+            `traveller_index` smallint(5) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Position in booking (0-based)',
+            `is_lead` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Is this the lead/primary traveller',
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_booking_id` (`booking_id`),
+            KEY `idx_is_lead` (`is_lead`),
+            KEY `idx_booking_index` (`booking_id`, `traveller_index`)
+        ) {$charset_collate} COMMENT='Individual travellers for each booking';";
+
+        dbDelta($sql_booking_travellers);
+        
+        // ============================================
+        // BOOKING TRAVELLER META (Dynamic Fields as Key-Value Pairs)
+        // ============================================
+        $table_booking_traveller_meta = $wpdb->prefix . 'yatra_booking_traveller_meta';
+        
+        $sql_booking_traveller_meta = "CREATE TABLE IF NOT EXISTS `{$table_booking_traveller_meta}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `traveller_id` bigint(20) UNSIGNED NOT NULL COMMENT 'Reference to yatra_booking_travellers.id',
+            `meta_key` varchar(255) NOT NULL,
+            `meta_value` longtext,
+            PRIMARY KEY (`id`),
+            KEY `idx_traveller_id` (`traveller_id`),
+            KEY `idx_meta_key` (`meta_key`(191)),
+            UNIQUE KEY `idx_traveller_meta` (`traveller_id`, `meta_key`(191))
+        ) {$charset_collate} COMMENT='Dynamic traveller fields as key-value pairs';";
+
+        dbDelta($sql_booking_traveller_meta);
     }
 
     /**

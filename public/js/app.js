@@ -404,6 +404,7 @@ const Layout = ({ children }) => {
     { subpage: "payments", label: "Payments", icon: CreditCard },
     { subpage: "bookings", label: "Bookings", icon: Calendar$1 },
     { subpage: "customers", label: "Customers", icon: Users },
+    { subpage: "travelers", label: "Travelers", icon: Users },
     { subpage: "enquiries", label: "Enquiries", icon: MessageSquare },
     { subpage: "reviews", label: "Reviews", icon: Star },
     { subpage: "reports", label: "Reports", icon: BarChart3 },
@@ -12209,8 +12210,40 @@ const Bookings = () => {
     )
   ] });
 };
+const countryList = [
+  { code: "US", name: "United States" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "CA", name: "Canada" },
+  { code: "AU", name: "Australia" },
+  { code: "DE", name: "Germany" },
+  { code: "FR", name: "France" },
+  { code: "IN", name: "India" },
+  { code: "NP", name: "Nepal" },
+  { code: "CN", name: "China" },
+  { code: "JP", name: "Japan" },
+  { code: "BR", name: "Brazil" },
+  { code: "MX", name: "Mexico" },
+  { code: "ES", name: "Spain" },
+  { code: "IT", name: "Italy" },
+  { code: "NL", name: "Netherlands" },
+  { code: "CH", name: "Switzerland" },
+  { code: "SE", name: "Sweden" },
+  { code: "NO", name: "Norway" },
+  { code: "DK", name: "Denmark" },
+  { code: "FI", name: "Finland" },
+  { code: "NZ", name: "New Zealand" },
+  { code: "SG", name: "Singapore" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "TH", name: "Thailand" },
+  { code: "MY", name: "Malaysia" },
+  { code: "ID", name: "Indonesia" },
+  { code: "PH", name: "Philippines" },
+  { code: "VN", name: "Vietnam" },
+  { code: "KR", name: "South Korea" },
+  { code: "ZA", name: "South Africa" }
+];
 const BookingForm = () => {
-  var _a, _b;
+  var _a, _b, _c, _d, _e;
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const [formData, setFormData] = reactExports.useState({
@@ -12227,8 +12260,38 @@ const BookingForm = () => {
     payment_method: "",
     notes: ""
   });
+  const [travelersData, setTravelersData] = reactExports.useState([{}]);
+  const [expandedTravelers, setExpandedTravelers] = reactExports.useState([0]);
   const [errors, setErrors] = reactExports.useState({});
   const [isSubmitting, setIsSubmitting] = reactExports.useState(false);
+  const { data: formConfig } = useQuery({
+    queryKey: ["booking-form-config"],
+    queryFn: async () => {
+      var _a2, _b2, _c2;
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/settings`, {
+        headers: {
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch settings");
+      }
+      const result = await response.json();
+      return ((_c2 = result.data) == null ? void 0 : _c2.booking_form_config) || result.booking_form_config || null;
+    }
+  });
+  const travelerFields = reactExports.useMemo(() => {
+    var _a2;
+    if (!((_a2 = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _a2.fields)) return [];
+    return formConfig.traveler_form.fields.filter((field) => field.enabled).sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+  const createEmptyTraveler = () => {
+    const empty = {};
+    travelerFields.forEach((field) => {
+      empty[field.id] = "";
+    });
+    return empty;
+  };
   const action = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("action") || "create";
@@ -12311,6 +12374,19 @@ const BookingForm = () => {
       if (result.success) {
         const booking = result.data;
         const customerName = booking.customer_name || `${booking.contact_first_name || ""} ${booking.contact_last_name || ""}`.trim();
+        let travelers = [];
+        if (booking.travelers && Array.isArray(booking.travelers)) {
+          travelers = booking.travelers.map((t) => {
+            const traveler = {};
+            Object.entries(t).forEach(([key, value]) => {
+              traveler[key] = String(value || "");
+            });
+            return traveler;
+          });
+        }
+        if (travelers.length === 0) {
+          travelers = [{}];
+        }
         const mappedData = {
           id: booking.id,
           customer_name: customerName,
@@ -12324,7 +12400,8 @@ const BookingForm = () => {
           payment_status: booking.payment_status || "pending",
           booking_status: booking.status || "pending",
           payment_method: booking.payment_gateway || "",
-          notes: booking.special_requests || ""
+          notes: booking.special_requests || "",
+          travelers_data: travelers
         };
         console.log("Mapped booking data:", mappedData);
         return mappedData;
@@ -12351,6 +12428,10 @@ const BookingForm = () => {
         payment_method: bookingData.payment_method || "",
         notes: bookingData.notes || ""
       });
+      if (bookingData.travelers_data && bookingData.travelers_data.length > 0) {
+        setTravelersData(bookingData.travelers_data);
+        setExpandedTravelers([0]);
+      }
       setIsDataLoaded(true);
     }
   }, [bookingData, isEditMode]);
@@ -12370,6 +12451,30 @@ const BookingForm = () => {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
+  };
+  const handleTravelerChange = (index, field, value) => {
+    setTravelersData((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+  const addTraveler = () => {
+    const newTraveler = createEmptyTraveler();
+    setTravelersData((prev) => [...prev, newTraveler]);
+    setFormData((prev) => ({ ...prev, travelers: String(travelersData.length + 1) }));
+    setExpandedTravelers((prev) => [...prev, travelersData.length]);
+  };
+  const removeTraveler = (index) => {
+    if (travelersData.length <= 1) return;
+    setTravelersData((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({ ...prev, travelers: String(travelersData.length - 1) }));
+    setExpandedTravelers((prev) => prev.filter((i) => i !== index).map((i) => i > index ? i - 1 : i));
+  };
+  const toggleTravelerExpanded = (index) => {
+    setExpandedTravelers(
+      (prev) => prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+    );
   };
   const validateForm = () => {
     const newErrors = {};
@@ -12401,7 +12506,7 @@ const BookingForm = () => {
   };
   const saveMutation = useMutation({
     mutationFn: async (data) => {
-      var _a2, _b2, _c;
+      var _a2, _b2, _c2;
       const nameParts = data.customer_name.trim().split(" ");
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
@@ -12412,19 +12517,21 @@ const BookingForm = () => {
         contact_phone: data.customer_phone.trim(),
         trip_id: parseInt(data.trip_id),
         travel_date: data.travel_date,
-        travelers_count: parseInt(data.travelers),
+        travelers_count: travelersData.length,
         total_amount: parseFloat(data.total_amount),
         payment_status: data.payment_status,
         status: data.booking_status,
         payment_gateway: data.payment_method.trim(),
-        special_requests: data.notes.trim()
+        special_requests: data.notes.trim(),
+        // Include travelers data
+        travelers_data: travelersData
       };
       const url = isEditMode && bookingId ? `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/bookings/${bookingId}` : `${((_b2 = window.yatraAdmin) == null ? void 0 : _b2.apiUrl) || "/wp-json/yatra/v1"}/bookings`;
       const response = await fetch(url, {
         method: isEditMode ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-WP-Nonce": ((_c = window.yatraAdmin) == null ? void 0 : _c.nonce) || ""
+          "X-WP-Nonce": ((_c2 = window.yatraAdmin) == null ? void 0 : _c2.nonce) || ""
         },
         body: JSON.stringify(payload)
       });
@@ -12761,6 +12868,165 @@ const BookingForm = () => {
               )
             ] })
           ] })
+        ] }),
+        ((_b = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _b.enabled) !== false && travelerFields.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "pb-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-4 h-4" }),
+                ((_c = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _c.title) || __("Travelers Information", "Travelers Information"),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-normal text-gray-500 dark:text-gray-400", children: [
+                  "(",
+                  travelersData.length,
+                  " ",
+                  travelersData.length === 1 ? __("traveler", "traveler") : __("travelers", "travelers"),
+                  ")"
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                travelersData.length > 1 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    type: "button",
+                    variant: "ghost",
+                    size: "sm",
+                    onClick: () => setExpandedTravelers(
+                      expandedTravelers.length === travelersData.length ? [] : travelersData.map((_, i) => i)
+                    ),
+                    className: "text-gray-500 text-xs",
+                    children: expandedTravelers.length === travelersData.length ? __("Collapse All", "Collapse All") : __("Expand All", "Expand All")
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Button,
+                  {
+                    type: "button",
+                    variant: "outline",
+                    size: "sm",
+                    onClick: addTraveler,
+                    className: "flex items-center gap-1",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-3 h-3" }),
+                      __("Add Traveler", "Add Traveler")
+                    ]
+                  }
+                )
+              ] })
+            ] }),
+            ((_d = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _d.description) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: formConfig.traveler_form.description })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: travelersData.map((traveler, travelerIndex) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              className: `border rounded-lg ${travelerIndex === 0 ? "border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10" : "border-gray-200 dark:border-gray-700"}`,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "div",
+                  {
+                    className: "flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-t-lg",
+                    onClick: () => toggleTravelerExpanded(travelerIndex),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-1 min-w-0", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-sm text-gray-900 dark:text-white whitespace-nowrap", children: travelerIndex === 0 ? __("Lead Traveler", "Lead Traveler") : `${__("Traveler", "Traveler")} ${travelerIndex + 1}` }),
+                        traveler.first_name || traveler.last_name ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-gray-500 dark:text-gray-400 truncate", children: [
+                          "- ",
+                          [traveler.first_name, traveler.last_name].filter(Boolean).join(" ")
+                        ] }) : null,
+                        travelerIndex === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded whitespace-nowrap", children: __("Primary", "Primary") })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 ml-2", children: [
+                        travelersData.length > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "ghost",
+                            size: "sm",
+                            onClick: (e) => {
+                              e.stopPropagation();
+                              removeTraveler(travelerIndex);
+                            },
+                            className: "text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-8 px-2 flex items-center gap-1",
+                            title: __("Remove Traveler", "Remove Traveler"),
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs hidden sm:inline", children: __("Remove", "Remove") })
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-6 h-6 flex items-center justify-center", children: expandedTravelers.includes(travelerIndex) ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronUp, { className: "w-4 h-4 text-gray-500" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4 text-gray-500" }) })
+                      ] })
+                    ]
+                  }
+                ),
+                expandedTravelers.includes(travelerIndex) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 pt-0 border-t border-gray-100 dark:border-gray-700/50", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3 mt-3", children: travelerFields.map((field) => {
+                  var _a2;
+                  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      className: field.width === "full" ? "md:col-span-2" : "",
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          "label",
+                          {
+                            htmlFor: `traveler-${travelerIndex}-${field.id}`,
+                            className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1",
+                            children: [
+                              field.label,
+                              field.required && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500 ml-1", children: "*" })
+                            ]
+                          }
+                        ),
+                        field.type === "select" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Select,
+                          {
+                            id: `traveler-${travelerIndex}-${field.id}`,
+                            value: traveler[field.id] || "",
+                            onChange: (e) => handleTravelerChange(travelerIndex, field.id, e.target.value),
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: field.placeholder || `Select ${field.label}` }),
+                              (_a2 = field.options) == null ? void 0 : _a2.map((opt) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: opt.value, children: opt.label }, opt.value))
+                            ]
+                          }
+                        ) : field.type === "country" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Select,
+                          {
+                            id: `traveler-${travelerIndex}-${field.id}`,
+                            value: traveler[field.id] || "",
+                            onChange: (e) => handleTravelerChange(travelerIndex, field.id, e.target.value),
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: field.placeholder || "Select Country" }),
+                              countryList.map((country) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: country.code, children: country.name }, country.code))
+                            ]
+                          }
+                        ) : field.type === "textarea" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "textarea",
+                          {
+                            id: `traveler-${travelerIndex}-${field.id}`,
+                            value: traveler[field.id] || "",
+                            onChange: (e) => handleTravelerChange(travelerIndex, field.id, e.target.value),
+                            placeholder: field.placeholder,
+                            rows: 2,
+                            className: "flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:placeholder:text-gray-400 resize-none"
+                          }
+                        ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          Input,
+                          {
+                            id: `traveler-${travelerIndex}-${field.id}`,
+                            type: field.type === "email" ? "email" : field.type === "tel" ? "tel" : field.type === "date" ? "date" : field.type === "number" ? "number" : "text",
+                            value: traveler[field.id] || "",
+                            onChange: (e) => handleTravelerChange(travelerIndex, field.id, e.target.value),
+                            placeholder: field.placeholder
+                          }
+                        )
+                      ]
+                    },
+                    field.id
+                  );
+                }) }) })
+              ]
+            },
+            travelerIndex
+          )) })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -12813,7 +13079,7 @@ const BookingForm = () => {
                   onChange: (e) => handleFieldChange("payment_method", e.target.value),
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Select payment method", "Select payment method") }),
-                    (_b = gatewaysData == null ? void 0 : gatewaysData.data) == null ? void 0 : _b.map((gw) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: gw.id, children: gw.title }, gw.id)),
+                    (_e = gatewaysData == null ? void 0 : gatewaysData.data) == null ? void 0 : _e.map((gw) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: gw.id, children: gw.title }, gw.id)),
                     (!(gatewaysData == null ? void 0 : gatewaysData.data) || gatewaysData.data.length === 0) && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pay_later", children: __("Pay Later", "Pay Later") }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "bank_transfer", children: __("Bank Transfer", "Bank Transfer") }),
@@ -12861,19 +13127,50 @@ const BookingForm = () => {
   ] });
 };
 const ViewBooking = () => {
+  var _a, _b;
   const { can } = usePermissions();
   const bookingId = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("id") ? parseInt(params.get("id") || "0") : null;
   }, []);
+  const { data: formConfig } = useQuery({
+    queryKey: ["booking-form-config"],
+    queryFn: async () => {
+      var _a2, _b2, _c;
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/settings`, {
+        headers: {
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch settings");
+      }
+      const result = await response.json();
+      return ((_c = result.data) == null ? void 0 : _c.booking_form_config) || result.booking_form_config || null;
+    }
+  });
+  const travelerFields = reactExports.useMemo(() => {
+    var _a2;
+    if (!((_a2 = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _a2.fields)) return [];
+    return formConfig.traveler_form.fields.filter((field) => field.enabled).sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+  const emergencyFields = reactExports.useMemo(() => {
+    var _a2;
+    if (!((_a2 = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _a2.fields)) return [];
+    return formConfig.emergency_contact_form.fields.filter((field) => field.enabled).sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+  const getFieldLabel = (fieldId, fields) => {
+    const field = fields.find((f) => f.id === fieldId);
+    return (field == null ? void 0 : field.label) || fieldId.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  };
   const { data: booking, isLoading, error } = useQuery({
     queryKey: ["booking", bookingId],
     queryFn: async () => {
-      var _a, _b;
+      var _a2, _b2;
       if (!bookingId) return null;
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/bookings/${bookingId}`, {
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/bookings/${bookingId}`, {
         headers: {
-          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
         }
       });
       if (!response.ok) {
@@ -12988,12 +13285,12 @@ const ViewBooking = () => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${statusInfo.className}`, children: statusInfo.label });
   };
   const handleBack = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings`;
   };
   const handleEdit = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=edit&id=${bookingId}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=edit&id=${bookingId}`;
   };
   if (isLoading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -13202,7 +13499,7 @@ const ViewBooking = () => {
         booking.travelers_data && booking.travelers_data.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-4 h-4" }),
-            __("Travelers Information", "Travelers Information"),
+            ((_a = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _a.title) || __("Travelers Information", "Travelers Information"),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 text-xs font-normal text-gray-500 dark:text-gray-400", children: [
               "(",
               booking.travelers_data.length,
@@ -13211,73 +13508,67 @@ const ViewBooking = () => {
               ")"
             ] })
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-4", children: booking.travelers_data.map((traveler, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "div",
-            {
-              className: `p-4 rounded-lg ${index === 0 ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800" : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"}`,
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: index === 0 ? __("Lead Traveler", "Lead Traveler") : `${__("Traveler", "Traveler")} ${index + 1}` }),
-                  index === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded", children: __("Primary Contact", "Primary Contact") })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-3 gap-3", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Full Name", "Full Name") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: [traveler.first_name, traveler.last_name].filter(Boolean).join(" ") || "-" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-4", children: booking.travelers_data.map((traveler, index) => {
+            const travelerEntries = Object.entries(traveler).filter(([_, value]) => value && String(value).trim() !== "");
+            return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: `p-4 rounded-lg ${index === 0 ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800" : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"}`,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
+                      index === 0 ? __("Lead Traveler", "Lead Traveler") : `${__("Traveler", "Traveler")} ${index + 1}`,
+                      (traveler.first_name || traveler.last_name) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-normal text-gray-500 dark:text-gray-400 ml-2", children: [
+                        "- ",
+                        [traveler.first_name, traveler.last_name].filter(Boolean).join(" ")
+                      ] })
+                    ] }),
+                    index === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded", children: __("Primary Contact", "Primary Contact") })
                   ] }),
-                  traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Gender", "Gender") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white capitalize", children: traveler.gender })
-                  ] }),
-                  traveler.date_of_birth && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Date of Birth", "Date of Birth") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: new Date(traveler.date_of_birth).toLocaleDateString() })
-                  ] }),
-                  traveler.nationality && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Nationality", "Nationality") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: traveler.nationality })
-                  ] }),
-                  traveler.passport && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Passport No.", "Passport No.") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white font-mono", children: traveler.passport })
-                  ] }),
-                  traveler.passport_expiry && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Passport Expiry", "Passport Expiry") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: new Date(traveler.passport_expiry).toLocaleDateString() })
-                  ] }),
-                  traveler.dietary && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-2 md:col-span-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Dietary Requirements", "Dietary Requirements") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: traveler.dietary })
-                  ] }),
-                  traveler.medical && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-2 md:col-span-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Medical Conditions", "Medical Conditions") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: traveler.medical })
-                  ] })
-                ] })
-              ]
-            },
-            index
-          )) })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 md:grid-cols-3 gap-3", children: travelerEntries.map(([fieldId, fieldValue]) => {
+                    if (fieldId === "first_name" || fieldId === "last_name") return null;
+                    const fieldConfig = travelerFields.find((f) => f.id === fieldId);
+                    const label = (fieldConfig == null ? void 0 : fieldConfig.label) || getFieldLabel(fieldId, travelerFields);
+                    const isLongField = (fieldConfig == null ? void 0 : fieldConfig.type) === "textarea" || String(fieldValue).length > 50;
+                    let displayValue = String(fieldValue);
+                    if ((fieldConfig == null ? void 0 : fieldConfig.type) === "date" || fieldId.includes("date") || fieldId.includes("expiry")) {
+                      try {
+                        displayValue = new Date(fieldValue).toLocaleDateString();
+                      } catch {
+                        displayValue = String(fieldValue);
+                      }
+                    }
+                    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "div",
+                      {
+                        className: isLongField ? "col-span-2 md:col-span-3" : "",
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: label }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-sm text-gray-900 dark:text-white ${fieldId === "passport" ? "font-mono" : ""} capitalize`, children: displayValue })
+                        ]
+                      },
+                      fieldId
+                    );
+                  }) }),
+                  travelerEntries.length <= 2 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-400 dark:text-gray-500 italic mt-2", children: __("Limited traveler information provided", "Limited traveler information provided") })
+                ]
+              },
+              index
+            );
+          }) })
         ] }),
-        booking.emergency_contact && (booking.emergency_contact.name || booking.emergency_contact.phone) && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        booking.emergency_contact && Object.values(booking.emergency_contact).some((v) => v && String(v).trim() !== "") && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-4 h-4" }),
-            __("Emergency Contact", "Emergency Contact")
+            /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
+            ((_b = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _b.title) || __("Emergency Contact", "Emergency Contact")
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-3", children: [
-            booking.emergency_contact.name && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Contact Name", "Contact Name") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: booking.emergency_contact.name })
-            ] }),
-            booking.emergency_contact.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Phone Number", "Phone Number") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: booking.emergency_contact.phone })
-            ] }),
-            booking.emergency_contact.relationship && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Relationship", "Relationship") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white capitalize", children: booking.emergency_contact.relationship })
-            ] })
-          ] }) })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-3", children: Object.entries(booking.emergency_contact).filter(([_, value]) => value && String(value).trim() !== "").map(([fieldId, fieldValue]) => {
+            const label = getFieldLabel(fieldId, emergencyFields);
+            return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: label }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white capitalize", children: String(fieldValue) })
+            ] }, fieldId);
+          }) }) })
         ] }),
         booking.notes && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
@@ -35794,6 +36085,253 @@ const Modules = () => {
     )
   ] });
 };
+const Travelers = () => {
+  var _a, _b;
+  const { can } = usePermissions();
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const [tripFilter, setTripFilter] = reactExports.useState("");
+  const [page, setPage] = reactExports.useState(1);
+  const perPage = 20;
+  const { data, isLoading } = useQuery({
+    queryKey: ["travelers", searchTerm, tripFilter, page],
+    queryFn: async () => {
+      var _a2, _b2;
+      const params = new URLSearchParams({
+        page: String(page),
+        per_page: String(perPage)
+      });
+      if (searchTerm) params.append("search", searchTerm);
+      if (tripFilter) params.append("trip_id", tripFilter);
+      const response = await fetch(
+        `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/travelers?${params.toString()}`,
+        {
+          headers: {
+            "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+          }
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch travelers");
+      }
+      return await response.json();
+    },
+    enabled: can("yatra_view_bookings")
+  });
+  const { data: tripsData } = useQuery({
+    queryKey: ["trips-list-filter"],
+    queryFn: async () => {
+      var _a2, _b2;
+      const response = await fetch(
+        `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/trips?per_page=100`,
+        {
+          headers: {
+            "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+          }
+        }
+      );
+      if (!response.ok) return { data: [] };
+      const result = await response.json();
+      return { data: result.data || [] };
+    }
+  });
+  const travelers = (data == null ? void 0 : data.data) || [];
+  const totalTravelers = ((_a = data == null ? void 0 : data.meta) == null ? void 0 : _a.total) || 0;
+  const totalPages = Math.ceil(totalTravelers / perPage);
+  const handleViewBooking = (bookingId) => {
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
+  };
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch {
+      return dateString;
+    }
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: __("Travelers", "Travelers"),
+        description: __("View all travelers from bookings", "View all travelers from bookings")
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row gap-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "text",
+            placeholder: __("Search by name, email, passport...", "Search by name, email, passport..."),
+            value: searchTerm,
+            onChange: (e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            },
+            className: "pl-10"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
+        {
+          value: tripFilter,
+          onChange: (e) => {
+            setTripFilter(e.target.value);
+            setPage(1);
+          },
+          className: "w-full sm:w-64",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("All Trips", "All Trips") }),
+            (_b = tripsData == null ? void 0 : tripsData.data) == null ? void 0 : _b.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: trip.id, children: trip.title }, trip.id))
+          ]
+        }
+      )
+    ] }) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 sm:grid-cols-3 gap-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4 flex items-center gap-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Total Travelers", "Total Travelers") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16" }) : totalTravelers })
+      ] })
+    ] }) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Traveler", "Traveler") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Contact", "Contact") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travel Date", "Travel Date") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Passport", "Passport") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: __("Actions", "Actions") })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-40" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-48" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-32" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-24" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-28" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-16" }) })
+      ] }, i)) })
+    ] }) : travelers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400", children: searchTerm || tripFilter ? __("No travelers found matching your criteria", "No travelers found matching your criteria") : __("No travelers found", "No travelers found") })
+    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Traveler", "Traveler") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Contact", "Contact") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travel Date", "Travel Date") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Passport", "Passport") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: __("Actions", "Actions") })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: travelers.map((traveler) => {
+        var _a2, _b2, _c;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300", children: [
+              (((_a2 = traveler.first_name) == null ? void 0 : _a2[0]) || "?").toUpperCase(),
+              (((_b2 = traveler.last_name) == null ? void 0 : _b2[0]) || "").toUpperCase()
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-medium text-gray-900 dark:text-white flex items-center gap-2", children: [
+                [traveler.first_name, traveler.last_name].filter(Boolean).join(" ") || "N/A",
+                traveler.is_lead && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "info", className: "text-xs", children: __("Lead", "Lead") })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2", children: [
+                traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: traveler.gender }),
+                traveler.nationality && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "•" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: traveler.nationality })
+                ] })
+              ] })
+            ] })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+            traveler.email && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate max-w-[180px]", children: traveler.email })
+            ] }),
+            traveler.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: traveler.phone })
+            ] }),
+            !traveler.email && !traveler.phone && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-400", children: "-" })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-[200px] truncate", title: traveler.trip_title, children: traveler.trip_title || `Trip #${traveler.trip_id}` }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3 text-gray-400" }),
+            formatDate(traveler.travel_date)
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: traveler.passport ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-mono text-sm", children: traveler.passport }),
+            traveler.passport_expiry && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
+              "Exp: ",
+              formatDate(traveler.passport_expiry)
+            ] })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "-" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "a",
+            {
+              href: `${((_c = window.yatraAdmin) == null ? void 0 : _c.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${traveler.booking_id}`,
+              className: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-mono text-sm",
+              children: traveler.booking_reference
+            }
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "ghost",
+              size: "sm",
+              onClick: () => handleViewBooking(traveler.booking_id),
+              title: __("View Booking", "View Booking"),
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
+            }
+          ) })
+        ] }, traveler.id);
+      }) })
+    ] }) }) }),
+    totalPages > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: [
+        __("Showing", "Showing"),
+        " ",
+        (page - 1) * perPage + 1,
+        " - ",
+        Math.min(page * perPage, totalTravelers),
+        " ",
+        __("of", "of"),
+        " ",
+        totalTravelers
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            disabled: page === 1,
+            onClick: () => setPage((p) => p - 1),
+            children: __("Previous", "Previous")
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            disabled: page >= totalPages,
+            onClick: () => setPage((p) => p + 1),
+            children: __("Next", "Next")
+          }
+        )
+      ] })
+    ] })
+  ] });
+};
 const App = () => {
   const [urlKey, setUrlKey] = reactExports.useState(0);
   reactExports.useEffect(() => {
@@ -35877,6 +36415,8 @@ const App = () => {
           return /* @__PURE__ */ jsxRuntimeExports.jsx(CustomerForm, {});
         }
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Customers, {});
+      case "travelers":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Travelers, {});
       case "enquiries":
         if (action === "view") {
           return /* @__PURE__ */ jsxRuntimeExports.jsx(ViewEnquiry, {});
