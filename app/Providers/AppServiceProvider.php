@@ -42,6 +42,9 @@ class AppServiceProvider extends ServiceProvider
         
         // Register cron jobs for booking reminders and expiry
         \Yatra\Services\BookingCronService::register();
+        
+        // Register scheduled payment processing
+        \Yatra\Services\ScheduledPaymentService::register();
 
         // Initialize plugin settings
         add_action('init', [$this, 'initSettings'], 5);
@@ -51,6 +54,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Add rewrite rules for trip permalinks
         add_action('init', [$this, 'addTripRewriteRules'], 10);
+        
+        // Register custom query vars
+        add_filter('query_vars', [$this, 'addCustomQueryVars']);
 
         // Register shortcodes
         add_action('init', [$this, 'registerShortcodes'], 10);
@@ -86,6 +92,15 @@ class AppServiceProvider extends ServiceProvider
         // AJAX handler for enquiry submission (allow both logged in and guest users)
         add_action('wp_ajax_yatra_submit_enquiry', [$this, 'handleEnquirySubmission']);
         add_action('wp_ajax_nopriv_yatra_submit_enquiry', [$this, 'handleEnquirySubmission']);
+
+        // Authentication (login, register, email verification)
+        add_action('rest_api_init', [\Yatra\Controllers\AuthController::class, 'registerRoutes']);
+        add_filter('authenticate', [\Yatra\Controllers\AuthController::class, 'blockUnverifiedUserLogin'], 30, 3);
+        add_action('init', [\Yatra\Controllers\AuthController::class, 'registerCustomerRole'], 5);
+        add_action('init', [\Yatra\Controllers\AuthController::class, 'handleWpLoginResendVerification'], 1);
+        add_action('template_redirect', [\Yatra\Controllers\AuthController::class, 'handleEmailVerification'], 1);
+        add_filter('login_message', [\Yatra\Controllers\AuthController::class, 'customLoginMessages']);
+        add_filter('wp_login_errors', [\Yatra\Controllers\AuthController::class, 'customLoginErrors']);
     }
 
     /**
@@ -583,10 +598,13 @@ class AppServiceProvider extends ServiceProvider
         
         // Tables that must exist
         $required_tables = [
+            $wpdb->prefix . 'yatra_customers',
             $wpdb->prefix . 'yatra_bookings',
             $wpdb->prefix . 'yatra_booking_payments',
             $wpdb->prefix . 'yatra_booking_travellers',
             $wpdb->prefix . 'yatra_booking_traveller_meta',
+            $wpdb->prefix . 'yatra_scheduled_payments',
+            $wpdb->prefix . 'yatra_payment_tokens',
         ];
         
         $missing_table = false;
@@ -604,12 +622,13 @@ class AppServiceProvider extends ServiceProvider
         }
         
         if ($missing_table) {
-            $this->createBookingsTables();
+            // Use Database class to create ALL tables including customers
+            \Yatra\Core\Database::createTables();
         }
     }
     
     /**
-     * Create bookings tables
+     * Create bookings tables (legacy - now using Database::createTables())
      */
     private function createBookingsTables(): void
     {
@@ -995,6 +1014,19 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
+     * Add custom query vars for Yatra
+     */
+    public function addCustomQueryVars(array $vars): array
+    {
+        $vars[] = 'yatra_trip_slug';
+        $vars[] = 'yatra_listing_page';
+        $vars[] = 'yatra_booking_page';
+        $vars[] = 'yatra_booking_confirmation';
+        $vars[] = 'yatra_verify_email';
+        return $vars;
+    }
+
+    /**
      * Add rewrite rules for trip permalinks and listing pages
      */
     public function addTripRewriteRules(): void
@@ -1019,6 +1051,14 @@ class AppServiceProvider extends ServiceProvider
         add_rewrite_tag('%yatra_listing_page%', '([^&]+)');
         add_rewrite_tag('%yatra_booking_page%', '([^&]+)');
         add_rewrite_tag('%yatra_booking_confirmation%', '([^&]+)');
+        add_rewrite_tag('%yatra_verify_email%', '([^&]+)');
+        
+        // Add rewrite rule for email verification: /yatra-verify-email/{token}/
+        add_rewrite_rule(
+            '^yatra-verify-email/([a-zA-Z0-9_-]+)/?$',
+            'index.php?yatra_verify_email=$matches[1]',
+            'top'
+        );
 
         // Add rewrite rule for trip single page: {trip_base}/{trip_slug}
         add_rewrite_rule(
@@ -1559,6 +1599,7 @@ class AppServiceProvider extends ServiceProvider
             // Localize script with booking data using SettingsService
             $localized_data = [
                 'apiUrl' => rest_url('yatra/v1'),
+                'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('wp_rest'),
                 'depositPercentage' => $booking->deposit_percentage ?? SettingsService::getInt('deposit_percentage', 20),
                 'partialPercentage' => $booking->partial_payment_percentage ?? SettingsService::getInt('partial_payment_percentage', 30),

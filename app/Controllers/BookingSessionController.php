@@ -8,6 +8,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use Yatra\Repositories\TravellerRepository;
+use Yatra\Repositories\CustomerRepository;
 
 /**
  * Booking Session REST API Controller
@@ -21,11 +22,17 @@ class BookingSessionController extends BaseController
     private TravellerRepository $travellerRepository;
 
     /**
+     * @var CustomerRepository
+     */
+    private CustomerRepository $customerRepository;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->travellerRepository = new TravellerRepository();
+        $this->customerRepository = new CustomerRepository();
     }
 
     /**
@@ -406,6 +413,33 @@ class BookingSessionController extends BaseController
             }
         }
 
+        // ========================================
+        // CREATE OR UPDATE CUSTOMER
+        // ========================================
+        // Customers are separate from WordPress users - this is for CRM purposes
+        $customer_id = null;
+        try {
+            $customer_id = $this->customerRepository->findOrCreate([
+                'user_id' => get_current_user_id() ?: null,
+                'first_name' => $contact_data['first_name'],
+                'last_name' => $contact_data['last_name'],
+                'email' => $contact_data['email'],
+                'phone' => $contact_data['phone'],
+                'address' => $contact_data['address'],
+                'country' => $contact_data['country'],
+                'nationality' => $contact_data['nationality'],
+                'emergency_name' => $emergency_data['name'],
+                'emergency_phone' => $emergency_data['phone'],
+                'emergency_relationship' => $emergency_data['relationship'],
+                'newsletter_optin' => !empty($data['subscribe_newsletter']),
+                'total_spent' => $total_amount,
+                'source' => 'booking',
+            ]);
+        } catch (\Exception $e) {
+            // Log error but continue - customer creation is not critical
+            error_log('Yatra: Failed to create customer: ' . $e->getMessage());
+        }
+
         // Insert booking
         $bookings_table = $wpdb->prefix . 'yatra_bookings';
         
@@ -414,6 +448,7 @@ class BookingSessionController extends BaseController
             [
                 'reference' => $booking_reference,
                 'trip_id' => $trip_id,
+                'customer_id' => $customer_id,
                 'user_id' => get_current_user_id() ?: null,
                 'contact_first_name' => $contact_data['first_name'],
                 'contact_last_name' => $contact_data['last_name'],
@@ -438,7 +473,7 @@ class BookingSessionController extends BaseController
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql'),
             ],
-            ['%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s']
+            ['%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s']
         );
 
         if ($result === false) {

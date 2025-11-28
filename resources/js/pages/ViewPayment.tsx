@@ -5,13 +5,14 @@
 
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Loader2, Mail, Phone, Calendar, CreditCard, Edit, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Calendar, CreditCard, Edit, ExternalLink } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { Skeleton } from '../components/ui/skeleton';
 
 const ViewPayment: React.FC = () => {
   const { can } = usePermissions();
@@ -27,33 +28,42 @@ const ViewPayment: React.FC = () => {
     queryKey: ['payment', paymentId],
     queryFn: async () => {
       if (!paymentId) return null;
-      // return await apiClient.get(`/yatra/v1/payments/${paymentId}`);
-      // Dummy data
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0];
-      };
+      
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments/${paymentId}`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to fetch payment');
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Payment not found');
+      }
+
+      const data = result.data;
       return {
-        id: paymentId,
-        payment_number: 'PAY-2024-001',
-        booking_id: 1,
-        booking_number: 'YT-2024-001',
-        customer_name: 'John Smith',
-        customer_email: 'john.smith@example.com',
-        customer_phone: '+1 234-567-8900',
-        trip_id: 1,
-        trip_title: 'Everest Base Camp Trek',
-        amount: 2500,
-        payment_method: 'Credit Card',
-        payment_status: 'completed',
-        transaction_id: 'TXN-123456789',
-        payment_date: getDate(5),
-        notes: 'Full payment received via credit card. Transaction processed successfully.',
-        created_at: getDate(5),
-        updated_at: getDate(2),
+        id: data.id,
+        payment_number: `PAY-${data.id.toString().padStart(6, '0')}`,
+        booking_id: data.booking_id,
+        booking_number: data.booking_reference || `#${data.booking_id}`,
+        customer_name: data.customer_name || 'N/A',
+        customer_email: data.customer_email || '',
+        customer_phone: data.customer_phone || '',
+        trip_id: data.trip_id,
+        trip_title: data.trip_title || '',
+        amount: data.amount,
+        payment_method: data.gateway,
+        payment_status: data.status,
+        transaction_id: data.transaction_id,
+        payment_date: data.processed_at || data.created_at,
+        notes: data.notes,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
       };
     },
     enabled: !!paymentId && can('yatra_view_bookings'),
@@ -127,8 +137,56 @@ const ViewPayment: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+      <div className="space-y-3">
+        <PageHeader
+          title={__('Payment Details', 'Payment Details')}
+          actions={
+            <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              {__('Back', 'Back')}
+            </Button>
+          }
+        />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <div className="lg:col-span-2 space-y-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-6 w-40" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-6 w-32" />
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="space-y-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-6 w-24" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Skeleton className="h-5 w-full" />
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-5 w-1/2" />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }

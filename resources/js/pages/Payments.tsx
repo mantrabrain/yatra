@@ -15,6 +15,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { Skeleton } from '../components/ui/skeleton';
 
 interface Payment {
   id: number;
@@ -131,12 +132,30 @@ const Payments: React.FC = () => {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (_id: number) => {
-      // return await apiClient.delete(`/yatra/v1/payments/${_id}`);
-      return { success: true };
+    mutationFn: async (id: number) => {
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete payment');
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to delete payment');
+      }
+
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
   });
 
@@ -356,9 +375,34 @@ const Payments: React.FC = () => {
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('Loading payments...', 'Loading payments...')}
-                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{__('Payment', 'Payment')}</TableHead>
+                        <TableHead>{__('Customer', 'Customer')}</TableHead>
+                        <TableHead>{__('Booking', 'Booking')}</TableHead>
+                        <TableHead>{__('Amount', 'Amount')}</TableHead>
+                        <TableHead>{__('Method', 'Method')}</TableHead>
+                        <TableHead>{__('Status', 'Status')}</TableHead>
+                        <TableHead>{__('Date', 'Date')}</TableHead>
+                        <TableHead className="text-right">{__('Actions', 'Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...Array(5)].map((_, i) => (
+                        <TableRow key={i}>
+                          <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-28" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                          <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                          <TableCell className="text-right"><Skeleton className="h-5 w-20 ml-auto" /></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 ) : payments.length === 0 ? (
                   <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                     {__('No payments found', 'No payments found')}

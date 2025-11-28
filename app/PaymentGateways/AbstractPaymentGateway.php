@@ -156,5 +156,73 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
             'error' => __('Refunds not supported by this gateway', 'yatra'),
         ];
     }
+
+    /**
+     * Check if gateway supports tokenization
+     */
+    public function supportsTokenization(): bool
+    {
+        return in_array('tokenization', $this->supports) || in_array('recurring', $this->supports);
+    }
+
+    /**
+     * Check if gateway supports recurring payments
+     */
+    public function supportsRecurring(): bool
+    {
+        return in_array('recurring', $this->supports) || in_array('scheduled_payments', $this->supports);
+    }
+
+    /**
+     * Create a customer (default: not supported)
+     */
+    public function createCustomer(array $customerData): array
+    {
+        return [
+            'success' => false,
+            'error' => __('Customer creation not supported by this gateway', 'yatra'),
+        ];
+    }
+
+    /**
+     * Save payment method (default: not supported)
+     */
+    public function savePaymentMethod(string $customerId, array $paymentMethodData): array
+    {
+        return [
+            'success' => false,
+            'error' => __('Saving payment methods not supported by this gateway', 'yatra'),
+        ];
+    }
+
+    /**
+     * Charge saved payment method (default: not supported)
+     */
+    public function chargePaymentMethod(string $customerId, string $paymentMethodId, array $paymentData): array
+    {
+        return [
+            'success' => false,
+            'error' => __('Charging saved payment methods not supported by this gateway', 'yatra'),
+        ];
+    }
+
+    /**
+     * Delete payment method (default: not supported)
+     */
+    public function deletePaymentMethod(string $paymentMethodId): array
+    {
+        return [
+            'success' => false,
+            'error' => __('Deleting payment methods not supported by this gateway', 'yatra'),
+        ];
+    }
+
+    /**
+     * Get customer's payment methods (default: not supported)
+     */
+    public function getPaymentMethods(string $customerId): array
+    {
+        return [];
+    }
 }
 

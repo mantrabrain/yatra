@@ -101,6 +101,34 @@ class BookingsController extends BaseController
             'permission_callback' => [$this, 'check_admin_permission'],
         ]);
 
+        // Create payment
+        register_rest_route($this->namespace, '/payments', [
+            'methods' => 'POST',
+            'callback' => [$this, 'create_payment'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        // Get single payment
+        register_rest_route($this->namespace, '/payments/(?P<id>\d+)', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_payment'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        // Update payment
+        register_rest_route($this->namespace, '/payments/(?P<id>\d+)', [
+            'methods' => 'PUT',
+            'callback' => [$this, 'update_payment'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        // Delete payment
+        register_rest_route($this->namespace, '/payments/(?P<id>\d+)', [
+            'methods' => 'DELETE',
+            'callback' => [$this, 'delete_payment'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
         // Get booking statistics
         register_rest_route($this->namespace, '/bookings/stats', [
             'methods' => 'GET',
@@ -119,6 +147,43 @@ class BookingsController extends BaseController
         register_rest_route($this->namespace, '/travelers', [
             'methods' => 'GET',
             'callback' => [$this, 'get_travelers'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        // Scheduled Payments
+        register_rest_route($this->namespace, '/scheduled-payments', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_scheduled_payments'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        register_rest_route($this->namespace, '/scheduled-payments/(?P<id>\d+)', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_scheduled_payment'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        register_rest_route($this->namespace, '/scheduled-payments/(?P<id>\d+)', [
+            'methods' => 'PUT',
+            'callback' => [$this, 'update_scheduled_payment'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        register_rest_route($this->namespace, '/scheduled-payments/(?P<id>\d+)/cancel', [
+            'methods' => 'POST',
+            'callback' => [$this, 'cancel_scheduled_payment'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        register_rest_route($this->namespace, '/scheduled-payments/(?P<id>\d+)/process', [
+            'methods' => 'POST',
+            'callback' => [$this, 'process_scheduled_payment_now'],
+            'permission_callback' => [$this, 'check_admin_permission'],
+        ]);
+
+        register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/scheduled-payments', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_booking_scheduled_payments'],
             'permission_callback' => [$this, 'check_admin_permission'],
         ]);
     }
@@ -762,6 +827,319 @@ class BookingsController extends BaseController
     }
 
     /**
+     * Get single payment
+     */
+    public function get_payment(WP_REST_Request $request): WP_REST_Response
+    {
+        global $wpdb;
+        
+        $payment_id = (int) $request->get_param('id');
+        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $trips_table = $wpdb->prefix . 'yatra_trips';
+        
+        $payment = $wpdb->get_row($wpdb->prepare(
+            "SELECT p.*, b.reference as booking_reference, b.contact_email, 
+                    b.contact_first_name, b.contact_last_name, b.contact_phone,
+                    t.id as trip_id, t.title as trip_title
+             FROM {$payments_table} p
+             LEFT JOIN {$bookings_table} b ON p.booking_id = b.id
+             LEFT JOIN {$trips_table} t ON b.trip_id = t.id
+             WHERE p.id = %d",
+            $payment_id
+        ));
+        
+        if (!$payment) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Payment not found.', 'yatra'),
+            ], 404);
+        }
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => [
+                'id' => (int) $payment->id,
+                'booking_id' => (int) $payment->booking_id,
+                'booking_reference' => $payment->booking_reference,
+                'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')),
+                'customer_email' => $payment->contact_email,
+                'customer_phone' => $payment->contact_phone,
+                'trip_id' => (int) $payment->trip_id,
+                'trip_title' => $payment->trip_title,
+                'transaction_id' => $payment->transaction_id,
+                'gateway' => $payment->gateway,
+                'amount' => (float) $payment->amount,
+                'currency' => $payment->currency,
+                'status' => $payment->status,
+                'payment_type' => $payment->payment_type,
+                'notes' => $payment->notes,
+                'processed_at' => $payment->processed_at,
+                'created_at' => $payment->created_at,
+                'updated_at' => $payment->updated_at,
+            ],
+        ]);
+    }
+
+    /**
+     * Create payment
+     */
+    public function create_payment(WP_REST_Request $request): WP_REST_Response
+    {
+        global $wpdb;
+        
+        $data = $request->get_json_params();
+        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        
+        // Validate booking_id
+        $booking_id = (int) ($data['booking_id'] ?? 0);
+        if ($booking_id <= 0) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Valid booking ID is required.', 'yatra'),
+            ], 400);
+        }
+        
+        // Check booking exists
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT id, total_amount, amount_paid, amount_due FROM {$bookings_table} WHERE id = %d",
+            $booking_id
+        ));
+        
+        if (!$booking) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Booking not found.', 'yatra'),
+            ], 404);
+        }
+        
+        // Validate amount
+        $amount = (float) ($data['amount'] ?? 0);
+        if ($amount <= 0) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Valid payment amount is required.', 'yatra'),
+            ], 400);
+        }
+        
+        $gateway = sanitize_text_field($data['gateway'] ?? $data['payment_method'] ?? 'manual');
+        $status = sanitize_text_field($data['status'] ?? $data['payment_status'] ?? 'completed');
+        $payment_type = sanitize_text_field($data['payment_type'] ?? 'full');
+        $transaction_id = sanitize_text_field($data['transaction_id'] ?? '');
+        $notes = sanitize_textarea_field($data['notes'] ?? '');
+        $currency = sanitize_text_field($data['currency'] ?? get_option('yatra_currency', 'USD'));
+        $processed_at = sanitize_text_field($data['processed_at'] ?? $data['payment_date'] ?? current_time('mysql'));
+        
+        // Insert payment
+        $result = $wpdb->insert(
+            $payments_table,
+            [
+                'booking_id' => $booking_id,
+                'transaction_id' => $transaction_id ?: null,
+                'gateway' => $gateway,
+                'amount' => $amount,
+                'currency' => $currency,
+                'status' => $status,
+                'payment_type' => $payment_type,
+                'notes' => $notes ?: null,
+                'processed_at' => $processed_at,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql'),
+            ],
+            ['%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
+        );
+        
+        if ($result === false) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Failed to create payment.', 'yatra'),
+            ], 500);
+        }
+        
+        $payment_id = $wpdb->insert_id;
+        
+        // Update booking amounts if payment is completed
+        if ($status === 'completed') {
+            $new_amount_paid = (float) $booking->amount_paid + $amount;
+            $new_amount_due = max(0, (float) $booking->total_amount - $new_amount_paid);
+            $new_payment_status = $new_amount_due <= 0 ? 'paid' : 'partial';
+            
+            $wpdb->update(
+                $bookings_table,
+                [
+                    'amount_paid' => $new_amount_paid,
+                    'amount_due' => $new_amount_due,
+                    'payment_status' => $new_payment_status,
+                    'updated_at' => current_time('mysql'),
+                ],
+                ['id' => $booking_id],
+                ['%f', '%f', '%s', '%s'],
+                ['%d']
+            );
+        }
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => __('Payment created successfully.', 'yatra'),
+            'data' => ['id' => $payment_id],
+        ]);
+    }
+
+    /**
+     * Update payment
+     */
+    public function update_payment(WP_REST_Request $request): WP_REST_Response
+    {
+        global $wpdb;
+        
+        $payment_id = (int) $request->get_param('id');
+        $data = $request->get_json_params();
+        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+        
+        // Check payment exists
+        $payment = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$payments_table} WHERE id = %d",
+            $payment_id
+        ));
+        
+        if (!$payment) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Payment not found.', 'yatra'),
+            ], 404);
+        }
+        
+        // Prepare update data
+        $update_data = ['updated_at' => current_time('mysql')];
+        $update_format = ['%s'];
+        
+        if (isset($data['amount'])) {
+            $update_data['amount'] = (float) $data['amount'];
+            $update_format[] = '%f';
+        }
+        
+        if (isset($data['gateway']) || isset($data['payment_method'])) {
+            $update_data['gateway'] = sanitize_text_field($data['gateway'] ?? $data['payment_method']);
+            $update_format[] = '%s';
+        }
+        
+        if (isset($data['status']) || isset($data['payment_status'])) {
+            $update_data['status'] = sanitize_text_field($data['status'] ?? $data['payment_status']);
+            $update_format[] = '%s';
+        }
+        
+        if (isset($data['payment_type'])) {
+            $update_data['payment_type'] = sanitize_text_field($data['payment_type']);
+            $update_format[] = '%s';
+        }
+        
+        if (isset($data['transaction_id'])) {
+            $update_data['transaction_id'] = sanitize_text_field($data['transaction_id']) ?: null;
+            $update_format[] = '%s';
+        }
+        
+        if (isset($data['notes'])) {
+            $update_data['notes'] = sanitize_textarea_field($data['notes']) ?: null;
+            $update_format[] = '%s';
+        }
+        
+        if (isset($data['processed_at']) || isset($data['payment_date'])) {
+            $update_data['processed_at'] = sanitize_text_field($data['processed_at'] ?? $data['payment_date']);
+            $update_format[] = '%s';
+        }
+        
+        $result = $wpdb->update(
+            $payments_table,
+            $update_data,
+            ['id' => $payment_id],
+            $update_format,
+            ['%d']
+        );
+        
+        if ($result === false) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Failed to update payment.', 'yatra'),
+            ], 500);
+        }
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => __('Payment updated successfully.', 'yatra'),
+        ]);
+    }
+
+    /**
+     * Delete payment
+     */
+    public function delete_payment(WP_REST_Request $request): WP_REST_Response
+    {
+        global $wpdb;
+        
+        $payment_id = (int) $request->get_param('id');
+        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+        
+        // Check payment exists
+        $payment = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$payments_table} WHERE id = %d",
+            $payment_id
+        ));
+        
+        if (!$payment) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Payment not found.', 'yatra'),
+            ], 404);
+        }
+        
+        $result = $wpdb->delete($payments_table, ['id' => $payment_id], ['%d']);
+        
+        if ($result === false) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Failed to delete payment.', 'yatra'),
+            ], 500);
+        }
+        
+        // Update booking amounts
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT id, total_amount FROM {$bookings_table} WHERE id = %d",
+            $payment->booking_id
+        ));
+        
+        if ($booking && $payment->status === 'completed') {
+            // Recalculate amounts
+            $total_paid = (float) $wpdb->get_var($wpdb->prepare(
+                "SELECT COALESCE(SUM(amount), 0) FROM {$payments_table} WHERE booking_id = %d AND status = 'completed'",
+                $booking->id
+            ));
+            
+            $amount_due = max(0, (float) $booking->total_amount - $total_paid);
+            $payment_status = $amount_due <= 0 ? 'paid' : ($total_paid > 0 ? 'partial' : 'unpaid');
+            
+            $wpdb->update(
+                $bookings_table,
+                [
+                    'amount_paid' => $total_paid,
+                    'amount_due' => $amount_due,
+                    'payment_status' => $payment_status,
+                    'updated_at' => current_time('mysql'),
+                ],
+                ['id' => $booking->id],
+                ['%f', '%f', '%s', '%s'],
+                ['%d']
+            );
+        }
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => __('Payment deleted successfully.', 'yatra'),
+        ]);
+    }
+
+    /**
      * Get booking statistics
      */
     public function get_booking_stats(WP_REST_Request $request): WP_REST_Response
@@ -1011,6 +1389,295 @@ class BookingsController extends BaseController
                 'per_page' => $per_page,
                 'total_pages' => ceil($result['total'] / $per_page),
             ],
+        ]);
+    }
+
+    /**
+     * Get all scheduled payments
+     */
+    public function get_scheduled_payments(WP_REST_Request $request): WP_REST_Response
+    {
+        global $wpdb;
+        
+        $scheduled_table = $wpdb->prefix . 'yatra_scheduled_payments';
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $trips_table = $wpdb->prefix . 'yatra_trips';
+        
+        $page = max(1, (int) $request->get_param('page') ?: 1);
+        $per_page = max(1, min(100, (int) $request->get_param('per_page') ?: 20));
+        $offset = ($page - 1) * $per_page;
+        
+        $status = sanitize_text_field($request->get_param('status') ?: '');
+        $search = sanitize_text_field($request->get_param('search') ?: '');
+        
+        $where_clauses = ['1=1'];
+        $where_values = [];
+        
+        if ($status) {
+            $where_clauses[] = 'sp.status = %s';
+            $where_values[] = $status;
+        }
+        
+        if ($search) {
+            $search_like = '%' . $wpdb->esc_like($search) . '%';
+            $where_clauses[] = '(b.reference LIKE %s OR b.contact_email LIKE %s)';
+            $where_values = array_merge($where_values, [$search_like, $search_like]);
+        }
+        
+        $where_sql = implode(' AND ', $where_clauses);
+        
+        // Get total
+        $count_query = "SELECT COUNT(*) FROM {$scheduled_table} sp 
+                        LEFT JOIN {$bookings_table} b ON sp.booking_id = b.id 
+                        WHERE {$where_sql}";
+        if (!empty($where_values)) {
+            $count_query = $wpdb->prepare($count_query, ...$where_values);
+        }
+        $total = (int) $wpdb->get_var($count_query);
+        
+        // Get scheduled payments
+        $query = "SELECT sp.*, b.reference as booking_reference, b.contact_email, 
+                         b.contact_first_name, b.contact_last_name, t.title as trip_title
+                  FROM {$scheduled_table} sp
+                  LEFT JOIN {$bookings_table} b ON sp.booking_id = b.id
+                  LEFT JOIN {$trips_table} t ON b.trip_id = t.id
+                  WHERE {$where_sql}
+                  ORDER BY sp.scheduled_date ASC
+                  LIMIT %d OFFSET %d";
+        
+        $query_values = array_merge($where_values, [$per_page, $offset]);
+        $scheduled = $wpdb->get_results($wpdb->prepare($query, ...$query_values));
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => array_map(function($sp) {
+                return [
+                    'id' => (int) $sp->id,
+                    'booking_id' => (int) $sp->booking_id,
+                    'booking_reference' => $sp->booking_reference,
+                    'customer_name' => trim(($sp->contact_first_name ?? '') . ' ' . ($sp->contact_last_name ?? '')),
+                    'customer_email' => $sp->contact_email,
+                    'trip_title' => $sp->trip_title,
+                    'gateway' => $sp->gateway,
+                    'amount' => (float) $sp->amount,
+                    'currency' => $sp->currency,
+                    'scheduled_date' => $sp->scheduled_date,
+                    'status' => $sp->status,
+                    'payment_type' => $sp->payment_type,
+                    'attempt_count' => (int) $sp->attempt_count,
+                    'max_attempts' => (int) $sp->max_attempts,
+                    'last_attempt_at' => $sp->last_attempt_at,
+                    'last_error' => $sp->last_error,
+                    'created_at' => $sp->created_at,
+                ];
+            }, $scheduled),
+            'meta' => [
+                'total' => $total,
+                'page' => $page,
+                'per_page' => $per_page,
+                'total_pages' => ceil($total / $per_page),
+            ],
+        ]);
+    }
+
+    /**
+     * Get single scheduled payment
+     */
+    public function get_scheduled_payment(WP_REST_Request $request): WP_REST_Response
+    {
+        global $wpdb;
+        
+        $id = (int) $request->get_param('id');
+        $scheduled_table = $wpdb->prefix . 'yatra_scheduled_payments';
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        
+        $sp = $wpdb->get_row($wpdb->prepare(
+            "SELECT sp.*, b.reference as booking_reference, b.contact_email, 
+                    b.contact_first_name, b.contact_last_name
+             FROM {$scheduled_table} sp
+             LEFT JOIN {$bookings_table} b ON sp.booking_id = b.id
+             WHERE sp.id = %d",
+            $id
+        ));
+        
+        if (!$sp) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Scheduled payment not found.', 'yatra'),
+            ], 404);
+        }
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => [
+                'id' => (int) $sp->id,
+                'booking_id' => (int) $sp->booking_id,
+                'booking_reference' => $sp->booking_reference,
+                'customer_name' => trim(($sp->contact_first_name ?? '') . ' ' . ($sp->contact_last_name ?? '')),
+                'customer_email' => $sp->contact_email,
+                'gateway' => $sp->gateway,
+                'amount' => (float) $sp->amount,
+                'currency' => $sp->currency,
+                'scheduled_date' => $sp->scheduled_date,
+                'status' => $sp->status,
+                'payment_type' => $sp->payment_type,
+                'attempt_count' => (int) $sp->attempt_count,
+                'max_attempts' => (int) $sp->max_attempts,
+                'last_attempt_at' => $sp->last_attempt_at,
+                'last_error' => $sp->last_error,
+                'notes' => $sp->notes,
+                'created_at' => $sp->created_at,
+                'updated_at' => $sp->updated_at,
+            ],
+        ]);
+    }
+
+    /**
+     * Update scheduled payment
+     */
+    public function update_scheduled_payment(WP_REST_Request $request): WP_REST_Response
+    {
+        global $wpdb;
+        
+        $id = (int) $request->get_param('id');
+        $data = $request->get_json_params();
+        $scheduled_table = $wpdb->prefix . 'yatra_scheduled_payments';
+        
+        $sp = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$scheduled_table} WHERE id = %d",
+            $id
+        ));
+        
+        if (!$sp) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Scheduled payment not found.', 'yatra'),
+            ], 404);
+        }
+        
+        $update_data = ['updated_at' => current_time('mysql')];
+        $update_format = ['%s'];
+        
+        if (isset($data['scheduled_date'])) {
+            $update_data['scheduled_date'] = sanitize_text_field($data['scheduled_date']);
+            $update_format[] = '%s';
+        }
+        
+        if (isset($data['amount'])) {
+            $update_data['amount'] = (float) $data['amount'];
+            $update_format[] = '%f';
+        }
+        
+        if (isset($data['notes'])) {
+            $update_data['notes'] = sanitize_textarea_field($data['notes']);
+            $update_format[] = '%s';
+        }
+        
+        $wpdb->update($scheduled_table, $update_data, ['id' => $id], $update_format, ['%d']);
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => __('Scheduled payment updated.', 'yatra'),
+        ]);
+    }
+
+    /**
+     * Cancel scheduled payment
+     */
+    public function cancel_scheduled_payment(WP_REST_Request $request): WP_REST_Response
+    {
+        global $wpdb;
+        
+        $id = (int) $request->get_param('id');
+        $scheduled_table = $wpdb->prefix . 'yatra_scheduled_payments';
+        
+        $sp = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$scheduled_table} WHERE id = %d",
+            $id
+        ));
+        
+        if (!$sp) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Scheduled payment not found.', 'yatra'),
+            ], 404);
+        }
+        
+        if ($sp->status !== 'pending') {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Only pending scheduled payments can be cancelled.', 'yatra'),
+            ], 400);
+        }
+        
+        $wpdb->update(
+            $scheduled_table,
+            [
+                'status' => 'cancelled',
+                'updated_at' => current_time('mysql'),
+            ],
+            ['id' => $id],
+            ['%s', '%s'],
+            ['%d']
+        );
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => __('Scheduled payment cancelled.', 'yatra'),
+        ]);
+    }
+
+    /**
+     * Process scheduled payment immediately
+     */
+    public function process_scheduled_payment_now(WP_REST_Request $request): WP_REST_Response
+    {
+        global $wpdb;
+        
+        $id = (int) $request->get_param('id');
+        $scheduled_table = $wpdb->prefix . 'yatra_scheduled_payments';
+        
+        $sp = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$scheduled_table} WHERE id = %d",
+            $id
+        ));
+        
+        if (!$sp) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Scheduled payment not found.', 'yatra'),
+            ], 404);
+        }
+        
+        if ($sp->status !== 'pending' && $sp->status !== 'failed') {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Only pending or failed scheduled payments can be processed.', 'yatra'),
+            ], 400);
+        }
+        
+        $result = \Yatra\Services\ScheduledPaymentService::processScheduledPayment($sp);
+        
+        return new WP_REST_Response([
+            'success' => $result['success'],
+            'message' => $result['success'] 
+                ? __('Payment processed successfully.', 'yatra')
+                : ($result['error'] ?? __('Payment processing failed.', 'yatra')),
+            'data' => $result,
+        ], $result['success'] ? 200 : 400);
+    }
+
+    /**
+     * Get scheduled payments for a booking
+     */
+    public function get_booking_scheduled_payments(WP_REST_Request $request): WP_REST_Response
+    {
+        $booking_id = (int) $request->get_param('id');
+        $scheduled = \Yatra\Services\ScheduledPaymentService::getScheduledPayments($booking_id);
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $scheduled,
         ]);
     }
 }

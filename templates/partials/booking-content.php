@@ -27,24 +27,42 @@ if (!defined('ABSPATH')) {
 // Prepare variables for form fields partial
 $trip_id = $trip->id;
 $trip_slug = $trip->slug ?? '';
+
+// Check if login is required
+$require_login = \Yatra\Services\SettingsService::get('require_login', false);
+$allow_guest_checkout = \Yatra\Services\SettingsService::get('allow_guest_checkout', true);
+$needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest_checkout);
 ?>
 
 <div class="yatra-booking-page">
     <div class="yatra-booking-container">
         <div class="yatra-booking-layout">
-            <!-- Left Side: Booking Form -->
+            <!-- Left Side: Auth Form or Booking Form -->
             <div class="yatra-booking-main">
-                <div class="yatra-booking-header">
-                    <h1><?php esc_html_e('Complete Your Booking', 'yatra'); ?></h1>
-                    <p class="yatra-booking-subtitle"><?php esc_html_e('Please fill in your details to complete the booking', 'yatra'); ?></p>
-                </div>
+                <?php if ($needs_authentication) : ?>
+                    <!-- Show Login/Registration Form -->
+                    <div class="yatra-booking-header">
+                        <h1><?php esc_html_e('Login Required', 'yatra'); ?></h1>
+                        <p class="yatra-booking-subtitle"><?php esc_html_e('Please login or create an account to continue with your booking', 'yatra'); ?></p>
+                    </div>
 
-                <!-- Booking Form -->
-                <form class="yatra-booking-form" id="yatra-booking-form">
                     <?php 
-                    // Include shared booking form fields
-                    include YATRA_PLUGIN_PATH . 'templates/partials/booking-form-fields.php'; 
+                    // Include the authentication form partial
+                    include YATRA_PLUGIN_PATH . 'templates/partials/booking-auth.php'; 
                     ?>
+                <?php else : ?>
+                    <!-- Show Booking Form -->
+                    <div class="yatra-booking-header">
+                        <h1><?php esc_html_e('Complete Your Booking', 'yatra'); ?></h1>
+                        <p class="yatra-booking-subtitle"><?php esc_html_e('Please fill in your details to complete the booking', 'yatra'); ?></p>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <form class="yatra-booking-form" id="yatra-booking-form">
+                        <?php 
+                        // Include shared booking form fields
+                        include YATRA_PLUGIN_PATH . 'templates/partials/booking-form-fields.php'; 
+                        ?>
 
                     <!-- Submit Button -->
                     <div class="yatra-booking-actions">
@@ -65,6 +83,7 @@ $trip_slug = $trip->slug ?? '';
                     <input type="hidden" name="currency" value="<?php echo esc_attr($trip->currency); ?>">
                     <?php wp_nonce_field('yatra_booking_nonce', 'yatra_booking_nonce'); ?>
                 </form>
+                <?php endif; ?>
             </div>
 
             <!-- Right Side: Booking Summary -->

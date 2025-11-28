@@ -195,6 +195,7 @@ class PaymentGatewayController extends BaseController
         $gatewayId = sanitize_text_field($request->get_param('gateway'));
         $transactionId = sanitize_text_field($request->get_param('transaction_id'));
         $bookingId = (int) $request->get_param('booking_id');
+        $saveCard = !empty($request->get_param('save_card'));
 
         $gateway = $this->registry->get($gatewayId);
         if (!$gateway) {
@@ -204,7 +205,19 @@ class PaymentGatewayController extends BaseController
         $result = $gateway->verifyPayment($transactionId);
 
         if ($result['success']) {
-            $this->handle_successful_payment($bookingId, $gatewayId, $transactionId, $result['amount'] ?? null, $result['currency'] ?? null);
+            // Get customer and payment method from result
+            $customerId = $result['customer_id'] ?? null;
+            $paymentMethodId = $result['payment_method_id'] ?? $result['token_id'] ?? $result['vault_id'] ?? null;
+
+            $this->handle_successful_payment(
+                $bookingId, 
+                $gatewayId, 
+                $transactionId, 
+                $result['amount'] ?? null, 
+                $result['currency'] ?? null,
+                $saveCard ? $customerId : null,
+                $saveCard ? $paymentMethodId : null
+            );
         }
 
         return new WP_REST_Response($result, 200);
@@ -298,18 +311,38 @@ class PaymentGatewayController extends BaseController
     /**
      * Handle successful payment
      */
-    private function handle_successful_payment(int $bookingId, string $gateway, string $transactionId, ?float $amount = null, ?string $currency = null): void
-    {
+    private function handle_successful_payment(
+        int $bookingId, 
+        string $gateway, 
+        string $transactionId, 
+        ?float $amount = null, 
+        ?string $currency = null,
+        ?string $customerId = null,
+        ?string $paymentMethodId = null
+    ): void {
         global $wpdb;
 
         if ($bookingId <= 0) {
             return;
         }
 
+        // Get booking details
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$this->bookings_table} WHERE id = %d",
+            $bookingId
+        ));
+
+        if (!$booking) {
+            return;
+        }
+
         $existing = $wpdb->get_row($wpdb->prepare(
-            "SELECT id FROM {$this->payments_table} WHERE booking_id = %d AND payment_gateway = %s",
+            "SELECT id FROM {$this->payments_table} WHERE booking_id = %d AND payment_gateway = %s AND status = 'completed'",
             $bookingId, $gateway
         ));
+
+        $paid_amount = $amount ?? (float) $booking->amount_due;
+        $payment_currency = $currency ?? $booking->currency;
 
         $payment_data = [
             'status' => 'completed',
@@ -334,17 +367,168 @@ class PaymentGatewayController extends BaseController
             $wpdb->insert($this->payments_table, $payment_data);
         }
 
-        // Update booking status
+        // Calculate new amounts
+        $new_amount_paid = (float) $booking->amount_paid + $paid_amount;
+        $new_amount_due = max(0, (float) $booking->total_amount - $new_amount_paid);
+        
+        // Determine payment status
+        $payment_status = 'paid';
+        if ($new_amount_due > 0) {
+            $payment_status = 'partial';
+        }
+
+        // Update booking
         $wpdb->update(
             $this->bookings_table,
             [
-                'payment_status' => 'paid',
+                'amount_paid' => $new_amount_paid,
+                'amount_due' => $new_amount_due,
+                'payment_status' => $payment_status,
                 'status' => 'confirmed',
                 'updated_at' => current_time('mysql'),
             ],
             ['id' => $bookingId]
         );
 
-        do_action('yatra_payment_completed', $bookingId, $gateway, $transactionId);
+        // Handle scheduled payments for remaining balance
+        if ($new_amount_due > 0 && $customerId && $paymentMethodId) {
+            $this->createScheduledPaymentsForBooking(
+                $bookingId,
+                $gateway,
+                $customerId,
+                $paymentMethodId,
+                $new_amount_due,
+                $payment_currency
+            );
+        }
+
+        do_action('yatra_payment_completed', $bookingId, $gateway, $transactionId, [
+            'amount' => $paid_amount,
+            'remaining' => $new_amount_due,
+            'customer_id' => $customerId,
+            'payment_method_id' => $paymentMethodId,
+        ]);
+    }
+
+    /**
+     * Create scheduled payments for remaining balance
+     */
+    private function createScheduledPaymentsForBooking(
+        int $bookingId,
+        string $gateway,
+        string $customerId,
+        string $paymentMethodId,
+        float $remainingAmount,
+        string $currency
+    ): void {
+        // Get scheduled payment settings
+        $settings = \Yatra\Services\SettingsService::getAll();
+        
+        // Check if auto-scheduled payments is enabled
+        if (empty($settings['enable_scheduled_payments'])) {
+            return;
+        }
+
+        // Save the payment token first
+        $tokenId = $this->savePaymentToken($bookingId, $gateway, $customerId, $paymentMethodId);
+        
+        if (!$tokenId) {
+            return;
+        }
+
+        // Get schedule configuration from settings
+        $schedule = [
+            'type' => $settings['scheduled_payment_type'] ?? 'single', // single, installments
+            'days_until' => (int) ($settings['scheduled_payment_days'] ?? 15),
+            'installments' => (int) ($settings['scheduled_payment_installments'] ?? 1),
+            'interval_days' => (int) ($settings['scheduled_payment_interval'] ?? 30),
+        ];
+
+        // Create scheduled payments
+        \Yatra\Services\ScheduledPaymentService::createScheduledPayments(
+            $bookingId,
+            $gateway,
+            $customerId,
+            $tokenId,
+            $remainingAmount,
+            $currency,
+            $schedule
+        );
+    }
+
+    /**
+     * Save payment token for future charges
+     */
+    private function savePaymentToken(
+        int $bookingId,
+        string $gateway,
+        string $customerId,
+        string $paymentMethodId
+    ): ?int {
+        global $wpdb;
+
+        // Get booking for customer info
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$this->bookings_table} WHERE id = %d",
+            $bookingId
+        ));
+
+        if (!$booking) {
+            return null;
+        }
+
+        $tokens_table = $wpdb->prefix . 'yatra_payment_tokens';
+        $userId = get_current_user_id() ?: 0;
+
+        // Check if token already exists
+        $existing = $wpdb->get_row($wpdb->prepare(
+            "SELECT id FROM {$tokens_table} 
+             WHERE gateway = %s AND gateway_customer_id = %s AND gateway_payment_method_id = %s",
+            $gateway, $customerId, $paymentMethodId
+        ));
+
+        if ($existing) {
+            return (int) $existing->id;
+        }
+
+        // Get payment method details from gateway
+        $gatewayInstance = $this->registry->get($gateway);
+        $cardInfo = [];
+        
+        if ($gatewayInstance) {
+            $methods = $gatewayInstance->getPaymentMethods($customerId);
+            foreach ($methods as $method) {
+                if ($method['id'] === $paymentMethodId) {
+                    $cardInfo = $method;
+                    break;
+                }
+            }
+        }
+
+        // Insert token
+        $result = $wpdb->insert(
+            $tokens_table,
+            [
+                'customer_id' => $userId,
+                'gateway' => $gateway,
+                'gateway_customer_id' => $customerId,
+                'gateway_payment_method_id' => $paymentMethodId,
+                'token_type' => $cardInfo['type'] ?? 'card',
+                'card_brand' => $cardInfo['brand'] ?? null,
+                'card_last4' => $cardInfo['last4'] ?? null,
+                'card_exp_month' => $cardInfo['exp_month'] ?? null,
+                'card_exp_year' => $cardInfo['exp_year'] ?? null,
+                'is_default' => 1,
+                'is_active' => 1,
+                'created_at' => current_time('mysql'),
+            ],
+            ['%d', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s']
+        );
+
+        if ($result === false) {
+            return null;
+        }
+
+        return (int) $wpdb->insert_id;
     }
 }

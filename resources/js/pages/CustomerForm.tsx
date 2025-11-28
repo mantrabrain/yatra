@@ -1,6 +1,6 @@
 /**
  * Customer Form Page
- * Add/Edit Customer form with clean, minimal SaaS-style design
+ * Add/Edit Customer form with dynamic data from API
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -14,30 +14,69 @@ import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { Skeleton } from '../components/ui/skeleton';
 
 interface CustomerFormData {
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   phone: string;
+  secondary_phone: string;
   country: string;
   city: string;
+  state: string;
   address: string;
+  postal_code: string;
+  nationality: string;
+  date_of_birth: string;
+  gender: string;
+  passport_number: string;
+  passport_expiry: string;
+  emergency_name: string;
+  emergency_phone: string;
+  emergency_relationship: string;
+  dietary_requirements: string;
+  medical_conditions: string;
+  special_needs: string;
+  newsletter_optin: boolean;
+  marketing_optin: boolean;
   status: string;
   notes: string;
+  loyalty_tier: string;
+  loyalty_points: number;
 }
 
 const CustomerForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const [formData, setFormData] = useState<CustomerFormData>({
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     phone: '',
+    secondary_phone: '',
     country: '',
     city: '',
+    state: '',
     address: '',
+    postal_code: '',
+    nationality: '',
+    date_of_birth: '',
+    gender: '',
+    passport_number: '',
+    passport_expiry: '',
+    emergency_name: '',
+    emergency_phone: '',
+    emergency_relationship: '',
+    dietary_requirements: '',
+    medical_conditions: '',
+    special_needs: '',
+    newsletter_optin: false,
+    marketing_optin: false,
     status: 'active',
     notes: '',
+    loyalty_tier: 'bronze',
+    loyalty_points: 0,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,19 +99,11 @@ const CustomerForm: React.FC = () => {
     queryKey: ['customer', customerId],
     queryFn: async () => {
       if (!customerId) return null;
-      // return await apiClient.get(`/customers/${customerId}`);
-      // Dummy data for now
-      return {
-        id: customerId,
-        name: 'John Smith',
-        email: 'john.smith@example.com',
-        phone: '+1 234-567-8900',
-        country: 'United States',
-        city: 'New York',
-        address: '123 Main Street, Apt 4B',
-        status: 'active',
-        notes: 'VIP customer, prefers window seats',
-      };
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/customers/${customerId}`, {
+        headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
+      });
+      if (!response.ok) throw new Error('Failed to fetch customer');
+      return response.json();
     },
     enabled: isEditMode && can('yatra_view_bookings'),
   });
@@ -81,19 +112,38 @@ const CustomerForm: React.FC = () => {
   useEffect(() => {
     if (customerData && isEditMode) {
       setFormData({
-        name: customerData.name || '',
+        first_name: customerData.first_name || '',
+        last_name: customerData.last_name || '',
         email: customerData.email || '',
         phone: customerData.phone || '',
+        secondary_phone: customerData.secondary_phone || '',
         country: customerData.country || '',
         city: customerData.city || '',
+        state: customerData.state || '',
         address: customerData.address || '',
+        postal_code: customerData.postal_code || '',
+        nationality: customerData.nationality || '',
+        date_of_birth: customerData.date_of_birth || '',
+        gender: customerData.gender || '',
+        passport_number: customerData.passport_number || '',
+        passport_expiry: customerData.passport_expiry || '',
+        emergency_name: customerData.emergency_name || '',
+        emergency_phone: customerData.emergency_phone || '',
+        emergency_relationship: customerData.emergency_relationship || '',
+        dietary_requirements: customerData.dietary_requirements || '',
+        medical_conditions: customerData.medical_conditions || '',
+        special_needs: customerData.special_needs || '',
+        newsletter_optin: customerData.newsletter_optin || false,
+        marketing_optin: customerData.marketing_optin || false,
         status: customerData.status || 'active',
         notes: customerData.notes || '',
+        loyalty_tier: customerData.loyalty_tier || 'bronze',
+        loyalty_points: customerData.loyalty_points || 0,
       });
     }
   }, [customerData, isEditMode]);
 
-  const handleFieldChange = (field: keyof CustomerFormData, value: string) => {
+  const handleFieldChange = (field: keyof CustomerFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -103,8 +153,8 @@ const CustomerForm: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'Name is required');
+    if (!formData.first_name.trim()) {
+      newErrors.first_name = __('First name is required', 'First name is required');
     }
 
     if (!formData.email.trim()) {
@@ -120,29 +170,29 @@ const CustomerForm: React.FC = () => {
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: CustomerFormData) => {
-      const payload = {
-        name: data.name.trim(),
-        email: data.email.trim(),
-        phone: data.phone.trim(),
-        country: data.country.trim(),
-        city: data.city.trim(),
-        address: data.address.trim(),
-        status: data.status,
-        notes: data.notes.trim(),
-      };
+      const payload = { ...data };
 
       if (isEditMode && customerId) {
-        // return await apiClient.put(`/customers/${customerId}`, payload);
-        console.log('Updating customer:', customerId, payload);
-        return { success: true, id: customerId };
+        const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/customers/${customerId}`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': window.yatraAdmin?.nonce || '' 
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error('Failed to update customer');
+        return response.json();
       } else {
-        // return await apiClient.post('/customers', payload);
-        console.log('Creating customer:', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+        // For creation, we need a different approach since CustomerController
+        // doesn't have a create endpoint yet - customers are created during booking
+        // For now, return error for create
+        throw new Error('Creating customers directly is not supported. Customers are created when bookings are made.');
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ['customer', customerId] });
       // Redirect to customers list
       window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers`;
     },
@@ -169,11 +219,59 @@ const CustomerForm: React.FC = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers`;
   };
 
+  // Skeleton loader
+  const renderSkeleton = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+      <div className="lg:col-span-2 space-y-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <Skeleton className="h-5 w-40" />
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-9 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-9 w-full" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="space-y-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <Skeleton className="h-5 w-20" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-9 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
   if (isEditMode && isLoadingCustomer) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading customer...', 'Loading customer...')}</span>
+      <div className="space-y-3">
+        <PageHeader
+          title={__('Edit Customer', 'Edit Customer')}
+          description={__('Loading...', 'Loading...')}
+          actions={
+            <Button variant="outline" onClick={handleCancel} className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              {__('Back', 'Back')}
+            </Button>
+          }
+        />
+        {renderSkeleton()}
       </div>
     );
   }
@@ -207,56 +305,130 @@ const CustomerForm: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {/* Name */}
+                    {/* First Name */}
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Full Name', 'Full Name')} <span className="text-red-500">*</span>
+                      <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('First Name', 'First Name')} <span className="text-red-500">*</span>
                       </label>
                       <Input
-                        id="name"
+                        id="first_name"
                         type="text"
-                        value={formData.name}
-                        onChange={(e) => handleFieldChange('name', e.target.value)}
-                        placeholder={__('Enter customer name', 'Enter customer name')}
-                        className={errors.name ? 'border-red-500' : ''}
+                        value={formData.first_name}
+                        onChange={(e) => handleFieldChange('first_name', e.target.value)}
+                        placeholder={__('Enter first name', 'Enter first name')}
+                        className={errors.first_name ? 'border-red-500' : ''}
                         required
                       />
-                      {errors.name && (
-                        <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                      {errors.first_name && (
+                        <p className="mt-1 text-sm text-red-500">{errors.first_name}</p>
                       )}
                     </div>
 
-                    {/* Email */}
+                    {/* Last Name */}
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Email Address', 'Email Address')} <span className="text-red-500">*</span>
+                      <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Last Name', 'Last Name')}
                       </label>
                       <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleFieldChange('email', e.target.value)}
-                        placeholder={__('customer@example.com', 'customer@example.com')}
-                        className={errors.email ? 'border-red-500' : ''}
-                        required
+                        id="last_name"
+                        type="text"
+                        value={formData.last_name}
+                        onChange={(e) => handleFieldChange('last_name', e.target.value)}
+                        placeholder={__('Enter last name', 'Enter last name')}
                       />
-                      {errors.email && (
-                        <p className="mt-1 text-sm text-red-500">{errors.email}</p>
-                      )}
                     </div>
                   </div>
 
-                  {/* Phone */}
+                  {/* Email */}
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Phone Number', 'Phone Number')}
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Email Address', 'Email Address')} <span className="text-red-500">*</span>
                     </label>
                     <Input
-                      id="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => handleFieldChange('phone', e.target.value)}
-                      placeholder={__('+1234567890', '+1234567890')}
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleFieldChange('email', e.target.value)}
+                      placeholder={__('customer@example.com', 'customer@example.com')}
+                      className={errors.email ? 'border-red-500' : ''}
+                      required
+                      disabled={isEditMode} // Can't change email
+                    />
+                    {errors.email && (
+                      <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+                    )}
+                  </div>
+
+                  {/* Phone Numbers */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Phone Number', 'Phone Number')}
+                      </label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => handleFieldChange('phone', e.target.value)}
+                        placeholder={__('+1234567890', '+1234567890')}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="secondary_phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Secondary Phone', 'Secondary Phone')}
+                      </label>
+                      <Input
+                        id="secondary_phone"
+                        type="tel"
+                        value={formData.secondary_phone}
+                        onChange={(e) => handleFieldChange('secondary_phone', e.target.value)}
+                        placeholder={__('+1234567890', '+1234567890')}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Date of Birth & Gender */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Date of Birth', 'Date of Birth')}
+                      </label>
+                      <Input
+                        id="date_of_birth"
+                        type="date"
+                        value={formData.date_of_birth}
+                        onChange={(e) => handleFieldChange('date_of_birth', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Gender', 'Gender')}
+                      </label>
+                      <Select
+                        id="gender"
+                        value={formData.gender}
+                        onChange={(e) => handleFieldChange('gender', e.target.value)}
+                      >
+                        <option value="">{__('Select gender', 'Select gender')}</option>
+                        <option value="male">{__('Male', 'Male')}</option>
+                        <option value="female">{__('Female', 'Female')}</option>
+                        <option value="other">{__('Other', 'Other')}</option>
+                        <option value="prefer_not_to_say">{__('Prefer not to say', 'Prefer not to say')}</option>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Nationality */}
+                  <div>
+                    <label htmlFor="nationality" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Nationality', 'Nationality')}
+                    </label>
+                    <Input
+                      id="nationality"
+                      type="text"
+                      value={formData.nationality}
+                      onChange={(e) => handleFieldChange('nationality', e.target.value)}
+                      placeholder={__('Enter nationality', 'Enter nationality')}
                     />
                   </div>
                 </CardContent>
@@ -268,6 +440,50 @@ const CustomerForm: React.FC = () => {
                   <CardTitle className="text-base">{__('Address Information', 'Address Information')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  {/* Address */}
+                  <div>
+                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Street Address', 'Street Address')}
+                    </label>
+                    <Input
+                      id="address"
+                      type="text"
+                      value={formData.address}
+                      onChange={(e) => handleFieldChange('address', e.target.value)}
+                      placeholder={__('Enter street address', 'Enter street address')}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* City */}
+                    <div>
+                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('City', 'City')}
+                      </label>
+                      <Input
+                        id="city"
+                        type="text"
+                        value={formData.city}
+                        onChange={(e) => handleFieldChange('city', e.target.value)}
+                        placeholder={__('Enter city', 'Enter city')}
+                      />
+                    </div>
+
+                    {/* State */}
+                    <div>
+                      <label htmlFor="state" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('State/Province', 'State/Province')}
+                      </label>
+                      <Input
+                        id="state"
+                        type="text"
+                        value={formData.state}
+                        onChange={(e) => handleFieldChange('state', e.target.value)}
+                        placeholder={__('Enter state', 'Enter state')}
+                      />
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Country */}
                     <div>
@@ -283,32 +499,146 @@ const CustomerForm: React.FC = () => {
                       />
                     </div>
 
-                    {/* City */}
+                    {/* Postal Code */}
                     <div>
-                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('City', 'City')}
+                      <label htmlFor="postal_code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Postal Code', 'Postal Code')}
                       </label>
                       <Input
-                        id="city"
+                        id="postal_code"
                         type="text"
-                        value={formData.city}
-                        onChange={(e) => handleFieldChange('city', e.target.value)}
-                        placeholder={__('Enter city', 'Enter city')}
+                        value={formData.postal_code}
+                        onChange={(e) => handleFieldChange('postal_code', e.target.value)}
+                        placeholder={__('Enter postal code', 'Enter postal code')}
                       />
                     </div>
                   </div>
+                </CardContent>
+              </Card>
 
-                  {/* Address */}
+              {/* Passport Information */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Passport Information', 'Passport Information')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="passport_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Passport Number', 'Passport Number')}
+                      </label>
+                      <Input
+                        id="passport_number"
+                        type="text"
+                        value={formData.passport_number}
+                        onChange={(e) => handleFieldChange('passport_number', e.target.value)}
+                        placeholder={__('Enter passport number', 'Enter passport number')}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="passport_expiry" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Passport Expiry', 'Passport Expiry')}
+                      </label>
+                      <Input
+                        id="passport_expiry"
+                        type="date"
+                        value={formData.passport_expiry}
+                        onChange={(e) => handleFieldChange('passport_expiry', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Emergency Contact */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Emergency Contact', 'Emergency Contact')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <label htmlFor="emergency_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Contact Name', 'Contact Name')}
+                      </label>
+                      <Input
+                        id="emergency_name"
+                        type="text"
+                        value={formData.emergency_name}
+                        onChange={(e) => handleFieldChange('emergency_name', e.target.value)}
+                        placeholder={__('Full name', 'Full name')}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="emergency_phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Contact Phone', 'Contact Phone')}
+                      </label>
+                      <Input
+                        id="emergency_phone"
+                        type="tel"
+                        value={formData.emergency_phone}
+                        onChange={(e) => handleFieldChange('emergency_phone', e.target.value)}
+                        placeholder={__('+1234567890', '+1234567890')}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="emergency_relationship" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Relationship', 'Relationship')}
+                      </label>
+                      <Input
+                        id="emergency_relationship"
+                        type="text"
+                        value={formData.emergency_relationship}
+                        onChange={(e) => handleFieldChange('emergency_relationship', e.target.value)}
+                        placeholder={__('e.g., Spouse, Parent', 'e.g., Spouse, Parent')}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Special Requirements */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Special Requirements', 'Special Requirements')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
                   <div>
-                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Street Address', 'Street Address')}
+                    <label htmlFor="dietary_requirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Dietary Requirements', 'Dietary Requirements')}
                     </label>
                     <Input
-                      id="address"
+                      id="dietary_requirements"
                       type="text"
-                      value={formData.address}
-                      onChange={(e) => handleFieldChange('address', e.target.value)}
-                      placeholder={__('Enter street address', 'Enter street address')}
+                      value={formData.dietary_requirements}
+                      onChange={(e) => handleFieldChange('dietary_requirements', e.target.value)}
+                      placeholder={__('e.g., Vegetarian, Gluten-free', 'e.g., Vegetarian, Gluten-free')}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="medical_conditions" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Medical Conditions', 'Medical Conditions')}
+                    </label>
+                    <textarea
+                      id="medical_conditions"
+                      value={formData.medical_conditions}
+                      onChange={(e) => handleFieldChange('medical_conditions', e.target.value)}
+                      placeholder={__('Any relevant medical conditions', 'Any relevant medical conditions')}
+                      rows={2}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="special_needs" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Special Needs', 'Special Needs')}
+                    </label>
+                    <textarea
+                      id="special_needs"
+                      value={formData.special_needs}
+                      onChange={(e) => handleFieldChange('special_needs', e.target.value)}
+                      placeholder={__('Any special accommodations needed', 'Any special accommodations needed')}
+                      rows={2}
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
                   </div>
                 </CardContent>
@@ -317,14 +647,14 @@ const CustomerForm: React.FC = () => {
               {/* Notes */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Additional Notes', 'Additional Notes')}</CardTitle>
+                  <CardTitle className="text-base">{__('Internal Notes', 'Internal Notes')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <textarea
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => handleFieldChange('notes', e.target.value)}
-                    placeholder={__('Enter any additional notes about this customer', 'Enter any additional notes about this customer')}
+                    placeholder={__('Enter any internal notes about this customer (not visible to customer)', 'Enter any internal notes about this customer (not visible to customer)')}
                     rows={4}
                     className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                   />
@@ -348,12 +678,81 @@ const CustomerForm: React.FC = () => {
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
-                      className="h-9"
                     >
                       <option value="active">{__('Active', 'Active')}</option>
                       <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                      <option value="blocked">{__('Blocked', 'Blocked')}</option>
                     </Select>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Loyalty */}
+              {isEditMode && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">{__('Loyalty', 'Loyalty')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div>
+                      <label htmlFor="loyalty_tier" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Loyalty Tier', 'Loyalty Tier')}
+                      </label>
+                      <Select
+                        id="loyalty_tier"
+                        value={formData.loyalty_tier}
+                        onChange={(e) => handleFieldChange('loyalty_tier', e.target.value)}
+                      >
+                        <option value="bronze">{__('🥉 Bronze', '🥉 Bronze')}</option>
+                        <option value="silver">{__('🥈 Silver', '🥈 Silver')}</option>
+                        <option value="gold">{__('🥇 Gold', '🥇 Gold')}</option>
+                        <option value="platinum">{__('💎 Platinum', '💎 Platinum')}</option>
+                      </Select>
+                    </div>
+                    <div>
+                      <label htmlFor="loyalty_points" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Loyalty Points', 'Loyalty Points')}
+                      </label>
+                      <Input
+                        id="loyalty_points"
+                        type="number"
+                        min={0}
+                        value={formData.loyalty_points}
+                        onChange={(e) => handleFieldChange('loyalty_points', parseInt(e.target.value) || 0)}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Preferences */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Preferences', 'Preferences')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.newsletter_optin}
+                      onChange={(e) => handleFieldChange('newsletter_optin', e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {__('Subscribe to newsletter', 'Subscribe to newsletter')}
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.marketing_optin}
+                      onChange={(e) => handleFieldChange('marketing_optin', e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {__('Receive marketing emails', 'Receive marketing emails')}
+                    </span>
+                  </label>
                 </CardContent>
               </Card>
 
@@ -405,4 +804,3 @@ const CustomerForm: React.FC = () => {
 };
 
 export default CustomerForm;
-

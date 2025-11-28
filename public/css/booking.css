@@ -960,3 +960,378 @@
 }
 
 
+/* ============================================
+   BOOKING AUTH STYLES
+   ============================================ */
+
+/* Auth Container */
+.yatra-booking-auth {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Tab Navigation */
+.yatra-auth-tabs {
+    display: flex;
+    background: #f9fafb;
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
+}
+
+.yatra-auth-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 15px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yatra-auth-tab:hover {
+    color: #374151;
+    background: #f3f4f6;
+}
+
+.yatra-auth-tab.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+    background: #fff;
+}
+
+.yatra-auth-tab svg {
+    flex-shrink: 0;
+}
+
+/* Auth Content */
+.yatra-auth-content {
+    padding: 32px;
+}
+
+.yatra-auth-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.yatra-auth-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+}
+
+.yatra-auth-header p {
+    font-size: 15px;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Auth Form Styles */
+.yatra-auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.yatra-auth-form .yatra-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.yatra-auth-form .yatra-form-group {
+    margin-bottom: 0;
+}
+
+.yatra-auth-form .yatra-form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.yatra-auth-form .yatra-form-group label .required {
+    color: #ef4444;
+}
+
+.yatra-auth-form .yatra-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.yatra-auth-form .yatra-input-wrapper > svg:first-of-type {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+    z-index: 1;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.yatra-auth-form .yatra-input-wrapper input {
+    width: 100%;
+    height: 48px;
+    padding: 0 44px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #111827;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.yatra-auth-form .yatra-input-wrapper input::placeholder {
+    color: #9ca3af;
+}
+
+.yatra-auth-form .yatra-input-wrapper input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.yatra-auth-form .yatra-form-group > input {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #111827;
+    transition: all 0.2s ease;
+}
+
+.yatra-auth-form .yatra-form-group > input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Toggle Password */
+.yatra-toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #9ca3af;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yatra-toggle-password:hover {
+    color: #6b7280;
+}
+
+/* Password Strength */
+.yatra-password-strength {
+    margin-top: 6px;
+    height: 4px;
+    border-radius: 2px;
+    background: #e5e7eb;
+    overflow: hidden;
+}
+
+.yatra-password-strength::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: var(--strength, 0%);
+    background: var(--color, #e5e7eb);
+    transition: all 0.3s ease;
+}
+
+.yatra-password-strength.weak { --strength: 25%; --color: #ef4444; }
+.yatra-password-strength.fair { --strength: 50%; --color: #f59e0b; }
+.yatra-password-strength.good { --strength: 75%; --color: #10b981; }
+.yatra-password-strength.strong { --strength: 100%; --color: #059669; }
+
+/* Form Options */
+.yatra-form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -8px;
+}
+
+.yatra-auth-form .yatra-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #4b5563;
+    cursor: pointer;
+    padding: 0;
+    background: transparent;
+    border: none;
+    line-height: 1.4;
+}
+
+.yatra-auth-form .yatra-checkbox-label:hover {
+    background: transparent;
+}
+
+.yatra-auth-form .yatra-checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    margin: 0;
+    accent-color: #3b82f6;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.yatra-auth-form .yatra-checkbox-label span {
+    display: inline;
+    line-height: 1.4;
+}
+
+.yatra-auth-form .yatra-checkbox-label a {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+.yatra-auth-form .yatra-checkbox-label a:hover {
+    text-decoration: underline;
+}
+
+.yatra-forgot-link {
+    font-size: 14px;
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+.yatra-forgot-link:hover {
+    text-decoration: underline;
+}
+
+/* Auth Message */
+.yatra-auth-message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.yatra-auth-message.error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
+.yatra-auth-message.success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #16a34a;
+}
+
+/* Submit Button */
+.yatra-auth-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yatra-auth-submit:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.yatra-auth-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.yatra-auth-submit .btn-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Animate spin */
+@keyframes yatra-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.yatra-auth-form .animate-spin {
+    animation: yatra-spin 1s linear infinite;
+}
+
+/* Auth Footer */
+.yatra-auth-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.yatra-auth-footer p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.yatra-switch-tab {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.yatra-switch-tab:hover {
+    text-decoration: underline;
+}
+
+/* Auth Responsive */
+@media (max-width: 640px) {
+    .yatra-auth-content {
+        padding: 24px 20px;
+    }
+    
+    .yatra-auth-form .yatra-form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .yatra-form-options {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+}
+

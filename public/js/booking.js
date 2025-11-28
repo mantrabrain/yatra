@@ -10,11 +10,13 @@
 (function($) {
     'use strict';
 
+    // API configuration - available throughout the module
+    const apiUrl = window.yatraBookingData?.apiUrl || '/wp-json/yatra/v1';
+    const nonce = window.yatraBookingData?.nonce || '';
+
     $(document).ready(function() {
         const $form = $('#yatra-booking-form');
         const $submitBtn = $('#yatra-submit-booking');
-        const apiUrl = window.yatraBookingData?.apiUrl || '/wp-json/yatra/v1';
-        const nonce = window.yatraBookingData?.nonce || '';
         
         // Get pricing data
         const pricePerPerson = parseFloat($('input[name="trip_price"]').val()) || window.yatraBookingData?.tripPrice || 0;
@@ -461,5 +463,320 @@
     const style = document.createElement('style');
     style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
     document.head.appendChild(style);
+
+    // =====================
+    // Auth Forms (Login/Register)
+    // =====================
+    
+    // Tab switching
+    $(document).on('click', '.yatra-auth-tab, .yatra-switch-tab', function() {
+        const tab = $(this).data('tab');
+        
+        // Update tabs
+        $('.yatra-auth-tab').removeClass('active');
+        $(`.yatra-auth-tab[data-tab="${tab}"]`).addClass('active');
+        
+        // Update content
+        $('.yatra-auth-content').hide();
+        $(`#yatra-auth-${tab}`).show();
+    });
+
+    // Toggle password visibility
+    $(document).on('click', '.yatra-toggle-password', function() {
+        const $input = $(this).parent().find('input');
+        const $eyeOpen = $(this).find('.eye-open');
+        const $eyeClosed = $(this).find('.eye-closed');
+        
+        if ($input.attr('type') === 'password') {
+            $input.attr('type', 'text');
+            $eyeOpen.hide();
+            $eyeClosed.show();
+        } else {
+            $input.attr('type', 'password');
+            $eyeOpen.show();
+            $eyeClosed.hide();
+        }
+    });
+
+    // Password strength indicator
+    $(document).on('input', '#yatra-reg-password', function() {
+        const password = $(this).val();
+        const $strengthMeter = $('#yatra-password-strength');
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+        if (password.match(/[0-9]/)) strength++;
+        if (password.match(/[^a-zA-Z0-9]/)) strength++;
+        
+        $strengthMeter.removeClass('weak fair good strong');
+        if (password.length > 0) {
+            if (strength <= 1) $strengthMeter.addClass('weak');
+            else if (strength === 2) $strengthMeter.addClass('fair');
+            else if (strength === 3) $strengthMeter.addClass('good');
+            else $strengthMeter.addClass('strong');
+        }
+    });
+
+    // Login form submission via REST API
+    $(document).on('submit', '#yatra-login-form', function(e) {
+        e.preventDefault();
+        
+        const $form = $(this);
+        const $btn = $form.find('.yatra-auth-submit');
+        const $btnText = $btn.find('.btn-text');
+        const $btnLoading = $btn.find('.btn-loading');
+        const $messageEl = $('#yatra-login-message');
+        
+        // Remove any existing resend link
+        $('.yatra-resend-verification').remove();
+        
+        // Show loading
+        $btn.prop('disabled', true);
+        $btnText.hide();
+        $btnLoading.css('display', 'flex');
+        $messageEl.hide();
+        
+        // Prepare data for REST API
+        const loginData = {
+            username: $('#yatra-login-email').val(),
+            password: $('#yatra-login-password').val(),
+            remember: $('input[name="rememberme"]').is(':checked')
+        };
+        
+        fetch(apiUrl + '/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': nonce
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(loginData)
+        })
+        .then(response => response.json())
+        .then(response => {
+            if (response.success) {
+                $messageEl.removeClass('error').addClass('success');
+                $messageEl.text(response.message || 'Login successful! Redirecting...');
+                $messageEl.show();
+                
+                // Reload page to show booking form
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                $messageEl.removeClass('success').addClass('error');
+                $messageEl.html(response.message || 'Invalid credentials. Please try again.');
+                $messageEl.show();
+                
+                // If email needs verification, show resend option
+                if (response.needs_verification && response.email) {
+                    const $resendLink = $('<div class="yatra-resend-verification" style="margin-top: 12px; text-align: center;">' +
+                        '<span style="color: #6b7280; font-size: 14px;">Didn\'t receive the email? </span>' +
+                        '<button type="button" class="yatra-resend-btn" data-email="' + response.email + '" style="background: none; border: none; color: #3b82f6; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: underline;">Resend verification link</button>' +
+                        '</div>');
+                    $messageEl.after($resendLink);
+                }
+                
+                $btn.prop('disabled', false);
+                $btnText.show();
+                $btnLoading.hide();
+            }
+        })
+        .catch(function() {
+            $messageEl.removeClass('success').addClass('error');
+            $messageEl.text('An error occurred. Please try again.');
+            $messageEl.show();
+            
+            $btn.prop('disabled', false);
+            $btnText.show();
+            $btnLoading.hide();
+        });
+    });
+
+    // Resend verification email
+    $(document).on('click', '.yatra-resend-btn', function(e) {
+        e.preventDefault();
+        
+        const $btn = $(this);
+        const email = $btn.data('email');
+        const $messageEl = $('#yatra-login-message');
+        
+        // Don't allow click if countdown is active
+        if ($btn.data('countdown-active')) {
+            return;
+        }
+        
+        // Disable button and show loading
+        $btn.prop('disabled', true).text('Sending...');
+        
+        fetch(apiUrl + '/auth/resend-verification', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': nonce
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => response.json())
+        .then(response => {
+            if (response.success) {
+                $messageEl.removeClass('error').addClass('success');
+                $messageEl.text(response.message);
+                $messageEl.show();
+                $('.yatra-resend-verification').remove();
+            } else if (response.rate_limited && response.remaining_seconds) {
+                // Start countdown timer
+                startResendCountdown($btn, response.remaining_seconds);
+                $messageEl.removeClass('success').addClass('error');
+                $messageEl.text('Please wait before requesting another email.');
+                $messageEl.show();
+            } else {
+                $messageEl.removeClass('success').addClass('error');
+                $messageEl.text(response.message);
+                $messageEl.show();
+                $btn.prop('disabled', false).text('Resend verification link');
+            }
+        })
+        .catch(function() {
+            $messageEl.removeClass('success').addClass('error');
+            $messageEl.text('An error occurred. Please try again.');
+            $messageEl.show();
+            $btn.prop('disabled', false).text('Resend verification link');
+        });
+    });
+
+    // Countdown timer for resend button
+    function startResendCountdown($btn, seconds) {
+        $btn.data('countdown-active', true);
+        $btn.prop('disabled', true);
+        
+        const updateCountdown = () => {
+            if (seconds <= 0) {
+                $btn.data('countdown-active', false);
+                $btn.prop('disabled', false);
+                $btn.html('Resend verification link');
+                return;
+            }
+            
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            const timeStr = mins > 0 
+                ? `${mins}:${secs.toString().padStart(2, '0')}` 
+                : `${secs}s`;
+            
+            $btn.html(`<span style="color: #9ca3af;">Resend in </span><span style="color: #3b82f6; font-weight: 700;">${timeStr}</span>`);
+            
+            seconds--;
+            setTimeout(updateCountdown, 1000);
+        };
+        
+        updateCountdown();
+    }
+
+    // Registration form submission via REST API
+    $(document).on('submit', '#yatra-register-form', function(e) {
+        e.preventDefault();
+        
+        const $form = $(this);
+        const $btn = $form.find('.yatra-auth-submit');
+        const $btnText = $btn.find('.btn-text');
+        const $btnLoading = $btn.find('.btn-loading');
+        const $messageEl = $('#yatra-register-message');
+        
+        // Validate passwords match
+        const password = $('#yatra-reg-password').val();
+        const confirmPassword = $('#yatra-reg-confirm-password').val();
+        
+        if (password !== confirmPassword) {
+            $messageEl.removeClass('success').addClass('error');
+            $messageEl.text('Passwords do not match.');
+            $messageEl.show();
+            return;
+        }
+        
+        // Show loading
+        $btn.prop('disabled', true);
+        $btnText.hide();
+        $btnLoading.css('display', 'flex');
+        $messageEl.hide();
+        
+        // Prepare data for REST API
+        const registerData = {
+            first_name: $('#yatra-reg-first-name').val(),
+            last_name: $('#yatra-reg-last-name').val(),
+            email: $('#yatra-reg-email').val(),
+            phone: $('#yatra-reg-phone').val(),
+            password: password,
+            confirm_password: confirmPassword
+        };
+        
+        fetch(apiUrl + '/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': nonce
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(registerData)
+        })
+        .then(response => response.json())
+        .then(response => {
+            if (response.success) {
+                $messageEl.removeClass('error').addClass('success');
+                $messageEl.text(response.message || 'Account created! Please check your email to verify.');
+                $messageEl.show();
+                
+                // Reset form
+                $form[0].reset();
+                $('#yatra-password-strength').removeClass('weak fair good strong');
+                
+                // If verification is required, switch to login tab after a delay
+                if (response.require_verification) {
+                    $btn.prop('disabled', false);
+                    $btnText.show();
+                    $btnLoading.hide();
+                    
+                    // Show message and switch to login tab after 3 seconds
+                    setTimeout(function() {
+                        // Switch to login tab
+                        $('.yatra-auth-tab').removeClass('active');
+                        $('.yatra-auth-tab[data-tab="login"]').addClass('active');
+                        $('.yatra-auth-content').hide();
+                        $('#yatra-auth-login').show();
+                        
+                        // Show info message on login tab
+                        const $loginMessage = $('#yatra-login-message');
+                        $loginMessage.removeClass('error').addClass('success');
+                        $loginMessage.text('Please check your email and click the verification link, then login here.');
+                        $loginMessage.show();
+                    }, 3000);
+                } else {
+                    // Reload page if no verification required (shouldn't happen normally)
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                }
+            } else {
+                $messageEl.removeClass('success').addClass('error');
+                $messageEl.text(response.message || 'Registration failed. Please try again.');
+                $messageEl.show();
+                
+                $btn.prop('disabled', false);
+                $btnText.show();
+                $btnLoading.hide();
+            }
+        })
+        .catch(function() {
+            $messageEl.removeClass('success').addClass('error');
+            $messageEl.text('An error occurred. Please try again.');
+            $messageEl.show();
+            
+            $btn.prop('disabled', false);
+            $btnText.show();
+            $btnLoading.hide();
+        });
+    });
 
 })(jQuery);

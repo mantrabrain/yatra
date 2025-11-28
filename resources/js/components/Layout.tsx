@@ -3,7 +3,6 @@ import {
   LayoutDashboard, 
   MapPin, 
   Calendar, 
-  Users, 
   Star, 
   BarChart3, 
   Settings,
@@ -28,7 +27,8 @@ import {
   TrendingUp,
   RefreshCw,
   Puzzle,
-  Loader2
+  Loader2,
+  Plane
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
@@ -228,8 +228,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { subpage: 'discounts', label: 'Discount', icon: BadgePercent },
     { subpage: 'payments', label: 'Payments', icon: CreditCard },
     { subpage: 'bookings', label: 'Bookings', icon: Calendar },
-    { subpage: 'customers', label: 'Customers', icon: Users },
-    { subpage: 'travelers', label: 'Travelers', icon: Users },
+    { subpage: 'customers', label: 'Customers', icon: UserCircle },
+    { subpage: 'travelers', label: 'Travelers', icon: Plane },
     { subpage: 'enquiries', label: 'Enquiries', icon: MessageSquare },
     { subpage: 'reviews', label: 'Reviews', icon: Star },
     { subpage: 'reports', label: 'Reports', icon: BarChart3 },

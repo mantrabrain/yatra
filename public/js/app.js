@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, B as BadgePercent, h as CreditCard, i as Calendar$1, U as Users, k as MessageSquare, S as Star, l as BarChart3, P as Puzzle, m as Settings$1, n as ChevronDown, o as ChevronRight, p as RefreshCw, q as Loader2, s as Sun, t as Moon, v as Bell, w as User, x as Clock, D as DollarSign, y as ArrowRight, I as Info, z as Plane, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Mail, ar as Lightbulb, as as Database, at as History, au as Save, av as Sparkles, aw as ChevronLeft, ax as Box, ay as ChevronUp, az as Upload, aA as Check, aB as ArrowLeft, aC as Pen, aD as React, aE as Phone, aF as Download, aG as TrendingDown, aH as Globe, aI as PieChart, aJ as ClipboardList, aK as Receipt, aL as Plug, aM as Shield, aN as Lock, aO as EyeOff, aP as MoreVertical, aQ as Ban, aR as Send, aS as Crown, aT as reactDomExports, aU as Filter, aV as QueryClient, aW as client, aX as QueryClientProvider } from "./react-vendor-BXPbDqwT.js";
-import { u as useToast, _ as __, a as apiClient, T as ToastProvider } from "./index-C-oyR4ku.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, B as BadgePercent, h as CreditCard, i as Calendar$1, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Mail, ar as Lightbulb, as as Database, at as History, au as Save, av as Sparkles, aw as ChevronLeft, ax as Box, ay as ChevronUp, az as Upload, aA as Check, aB as ArrowLeft, aC as Pen, aD as React, aE as Phone, aF as Award, aG as Globe, aH as Download, aI as TrendingDown, aJ as PieChart, aK as ClipboardList, aL as Receipt, aM as Plug, aN as Shield, aO as Lock, aP as EyeOff, aQ as MoreVertical, aR as Ban, aS as Send, aT as Crown, aU as reactDomExports, aV as Filter, aW as QueryClient, aX as client, aY as QueryClientProvider } from "./react-vendor-eze4RMXi.js";
+import { u as useToast, _ as __, a as apiClient, T as ToastProvider } from "./index-CmYySbNx.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -403,8 +403,8 @@ const Layout = ({ children }) => {
     { subpage: "discounts", label: "Discount", icon: BadgePercent },
     { subpage: "payments", label: "Payments", icon: CreditCard },
     { subpage: "bookings", label: "Bookings", icon: Calendar$1 },
-    { subpage: "customers", label: "Customers", icon: Users },
-    { subpage: "travelers", label: "Travelers", icon: Users },
+    { subpage: "customers", label: "Customers", icon: CircleUser },
+    { subpage: "travelers", label: "Travelers", icon: Plane },
     { subpage: "enquiries", label: "Enquiries", icon: MessageSquare },
     { subpage: "reviews", label: "Reviews", icon: Star },
     { subpage: "reports", label: "Reports", icon: BarChart3 },
@@ -13718,9 +13718,12 @@ const ViewBooking = () => {
 const Customers = () => {
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
-  const [sortBy, setSortBy] = reactExports.useState("registered_at");
+  const [loyaltyFilter, setLoyaltyFilter] = reactExports.useState("all");
+  const [sortBy, setSortBy] = reactExports.useState("created_at");
   const [sortOrder, setSortOrder] = reactExports.useState("desc");
   const [page, setPage] = reactExports.useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = reactExports.useState(false);
+  const [customerToDelete, setCustomerToDelete] = reactExports.useState(null);
   const queryClient2 = useQueryClient();
   const { can, isPro } = usePermissions();
   const queryParams = reactExports.useMemo(() => {
@@ -13736,216 +13739,50 @@ const Customers = () => {
     if (statusFilter !== "all") {
       params.status = statusFilter;
     }
+    if (loyaltyFilter !== "all") {
+      params.loyalty_tier = loyaltyFilter;
+    }
     return params;
-  }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+  }, [searchTerm, statusFilter, loyaltyFilter, sortBy, sortOrder, page]);
   const { data, isLoading, error } = useQuery({
     queryKey: ["customers", queryParams],
     queryFn: async () => {
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split("T")[0];
-      };
-      const allCustomers = [
-        {
-          id: 1,
-          name: "John Smith",
-          email: "john.smith@example.com",
-          phone: "+1 234-567-8900",
-          country: "United States",
-          city: "New York",
-          total_bookings: 3,
-          total_spent: 6250,
-          total_payments: 5,
-          total_payment_amount: 6250,
-          status: "active",
-          registered_at: getDate(120),
-          last_booking_date: getDate(5)
-        },
-        {
-          id: 2,
-          name: "Sarah Johnson",
-          email: "sarah.j@example.com",
-          phone: "+1 345-678-9012",
-          country: "Canada",
-          city: "Toronto",
-          total_bookings: 2,
-          total_spent: 1960,
-          total_payments: 3,
-          total_payment_amount: 1960,
-          status: "active",
-          registered_at: getDate(90),
-          last_booking_date: getDate(3)
-        },
-        {
-          id: 3,
-          name: "Michael Chen",
-          email: "m.chen@example.com",
-          phone: "+86 138-0013-8000",
-          country: "China",
-          city: "Beijing",
-          total_bookings: 1,
-          total_spent: 3e3,
-          total_payments: 2,
-          total_payment_amount: 3e3,
-          status: "active",
-          registered_at: getDate(60),
-          last_booking_date: getDate(10)
-        },
-        {
-          id: 4,
-          name: "Emma Williams",
-          email: "emma.w@example.com",
-          phone: "+44 20-7946-0958",
-          country: "United Kingdom",
-          city: "London",
-          total_bookings: 2,
-          total_spent: 3300,
-          total_payments: 4,
-          total_payment_amount: 3300,
-          status: "active",
-          registered_at: getDate(45),
-          last_booking_date: getDate(15)
-        },
-        {
-          id: 5,
-          name: "David Brown",
-          email: "d.brown@example.com",
-          phone: "+61 2-9374-4000",
-          country: "Australia",
-          city: "Sydney",
-          total_bookings: 1,
-          total_spent: 920,
-          total_payments: 1,
-          total_payment_amount: 920,
-          status: "active",
-          registered_at: getDate(30),
-          last_booking_date: getDate(2)
-        },
-        {
-          id: 6,
-          name: "Lisa Anderson",
-          email: "lisa.a@example.com",
-          phone: "+1 456-789-0123",
-          country: "United States",
-          city: "Los Angeles",
-          total_bookings: 1,
-          total_spent: 4050,
-          total_payments: 2,
-          total_payment_amount: 4050,
-          status: "inactive",
-          registered_at: getDate(180),
-          last_booking_date: getDate(150)
-        },
-        {
-          id: 7,
-          name: "Robert Taylor",
-          email: "r.taylor@example.com",
-          phone: "+1 567-890-1234",
-          country: "United States",
-          city: "Chicago",
-          total_bookings: 1,
-          total_spent: 2500,
-          total_payments: 1,
-          total_payment_amount: 2500,
-          status: "active",
-          registered_at: getDate(20),
-          last_booking_date: getDate(12)
-        },
-        {
-          id: 8,
-          name: "Maria Garcia",
-          email: "maria.g@example.com",
-          phone: "+34 91-123-4567",
-          country: "Spain",
-          city: "Madrid",
-          total_bookings: 1,
-          total_spent: 850,
-          total_payments: 1,
-          total_payment_amount: 850,
-          status: "active",
-          registered_at: getDate(15),
-          last_booking_date: getDate(20)
+      var _a, _b;
+      const params = new URLSearchParams();
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (value !== void 0 && value !== null && value !== "") {
+          params.append(key, String(value));
         }
-      ];
-      let filtered = allCustomers;
-      if (searchTerm) {
-        filtered = filtered.filter(
-          (customer) => customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || customer.email.toLowerCase().includes(searchTerm.toLowerCase()) || customer.phone.toLowerCase().includes(searchTerm.toLowerCase()) || customer.country.toLowerCase().includes(searchTerm.toLowerCase()) || customer.city.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      if (statusFilter !== "all") {
-        filtered = filtered.filter((customer) => customer.status === statusFilter);
-      }
-      filtered = [...filtered].sort((a, b) => {
-        let aValue;
-        let bValue;
-        switch (sortBy) {
-          case "name":
-            aValue = a.name.toLowerCase();
-            bValue = b.name.toLowerCase();
-            break;
-          case "email":
-            aValue = a.email.toLowerCase();
-            bValue = b.email.toLowerCase();
-            break;
-          case "country":
-            aValue = a.country.toLowerCase();
-            bValue = b.country.toLowerCase();
-            break;
-          case "total_bookings":
-            aValue = a.total_bookings;
-            bValue = b.total_bookings;
-            break;
-          case "total_spent":
-            aValue = a.total_spent;
-            bValue = b.total_spent;
-            break;
-          case "total_payments":
-            aValue = a.total_payment_amount;
-            bValue = b.total_payment_amount;
-            break;
-          case "status":
-            aValue = a.status;
-            bValue = b.status;
-            break;
-          case "registered_at":
-            aValue = new Date(a.registered_at).getTime();
-            bValue = new Date(b.registered_at).getTime();
-            break;
-          default:
-            aValue = new Date(a.registered_at).getTime();
-            bValue = new Date(b.registered_at).getTime();
-        }
-        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-        return 0;
       });
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
-      return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10
-      };
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers?${params.toString()}`, {
+        headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
+      });
+      if (!response.ok) throw new Error("Failed to fetch customers");
+      return response.json();
     },
     enabled: can("yatra_view_bookings")
   });
   const deleteMutation = useMutation({
-    mutationFn: async (_id) => {
-      return { success: true };
+    mutationFn: async (id) => {
+      var _a, _b;
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${id}`, {
+        method: "DELETE",
+        headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
+      });
+      if (!response.ok) throw new Error("Failed to delete customer");
+      return response.json();
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["customers"] });
+      setDeleteDialogOpen(false);
+      setCustomerToDelete(null);
     }
   });
   const customers = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
-  const totalPages = Math.ceil(total / 10);
+  const totalPages = (data == null ? void 0 : data.pages) || Math.ceil(total / 10);
   const formatDate = (dateString) => {
+    if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -13967,6 +13804,10 @@ const Customers = () => {
       "inactive": {
         className: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
         label: __("Inactive", "Inactive")
+      },
+      "blocked": {
+        className: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+        label: __("Blocked", "Blocked")
       }
     };
     const statusInfo = statusMap[status] || {
@@ -13975,13 +13816,42 @@ const Customers = () => {
     };
     return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`, children: statusInfo.label });
   };
+  const getLoyaltyBadge = (tier) => {
+    const tierMap = {
+      "bronze": {
+        className: "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
+        icon: "🥉"
+      },
+      "silver": {
+        className: "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300",
+        icon: "🥈"
+      },
+      "gold": {
+        className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
+        icon: "🥇"
+      },
+      "platinum": {
+        className: "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
+        icon: "💎"
+      }
+    };
+    const tierInfo = tierMap[tier] || tierMap["bronze"];
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${tierInfo.className}`, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: tierInfo.icon }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: tier })
+    ] });
+  };
   const handleEdit = (customer) => {
     var _a;
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customer.id}`;
   };
   const handleDelete = (customer) => {
-    if (confirm(__("Are you sure you want to delete this customer?", "Are you sure you want to delete this customer?"))) {
-      deleteMutation.mutate(customer.id);
+    setCustomerToDelete(customer);
+    setDeleteDialogOpen(true);
+  };
+  const confirmDelete = () => {
+    if (customerToDelete) {
+      deleteMutation.mutate(customerToDelete.id);
     }
   };
   const handleView = (customer) => {
@@ -13995,7 +13865,8 @@ const Customers = () => {
   const handleResetFilters = () => {
     setSearchTerm("");
     setStatusFilter("all");
-    setSortBy("registered_at");
+    setLoyaltyFilter("all");
+    setSortBy("created_at");
     setSortOrder("desc");
     setPage(1);
   };
@@ -14013,7 +13884,36 @@ const Customers = () => {
     }
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
-  const hasFilters = searchTerm || statusFilter !== "all" || sortBy !== "registered_at" || sortOrder !== "desc";
+  const hasFilters = searchTerm || statusFilter !== "all" || loyaltyFilter !== "all" || sortBy !== "created_at" || sortOrder !== "desc";
+  const renderSkeleton = () => /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: __("Customer", "Customer") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Location", "Location") }),
+      isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Bookings", "Bookings") }),
+      isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Total Spent", "Total Spent") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Loyalty", "Loyalty") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Registered", "Registered") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-40" })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }) }),
+      isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-8" }) }),
+      isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-16" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-14 rounded" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" })
+      ] }) })
+    ] }, i)) })
+  ] });
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
@@ -14028,8 +13928,8 @@ const Customers = () => {
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
@@ -14037,7 +13937,7 @@ const Customers = () => {
             placeholder: __("Search customers...", "Search customers..."),
             value: searchTerm,
             onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9"
+            className: "pl-10 w-full"
           }
         )
       ] }),
@@ -14046,11 +13946,27 @@ const Customers = () => {
         {
           value: statusFilter,
           onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40",
+          className: "w-full md:w-36",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "active", children: __("Active", "Active") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "inactive", children: __("Inactive", "Inactive") })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "inactive", children: __("Inactive", "Inactive") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "blocked", children: __("Blocked", "Blocked") })
+          ]
+        }
+      ),
+      isPro && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
+        {
+          value: loyaltyFilter,
+          onChange: (e) => setLoyaltyFilter(e.target.value),
+          className: "w-full md:w-36",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Tiers", "All Tiers") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "bronze", children: __("Bronze", "Bronze") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "silver", children: __("Silver", "Silver") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "gold", children: __("Gold", "Gold") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "platinum", children: __("Platinum", "Platinum") })
           ]
         }
       ),
@@ -14061,13 +13977,12 @@ const Customers = () => {
           onChange: (e) => setSortBy(e.target.value),
           className: "w-full md:w-40",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "registered_at", children: __("Registration Date", "Registration Date") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "created_at", children: __("Registration Date", "Registration Date") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "name", children: __("Name", "Name") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "email", children: __("Email", "Email") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "country", children: __("Country", "Country") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "total_bookings", children: __("Bookings", "Bookings") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "total_spent", children: __("Total Spent", "Total Spent") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "total_payments", children: __("Payments", "Payments") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: __("Status", "Status") })
           ]
         }
@@ -14099,7 +14014,11 @@ const Customers = () => {
       )
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading customers", "Error loading customers") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("Loading customers...", "Loading customers...") }) : customers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No customers found", "No customers found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? renderSkeleton() : customers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg font-medium", children: __("No customers found", "No customers found") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm mt-1", children: __("Customers will appear here when bookings are made", "Customers will appear here when bookings are made") })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
@@ -14145,17 +14064,10 @@ const Customers = () => {
               ]
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("total_payments"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Payments", "Payments"),
-                getSortIcon("total_payments")
-              ]
-            }
-          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Award, { className: "w-3.5 h-3.5" }),
+            __("Loyalty", "Loyalty")
+          ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
@@ -14170,11 +14082,11 @@ const Customers = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
-              onClick: () => handleSort("registered_at"),
+              onClick: () => handleSort("created_at"),
               className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
               children: [
                 __("Registered", "Registered"),
-                getSortIcon("registered_at")
+                getSortIcon("created_at")
               ]
             }
           ) }),
@@ -14182,7 +14094,7 @@ const Customers = () => {
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: customers.map((customer) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: customer.name }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: customer.name || `${customer.first_name} ${customer.last_name}` }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3" }),
@@ -14194,19 +14106,18 @@ const Customers = () => {
               ] })
             ] })
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: customer.country ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-              customer.city,
-              ", ",
+              customer.city ? `${customer.city}, ` : "",
               customer.country
             ] })
-          ] }) }),
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "-" }) }),
           isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: customer.total_bookings }),
           isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(customer.total_spent) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(customer.total_payment_amount) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getLoyaltyBadge(customer.loyalty_tier || "bronze") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(customer.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(customer.registered_at) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(customer.created_at) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
@@ -14283,21 +14194,54 @@ const Customers = () => {
           )
         ] })
       ] }) }) })
-    ] }) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: deleteDialogOpen,
+        onClose: () => setDeleteDialogOpen(false),
+        onConfirm: confirmDelete,
+        title: __("Delete Customer", "Delete Customer"),
+        message: customerToDelete ? __("Are you sure you want to delete this customer? This action cannot be undone.", "Are you sure you want to delete this customer? This action cannot be undone.") + ` (${customerToDelete.name || customerToDelete.email})` : "",
+        confirmText: __("Delete", "Delete"),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "danger",
+        isLoading: deleteMutation.isPending
+      }
+    )
   ] });
 };
 const CustomerForm = () => {
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const [formData, setFormData] = reactExports.useState({
-    name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     phone: "",
+    secondary_phone: "",
     country: "",
     city: "",
+    state: "",
     address: "",
+    postal_code: "",
+    nationality: "",
+    date_of_birth: "",
+    gender: "",
+    passport_number: "",
+    passport_expiry: "",
+    emergency_name: "",
+    emergency_phone: "",
+    emergency_relationship: "",
+    dietary_requirements: "",
+    medical_conditions: "",
+    special_needs: "",
+    newsletter_optin: false,
+    marketing_optin: false,
     status: "active",
-    notes: ""
+    notes: "",
+    loyalty_tier: "bronze",
+    loyalty_points: 0
   });
   const [errors, setErrors] = reactExports.useState({});
   const [isSubmitting, setIsSubmitting] = reactExports.useState(false);
@@ -14313,32 +14257,46 @@ const CustomerForm = () => {
   const { data: customerData, isLoading: isLoadingCustomer } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
+      var _a, _b;
       if (!customerId) return null;
-      return {
-        id: customerId,
-        name: "John Smith",
-        email: "john.smith@example.com",
-        phone: "+1 234-567-8900",
-        country: "United States",
-        city: "New York",
-        address: "123 Main Street, Apt 4B",
-        status: "active",
-        notes: "VIP customer, prefers window seats"
-      };
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}`, {
+        headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
+      });
+      if (!response.ok) throw new Error("Failed to fetch customer");
+      return response.json();
     },
     enabled: isEditMode && can("yatra_view_bookings")
   });
   reactExports.useEffect(() => {
     if (customerData && isEditMode) {
       setFormData({
-        name: customerData.name || "",
+        first_name: customerData.first_name || "",
+        last_name: customerData.last_name || "",
         email: customerData.email || "",
         phone: customerData.phone || "",
+        secondary_phone: customerData.secondary_phone || "",
         country: customerData.country || "",
         city: customerData.city || "",
+        state: customerData.state || "",
         address: customerData.address || "",
+        postal_code: customerData.postal_code || "",
+        nationality: customerData.nationality || "",
+        date_of_birth: customerData.date_of_birth || "",
+        gender: customerData.gender || "",
+        passport_number: customerData.passport_number || "",
+        passport_expiry: customerData.passport_expiry || "",
+        emergency_name: customerData.emergency_name || "",
+        emergency_phone: customerData.emergency_phone || "",
+        emergency_relationship: customerData.emergency_relationship || "",
+        dietary_requirements: customerData.dietary_requirements || "",
+        medical_conditions: customerData.medical_conditions || "",
+        special_needs: customerData.special_needs || "",
+        newsletter_optin: customerData.newsletter_optin || false,
+        marketing_optin: customerData.marketing_optin || false,
         status: customerData.status || "active",
-        notes: customerData.notes || ""
+        notes: customerData.notes || "",
+        loyalty_tier: customerData.loyalty_tier || "bronze",
+        loyalty_points: customerData.loyalty_points || 0
       });
     }
   }, [customerData, isEditMode]);
@@ -14350,8 +14308,8 @@ const CustomerForm = () => {
   };
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) {
-      newErrors.name = __("Name is required", "Name is required");
+    if (!formData.first_name.trim()) {
+      newErrors.first_name = __("First name is required", "First name is required");
     }
     if (!formData.email.trim()) {
       newErrors.email = __("Email is required", "Email is required");
@@ -14363,27 +14321,27 @@ const CustomerForm = () => {
   };
   const saveMutation = useMutation({
     mutationFn: async (data) => {
-      const payload = {
-        name: data.name.trim(),
-        email: data.email.trim(),
-        phone: data.phone.trim(),
-        country: data.country.trim(),
-        city: data.city.trim(),
-        address: data.address.trim(),
-        status: data.status,
-        notes: data.notes.trim()
-      };
+      var _a, _b;
+      const payload = { ...data };
       if (isEditMode && customerId) {
-        console.log("Updating customer:", customerId, payload);
-        return { success: true, id: customerId };
+        const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error("Failed to update customer");
+        return response.json();
       } else {
-        console.log("Creating customer:", payload);
-        return { success: true, id: Math.floor(Math.random() * 1e3) };
+        throw new Error("Creating customers directly is not supported. Customers are created when bookings are made.");
       }
     },
     onSuccess: () => {
       var _a;
       queryClient2.invalidateQueries({ queryKey: ["customers"] });
+      queryClient2.invalidateQueries({ queryKey: ["customer", customerId] });
       window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers`;
     },
     onError: (error) => {
@@ -14405,10 +14363,45 @@ const CustomerForm = () => {
     var _a;
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers`;
   };
+  const renderSkeleton = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-40" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-9 w-full" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-9 w-full" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-9 w-full" })
+        ] })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-9 w-full" }) })
+    ] }) })
+  ] });
   if (isEditMode && isLoadingCustomer) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-gray-600 dark:text-gray-400", children: __("Loading customer...", "Loading customer...") })
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PageHeader,
+        {
+          title: __("Edit Customer", "Edit Customer"),
+          description: __("Loading...", "Loading..."),
+          actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: handleCancel, className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
+            __("Back", "Back")
+          ] })
+        }
+      ),
+      renderSkeleton()
     ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -14438,56 +14431,130 @@ const CustomerForm = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "name", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
-                  __("Full Name", "Full Name"),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "first_name", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                  __("First Name", "First Name"),
                   " ",
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   Input,
                   {
-                    id: "name",
+                    id: "first_name",
                     type: "text",
-                    value: formData.name,
-                    onChange: (e) => handleFieldChange("name", e.target.value),
-                    placeholder: __("Enter customer name", "Enter customer name"),
-                    className: errors.name ? "border-red-500" : "",
+                    value: formData.first_name,
+                    onChange: (e) => handleFieldChange("first_name", e.target.value),
+                    placeholder: __("Enter first name", "Enter first name"),
+                    className: errors.first_name ? "border-red-500" : "",
                     required: true
                   }
                 ),
-                errors.name && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-500", children: errors.name })
+                errors.first_name && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-500", children: errors.first_name })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "email", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
-                  __("Email Address", "Email Address"),
-                  " ",
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
-                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "last_name", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Last Name", "Last Name") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   Input,
                   {
-                    id: "email",
-                    type: "email",
-                    value: formData.email,
-                    onChange: (e) => handleFieldChange("email", e.target.value),
-                    placeholder: __("customer@example.com", "customer@example.com"),
-                    className: errors.email ? "border-red-500" : "",
-                    required: true
+                    id: "last_name",
+                    type: "text",
+                    value: formData.last_name,
+                    onChange: (e) => handleFieldChange("last_name", e.target.value),
+                    placeholder: __("Enter last name", "Enter last name")
                   }
-                ),
-                errors.email && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-500", children: errors.email })
+                )
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "phone", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Phone Number", "Phone Number") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "email", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                __("Email Address", "Email Address"),
+                " ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+              ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 Input,
                 {
-                  id: "phone",
-                  type: "tel",
-                  value: formData.phone,
-                  onChange: (e) => handleFieldChange("phone", e.target.value),
-                  placeholder: __("+1234567890", "+1234567890")
+                  id: "email",
+                  type: "email",
+                  value: formData.email,
+                  onChange: (e) => handleFieldChange("email", e.target.value),
+                  placeholder: __("customer@example.com", "customer@example.com"),
+                  className: errors.email ? "border-red-500" : "",
+                  required: true,
+                  disabled: isEditMode
+                }
+              ),
+              errors.email && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-500", children: errors.email })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "phone", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Phone Number", "Phone Number") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    id: "phone",
+                    type: "tel",
+                    value: formData.phone,
+                    onChange: (e) => handleFieldChange("phone", e.target.value),
+                    placeholder: __("+1234567890", "+1234567890")
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "secondary_phone", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Secondary Phone", "Secondary Phone") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    id: "secondary_phone",
+                    type: "tel",
+                    value: formData.secondary_phone,
+                    onChange: (e) => handleFieldChange("secondary_phone", e.target.value),
+                    placeholder: __("+1234567890", "+1234567890")
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "date_of_birth", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Date of Birth", "Date of Birth") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    id: "date_of_birth",
+                    type: "date",
+                    value: formData.date_of_birth,
+                    onChange: (e) => handleFieldChange("date_of_birth", e.target.value)
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "gender", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Gender", "Gender") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Select,
+                  {
+                    id: "gender",
+                    value: formData.gender,
+                    onChange: (e) => handleFieldChange("gender", e.target.value),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Select gender", "Select gender") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "male", children: __("Male", "Male") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "female", children: __("Female", "Female") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "other", children: __("Other", "Other") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "prefer_not_to_say", children: __("Prefer not to say", "Prefer not to say") })
+                    ]
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "nationality", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Nationality", "Nationality") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "nationality",
+                  type: "text",
+                  value: formData.nationality,
+                  onChange: (e) => handleFieldChange("nationality", e.target.value),
+                  placeholder: __("Enter nationality", "Enter nationality")
                 }
               )
             ] })
@@ -14496,6 +14563,47 @@ const CustomerForm = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Address Information", "Address Information") }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "address", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Street Address", "Street Address") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "address",
+                  type: "text",
+                  value: formData.address,
+                  onChange: (e) => handleFieldChange("address", e.target.value),
+                  placeholder: __("Enter street address", "Enter street address")
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "city", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("City", "City") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    id: "city",
+                    type: "text",
+                    value: formData.city,
+                    onChange: (e) => handleFieldChange("city", e.target.value),
+                    placeholder: __("Enter city", "Enter city")
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "state", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("State/Province", "State/Province") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    id: "state",
+                    type: "text",
+                    value: formData.state,
+                    onChange: (e) => handleFieldChange("state", e.target.value),
+                    placeholder: __("Enter state", "Enter state")
+                  }
+                )
+              ] })
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "country", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Country", "Country") }),
@@ -14511,43 +14619,150 @@ const CustomerForm = () => {
                 )
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "city", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("City", "City") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "postal_code", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Postal Code", "Postal Code") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   Input,
                   {
-                    id: "city",
+                    id: "postal_code",
                     type: "text",
-                    value: formData.city,
-                    onChange: (e) => handleFieldChange("city", e.target.value),
-                    placeholder: __("Enter city", "Enter city")
+                    value: formData.postal_code,
+                    onChange: (e) => handleFieldChange("postal_code", e.target.value),
+                    placeholder: __("Enter postal code", "Enter postal code")
                   }
                 )
               ] })
-            ] }),
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Passport Information", "Passport Information") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "address", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Street Address", "Street Address") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "passport_number", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Passport Number", "Passport Number") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 Input,
                 {
-                  id: "address",
+                  id: "passport_number",
                   type: "text",
-                  value: formData.address,
-                  onChange: (e) => handleFieldChange("address", e.target.value),
-                  placeholder: __("Enter street address", "Enter street address")
+                  value: formData.passport_number,
+                  onChange: (e) => handleFieldChange("passport_number", e.target.value),
+                  placeholder: __("Enter passport number", "Enter passport number")
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "passport_expiry", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Passport Expiry", "Passport Expiry") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "passport_expiry",
+                  type: "date",
+                  value: formData.passport_expiry,
+                  onChange: (e) => handleFieldChange("passport_expiry", e.target.value)
+                }
+              )
+            ] })
+          ] }) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Emergency Contact", "Emergency Contact") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "emergency_name", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Contact Name", "Contact Name") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "emergency_name",
+                  type: "text",
+                  value: formData.emergency_name,
+                  onChange: (e) => handleFieldChange("emergency_name", e.target.value),
+                  placeholder: __("Full name", "Full name")
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "emergency_phone", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Contact Phone", "Contact Phone") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "emergency_phone",
+                  type: "tel",
+                  value: formData.emergency_phone,
+                  onChange: (e) => handleFieldChange("emergency_phone", e.target.value),
+                  placeholder: __("+1234567890", "+1234567890")
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "emergency_relationship", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Relationship", "Relationship") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "emergency_relationship",
+                  type: "text",
+                  value: formData.emergency_relationship,
+                  onChange: (e) => handleFieldChange("emergency_relationship", e.target.value),
+                  placeholder: __("e.g., Spouse, Parent", "e.g., Spouse, Parent")
+                }
+              )
+            ] })
+          ] }) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Special Requirements", "Special Requirements") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "dietary_requirements", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Dietary Requirements", "Dietary Requirements") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "dietary_requirements",
+                  type: "text",
+                  value: formData.dietary_requirements,
+                  onChange: (e) => handleFieldChange("dietary_requirements", e.target.value),
+                  placeholder: __("e.g., Vegetarian, Gluten-free", "e.g., Vegetarian, Gluten-free")
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "medical_conditions", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Medical Conditions", "Medical Conditions") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "textarea",
+                {
+                  id: "medical_conditions",
+                  value: formData.medical_conditions,
+                  onChange: (e) => handleFieldChange("medical_conditions", e.target.value),
+                  placeholder: __("Any relevant medical conditions", "Any relevant medical conditions"),
+                  rows: 2,
+                  className: "flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "special_needs", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Special Needs", "Special Needs") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "textarea",
+                {
+                  id: "special_needs",
+                  value: formData.special_needs,
+                  onChange: (e) => handleFieldChange("special_needs", e.target.value),
+                  placeholder: __("Any special accommodations needed", "Any special accommodations needed"),
+                  rows: 2,
+                  className: "flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                 }
               )
             ] })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Additional Notes", "Additional Notes") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Internal Notes", "Internal Notes") }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "textarea",
             {
               id: "notes",
               value: formData.notes,
               onChange: (e) => handleFieldChange("notes", e.target.value),
-              placeholder: __("Enter any additional notes about this customer", "Enter any additional notes about this customer"),
+              placeholder: __("Enter any internal notes about this customer (not visible to customer)", "Enter any internal notes about this customer (not visible to customer)"),
               rows: 4,
               className: "flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
             }
@@ -14565,14 +14780,78 @@ const CustomerForm = () => {
                 id: "status",
                 value: formData.status,
                 onChange: (e) => handleFieldChange("status", e.target.value),
-                className: "h-9",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "active", children: __("Active", "Active") }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "inactive", children: __("Inactive", "Inactive") })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "inactive", children: __("Inactive", "Inactive") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "blocked", children: __("Blocked", "Blocked") })
                 ]
               }
             )
           ] }) })
+        ] }),
+        isEditMode && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Loyalty", "Loyalty") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "loyalty_tier", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Loyalty Tier", "Loyalty Tier") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  id: "loyalty_tier",
+                  value: formData.loyalty_tier,
+                  onChange: (e) => handleFieldChange("loyalty_tier", e.target.value),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "bronze", children: __("🥉 Bronze", "🥉 Bronze") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "silver", children: __("🥈 Silver", "🥈 Silver") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "gold", children: __("🥇 Gold", "🥇 Gold") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "platinum", children: __("💎 Platinum", "💎 Platinum") })
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "loyalty_points", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Loyalty Points", "Loyalty Points") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "loyalty_points",
+                  type: "number",
+                  min: 0,
+                  value: formData.loyalty_points,
+                  onChange: (e) => handleFieldChange("loyalty_points", parseInt(e.target.value) || 0)
+                }
+              )
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Preferences", "Preferences") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: formData.newsletter_optin,
+                  onChange: (e) => handleFieldChange("newsletter_optin", e.target.checked),
+                  className: "rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300", children: __("Subscribe to newsletter", "Subscribe to newsletter") })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  checked: formData.marketing_optin,
+                  onChange: (e) => handleFieldChange("marketing_optin", e.target.checked),
+                  className: "rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300", children: __("Receive marketing emails", "Receive marketing emails") })
+            ] })
+          ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
           errors.submit && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 rounded-md", children: errors.submit }),
@@ -14617,60 +14896,31 @@ const ViewCustomer = () => {
   const { data: customer, isLoading, error } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
-      if (!customerId) return null;
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split("T")[0];
-      };
-      return {
-        id: customerId,
-        name: "John Smith",
-        email: "john.smith@example.com",
-        phone: "+1 234-567-8900",
-        country: "United States",
-        city: "New York",
-        address: "123 Main Street, Apt 4B, New York, NY 10001",
-        status: "active",
-        notes: "VIP customer, prefers window seats and vegetarian meals. Very satisfied with previous bookings.",
-        registered_at: getDate(120),
-        total_bookings: 3,
-        total_spent: 6250,
-        recent_bookings: [
-          {
-            id: 1,
-            booking_number: "YT-2024-001",
-            trip_title: "Everest Base Camp Trek",
-            booking_date: getDate(5),
-            travel_date: getDate(30),
-            amount: 2500,
-            status: "confirmed"
-          },
-          {
-            id: 2,
-            booking_number: "YT-2023-045",
-            trip_title: "Annapurna Circuit Adventure",
-            booking_date: getDate(45),
-            travel_date: getDate(60),
-            amount: 1960,
-            status: "completed"
-          },
-          {
-            id: 3,
-            booking_number: "YT-2023-032",
-            trip_title: "Langtang Valley Trek",
-            booking_date: getDate(90),
-            travel_date: getDate(105),
-            amount: 1840,
-            status: "completed"
-          }
-        ]
-      };
+      var _a, _b;
+      if (!customerId) throw new Error("No customer ID");
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}`, {
+        headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
+      });
+      if (!response.ok) throw new Error("Failed to fetch customer");
+      return response.json();
+    },
+    enabled: !!customerId && can("yatra_view_bookings")
+  });
+  const { data: bookings, isLoading: isLoadingBookings } = useQuery({
+    queryKey: ["customer-bookings", customerId],
+    queryFn: async () => {
+      var _a, _b;
+      if (!customerId) return [];
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}/bookings`, {
+        headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
+      });
+      if (!response.ok) throw new Error("Failed to fetch bookings");
+      return response.json();
     },
     enabled: !!customerId && can("yatra_view_bookings")
   });
   const formatDate = (dateString) => {
+    if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -14678,10 +14928,18 @@ const ViewCustomer = () => {
       day: "numeric"
     });
   };
-  const formatPrice = (price) => {
+  const formatShortDate = (dateString) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  };
+  const formatPrice = (price, currency = "USD") => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD"
+      currency
     }).format(price);
   };
   const getStatusBadge = (status) => {
@@ -14693,6 +14951,10 @@ const ViewCustomer = () => {
       "inactive": {
         className: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
         label: __("Inactive", "Inactive")
+      },
+      "blocked": {
+        className: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+        label: __("Blocked", "Blocked")
       }
     };
     const statusInfo = statusMap[status] || {
@@ -14726,6 +14988,31 @@ const ViewCustomer = () => {
     };
     return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`, children: statusInfo.label });
   };
+  const getLoyaltyBadge = (tier) => {
+    const tierMap = {
+      "bronze": {
+        className: "bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
+        icon: "🥉"
+      },
+      "silver": {
+        className: "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300",
+        icon: "🥈"
+      },
+      "gold": {
+        className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
+        icon: "🥇"
+      },
+      "platinum": {
+        className: "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400",
+        icon: "💎"
+      }
+    };
+    const tierInfo = tierMap[tier] || tierMap["bronze"];
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `inline-flex items-center gap-1 px-3 py-1 rounded-md text-sm font-medium ${tierInfo.className}`, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: tierInfo.icon }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: tier })
+    ] });
+  };
   const handleBack = () => {
     var _a;
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers`;
@@ -14738,10 +15025,58 @@ const ViewCustomer = () => {
     var _a;
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
   };
+  const renderSkeleton = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-40" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded" })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-48" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-20" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-36" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-20" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-28" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-16" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-64" })
+        ] })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-24" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-20" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-12" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-20" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-20" })
+        ] })
+      ] })
+    ] }) })
+  ] });
   if (isLoading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-gray-600 dark:text-gray-400", children: __("Loading customer...", "Loading customer...") })
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PageHeader,
+        {
+          title: __("Customer Details", "Customer Details"),
+          description: __("Loading...", "Loading..."),
+          actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: handleBack, className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
+            __("Back", "Back")
+          ] })
+        }
+      ),
+      renderSkeleton()
     ] });
   }
   if (error || !customer) {
@@ -14765,7 +15100,10 @@ const ViewCustomer = () => {
           )
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading customer or customer not found", "Error loading customer or customer not found") }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-8 text-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-12 h-12 mx-auto mb-3 text-red-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-red-500", children: __("Error loading customer or customer not found", "Error loading customer or customer not found") })
+      ] }) })
     ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -14806,12 +15144,18 @@ const ViewCustomer = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Customer Overview", "Customer Overview") }),
-            getStatusBadge(customer.status)
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+              getStatusBadge(customer.status),
+              getLoyaltyBadge(customer.loyalty_tier || "bronze")
+            ] })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Full Name", "Full Name") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: customer.name })
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3 h-3" }),
+                __("Full Name", "Full Name")
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: customer.name || `${customer.first_name} ${customer.last_name}` })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -14826,7 +15170,13 @@ const ViewCustomer = () => {
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
                   __("Phone Number", "Phone Number")
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.phone })
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-900 dark:text-white", children: [
+                  customer.phone,
+                  customer.secondary_phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-500 ml-2", children: [
+                    "/ ",
+                    customer.secondary_phone
+                  ] })
+                ] })
               ] })
             ] }),
             customer.address && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -14834,38 +15184,73 @@ const ViewCustomer = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3 h-3" }),
                 __("Address", "Address")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.address })
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-900 dark:text-white", children: [
+                customer.address,
+                customer.city && `, ${customer.city}`,
+                customer.state && `, ${customer.state}`,
+                customer.postal_code && ` ${customer.postal_code}`
+              ] })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("City", "City") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.city })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Country", "Country") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
+              customer.country && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Globe, { className: "w-3 h-3" }),
+                  __("Country", "Country")
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.country })
+              ] }),
+              customer.nationality && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Nationality", "Nationality") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.nationality })
+              ] }),
+              customer.date_of_birth && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Date of Birth", "Date of Birth") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatShortDate(customer.date_of_birth) })
               ] })
             ] })
           ] })
         ] }),
-        customer.recent_bookings && customer.recent_bookings.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Recent Bookings", "Recent Bookings") }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+        customer.emergency_name && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4 text-red-500" }),
+            __("Emergency Contact", "Emergency Contact")
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Name", "Name") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.emergency_name })
+            ] }),
+            customer.emergency_phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Phone", "Phone") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.emergency_phone })
+            ] }),
+            customer.emergency_relationship && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Relationship", "Relationship") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.emergency_relationship })
+            ] })
+          ] }) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Booking History", "Booking History") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoadingBookings ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 space-y-2", children: [...Array(3)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-40" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-16" })
+          ] }, i)) }) : !bookings || bookings.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No bookings yet", "No bookings yet") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking #", "Booking #") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Reference", "Reference") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking Date", "Booking Date") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travel Date", "Travel Date") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Amount", "Amount") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: __("Actions", "Actions") })
             ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: customer.recent_bookings.map((booking) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium text-gray-900 dark:text-white", children: booking.booking_number }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: bookings.map((booking) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium text-gray-900 dark:text-white", children: booking.reference }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-900 dark:text-white", children: booking.trip_title }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(booking.booking_date) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(booking.travel_date) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(booking.amount) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatShortDate(booking.travel_date) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(booking.total_amount, booking.currency) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getBookingStatusBadge(booking.status) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                 Button,
@@ -14883,9 +15268,26 @@ const ViewCustomer = () => {
         customer.notes && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4" }),
-            __("Notes", "Notes")
+            __("Internal Notes", "Internal Notes")
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap", children: customer.notes }) })
+        ] }),
+        (customer.dietary_requirements || customer.medical_conditions || customer.special_needs) && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Special Requirements", "Special Requirements") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            customer.dietary_requirements && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Dietary Requirements", "Dietary Requirements") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.dietary_requirements })
+            ] }),
+            customer.medical_conditions && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Medical Conditions", "Medical Conditions") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.medical_conditions })
+            ] }),
+            customer.special_needs && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Special Needs", "Special Needs") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: customer.special_needs })
+            ] })
+          ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -14905,18 +15307,80 @@ const ViewCustomer = () => {
                 __("Total Spent", "Total Spent")
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-semibold text-gray-900 dark:text-white", children: formatPrice(customer.total_spent || 0) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
+                __("Total Travelers", "Total Travelers")
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-semibold text-gray-900 dark:text-white", children: customer.total_travelers || 0 })
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Award, { className: "w-4 h-4" }),
+            __("Loyalty", "Loyalty")
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Current Tier", "Current Tier") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: getLoyaltyBadge(customer.loyalty_tier || "bronze") })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Points", "Points") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: customer.loyalty_points || 0 })
+            ] })
+          ] })
+        ] }),
+        (customer.passport_number || customer.passport_expiry) && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-4 h-4" }),
+            __("Passport", "Passport")
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            customer.passport_number && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Number", "Number") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white font-mono", children: customer.passport_number })
+            ] }),
+            customer.passport_expiry && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Expiry Date", "Expiry Date") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatShortDate(customer.passport_expiry) })
             ] })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Timeline", "Timeline") }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3" }),
-              __("Registered", "Registered")
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3" }),
+                __("Registered", "Registered")
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(customer.created_at) })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(customer.registered_at) })
-          ] }) })
+            customer.last_booking_date && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Last Booking", "Last Booking") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatShortDate(customer.last_booking_date) })
+            ] }),
+            customer.last_travel_date && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Last Travel", "Last Travel") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatShortDate(customer.last_travel_date) })
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Preferences", "Preferences") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-sm", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: __("Newsletter", "Newsletter") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: customer.newsletter_optin ? "text-green-600" : "text-gray-400", children: customer.newsletter_optin ? __("Subscribed", "Subscribed") : __("Not subscribed", "Not subscribed") })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-sm", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: __("Marketing", "Marketing") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: customer.marketing_optin ? "text-green-600" : "text-gray-400", children: customer.marketing_optin ? __("Opted in", "Opted in") : __("Opted out", "Opted out") })
+            ] })
+          ] })
         ] })
       ] })
     ] }) })
@@ -26481,11 +26945,27 @@ const Payments = () => {
     enabled: can("yatra_view_bookings")
   });
   const deleteMutation = useMutation({
-    mutationFn: async (_id) => {
-      return { success: true };
+    mutationFn: async (id) => {
+      var _a, _b;
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/payments/${id}`, {
+        method: "DELETE",
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete payment");
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete payment");
+      }
+      return result;
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["payments"] });
+      queryClient2.invalidateQueries({ queryKey: ["bookings"] });
     }
   });
   const payments = (data == null ? void 0 : data.data) || [];
@@ -26674,7 +27154,28 @@ const Payments = () => {
       )
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading payments", "Error loading payments") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("Loading payments...", "Loading payments...") }) : payments.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No payments found", "No payments found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Payment", "Payment") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Customer", "Customer") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Amount", "Amount") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Method", "Method") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Date", "Date") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: __("Actions", "Actions") })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-32" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-28" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-24" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-16" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20 ml-auto" }) })
+        ] }, i)) })
+      ] }) : payments.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No payments found", "No payments found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
@@ -26874,16 +27375,30 @@ const PaymentForm = () => {
   const { data: paymentData, isLoading: isLoadingPayment } = useQuery({
     queryKey: ["payment", paymentId],
     queryFn: async () => {
+      var _a, _b;
       if (!paymentId) return null;
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/payments/${paymentId}`, {
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch payment");
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.message || "Payment not found");
+      }
+      const data = result.data;
       return {
-        id: paymentId,
-        booking_id: 1,
-        amount: 2500,
-        payment_method: "Credit Card",
-        payment_status: "completed",
-        payment_date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-        transaction_id: "TXN-123456789",
-        notes: "Full payment received"
+        id: data.id,
+        booking_id: data.booking_id,
+        amount: data.amount,
+        payment_method: data.gateway,
+        payment_status: data.status,
+        payment_date: data.processed_at ? data.processed_at.split(" ")[0] : (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+        transaction_id: data.transaction_id || "",
+        notes: data.notes || ""
       };
     },
     enabled: isEditMode && can("yatra_view_bookings")
@@ -26936,12 +27451,35 @@ const PaymentForm = () => {
     return Object.keys(newErrors).length === 0;
   };
   const saveMutation = useMutation({
-    mutationFn: async (_data) => {
-      if (isEditMode && paymentId) {
-        return { success: true, id: paymentId };
-      } else {
-        return { success: true, id: Math.floor(Math.random() * 1e3) };
+    mutationFn: async (data) => {
+      var _a, _b, _c;
+      const payload = {
+        booking_id: parseInt(data.booking_id),
+        amount: parseFloat(data.amount),
+        gateway: data.payment_method,
+        status: data.payment_status,
+        processed_at: data.payment_date,
+        transaction_id: data.transaction_id.trim() || null,
+        notes: data.notes.trim() || null
+      };
+      const url = isEditMode && paymentId ? `${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/payments/${paymentId}` : `${((_b = window.yatraAdmin) == null ? void 0 : _b.apiUrl) || "/wp-json/yatra/v1"}/payments`;
+      const response = await fetch(url, {
+        method: isEditMode ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": ((_c = window.yatraAdmin) == null ? void 0 : _c.nonce) || ""
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save payment");
       }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.message || "Failed to save payment");
+      }
+      return result;
     },
     onSuccess: () => {
       var _a;
@@ -27241,31 +27779,39 @@ const ViewPayment = () => {
   const { data: payment, isLoading, error } = useQuery({
     queryKey: ["payment", paymentId],
     queryFn: async () => {
+      var _a, _b;
       if (!paymentId) return null;
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split("T")[0];
-      };
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/payments/${paymentId}`, {
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch payment");
+      }
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.message || "Payment not found");
+      }
+      const data = result.data;
       return {
-        id: paymentId,
-        payment_number: "PAY-2024-001",
-        booking_id: 1,
-        booking_number: "YT-2024-001",
-        customer_name: "John Smith",
-        customer_email: "john.smith@example.com",
-        customer_phone: "+1 234-567-8900",
-        trip_id: 1,
-        trip_title: "Everest Base Camp Trek",
-        amount: 2500,
-        payment_method: "Credit Card",
-        payment_status: "completed",
-        transaction_id: "TXN-123456789",
-        payment_date: getDate(5),
-        notes: "Full payment received via credit card. Transaction processed successfully.",
-        created_at: getDate(5),
-        updated_at: getDate(2)
+        id: data.id,
+        payment_number: `PAY-${data.id.toString().padStart(6, "0")}`,
+        booking_id: data.booking_id,
+        booking_number: data.booking_reference || `#${data.booking_id}`,
+        customer_name: data.customer_name || "N/A",
+        customer_email: data.customer_email || "",
+        customer_phone: data.customer_phone || "",
+        trip_id: data.trip_id,
+        trip_title: data.trip_title || "",
+        amount: data.amount,
+        payment_method: data.gateway,
+        payment_status: data.status,
+        transaction_id: data.transaction_id,
+        payment_date: data.processed_at || data.created_at,
+        notes: data.notes,
+        created_at: data.created_at,
+        updated_at: data.updated_at
       };
     },
     enabled: !!paymentId && can("yatra_view_bookings")
@@ -27328,7 +27874,46 @@ const ViewPayment = () => {
     }
   };
   if (isLoading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }) });
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PageHeader,
+        {
+          title: __("Payment Details", "Payment Details"),
+          actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: handleBack, className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
+            __("Back", "Back")
+          ] })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-40" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-12 w-full" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-12 w-full" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-12 w-full" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-12 w-full" })
+            ] }) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-32" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-12 w-full" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-12 w-full" })
+            ] }) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-24" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-full" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-3/4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-1/2" })
+          ] })
+        ] }) })
+      ] })
+    ] });
   }
   if (error || !payment) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -36185,6 +36770,7 @@ const EXCLUDED_DYNAMIC_FIELDS = [
   "last_name",
   "gender",
   "nationality",
+  "phone",
   "_traveller_id",
   "_is_lead",
   "_traveller_index",
@@ -36197,6 +36783,209 @@ const EXCLUDED_DYNAMIC_FIELDS = [
   "is_lead",
   "id"
 ];
+const COUNTRY_NAMES = {
+  "AF": "Afghanistan",
+  "AL": "Albania",
+  "DZ": "Algeria",
+  "AD": "Andorra",
+  "AO": "Angola",
+  "AG": "Antigua and Barbuda",
+  "AR": "Argentina",
+  "AM": "Armenia",
+  "AU": "Australia",
+  "AT": "Austria",
+  "AZ": "Azerbaijan",
+  "BS": "Bahamas",
+  "BH": "Bahrain",
+  "BD": "Bangladesh",
+  "BB": "Barbados",
+  "BY": "Belarus",
+  "BE": "Belgium",
+  "BZ": "Belize",
+  "BJ": "Benin",
+  "BT": "Bhutan",
+  "BO": "Bolivia",
+  "BA": "Bosnia and Herzegovina",
+  "BW": "Botswana",
+  "BR": "Brazil",
+  "BN": "Brunei",
+  "BG": "Bulgaria",
+  "BF": "Burkina Faso",
+  "BI": "Burundi",
+  "KH": "Cambodia",
+  "CM": "Cameroon",
+  "CA": "Canada",
+  "CV": "Cape Verde",
+  "CF": "Central African Republic",
+  "TD": "Chad",
+  "CL": "Chile",
+  "CN": "China",
+  "CO": "Colombia",
+  "KM": "Comoros",
+  "CG": "Congo",
+  "CD": "DR Congo",
+  "CR": "Costa Rica",
+  "CI": "Ivory Coast",
+  "HR": "Croatia",
+  "CU": "Cuba",
+  "CY": "Cyprus",
+  "CZ": "Czech Republic",
+  "DK": "Denmark",
+  "DJ": "Djibouti",
+  "DM": "Dominica",
+  "DO": "Dominican Republic",
+  "EC": "Ecuador",
+  "EG": "Egypt",
+  "SV": "El Salvador",
+  "GQ": "Equatorial Guinea",
+  "ER": "Eritrea",
+  "EE": "Estonia",
+  "SZ": "Eswatini",
+  "ET": "Ethiopia",
+  "FJ": "Fiji",
+  "FI": "Finland",
+  "FR": "France",
+  "GA": "Gabon",
+  "GM": "Gambia",
+  "GE": "Georgia",
+  "DE": "Germany",
+  "GH": "Ghana",
+  "GR": "Greece",
+  "GD": "Grenada",
+  "GT": "Guatemala",
+  "GN": "Guinea",
+  "GW": "Guinea-Bissau",
+  "GY": "Guyana",
+  "HT": "Haiti",
+  "HN": "Honduras",
+  "HU": "Hungary",
+  "IS": "Iceland",
+  "IN": "India",
+  "ID": "Indonesia",
+  "IR": "Iran",
+  "IQ": "Iraq",
+  "IE": "Ireland",
+  "IL": "Israel",
+  "IT": "Italy",
+  "JM": "Jamaica",
+  "JP": "Japan",
+  "JO": "Jordan",
+  "KZ": "Kazakhstan",
+  "KE": "Kenya",
+  "KI": "Kiribati",
+  "KP": "North Korea",
+  "KR": "South Korea",
+  "KW": "Kuwait",
+  "KG": "Kyrgyzstan",
+  "LA": "Laos",
+  "LV": "Latvia",
+  "LB": "Lebanon",
+  "LS": "Lesotho",
+  "LR": "Liberia",
+  "LY": "Libya",
+  "LI": "Liechtenstein",
+  "LT": "Lithuania",
+  "LU": "Luxembourg",
+  "MG": "Madagascar",
+  "MW": "Malawi",
+  "MY": "Malaysia",
+  "MV": "Maldives",
+  "ML": "Mali",
+  "MT": "Malta",
+  "MH": "Marshall Islands",
+  "MR": "Mauritania",
+  "MU": "Mauritius",
+  "MX": "Mexico",
+  "FM": "Micronesia",
+  "MD": "Moldova",
+  "MC": "Monaco",
+  "MN": "Mongolia",
+  "ME": "Montenegro",
+  "MA": "Morocco",
+  "MZ": "Mozambique",
+  "MM": "Myanmar",
+  "NA": "Namibia",
+  "NR": "Nauru",
+  "NP": "Nepal",
+  "NL": "Netherlands",
+  "NZ": "New Zealand",
+  "NI": "Nicaragua",
+  "NE": "Niger",
+  "NG": "Nigeria",
+  "MK": "North Macedonia",
+  "NO": "Norway",
+  "OM": "Oman",
+  "PK": "Pakistan",
+  "PW": "Palau",
+  "PS": "Palestine",
+  "PA": "Panama",
+  "PG": "Papua New Guinea",
+  "PY": "Paraguay",
+  "PE": "Peru",
+  "PH": "Philippines",
+  "PL": "Poland",
+  "PT": "Portugal",
+  "QA": "Qatar",
+  "RO": "Romania",
+  "RU": "Russia",
+  "RW": "Rwanda",
+  "KN": "Saint Kitts and Nevis",
+  "LC": "Saint Lucia",
+  "VC": "Saint Vincent and the Grenadines",
+  "WS": "Samoa",
+  "SM": "San Marino",
+  "ST": "Sao Tome and Principe",
+  "SA": "Saudi Arabia",
+  "SN": "Senegal",
+  "RS": "Serbia",
+  "SC": "Seychelles",
+  "SL": "Sierra Leone",
+  "SG": "Singapore",
+  "SK": "Slovakia",
+  "SI": "Slovenia",
+  "SB": "Solomon Islands",
+  "SO": "Somalia",
+  "ZA": "South Africa",
+  "SS": "South Sudan",
+  "ES": "Spain",
+  "LK": "Sri Lanka",
+  "SD": "Sudan",
+  "SR": "Suriname",
+  "SE": "Sweden",
+  "CH": "Switzerland",
+  "SY": "Syria",
+  "TW": "Taiwan",
+  "TJ": "Tajikistan",
+  "TZ": "Tanzania",
+  "TH": "Thailand",
+  "TL": "Timor-Leste",
+  "TG": "Togo",
+  "TO": "Tonga",
+  "TT": "Trinidad and Tobago",
+  "TN": "Tunisia",
+  "TR": "Turkey",
+  "TM": "Turkmenistan",
+  "TV": "Tuvalu",
+  "UG": "Uganda",
+  "UA": "Ukraine",
+  "AE": "United Arab Emirates",
+  "GB": "United Kingdom",
+  "US": "United States",
+  "UY": "Uruguay",
+  "UZ": "Uzbekistan",
+  "VU": "Vanuatu",
+  "VA": "Vatican City",
+  "VE": "Venezuela",
+  "VN": "Vietnam",
+  "YE": "Yemen",
+  "ZM": "Zambia",
+  "ZW": "Zimbabwe"
+};
+const getCountryName = (code) => {
+  if (!code) return "";
+  const upperCode = code.toUpperCase();
+  return COUNTRY_NAMES[upperCode] || code;
+};
 const Travelers = () => {
   var _a, _b;
   const { can } = usePermissions();
@@ -36311,7 +37100,7 @@ const Travelers = () => {
       case "country":
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3 h-3 text-gray-400" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: value })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: getCountryName(value) })
         ] });
       default:
         return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: String(value) });
@@ -36329,20 +37118,20 @@ const Travelers = () => {
         description: __("View all travelers from bookings", "View all travelers from bookings")
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row gap-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
             type: "text",
-            placeholder: __("Search by name, email, passport...", "Search by name, email, passport..."),
+            placeholder: __("Search by name, email, phone, passport...", "Search by name, email, phone, passport..."),
             value: searchTerm,
             onChange: (e) => {
               setSearchTerm(e.target.value);
               setPage(1);
             },
-            className: "pl-10"
+            className: "pl-10 w-full"
           }
         )
       ] }),
@@ -36404,11 +37193,17 @@ const Travelers = () => {
                 [traveler.first_name, traveler.last_name].filter(Boolean).join(" ") || "N/A",
                 traveler.is_lead && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "info", className: "text-xs", children: __("Lead", "Lead") })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2", children: [
-                traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: traveler.gender }),
-                traveler.nationality && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                  traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "•" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: traveler.nationality })
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5 space-y-0.5", children: [
+                traveler.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: traveler.phone })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                  traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: traveler.gender }),
+                  traveler.nationality && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "•" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: getCountryName(traveler.nationality) })
+                  ] })
                 ] })
               ] })
             ] })

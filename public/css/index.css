@@ -914,6 +914,9 @@ video {
 .w-12 {
   width: 3rem;
 }
+.w-14 {
+  width: 3.5rem;
+}
 .w-16 {
   width: 4rem;
 }
@@ -2285,6 +2288,9 @@ video {
 .opacity-100 {
   opacity: 1;
 }
+.opacity-25 {
+  opacity: 0.25;
+}
 .opacity-40 {
   opacity: 0.4;
 }
@@ -3319,6 +3325,10 @@ video {
 
   .md\:block {
     display: block;
+  }
+
+  .md\:w-36 {
+    width: 9rem;
   }
 
   .md\:w-40 {

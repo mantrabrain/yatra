@@ -37,6 +37,7 @@ class SettingsController extends BaseController
         // Booking Settings
         'booking_confirmation' => true,
         'auto_confirm_bookings' => false,
+        'auto_confirm_pay_later' => true,
         'require_login' => false,
         'allow_guest_checkout' => true,
         'cancellation_policy' => 'full_refund',
@@ -57,6 +58,15 @@ class SettingsController extends BaseController
         'deposit_percentage' => 20,
         'gateway_configs' => [],
         'gateway_order' => [],
+        
+        // Scheduled/Recurring Payment Settings
+        'enable_scheduled_payments' => true,
+        'scheduled_payment_type' => 'single', // single, installments
+        'scheduled_payment_days' => 15, // Days until first scheduled payment
+        'scheduled_payment_installments' => 1, // Number of installments (if type is installments)
+        'scheduled_payment_interval' => 30, // Days between installments
+        'scheduled_payment_reminder_days' => 3, // Days before to send reminder
+        'allow_save_payment_methods' => true,
         
         // Email Settings
         'admin_email' => '',

@@ -60,17 +60,33 @@ const PaymentForm: React.FC = () => {
     queryKey: ['payment', paymentId],
     queryFn: async () => {
       if (!paymentId) return null;
-      // return await apiClient.get(`/yatra/v1/payments/${paymentId}`);
-      // Dummy data
+      
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments/${paymentId}`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch payment');
+      }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Payment not found');
+      }
+
+      const data = result.data;
       return {
-        id: paymentId,
-        booking_id: 1,
-        amount: 2500,
-        payment_method: 'Credit Card',
-        payment_status: 'completed',
-        payment_date: new Date().toISOString().split('T')[0],
-        transaction_id: 'TXN-123456789',
-        notes: 'Full payment received',
+        id: data.id,
+        booking_id: data.booking_id,
+        amount: data.amount,
+        payment_method: data.gateway,
+        payment_status: data.status,
+        payment_date: data.processed_at ? data.processed_at.split(' ')[0] : new Date().toISOString().split('T')[0],
+        transaction_id: data.transaction_id || '',
+        notes: data.notes || '',
       };
     },
     enabled: isEditMode && can('yatra_view_bookings'),
@@ -133,32 +149,42 @@ const PaymentForm: React.FC = () => {
 
   // Create/Update mutation
   const saveMutation = useMutation({
-    mutationFn: async (_data: PaymentFormData) => {
-      if (isEditMode && paymentId) {
-        // const payload = {
-        //   booking_id: parseInt(data.booking_id),
-        //   amount: parseFloat(data.amount),
-        //   payment_method: data.payment_method,
-        //   payment_status: data.payment_status,
-        //   payment_date: data.payment_date,
-        //   transaction_id: data.transaction_id.trim() || null,
-        //   notes: data.notes.trim() || null,
-        // };
-        // return await apiClient.put(`/yatra/v1/payments/${paymentId}`, payload);
-        return { success: true, id: paymentId };
-      } else {
-        // const payload = {
-        //   booking_id: parseInt(data.booking_id),
-        //   amount: parseFloat(data.amount),
-        //   payment_method: data.payment_method,
-        //   payment_status: data.payment_status,
-        //   payment_date: data.payment_date,
-        //   transaction_id: data.transaction_id.trim() || null,
-        //   notes: data.notes.trim() || null,
-        // };
-        // return await apiClient.post('/yatra/v1/payments', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+    mutationFn: async (data: PaymentFormData) => {
+      const payload = {
+        booking_id: parseInt(data.booking_id),
+        amount: parseFloat(data.amount),
+        gateway: data.payment_method,
+        status: data.payment_status,
+        processed_at: data.payment_date,
+        transaction_id: data.transaction_id.trim() || null,
+        notes: data.notes.trim() || null,
+      };
+
+      const url = isEditMode && paymentId
+        ? `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments/${paymentId}`
+        : `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments`;
+      
+      const response = await fetch(url, {
+        method: isEditMode ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to save payment');
       }
+
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to save payment');
+      }
+
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });

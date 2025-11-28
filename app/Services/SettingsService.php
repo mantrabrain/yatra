@@ -70,6 +70,15 @@ class SettingsService
         'gateway_configs' => [],
         'gateway_order' => [],
         
+        // Scheduled/Recurring Payments
+        'enable_scheduled_payments' => true,
+        'scheduled_payment_type' => 'single',
+        'scheduled_payment_days' => 15,
+        'scheduled_payment_installments' => 1,
+        'scheduled_payment_interval' => 30,
+        'scheduled_payment_reminder_days' => 3,
+        'allow_save_payment_methods' => true,
+        
         // Email
         'email_from_name' => '',
         'email_from_address' => '',
