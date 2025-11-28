@@ -1508,18 +1508,29 @@ const Input = reactExports.forwardRef(
   }
 );
 Input.displayName = "Input";
+const dropdownArrow = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`;
 const Select = reactExports.forwardRef(
-  ({ className = "", children, ...props }, ref) => {
+  ({ className = "", children, style, ...props }, ref) => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
       "select",
       {
-        className: `flex h-11 w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:focus-visible:ring-blue-400 transition-colors ${className}`,
+        className: `flex w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:focus-visible:ring-blue-400 transition-colors cursor-pointer ${className}`,
         ref,
         style: {
-          ...props.style,
-          overflow: "visible",
-          color: "inherit",
-          backgroundColor: "transparent"
+          height: "38px",
+          minHeight: "38px",
+          lineHeight: "38px",
+          paddingTop: "0",
+          paddingBottom: "0",
+          paddingRight: "2.5rem",
+          WebkitAppearance: "none",
+          MozAppearance: "none",
+          appearance: "none",
+          backgroundImage: dropdownArrow,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "right 0.75rem center",
+          backgroundSize: "16px 16px",
+          ...style
         },
         ...props,
         children
@@ -4076,11 +4087,14 @@ const ConfirmationDialog = ({
   onConfirm,
   title: title2,
   message: message2,
+  description,
   confirmText,
   cancelText,
   variant = "danger",
-  isLoading = false
+  isLoading = false,
+  icon
 }) => {
+  const displayMessage = description || message2 || "";
   if (!isOpen) return null;
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -4116,10 +4130,10 @@ const ConfirmationDialog = ({
     {
       className: "fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm",
       onClick: handleBackdropClick,
-      children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-md mx-4 shadow-xl", children: [
+      children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-md mx-4 shadow-xl animate-in fade-in zoom-in-95 duration-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `flex-shrink-0 mt-1 ${getVariantStyles()}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTriangle, { className: "w-6 h-6" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `flex-shrink-0 mt-0.5 ${getVariantStyles()}`, children: icon || /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTriangle, { className: "w-6 h-6" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg", children: title2 || __("Confirm Action", "Confirm Action") }) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -4134,7 +4148,7 @@ const ConfirmationDialog = ({
           )
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: message2 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: displayMessage }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 justify-end pt-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
@@ -4151,9 +4165,10 @@ const ConfirmationDialog = ({
                 variant: getButtonVariant(),
                 onClick: onConfirm,
                 disabled: isLoading,
+                className: "min-w-[100px]",
                 children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "animate-spin mr-2", children: "⏳" }),
-                  __("Processing...", "Processing...")
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 mr-2 animate-spin" }),
+                  __("Deleting...", "Deleting...")
                 ] }) : confirmText || __("Confirm", "Confirm")
               }
             )
@@ -11653,6 +11668,14 @@ const DifficultyLevelForm = () => {
     ] }) }) })
   ] });
 };
+const Skeleton = ({ className = "" }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "div",
+    {
+      className: `animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`
+    }
+  );
+};
 const Bookings = () => {
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
@@ -11660,6 +11683,8 @@ const Bookings = () => {
   const [sortBy, setSortBy] = reactExports.useState("booking_date");
   const [sortOrder, setSortOrder] = reactExports.useState("desc");
   const [page, setPage] = reactExports.useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = reactExports.useState(false);
+  const [bookingToDelete, setBookingToDelete] = reactExports.useState(null);
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const queryParams = reactExports.useMemo(() => {
@@ -11683,213 +11708,69 @@ const Bookings = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["bookings", queryParams],
     queryFn: async () => {
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split("T")[0];
-      };
-      const allBookings = [
-        {
-          id: 1,
-          booking_number: "YT-2024-001",
-          customer_name: "John Smith",
-          customer_email: "john.smith@example.com",
-          trip_title: "Everest Base Camp Trek",
-          trip_id: 1,
-          booking_date: getDate(5),
-          travel_date: getDate(30),
-          travelers: 2,
-          total_amount: 2500,
-          payment_status: "paid",
-          booking_status: "confirmed",
-          payment_method: "Credit Card",
-          created_at: getDate(5)
-        },
-        {
-          id: 2,
-          booking_number: "YT-2024-002",
-          customer_name: "Sarah Johnson",
-          customer_email: "sarah.j@example.com",
-          trip_title: "Annapurna Circuit Adventure",
-          trip_id: 2,
-          booking_date: getDate(3),
-          travel_date: getDate(25),
-          travelers: 1,
-          total_amount: 980,
-          payment_status: "pending",
-          booking_status: "pending",
-          payment_method: "Bank Transfer",
-          created_at: getDate(3)
-        },
-        {
-          id: 3,
-          booking_number: "YT-2024-003",
-          customer_name: "Michael Chen",
-          customer_email: "m.chen@example.com",
-          trip_title: "Golden Triangle Tour",
-          trip_id: 3,
-          booking_date: getDate(10),
-          travel_date: getDate(20),
-          travelers: 4,
-          total_amount: 3e3,
-          payment_status: "paid",
-          booking_status: "confirmed",
-          payment_method: "PayPal",
-          created_at: getDate(10)
-        },
-        {
-          id: 4,
-          booking_number: "YT-2024-004",
-          customer_name: "Emma Williams",
-          customer_email: "emma.w@example.com",
-          trip_title: "Bhutan Cultural Journey",
-          trip_id: 4,
-          booking_date: getDate(15),
-          travel_date: getDate(35),
-          travelers: 2,
-          total_amount: 2200,
-          payment_status: "partial",
-          booking_status: "confirmed",
-          payment_method: "Credit Card",
-          created_at: getDate(15)
-        },
-        {
-          id: 5,
-          booking_number: "YT-2024-005",
-          customer_name: "David Brown",
-          customer_email: "d.brown@example.com",
-          trip_title: "Langtang Valley Trek",
-          trip_id: 6,
-          booking_date: getDate(2),
-          travel_date: getDate(40),
-          travelers: 1,
-          total_amount: 920,
-          payment_status: "paid",
-          booking_status: "confirmed",
-          payment_method: "Stripe",
-          created_at: getDate(2)
-        },
-        {
-          id: 6,
-          booking_number: "YT-2024-006",
-          customer_name: "Lisa Anderson",
-          customer_email: "lisa.a@example.com",
-          trip_title: "Manaslu Circuit Trek",
-          trip_id: 7,
-          booking_date: getDate(8),
-          travel_date: getDate(28),
-          travelers: 3,
-          total_amount: 4050,
-          payment_status: "refunded",
-          booking_status: "cancelled",
-          payment_method: "Credit Card",
-          created_at: getDate(8)
-        },
-        {
-          id: 7,
-          booking_number: "YT-2024-007",
-          customer_name: "Robert Taylor",
-          customer_email: "r.taylor@example.com",
-          trip_title: "Everest Base Camp Trek",
-          trip_id: 1,
-          booking_date: getDate(12),
-          travel_date: getDate(45),
-          travelers: 2,
-          total_amount: 2500,
-          payment_status: "pending",
-          booking_status: "pending",
-          payment_method: "Bank Transfer",
-          created_at: getDate(12)
-        },
-        {
-          id: 8,
-          booking_number: "YT-2024-008",
-          customer_name: "Maria Garcia",
-          customer_email: "maria.g@example.com",
-          trip_title: "Tibet Spiritual Tour",
-          trip_id: 5,
-          booking_date: getDate(20),
-          travel_date: getDate(50),
-          travelers: 1,
-          total_amount: 850,
-          payment_status: "paid",
-          booking_status: "completed",
-          payment_method: "PayPal",
-          created_at: getDate(20)
+      var _a, _b;
+      const params = new URLSearchParams();
+      params.append("page", String(queryParams.page));
+      params.append("per_page", String(queryParams.per_page));
+      if (queryParams.search) {
+        params.append("search", queryParams.search);
+      }
+      if (queryParams.status) {
+        params.append("status", queryParams.status);
+      }
+      if (queryParams.payment_status) {
+        params.append("payment_status", queryParams.payment_status);
+      }
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/bookings?${params.toString()}`, {
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
         }
-      ];
-      let filtered = allBookings;
-      if (searchTerm) {
-        filtered = filtered.filter(
-          (booking) => booking.booking_number.toLowerCase().includes(searchTerm.toLowerCase()) || booking.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) || booking.customer_email.toLowerCase().includes(searchTerm.toLowerCase()) || booking.trip_title.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      if (statusFilter !== "all") {
-        filtered = filtered.filter((booking) => booking.booking_status === statusFilter);
-      }
-      if (paymentFilter !== "all") {
-        filtered = filtered.filter((booking) => booking.payment_status === paymentFilter);
-      }
-      filtered = [...filtered].sort((a, b) => {
-        let aValue;
-        let bValue;
-        switch (sortBy) {
-          case "booking_number":
-            aValue = a.booking_number;
-            bValue = b.booking_number;
-            break;
-          case "customer_name":
-            aValue = a.customer_name.toLowerCase();
-            bValue = b.customer_name.toLowerCase();
-            break;
-          case "trip_title":
-            aValue = a.trip_title.toLowerCase();
-            bValue = b.trip_title.toLowerCase();
-            break;
-          case "booking_date":
-            aValue = new Date(a.booking_date).getTime();
-            bValue = new Date(b.booking_date).getTime();
-            break;
-          case "travel_date":
-            aValue = new Date(a.travel_date).getTime();
-            bValue = new Date(b.travel_date).getTime();
-            break;
-          case "total_amount":
-            aValue = a.total_amount;
-            bValue = b.total_amount;
-            break;
-          case "booking_status":
-            aValue = a.booking_status;
-            bValue = b.booking_status;
-            break;
-          case "payment_status":
-            aValue = a.payment_status;
-            bValue = b.payment_status;
-            break;
-          default:
-            aValue = new Date(a.booking_date).getTime();
-            bValue = new Date(b.booking_date).getTime();
-        }
-        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-        return 0;
       });
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
-      return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10
-      };
+      if (!response.ok) {
+        throw new Error("Failed to fetch bookings");
+      }
+      const result = await response.json();
+      if (result.success) {
+        const bookings2 = result.data.map((booking) => ({
+          id: booking.id,
+          booking_number: booking.reference,
+          customer_name: booking.customer_name || "N/A",
+          customer_email: booking.customer_email,
+          trip_title: booking.trip_title || `Trip #${booking.trip_id}`,
+          trip_id: booking.trip_id,
+          booking_date: booking.created_at,
+          travel_date: booking.travel_date,
+          travelers: booking.travelers_count,
+          total_amount: booking.total_amount,
+          payment_status: booking.payment_status,
+          booking_status: booking.status,
+          payment_method: booking.payment_gateway,
+          created_at: booking.created_at
+        }));
+        return {
+          data: bookings2,
+          total: result.meta.total,
+          page: result.meta.page,
+          per_page: result.meta.per_page
+        };
+      }
+      return { data: [], total: 0, page: 1, per_page: 10 };
     },
     enabled: can("yatra_view_bookings")
   });
   const deleteMutation = useMutation({
-    mutationFn: async (_id) => {
-      return { success: true };
+    mutationFn: async (id) => {
+      var _a, _b;
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/bookings/${id}`, {
+        method: "DELETE",
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete booking");
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["bookings"] });
@@ -11966,9 +11847,19 @@ const Bookings = () => {
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=edit&id=${booking.id}`;
   };
   const handleDelete = (booking) => {
-    if (confirm(__("Are you sure you want to delete this booking?", "Are you sure you want to delete this booking?"))) {
-      deleteMutation.mutate(booking.id);
+    setBookingToDelete(booking);
+    setDeleteDialogOpen(true);
+  };
+  const confirmDelete = () => {
+    if (bookingToDelete) {
+      deleteMutation.mutate(bookingToDelete.id);
+      setDeleteDialogOpen(false);
+      setBookingToDelete(null);
     }
+  };
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setBookingToDelete(null);
   };
   const handleView = (booking) => {
     var _a;
@@ -12102,7 +11993,23 @@ const Bookings = () => {
       ) })
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading bookings", "Error loading bookings") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("Loading bookings...", "Loading bookings...") }) : bookings.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No bookings found", "No bookings found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 space-y-3", children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 p-3 border-b border-gray-100 dark:border-gray-700 last:border-0", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-48" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-28" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded-full" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded-full" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" })
+        ] })
+      ] }, i)) }) : bookings.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No bookings found", "No bookings found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[120px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
@@ -12284,11 +12191,26 @@ const Bookings = () => {
           )
         ] })
       ] }) }) })
-    ] }) })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: deleteDialogOpen,
+        onClose: cancelDelete,
+        onConfirm: confirmDelete,
+        title: __("Delete Booking", "Delete Booking"),
+        description: bookingToDelete ? __(`Are you sure you want to delete booking "${bookingToDelete.booking_number}"? This action cannot be undone.`, `Are you sure you want to delete booking "${bookingToDelete.booking_number}"? This action cannot be undone.`) : __("Are you sure you want to delete this booking?", "Are you sure you want to delete this booking?"),
+        confirmText: __("Delete", "Delete"),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "danger",
+        isLoading: deleteMutation.isPending,
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTriangle, { className: "w-6 h-6 text-red-500" })
+      }
+    )
   ] });
 };
 const BookingForm = () => {
-  var _a;
+  var _a, _b;
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const [formData, setFormData] = reactExports.useState({
@@ -12316,75 +12238,133 @@ const BookingForm = () => {
     return params.get("id") ? parseInt(params.get("id") || "0") : null;
   }, []);
   const isEditMode = action === "edit" && bookingId !== null;
-  const { data: tripsData } = useQuery({
+  const { data: gatewaysData } = useQuery({
+    queryKey: ["payment-gateways"],
+    queryFn: async () => {
+      var _a2, _b2;
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/payment/gateways`, {
+        headers: {
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        return { data: [] };
+      }
+      const result = await response.json();
+      if (result.success) {
+        return {
+          data: result.data.filter((gw) => gw.enabled).map((gw) => ({
+            id: gw.id,
+            title: gw.title || gw.name
+          }))
+        };
+      }
+      return { data: [] };
+    }
+  });
+  const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
     queryKey: ["trips-list"],
     queryFn: async () => {
-      return {
-        data: [
-          { id: 1, title: "Everest Base Camp Trek", price: 1250 },
-          { id: 2, title: "Annapurna Circuit Adventure", price: 980 },
-          { id: 3, title: "Golden Triangle Tour", price: 750 },
-          { id: 4, title: "Bhutan Cultural Journey", price: 1100 },
-          { id: 5, title: "Tibet Spiritual Tour", price: 850 },
-          { id: 6, title: "Langtang Valley Trek", price: 920 },
-          { id: 7, title: "Manaslu Circuit Trek", price: 1350 },
-          { id: 8, title: "Upper Mustang Trek", price: 1450 }
-        ]
-      };
+      var _a2, _b2;
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/trips?per_page=100`, {
+        headers: {
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch trips");
+      }
+      const result = await response.json();
+      console.log("Trips API Response:", result);
+      const tripsArray = result.data || result || [];
+      if (Array.isArray(tripsArray) && tripsArray.length > 0) {
+        const trips = tripsArray.map((trip) => ({
+          id: String(trip.id),
+          title: trip.title,
+          price: parseFloat(trip.sale_price || trip.original_price || 0),
+          currency: trip.currency || "USD"
+        }));
+        console.log("Mapped trips:", trips);
+        return { data: trips };
+      }
+      console.log("No trips found in response");
+      return { data: [] };
     },
-    enabled: can("yatra_view_trips")
+    // Always fetch trips when user can manage bookings
+    enabled: can("yatra_view_bookings") || can("yatra_view_trips")
   });
   const { data: bookingData, isLoading: isLoadingBooking } = useQuery({
     queryKey: ["booking", bookingId],
     queryFn: async () => {
+      var _a2, _b2;
       if (!bookingId) return null;
-      return {
-        id: bookingId,
-        customer_name: "John Smith",
-        customer_email: "john.smith@example.com",
-        customer_phone: "+1234567890",
-        trip_id: 1,
-        booking_date: (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
-        travel_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1e3).toISOString().split("T")[0],
-        travelers: 2,
-        total_amount: 2500,
-        payment_status: "paid",
-        booking_status: "confirmed",
-        payment_method: "Credit Card",
-        notes: "Customer requested early check-in"
-      };
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/bookings/${bookingId}`, {
+        headers: {
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch booking");
+      }
+      const result = await response.json();
+      console.log("Booking API Response:", result);
+      if (result.success) {
+        const booking = result.data;
+        const customerName = booking.customer_name || `${booking.contact_first_name || ""} ${booking.contact_last_name || ""}`.trim();
+        const mappedData = {
+          id: booking.id,
+          customer_name: customerName,
+          customer_email: booking.customer_email || "",
+          customer_phone: booking.customer_phone || "",
+          trip_id: String(booking.trip_id || ""),
+          booking_date: booking.created_at ? booking.created_at.split(" ")[0] : (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
+          travel_date: booking.travel_date || "",
+          travelers: booking.travelers_count || 1,
+          total_amount: parseFloat(booking.total_amount || 0),
+          payment_status: booking.payment_status || "pending",
+          booking_status: booking.status || "pending",
+          payment_method: booking.payment_gateway || "",
+          notes: booking.special_requests || ""
+        };
+        console.log("Mapped booking data:", mappedData);
+        return mappedData;
+      }
+      return null;
     },
     enabled: isEditMode && can("yatra_view_bookings")
   });
+  const [isDataLoaded, setIsDataLoaded] = reactExports.useState(false);
   reactExports.useEffect(() => {
-    var _a2, _b, _c;
     if (bookingData && isEditMode) {
+      console.log("Setting form data from booking:", bookingData);
       setFormData({
         customer_name: bookingData.customer_name || "",
         customer_email: bookingData.customer_email || "",
         customer_phone: bookingData.customer_phone || "",
-        trip_id: ((_a2 = bookingData.trip_id) == null ? void 0 : _a2.toString()) || "",
+        trip_id: String(bookingData.trip_id || ""),
         booking_date: bookingData.booking_date || (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
         travel_date: bookingData.travel_date || "",
-        travelers: ((_b = bookingData.travelers) == null ? void 0 : _b.toString()) || "1",
-        total_amount: ((_c = bookingData.total_amount) == null ? void 0 : _c.toString()) || "",
+        travelers: String(bookingData.travelers || "1"),
+        total_amount: String(bookingData.total_amount || ""),
         payment_status: bookingData.payment_status || "pending",
         booking_status: bookingData.booking_status || "pending",
         payment_method: bookingData.payment_method || "",
         notes: bookingData.notes || ""
       });
+      setIsDataLoaded(true);
     }
   }, [bookingData, isEditMode]);
   reactExports.useEffect(() => {
     var _a2;
-    if (formData.trip_id && formData.travelers) {
-      const selectedTrip = (_a2 = tripsData == null ? void 0 : tripsData.data) == null ? void 0 : _a2.find((trip) => trip.id === parseInt(formData.trip_id));
+    if (isEditMode && !isDataLoaded) return;
+    if (formData.trip_id && formData.travelers && !isEditMode) {
+      const selectedTrip = (_a2 = tripsData == null ? void 0 : tripsData.data) == null ? void 0 : _a2.find((trip) => String(trip.id) === formData.trip_id);
       if (selectedTrip) {
         const total = selectedTrip.price * parseInt(formData.travelers);
         setFormData((prev) => ({ ...prev, total_amount: total.toString() }));
       }
     }
-  }, [formData.trip_id, formData.travelers, tripsData]);
+  }, [formData.trip_id, formData.travelers, tripsData, isEditMode, isDataLoaded]);
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -12421,27 +12401,38 @@ const BookingForm = () => {
   };
   const saveMutation = useMutation({
     mutationFn: async (data) => {
+      var _a2, _b2, _c;
+      const nameParts = data.customer_name.trim().split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || "";
       const payload = {
-        customer_name: data.customer_name.trim(),
-        customer_email: data.customer_email.trim(),
-        customer_phone: data.customer_phone.trim(),
+        contact_first_name: firstName,
+        contact_last_name: lastName,
+        contact_email: data.customer_email.trim(),
+        contact_phone: data.customer_phone.trim(),
         trip_id: parseInt(data.trip_id),
-        booking_date: data.booking_date,
         travel_date: data.travel_date,
-        travelers: parseInt(data.travelers),
+        travelers_count: parseInt(data.travelers),
         total_amount: parseFloat(data.total_amount),
         payment_status: data.payment_status,
-        booking_status: data.booking_status,
-        payment_method: data.payment_method.trim(),
-        notes: data.notes.trim()
+        status: data.booking_status,
+        payment_gateway: data.payment_method.trim(),
+        special_requests: data.notes.trim()
       };
-      if (isEditMode && bookingId) {
-        console.log("Updating booking:", bookingId, payload);
-        return { success: true, id: bookingId };
-      } else {
-        console.log("Creating booking:", payload);
-        return { success: true, id: Math.floor(Math.random() * 1e3) };
+      const url = isEditMode && bookingId ? `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/bookings/${bookingId}` : `${((_b2 = window.yatraAdmin) == null ? void 0 : _b2.apiUrl) || "/wp-json/yatra/v1"}/bookings`;
+      const response = await fetch(url, {
+        method: isEditMode ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": ((_c = window.yatraAdmin) == null ? void 0 : _c.nonce) || ""
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to save booking");
       }
+      return await response.json();
     },
     onSuccess: () => {
       var _a2;
@@ -12468,9 +12459,93 @@ const BookingForm = () => {
     window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings`;
   };
   if (isEditMode && isLoadingBooking) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-gray-600 dark:text-gray-400", children: __("Loading booking...", "Loading booking...") })
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-48" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-64" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-24" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-40" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-28" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-32" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-16" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-16" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-20 w-full" })
+              ] })
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-32" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-28" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-28" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-full" })
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 flex-1" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-20" })
+          ] }) }) })
+        ] })
+      ] })
     ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -12570,11 +12645,11 @@ const BookingForm = () => {
                   id: "trip_id",
                   value: formData.trip_id,
                   onChange: (e) => handleFieldChange("trip_id", e.target.value),
-                  className: `h-9 ${errors.trip_id ? "border-red-500" : ""}`,
+                  className: errors.trip_id ? "border-red-500" : "",
                   required: true,
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Select a trip", "Select a trip") }),
-                    (_a = tripsData == null ? void 0 : tripsData.data) == null ? void 0 : _a.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: trip.id, children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: isLoadingTrips ? __("Loading trips...", "Loading trips...") : __("Select a trip", "Select a trip") }),
+                    (_a = tripsData == null ? void 0 : tripsData.data) == null ? void 0 : _a.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: String(trip.id), children: [
                       trip.title,
                       " - $",
                       trip.price
@@ -12700,12 +12775,13 @@ const BookingForm = () => {
                   id: "booking_status",
                   value: formData.booking_status,
                   onChange: (e) => handleFieldChange("booking_status", e.target.value),
-                  className: "h-9",
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "Pending") }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "confirmed", children: __("Confirmed", "Confirmed") }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "cancelled", children: __("Cancelled", "Cancelled") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "completed", children: __("Completed", "Completed") })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "completed", children: __("Completed", "Completed") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "refunded", children: __("Refunded", "Refunded") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "failed", children: __("Failed", "Failed") })
                   ]
                 }
               )
@@ -12718,7 +12794,6 @@ const BookingForm = () => {
                   id: "payment_status",
                   value: formData.payment_status,
                   onChange: (e) => handleFieldChange("payment_status", e.target.value),
-                  className: "h-9",
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "Pending") }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "partial", children: __("Partial", "Partial") }),
@@ -12736,14 +12811,15 @@ const BookingForm = () => {
                   id: "payment_method",
                   value: formData.payment_method,
                   onChange: (e) => handleFieldChange("payment_method", e.target.value),
-                  className: "h-9",
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Select payment method", "Select payment method") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Credit Card", children: __("Credit Card", "Credit Card") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Bank Transfer", children: __("Bank Transfer", "Bank Transfer") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "PayPal", children: __("PayPal", "PayPal") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Stripe", children: __("Stripe", "Stripe") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Cash", children: __("Cash", "Cash") })
+                    (_b = gatewaysData == null ? void 0 : gatewaysData.data) == null ? void 0 : _b.map((gw) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: gw.id, children: gw.title }, gw.id)),
+                    (!(gatewaysData == null ? void 0 : gatewaysData.data) || gatewaysData.data.length === 0) && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pay_later", children: __("Pay Later", "Pay Later") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "bank_transfer", children: __("Bank Transfer", "Bank Transfer") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "stripe", children: __("Stripe", "Stripe") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "paypal", children: __("PayPal", "PayPal") })
+                    ] })
                   ]
                 }
               )
@@ -12793,33 +12869,57 @@ const ViewBooking = () => {
   const { data: booking, isLoading, error } = useQuery({
     queryKey: ["booking", bookingId],
     queryFn: async () => {
+      var _a, _b;
       if (!bookingId) return null;
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() + days);
-        return date.toISOString().split("T")[0];
-      };
-      return {
-        id: bookingId,
-        booking_number: "YT-2024-001",
-        customer_name: "John Smith",
-        customer_email: "john.smith@example.com",
-        customer_phone: "+1234567890",
-        trip_id: 1,
-        trip_title: "Everest Base Camp Trek",
-        trip_price: 1250,
-        booking_date: getDate(-5),
-        travel_date: getDate(30),
-        travelers: 2,
-        total_amount: 2500,
-        payment_status: "paid",
-        booking_status: "confirmed",
-        payment_method: "Credit Card",
-        notes: "Customer requested early check-in and vegetarian meals. Please confirm availability.",
-        created_at: getDate(-5),
-        updated_at: getDate(-2)
-      };
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/bookings/${bookingId}`, {
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch booking");
+      }
+      const result = await response.json();
+      if (result.success && result.data) {
+        const data = result.data;
+        return {
+          id: data.id,
+          booking_number: data.reference,
+          customer_name: data.customer_name || `${data.contact_first_name || ""} ${data.contact_last_name || ""}`.trim() || "N/A",
+          customer_email: data.customer_email,
+          customer_phone: data.customer_phone,
+          customer_country: data.contact_country,
+          trip_id: data.trip_id,
+          trip_title: data.trip_title || `Trip #${data.trip_id}`,
+          trip_image: data.trip_image,
+          trip_price: data.total_amount / (data.travelers_count || 1),
+          booking_date: data.created_at,
+          travel_date: data.travel_date,
+          travelers: data.travelers_count,
+          travelers_data: data.travelers || [],
+          total_amount: data.total_amount,
+          amount_paid: data.amount_paid || 0,
+          amount_due: data.amount_due || 0,
+          currency: data.currency || "USD",
+          payment_status: data.payment_status,
+          booking_status: data.status,
+          payment_method: data.payment_gateway,
+          payment_date: data.payment_date,
+          notes: data.special_requests,
+          internal_notes: data.internal_notes,
+          emergency_contact: data.emergency_contact,
+          contact_data: data.contact_data,
+          payments: data.payments || [],
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+          confirmed_at: data.confirmed_at,
+          completed_at: data.completed_at,
+          cancelled_at: data.cancelled_at,
+          cancellation_reason: data.cancellation_reason,
+          trip_details: data.trip_details
+        };
+      }
+      return null;
     },
     enabled: !!bookingId && can("yatra_view_bookings")
   });
@@ -12896,9 +12996,84 @@ const ViewBooking = () => {
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=edit&id=${bookingId}`;
   };
   if (isLoading) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-gray-600 dark:text-gray-400", children: __("Loading booking...", "Loading booking...") })
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-48" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-64" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-28" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-20" })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-36" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-20 rounded-md" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded-md" })
+              ] })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [...Array(6)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-24" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-32" })
+            ] }, i)) }) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-40" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-36" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-48" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" })
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-16" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-20 w-full" }) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-36" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-24" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded-md" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-28" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-32" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-24" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-28" })
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-16" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-40" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-24" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-40" })
+              ] })
+            ] })
+          ] })
+        ] })
+      ] })
     ] });
   }
   if (error || !booking) {
@@ -13024,10 +13199,90 @@ const ViewBooking = () => {
             ] })
           ] }) })
         ] }),
+        booking.travelers_data && booking.travelers_data.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-4 h-4" }),
+            __("Travelers Information", "Travelers Information"),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 text-xs font-normal text-gray-500 dark:text-gray-400", children: [
+              "(",
+              booking.travelers_data.length,
+              " ",
+              booking.travelers_data.length === 1 ? __("traveler", "traveler") : __("travelers", "travelers"),
+              ")"
+            ] })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-4", children: booking.travelers_data.map((traveler, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              className: `p-4 rounded-lg ${index === 0 ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800" : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"}`,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: index === 0 ? __("Lead Traveler", "Lead Traveler") : `${__("Traveler", "Traveler")} ${index + 1}` }),
+                  index === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded", children: __("Primary Contact", "Primary Contact") })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-3 gap-3", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Full Name", "Full Name") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: [traveler.first_name, traveler.last_name].filter(Boolean).join(" ") || "-" })
+                  ] }),
+                  traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Gender", "Gender") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white capitalize", children: traveler.gender })
+                  ] }),
+                  traveler.date_of_birth && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Date of Birth", "Date of Birth") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: new Date(traveler.date_of_birth).toLocaleDateString() })
+                  ] }),
+                  traveler.nationality && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Nationality", "Nationality") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: traveler.nationality })
+                  ] }),
+                  traveler.passport && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Passport No.", "Passport No.") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white font-mono", children: traveler.passport })
+                  ] }),
+                  traveler.passport_expiry && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Passport Expiry", "Passport Expiry") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: new Date(traveler.passport_expiry).toLocaleDateString() })
+                  ] }),
+                  traveler.dietary && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-2 md:col-span-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Dietary Requirements", "Dietary Requirements") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: traveler.dietary })
+                  ] }),
+                  traveler.medical && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-2 md:col-span-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Medical Conditions", "Medical Conditions") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: traveler.medical })
+                  ] })
+                ] })
+              ]
+            },
+            index
+          )) })
+        ] }),
+        booking.emergency_contact && (booking.emergency_contact.name || booking.emergency_contact.phone) && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-4 h-4" }),
+            __("Emergency Contact", "Emergency Contact")
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-3", children: [
+            booking.emergency_contact.name && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Contact Name", "Contact Name") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: booking.emergency_contact.name })
+            ] }),
+            booking.emergency_contact.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Phone Number", "Phone Number") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: booking.emergency_contact.phone })
+            ] }),
+            booking.emergency_contact.relationship && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: __("Relationship", "Relationship") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white capitalize", children: booking.emergency_contact.relationship })
+            ] })
+          ] }) })
+        ] }),
         booking.notes && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4" }),
-            __("Notes", "Notes")
+            __("Special Requests", "Special Requests")
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap", children: booking.notes }) })
         ] })
@@ -17001,6 +17256,7 @@ const Settings = () => {
     partial_payment_percentage: 30,
     deposit_required: true,
     deposit_percentage: 20,
+    auto_confirm_pay_later: true,
     gateway_configs: {
       stripe: {
         enabled: true,
@@ -17875,7 +18131,24 @@ const Settings = () => {
                     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-500 dark:text-gray-400", children: "%" })
                   ] })
                 }
-              )
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "checkbox",
+                    id: "auto_confirm_pay_later",
+                    checked: formData.auto_confirm_pay_later,
+                    name: "auto_confirm_pay_later",
+                    onChange: handleFieldChange,
+                    className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "auto_confirm_pay_later", className: "font-medium cursor-pointer", children: __('Auto-confirm "Pay Later" Bookings', 'Auto-confirm "Pay Later" Bookings') }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __('Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.', 'Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.') })
+                ] })
+              ] })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Payment Gateways", "Payment Gateways") }),
@@ -25771,183 +26044,53 @@ const Payments = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["payments", queryParams],
     queryFn: async () => {
-      const today = /* @__PURE__ */ new Date();
-      const getDate = (days) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split("T")[0];
-      };
-      const allPayments = [
-        {
-          id: 1,
-          payment_number: "PAY-2024-001",
-          booking_id: 1,
-          booking_number: "YT-2024-001",
-          customer_name: "John Smith",
-          customer_email: "john.smith@example.com",
-          trip_title: "Everest Base Camp Trek",
-          amount: 2500,
-          payment_method: "Credit Card",
-          payment_status: "completed",
-          transaction_id: "TXN-123456789",
-          payment_date: getDate(5),
-          notes: "Full payment received",
-          created_at: getDate(5)
-        },
-        {
-          id: 2,
-          payment_number: "PAY-2024-002",
-          booking_id: 2,
-          booking_number: "YT-2024-002",
-          customer_name: "Sarah Johnson",
-          customer_email: "sarah.j@example.com",
-          trip_title: "Annapurna Circuit Adventure",
-          amount: 980,
-          payment_method: "PayPal",
-          payment_status: "completed",
-          transaction_id: "PP-987654321",
-          payment_date: getDate(3),
-          created_at: getDate(3)
-        },
-        {
-          id: 3,
-          payment_number: "PAY-2024-003",
-          booking_id: 3,
-          booking_number: "YT-2024-003",
-          customer_name: "Michael Chen",
-          customer_email: "m.chen@example.com",
-          trip_title: "Golden Triangle Tour",
-          amount: 1500,
-          payment_method: "Bank Transfer",
-          payment_status: "pending",
-          payment_date: getDate(2),
-          notes: "Awaiting bank confirmation",
-          created_at: getDate(2)
-        },
-        {
-          id: 4,
-          payment_number: "PAY-2024-004",
-          booking_id: 4,
-          booking_number: "YT-2024-004",
-          customer_name: "Emma Williams",
-          customer_email: "emma.w@example.com",
-          trip_title: "Bhutan Cultural Tour",
-          amount: 1200,
-          payment_method: "Credit Card",
-          payment_status: "partial",
-          transaction_id: "TXN-456789012",
-          payment_date: getDate(1),
-          notes: "Partial payment - balance pending",
-          created_at: getDate(1)
-        },
-        {
-          id: 5,
-          payment_number: "PAY-2024-005",
-          booking_id: 5,
-          booking_number: "YT-2024-005",
-          customer_name: "David Brown",
-          customer_email: "d.brown@example.com",
-          trip_title: "Langtang Valley Trek",
-          amount: 920,
-          payment_method: "Cash",
-          payment_status: "completed",
-          payment_date: getDate(0),
-          notes: "Cash payment at office",
-          created_at: getDate(0)
-        },
-        {
-          id: 6,
-          payment_number: "PAY-2024-006",
-          booking_id: 6,
-          booking_number: "YT-2024-006",
-          customer_name: "Lisa Anderson",
-          customer_email: "lisa.a@example.com",
-          trip_title: "Chitwan National Park Safari",
-          amount: 800,
-          payment_method: "Credit Card",
-          payment_status: "failed",
-          transaction_id: "TXN-FAILED-001",
-          payment_date: getDate(7),
-          notes: "Card declined - insufficient funds",
-          created_at: getDate(7)
-        },
-        {
-          id: 7,
-          payment_number: "PAY-2024-007",
-          booking_id: 7,
-          booking_number: "YT-2024-007",
-          customer_name: "Robert Taylor",
-          customer_email: "r.taylor@example.com",
-          trip_title: "Pokhara Adventure",
-          amount: 600,
-          payment_method: "PayPal",
-          payment_status: "refunded",
-          transaction_id: "PP-REFUND-001",
-          payment_date: getDate(10),
-          notes: "Refunded due to cancellation",
-          created_at: getDate(10)
+      var _a, _b;
+      const params = new URLSearchParams();
+      params.append("page", String(queryParams.page));
+      params.append("per_page", String(queryParams.per_page));
+      if (queryParams.search) {
+        params.append("search", queryParams.search);
+      }
+      if (queryParams.payment_status) {
+        params.append("status", queryParams.payment_status);
+      }
+      if (queryParams.payment_method) {
+        params.append("gateway", queryParams.payment_method);
+      }
+      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/payments?${params.toString()}`, {
+        headers: {
+          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
         }
-      ];
-      let filtered = allPayments;
-      if (searchTerm) {
-        filtered = filtered.filter(
-          (payment) => {
-            var _a;
-            return payment.payment_number.toLowerCase().includes(searchTerm.toLowerCase()) || payment.booking_number.toLowerCase().includes(searchTerm.toLowerCase()) || payment.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) || payment.customer_email.toLowerCase().includes(searchTerm.toLowerCase()) || payment.trip_title.toLowerCase().includes(searchTerm.toLowerCase()) || ((_a = payment.transaction_id) == null ? void 0 : _a.toLowerCase().includes(searchTerm.toLowerCase()));
-          }
-        );
-      }
-      if (statusFilter !== "all") {
-        filtered = filtered.filter((payment) => payment.payment_status === statusFilter);
-      }
-      if (methodFilter !== "all") {
-        filtered = filtered.filter((payment) => payment.payment_method === methodFilter);
-      }
-      filtered = [...filtered].sort((a, b) => {
-        let aValue;
-        let bValue;
-        switch (sortBy) {
-          case "payment_number":
-            aValue = a.payment_number.toLowerCase();
-            bValue = b.payment_number.toLowerCase();
-            break;
-          case "customer_name":
-            aValue = a.customer_name.toLowerCase();
-            bValue = b.customer_name.toLowerCase();
-            break;
-          case "amount":
-            aValue = a.amount;
-            bValue = b.amount;
-            break;
-          case "payment_method":
-            aValue = a.payment_method.toLowerCase();
-            bValue = b.payment_method.toLowerCase();
-            break;
-          case "payment_status":
-            aValue = a.payment_status;
-            bValue = b.payment_status;
-            break;
-          case "payment_date":
-            aValue = new Date(a.payment_date).getTime();
-            bValue = new Date(b.payment_date).getTime();
-            break;
-          default:
-            aValue = new Date(a.payment_date).getTime();
-            bValue = new Date(b.payment_date).getTime();
-        }
-        if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
-        return 0;
       });
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
-      return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10
-      };
+      if (!response.ok) {
+        throw new Error("Failed to fetch payments");
+      }
+      const result = await response.json();
+      if (result.success) {
+        const payments2 = result.data.map((payment) => ({
+          id: payment.id,
+          payment_number: `PAY-${payment.id.toString().padStart(6, "0")}`,
+          booking_id: payment.booking_id,
+          booking_number: payment.booking_reference || `#${payment.booking_id}`,
+          customer_name: payment.customer_name || "N/A",
+          customer_email: payment.customer_email || "",
+          trip_title: payment.trip_title || "",
+          amount: payment.amount,
+          payment_method: payment.gateway,
+          payment_status: payment.status,
+          transaction_id: payment.transaction_id,
+          payment_date: payment.processed_at || payment.created_at,
+          notes: payment.notes,
+          created_at: payment.created_at
+        }));
+        return {
+          data: payments2,
+          total: result.meta.total,
+          page: result.meta.page,
+          per_page: result.meta.per_page
+        };
+      }
+      return { data: [], total: 0, page: 1, per_page: 10 };
     },
     enabled: can("yatra_view_bookings")
   });
@@ -33780,14 +33923,6 @@ const AvailabilityForm = () => {
       ] })
     ] })
   ] });
-};
-const Skeleton = ({ className = "" }) => {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    "div",
-    {
-      className: `animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`
-    }
-  );
 };
 const Enquiries = () => {
   var _a;

@@ -194,6 +194,7 @@ interface SettingsData {
   partial_payment_percentage: number;
   deposit_required: boolean;
   deposit_percentage: number;
+  auto_confirm_pay_later: boolean;
   gateway_configs: Record<string, PaymentGatewayConfig>;
   gateway_order?: string[];
   
@@ -1185,6 +1186,7 @@ const Settings: React.FC = () => {
         partial_payment_percentage: 30,
         deposit_required: true,
         deposit_percentage: 20,
+        auto_confirm_pay_later: true,
         gateway_configs: {
           stripe: {
             enabled: true,
@@ -2068,6 +2070,26 @@ onChange={handleFieldChange}
                     </div>
                   </FormField>
                 )}
+
+                {/* Auto-confirm Pay Later Bookings */}
+                <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                  <input
+                    type="checkbox"
+                    id="auto_confirm_pay_later"
+                    checked={formData.auto_confirm_pay_later}
+                    name='auto_confirm_pay_later'
+                    onChange={handleFieldChange}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="auto_confirm_pay_later" className="font-medium cursor-pointer">
+                      {__('Auto-confirm "Pay Later" Bookings', 'Auto-confirm "Pay Later" Bookings')}
+                    </Label>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {__('Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.', 'Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.')}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 

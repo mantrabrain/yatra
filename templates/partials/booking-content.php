@@ -137,14 +137,79 @@ $trip_slug = $trip->slug ?? '';
                         </div>
                     </div>
 
-                    <!-- Important Info -->
-                    <div class="yatra-summary-info">
-                        <h4><?php esc_html_e('Important Information', 'yatra'); ?></h4>
+                    <!-- Cancellation & Refund Policy -->
+                    <?php 
+                    $cancellation_policy = $booking->cancellation_policy ?? 'full_refund';
+                    $cancellation_days = $booking->cancellation_days ?? 7;
+                    $refund_policy = $booking->refund_policy ?? '';
+                    
+                    $policy_labels = [
+                        'full_refund' => __('Full refund available', 'yatra'),
+                        'partial_refund' => __('Partial refund available', 'yatra'),
+                        'no_refund' => __('No refund', 'yatra'),
+                        'flexible' => __('Flexible cancellation', 'yatra'),
+                    ];
+                    $policy_label = $policy_labels[$cancellation_policy] ?? __('Standard policy', 'yatra');
+                    ?>
+                    <div class="yatra-summary-info yatra-cancellation-policy">
+                        <h4><?php esc_html_e('Cancellation Policy', 'yatra'); ?></h4>
                         <ul>
-                            <li><?php esc_html_e('Free cancellation up to 48 hours before departure', 'yatra'); ?></li>
-                            <li><?php esc_html_e('Instant confirmation', 'yatra'); ?></li>
-                            <li><?php esc_html_e('24/7 customer support', 'yatra'); ?></li>
-                            <li><?php esc_html_e('Secure payment processing', 'yatra'); ?></li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 6v6l4 2"></path>
+                                </svg>
+                                <?php 
+                                printf(
+                                    /* translators: %d: number of days */
+                                    esc_html__('Free cancellation up to %d days before departure', 'yatra'), 
+                                    (int) $cancellation_days
+                                ); 
+                                ?>
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                </svg>
+                                <?php echo esc_html($policy_label); ?>
+                            </li>
+                            <?php if (!empty($refund_policy)) : ?>
+                            <li class="yatra-refund-details">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 16v-4"></path>
+                                    <path d="M12 8h.01"></path>
+                                </svg>
+                                <?php echo esc_html($refund_policy); ?>
+                            </li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                    
+                    <!-- Booking Assurance -->
+                    <div class="yatra-summary-info">
+                        <h4><?php esc_html_e('Booking Assurance', 'yatra'); ?></h4>
+                        <ul>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                <?php esc_html_e('Instant confirmation', 'yatra'); ?>
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                                <?php esc_html_e('24/7 customer support', 'yatra'); ?>
+                            </li>
+                            <li>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                                </svg>
+                                <?php esc_html_e('Secure payment processing', 'yatra'); ?>
+                            </li>
                         </ul>
                     </div>
                     

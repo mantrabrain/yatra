@@ -34,6 +34,7 @@ use Yatra\Controllers\ReviewController;
 use Yatra\Controllers\EnquiryController;
 use Yatra\Controllers\PaymentGatewayController;
 use Yatra\Controllers\BookingSessionController;
+use Yatra\Controllers\BookingsController;
 
 // Register Trip routes
 if (class_exists('Yatra\Controllers\TripController')) {
@@ -431,6 +432,27 @@ if (class_exists('Yatra\Controllers\BookingSessionController')) {
     } catch (\Exception $e) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Yatra: Failed to register Booking Session routes: ' . $e->getMessage());
+            error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
+        }
+    }
+}
+
+// Register Bookings Controller (Admin CRUD)
+if (class_exists('Yatra\Controllers\BookingsController')) {
+    try {
+        $bookings_controller = new BookingsController();
+        $bookings_controller->register_routes();
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $routes = rest_get_server()->get_routes('yatra/v1');
+            $bookings_routes = array_filter($routes, function($key) {
+                return strpos($key, '/bookings') !== false || strpos($key, '/payments') !== false;
+            }, ARRAY_FILTER_USE_KEY);
+            error_log('Yatra: Bookings routes registered: ' . print_r(array_keys($bookings_routes), true));
+        }
+    } catch (\Exception $e) {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Failed to register Bookings routes: ' . $e->getMessage());
             error_log('Yatra: Stack trace: ' . $e->getTraceAsString());
         }
     }

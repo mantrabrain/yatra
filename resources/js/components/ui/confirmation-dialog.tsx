@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, X, Loader2 } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { Button } from './button';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
@@ -14,11 +14,13 @@ interface ConfirmationDialogProps {
   onClose: () => void;
   onConfirm: () => void;
   title?: string;
-  message: string;
+  message?: string;
+  description?: string;
   confirmText?: string;
   cancelText?: string;
   variant?: 'danger' | 'warning' | 'info';
   isLoading?: boolean;
+  icon?: React.ReactNode;
 }
 
 export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -27,11 +29,15 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   onConfirm,
   title,
   message,
+  description,
   confirmText,
   cancelText,
   variant = 'danger',
   isLoading = false,
+  icon,
 }) => {
+  // Use description if provided, otherwise fall back to message
+  const displayMessage = description || message || '';
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -71,12 +77,12 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm"
       onClick={handleBackdropClick}
     >
-      <Card className="w-full max-w-md mx-4 shadow-xl">
+      <Card className="w-full max-w-md mx-4 shadow-xl animate-in fade-in zoom-in-95 duration-200">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
-              <div className={`flex-shrink-0 mt-1 ${getVariantStyles()}`}>
-                <AlertTriangle className="w-6 h-6" />
+              <div className={`flex-shrink-0 mt-0.5 ${getVariantStyles()}`}>
+                {icon || <AlertTriangle className="w-6 h-6" />}
               </div>
               <div>
                 <CardTitle className="text-lg">
@@ -96,7 +102,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {message}
+            {displayMessage}
           </p>
           <div className="flex gap-2 justify-end pt-2">
             <Button
@@ -110,11 +116,12 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               variant={getButtonVariant()}
               onClick={onConfirm}
               disabled={isLoading}
+              className="min-w-[100px]"
             >
               {isLoading ? (
                 <>
-                  <span className="animate-spin mr-2">⏳</span>
-                  {__('Processing...', 'Processing...')}
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {__('Deleting...', 'Deleting...')}
                 </>
               ) : (
                 confirmText || __('Confirm', 'Confirm')

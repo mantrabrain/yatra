@@ -42,8 +42,16 @@ class SettingsService
         'use_booking_page' => false,
         'booking_page_id' => 0,
         'enable_guest_booking' => true,
-        'booking_confirmation' => 'manual',
+        'booking_confirmation' => true,
+        'auto_confirm_bookings' => false,
+        'require_login' => false,
+        'allow_guest_checkout' => true,
+        'cancellation_policy' => 'full_refund',
+        'cancellation_days' => 7,
+        'refund_policy' => '',
         'booking_expiry_hours' => 24,
+        'booking_reminder_days' => 3,
+        'allow_waitlist' => true,
         
         // Payment
         'currency' => 'USD',
@@ -58,6 +66,7 @@ class SettingsService
         'deposit_percentage' => 20,
         'partial_payment' => false,
         'partial_payment_percentage' => 30,
+        'auto_confirm_pay_later' => true,
         'gateway_configs' => [],
         'gateway_order' => [],
         

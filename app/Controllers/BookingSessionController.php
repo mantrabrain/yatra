@@ -220,6 +220,42 @@ class BookingSessionController extends BaseController
     {
         $data = $request->get_json_params();
 
+        // ========================================
+        // GET BOOKING SETTINGS
+        // ========================================
+        $settings = [
+            'booking_confirmation' => \Yatra\Services\SettingsService::get('booking_confirmation', true),
+            'auto_confirm_bookings' => \Yatra\Services\SettingsService::get('auto_confirm_bookings', false),
+            'require_login' => \Yatra\Services\SettingsService::get('require_login', false),
+            'allow_guest_checkout' => \Yatra\Services\SettingsService::get('allow_guest_checkout', true),
+            'cancellation_policy' => \Yatra\Services\SettingsService::get('cancellation_policy', 'full_refund'),
+            'cancellation_days' => (int) \Yatra\Services\SettingsService::get('cancellation_days', 7),
+            'booking_expiry_hours' => (int) \Yatra\Services\SettingsService::get('booking_expiry_hours', 24),
+            'auto_confirm_pay_later' => \Yatra\Services\SettingsService::get('auto_confirm_pay_later', true),
+        ];
+
+        // ========================================
+        // CHECK LOGIN REQUIREMENT
+        // ========================================
+        if ($settings['require_login'] && !is_user_logged_in()) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('You must be logged in to make a booking.', 'yatra'),
+                'code' => 'login_required',
+                'login_url' => wp_login_url(home_url($_SERVER['REQUEST_URI'] ?? '')),
+            ], 401);
+        }
+
+        // Check guest checkout
+        if (!$settings['allow_guest_checkout'] && !is_user_logged_in()) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Guest checkout is not allowed. Please log in or create an account.', 'yatra'),
+                'code' => 'guest_not_allowed',
+                'login_url' => wp_login_url(home_url($_SERVER['REQUEST_URI'] ?? '')),
+            ], 401);
+        }
+
         // Get session data
         $session = yatra_get_booking_session();
         
@@ -233,19 +269,55 @@ class BookingSessionController extends BaseController
             ], 400);
         }
 
+        // Get contact email - handle both flat and nested formats
+        $contact_email = $data['contact_email'] ?? '';
+        $contact_phone = $data['contact_phone'] ?? '';
+        $contact_first_name = $data['contact_first_name'] ?? '';
+        $contact_last_name = $data['contact_last_name'] ?? '';
+        $contact_country = $data['contact_country'] ?? '';
+        $contact_nationality = $data['contact_nationality'] ?? '';
+        $contact_address = $data['contact_address'] ?? '';
+        
+        // Emergency contact
+        $emergency_name = $data['emergency_name'] ?? '';
+        $emergency_phone = $data['emergency_phone'] ?? '';
+        $emergency_relationship = $data['emergency_relationship'] ?? '';
+        
+        // Travel details
+        $travel_date = $data['travel_date'] ?? ($session['travel_date'] ?? '');
+        $travelers = $data['travelers'] ?? [];
+        
         // Validate required fields
-        $required_fields = ['contact_email', 'contact_phone', 'travel_date', 'travelers'];
-        foreach ($required_fields as $field) {
-            if (empty($data[$field])) {
-                return new WP_REST_Response([
-                    'success' => false,
-                    'message' => sprintf(__('Field %s is required.', 'yatra'), $field),
-                ], 400);
-            }
+        if (empty($contact_email)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Email address is required.', 'yatra'),
+            ], 400);
+        }
+        
+        if (empty($contact_phone)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Phone number is required.', 'yatra'),
+            ], 400);
+        }
+        
+        if (empty($travel_date)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Travel date is required.', 'yatra'),
+            ], 400);
+        }
+        
+        if (empty($travelers) || !is_array($travelers)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('At least one traveler is required.', 'yatra'),
+            ], 400);
         }
 
         // Validate email
-        if (!is_email($data['contact_email'])) {
+        if (!is_email($contact_email)) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Invalid email address.', 'yatra'),
@@ -269,16 +341,16 @@ class BookingSessionController extends BaseController
 
         // Calculate price
         $price_per_person = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
-        $travelers_count = count($data['travelers']);
+        $travelers_count = count($travelers);
         $total_amount = $price_per_person * $travelers_count;
 
         // Handle payment method
         $payment_method = sanitize_text_field($data['payment_method'] ?? 'full');
         $payment_gateway = sanitize_text_field($data['payment_gateway'] ?? 'pay_later');
         
-        $settings = get_option('yatra_settings', []);
-        $deposit_percentage = (int) ($settings['deposit_percentage'] ?? 20);
-        $partial_percentage = (int) ($settings['partial_payment_percentage'] ?? 30);
+        // Use SettingsService for settings
+        $deposit_percentage = (int) \Yatra\Services\SettingsService::get('deposit_percentage', 20);
+        $partial_percentage = (int) \Yatra\Services\SettingsService::get('partial_payment_percentage', 30);
 
         $amount_due = $total_amount;
         if ($payment_method === 'deposit') {
@@ -290,6 +362,36 @@ class BookingSessionController extends BaseController
         // Generate booking reference
         $booking_reference = 'YTR-' . strtoupper(substr(md5(uniqid((string)mt_rand(), true)), 0, 8));
 
+        // Prepare contact data
+        $contact_data = [
+            'first_name' => sanitize_text_field($contact_first_name),
+            'last_name' => sanitize_text_field($contact_last_name),
+            'email' => sanitize_email($contact_email),
+            'phone' => sanitize_text_field($contact_phone),
+            'country' => sanitize_text_field($contact_country),
+            'nationality' => sanitize_text_field($contact_nationality),
+            'address' => sanitize_text_field($contact_address),
+        ];
+        
+        // Prepare emergency contact data
+        $emergency_data = [
+            'name' => sanitize_text_field($emergency_name),
+            'phone' => sanitize_text_field($emergency_phone),
+            'relationship' => sanitize_text_field($emergency_relationship),
+        ];
+        
+        // Sanitize travelers data
+        $sanitized_travelers = [];
+        foreach ($travelers as $traveler) {
+            if (is_array($traveler)) {
+                $sanitized_traveler = [];
+                foreach ($traveler as $key => $value) {
+                    $sanitized_traveler[sanitize_key($key)] = sanitize_text_field($value);
+                }
+                $sanitized_travelers[] = $sanitized_traveler;
+            }
+        }
+
         // Insert booking
         $bookings_table = $wpdb->prefix . 'yatra_bookings';
         
@@ -299,12 +401,16 @@ class BookingSessionController extends BaseController
                 'reference' => $booking_reference,
                 'trip_id' => $trip_id,
                 'user_id' => get_current_user_id() ?: null,
-                'contact_email' => sanitize_email($data['contact_email']),
-                'contact_phone' => sanitize_text_field($data['contact_phone']),
-                'contact_country' => sanitize_text_field($data['contact_country'] ?? ''),
-                'travel_date' => sanitize_text_field($data['travel_date']),
+                'contact_first_name' => $contact_data['first_name'],
+                'contact_last_name' => $contact_data['last_name'],
+                'contact_email' => $contact_data['email'],
+                'contact_phone' => $contact_data['phone'],
+                'contact_country' => $contact_data['country'],
+                'contact_data' => wp_json_encode($contact_data),
+                'emergency_contact' => wp_json_encode($emergency_data),
+                'travel_date' => sanitize_text_field($travel_date),
                 'travelers_count' => $travelers_count,
-                'travelers_data' => json_encode($data['travelers']),
+                'travelers_data' => wp_json_encode($sanitized_travelers),
                 'total_amount' => $total_amount,
                 'amount_paid' => 0,
                 'amount_due' => $amount_due,
@@ -313,17 +419,19 @@ class BookingSessionController extends BaseController
                 'payment_gateway' => $payment_gateway,
                 'status' => 'pending',
                 'special_requests' => sanitize_textarea_field($data['special_requests'] ?? ''),
+                'newsletter_optin' => !empty($data['subscribe_newsletter']) ? 1 : 0,
                 'ip_address' => $this->getClientIp(),
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql'),
             ],
-            ['%s', '%d', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
+            ['%s', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s']
         );
 
         if ($result === false) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Failed to create booking. Please try again.', 'yatra'),
+                'error' => $wpdb->last_error,
             ], 500);
         }
 
@@ -333,46 +441,509 @@ class BookingSessionController extends BaseController
         yatra_clear_booking_session();
 
         // Check if this is an offline gateway
-        $gateway_configs = $settings['gateway_configs'] ?? [];
-        $gateway_config = $gateway_configs[$payment_gateway] ?? [];
         $is_offline = in_array($payment_gateway, ['pay_later', 'bank_transfer']);
 
         // For online gateways, create payment intent and return redirect URL
         if (!$is_offline && $amount_due > 0) {
-            // TODO: Integrate with actual payment gateway
-            // For now, return a placeholder
-            return new WP_REST_Response([
-                'success' => true,
-                'message' => __('Booking created. Redirecting to payment...', 'yatra'),
-                'data' => [
-                    'booking_id' => $booking_id,
-                    'reference' => $booking_reference,
-                    'payment_url' => home_url('/payment/' . $booking_reference . '/'),
-                ],
+            // Process payment based on gateway
+            $payment_result = $this->processPaymentGateway($payment_gateway, [
+                'booking_id' => $booking_id,
+                'reference' => $booking_reference,
+                'amount' => $amount_due,
+                'currency' => $trip->currency ?: 'USD',
+                'customer_email' => $contact_data['email'],
+                'customer_name' => $contact_data['first_name'] . ' ' . $contact_data['last_name'],
+                'trip_title' => $trip->title,
             ]);
+            
+            if ($payment_result['success'] && !empty($payment_result['payment_url'])) {
+                return new WP_REST_Response([
+                    'success' => true,
+                    'message' => __('Booking created. Redirecting to payment...', 'yatra'),
+                    'data' => [
+                        'booking_id' => $booking_id,
+                        'reference' => $booking_reference,
+                        'payment_url' => $payment_result['payment_url'],
+                    ],
+                ]);
+            }
+            
+            // If payment processing failed but booking was created, still return success
+            // but with a note about payment
+            if (!$payment_result['success']) {
+                return new WP_REST_Response([
+                    'success' => true,
+                    'message' => __('Booking created but payment processing is pending. We will contact you.', 'yatra'),
+                    'data' => [
+                        'booking_id' => $booking_id,
+                        'reference' => $booking_reference,
+                        'redirect_url' => $this->getConfirmationUrl($booking_reference),
+                    ],
+                ]);
+            }
         }
 
-        // For offline gateways, mark as confirmed and redirect to confirmation
+        // ========================================
+        // DETERMINE BOOKING STATUS
+        // ========================================
+        // Priority: 
+        // 1. auto_confirm_bookings setting (confirms ALL bookings automatically)
+        // 2. For pay_later: auto_confirm_pay_later setting
+        // 3. For bank_transfer: always pending until verified
+        
+        $booking_status = 'pending';
+        $status_message = __('Booking received!', 'yatra');
+        
+        // Check if auto-confirm all bookings is enabled
+        if ($settings['auto_confirm_bookings']) {
+            // Auto-confirm is enabled - confirm immediately regardless of payment
+            $booking_status = 'confirmed';
+            $status_message = __('Booking confirmed!', 'yatra');
+        } elseif ($payment_gateway === 'pay_later') {
+            // Pay Later: Check the specific pay_later auto-confirm setting
+            if ($settings['auto_confirm_pay_later']) {
+                $booking_status = 'confirmed';
+                $status_message = __('Booking confirmed! Payment will be collected later.', 'yatra');
+            } else {
+                $booking_status = 'pending';
+                $status_message = __('Booking received! We will contact you to arrange payment.', 'yatra');
+            }
+        } elseif ($payment_gateway === 'bank_transfer') {
+            // Bank Transfer: Always pending until payment is verified by admin
+            $booking_status = 'pending';
+            $status_message = __('Booking received! Please complete the bank transfer. We will confirm once payment is verified.', 'yatra');
+        }
+        
+        // Calculate booking expiry time for pending bookings
+        $expiry_datetime = null;
+        if ($booking_status === 'pending' && $settings['booking_expiry_hours'] > 0) {
+            $expiry_datetime = date('Y-m-d H:i:s', strtotime('+' . $settings['booking_expiry_hours'] . ' hours'));
+        }
+        
+        // Set confirmed_at if auto-confirmed
+        $confirmed_at = ($booking_status === 'confirmed') ? current_time('mysql') : null;
+        
+        // Update booking status with additional metadata
+        $update_data = [
+            'status' => $booking_status,
+            'payment_status' => 'pending', // No payment made yet for offline gateways
+        ];
+        $update_format = ['%s', '%s'];
+        
+        if ($confirmed_at) {
+            $update_data['confirmed_at'] = $confirmed_at;
+            $update_format[] = '%s';
+        }
+        
         $wpdb->update(
             $bookings_table,
-            ['status' => 'confirmed'],
+            $update_data,
             ['id' => $booking_id],
-            ['%s'],
+            $update_format,
             ['%d']
         );
 
-        // Send confirmation email
-        $this->sendBookingConfirmationEmail($booking_id, $booking_reference, $trip, $data);
+        // ========================================
+        // SEND CONFIRMATION EMAIL
+        // ========================================
+        if ($settings['booking_confirmation']) {
+            $this->sendBookingConfirmationEmail($booking_id, $booking_reference, $trip, [
+                'contact' => $contact_data,
+                'emergency' => $emergency_data,
+                'travelers' => $sanitized_travelers,
+                'travel_date' => $travel_date,
+                'payment_method' => $payment_method,
+                'payment_gateway' => $payment_gateway,
+                'total_amount' => $total_amount,
+                'amount_due' => $amount_due,
+                'booking_status' => $booking_status,
+                'cancellation_policy' => $settings['cancellation_policy'],
+                'cancellation_days' => $settings['cancellation_days'],
+                'expiry_datetime' => $expiry_datetime,
+            ]);
+        }
 
         return new WP_REST_Response([
             'success' => true,
-            'message' => __('Booking confirmed successfully!', 'yatra'),
+            'message' => $status_message,
             'data' => [
                 'booking_id' => $booking_id,
                 'reference' => $booking_reference,
-                'redirect_url' => home_url('/booking-confirmation/' . $booking_reference . '/'),
+                'status' => $booking_status,
+                'payment_status' => 'pending',
+                'redirect_url' => $this->getConfirmationUrl($booking_reference),
             ],
         ]);
+    }
+    
+    /**
+     * Get confirmation page URL
+     */
+    private function getConfirmationUrl(string $reference): string
+    {
+        // Check if a custom confirmation page is set
+        $confirmation_page_id = \Yatra\Services\SettingsService::get('booking_confirmation_page');
+        
+        if ($confirmation_page_id) {
+            return add_query_arg('booking', $reference, get_permalink($confirmation_page_id));
+        }
+        
+        return home_url('/booking-confirmation/' . $reference . '/');
+    }
+    
+    /**
+     * Process payment through the selected gateway
+     */
+    private function processPaymentGateway(string $gateway, array $params): array
+    {
+        // Get gateway configuration
+        $gateway_configs = \Yatra\Services\SettingsService::get('gateway_configs', []);
+        $config = $gateway_configs[$gateway] ?? [];
+        
+        // Check if gateway is in test mode
+        $is_test_mode = !empty($config['test_mode']) || !empty($config['sandbox']);
+        
+        switch ($gateway) {
+            case 'stripe':
+                return $this->processStripePayment($params, $config, $is_test_mode);
+                
+            case 'paypal':
+                return $this->processPayPalPayment($params, $config, $is_test_mode);
+                
+            case 'razorpay':
+                return $this->processRazorpayPayment($params, $config, $is_test_mode);
+                
+            case 'esewa':
+                return $this->processEsewaPayment($params, $config, $is_test_mode);
+                
+            case 'khalti':
+                return $this->processKhaltiPayment($params, $config, $is_test_mode);
+                
+            case 'authorize_net':
+                return $this->processAuthorizeNetPayment($params, $config, $is_test_mode);
+                
+            default:
+                return ['success' => false, 'message' => 'Unknown payment gateway'];
+        }
+    }
+    
+    /**
+     * Process Stripe payment
+     */
+    private function processStripePayment(array $params, array $config, bool $is_test): array
+    {
+        $api_key = $is_test ? ($config['api_secret'] ?? '') : ($config['api_secret'] ?? '');
+        
+        if (empty($api_key)) {
+            return ['success' => false, 'message' => 'Stripe API key not configured'];
+        }
+        
+        try {
+            // Create Stripe checkout session
+            $response = wp_remote_post('https://api.stripe.com/v1/checkout/sessions', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $api_key,
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ],
+                'body' => [
+                    'payment_method_types[]' => 'card',
+                    'line_items[0][price_data][currency]' => strtolower($params['currency']),
+                    'line_items[0][price_data][product_data][name]' => $params['trip_title'],
+                    'line_items[0][price_data][unit_amount]' => (int) ($params['amount'] * 100),
+                    'line_items[0][quantity]' => 1,
+                    'mode' => 'payment',
+                    'success_url' => $this->getConfirmationUrl($params['reference']) . '?payment=success',
+                    'cancel_url' => home_url('/book/?payment=cancelled&ref=' . $params['reference']),
+                    'customer_email' => $params['customer_email'],
+                    'metadata[booking_id]' => $params['booking_id'],
+                    'metadata[reference]' => $params['reference'],
+                ],
+            ]);
+            
+            if (is_wp_error($response)) {
+                return ['success' => false, 'message' => $response->get_error_message()];
+            }
+            
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+            
+            if (!empty($body['url'])) {
+                // Save session ID for webhook verification
+                global $wpdb;
+                $wpdb->update(
+                    $wpdb->prefix . 'yatra_bookings',
+                    ['payment_session_id' => $body['id'] ?? ''],
+                    ['id' => $params['booking_id']],
+                    ['%s'],
+                    ['%d']
+                );
+                
+                return ['success' => true, 'payment_url' => $body['url']];
+            }
+            
+            return ['success' => false, 'message' => $body['error']['message'] ?? 'Failed to create Stripe session'];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Process PayPal payment
+     */
+    private function processPayPalPayment(array $params, array $config, bool $is_test): array
+    {
+        $client_id = $config['client_id'] ?? '';
+        $client_secret = $config['client_secret'] ?? '';
+        
+        if (empty($client_id) || empty($client_secret)) {
+            return ['success' => false, 'message' => 'PayPal credentials not configured'];
+        }
+        
+        $base_url = $is_test ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
+        
+        try {
+            // Get access token
+            $auth_response = wp_remote_post($base_url . '/v1/oauth2/token', [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($client_id . ':' . $client_secret),
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ],
+                'body' => 'grant_type=client_credentials',
+            ]);
+            
+            if (is_wp_error($auth_response)) {
+                return ['success' => false, 'message' => $auth_response->get_error_message()];
+            }
+            
+            $auth_body = json_decode(wp_remote_retrieve_body($auth_response), true);
+            $access_token = $auth_body['access_token'] ?? '';
+            
+            if (empty($access_token)) {
+                return ['success' => false, 'message' => 'Failed to get PayPal access token'];
+            }
+            
+            // Create order
+            $order_response = wp_remote_post($base_url . '/v2/checkout/orders', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $access_token,
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => wp_json_encode([
+                    'intent' => 'CAPTURE',
+                    'purchase_units' => [[
+                        'reference_id' => $params['reference'],
+                        'amount' => [
+                            'currency_code' => $params['currency'],
+                            'value' => number_format($params['amount'], 2, '.', ''),
+                        ],
+                        'description' => $params['trip_title'],
+                    ]],
+                    'application_context' => [
+                        'return_url' => $this->getConfirmationUrl($params['reference']) . '?payment=success',
+                        'cancel_url' => home_url('/book/?payment=cancelled&ref=' . $params['reference']),
+                    ],
+                ]),
+            ]);
+            
+            if (is_wp_error($order_response)) {
+                return ['success' => false, 'message' => $order_response->get_error_message()];
+            }
+            
+            $order_body = json_decode(wp_remote_retrieve_body($order_response), true);
+            
+            // Find approval link
+            foreach ($order_body['links'] ?? [] as $link) {
+                if ($link['rel'] === 'approve') {
+                    // Save order ID for capture later
+                    global $wpdb;
+                    $wpdb->update(
+                        $wpdb->prefix . 'yatra_bookings',
+                        ['payment_session_id' => $order_body['id'] ?? ''],
+                        ['id' => $params['booking_id']],
+                        ['%s'],
+                        ['%d']
+                    );
+                    
+                    return ['success' => true, 'payment_url' => $link['href']];
+                }
+            }
+            
+            return ['success' => false, 'message' => 'Failed to create PayPal order'];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Process Razorpay payment
+     */
+    private function processRazorpayPayment(array $params, array $config, bool $is_test): array
+    {
+        $key_id = $config['api_key'] ?? '';
+        $key_secret = $config['api_secret'] ?? '';
+        
+        if (empty($key_id) || empty($key_secret)) {
+            return ['success' => false, 'message' => 'Razorpay credentials not configured'];
+        }
+        
+        try {
+            // Create Razorpay order
+            $response = wp_remote_post('https://api.razorpay.com/v1/orders', [
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($key_id . ':' . $key_secret),
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => wp_json_encode([
+                    'amount' => (int) ($params['amount'] * 100), // Amount in paise
+                    'currency' => $params['currency'],
+                    'receipt' => $params['reference'],
+                    'notes' => [
+                        'booking_id' => $params['booking_id'],
+                        'trip' => $params['trip_title'],
+                    ],
+                ]),
+            ]);
+            
+            if (is_wp_error($response)) {
+                return ['success' => false, 'message' => $response->get_error_message()];
+            }
+            
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+            
+            if (!empty($body['id'])) {
+                // Save order ID
+                global $wpdb;
+                $wpdb->update(
+                    $wpdb->prefix . 'yatra_bookings',
+                    ['payment_session_id' => $body['id']],
+                    ['id' => $params['booking_id']],
+                    ['%s'],
+                    ['%d']
+                );
+                
+                // Razorpay requires client-side integration, return data for JS
+                // Store order details and redirect to a payment page
+                $payment_url = add_query_arg([
+                    'razorpay_order' => $body['id'],
+                    'booking_ref' => $params['reference'],
+                    'key' => $key_id,
+                    'amount' => (int) ($params['amount'] * 100),
+                    'currency' => $params['currency'],
+                    'name' => get_bloginfo('name'),
+                    'description' => $params['trip_title'],
+                    'email' => $params['customer_email'],
+                ], home_url('/yatra-payment/razorpay/'));
+                
+                return ['success' => true, 'payment_url' => $payment_url];
+            }
+            
+            return ['success' => false, 'message' => $body['error']['description'] ?? 'Failed to create Razorpay order'];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Process eSewa payment
+     */
+    private function processEsewaPayment(array $params, array $config, bool $is_test): array
+    {
+        $merchant_id = $config['merchant_id'] ?? '';
+        
+        if (empty($merchant_id)) {
+            return ['success' => false, 'message' => 'eSewa merchant ID not configured'];
+        }
+        
+        $base_url = $is_test ? 'https://uat.esewa.com.np/epay/main' : 'https://esewa.com.np/epay/main';
+        
+        // eSewa uses form redirect, build URL with parameters
+        $payment_url = add_query_arg([
+            'amt' => $params['amount'],
+            'psc' => 0,
+            'pdc' => 0,
+            'txAmt' => 0,
+            'tAmt' => $params['amount'],
+            'pid' => $params['reference'],
+            'scd' => $merchant_id,
+            'su' => $this->getConfirmationUrl($params['reference']) . '?payment=success&gateway=esewa',
+            'fu' => home_url('/book/?payment=failed&ref=' . $params['reference']),
+        ], $base_url);
+        
+        return ['success' => true, 'payment_url' => $payment_url];
+    }
+    
+    /**
+     * Process Khalti payment
+     */
+    private function processKhaltiPayment(array $params, array $config, bool $is_test): array
+    {
+        $secret_key = $config['api_secret'] ?? '';
+        
+        if (empty($secret_key)) {
+            return ['success' => false, 'message' => 'Khalti secret key not configured'];
+        }
+        
+        $base_url = $is_test ? 'https://a.khalti.com/api/v2/epayment/initiate/' : 'https://khalti.com/api/v2/epayment/initiate/';
+        
+        try {
+            $response = wp_remote_post($base_url, [
+                'headers' => [
+                    'Authorization' => 'Key ' . $secret_key,
+                    'Content-Type' => 'application/json',
+                ],
+                'body' => wp_json_encode([
+                    'return_url' => $this->getConfirmationUrl($params['reference']) . '?payment=success&gateway=khalti',
+                    'website_url' => home_url(),
+                    'amount' => (int) ($params['amount'] * 100), // Amount in paisa
+                    'purchase_order_id' => $params['reference'],
+                    'purchase_order_name' => $params['trip_title'],
+                    'customer_info' => [
+                        'name' => $params['customer_name'],
+                        'email' => $params['customer_email'],
+                    ],
+                ]),
+            ]);
+            
+            if (is_wp_error($response)) {
+                return ['success' => false, 'message' => $response->get_error_message()];
+            }
+            
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+            
+            if (!empty($body['payment_url'])) {
+                // Save pidx for verification
+                global $wpdb;
+                $wpdb->update(
+                    $wpdb->prefix . 'yatra_bookings',
+                    ['payment_session_id' => $body['pidx'] ?? ''],
+                    ['id' => $params['booking_id']],
+                    ['%s'],
+                    ['%d']
+                );
+                
+                return ['success' => true, 'payment_url' => $body['payment_url']];
+            }
+            
+            return ['success' => false, 'message' => $body['detail'] ?? 'Failed to initiate Khalti payment'];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Process Authorize.net payment
+     */
+    private function processAuthorizeNetPayment(array $params, array $config, bool $is_test): array
+    {
+        // Authorize.net typically requires hosted payment page or client-side integration
+        // Return URL for hosted payment page setup
+        return [
+            'success' => true, 
+            'payment_url' => add_query_arg([
+                'booking_ref' => $params['reference'],
+                'amount' => $params['amount'],
+                'gateway' => 'authorize_net',
+            ], home_url('/yatra-payment/authorize-net/'))
+        ];
     }
 
     /**
@@ -402,31 +973,161 @@ class BookingSessionController extends BaseController
      */
     private function sendBookingConfirmationEmail(int $booking_id, string $reference, object $trip, array $data): void
     {
-        $to = sanitize_email($data['contact_email']);
-        $subject = sprintf(__('[%s] Booking Confirmation - %s', 'yatra'), get_bloginfo('name'), $reference);
+        $contact = $data['contact'] ?? [];
+        $travelers = $data['travelers'] ?? [];
+        $travel_date = $data['travel_date'] ?? '';
+        $total_amount = $data['total_amount'] ?? 0;
+        $amount_due = $data['amount_due'] ?? 0;
+        $payment_method = $data['payment_method'] ?? 'full';
+        $payment_gateway = $data['payment_gateway'] ?? 'pay_later';
+        $booking_status = $data['booking_status'] ?? 'pending';
+        $cancellation_policy = $data['cancellation_policy'] ?? 'full_refund';
+        $cancellation_days = $data['cancellation_days'] ?? 7;
+        $expiry_datetime = $data['expiry_datetime'] ?? null;
         
-        $body = sprintf(__("Dear Customer,\n\nThank you for your booking!\n\n", 'yatra'));
+        $customer_email = $contact['email'] ?? '';
+        $customer_name = trim(($contact['first_name'] ?? '') . ' ' . ($contact['last_name'] ?? ''));
+        
+        if (empty($customer_email)) {
+            return;
+        }
+        
+        // Format currency
+        $currency = $trip->currency ?: 'USD';
+        $formatted_total = yatra_format_price($total_amount, $currency);
+        $formatted_due = yatra_format_price($amount_due, $currency);
+        
+        // Determine email subject and intro based on booking status
+        $to = sanitize_email($customer_email);
+        
+        if ($booking_status === 'confirmed') {
+            $subject = sprintf(__('[%s] Booking Confirmed - %s', 'yatra'), get_bloginfo('name'), $reference);
+            $body = sprintf(__("Dear %s,\n\n", 'yatra'), $customer_name ?: 'Customer');
+            $body .= __("Thank you for your booking! Your reservation has been confirmed.\n\n", 'yatra');
+        } else {
+            $subject = sprintf(__('[%s] Booking Received - %s', 'yatra'), get_bloginfo('name'), $reference);
+            $body = sprintf(__("Dear %s,\n\n", 'yatra'), $customer_name ?: 'Customer');
+            $body .= __("Thank you for your booking! Your reservation has been received and is pending confirmation.\n\n", 'yatra');
+            
+            // Add expiry notice for pending bookings
+            if ($expiry_datetime) {
+                $body .= sprintf(
+                    __("⚠️ Important: Please complete your payment before %s to avoid automatic cancellation.\n\n", 'yatra'),
+                    date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($expiry_datetime))
+                );
+            }
+        }
+        $body .= "═══════════════════════════════════════\n";
         $body .= sprintf(__("Booking Reference: %s\n", 'yatra'), $reference);
+        $body .= "═══════════════════════════════════════\n\n";
         $body .= sprintf(__("Trip: %s\n", 'yatra'), $trip->title);
-        $body .= sprintf(__("Travel Date: %s\n", 'yatra'), $data['travel_date']);
-        $body .= sprintf(__("Travelers: %d\n", 'yatra'), count($data['travelers']));
-        $body .= sprintf(__("\nWe will contact you shortly with more details.\n\n", 'yatra'));
-        $body .= sprintf(__("Best regards,\n%s\n", 'yatra'), get_bloginfo('name'));
+        $body .= sprintf(__("Travel Date: %s\n", 'yatra'), date_i18n(get_option('date_format'), strtotime($travel_date)));
+        $body .= sprintf(__("Duration: %d Days / %d Nights\n", 'yatra'), $trip->duration_days, $trip->duration_nights);
+        $body .= sprintf(__("Number of Travelers: %d\n\n", 'yatra'), count($travelers));
+        
+        $body .= __("PAYMENT DETAILS\n", 'yatra');
+        $body .= "───────────────────────────────────────\n";
+        $body .= sprintf(__("Total Amount: %s\n", 'yatra'), $formatted_total);
+        
+        if ($payment_method === 'deposit') {
+            $body .= sprintf(__("Payment Type: Deposit\n", 'yatra'));
+            $body .= sprintf(__("Amount Due Now: %s\n", 'yatra'), $formatted_due);
+            $body .= sprintf(__("Remaining Balance: %s (due before trip)\n", 'yatra'), yatra_format_price($total_amount - $amount_due, $currency));
+        } elseif ($payment_method === 'partial') {
+            $body .= sprintf(__("Payment Type: Partial Payment\n", 'yatra'));
+            $body .= sprintf(__("Amount Due Now: %s\n", 'yatra'), $formatted_due);
+            $body .= sprintf(__("Remaining Balance: %s\n", 'yatra'), yatra_format_price($total_amount - $amount_due, $currency));
+        } else {
+            $body .= sprintf(__("Payment Type: Full Payment\n", 'yatra'));
+        }
+        
+        if ($payment_gateway === 'pay_later') {
+            $body .= "\n" . __("Payment Status: Pay Later - Please contact us to arrange payment.\n", 'yatra');
+        } elseif ($payment_gateway === 'bank_transfer') {
+            $body .= "\n" . __("Payment Status: Bank Transfer - You will receive bank details in a separate email.\n", 'yatra');
+        }
+        
+        $body .= "\n" . __("TRAVELERS\n", 'yatra');
+        $body .= "───────────────────────────────────────\n";
+        foreach ($travelers as $i => $traveler) {
+            $traveler_name = trim(($traveler['first_name'] ?? '') . ' ' . ($traveler['last_name'] ?? ''));
+            $body .= sprintf(__("Traveler %d: %s\n", 'yatra'), $i + 1, $traveler_name ?: 'N/A');
+        }
+        
+        $body .= "\n" . __("CANCELLATION POLICY\n", 'yatra');
+        $body .= "───────────────────────────────────────\n";
+        
+        $cancellation_policy_labels = [
+            'full_refund' => __('Full refund available', 'yatra'),
+            'partial_refund' => __('Partial refund available', 'yatra'),
+            'no_refund' => __('No refund available', 'yatra'),
+            'flexible' => __('Flexible cancellation', 'yatra'),
+        ];
+        $policy_label = $cancellation_policy_labels[$cancellation_policy] ?? __('Standard policy applies', 'yatra');
+        
+        $body .= sprintf(__("Policy: %s\n", 'yatra'), $policy_label);
+        $body .= sprintf(__("Free cancellation up to: %d days before departure\n", 'yatra'), $cancellation_days);
+        
+        // Add custom refund policy text if set
+        $custom_refund_policy = \Yatra\Services\SettingsService::get('refund_policy', '');
+        if (!empty($custom_refund_policy)) {
+            $body .= sprintf(__("Details: %s\n", 'yatra'), $custom_refund_policy);
+        }
+        
+        $body .= "\n" . __("WHAT'S NEXT?\n", 'yatra');
+        $body .= "───────────────────────────────────────\n";
+        $body .= __("1. You will receive a detailed trip itinerary within 24-48 hours.\n", 'yatra');
+        $body .= __("2. Our team will contact you to confirm any special requirements.\n", 'yatra');
+        $body .= __("3. Please ensure all traveler passports are valid for at least 6 months.\n\n", 'yatra');
+        
+        $body .= __("If you have any questions, please don't hesitate to contact us.\n\n", 'yatra');
+        $body .= sprintf(__("Best regards,\n%s Team\n", 'yatra'), get_bloginfo('name'));
+        $body .= "\n" . home_url() . "\n";
 
-        wp_mail($to, $subject, $body);
+        // Set HTML content type for better formatting
+        $headers = ['Content-Type: text/plain; charset=UTF-8'];
+        
+        wp_mail($to, $subject, $body, $headers);
 
-        // Also notify admin
+        // Admin notification
         $admin_email = get_option('admin_email');
-        $admin_subject = sprintf(__('[%s] New Booking - %s', 'yatra'), get_bloginfo('name'), $reference);
-        $admin_body = sprintf(__("New booking received!\n\n", 'yatra'));
+        
+        $status_emoji = ($booking_status === 'confirmed') ? '✅' : '⏳';
+        $status_label = ($booking_status === 'confirmed') ? __('Confirmed', 'yatra') : __('Pending', 'yatra');
+        
+        $admin_subject = sprintf(__('[%s] %s New Booking - %s', 'yatra'), get_bloginfo('name'), $status_emoji, $reference);
+        
+        $admin_body = sprintf(__("A new booking has been received! Status: %s\n\n", 'yatra'), $status_label);
+        $admin_body .= "═══════════════════════════════════════\n";
         $admin_body .= sprintf(__("Reference: %s\n", 'yatra'), $reference);
+        $admin_body .= sprintf(__("Status: %s\n", 'yatra'), strtoupper($status_label));
+        $admin_body .= "═══════════════════════════════════════\n\n";
         $admin_body .= sprintf(__("Trip: %s\n", 'yatra'), $trip->title);
-        $admin_body .= sprintf(__("Customer: %s (%s)\n", 'yatra'), $data['contact_email'], $data['contact_phone']);
-        $admin_body .= sprintf(__("Travel Date: %s\n", 'yatra'), $data['travel_date']);
-        $admin_body .= sprintf(__("Travelers: %d\n", 'yatra'), count($data['travelers']));
-        $admin_body .= sprintf(__("\nView in admin: %s\n", 'yatra'), admin_url('admin.php?page=yatra&subpage=bookings&action=view&id=' . $booking_id));
+        $admin_body .= sprintf(__("Travel Date: %s\n", 'yatra'), date_i18n(get_option('date_format'), strtotime($travel_date)));
+        $admin_body .= sprintf(__("Travelers: %d\n\n", 'yatra'), count($travelers));
+        
+        $admin_body .= __("CUSTOMER DETAILS\n", 'yatra');
+        $admin_body .= "───────────────────────────────────────\n";
+        $admin_body .= sprintf(__("Name: %s\n", 'yatra'), $customer_name);
+        $admin_body .= sprintf(__("Email: %s\n", 'yatra'), $customer_email);
+        $admin_body .= sprintf(__("Phone: %s\n", 'yatra'), $contact['phone'] ?? 'N/A');
+        $admin_body .= sprintf(__("Country: %s\n\n", 'yatra'), $contact['country'] ?? 'N/A');
+        
+        $admin_body .= __("PAYMENT\n", 'yatra');
+        $admin_body .= "───────────────────────────────────────\n";
+        $admin_body .= sprintf(__("Total: %s\n", 'yatra'), $formatted_total);
+        $admin_body .= sprintf(__("Due Now: %s\n", 'yatra'), $formatted_due);
+        $admin_body .= sprintf(__("Method: %s\n", 'yatra'), ucfirst($payment_method));
+        $admin_body .= sprintf(__("Gateway: %s\n", 'yatra'), ucwords(str_replace('_', ' ', $payment_gateway)));
+        $admin_body .= sprintf(__("Payment Status: %s\n\n", 'yatra'), __('Pending', 'yatra'));
+        
+        if ($booking_status === 'pending' && $payment_gateway !== 'pay_later') {
+            $admin_body .= sprintf(__("⚠️ ACTION REQUIRED: This booking is pending. Please verify payment and confirm.\n\n", 'yatra'));
+        }
+        
+        $admin_body .= sprintf(__("View Booking: %s\n", 'yatra'), admin_url('admin.php?page=yatra&subpage=bookings&action=view&id=' . $booking_id));
 
-        wp_mail($admin_email, $admin_subject, $admin_body);
+        wp_mail($admin_email, $admin_subject, $admin_body, $headers);
     }
 }
 

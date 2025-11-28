@@ -589,11 +589,11 @@
 .yatra-booking-submit-btn,
 .yatra-booking-pay-btn {
     flex: 1;
-    padding: 16px 32px;
-    background: #3b82f6;
+    padding: 18px 32px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
@@ -607,19 +607,29 @@
 
 .yatra-booking-submit-btn:hover,
 .yatra-booking-pay-btn:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
-.yatra-booking-pay-btn span {
-    display: inline;
+.yatra-booking-pay-btn svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
 }
 
-.yatra-booking-pay-btn .yatra-pay-amount {
+.yatra-booking-pay-btn #pay-button-text {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.yatra-booking-pay-btn #pay-amount {
     font-size: 18px;
     font-weight: 700;
-    margin-left: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 6px;
+    margin-left: 6px;
 }
 
 .yatra-booking-cancel-btn {

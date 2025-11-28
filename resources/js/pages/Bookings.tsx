@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -15,6 +15,8 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { Skeleton } from '../components/ui/skeleton';
 
 interface Booking {
   id: number;
@@ -40,6 +42,8 @@ const Bookings: React.FC = () => {
   const [sortBy, setSortBy] = useState('booking_date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
   const queryClient = useQueryClient();
   const { can } = usePermissions();
 
@@ -67,242 +71,90 @@ const Bookings: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, paymentFilter, sortBy, sortOrder, page]);
 
-  // Fetch bookings with dummy data
+  // Fetch bookings from API
   const { data, isLoading, error } = useQuery({
     queryKey: ['bookings', queryParams],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/bookings', { params: queryParams });
-      // Dummy data
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0];
-      };
-
-      const allBookings: Booking[] = [
-        {
-          id: 1,
-          booking_number: 'YT-2024-001',
-          customer_name: 'John Smith',
-          customer_email: 'john.smith@example.com',
-          trip_title: 'Everest Base Camp Trek',
-          trip_id: 1,
-          booking_date: getDate(5),
-          travel_date: getDate(30),
-          travelers: 2,
-          total_amount: 2500,
-          payment_status: 'paid',
-          booking_status: 'confirmed',
-          payment_method: 'Credit Card',
-          created_at: getDate(5),
-        },
-        {
-          id: 2,
-          booking_number: 'YT-2024-002',
-          customer_name: 'Sarah Johnson',
-          customer_email: 'sarah.j@example.com',
-          trip_title: 'Annapurna Circuit Adventure',
-          trip_id: 2,
-          booking_date: getDate(3),
-          travel_date: getDate(25),
-          travelers: 1,
-          total_amount: 980,
-          payment_status: 'pending',
-          booking_status: 'pending',
-          payment_method: 'Bank Transfer',
-          created_at: getDate(3),
-        },
-        {
-          id: 3,
-          booking_number: 'YT-2024-003',
-          customer_name: 'Michael Chen',
-          customer_email: 'm.chen@example.com',
-          trip_title: 'Golden Triangle Tour',
-          trip_id: 3,
-          booking_date: getDate(10),
-          travel_date: getDate(20),
-          travelers: 4,
-          total_amount: 3000,
-          payment_status: 'paid',
-          booking_status: 'confirmed',
-          payment_method: 'PayPal',
-          created_at: getDate(10),
-        },
-        {
-          id: 4,
-          booking_number: 'YT-2024-004',
-          customer_name: 'Emma Williams',
-          customer_email: 'emma.w@example.com',
-          trip_title: 'Bhutan Cultural Journey',
-          trip_id: 4,
-          booking_date: getDate(15),
-          travel_date: getDate(35),
-          travelers: 2,
-          total_amount: 2200,
-          payment_status: 'partial',
-          booking_status: 'confirmed',
-          payment_method: 'Credit Card',
-          created_at: getDate(15),
-        },
-        {
-          id: 5,
-          booking_number: 'YT-2024-005',
-          customer_name: 'David Brown',
-          customer_email: 'd.brown@example.com',
-          trip_title: 'Langtang Valley Trek',
-          trip_id: 6,
-          booking_date: getDate(2),
-          travel_date: getDate(40),
-          travelers: 1,
-          total_amount: 920,
-          payment_status: 'paid',
-          booking_status: 'confirmed',
-          payment_method: 'Stripe',
-          created_at: getDate(2),
-        },
-        {
-          id: 6,
-          booking_number: 'YT-2024-006',
-          customer_name: 'Lisa Anderson',
-          customer_email: 'lisa.a@example.com',
-          trip_title: 'Manaslu Circuit Trek',
-          trip_id: 7,
-          booking_date: getDate(8),
-          travel_date: getDate(28),
-          travelers: 3,
-          total_amount: 4050,
-          payment_status: 'refunded',
-          booking_status: 'cancelled',
-          payment_method: 'Credit Card',
-          created_at: getDate(8),
-        },
-        {
-          id: 7,
-          booking_number: 'YT-2024-007',
-          customer_name: 'Robert Taylor',
-          customer_email: 'r.taylor@example.com',
-          trip_title: 'Everest Base Camp Trek',
-          trip_id: 1,
-          booking_date: getDate(12),
-          travel_date: getDate(45),
-          travelers: 2,
-          total_amount: 2500,
-          payment_status: 'pending',
-          booking_status: 'pending',
-          payment_method: 'Bank Transfer',
-          created_at: getDate(12),
-        },
-        {
-          id: 8,
-          booking_number: 'YT-2024-008',
-          customer_name: 'Maria Garcia',
-          customer_email: 'maria.g@example.com',
-          trip_title: 'Tibet Spiritual Tour',
-          trip_id: 5,
-          booking_date: getDate(20),
-          travel_date: getDate(50),
-          travelers: 1,
-          total_amount: 850,
-          payment_status: 'paid',
-          booking_status: 'completed',
-          payment_method: 'PayPal',
-          created_at: getDate(20),
-        },
-      ];
-
-      // Apply filters
-      let filtered = allBookings;
-      if (searchTerm) {
-        filtered = filtered.filter(booking =>
-          booking.booking_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          booking.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          booking.customer_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          booking.trip_title.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+      const params = new URLSearchParams();
+      params.append('page', String(queryParams.page));
+      params.append('per_page', String(queryParams.per_page));
+      
+      if (queryParams.search) {
+        params.append('search', queryParams.search);
       }
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(booking => booking.booking_status === statusFilter);
+      if (queryParams.status) {
+        params.append('status', queryParams.status);
       }
-      if (paymentFilter !== 'all') {
-        filtered = filtered.filter(booking => booking.payment_status === paymentFilter);
+      if (queryParams.payment_status) {
+        params.append('payment_status', queryParams.payment_status);
       }
 
-      // Apply sorting
-      filtered = [...filtered].sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
-
-        switch (sortBy) {
-          case 'booking_number':
-            aValue = a.booking_number;
-            bValue = b.booking_number;
-            break;
-          case 'customer_name':
-            aValue = a.customer_name.toLowerCase();
-            bValue = b.customer_name.toLowerCase();
-            break;
-          case 'trip_title':
-            aValue = a.trip_title.toLowerCase();
-            bValue = b.trip_title.toLowerCase();
-            break;
-          case 'booking_date':
-            aValue = new Date(a.booking_date).getTime();
-            bValue = new Date(b.booking_date).getTime();
-            break;
-          case 'travel_date':
-            aValue = new Date(a.travel_date).getTime();
-            bValue = new Date(b.travel_date).getTime();
-            break;
-          case 'total_amount':
-            aValue = a.total_amount;
-            bValue = b.total_amount;
-            break;
-          case 'booking_status':
-            aValue = a.booking_status;
-            bValue = b.booking_status;
-            break;
-          case 'payment_status':
-            aValue = a.payment_status;
-            bValue = b.payment_status;
-            break;
-          default:
-            aValue = new Date(a.booking_date).getTime();
-            bValue = new Date(b.booking_date).getTime();
-        }
-
-        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings?${params.toString()}`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
       });
 
-      // Apply pagination
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
+      if (!response.ok) {
+        throw new Error('Failed to fetch bookings');
+      }
 
-      return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10,
-      };
+      const result = await response.json();
+      
+      if (result.success) {
+        // Map API response to expected format
+        const bookings = result.data.map((booking: any) => ({
+          id: booking.id,
+          booking_number: booking.reference,
+          customer_name: booking.customer_name || 'N/A',
+          customer_email: booking.customer_email,
+          trip_title: booking.trip_title || `Trip #${booking.trip_id}`,
+          trip_id: booking.trip_id,
+          booking_date: booking.created_at,
+          travel_date: booking.travel_date,
+          travelers: booking.travelers_count,
+          total_amount: booking.total_amount,
+          payment_status: booking.payment_status,
+          booking_status: booking.status,
+          payment_method: booking.payment_gateway,
+          created_at: booking.created_at,
+        }));
+
+        return {
+          data: bookings,
+          total: result.meta.total,
+          page: result.meta.page,
+          per_page: result.meta.per_page,
+        };
+      }
+
+      return { data: [], total: 0, page: 1, per_page: 10 };
     },
     enabled: can('yatra_view_bookings'),
   });
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (_id: number) => {
-      // return await apiClient.delete(`/yatra/v1/bookings/${_id}`);
-      return { success: true };
+    mutationFn: async (id: number) => {
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete booking');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
   });
 
-  const bookings = data?.data || [];
+  const bookings: Booking[] = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
 
@@ -390,9 +242,21 @@ const Bookings: React.FC = () => {
   };
 
   const handleDelete = (booking: Booking) => {
-    if (confirm(__('Are you sure you want to delete this booking?', 'Are you sure you want to delete this booking?'))) {
-      deleteMutation.mutate(booking.id);
+    setBookingToDelete(booking);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (bookingToDelete) {
+      deleteMutation.mutate(bookingToDelete.id);
+      setDeleteDialogOpen(false);
+      setBookingToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setBookingToDelete(null);
   };
 
   const handleView = (booking: Booking) => {
@@ -556,8 +420,26 @@ const Bookings: React.FC = () => {
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('Loading bookings...', 'Loading bookings...')}
+                  <div className="p-4 space-y-3">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-4 p-3 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                        <Skeleton className="h-4 w-24" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-48" />
+                        </div>
+                        <Skeleton className="h-4 w-28" />
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-6 w-16 rounded-full" />
+                        <Skeleton className="h-6 w-16 rounded-full" />
+                        <div className="flex gap-1">
+                          <Skeleton className="h-8 w-8 rounded" />
+                          <Skeleton className="h-8 w-8 rounded" />
+                          <Skeleton className="h-8 w-8 rounded" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : bookings.length === 0 ? (
                   <div className="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -762,6 +644,24 @@ const Bookings: React.FC = () => {
           </>
         )}
       </ConditionalRender>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title={__('Delete Booking', 'Delete Booking')}
+        description={
+          bookingToDelete
+            ? __(`Are you sure you want to delete booking "${bookingToDelete.booking_number}"? This action cannot be undone.`, `Are you sure you want to delete booking "${bookingToDelete.booking_number}"? This action cannot be undone.`)
+            : __('Are you sure you want to delete this booking?', 'Are you sure you want to delete this booking?')
+        }
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+        icon={<AlertTriangle className="w-6 h-6 text-red-500" />}
+      />
     </div>
   );
 };

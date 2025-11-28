@@ -67,201 +67,64 @@ const Payments: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, methodFilter, sortBy, sortOrder, page]);
 
-  // Fetch payments with dummy data
+  // Fetch payments from API
   const { data, isLoading, error } = useQuery({
     queryKey: ['payments', queryParams],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/payments', { params: queryParams });
-      // Dummy data
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0];
-      };
-
-      const allPayments: Payment[] = [
-        {
-          id: 1,
-          payment_number: 'PAY-2024-001',
-          booking_id: 1,
-          booking_number: 'YT-2024-001',
-          customer_name: 'John Smith',
-          customer_email: 'john.smith@example.com',
-          trip_title: 'Everest Base Camp Trek',
-          amount: 2500,
-          payment_method: 'Credit Card',
-          payment_status: 'completed',
-          transaction_id: 'TXN-123456789',
-          payment_date: getDate(5),
-          notes: 'Full payment received',
-          created_at: getDate(5),
-        },
-        {
-          id: 2,
-          payment_number: 'PAY-2024-002',
-          booking_id: 2,
-          booking_number: 'YT-2024-002',
-          customer_name: 'Sarah Johnson',
-          customer_email: 'sarah.j@example.com',
-          trip_title: 'Annapurna Circuit Adventure',
-          amount: 980,
-          payment_method: 'PayPal',
-          payment_status: 'completed',
-          transaction_id: 'PP-987654321',
-          payment_date: getDate(3),
-          created_at: getDate(3),
-        },
-        {
-          id: 3,
-          payment_number: 'PAY-2024-003',
-          booking_id: 3,
-          booking_number: 'YT-2024-003',
-          customer_name: 'Michael Chen',
-          customer_email: 'm.chen@example.com',
-          trip_title: 'Golden Triangle Tour',
-          amount: 1500,
-          payment_method: 'Bank Transfer',
-          payment_status: 'pending',
-          payment_date: getDate(2),
-          notes: 'Awaiting bank confirmation',
-          created_at: getDate(2),
-        },
-        {
-          id: 4,
-          payment_number: 'PAY-2024-004',
-          booking_id: 4,
-          booking_number: 'YT-2024-004',
-          customer_name: 'Emma Williams',
-          customer_email: 'emma.w@example.com',
-          trip_title: 'Bhutan Cultural Tour',
-          amount: 1200,
-          payment_method: 'Credit Card',
-          payment_status: 'partial',
-          transaction_id: 'TXN-456789012',
-          payment_date: getDate(1),
-          notes: 'Partial payment - balance pending',
-          created_at: getDate(1),
-        },
-        {
-          id: 5,
-          payment_number: 'PAY-2024-005',
-          booking_id: 5,
-          booking_number: 'YT-2024-005',
-          customer_name: 'David Brown',
-          customer_email: 'd.brown@example.com',
-          trip_title: 'Langtang Valley Trek',
-          amount: 920,
-          payment_method: 'Cash',
-          payment_status: 'completed',
-          payment_date: getDate(0),
-          notes: 'Cash payment at office',
-          created_at: getDate(0),
-        },
-        {
-          id: 6,
-          payment_number: 'PAY-2024-006',
-          booking_id: 6,
-          booking_number: 'YT-2024-006',
-          customer_name: 'Lisa Anderson',
-          customer_email: 'lisa.a@example.com',
-          trip_title: 'Chitwan National Park Safari',
-          amount: 800,
-          payment_method: 'Credit Card',
-          payment_status: 'failed',
-          transaction_id: 'TXN-FAILED-001',
-          payment_date: getDate(7),
-          notes: 'Card declined - insufficient funds',
-          created_at: getDate(7),
-        },
-        {
-          id: 7,
-          payment_number: 'PAY-2024-007',
-          booking_id: 7,
-          booking_number: 'YT-2024-007',
-          customer_name: 'Robert Taylor',
-          customer_email: 'r.taylor@example.com',
-          trip_title: 'Pokhara Adventure',
-          amount: 600,
-          payment_method: 'PayPal',
-          payment_status: 'refunded',
-          transaction_id: 'PP-REFUND-001',
-          payment_date: getDate(10),
-          notes: 'Refunded due to cancellation',
-          created_at: getDate(10),
-        },
-      ];
-
-      // Apply filters
-      let filtered = allPayments;
-      if (searchTerm) {
-        filtered = filtered.filter(payment =>
-          payment.payment_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.booking_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.customer_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.trip_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          payment.transaction_id?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+      const params = new URLSearchParams();
+      params.append('page', String(queryParams.page));
+      params.append('per_page', String(queryParams.per_page));
+      
+      if (queryParams.search) {
+        params.append('search', queryParams.search);
       }
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(payment => payment.payment_status === statusFilter);
+      if (queryParams.payment_status) {
+        params.append('status', queryParams.payment_status);
       }
-      if (methodFilter !== 'all') {
-        filtered = filtered.filter(payment => payment.payment_method === methodFilter);
+      if (queryParams.payment_method) {
+        params.append('gateway', queryParams.payment_method);
       }
 
-      // Apply sorting
-      filtered = [...filtered].sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
-
-        switch (sortBy) {
-          case 'payment_number':
-            aValue = a.payment_number.toLowerCase();
-            bValue = b.payment_number.toLowerCase();
-            break;
-          case 'customer_name':
-            aValue = a.customer_name.toLowerCase();
-            bValue = b.customer_name.toLowerCase();
-            break;
-          case 'amount':
-            aValue = a.amount;
-            bValue = b.amount;
-            break;
-          case 'payment_method':
-            aValue = a.payment_method.toLowerCase();
-            bValue = b.payment_method.toLowerCase();
-            break;
-          case 'payment_status':
-            aValue = a.payment_status;
-            bValue = b.payment_status;
-            break;
-          case 'payment_date':
-            aValue = new Date(a.payment_date).getTime();
-            bValue = new Date(b.payment_date).getTime();
-            break;
-          default:
-            aValue = new Date(a.payment_date).getTime();
-            bValue = new Date(b.payment_date).getTime();
-        }
-
-        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments?${params.toString()}`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
       });
 
-      // Apply pagination
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
+      if (!response.ok) {
+        throw new Error('Failed to fetch payments');
+      }
 
-      return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10,
-      };
+      const result = await response.json();
+      
+      if (result.success) {
+        // Map API response to expected format
+        const payments = result.data.map((payment: any) => ({
+          id: payment.id,
+          payment_number: `PAY-${payment.id.toString().padStart(6, '0')}`,
+          booking_id: payment.booking_id,
+          booking_number: payment.booking_reference || `#${payment.booking_id}`,
+          customer_name: payment.customer_name || 'N/A',
+          customer_email: payment.customer_email || '',
+          trip_title: payment.trip_title || '',
+          amount: payment.amount,
+          payment_method: payment.gateway,
+          payment_status: payment.status,
+          transaction_id: payment.transaction_id,
+          payment_date: payment.processed_at || payment.created_at,
+          notes: payment.notes,
+          created_at: payment.created_at,
+        }));
+
+        return {
+          data: payments,
+          total: result.meta.total,
+          page: result.meta.page,
+          per_page: result.meta.per_page,
+        };
+      }
+
+      return { data: [], total: 0, page: 1, per_page: 10 };
     },
     enabled: can('yatra_view_bookings'),
   });
@@ -277,7 +140,7 @@ const Payments: React.FC = () => {
     },
   });
 
-  const payments = data?.data || [];
+  const payments: Payment[] = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
 

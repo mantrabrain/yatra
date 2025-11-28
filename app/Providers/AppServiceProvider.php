@@ -39,9 +39,15 @@ class AppServiceProvider extends ServiceProvider
         // Start session early for booking management (both frontend and REST API)
         add_action('init', [$this, 'startSession'], 1);
         add_action('rest_api_init', [$this, 'startSession'], 1);
+        
+        // Register cron jobs for booking reminders and expiry
+        \Yatra\Services\BookingCronService::register();
 
         // Initialize plugin settings
         add_action('init', [$this, 'initSettings'], 5);
+        
+        // Ensure database tables exist
+        add_action('init', [$this, 'ensureTablesExist'], 5);
 
         // Add rewrite rules for trip permalinks
         add_action('init', [$this, 'addTripRewriteRules'], 10);
@@ -60,6 +66,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Handle booking page - use early priority to catch before 404
         add_action('template_redirect', [$this, 'handleBookingPage'], 1);
+        
+        // Handle booking confirmation page
+        add_action('template_redirect', [$this, 'handleBookingConfirmationPage'], 1);
 
         // Ensure frontend bundles are marked as ES modules
         add_filter('script_loader_tag', [$this, 'addFrontendModuleType'], 10, 2);
@@ -563,6 +572,123 @@ class AppServiceProvider extends ServiceProvider
 
         ModuleManager::initializeDefaults();
     }
+    
+    /**
+     * Ensure required database tables exist
+     * Creates missing tables if they don't exist
+     */
+    public function ensureTablesExist(): void
+    {
+        global $wpdb;
+        
+        // Check if bookings table exists
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $table_exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
+            DB_NAME,
+            $bookings_table
+        ));
+        
+        if (!$table_exists) {
+            $this->createBookingsTables();
+        }
+    }
+    
+    /**
+     * Create bookings tables
+     */
+    private function createBookingsTables(): void
+    {
+        global $wpdb;
+        
+        $charset_collate = $wpdb->get_charset_collate();
+        
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        
+        // Bookings table
+        $table_bookings = $wpdb->prefix . 'yatra_bookings';
+        
+        $sql_bookings = "CREATE TABLE IF NOT EXISTS `{$table_bookings}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `reference` varchar(50) NOT NULL COMMENT 'Booking reference code',
+            `trip_id` bigint(20) UNSIGNED NOT NULL,
+            `user_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'WordPress user ID if logged in',
+            `contact_first_name` varchar(100) DEFAULT NULL,
+            `contact_last_name` varchar(100) DEFAULT NULL,
+            `contact_email` varchar(255) NOT NULL,
+            `contact_phone` varchar(50) NOT NULL,
+            `contact_country` varchar(100) DEFAULT NULL,
+            `contact_data` text COMMENT 'JSON with full contact details',
+            `emergency_contact` text COMMENT 'JSON with emergency contact details',
+            `travel_date` date NOT NULL,
+            `travelers_count` smallint(5) UNSIGNED NOT NULL DEFAULT 1,
+            `travelers_data` longtext NOT NULL COMMENT 'JSON array of traveler details',
+            `total_amount` decimal(12,2) NOT NULL,
+            `amount_paid` decimal(12,2) DEFAULT 0,
+            `amount_due` decimal(12,2) NOT NULL,
+            `currency` char(3) DEFAULT 'USD',
+            `discount_amount` decimal(12,2) DEFAULT 0,
+            `discount_code` varchar(100) DEFAULT NULL,
+            `payment_method` enum('full','deposit','partial') DEFAULT 'full',
+            `payment_gateway` varchar(50) DEFAULT 'pay_later',
+            `payment_status` enum('pending','partial','paid','refunded','failed') DEFAULT 'pending',
+            `payment_session_id` varchar(255) DEFAULT NULL COMMENT 'External payment session/order ID',
+            `payment_transaction_id` varchar(255) DEFAULT NULL,
+            `payment_date` datetime DEFAULT NULL,
+            `payment_notes` text,
+            `status` enum('pending','confirmed','processing','completed','cancelled','refunded','failed','on_hold') DEFAULT 'pending',
+            `cancellation_reason` text,
+            `cancelled_at` datetime DEFAULT NULL,
+            `cancelled_by` bigint(20) UNSIGNED DEFAULT NULL,
+            `special_requests` text,
+            `internal_notes` text COMMENT 'Admin-only notes',
+            `newsletter_optin` tinyint(1) DEFAULT 0,
+            `terms_accepted` tinyint(1) DEFAULT 1,
+            `ip_address` varchar(45) DEFAULT NULL,
+            `user_agent` text,
+            `referral_source` varchar(255) DEFAULT NULL,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `confirmed_at` datetime DEFAULT NULL,
+            `completed_at` datetime DEFAULT NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `reference` (`reference`),
+            KEY `idx_trip_id` (`trip_id`),
+            KEY `idx_user_id` (`user_id`),
+            KEY `idx_email` (`contact_email`),
+            KEY `idx_status` (`status`),
+            KEY `idx_payment_status` (`payment_status`),
+            KEY `idx_travel_date` (`travel_date`),
+            KEY `idx_created` (`created_at`)
+        ) {$charset_collate} COMMENT='Trip bookings';";
+
+        dbDelta($sql_bookings);
+        
+        // Booking payments table
+        $table_booking_payments = $wpdb->prefix . 'yatra_booking_payments';
+        
+        $sql_booking_payments = "CREATE TABLE IF NOT EXISTS `{$table_booking_payments}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `booking_id` bigint(20) UNSIGNED NOT NULL,
+            `transaction_id` varchar(255) DEFAULT NULL,
+            `gateway` varchar(50) NOT NULL,
+            `amount` decimal(12,2) NOT NULL,
+            `currency` char(3) DEFAULT 'USD',
+            `status` enum('pending','completed','failed','refunded','cancelled') DEFAULT 'pending',
+            `payment_type` enum('initial','partial','final','refund') DEFAULT 'initial',
+            `gateway_response` longtext COMMENT 'JSON gateway response data',
+            `notes` text,
+            `processed_at` datetime DEFAULT NULL,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_booking_id` (`booking_id`),
+            KEY `idx_transaction_id` (`transaction_id`),
+            KEY `idx_status` (`status`),
+            KEY `idx_created` (`created_at`)
+        ) {$charset_collate} COMMENT='Booking payment history';";
+
+        dbDelta($sql_booking_payments);
+    }
 
     /**
      * Register shortcodes
@@ -840,6 +966,7 @@ class AppServiceProvider extends ServiceProvider
         add_rewrite_tag('%yatra_trip_slug%', '([^&]+)');
         add_rewrite_tag('%yatra_listing_page%', '([^&]+)');
         add_rewrite_tag('%yatra_booking_page%', '([^&]+)');
+        add_rewrite_tag('%yatra_booking_confirmation%', '([^&]+)');
 
         // Add rewrite rule for trip single page: {trip_base}/{trip_slug}
         add_rewrite_rule(
@@ -878,13 +1005,28 @@ class AppServiceProvider extends ServiceProvider
         );
 
         // Only add booking page rewrite rule if NOT using custom booking page
-        if (!$use_booking_page) {            // Booking page: /{booking_base}/{trip_slug}
+        if (!$use_booking_page) {
+            // Booking page: /{booking_base}/{trip_slug}
             add_rewrite_rule(
                 '^' . $booking_base . '/([^/]+)/?$',
                 'index.php?yatra_booking_page=$matches[1]',
                 'top'
             );
+            
+            // Booking page without trip slug (session-based): /{booking_base}/
+            add_rewrite_rule(
+                '^' . $booking_base . '/?$',
+                'index.php?yatra_booking_page=checkout',
+                'top'
+            );
         }
+        
+        // Booking confirmation page: /booking-confirmation/{reference}/
+        add_rewrite_rule(
+            '^booking-confirmation/([^/]+)/?$',
+            'index.php?yatra_booking_confirmation=$matches[1]',
+            'top'
+        );
 
         // Debug logging
         if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -1165,6 +1307,13 @@ class AppServiceProvider extends ServiceProvider
             'partial_payment_percentage' => SettingsService::getInt('partial_payment_percentage', 30),
             'enabled_gateways' => [],
             'error' => null,
+            // Cancellation & Refund Policy
+            'cancellation_policy' => SettingsService::get('cancellation_policy', 'full_refund'),
+            'cancellation_days' => SettingsService::getInt('cancellation_days', 7),
+            'refund_policy' => SettingsService::get('refund_policy', ''),
+            // Login requirements
+            'require_login' => SettingsService::isEnabled('require_login'),
+            'allow_guest_checkout' => SettingsService::isEnabled('allow_guest_checkout'),
         ];
 
         // Check if we have valid session
@@ -1503,6 +1652,148 @@ class AppServiceProvider extends ServiceProvider
         </div>
         <?php
         get_footer();
+    }
+
+    /**
+     * Handle booking confirmation page
+     */
+    public function handleBookingConfirmationPage(): void
+    {
+        global $wp_query, $wp;
+
+        // Check for query var first
+        $booking_reference = get_query_var('yatra_booking_confirmation', '');
+        
+        // Also check URL path directly
+        if (empty($booking_reference)) {
+            $request_path = isset($wp->request) ? trim($wp->request, '/') : '';
+            
+            if (preg_match('/^booking-confirmation\/([^\/]+)\/?$/', $request_path, $matches)) {
+                $booking_reference = $matches[1];
+            }
+        }
+        
+        // Also check GET parameter (for custom confirmation pages)
+        if (empty($booking_reference) && !empty($_GET['booking'])) {
+            $booking_reference = sanitize_text_field($_GET['booking']);
+        }
+
+        if (empty($booking_reference)) {
+            return;
+        }
+
+        // Fetch booking from database
+        global $wpdb, $booking_data;
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $trips_table = $wpdb->prefix . 'yatra_trips';
+
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT b.*, t.title as trip_title, t.slug as trip_slug, t.featured_image, 
+                    t.duration_days, t.duration_nights, t.difficulty_level,
+                    t.starting_location, t.ending_location
+             FROM {$bookings_table} b
+             LEFT JOIN {$trips_table} t ON b.trip_id = t.id
+             WHERE b.reference = %s
+             LIMIT 1",
+            $booking_reference
+        ));
+
+        if (!$booking) {
+            // Show 404 for invalid booking reference
+            $wp_query->set_404();
+            status_header(404);
+            return;
+        }
+
+        // Parse JSON data
+        $booking->travelers = json_decode($booking->travelers_data, true) ?: [];
+        $booking->contact = json_decode($booking->contact_data, true) ?: [];
+        $booking->emergency = json_decode($booking->emergency_contact, true) ?: [];
+
+        // Make booking data globally available
+        $booking_data = $booking;
+        $GLOBALS['yatra_booking'] = $booking;
+
+        // Prevent 404
+        $wp_query->is_404 = false;
+        status_header(200);
+
+        // Enqueue styles
+        wp_enqueue_style(
+            'yatra-booking-confirmation',
+            plugins_url('public/css/booking.css', dirname(__DIR__)),
+            [],
+            YATRA_VERSION
+        );
+
+        // Load template
+        $template_path = YATRA_PLUGIN_PATH . 'templates/booking-confirmation.php';
+        if (file_exists($template_path)) {
+            include $template_path;
+        } else {
+            // Fallback template
+            get_header();
+            $this->renderConfirmationFallback($booking);
+            get_footer();
+        }
+
+        exit;
+    }
+
+    /**
+     * Fallback confirmation template
+     */
+    private function renderConfirmationFallback($booking): void
+    {
+        ?>
+        <div class="yatra-confirmation-page" style="max-width: 800px; margin: 60px auto; padding: 0 20px; text-align: center;">
+            <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 16px; padding: 40px;">
+                <svg style="width: 80px; height: 80px; color: #22c55e; margin-bottom: 20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="9,12 12,15 16,10"></polyline>
+                </svg>
+                <h1 style="font-size: 32px; margin-bottom: 12px; color: #166534;">Booking Confirmed!</h1>
+                <p style="font-size: 18px; color: #15803d; margin-bottom: 24px;">Thank you for your booking.</p>
+                
+                <div style="background: white; border-radius: 12px; padding: 24px; margin-top: 24px; text-align: left;">
+                    <h2 style="font-size: 20px; margin-bottom: 16px; color: #111827;">Booking Details</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <p style="color: #6b7280; margin-bottom: 4px;">Reference</p>
+                            <p style="font-weight: 600; color: #111827;"><?php echo esc_html($booking->reference); ?></p>
+                        </div>
+                        <div>
+                            <p style="color: #6b7280; margin-bottom: 4px;">Status</p>
+                            <p style="font-weight: 600; color: #22c55e;"><?php echo esc_html(ucfirst($booking->status)); ?></p>
+                        </div>
+                        <div>
+                            <p style="color: #6b7280; margin-bottom: 4px;">Trip</p>
+                            <p style="font-weight: 600; color: #111827;"><?php echo esc_html($booking->trip_title); ?></p>
+                        </div>
+                        <div>
+                            <p style="color: #6b7280; margin-bottom: 4px;">Travel Date</p>
+                            <p style="font-weight: 600; color: #111827;"><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($booking->travel_date))); ?></p>
+                        </div>
+                        <div>
+                            <p style="color: #6b7280; margin-bottom: 4px;">Travelers</p>
+                            <p style="font-weight: 600; color: #111827;"><?php echo esc_html($booking->travelers_count); ?></p>
+                        </div>
+                        <div>
+                            <p style="color: #6b7280; margin-bottom: 4px;">Total Amount</p>
+                            <p style="font-weight: 600; color: #111827;"><?php echo esc_html(yatra_format_price($booking->total_amount, $booking->currency)); ?></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 24px; color: #6b7280;">A confirmation email has been sent to <strong><?php echo esc_html($booking->contact_email); ?></strong></p>
+                
+                <a href="<?php echo esc_url(home_url('/')); ?>" style="display: inline-block; margin-top: 24px; padding: 12px 24px; background: #22c55e; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                    Return to Home
+                </a>
+            </div>
+        </div>
+        <?php
     }
 
     /**

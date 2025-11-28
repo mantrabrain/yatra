@@ -753,6 +753,117 @@ class Database
 
         dbDelta($sql_trip_revisions);
         
+        // ============================================
+        // BOOKINGS
+        // ============================================
+        $table_bookings = $wpdb->prefix . 'yatra_bookings';
+        
+        $sql_bookings = "CREATE TABLE IF NOT EXISTS `{$table_bookings}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `reference` varchar(50) NOT NULL COMMENT 'Booking reference code',
+            `trip_id` bigint(20) UNSIGNED NOT NULL,
+            `user_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'WordPress user ID if logged in',
+            
+            -- Contact Information
+            `contact_first_name` varchar(100) DEFAULT NULL,
+            `contact_last_name` varchar(100) DEFAULT NULL,
+            `contact_email` varchar(255) NOT NULL,
+            `contact_phone` varchar(50) NOT NULL,
+            `contact_country` varchar(100) DEFAULT NULL,
+            `contact_data` text COMMENT 'JSON with full contact details',
+            
+            -- Emergency Contact
+            `emergency_contact` text COMMENT 'JSON with emergency contact details',
+            
+            -- Booking Details
+            `travel_date` date NOT NULL,
+            `travelers_count` smallint(5) UNSIGNED NOT NULL DEFAULT 1,
+            `travelers_data` longtext NOT NULL COMMENT 'JSON array of traveler details',
+            
+            -- Pricing
+            `total_amount` decimal(12,2) NOT NULL,
+            `amount_paid` decimal(12,2) DEFAULT 0,
+            `amount_due` decimal(12,2) NOT NULL,
+            `currency` char(3) DEFAULT 'USD',
+            `discount_amount` decimal(12,2) DEFAULT 0,
+            `discount_code` varchar(100) DEFAULT NULL,
+            
+            -- Payment
+            `payment_method` enum('full','deposit','partial') DEFAULT 'full',
+            `payment_gateway` varchar(50) DEFAULT 'pay_later',
+            `payment_status` enum('pending','partial','paid','refunded','failed') DEFAULT 'pending',
+            `payment_session_id` varchar(255) DEFAULT NULL COMMENT 'External payment session/order ID',
+            `payment_transaction_id` varchar(255) DEFAULT NULL,
+            `payment_date` datetime DEFAULT NULL,
+            `payment_notes` text,
+            
+            -- Status
+            `status` enum('pending','confirmed','processing','completed','cancelled','refunded','failed','on_hold') DEFAULT 'pending',
+            `cancellation_reason` text,
+            `cancelled_at` datetime DEFAULT NULL,
+            `cancelled_by` bigint(20) UNSIGNED DEFAULT NULL,
+            
+            -- Additional Info
+            `special_requests` text,
+            `internal_notes` text COMMENT 'Admin-only notes',
+            `newsletter_optin` tinyint(1) DEFAULT 0,
+            `terms_accepted` tinyint(1) DEFAULT 1,
+            
+            -- Tracking
+            `ip_address` varchar(45) DEFAULT NULL,
+            `user_agent` text,
+            `referral_source` varchar(255) DEFAULT NULL,
+            
+            -- Reminders
+            `reminder_sent` tinyint(1) DEFAULT 0 COMMENT 'Whether reminder email has been sent',
+            `reminder_sent_at` datetime DEFAULT NULL,
+            
+            -- Timestamps
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            `confirmed_at` datetime DEFAULT NULL,
+            `completed_at` datetime DEFAULT NULL,
+            
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `reference` (`reference`),
+            KEY `idx_trip_id` (`trip_id`),
+            KEY `idx_user_id` (`user_id`),
+            KEY `idx_email` (`contact_email`),
+            KEY `idx_status` (`status`),
+            KEY `idx_payment_status` (`payment_status`),
+            KEY `idx_travel_date` (`travel_date`),
+            KEY `idx_created` (`created_at`)
+        ) {$charset_collate} COMMENT='Trip bookings';";
+
+        dbDelta($sql_bookings);
+        
+        // ============================================
+        // BOOKING PAYMENTS (Payment History)
+        // ============================================
+        $table_booking_payments = $wpdb->prefix . 'yatra_booking_payments';
+        
+        $sql_booking_payments = "CREATE TABLE IF NOT EXISTS `{$table_booking_payments}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `booking_id` bigint(20) UNSIGNED NOT NULL,
+            `transaction_id` varchar(255) DEFAULT NULL,
+            `gateway` varchar(50) NOT NULL,
+            `amount` decimal(12,2) NOT NULL,
+            `currency` char(3) DEFAULT 'USD',
+            `status` enum('pending','completed','failed','refunded','cancelled') DEFAULT 'pending',
+            `payment_type` enum('initial','partial','final','refund') DEFAULT 'initial',
+            `gateway_response` longtext COMMENT 'JSON gateway response data',
+            `notes` text,
+            `processed_at` datetime DEFAULT NULL,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_booking_id` (`booking_id`),
+            KEY `idx_transaction_id` (`transaction_id`),
+            KEY `idx_status` (`status`),
+            KEY `idx_created` (`created_at`)
+        ) {$charset_collate} COMMENT='Booking payment history';";
+
+        dbDelta($sql_booking_payments);
+        
         // Update existing tables to add missing columns
         self::updateTables();
     }
@@ -953,6 +1064,8 @@ class Database
         global $wpdb;
 
         $tables = [
+            $wpdb->prefix . 'yatra_booking_payments',
+            $wpdb->prefix . 'yatra_bookings',
             $wpdb->prefix . 'yatra_trip_availability_dates',
             $wpdb->prefix . 'yatra_trip_faqs',
             $wpdb->prefix . 'yatra_trip_highlights',

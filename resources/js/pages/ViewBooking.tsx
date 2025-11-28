@@ -5,13 +5,14 @@
 
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Loader2, Mail, Phone, Calendar, Users, DollarSign, CreditCard, FileText } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Calendar, Users, DollarSign, CreditCard, FileText } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { Skeleton } from '../components/ui/skeleton';
 
 const ViewBooking: React.FC = () => {
   const { can } = usePermissions();
@@ -22,40 +23,65 @@ const ViewBooking: React.FC = () => {
     return params.get('id') ? parseInt(params.get('id') || '0') : null;
   }, []);
 
-  // Fetch booking data
+  // Fetch booking data from API
   const { data: booking, isLoading, error } = useQuery({
     queryKey: ['booking', bookingId],
     queryFn: async () => {
       if (!bookingId) return null;
-      // return await apiClient.get(`/bookings/${bookingId}`);
-      // Dummy data for now
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() + days);
-        return date.toISOString().split('T')[0];
-      };
+      
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings/${bookingId}`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
 
-      return {
-        id: bookingId,
-        booking_number: 'YT-2024-001',
-        customer_name: 'John Smith',
-        customer_email: 'john.smith@example.com',
-        customer_phone: '+1234567890',
-        trip_id: 1,
-        trip_title: 'Everest Base Camp Trek',
-        trip_price: 1250,
-        booking_date: getDate(-5),
-        travel_date: getDate(30),
-        travelers: 2,
-        total_amount: 2500,
-        payment_status: 'paid',
-        booking_status: 'confirmed',
-        payment_method: 'Credit Card',
-        notes: 'Customer requested early check-in and vegetarian meals. Please confirm availability.',
-        created_at: getDate(-5),
-        updated_at: getDate(-2),
-      };
+      if (!response.ok) {
+        throw new Error('Failed to fetch booking');
+      }
+
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        const data = result.data;
+        return {
+          id: data.id,
+          booking_number: data.reference,
+          customer_name: data.customer_name || `${data.contact_first_name || ''} ${data.contact_last_name || ''}`.trim() || 'N/A',
+          customer_email: data.customer_email,
+          customer_phone: data.customer_phone,
+          customer_country: data.contact_country,
+          trip_id: data.trip_id,
+          trip_title: data.trip_title || `Trip #${data.trip_id}`,
+          trip_image: data.trip_image,
+          trip_price: data.total_amount / (data.travelers_count || 1),
+          booking_date: data.created_at,
+          travel_date: data.travel_date,
+          travelers: data.travelers_count,
+          travelers_data: data.travelers || [],
+          total_amount: data.total_amount,
+          amount_paid: data.amount_paid || 0,
+          amount_due: data.amount_due || 0,
+          currency: data.currency || 'USD',
+          payment_status: data.payment_status,
+          booking_status: data.status,
+          payment_method: data.payment_gateway,
+          payment_date: data.payment_date,
+          notes: data.special_requests,
+          internal_notes: data.internal_notes,
+          emergency_contact: data.emergency_contact,
+          contact_data: data.contact_data,
+          payments: data.payments || [],
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+          confirmed_at: data.confirmed_at,
+          completed_at: data.completed_at,
+          cancelled_at: data.cancelled_at,
+          cancellation_reason: data.cancellation_reason,
+          trip_details: data.trip_details,
+        };
+      }
+
+      return null;
     },
     enabled: !!bookingId && can('yatra_view_bookings'),
   });
@@ -150,9 +176,115 @@ const ViewBooking: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading booking...', 'Loading booking...')}</span>
+      <div className="space-y-3">
+        {/* Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-28" />
+            <Skeleton className="h-10 w-20" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Main Content Skeleton */}
+          <div className="lg:col-span-2 space-y-3">
+            {/* Booking Overview Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-5 w-36" />
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-6 w-20 rounded-md" />
+                    <Skeleton className="h-6 w-16 rounded-md" />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="space-y-1">
+                      <Skeleton className="h-3 w-24" />
+                      <Skeleton className="h-5 w-32" />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Customer Information Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-40" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Skeleton className="h-5 w-36" />
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Notes Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-16" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-20 w-full" />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar Skeleton */}
+          <div className="space-y-3">
+            {/* Payment Information Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-36" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-1">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-6 w-16 rounded-md" />
+                </div>
+                <div className="space-y-1">
+                  <Skeleton className="h-3 w-28" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <div className="space-y-1">
+                  <Skeleton className="h-3 w-32" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+                <div className="space-y-1">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-6 w-28" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Timeline Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-20" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-1">
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+                <div className="space-y-1">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -309,13 +441,150 @@ const ViewBooking: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Travelers Information */}
+            {booking.travelers_data && booking.travelers_data.length > 0 && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    {__('Travelers Information', 'Travelers Information')}
+                    <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                      ({booking.travelers_data.length} {booking.travelers_data.length === 1 ? __('traveler', 'traveler') : __('travelers', 'travelers')})
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {booking.travelers_data.map((traveler: any, index: number) => (
+                    <div 
+                      key={index} 
+                      className={`p-4 rounded-lg ${index === 0 ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'}`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {index === 0 ? __('Lead Traveler', 'Lead Traveler') : `${__('Traveler', 'Traveler')} ${index + 1}`}
+                        </h4>
+                        {index === 0 && (
+                          <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded">
+                            {__('Primary Contact', 'Primary Contact')}
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {/* Name */}
+                        <div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Full Name', 'Full Name')}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {[traveler.first_name, traveler.last_name].filter(Boolean).join(' ') || '-'}
+                          </div>
+                        </div>
+                        
+                        {/* Gender */}
+                        {traveler.gender && (
+                          <div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Gender', 'Gender')}</div>
+                            <div className="text-sm text-gray-900 dark:text-white capitalize">{traveler.gender}</div>
+                          </div>
+                        )}
+                        
+                        {/* Date of Birth */}
+                        {traveler.date_of_birth && (
+                          <div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Date of Birth', 'Date of Birth')}</div>
+                            <div className="text-sm text-gray-900 dark:text-white">
+                              {new Date(traveler.date_of_birth).toLocaleDateString()}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Nationality */}
+                        {traveler.nationality && (
+                          <div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Nationality', 'Nationality')}</div>
+                            <div className="text-sm text-gray-900 dark:text-white">{traveler.nationality}</div>
+                          </div>
+                        )}
+                        
+                        {/* Passport Number */}
+                        {traveler.passport && (
+                          <div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Passport No.', 'Passport No.')}</div>
+                            <div className="text-sm text-gray-900 dark:text-white font-mono">{traveler.passport}</div>
+                          </div>
+                        )}
+                        
+                        {/* Passport Expiry */}
+                        {traveler.passport_expiry && (
+                          <div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Passport Expiry', 'Passport Expiry')}</div>
+                            <div className="text-sm text-gray-900 dark:text-white">
+                              {new Date(traveler.passport_expiry).toLocaleDateString()}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Dietary Requirements */}
+                        {traveler.dietary && (
+                          <div className="col-span-2 md:col-span-3">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Dietary Requirements', 'Dietary Requirements')}</div>
+                            <div className="text-sm text-gray-900 dark:text-white">{traveler.dietary}</div>
+                          </div>
+                        )}
+                        
+                        {/* Medical Conditions */}
+                        {traveler.medical && (
+                          <div className="col-span-2 md:col-span-3">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Medical Conditions', 'Medical Conditions')}</div>
+                            <div className="text-sm text-gray-900 dark:text-white">{traveler.medical}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Emergency Contact */}
+            {booking.emergency_contact && (booking.emergency_contact.name || booking.emergency_contact.phone) && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Phone className="w-4 h-4" />
+                    {__('Emergency Contact', 'Emergency Contact')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {booking.emergency_contact.name && (
+                      <div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Contact Name', 'Contact Name')}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">{booking.emergency_contact.name}</div>
+                      </div>
+                    )}
+                    {booking.emergency_contact.phone && (
+                      <div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Phone Number', 'Phone Number')}</div>
+                        <div className="text-sm text-gray-900 dark:text-white">{booking.emergency_contact.phone}</div>
+                      </div>
+                    )}
+                    {booking.emergency_contact.relationship && (
+                      <div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{__('Relationship', 'Relationship')}</div>
+                        <div className="text-sm text-gray-900 dark:text-white capitalize">{booking.emergency_contact.relationship}</div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Notes */}
             {booking.notes && (
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <FileText className="w-4 h-4" />
-                    {__('Notes', 'Notes')}
+                    {__('Special Requests', 'Special Requests')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

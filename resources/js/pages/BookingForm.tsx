@@ -14,6 +14,7 @@ import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { Skeleton } from '../components/ui/skeleton';
 
 interface BookingFormData {
   customer_name: string;
@@ -63,26 +64,65 @@ const BookingForm: React.FC = () => {
 
   const isEditMode = action === 'edit' && bookingId !== null;
 
+  // Fetch payment gateways for dropdown
+  const { data: gatewaysData } = useQuery({
+    queryKey: ['payment-gateways'],
+    queryFn: async () => {
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payment/gateways`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      if (!response.ok) {
+        return { data: [] };
+      }
+      const result = await response.json();
+      if (result.success) {
+        return {
+          data: result.data.filter((gw: any) => gw.enabled).map((gw: any) => ({
+            id: gw.id,
+            title: gw.title || gw.name,
+          })),
+        };
+      }
+      return { data: [] };
+    },
+  });
+
   // Fetch trips for dropdown
-  const { data: tripsData } = useQuery({
+  const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
     queryKey: ['trips-list'],
     queryFn: async () => {
-      // return await apiClient.get('/yatra/v1/trips', { params: { per_page: 100 } });
-      // Dummy trips data
-      return {
-        data: [
-          { id: 1, title: 'Everest Base Camp Trek', price: 1250 },
-          { id: 2, title: 'Annapurna Circuit Adventure', price: 980 },
-          { id: 3, title: 'Golden Triangle Tour', price: 750 },
-          { id: 4, title: 'Bhutan Cultural Journey', price: 1100 },
-          { id: 5, title: 'Tibet Spiritual Tour', price: 850 },
-          { id: 6, title: 'Langtang Valley Trek', price: 920 },
-          { id: 7, title: 'Manaslu Circuit Trek', price: 1350 },
-          { id: 8, title: 'Upper Mustang Trek', price: 1450 },
-        ],
-      };
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/trips?per_page=100`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch trips');
+      }
+      const result = await response.json();
+      console.log('Trips API Response:', result);
+      
+      // The trips API returns { data: [...], total, page, per_page } directly (no success flag)
+      const tripsArray = result.data || result || [];
+      
+      if (Array.isArray(tripsArray) && tripsArray.length > 0) {
+        const trips = tripsArray.map((trip: any) => ({
+          id: String(trip.id),
+          title: trip.title,
+          price: parseFloat(trip.sale_price || trip.original_price || 0),
+          currency: trip.currency || 'USD',
+        }));
+        console.log('Mapped trips:', trips);
+        return { data: trips };
+      }
+      
+      console.log('No trips found in response');
+      return { data: [] };
     },
-    enabled: can('yatra_view_trips'),
+    // Always fetch trips when user can manage bookings
+    enabled: can('yatra_view_bookings') || can('yatra_view_trips'),
   });
 
   // Fetch booking data if editing
@@ -90,57 +130,83 @@ const BookingForm: React.FC = () => {
     queryKey: ['booking', bookingId],
     queryFn: async () => {
       if (!bookingId) return null;
-      // return await apiClient.get(`/bookings/${bookingId}`);
-      // Dummy data for now
-      return {
-        id: bookingId,
-        customer_name: 'John Smith',
-        customer_email: 'john.smith@example.com',
-        customer_phone: '+1234567890',
-        trip_id: 1,
-        booking_date: new Date().toISOString().split('T')[0],
-        travel_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        travelers: 2,
-        total_amount: 2500,
-        payment_status: 'paid',
-        booking_status: 'confirmed',
-        payment_method: 'Credit Card',
-        notes: 'Customer requested early check-in',
-      };
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings/${bookingId}`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch booking');
+      }
+      const result = await response.json();
+      console.log('Booking API Response:', result);
+      if (result.success) {
+        const booking = result.data;
+        // Use customer_name if available, otherwise construct from first/last name
+        const customerName = booking.customer_name || 
+          `${booking.contact_first_name || ''} ${booking.contact_last_name || ''}`.trim();
+        
+        const mappedData = {
+          id: booking.id,
+          customer_name: customerName,
+          customer_email: booking.customer_email || '',
+          customer_phone: booking.customer_phone || '',
+          trip_id: String(booking.trip_id || ''),
+          booking_date: booking.created_at ? booking.created_at.split(' ')[0] : new Date().toISOString().split('T')[0],
+          travel_date: booking.travel_date || '',
+          travelers: booking.travelers_count || 1,
+          total_amount: parseFloat(booking.total_amount || 0),
+          payment_status: booking.payment_status || 'pending',
+          booking_status: booking.status || 'pending',
+          payment_method: booking.payment_gateway || '',
+          notes: booking.special_requests || '',
+        };
+        console.log('Mapped booking data:', mappedData);
+        return mappedData;
+      }
+      return null;
     },
     enabled: isEditMode && can('yatra_view_bookings'),
   });
 
+  // Track if we've loaded booking data to prevent auto-calculation from overwriting
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
   // Load booking data into form when editing
   useEffect(() => {
     if (bookingData && isEditMode) {
+      console.log('Setting form data from booking:', bookingData);
       setFormData({
         customer_name: bookingData.customer_name || '',
         customer_email: bookingData.customer_email || '',
         customer_phone: bookingData.customer_phone || '',
-        trip_id: bookingData.trip_id?.toString() || '',
+        trip_id: String(bookingData.trip_id || ''),
         booking_date: bookingData.booking_date || new Date().toISOString().split('T')[0],
         travel_date: bookingData.travel_date || '',
-        travelers: bookingData.travelers?.toString() || '1',
-        total_amount: bookingData.total_amount?.toString() || '',
+        travelers: String(bookingData.travelers || '1'),
+        total_amount: String(bookingData.total_amount || ''),
         payment_status: bookingData.payment_status || 'pending',
         booking_status: bookingData.booking_status || 'pending',
         payment_method: bookingData.payment_method || '',
         notes: bookingData.notes || '',
       });
+      setIsDataLoaded(true);
     }
   }, [bookingData, isEditMode]);
 
-  // Calculate total amount when trip or travelers change
+  // Calculate total amount when trip or travelers change (only for new bookings or manual changes)
   useEffect(() => {
-    if (formData.trip_id && formData.travelers) {
-      const selectedTrip = tripsData?.data?.find((trip: any) => trip.id === parseInt(formData.trip_id));
+    // Skip auto-calculation when first loading edit data
+    if (isEditMode && !isDataLoaded) return;
+    
+    if (formData.trip_id && formData.travelers && !isEditMode) {
+      const selectedTrip = tripsData?.data?.find((trip: any) => String(trip.id) === formData.trip_id);
       if (selectedTrip) {
         const total = selectedTrip.price * parseInt(formData.travelers);
         setFormData(prev => ({ ...prev, total_amount: total.toString() }));
       }
     }
-  }, [formData.trip_id, formData.travelers, tripsData]);
+  }, [formData.trip_id, formData.travelers, tripsData, isEditMode, isDataLoaded]);
 
   const handleFieldChange = (field: keyof BookingFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -189,30 +255,45 @@ const BookingForm: React.FC = () => {
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: BookingFormData) => {
+      // Split customer name into first and last
+      const nameParts = data.customer_name.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
       const payload = {
-        customer_name: data.customer_name.trim(),
-        customer_email: data.customer_email.trim(),
-        customer_phone: data.customer_phone.trim(),
+        contact_first_name: firstName,
+        contact_last_name: lastName,
+        contact_email: data.customer_email.trim(),
+        contact_phone: data.customer_phone.trim(),
         trip_id: parseInt(data.trip_id),
-        booking_date: data.booking_date,
         travel_date: data.travel_date,
-        travelers: parseInt(data.travelers),
+        travelers_count: parseInt(data.travelers),
         total_amount: parseFloat(data.total_amount),
         payment_status: data.payment_status,
-        booking_status: data.booking_status,
-        payment_method: data.payment_method.trim(),
-        notes: data.notes.trim(),
+        status: data.booking_status,
+        payment_gateway: data.payment_method.trim(),
+        special_requests: data.notes.trim(),
       };
 
-      if (isEditMode && bookingId) {
-        // return await apiClient.put(`/bookings/${bookingId}`, payload);
-        console.log('Updating booking:', bookingId, payload);
-        return { success: true, id: bookingId };
-      } else {
-        // return await apiClient.post('/bookings', payload);
-        console.log('Creating booking:', payload);
-        return { success: true, id: Math.floor(Math.random() * 1000) };
+      const url = isEditMode && bookingId
+        ? `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings/${bookingId}`
+        : `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings`;
+
+      const response = await fetch(url, {
+        method: isEditMode ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to save booking');
       }
+
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
@@ -244,9 +325,112 @@ const BookingForm: React.FC = () => {
 
   if (isEditMode && isLoadingBooking) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading booking...', 'Loading booking...')}</span>
+      <div className="space-y-3">
+        {/* Header Skeleton */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="h-10 w-24" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Main Form Skeleton */}
+          <div className="lg:col-span-2 space-y-3">
+            {/* Customer Information Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-40" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Booking Details Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-32" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar Skeleton */}
+          <div className="space-y-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-32" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-3">
+                <div className="flex gap-2">
+                  <Skeleton className="h-10 flex-1" />
+                  <Skeleton className="h-10 w-20" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -350,12 +534,12 @@ const BookingForm: React.FC = () => {
                       id="trip_id"
                       value={formData.trip_id}
                       onChange={(e) => handleFieldChange('trip_id', e.target.value)}
-                      className={`h-9 ${errors.trip_id ? 'border-red-500' : ''}`}
+                      className={errors.trip_id ? 'border-red-500' : ''}
                       required
                     >
-                      <option value="">{__('Select a trip', 'Select a trip')}</option>
+                      <option value="">{isLoadingTrips ? __('Loading trips...', 'Loading trips...') : __('Select a trip', 'Select a trip')}</option>
                       {tripsData?.data?.map((trip: any) => (
-                        <option key={trip.id} value={trip.id}>
+                        <option key={trip.id} value={String(trip.id)}>
                           {trip.title} - ${trip.price}
                         </option>
                       ))}
@@ -483,12 +667,13 @@ const BookingForm: React.FC = () => {
                       id="booking_status"
                       value={formData.booking_status}
                       onChange={(e) => handleFieldChange('booking_status', e.target.value)}
-                      className="h-9"
                     >
                       <option value="pending">{__('Pending', 'Pending')}</option>
                       <option value="confirmed">{__('Confirmed', 'Confirmed')}</option>
                       <option value="cancelled">{__('Cancelled', 'Cancelled')}</option>
                       <option value="completed">{__('Completed', 'Completed')}</option>
+                      <option value="refunded">{__('Refunded', 'Refunded')}</option>
+                      <option value="failed">{__('Failed', 'Failed')}</option>
                     </Select>
                   </div>
 
@@ -501,7 +686,6 @@ const BookingForm: React.FC = () => {
                       id="payment_status"
                       value={formData.payment_status}
                       onChange={(e) => handleFieldChange('payment_status', e.target.value)}
-                      className="h-9"
                     >
                       <option value="pending">{__('Pending', 'Pending')}</option>
                       <option value="partial">{__('Partial', 'Partial')}</option>
@@ -519,14 +703,22 @@ const BookingForm: React.FC = () => {
                       id="payment_method"
                       value={formData.payment_method}
                       onChange={(e) => handleFieldChange('payment_method', e.target.value)}
-                      className="h-9"
                     >
                       <option value="">{__('Select payment method', 'Select payment method')}</option>
-                      <option value="Credit Card">{__('Credit Card', 'Credit Card')}</option>
-                      <option value="Bank Transfer">{__('Bank Transfer', 'Bank Transfer')}</option>
-                      <option value="PayPal">{__('PayPal', 'PayPal')}</option>
-                      <option value="Stripe">{__('Stripe', 'Stripe')}</option>
-                      <option value="Cash">{__('Cash', 'Cash')}</option>
+                      {gatewaysData?.data?.map((gw: any) => (
+                        <option key={gw.id} value={gw.id}>
+                          {gw.title}
+                        </option>
+                      ))}
+                      {/* Fallback options if no gateways loaded */}
+                      {(!gatewaysData?.data || gatewaysData.data.length === 0) && (
+                        <>
+                          <option value="pay_later">{__('Pay Later', 'Pay Later')}</option>
+                          <option value="bank_transfer">{__('Bank Transfer', 'Bank Transfer')}</option>
+                          <option value="stripe">{__('Stripe', 'Stripe')}</option>
+                          <option value="paypal">{__('PayPal', 'PayPal')}</option>
+                        </>
+                      )}
                     </Select>
                   </div>
                 </CardContent>
