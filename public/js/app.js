@@ -12243,7 +12243,7 @@ const countryList = [
   { code: "ZA", name: "South Africa" }
 ];
 const BookingForm = () => {
-  var _a, _b, _c, _d, _e;
+  var _a, _b, _c, _d, _e, _f, _g, _h;
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const [formData, setFormData] = reactExports.useState({
@@ -12262,6 +12262,7 @@ const BookingForm = () => {
   });
   const [travelersData, setTravelersData] = reactExports.useState([{}]);
   const [expandedTravelers, setExpandedTravelers] = reactExports.useState([0]);
+  const [emergencyContactData, setEmergencyContactData] = reactExports.useState({});
   const [errors, setErrors] = reactExports.useState({});
   const [isSubmitting, setIsSubmitting] = reactExports.useState(false);
   const { data: formConfig } = useQuery({
@@ -12284,6 +12285,11 @@ const BookingForm = () => {
     var _a2;
     if (!((_a2 = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _a2.fields)) return [];
     return formConfig.traveler_form.fields.filter((field) => field.enabled).sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+  const emergencyContactFields = reactExports.useMemo(() => {
+    var _a2;
+    if (!((_a2 = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _a2.fields)) return [];
+    return formConfig.emergency_contact_form.fields.filter((field) => field.enabled).sort((a, b) => a.order - b.order);
   }, [formConfig]);
   const createEmptyTraveler = () => {
     const empty = {};
@@ -12387,6 +12393,12 @@ const BookingForm = () => {
         if (travelers.length === 0) {
           travelers = [{}];
         }
+        let emergencyContact = {};
+        if (booking.emergency_contact && typeof booking.emergency_contact === "object") {
+          Object.entries(booking.emergency_contact).forEach(([key, value]) => {
+            emergencyContact[key] = String(value || "");
+          });
+        }
         const mappedData = {
           id: booking.id,
           customer_name: customerName,
@@ -12401,7 +12413,8 @@ const BookingForm = () => {
           booking_status: booking.status || "pending",
           payment_method: booking.payment_gateway || "",
           notes: booking.special_requests || "",
-          travelers_data: travelers
+          travelers_data: travelers,
+          emergency_contact: emergencyContact
         };
         console.log("Mapped booking data:", mappedData);
         return mappedData;
@@ -12432,6 +12445,9 @@ const BookingForm = () => {
         setTravelersData(bookingData.travelers_data);
         setExpandedTravelers([0]);
       }
+      if (bookingData.emergency_contact) {
+        setEmergencyContactData(bookingData.emergency_contact);
+      }
       setIsDataLoaded(true);
     }
   }, [bookingData, isEditMode]);
@@ -12451,6 +12467,9 @@ const BookingForm = () => {
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
+  };
+  const handleEmergencyContactChange = (field, value) => {
+    setEmergencyContactData((prev) => ({ ...prev, [field]: value }));
   };
   const handleTravelerChange = (index, field, value) => {
     setTravelersData((prev) => {
@@ -12524,7 +12543,9 @@ const BookingForm = () => {
         payment_gateway: data.payment_method.trim(),
         special_requests: data.notes.trim(),
         // Include travelers data
-        travelers_data: travelersData
+        travelers_data: travelersData,
+        // Include emergency contact data
+        emergency_contact: emergencyContactData
       };
       const url = isEditMode && bookingId ? `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/bookings/${bookingId}` : `${((_b2 = window.yatraAdmin) == null ? void 0 : _b2.apiUrl) || "/wp-json/yatra/v1"}/bookings`;
       const response = await fetch(url, {
@@ -12869,12 +12890,86 @@ const BookingForm = () => {
             ] })
           ] })
         ] }),
-        ((_b = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _b.enabled) !== false && travelerFields.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        ((_b = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _b.enabled) !== false && emergencyContactFields.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "pb-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
+              ((_c = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _c.title) || __("Emergency Contact", "Emergency Contact")
+            ] }),
+            ((_d = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _d.description) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: formConfig.emergency_contact_form.description })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: emergencyContactFields.map((field) => {
+            var _a2;
+            return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: field.width === "full" ? "md:col-span-2" : "",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "label",
+                    {
+                      htmlFor: `emergency-${field.id}`,
+                      className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1",
+                      children: [
+                        field.label,
+                        field.required && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500 ml-1", children: "*" })
+                      ]
+                    }
+                  ),
+                  field.type === "select" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    Select,
+                    {
+                      id: `emergency-${field.id}`,
+                      value: emergencyContactData[field.id] || "",
+                      onChange: (e) => handleEmergencyContactChange(field.id, e.target.value),
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: field.placeholder || `Select ${field.label}` }),
+                        (_a2 = field.options) == null ? void 0 : _a2.map((opt) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: opt.value, children: opt.label }, opt.value))
+                      ]
+                    }
+                  ) : field.type === "country" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    Select,
+                    {
+                      id: `emergency-${field.id}`,
+                      value: emergencyContactData[field.id] || "",
+                      onChange: (e) => handleEmergencyContactChange(field.id, e.target.value),
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: field.placeholder || "Select Country" }),
+                        countryList.map((country) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: country.code, children: country.name }, country.code))
+                      ]
+                    }
+                  ) : field.type === "textarea" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "textarea",
+                    {
+                      id: `emergency-${field.id}`,
+                      value: emergencyContactData[field.id] || "",
+                      onChange: (e) => handleEmergencyContactChange(field.id, e.target.value),
+                      placeholder: field.placeholder,
+                      rows: 2,
+                      className: "flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:placeholder:text-gray-400 resize-none"
+                    }
+                  ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      id: `emergency-${field.id}`,
+                      type: field.type === "email" ? "email" : field.type === "tel" ? "tel" : field.type === "date" ? "date" : field.type === "number" ? "number" : "text",
+                      value: emergencyContactData[field.id] || "",
+                      onChange: (e) => handleEmergencyContactChange(field.id, e.target.value),
+                      placeholder: field.placeholder
+                    }
+                  )
+                ]
+              },
+              field.id
+            );
+          }) }) })
+        ] }),
+        ((_e = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _e.enabled) !== false && travelerFields.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "pb-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-4 h-4" }),
-                ((_c = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _c.title) || __("Travelers Information", "Travelers Information"),
+                ((_f = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _f.title) || __("Travelers Information", "Travelers Information"),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-normal text-gray-500 dark:text-gray-400", children: [
                   "(",
                   travelersData.length,
@@ -12913,7 +13008,7 @@ const BookingForm = () => {
                 )
               ] })
             ] }),
-            ((_d = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _d.description) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: formConfig.traveler_form.description })
+            ((_g = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _g.description) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: formConfig.traveler_form.description })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: travelersData.map((traveler, travelerIndex) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "div",
@@ -13079,7 +13174,7 @@ const BookingForm = () => {
                   onChange: (e) => handleFieldChange("payment_method", e.target.value),
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Select payment method", "Select payment method") }),
-                    (_e = gatewaysData == null ? void 0 : gatewaysData.data) == null ? void 0 : _e.map((gw) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: gw.id, children: gw.title }, gw.id)),
+                    (_h = gatewaysData == null ? void 0 : gatewaysData.data) == null ? void 0 : _h.map((gw) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: gw.id, children: gw.title }, gw.id)),
                     (!(gatewaysData == null ? void 0 : gatewaysData.data) || gatewaysData.data.length === 0) && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pay_later", children: __("Pay Later", "Pay Later") }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "bank_transfer", children: __("Bank Transfer", "Bank Transfer") }),
@@ -36085,6 +36180,23 @@ const Modules = () => {
     )
   ] });
 };
+const EXCLUDED_DYNAMIC_FIELDS = [
+  "first_name",
+  "last_name",
+  "gender",
+  "nationality",
+  "_traveller_id",
+  "_is_lead",
+  "_traveller_index",
+  "booking_id",
+  "booking_reference",
+  "trip_id",
+  "trip_title",
+  "travel_date",
+  "traveler_index",
+  "is_lead",
+  "id"
+];
 const Travelers = () => {
   var _a, _b;
   const { can } = usePermissions();
@@ -36092,6 +36204,23 @@ const Travelers = () => {
   const [tripFilter, setTripFilter] = reactExports.useState("");
   const [page, setPage] = reactExports.useState(1);
   const perPage = 20;
+  const { data: formConfigData } = useQuery({
+    queryKey: ["booking-form-config"],
+    queryFn: async () => {
+      var _a2, _b2, _c;
+      const response = await fetch(
+        `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/settings`,
+        {
+          headers: {
+            "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+          }
+        }
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.success ? (_c = result.data) == null ? void 0 : _c.booking_form_config : null;
+    }
+  });
   const { data, isLoading } = useQuery({
     queryKey: ["travelers", searchTerm, tripFilter, page],
     queryFn: async () => {
@@ -36134,6 +36263,19 @@ const Travelers = () => {
       return { data: result.data || [] };
     }
   });
+  const dynamicColumns = reactExports.useMemo(() => {
+    var _a2;
+    const formConfig = formConfigData;
+    if (!((_a2 = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _a2.fields)) {
+      return [];
+    }
+    const enabledFields = formConfig.traveler_form.fields.filter((field) => field.enabled && !EXCLUDED_DYNAMIC_FIELDS.includes(field.id)).sort((a, b) => (a.order || 0) - (b.order || 0));
+    return enabledFields.map((field) => ({
+      id: field.id,
+      label: field.label,
+      type: field.type
+    }));
+  }, [formConfigData]);
   const travelers = (data == null ? void 0 : data.data) || [];
   const totalTravelers = ((_a = data == null ? void 0 : data.meta) == null ? void 0 : _a.total) || 0;
   const totalPages = Math.ceil(totalTravelers / perPage);
@@ -36148,6 +36290,36 @@ const Travelers = () => {
     } catch {
       return dateString;
     }
+  };
+  const formatCellValue = (value, fieldType) => {
+    if (value === void 0 || value === null || value === "") {
+      return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "-" });
+    }
+    switch (fieldType) {
+      case "date":
+        return formatDate(value);
+      case "email":
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3 text-gray-400" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate max-w-[150px]", children: value })
+        ] });
+      case "tel":
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3 text-gray-400" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: value })
+        ] });
+      case "country":
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3 h-3 text-gray-400" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: value })
+        ] });
+      default:
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: String(value) });
+    }
+  };
+  const renderSkeletonRows = () => {
+    const columnCount = 5 + dynamicColumns.length;
+    return [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: [...Array(columnCount)].map((_2, j) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-full" }) }, j)) }, i));
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -36197,37 +36369,27 @@ const Travelers = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16" }) : totalTravelers })
       ] })
     ] }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0 overflow-x-auto", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Traveler", "Traveler") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Contact", "Contact") }),
+        dynamicColumns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: col.label }, col.id)),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travel Date", "Travel Date") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Passport", "Passport") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: __("Actions", "Actions") })
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-40" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-10 w-48" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-32" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-24" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-28" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-16" }) })
-      ] }, i)) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: renderSkeletonRows() })
     ] }) : travelers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400", children: searchTerm || tripFilter ? __("No travelers found matching your criteria", "No travelers found matching your criteria") : __("No travelers found", "No travelers found") })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Traveler", "Traveler") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Contact", "Contact") }),
+        dynamicColumns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: col.label }, col.id)),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travel Date", "Travel Date") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Passport", "Passport") }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: __("Actions", "Actions") })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[80px]", children: __("Actions", "Actions") })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: travelers.map((traveler) => {
         var _a2, _b2, _c;
@@ -36251,29 +36413,12 @@ const Travelers = () => {
               ] })
             ] })
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-            traveler.email && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate max-w-[180px]", children: traveler.email })
-            ] }),
-            traveler.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: traveler.phone })
-            ] }),
-            !traveler.email && !traveler.phone && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-400", children: "-" })
-          ] }) }),
+          dynamicColumns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatCellValue(traveler[col.id], col.type) }, col.id)),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-[200px] truncate", title: traveler.trip_title, children: traveler.trip_title || `Trip #${traveler.trip_id}` }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3 text-gray-400" }),
             formatDate(traveler.travel_date)
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: traveler.passport ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-mono text-sm", children: traveler.passport }),
-            traveler.passport_expiry && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
-              "Exp: ",
-              formatDate(traveler.passport_expiry)
-            ] })
-          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "-" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "a",
             {

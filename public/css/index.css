@@ -1043,8 +1043,8 @@ video {
 .max-w-7xl {
   max-width: 80rem;
 }
-.max-w-\[180px\] {
-  max-width: 180px;
+.max-w-\[150px\] {
+  max-width: 150px;
 }
 .max-w-\[200px\] {
   max-width: 200px;

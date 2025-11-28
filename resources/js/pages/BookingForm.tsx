@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Plus, Trash2, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Plus, Trash2, Users, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -115,6 +115,7 @@ const BookingForm: React.FC = () => {
   });
   const [travelersData, setTravelersData] = useState<TravelerData[]>([{}]);
   const [expandedTravelers, setExpandedTravelers] = useState<number[]>([0]);
+  const [emergencyContactData, setEmergencyContactData] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -139,6 +140,14 @@ const BookingForm: React.FC = () => {
   const travelerFields = useMemo(() => {
     if (!formConfig?.traveler_form?.fields) return [];
     return formConfig.traveler_form.fields
+      .filter(field => field.enabled)
+      .sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+
+  // Get enabled emergency contact fields from config
+  const emergencyContactFields = useMemo(() => {
+    if (!formConfig?.emergency_contact_form?.fields) return [];
+    return formConfig.emergency_contact_form.fields
       .filter(field => field.enabled)
       .sort((a, b) => a.order - b.order);
   }, [formConfig]);
@@ -265,6 +274,14 @@ const BookingForm: React.FC = () => {
           travelers = [{}]; // Empty object - fields will be populated from form config
         }
         
+        // Parse emergency contact data
+        let emergencyContact: Record<string, string> = {};
+        if (booking.emergency_contact && typeof booking.emergency_contact === 'object') {
+          Object.entries(booking.emergency_contact).forEach(([key, value]) => {
+            emergencyContact[key] = String(value || '');
+          });
+        }
+
         const mappedData = {
           id: booking.id,
           customer_name: customerName,
@@ -280,6 +297,7 @@ const BookingForm: React.FC = () => {
           payment_method: booking.payment_gateway || '',
           notes: booking.special_requests || '',
           travelers_data: travelers,
+          emergency_contact: emergencyContact,
         };
         console.log('Mapped booking data:', mappedData);
         return mappedData;
@@ -318,6 +336,11 @@ const BookingForm: React.FC = () => {
         setExpandedTravelers([0]);
       }
       
+      // Set emergency contact data
+      if (bookingData.emergency_contact) {
+        setEmergencyContactData(bookingData.emergency_contact);
+      }
+      
       setIsDataLoaded(true);
     }
   }, [bookingData, isEditMode]);
@@ -341,6 +364,11 @@ const BookingForm: React.FC = () => {
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
+  };
+
+  // Emergency contact change handler
+  const handleEmergencyContactChange = (field: string, value: string) => {
+    setEmergencyContactData(prev => ({ ...prev, [field]: value }));
   };
 
   // Traveler management functions
@@ -434,6 +462,8 @@ const BookingForm: React.FC = () => {
         special_requests: data.notes.trim(),
         // Include travelers data
         travelers_data: travelersData,
+        // Include emergency contact data
+        emergency_contact: emergencyContactData,
       };
 
       const url = isEditMode && bookingId
@@ -809,6 +839,83 @@ const BookingForm: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Emergency Contact - Dynamic Fields */}
+              {formConfig?.emergency_contact_form?.enabled !== false && emergencyContactFields.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" />
+                      {formConfig?.emergency_contact_form?.title || __('Emergency Contact', 'Emergency Contact')}
+                    </CardTitle>
+                    {formConfig?.emergency_contact_form?.description && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        {formConfig.emergency_contact_form.description}
+                      </p>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {emergencyContactFields.map((field) => (
+                        <div 
+                          key={field.id} 
+                          className={field.width === 'full' ? 'md:col-span-2' : ''}
+                        >
+                          <label 
+                            htmlFor={`emergency-${field.id}`}
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                          >
+                            {field.label}
+                            {field.required && <span className="text-red-500 ml-1">*</span>}
+                          </label>
+                          
+                          {/* Render field based on type */}
+                          {field.type === 'select' ? (
+                            <Select
+                              id={`emergency-${field.id}`}
+                              value={emergencyContactData[field.id] || ''}
+                              onChange={(e) => handleEmergencyContactChange(field.id, e.target.value)}
+                            >
+                              <option value="">{field.placeholder || `Select ${field.label}`}</option>
+                              {field.options?.map((opt) => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                              ))}
+                            </Select>
+                          ) : field.type === 'country' ? (
+                            <Select
+                              id={`emergency-${field.id}`}
+                              value={emergencyContactData[field.id] || ''}
+                              onChange={(e) => handleEmergencyContactChange(field.id, e.target.value)}
+                            >
+                              <option value="">{field.placeholder || 'Select Country'}</option>
+                              {countryList.map((country) => (
+                                <option key={country.code} value={country.code}>{country.name}</option>
+                              ))}
+                            </Select>
+                          ) : field.type === 'textarea' ? (
+                            <textarea
+                              id={`emergency-${field.id}`}
+                              value={emergencyContactData[field.id] || ''}
+                              onChange={(e) => handleEmergencyContactChange(field.id, e.target.value)}
+                              placeholder={field.placeholder}
+                              rows={2}
+                              className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:placeholder:text-gray-400 resize-none"
+                            />
+                          ) : (
+                            <Input
+                              id={`emergency-${field.id}`}
+                              type={field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : field.type === 'date' ? 'date' : field.type === 'number' ? 'number' : 'text'}
+                              value={emergencyContactData[field.id] || ''}
+                              onChange={(e) => handleEmergencyContactChange(field.id, e.target.value)}
+                              placeholder={field.placeholder}
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Travelers Information - Dynamic Fields */}
               {formConfig?.traveler_form?.enabled !== false && travelerFields.length > 0 && (

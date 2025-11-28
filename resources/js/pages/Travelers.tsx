@@ -1,11 +1,11 @@
 /**
  * Travelers Listing Page
- * Display all travelers from bookings with search and filter
+ * Display all travelers from bookings with dynamic columns from Form Builder
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Users, Search, Eye, Mail, Phone, Calendar } from 'lucide-react';
+import { Users, Search, Eye, Mail, Phone, Calendar, MapPin } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -17,8 +17,29 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Skeleton } from '../components/ui/skeleton';
 import { Badge } from '../components/ui/badge';
 
-interface Traveler {
+interface FormField {
   id: string;
+  type: string;
+  label: string;
+  placeholder?: string;
+  required: boolean;
+  enabled: boolean;
+  order: number;
+  width?: string;
+  locked?: boolean;
+}
+
+interface FormConfig {
+  traveler_form?: {
+    title: string;
+    description: string;
+    enabled: boolean;
+    fields: FormField[];
+  };
+}
+
+interface Traveler {
+  id: string | number;
   booking_id: number;
   booking_reference: string;
   trip_id: number;
@@ -26,18 +47,17 @@ interface Traveler {
   travel_date: string;
   traveler_index: number;
   is_lead: boolean;
-  first_name: string;
-  last_name: string;
-  email?: string;
-  phone?: string;
-  gender?: string;
-  date_of_birth?: string;
-  nationality?: string;
-  passport?: string;
-  passport_expiry?: string;
   // Dynamic fields
   [key: string]: any;
 }
+
+// Fields to exclude from dynamic columns (already shown in fixed columns)
+const EXCLUDED_DYNAMIC_FIELDS = [
+  'first_name', 'last_name', 'gender', 'nationality',
+  '_traveller_id', '_is_lead', '_traveller_index',
+  'booking_id', 'booking_reference', 'trip_id', 'trip_title', 'travel_date',
+  'traveler_index', 'is_lead', 'id',
+];
 
 const Travelers: React.FC = () => {
   const { can } = usePermissions();
@@ -45,6 +65,24 @@ const Travelers: React.FC = () => {
   const [tripFilter, setTripFilter] = useState('');
   const [page, setPage] = useState(1);
   const perPage = 20;
+
+  // Fetch form configuration for dynamic columns
+  const { data: formConfigData } = useQuery({
+    queryKey: ['booking-form-config'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/settings`,
+        {
+          headers: {
+            'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+          },
+        }
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.success ? result.data?.booking_form_config : null;
+    },
+  });
 
   // Fetch travelers from API
   const { data, isLoading } = useQuery({
@@ -93,6 +131,25 @@ const Travelers: React.FC = () => {
     },
   });
 
+  // Get dynamic columns from form config
+  const dynamicColumns = useMemo(() => {
+    const formConfig = formConfigData as FormConfig | null;
+    if (!formConfig?.traveler_form?.fields) {
+      return [];
+    }
+
+    // Get enabled fields from form config, sorted by order
+    const enabledFields = formConfig.traveler_form.fields
+      .filter(field => field.enabled && !EXCLUDED_DYNAMIC_FIELDS.includes(field.id))
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    return enabledFields.map(field => ({
+      id: field.id,
+      label: field.label,
+      type: field.type,
+    }));
+  }, [formConfigData]);
+
   const travelers = data?.data || [];
   const totalTravelers = data?.meta?.total || 0;
   const totalPages = Math.ceil(totalTravelers / perPage);
@@ -108,6 +165,55 @@ const Travelers: React.FC = () => {
     } catch {
       return dateString;
     }
+  };
+
+  // Format cell value based on field type
+  const formatCellValue = (value: any, fieldType: string): React.ReactNode => {
+    if (value === undefined || value === null || value === '') {
+      return <span className="text-gray-400">-</span>;
+    }
+
+    switch (fieldType) {
+      case 'date':
+        return formatDate(value);
+      case 'email':
+        return (
+          <div className="flex items-center gap-1 text-sm">
+            <Mail className="w-3 h-3 text-gray-400" />
+            <span className="truncate max-w-[150px]">{value}</span>
+          </div>
+        );
+      case 'tel':
+        return (
+          <div className="flex items-center gap-1 text-sm">
+            <Phone className="w-3 h-3 text-gray-400" />
+            <span>{value}</span>
+          </div>
+        );
+      case 'country':
+        return (
+          <div className="flex items-center gap-1 text-sm">
+            <MapPin className="w-3 h-3 text-gray-400" />
+            <span>{value}</span>
+          </div>
+        );
+      default:
+        return <span className="text-sm">{String(value)}</span>;
+    }
+  };
+
+  // Render skeleton rows
+  const renderSkeletonRows = () => {
+    const columnCount = 5 + dynamicColumns.length; // Fixed columns + dynamic
+    return [...Array(5)].map((_, i) => (
+      <TableRow key={i}>
+        {[...Array(columnCount)].map((_, j) => (
+          <TableCell key={j}>
+            <Skeleton className="h-8 w-full" />
+          </TableCell>
+        ))}
+      </TableRow>
+    ));
   };
 
   return (
@@ -172,32 +278,23 @@ const Travelers: React.FC = () => {
 
       {/* Travelers Table */}
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           {isLoading ? (
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>{__('Traveler', 'Traveler')}</TableHead>
-                  <TableHead>{__('Contact', 'Contact')}</TableHead>
+                  {dynamicColumns.map(col => (
+                    <TableHead key={col.id}>{col.label}</TableHead>
+                  ))}
                   <TableHead>{__('Trip', 'Trip')}</TableHead>
                   <TableHead>{__('Travel Date', 'Travel Date')}</TableHead>
-                  <TableHead>{__('Passport', 'Passport')}</TableHead>
                   <TableHead>{__('Booking', 'Booking')}</TableHead>
                   <TableHead className="text-right">{__('Actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {[...Array(5)].map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell><Skeleton className="h-10 w-40" /></TableCell>
-                    <TableCell><Skeleton className="h-10 w-48" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-28" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-16" /></TableCell>
-                  </TableRow>
-                ))}
+                {renderSkeletonRows()}
               </TableBody>
             </Table>
           ) : travelers.length === 0 ? (
@@ -214,18 +311,25 @@ const Travelers: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  {/* Fixed: Traveler Info Column */}
                   <TableHead>{__('Traveler', 'Traveler')}</TableHead>
-                  <TableHead>{__('Contact', 'Contact')}</TableHead>
+                  
+                  {/* Dynamic columns from Form Builder */}
+                  {dynamicColumns.map(col => (
+                    <TableHead key={col.id}>{col.label}</TableHead>
+                  ))}
+                  
+                  {/* Fixed: Trip, Date, Booking, Actions */}
                   <TableHead>{__('Trip', 'Trip')}</TableHead>
                   <TableHead>{__('Travel Date', 'Travel Date')}</TableHead>
-                  <TableHead>{__('Passport', 'Passport')}</TableHead>
                   <TableHead>{__('Booking', 'Booking')}</TableHead>
-                  <TableHead className="text-right">{__('Actions', 'Actions')}</TableHead>
+                  <TableHead className="text-right w-[80px]">{__('Actions', 'Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {travelers.map((traveler: Traveler) => (
                   <TableRow key={traveler.id}>
+                    {/* Traveler Info */}
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -253,50 +357,30 @@ const Travelers: React.FC = () => {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        {traveler.email && (
-                          <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                            <Mail className="w-3 h-3" />
-                            <span className="truncate max-w-[180px]">{traveler.email}</span>
-                          </div>
-                        )}
-                        {traveler.phone && (
-                          <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                            <Phone className="w-3 h-3" />
-                            <span>{traveler.phone}</span>
-                          </div>
-                        )}
-                        {!traveler.email && !traveler.phone && (
-                          <span className="text-sm text-gray-400">-</span>
-                        )}
-                      </div>
-                    </TableCell>
+
+                    {/* Dynamic Field Columns */}
+                    {dynamicColumns.map(col => (
+                      <TableCell key={col.id}>
+                        {formatCellValue(traveler[col.id], col.type)}
+                      </TableCell>
+                    ))}
+
+                    {/* Trip */}
                     <TableCell>
                       <div className="max-w-[200px] truncate" title={traveler.trip_title}>
                         {traveler.trip_title || `Trip #${traveler.trip_id}`}
                       </div>
                     </TableCell>
+
+                    {/* Travel Date */}
                     <TableCell>
                       <div className="flex items-center gap-1 text-sm">
                         <Calendar className="w-3 h-3 text-gray-400" />
                         {formatDate(traveler.travel_date)}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      {traveler.passport ? (
-                        <div>
-                          <div className="font-mono text-sm">{traveler.passport}</div>
-                          {traveler.passport_expiry && (
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              Exp: {formatDate(traveler.passport_expiry)}
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </TableCell>
+
+                    {/* Booking Reference */}
                     <TableCell>
                       <a
                         href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${traveler.booking_id}`}
@@ -305,6 +389,8 @@ const Travelers: React.FC = () => {
                         {traveler.booking_reference}
                       </a>
                     </TableCell>
+
+                    {/* Actions */}
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
@@ -354,4 +440,3 @@ const Travelers: React.FC = () => {
 };
 
 export default Travelers;
-
