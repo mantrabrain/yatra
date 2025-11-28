@@ -25,7 +25,6 @@ import { usePermissions } from '../hooks/usePermissions';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
-import { Select } from '../components/ui/select';
 import { SearchableSelect } from '../components/ui/searchable-select';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -95,18 +94,35 @@ const Itinerary: React.FC = () => {
     }
   }, [tripIdParam]);
 
-  // Fetch trips for filter
+  // State for item types and items (populated from trips API meta)
+  const [itemTypesData, setItemTypesData] = useState<Array<{ id: number; name: string; icon: string; color: string }>>([]);
+  const [itemsData, setItemsData] = useState<Array<{ id: number; name: string; type_id: number }>>([]);
+
+  // Fetch trips for filter (with itinerary meta for item types and items)
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ['trips-simple'],
+    queryKey: ['trips-with-itinerary-meta'],
     queryFn: async () => {
       try {
         const response = await apiClient.get('/trips', {
           params: {
             per_page: 100,
-            status: 'all' // Get all trips for filter
+            status: 'all', // Get all trips for filter
+            include_itinerary_meta: 1, // Include item types and items in meta
           }
         });
+        
+        // Extract trips data
         const trips = response?.data?.data || response?.data || response || [];
+        
+        // Extract meta data for item types and items
+        const meta = response?.data?.meta || response?.meta || {};
+        if (meta.available_item_types) {
+          setItemTypesData(meta.available_item_types);
+        }
+        if (meta.available_items) {
+          setItemsData(meta.available_items);
+        }
+        
         return Array.isArray(trips) ? trips : [];
       } catch (error: any) {
         showToast(error?.message || __('Failed to load trips', 'Failed to load trips'), 'error');
@@ -119,89 +135,17 @@ const Itinerary: React.FC = () => {
     refetchOnWindowFocus: false, // Don't refetch when switching tabs
   });
 
-  // Fetch item types and items for mapping
-  const { data: itemTypesData } = useQuery({
-    queryKey: ['item-types'],
-    queryFn: async () => {
-      try {
-        const response = await apiClient.get('/item-types', {
-          params: { per_page: 100, status: 'publish' }
-        });
-        return response?.data?.data || response?.data || response || [];
-      } catch (error: any) {
-        return [];
-      }
-    },
-    enabled: can('yatra_view_trips'),
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
-    refetchOnWindowFocus: false, // Don't refetch when switching tabs
-    refetchOnMount: false, // Don't refetch on component mount if data exists
-    refetchOnReconnect: true, // Only refetch on network reconnect
-  });
-
-  const { data: itemsData } = useQuery({
-    queryKey: ['items'],
-    queryFn: async () => {
-      try {
-        const response = await apiClient.get('/items', {
-          params: { per_page: 1000, status: 'publish' }
-        });
-        // Handle different response structures
-        let items = [];
-        if (response?.data?.data) {
-          items = response.data.data;
-        } else if (response?.data) {
-          items = Array.isArray(response.data) ? response.data : [];
-        } else if (Array.isArray(response)) {
-          items = response;
-        }
-        
-        // Ensure items is an array
-        const itemsArray = Array.isArray(items) ? items : [];
-        
-        return itemsArray;
-      } catch (error: any) {
-        console.error('Error fetching items:', error);
-        return [];
-      }
-    },
-    enabled: can('yatra_view_trips'),
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
-    refetchOnWindowFocus: false, // Don't refetch when switching tabs
-    refetchOnMount: false, // Don't refetch on component mount if data exists
-    refetchOnReconnect: true, // Only refetch on network reconnect
-  });
-
   // Helper function to map item_type_id and item_id to item_type/item_name/item_icon/item_color
   const mapItemIds = (itemTypeId: number | null | undefined, itemId: number | null | undefined) => {
-    const itemTypes = Array.isArray(itemTypesData) ? itemTypesData : [];
-    const items = Array.isArray(itemsData) ? itemsData : [];
-
     // Find item type
-    const itemType = itemTypeId ? itemTypes.find((type: any) => type.id === itemTypeId || type.id?.toString() === itemTypeId?.toString()) : null;
+    const itemType = itemTypeId ? itemTypesData.find((type) => type.id === itemTypeId || type.id?.toString() === itemTypeId?.toString()) : null;
     
     // Find item
-    const item = itemId ? items.find((it: any) => it.id === itemId || it.id?.toString() === itemId?.toString()) : null;
+    const item = itemId ? itemsData.find((it) => it.id === itemId || it.id?.toString() === itemId?.toString()) : null;
 
-    // Extract icon and color from item type
-    let iconName = 'footprints'; // default
-    let itemColor = 'gray'; // default
-    if (itemType) {
-      // Extract icon
-      if (itemType.icon) {
-        if (typeof itemType.icon === 'string') {
-          iconName = itemType.icon;
-        } else if (typeof itemType.icon === 'object' && itemType.icon.value) {
-          iconName = itemType.icon.value;
-        }
-      }
-      // Extract color
-      if (itemType.color) {
-        itemColor = itemType.color;
-      }
-    }
+    // Extract icon and color from item type (already processed by backend)
+    const iconName = itemType?.icon || 'footprints';
+    const itemColor = itemType?.color || 'gray';
 
     if (itemType && item) {
       return {
@@ -1318,40 +1262,16 @@ const Itinerary: React.FC = () => {
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-1 relative z-10">
-                                  <Select
-                                    value={(() => {
-                                      // Find the current item by item_id to get exact name match
-                                      if (entry.item_id && itemsData) {
-                                        const currentItem = itemsData.find((item: any) => 
-                                          item.id === entry.item_id || item.id?.toString() === entry.item_id?.toString()
-                                        );
-                                        return currentItem?.name || entry.item_name || '';
-                                      }
-                                      return entry.item_name || '';
-                                    })()}
-                                    className="h-8 text-xs min-w-[140px] w-auto relative z-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 px-2 py-1"
-                                    style={{ 
-                                      minWidth: '140px', 
-                                      width: 'auto',
-                                      color: 'rgb(17, 24, 39)',
-                                      backgroundColor: 'rgb(255, 255, 255)',
-                                      paddingLeft: '8px',
-                                      paddingRight: '24px',
-                                      paddingTop: '4px',
-                                      paddingBottom: '4px',
-                                    }}
-                                    onChange={(e) => {
-                                      // Find the selected item
-                                      const selectedItemName = e.target.value;
-                                      if (!selectedItemName) return;
+                                  <SearchableSelect
+                                    value={entry.item_id?.toString() || ''}
+                                    onChange={(value) => {
+                                      if (!value) return;
                                       
-                                      const selectedItem = itemsData?.find((item: any) => 
-                                        item.name === selectedItemName
+                                      const selectedItem = itemsData?.find((item) => 
+                                        item.id.toString() === value
                                       );
                                       
-                                      // Use entry.item_type_id directly (no need to find by name)
                                       if (selectedItem && entry.item_type_id) {
-                                        // Update the entry with new item
                                         updateItemMutation.mutate({
                                           entryId: entry.id,
                                           itemId: selectedItem.id,
@@ -1359,77 +1279,35 @@ const Itinerary: React.FC = () => {
                                         });
                                       }
                                     }}
-                                    disabled={updateItemMutation.isPending}
-                                  >
-                                    <option value="">{__('Select item...', 'Select item...')}</option>
-                                    {(() => {
-                                      // Use entry.item_type_id directly
+                                    options={(() => {
                                       const itemTypeId = entry.item_type_id;
+                                      if (!itemTypeId) return [];
                                       
-                                      // Ensure itemsData is an array
-                                      const allItems = Array.isArray(itemsData) ? itemsData : [];
+                                      const itemTypeIdNum = typeof itemTypeId === 'string' 
+                                        ? parseInt(itemTypeId, 10) 
+                                        : Number(itemTypeId);
                                       
-                                      if (!itemTypeId || itemTypeId === null || itemTypeId === undefined) {
-                                        return (
-                                          <option value="" disabled>
-                                            {__('No item type selected', 'No item type selected')}
-                                          </option>
-                                        );
-                                      }
+                                      if (!itemTypeIdNum || isNaN(itemTypeIdNum)) return [];
                                       
-                                      if (allItems.length === 0) {
-                                        return (
-                                          <option value="" disabled>
-                                            {__('Loading items...', 'Loading items...')}
-                                          </option>
-                                        );
-                                      }
-                                      
-                                      // Convert itemTypeId to number for comparison
-                                      const itemTypeIdNum = itemTypeId ? (typeof itemTypeId === 'string' ? parseInt(itemTypeId, 10) : Number(itemTypeId)) : null;
-                                      
-                                      if (!itemTypeIdNum || itemTypeIdNum <= 0 || isNaN(itemTypeIdNum)) {
-                                        return (
-                                          <option value="" disabled>
-                                            {__('Invalid item type', 'Invalid item type')}
-                                          </option>
-                                        );
-                                      }
-                                      
-                                      // Filter items by this item type ID
-                                      // Items from API have 'type_id' field
-                                      const filteredItems = allItems.filter((item: any) => {
-                                        if (!item || !item.id) return false;
-                                        
-                                        // Get type_id from item - could be type_id or item_type_id
-                                        const itemTypeIdFromItem = item.type_id || item.item_type_id;
-                                        
-                                        if (!itemTypeIdFromItem) return false;
-                                        
-                                        // Convert to number for comparison
-                                        const itemTypeIdNumFromItem = typeof itemTypeIdFromItem === 'string' 
-                                          ? parseInt(itemTypeIdFromItem, 10) 
-                                          : Number(itemTypeIdFromItem);
-                                        
-                                        // Compare as numbers
-                                        return !isNaN(itemTypeIdNumFromItem) && itemTypeIdNumFromItem === itemTypeIdNum;
-                                      });
-                                      
-                                      if (filteredItems.length === 0) {
-                                        return (
-                                          <option value="" disabled>
-                                            {__('No items available for this type', 'No items available for this type')}
-                                          </option>
-                                        );
-                                      }
-                                      
-                                      return filteredItems.map((item: any) => (
-                                        <option key={item.id} value={item.name}>
-                                          {item.name}
-                                        </option>
-                                      ));
+                                      return itemsData
+                                        .filter((item) => {
+                                          const typeId = item.type_id;
+                                          if (!typeId) return false;
+                                          const typeIdNum = typeof typeId === 'string' 
+                                            ? parseInt(typeId, 10) 
+                                            : Number(typeId);
+                                          return typeIdNum === itemTypeIdNum;
+                                        })
+                                        .map((item) => ({
+                                          value: item.id.toString(),
+                                          label: item.name,
+                                        }));
                                     })()}
-                                  </Select>
+                                    placeholder={__('Select item...', 'Select item...')}
+                                    searchPlaceholder={__('Search items...', 'Search items...')}
+                                    className="min-w-[140px]"
+                                    disabled={updateItemMutation.isPending}
+                                  />
                                   <ConditionalRender capability="yatra_edit_trips">
                                     <Button
                                       variant="ghost"

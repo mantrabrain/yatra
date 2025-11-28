@@ -717,6 +717,25 @@ class TravellerRepository
             ], $meta);
         }
 
+        // Get unique trips for filter dropdown (only on first page with no search)
+        $available_trips = [];
+        if ($page === 1 && empty($filters['search'])) {
+            $trips_query = "SELECT DISTINCT tr.id, tr.title
+                            FROM {$this->travellers_table} t
+                            INNER JOIN {$bookings_table} b ON t.booking_id = b.id
+                            INNER JOIN {$trips_table} tr ON b.trip_id = tr.id
+                            WHERE tr.id IS NOT NULL
+                            ORDER BY tr.title ASC";
+            $trips = $this->wpdb->get_results($trips_query);
+            
+            foreach ($trips as $trip) {
+                $available_trips[] = [
+                    'id' => (int) $trip->id,
+                    'title' => $trip->title,
+                ];
+            }
+        }
+
         return [
             'data' => $data,
             'meta' => [
@@ -724,6 +743,7 @@ class TravellerRepository
                 'page' => $page,
                 'per_page' => $per_page,
                 'total_pages' => (int) ceil($total / $per_page),
+                'available_trips' => $available_trips,
             ],
         ];
     }

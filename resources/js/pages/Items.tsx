@@ -3,7 +3,7 @@
  * Manage specific items under item types (Hiking, Lunch, Bus, etc.)
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
@@ -77,25 +77,8 @@ const Items: React.FC = () => {
     return params;
   }, [searchTerm, typeFilter, statusFilter, sortBy, sortOrder, page]);
 
-  // Fetch item types for filter - only published ones are usable
-  const { data: typesData } = useQuery({
-    queryKey: ['item-types-published'],
-    queryFn: async () => {
-      try {
-        const response = await apiClient.get('/item-types', { 
-          params: { 
-            per_page: 100,
-            status: 'publish' // Only get published item types
-          } 
-        });
-        return response.data || [];
-      } catch (error: any) {
-        showToast(error?.message || __('Failed to load item types', 'Failed to load item types'), 'error');
-        return [];
-      }
-    },
-    enabled: can('yatra_view_trips'),
-  });
+  // State for available types (populated from items API response)
+  const [availableTypes, setAvailableTypes] = useState<Array<{ id: number; name: string }>>([]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['items', queryParams],
@@ -128,7 +111,15 @@ const Items: React.FC = () => {
   const items = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
-  const types = typesData || [];
+
+  // Extract available types from API response meta
+  useEffect(() => {
+    if (data?.meta?.available_types) {
+      setAvailableTypes(data.meta.available_types);
+    }
+  }, [data]);
+
+  const types = availableTypes;
 
   const formatDate = (dateString: string) => {
     if (!dateString) return __('N/A', 'N/A');

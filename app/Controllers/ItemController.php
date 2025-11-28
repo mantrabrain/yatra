@@ -98,7 +98,25 @@ class ItemController extends BaseController
 
             $prepared = array_map([$this, 'prepareItem'], $items);
 
-            return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
+            // Get available item types for filter dropdown
+            $all_types = $this->itemTypeRepository->all(['where' => ['status' => 'publish']]);
+            $available_types = array_map(function ($type) {
+                return [
+                    'id' => (int) $type->id,
+                    'name' => esc_html($type->name),
+                ];
+            }, $all_types);
+
+            return new \WP_REST_Response([
+                'data' => $prepared,
+                'total' => $total,
+                'page' => $params['page'],
+                'per_page' => $params['per_page'],
+                'total_pages' => (int) ceil($total / $params['per_page']),
+                'meta' => [
+                    'available_types' => array_values($available_types),
+                ],
+            ], 200);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }

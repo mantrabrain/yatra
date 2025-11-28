@@ -254,7 +254,7 @@ class EnquiryRepository extends BaseRepository
         $result = $this->wpdb->update(
             $table,
             [
-                'response' => sanitize_textarea_field($response),
+                'response_notes' => sanitize_textarea_field($response),
                 'responded_by' => $userId,
                 'responded_at' => current_time('mysql'),
                 'status' => 'responded',
@@ -413,7 +413,11 @@ class EnquiryRepository extends BaseRepository
         }
 
         if (array_key_exists('response', $data)) {
-            $prepared['response'] = sanitize_textarea_field((string) $data['response']);
+            $prepared['response_notes'] = sanitize_textarea_field((string) $data['response']);
+        }
+
+        if (array_key_exists('response_notes', $data)) {
+            $prepared['response_notes'] = sanitize_textarea_field((string) $data['response_notes']);
         }
 
         if (array_key_exists('responded_by', $data)) {

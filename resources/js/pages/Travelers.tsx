@@ -135,7 +135,10 @@ const Travelers: React.FC = () => {
     },
   });
 
-  // Fetch travelers from API
+  // Store available trips from first page load
+  const [availableTrips, setAvailableTrips] = useState<Array<{ id: number; title: string }>>([]);
+
+  // Fetch travelers from API (includes trip info via JOIN, and available_trips in meta on first page)
   const { data, isLoading } = useQuery({
     queryKey: ['travelers', searchTerm, tripFilter, page],
     queryFn: async () => {
@@ -159,28 +162,20 @@ const Travelers: React.FC = () => {
         throw new Error('Failed to fetch travelers');
       }
 
-      return await response.json();
+      const result = await response.json();
+      
+      // Store available trips from meta (returned on first page with no search filter)
+      if (result.meta?.available_trips?.length > 0) {
+        setAvailableTrips(result.meta.available_trips);
+      }
+      
+      return result;
     },
     enabled: can('yatra_view_bookings'),
   });
 
-  // Fetch trips for filter dropdown
-  const { data: tripsData } = useQuery({
-    queryKey: ['trips-list-filter'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/trips?per_page=100`,
-        {
-          headers: {
-            'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-          },
-        }
-      );
-      if (!response.ok) return { data: [] };
-      const result = await response.json();
-      return { data: result.data || [] };
-    },
-  });
+  // Use available trips from state for filter dropdown
+  const tripsData = useMemo(() => ({ data: availableTrips }), [availableTrips]);
 
   // Get dynamic columns from form config
   const dynamicColumns = useMemo(() => {

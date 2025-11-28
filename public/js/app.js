@@ -1515,14 +1515,9 @@ const Select = reactExports.forwardRef(
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
       "select",
       {
-        className: `flex w-full rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:focus-visible:ring-blue-400 transition-colors cursor-pointer ${className}`,
+        className: `flex h-11 w-full rounded-md border-2 border-gray-300 bg-white px-4 text-base text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:focus-visible:ring-blue-400 transition-colors cursor-pointer ${className}`,
         ref,
         style: {
-          height: "38px",
-          minHeight: "38px",
-          lineHeight: "38px",
-          paddingTop: "0",
-          paddingBottom: "0",
           paddingRight: "2.5rem",
           WebkitAppearance: "none",
           MozAppearance: "none",
@@ -21790,25 +21785,7 @@ const Items = () => {
     }
     return params;
   }, [searchTerm, typeFilter, statusFilter, sortBy, sortOrder, page]);
-  const { data: typesData } = useQuery({
-    queryKey: ["item-types-published"],
-    queryFn: async () => {
-      try {
-        const response = await apiClient.get("/item-types", {
-          params: {
-            per_page: 100,
-            status: "publish"
-            // Only get published item types
-          }
-        });
-        return response.data || [];
-      } catch (error2) {
-        showToast((error2 == null ? void 0 : error2.message) || __("Failed to load item types", "Failed to load item types"), "error");
-        return [];
-      }
-    },
-    enabled: can("yatra_view_trips")
-  });
+  const [availableTypes, setAvailableTypes] = reactExports.useState([]);
   const { data, isLoading, error } = useQuery({
     queryKey: ["items", queryParams],
     queryFn: async () => {
@@ -21838,7 +21815,13 @@ const Items = () => {
   const items = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const types = typesData || [];
+  reactExports.useEffect(() => {
+    var _a;
+    if ((_a = data == null ? void 0 : data.meta) == null ? void 0 : _a.available_types) {
+      setAvailableTypes(data.meta.available_types);
+    }
+  }, [data]);
+  const types = availableTypes;
   const formatDate = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
@@ -22303,7 +22286,7 @@ const SearchableSelect = ({
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       "div",
       {
-        className: `flex h-10 w-full rounded-md border ${error ? "border-red-500" : "border-gray-300 dark:border-gray-600"} bg-white dark:bg-gray-800 px-3 py-2 text-sm ring-offset-white focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:focus-within:ring-blue-400`,
+        className: `flex h-11 w-full rounded-md border-2 ${error ? "border-red-500" : "border-gray-300 dark:border-gray-600"} bg-white dark:bg-gray-800 px-4 py-2.5 text-base ring-offset-white focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:focus-within:ring-blue-400 transition-colors`,
         children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "button",
           {
@@ -22342,7 +22325,7 @@ const SearchableSelect = ({
         )
       }
     ),
-    isOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute z-[9999] w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-visible", children: [
+    isOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute z-[9999] w-full mt-1 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-visible", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -22752,19 +22735,30 @@ const Itinerary = () => {
       setTripFilter(tripIdParam);
     }
   }, [tripIdParam]);
+  const [itemTypesData, setItemTypesData] = reactExports.useState([]);
+  const [itemsData, setItemsData] = reactExports.useState([]);
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ["trips-simple"],
+    queryKey: ["trips-with-itinerary-meta"],
     queryFn: async () => {
-      var _a2;
+      var _a2, _b2;
       try {
         const response = await apiClient.get("/trips", {
           params: {
             per_page: 100,
-            status: "all"
+            status: "all",
             // Get all trips for filter
+            include_itinerary_meta: 1
+            // Include item types and items in meta
           }
         });
         const trips = ((_a2 = response == null ? void 0 : response.data) == null ? void 0 : _a2.data) || (response == null ? void 0 : response.data) || response || [];
+        const meta = ((_b2 = response == null ? void 0 : response.data) == null ? void 0 : _b2.meta) || (response == null ? void 0 : response.meta) || {};
+        if (meta.available_item_types) {
+          setItemTypesData(meta.available_item_types);
+        }
+        if (meta.available_items) {
+          setItemsData(meta.available_items);
+        }
         return Array.isArray(trips) ? trips : [];
       } catch (error2) {
         showToast((error2 == null ? void 0 : error2.message) || __("Failed to load trips", "Failed to load trips"), "error");
@@ -22779,91 +22773,17 @@ const Itinerary = () => {
     refetchOnWindowFocus: false
     // Don't refetch when switching tabs
   });
-  const { data: itemTypesData } = useQuery({
-    queryKey: ["item-types"],
-    queryFn: async () => {
-      var _a2;
-      try {
-        const response = await apiClient.get("/item-types", {
-          params: { per_page: 100, status: "publish" }
-        });
-        return ((_a2 = response == null ? void 0 : response.data) == null ? void 0 : _a2.data) || (response == null ? void 0 : response.data) || response || [];
-      } catch (error2) {
-        return [];
-      }
-    },
-    enabled: can("yatra_view_trips"),
-    staleTime: 5 * 60 * 1e3,
-    // Consider data fresh for 5 minutes
-    gcTime: 10 * 60 * 1e3,
-    // Keep in cache for 10 minutes
-    refetchOnWindowFocus: false,
-    // Don't refetch when switching tabs
-    refetchOnMount: false,
-    // Don't refetch on component mount if data exists
-    refetchOnReconnect: true
-    // Only refetch on network reconnect
-  });
-  const { data: itemsData } = useQuery({
-    queryKey: ["items"],
-    queryFn: async () => {
-      var _a2;
-      try {
-        const response = await apiClient.get("/items", {
-          params: { per_page: 1e3, status: "publish" }
-        });
-        let items = [];
-        if ((_a2 = response == null ? void 0 : response.data) == null ? void 0 : _a2.data) {
-          items = response.data.data;
-        } else if (response == null ? void 0 : response.data) {
-          items = Array.isArray(response.data) ? response.data : [];
-        } else if (Array.isArray(response)) {
-          items = response;
-        }
-        const itemsArray = Array.isArray(items) ? items : [];
-        return itemsArray;
-      } catch (error2) {
-        console.error("Error fetching items:", error2);
-        return [];
-      }
-    },
-    enabled: can("yatra_view_trips"),
-    staleTime: 5 * 60 * 1e3,
-    // Consider data fresh for 5 minutes
-    gcTime: 10 * 60 * 1e3,
-    // Keep in cache for 10 minutes
-    refetchOnWindowFocus: false,
-    // Don't refetch when switching tabs
-    refetchOnMount: false,
-    // Don't refetch on component mount if data exists
-    refetchOnReconnect: true
-    // Only refetch on network reconnect
-  });
   const mapItemIds = (itemTypeId, itemId) => {
-    const itemTypes = Array.isArray(itemTypesData) ? itemTypesData : [];
-    const items = Array.isArray(itemsData) ? itemsData : [];
-    const itemType = itemTypeId ? itemTypes.find((type) => {
+    const itemType = itemTypeId ? itemTypesData.find((type) => {
       var _a2;
       return type.id === itemTypeId || ((_a2 = type.id) == null ? void 0 : _a2.toString()) === (itemTypeId == null ? void 0 : itemTypeId.toString());
     }) : null;
-    const item = itemId ? items.find((it) => {
+    const item = itemId ? itemsData.find((it) => {
       var _a2;
       return it.id === itemId || ((_a2 = it.id) == null ? void 0 : _a2.toString()) === (itemId == null ? void 0 : itemId.toString());
     }) : null;
-    let iconName = "footprints";
-    let itemColor = "gray";
-    if (itemType) {
-      if (itemType.icon) {
-        if (typeof itemType.icon === "string") {
-          iconName = itemType.icon;
-        } else if (typeof itemType.icon === "object" && itemType.icon.value) {
-          iconName = itemType.icon.value;
-        }
-      }
-      if (itemType.color) {
-        itemColor = itemType.color;
-      }
-    }
+    const iconName = (itemType == null ? void 0 : itemType.icon) || "footprints";
+    const itemColor = (itemType == null ? void 0 : itemType.color) || "gray";
     if (itemType && item) {
       return {
         item_type: itemType.name || "Activity",
@@ -23687,167 +23607,137 @@ const Itinerary = () => {
               }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No item types available", "No item types available") }) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 space-y-3 overflow-visible", children: [
-              sortedEntries.map((entry) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "div",
-                {
-                  className: "flex items-start gap-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-visible",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "input",
-                      {
-                        type: "checkbox",
-                        checked: selectedEntries.has(entry.id),
-                        onChange: (e) => {
-                          e.stopPropagation();
-                          handleToggleSelect(entry.id);
-                        },
-                        onClick: (e) => e.stopPropagation(),
-                        className: "mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer",
-                        title: __("Select this entry", "Select this entry")
-                      }
-                    ) }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center min-w-[80px]", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formatTime(entry.start_time) }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1 w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-2 h-2 rounded-full bg-blue-600" }) })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2 mb-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Badge,
-                          {
-                            className: "text-xs font-medium px-2 py-0.5",
-                            style: {
-                              backgroundColor: entry.item_color === "blue" ? "rgb(219, 234, 254)" : entry.item_color === "green" ? "rgb(220, 252, 231)" : entry.item_color === "orange" ? "rgb(255, 237, 213)" : entry.item_color === "purple" ? "rgb(243, 232, 255)" : entry.item_color === "red" ? "rgb(254, 226, 226)" : entry.item_color === "yellow" ? "rgb(254, 249, 195)" : "rgb(243, 244, 246)",
-                              color: entry.item_color === "blue" ? "rgb(29, 78, 216)" : entry.item_color === "green" ? "rgb(21, 128, 61)" : entry.item_color === "orange" ? "rgb(194, 65, 12)" : entry.item_color === "purple" ? "rgb(126, 34, 206)" : entry.item_color === "red" ? "rgb(185, 28, 28)" : entry.item_color === "yellow" ? "rgb(161, 98, 7)" : "rgb(55, 65, 81)",
-                              borderColor: entry.item_color === "blue" ? "rgb(147, 197, 253)" : entry.item_color === "green" ? "rgb(134, 239, 172)" : entry.item_color === "orange" ? "rgb(254, 215, 170)" : entry.item_color === "purple" ? "rgb(221, 214, 254)" : entry.item_color === "red" ? "rgb(252, 165, 165)" : entry.item_color === "yellow" ? "rgb(253, 230, 138)" : "rgb(209, 213, 219)",
-                              borderWidth: "1px",
-                              borderStyle: "solid"
-                            },
-                            children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
-                              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                                IconSelector,
-                                {
-                                  iconName: entry.item_icon,
-                                  className: "w-3 h-3"
-                                }
-                              ),
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.item_type })
-                            ] })
-                          }
-                        ) }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white mb-1", children: entry.title }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: entry.description }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400", children: [
-                          entry.location && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.location })
-                          ] }),
-                          entry.duration && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3.5 h-3.5" }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.duration })
-                          ] })
-                        ] })
+              sortedEntries.map((entry) => {
+                var _a2;
+                return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "div",
+                  {
+                    className: "flex items-start gap-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-visible",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: selectedEntries.has(entry.id),
+                          onChange: (e) => {
+                            e.stopPropagation();
+                            handleToggleSelect(entry.id);
+                          },
+                          onClick: (e) => e.stopPropagation(),
+                          className: "mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer",
+                          title: __("Select this entry", "Select this entry")
+                        }
+                      ) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center min-w-[80px]", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formatTime(entry.start_time) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1 w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-2 h-2 rounded-full bg-blue-600" }) })
                       ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 relative z-10", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                          Select,
-                          {
-                            value: (() => {
-                              if (entry.item_id && itemsData) {
-                                const currentItem = itemsData.find(
-                                  (item) => {
-                                    var _a2, _b2;
-                                    return item.id === entry.item_id || ((_a2 = item.id) == null ? void 0 : _a2.toString()) === ((_b2 = entry.item_id) == null ? void 0 : _b2.toString());
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2 mb-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Badge,
+                            {
+                              className: "text-xs font-medium px-2 py-0.5",
+                              style: {
+                                backgroundColor: entry.item_color === "blue" ? "rgb(219, 234, 254)" : entry.item_color === "green" ? "rgb(220, 252, 231)" : entry.item_color === "orange" ? "rgb(255, 237, 213)" : entry.item_color === "purple" ? "rgb(243, 232, 255)" : entry.item_color === "red" ? "rgb(254, 226, 226)" : entry.item_color === "yellow" ? "rgb(254, 249, 195)" : "rgb(243, 244, 246)",
+                                color: entry.item_color === "blue" ? "rgb(29, 78, 216)" : entry.item_color === "green" ? "rgb(21, 128, 61)" : entry.item_color === "orange" ? "rgb(194, 65, 12)" : entry.item_color === "purple" ? "rgb(126, 34, 206)" : entry.item_color === "red" ? "rgb(185, 28, 28)" : entry.item_color === "yellow" ? "rgb(161, 98, 7)" : "rgb(55, 65, 81)",
+                                borderColor: entry.item_color === "blue" ? "rgb(147, 197, 253)" : entry.item_color === "green" ? "rgb(134, 239, 172)" : entry.item_color === "orange" ? "rgb(254, 215, 170)" : entry.item_color === "purple" ? "rgb(221, 214, 254)" : entry.item_color === "red" ? "rgb(252, 165, 165)" : entry.item_color === "yellow" ? "rgb(253, 230, 138)" : "rgb(209, 213, 219)",
+                                borderWidth: "1px",
+                                borderStyle: "solid"
+                              },
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  IconSelector,
+                                  {
+                                    iconName: entry.item_icon,
+                                    className: "w-3 h-3"
                                   }
+                                ),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.item_type })
+                              ] })
+                            }
+                          ) }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white mb-1", children: entry.title }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: entry.description }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400", children: [
+                            entry.location && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.location })
+                            ] }),
+                            entry.duration && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3.5 h-3.5" }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.duration })
+                            ] })
+                          ] })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 relative z-10", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            SearchableSelect,
+                            {
+                              value: ((_a2 = entry.item_id) == null ? void 0 : _a2.toString()) || "",
+                              onChange: (value) => {
+                                if (!value) return;
+                                const selectedItem = itemsData == null ? void 0 : itemsData.find(
+                                  (item) => item.id.toString() === value
                                 );
-                                return (currentItem == null ? void 0 : currentItem.name) || entry.item_name || "";
-                              }
-                              return entry.item_name || "";
-                            })(),
-                            className: "h-8 text-xs min-w-[140px] w-auto relative z-10 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 px-2 py-1",
-                            style: {
-                              minWidth: "140px",
-                              width: "auto",
-                              color: "rgb(17, 24, 39)",
-                              backgroundColor: "rgb(255, 255, 255)",
-                              paddingLeft: "8px",
-                              paddingRight: "24px",
-                              paddingTop: "4px",
-                              paddingBottom: "4px"
-                            },
-                            onChange: (e) => {
-                              const selectedItemName = e.target.value;
-                              if (!selectedItemName) return;
-                              const selectedItem = itemsData == null ? void 0 : itemsData.find(
-                                (item) => item.name === selectedItemName
-                              );
-                              if (selectedItem && entry.item_type_id) {
-                                updateItemMutation.mutate({
-                                  entryId: entry.id,
-                                  itemId: selectedItem.id,
-                                  itemTypeId: entry.item_type_id
-                                });
-                              }
-                            },
-                            disabled: updateItemMutation.isPending,
-                            children: [
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Select item...", "Select item...") }),
-                              (() => {
+                                if (selectedItem && entry.item_type_id) {
+                                  updateItemMutation.mutate({
+                                    entryId: entry.id,
+                                    itemId: selectedItem.id,
+                                    itemTypeId: entry.item_type_id
+                                  });
+                                }
+                              },
+                              options: (() => {
                                 const itemTypeId = entry.item_type_id;
-                                const allItems = Array.isArray(itemsData) ? itemsData : [];
-                                if (!itemTypeId || itemTypeId === null || itemTypeId === void 0) {
-                                  return /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", disabled: true, children: __("No item type selected", "No item type selected") });
-                                }
-                                if (allItems.length === 0) {
-                                  return /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", disabled: true, children: __("Loading items...", "Loading items...") });
-                                }
-                                const itemTypeIdNum = itemTypeId ? typeof itemTypeId === "string" ? parseInt(itemTypeId, 10) : Number(itemTypeId) : null;
-                                if (!itemTypeIdNum || itemTypeIdNum <= 0 || isNaN(itemTypeIdNum)) {
-                                  return /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", disabled: true, children: __("Invalid item type", "Invalid item type") });
-                                }
-                                const filteredItems = allItems.filter((item) => {
-                                  if (!item || !item.id) return false;
-                                  const itemTypeIdFromItem = item.type_id || item.item_type_id;
-                                  if (!itemTypeIdFromItem) return false;
-                                  const itemTypeIdNumFromItem = typeof itemTypeIdFromItem === "string" ? parseInt(itemTypeIdFromItem, 10) : Number(itemTypeIdFromItem);
-                                  return !isNaN(itemTypeIdNumFromItem) && itemTypeIdNumFromItem === itemTypeIdNum;
-                                });
-                                if (filteredItems.length === 0) {
-                                  return /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", disabled: true, children: __("No items available for this type", "No items available for this type") });
-                                }
-                                return filteredItems.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: item.name, children: item.name }, item.id));
-                              })()
-                            ]
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Button,
-                          {
-                            variant: "ghost",
-                            size: "icon",
-                            onClick: () => handleEdit(entry),
-                            className: "h-8 w-8",
-                            title: __("Edit Activity", "Edit Activity"),
-                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { className: "w-4 h-4" })
-                          }
-                        ) }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          Button,
-                          {
-                            variant: "ghost",
-                            size: "icon",
-                            onClick: () => handleDelete(entry),
-                            className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                            title: __("Delete", "Delete"),
-                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-                          }
-                        ) })
-                      ] })
-                    ] }) })
-                  ]
-                },
-                entry.id
-              )),
+                                if (!itemTypeId) return [];
+                                const itemTypeIdNum = typeof itemTypeId === "string" ? parseInt(itemTypeId, 10) : Number(itemTypeId);
+                                if (!itemTypeIdNum || isNaN(itemTypeIdNum)) return [];
+                                return itemsData.filter((item) => {
+                                  const typeId = item.type_id;
+                                  if (!typeId) return false;
+                                  const typeIdNum = typeof typeId === "string" ? parseInt(typeId, 10) : Number(typeId);
+                                  return typeIdNum === itemTypeIdNum;
+                                }).map((item) => ({
+                                  value: item.id.toString(),
+                                  label: item.name
+                                }));
+                              })(),
+                              placeholder: __("Select item...", "Select item..."),
+                              searchPlaceholder: __("Search items...", "Search items..."),
+                              className: "min-w-[140px]",
+                              disabled: updateItemMutation.isPending
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Button,
+                            {
+                              variant: "ghost",
+                              size: "icon",
+                              onClick: () => handleEdit(entry),
+                              className: "h-8 w-8",
+                              title: __("Edit Activity", "Edit Activity"),
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { className: "w-4 h-4" })
+                            }
+                          ) }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Button,
+                            {
+                              variant: "ghost",
+                              size: "icon",
+                              onClick: () => handleDelete(entry),
+                              className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
+                              title: __("Delete", "Delete"),
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
+                            }
+                          ) })
+                        ] })
+                      ] }) })
+                    ]
+                  },
+                  entry.id
+                );
+              }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 Button,
                 {
@@ -34928,7 +34818,7 @@ const Enquiries = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["enquiries", queryParams],
     queryFn: async () => {
-      var _a2, _b;
+      var _a2, _b, _c, _d, _e;
       const params = new URLSearchParams();
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value !== void 0 && value !== null) {
@@ -34946,10 +34836,10 @@ const Enquiries = () => {
       }
       const result = await response.json();
       return {
-        data: result.items || [],
-        total: result.total || 0,
-        page: result.page || 1,
-        per_page: result.per_page || 10
+        data: result.data || [],
+        total: ((_c = result.meta) == null ? void 0 : _c.total) || result.total || 0,
+        page: ((_d = result.meta) == null ? void 0 : _d.page) || result.page || 1,
+        per_page: ((_e = result.meta) == null ? void 0 : _e.per_page) || result.per_page || 10
       };
     },
     enabled: can("yatra_view_bookings")
@@ -34979,19 +34869,19 @@ const Enquiries = () => {
     mutationFn: async ({ id, message: message2 }) => {
       var _a2, _b;
       const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
-      const response = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
+      const res = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
         },
-        body: JSON.stringify({ message: message2 })
+        body: JSON.stringify({ response: message2 })
       });
-      if (!response.ok) {
-        const error2 = await response.json();
+      if (!res.ok) {
+        const error2 = await res.json();
         throw new Error(error2.message || "Failed to send response");
       }
-      return response.json();
+      return res.json();
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
@@ -35015,6 +34905,10 @@ const Enquiries = () => {
       "new": {
         className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
         label: __("New", "New")
+      },
+      "pending": {
+        className: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
+        label: __("Pending", "Pending")
       },
       "responded": {
         className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
@@ -35116,6 +35010,7 @@ const Enquiries = () => {
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "new", children: __("New", "New") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "Pending") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "responded", children: __("Responded", "Responded") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "converted", children: __("Converted", "Converted") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "closed", children: __("Closed", "Closed") })
@@ -35194,7 +35089,23 @@ const Enquiries = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" })
           ] }) })
         ] }, i)) })
-      ] }) : enquiries.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No enquiries found", "No enquiries found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+      ] }) : enquiries.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-12 text-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquare, { className: "w-8 h-8 text-gray-400 dark:text-gray-500" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: __("No enquiries found", "No enquiries found") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto", children: hasFilters ? __("Try adjusting your search or filter criteria to find what you're looking for.", "Try adjusting your search or filter criteria to find what you're looking for.") : __("When customers submit enquiries, they will appear here.", "When customers submit enquiries, they will appear here.") }),
+        hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            variant: "outline",
+            onClick: handleResetFilters,
+            className: "mt-4",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4 mr-2" }),
+              __("Clear Filters", "Clear Filters")
+            ]
+          }
+        )
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
@@ -35267,8 +35178,8 @@ const Enquiries = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquare, { className: "w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 line-clamp-2", children: enquiry.message })
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: enquiry.number_of_travelers || "-" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: enquiry.preferred_travel_date ? formatDate(enquiry.preferred_travel_date) : "-" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: enquiry.travelers_count || "-" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: enquiry.travel_date ? formatDate(enquiry.travel_date) : "-" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(enquiry.status) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(enquiry.created_at) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
@@ -35387,8 +35298,8 @@ const Enquiries = () => {
             setSelectedEnquiry(null);
           }
         },
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-lg mx-4 shadow-xl", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-lg mx-4 shadow-xl bg-white dark:bg-gray-800", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3 bg-white dark:bg-gray-800 rounded-t-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-6 h-6" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -35507,7 +35418,11 @@ const ViewEnquiry = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch enquiry");
       }
-      return response.json();
+      const result = await response.json();
+      if (result.success && result.data) {
+        return result.data;
+      }
+      throw new Error(result.message || "Enquiry not found");
     },
     enabled: !!enquiryId && can("yatra_view_bookings")
   });
@@ -35515,19 +35430,19 @@ const ViewEnquiry = () => {
     mutationFn: async ({ id, message: message2 }) => {
       var _a2, _b;
       const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
-      const response = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
+      const res = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
         },
-        body: JSON.stringify({ message: message2 })
+        body: JSON.stringify({ response: message2 })
       });
-      if (!response.ok) {
-        const error2 = await response.json();
+      if (!res.ok) {
+        const error2 = await res.json();
         throw new Error(error2.message || "Failed to send response");
       }
-      return response.json();
+      return res.json();
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["enquiry", enquiryId] });
@@ -35548,6 +35463,10 @@ const ViewEnquiry = () => {
       "new": {
         className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
         label: __("New", "New")
+      },
+      "pending": {
+        className: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
+        label: __("Pending", "Pending")
       },
       "responded": {
         className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
@@ -35674,7 +35593,7 @@ const ViewEnquiry = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
             __("Back", "Back")
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_edit_bookings", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
             enquiry.status !== "responded" && enquiry.status !== "closed" && /* @__PURE__ */ jsxRuntimeExports.jsxs(
               Button,
               {
@@ -35691,7 +35610,7 @@ const ViewEnquiry = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
               __("Edit Enquiry", "Edit Enquiry")
             ] })
-          ] })
+          ] }) })
         ] })
       }
     ),
@@ -35711,24 +35630,24 @@ const ViewEnquiry = () => {
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700", children: [
-              enquiry.number_of_travelers && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              enquiry.travelers_count && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Number of Travelers", "Number of Travelers") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex items-center gap-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-4 h-4 text-gray-400" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: enquiry.number_of_travelers })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: enquiry.travelers_count })
                 ] })
               ] }),
-              enquiry.preferred_travel_date && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              enquiry.travel_date && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Preferred Travel Date", "Preferred Travel Date") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex items-center gap-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-4 h-4 text-gray-400" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formatDate(enquiry.preferred_travel_date) })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formatDate(enquiry.travel_date) })
                 ] })
               ] })
             ] }),
-            enquiry.response_notes && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 block", children: __("Response Notes", "Response Notes") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap", children: enquiry.response_notes })
+            enquiry.response && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 block", children: __("Response", "Response") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap", children: enquiry.response })
             ] })
           ] })
         ] }),
@@ -35797,8 +35716,8 @@ const ViewEnquiry = () => {
             setRespondDialogOpen(false);
           }
         },
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-lg mx-4 shadow-xl", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-lg mx-4 shadow-xl bg-white dark:bg-gray-800", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3 bg-white dark:bg-gray-800 rounded-t-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-6 h-6" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -37010,10 +36929,11 @@ const Travelers = () => {
       return result.success ? (_c = result.data) == null ? void 0 : _c.booking_form_config : null;
     }
   });
+  const [availableTrips, setAvailableTrips] = reactExports.useState([]);
   const { data, isLoading } = useQuery({
     queryKey: ["travelers", searchTerm, tripFilter, page],
     queryFn: async () => {
-      var _a2, _b2;
+      var _a2, _b2, _c, _d;
       const params = new URLSearchParams({
         page: String(page),
         per_page: String(perPage)
@@ -37031,27 +36951,15 @@ const Travelers = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch travelers");
       }
-      return await response.json();
+      const result = await response.json();
+      if (((_d = (_c = result.meta) == null ? void 0 : _c.available_trips) == null ? void 0 : _d.length) > 0) {
+        setAvailableTrips(result.meta.available_trips);
+      }
+      return result;
     },
     enabled: can("yatra_view_bookings")
   });
-  const { data: tripsData } = useQuery({
-    queryKey: ["trips-list-filter"],
-    queryFn: async () => {
-      var _a2, _b2;
-      const response = await fetch(
-        `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/trips?per_page=100`,
-        {
-          headers: {
-            "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
-          }
-        }
-      );
-      if (!response.ok) return { data: [] };
-      const result = await response.json();
-      return { data: result.data || [] };
-    }
-  });
+  const tripsData = reactExports.useMemo(() => ({ data: availableTrips }), [availableTrips]);
   const dynamicColumns = reactExports.useMemo(() => {
     var _a2;
     const formConfig = formConfigData;

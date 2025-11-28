@@ -28,9 +28,9 @@ interface Enquiry {
   trip_title?: string;
   trip_id?: number;
   message: string;
-  number_of_travelers?: number;
-  preferred_travel_date?: string;
-  status: 'new' | 'responded' | 'closed' | 'converted';
+  travelers_count?: number;
+  travel_date?: string;
+  status: 'new' | 'responded' | 'closed' | 'converted' | 'pending';
   created_at: string;
   responded_at?: string;
   response_notes?: string;
@@ -96,10 +96,10 @@ const Enquiries: React.FC = () => {
       const result = await response.json();
       
       return {
-        data: result.items || [],
-        total: result.total || 0,
-        page: result.page || 1,
-        per_page: result.per_page || 10,
+        data: result.data || [],
+        total: result.meta?.total || result.total || 0,
+        page: result.meta?.page || result.page || 1,
+        per_page: result.meta?.per_page || result.per_page || 10,
       };
     },
     enabled: can('yatra_view_bookings'),
@@ -133,21 +133,21 @@ const Enquiries: React.FC = () => {
   const respondMutation = useMutation({
     mutationFn: async ({ id, message }: { id: number; message: string }) => {
       const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const response = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
+      const res = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-WP-Nonce': window.yatraAdmin?.nonce || '',
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ response: message }),
       });
       
-      if (!response.ok) {
-        const error = await response.json();
+      if (!res.ok) {
+        const error = await res.json();
         throw new Error(error.message || 'Failed to send response');
       }
       
-      return response.json();
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enquiries'] });
@@ -174,6 +174,10 @@ const Enquiries: React.FC = () => {
       'new': {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
         label: __('New', 'New'),
+      },
+      'pending': {
+        className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
+        label: __('Pending', 'Pending'),
       },
       'responded': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
@@ -294,6 +298,7 @@ const Enquiries: React.FC = () => {
             >
               <option value="all">{__('All Status', 'All Status')}</option>
               <option value="new">{__('New', 'New')}</option>
+              <option value="pending">{__('Pending', 'Pending')}</option>
               <option value="responded">{__('Responded', 'Responded')}</option>
               <option value="converted">{__('Converted', 'Converted')}</option>
               <option value="closed">{__('Closed', 'Closed')}</option>
@@ -397,8 +402,29 @@ const Enquiries: React.FC = () => {
                     </TableBody>
                   </Table>
                 ) : enquiries.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('No enquiries found', 'No enquiries found')}
+                  <div className="p-12 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-4">
+                      <MessageSquare className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      {__('No enquiries found', 'No enquiries found')}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+                      {hasFilters 
+                        ? __('Try adjusting your search or filter criteria to find what you\'re looking for.', 'Try adjusting your search or filter criteria to find what you\'re looking for.')
+                        : __('When customers submit enquiries, they will appear here.', 'When customers submit enquiries, they will appear here.')
+                      }
+                    </p>
+                    {hasFilters && (
+                      <Button
+                        variant="outline"
+                        onClick={handleResetFilters}
+                        className="mt-4"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        {__('Clear Filters', 'Clear Filters')}
+                      </Button>
+                    )}
                   </div>
                 ) : (
                   <Table>
@@ -495,10 +521,10 @@ const Enquiries: React.FC = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                            {enquiry.number_of_travelers || '-'}
+                            {enquiry.travelers_count || '-'}
                           </TableCell>
                           <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            {enquiry.preferred_travel_date ? formatDate(enquiry.preferred_travel_date) : '-'}
+                            {enquiry.travel_date ? formatDate(enquiry.travel_date) : '-'}
                           </TableCell>
                           <TableCell>
                             {getStatusBadge(enquiry.status)}
@@ -632,8 +658,8 @@ const Enquiries: React.FC = () => {
             }
           }}
         >
-          <Card className="w-full max-w-lg mx-4 shadow-xl">
-            <CardHeader className="pb-3">
+          <Card className="w-full max-w-lg mx-4 shadow-xl bg-white dark:bg-gray-800">
+            <CardHeader className="pb-3 bg-white dark:bg-gray-800 rounded-t-lg">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400">

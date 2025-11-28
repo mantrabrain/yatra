@@ -25,12 +25,12 @@ interface Enquiry {
   trip_title?: string;
   trip_slug?: string;
   message: string;
-  number_of_travelers?: number;
-  preferred_travel_date?: string;
-  status: 'new' | 'responded' | 'closed' | 'converted';
+  travelers_count?: number;
+  travel_date?: string;
+  status: 'new' | 'pending' | 'responded' | 'closed' | 'converted';
   created_at: string;
   responded_at?: string;
-  response_notes?: string;
+  response?: string;
 }
 
 const ViewEnquiry: React.FC = () => {
@@ -62,7 +62,13 @@ const ViewEnquiry: React.FC = () => {
         throw new Error('Failed to fetch enquiry');
       }
       
-      return response.json();
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        return result.data;
+      }
+      
+      throw new Error(result.message || 'Enquiry not found');
     },
     enabled: !!enquiryId && can('yatra_view_bookings'),
   });
@@ -71,21 +77,21 @@ const ViewEnquiry: React.FC = () => {
   const respondMutation = useMutation({
     mutationFn: async ({ id, message }: { id: number; message: string }) => {
       const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const response = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
+      const res = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-WP-Nonce': window.yatraAdmin?.nonce || '',
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ response: message }),
       });
       
-      if (!response.ok) {
-        const error = await response.json();
+      if (!res.ok) {
+        const error = await res.json();
         throw new Error(error.message || 'Failed to send response');
       }
       
-      return response.json();
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enquiry', enquiryId] });
@@ -108,6 +114,10 @@ const ViewEnquiry: React.FC = () => {
       'new': {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
         label: __('New', 'New'),
+      },
+      'pending': {
+        className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
+        label: __('Pending', 'Pending'),
       },
       'responded': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
@@ -265,20 +275,22 @@ const ViewEnquiry: React.FC = () => {
               {__('Back', 'Back')}
             </Button>
             <ConditionalRender capability="yatra_edit_bookings">
-              {enquiry.status !== 'responded' && enquiry.status !== 'closed' && (
-                <Button 
-                  variant="outline" 
-                  onClick={handleRespond} 
-                  className="flex items-center gap-2 text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20"
-                >
-                  <Send className="w-4 h-4" />
-                  {__('Send Response', 'Send Response')}
+              <div className="flex items-center gap-2">
+                {enquiry.status !== 'responded' && enquiry.status !== 'closed' && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleRespond} 
+                    className="flex items-center gap-2 text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20"
+                  >
+                    <Send className="w-4 h-4" />
+                    {__('Send Response', 'Send Response')}
+                  </Button>
+                )}
+                <Button onClick={handleEdit} className="flex items-center gap-2">
+                  <Edit className="w-4 h-4" />
+                  {__('Edit Enquiry', 'Edit Enquiry')}
                 </Button>
-              )}
-              <Button onClick={handleEdit} className="flex items-center gap-2">
-                <Edit className="w-4 h-4" />
-                {__('Edit Enquiry', 'Edit Enquiry')}
-              </Button>
+              </div>
             </ConditionalRender>
           </div>
         }
@@ -310,7 +322,7 @@ const ViewEnquiry: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  {enquiry.number_of_travelers && (
+                  {enquiry.travelers_count && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                         {__('Number of Travelers', 'Number of Travelers')}
@@ -318,12 +330,12 @@ const ViewEnquiry: React.FC = () => {
                       <div className="mt-1 flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-400" />
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {enquiry.number_of_travelers}
+                          {enquiry.travelers_count}
                         </p>
                       </div>
                     </div>
                   )}
-                  {enquiry.preferred_travel_date && (
+                  {enquiry.travel_date && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                         {__('Preferred Travel Date', 'Preferred Travel Date')}
@@ -331,20 +343,20 @@ const ViewEnquiry: React.FC = () => {
                       <div className="mt-1 flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {formatDate(enquiry.preferred_travel_date)}
+                          {formatDate(enquiry.travel_date)}
                         </p>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {enquiry.response_notes && (
+                {enquiry.response && (
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 block">
-                      {__('Response Notes', 'Response Notes')}
+                      {__('Response', 'Response')}
                     </label>
                     <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                      {enquiry.response_notes}
+                      {enquiry.response}
                     </p>
                   </div>
                 )}
@@ -453,8 +465,8 @@ const ViewEnquiry: React.FC = () => {
             }
           }}
         >
-          <Card className="w-full max-w-lg mx-4 shadow-xl">
-            <CardHeader className="pb-3">
+          <Card className="w-full max-w-lg mx-4 shadow-xl bg-white dark:bg-gray-800">
+            <CardHeader className="pb-3 bg-white dark:bg-gray-800 rounded-t-lg">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400">

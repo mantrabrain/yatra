@@ -48,7 +48,7 @@ class CustomerService
      */
     public function getCustomer(int $id): ?array
     {
-        $customer = $this->customerRepository->getCustomer($id);
+        $customer = $this->customerRepository->find($id);
 
         if (!$customer) {
             return null;

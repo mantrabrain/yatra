@@ -9,6 +9,8 @@ use WP_REST_Response;
 use WP_Error;
 use Yatra\Services\TripService;
 use Yatra\Repositories\TripRevisionRepository;
+use Yatra\Repositories\ItemTypeRepository;
+use Yatra\Repositories\ItemRepository;
 use Yatra\Models\Trip;
 
 /**
@@ -142,16 +144,59 @@ class TripController extends BaseController
                 $items = $this->service->search($search, $args);
                 $total = count($items);
             } else {
-            $items = $this->service->getAll($args);
-            $total = $this->service->count($args);
+                $items = $this->service->getAll($args);
+                $total = $this->service->count($args);
             }
 
-            return $this->success_response([
+            // Check if itinerary meta is requested (for Itinerary page)
+            $include_meta = $request->get_param('include_itinerary_meta');
+            $meta = [];
+            
+            if ($include_meta) {
+                // Get available item types for itinerary mapping
+                $itemTypeRepo = new ItemTypeRepository();
+                $itemTypes = $itemTypeRepo->all(['where' => ['status' => 'publish']]);
+                $meta['available_item_types'] = array_map(function ($type) {
+                    $iconData = maybe_unserialize($type->icon ?? '');
+                    $iconValue = '';
+                    if (is_array($iconData) && isset($iconData['value'])) {
+                        $iconValue = $iconData['value'];
+                    } elseif (is_string($type->icon)) {
+                        $iconValue = $type->icon;
+                    }
+                    
+                    return [
+                        'id' => (int) $type->id,
+                        'name' => esc_html($type->name),
+                        'icon' => $iconValue,
+                        'color' => $type->color ?? 'gray',
+                    ];
+                }, $itemTypes);
+
+                // Get available items for itinerary mapping
+                $itemRepo = new ItemRepository();
+                $allItems = $itemRepo->all(['where' => ['status' => 'publish']]);
+                $meta['available_items'] = array_map(function ($item) {
+                    return [
+                        'id' => (int) $item->id,
+                        'name' => esc_html($item->name),
+                        'type_id' => (int) ($item->type_id ?? 0),
+                    ];
+                }, $allItems);
+            }
+
+            $response = [
                 'data' => $this->prepare_collection_for_response($items, $request),
                 'total' => $total,
                 'page' => (int) ($request->get_param('page') ?: 1),
                 'per_page' => (int) ($request->get_param('per_page') ?: 10),
-            ]);
+            ];
+
+            if (!empty($meta)) {
+                $response['meta'] = $meta;
+            }
+
+            return $this->success_response($response);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
