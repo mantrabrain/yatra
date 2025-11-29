@@ -85,6 +85,9 @@ class TripRepository extends BaseRepository
         // Load activities
         $trip->activities = $this->getActivities($id);
         
+        // Load trip categories
+        $trip->trip_category = $this->getTripCategories($id);
+        
         // Load price types
         $trip->price_types = $this->getPriceTypes($id);
         
@@ -144,6 +147,48 @@ class TripRepository extends BaseRepository
                 $tripId
             )
         ) ?: [];
+    }
+
+    /**
+     * Get trip categories for a trip
+     */
+    public function getTripCategories(int $tripId): array
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_trip_trip_categories';
+        
+        // Check if table exists first
+        $table_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table
+        )) === $table;
+        
+        if (!$table_exists) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("Yatra: getTripCategories - Table {$table} does not exist");
+            }
+            return [];
+        }
+        
+        $results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT ttc.*, tc.name as category_name, tc.slug as category_slug 
+                 FROM `{$table}` ttc
+                 LEFT JOIN `{$wpdb->prefix}yatra_trip_categories` tc ON ttc.category_id = tc.id
+                 WHERE ttc.trip_id = %d
+                 ORDER BY ttc.`order` ASC, ttc.id ASC",
+                $tripId
+            )
+        ) ?: [];
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Yatra: getTripCategories - Found " . count($results) . " categories for trip {$tripId}");
+            if (!empty($results)) {
+                error_log("Yatra: getTripCategories - Sample category: " . json_encode($results[0]));
+            }
+        }
+        
+        return $results;
     }
 
     /**
@@ -367,6 +412,64 @@ class TripRepository extends BaseRepository
                     ],
                     ['%d', '%d', '%d', '%d']
                 );
+            }
+        }
+    }
+
+    /**
+     * Save trip categories for a trip
+     */
+    public function saveTripCategories(int $tripId, array $categoryIds): void
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_trip_trip_categories';
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Yatra: saveTripCategories called with tripId={$tripId}, categoryIds=" . json_encode($categoryIds));
+        }
+        
+        // Check if table exists first
+        $table_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table
+        )) === $table;
+        
+        if (!$table_exists) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("Yatra: Table {$table} does not exist, creating tables...");
+            }
+            // Try to create tables
+            \Yatra\Core\Database::createTables();
+        }
+        
+        // Delete existing
+        $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
+        
+        // Insert new
+        if (!empty($categoryIds)) {
+            foreach ($categoryIds as $index => $categoryId) {
+                $result = $wpdb->insert(
+                    $table,
+                    [
+                        'trip_id' => $tripId,
+                        'category_id' => (int) $categoryId,
+                        'is_primary' => $index === 0 ? 1 : 0,
+                        'order' => $index,
+                    ],
+                    ['%d', '%d', '%d', '%d']
+                );
+                
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    if ($result === false) {
+                        error_log("Yatra: Failed to insert trip category - " . $wpdb->last_error);
+                    } else {
+                        error_log("Yatra: Inserted trip category {$categoryId} for trip {$tripId}");
+                    }
+                }
+            }
+        } else {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("Yatra: No category IDs to save for trip {$tripId}");
             }
         }
     }
@@ -602,6 +705,7 @@ class TripRepository extends BaseRepository
         // Extract relationship data
         $destinations = $relationships['destinations'] ?? [];
         $activities = $relationships['activities'] ?? [];
+        $tripCategories = $relationships['trip_category'] ?? [];
         $priceTypes = $relationships['price_types'] ?? [];
         $highlights = $relationships['highlights'] ?? [];
         $galleryImages = $relationships['gallery_images'] ?? [];
@@ -613,6 +717,7 @@ class TripRepository extends BaseRepository
         unset(
             $data['destinations'], 
             $data['activities'], 
+            $data['trip_category'],
             $data['price_types'],
             $data['highlights'],
             $data['gallery_images'],
@@ -631,6 +736,10 @@ class TripRepository extends BaseRepository
         
         if (!empty($activities)) {
             $this->saveActivities($tripId, $activities);
+        }
+        
+        if (!empty($tripCategories)) {
+            $this->saveTripCategories($tripId, $tripCategories);
         }
         
         if (!empty($priceTypes)) {
@@ -668,6 +777,7 @@ class TripRepository extends BaseRepository
         // Extract relationship data
         $destinations = $relationships['destinations'] ?? null;
         $activities = $relationships['activities'] ?? null;
+        $tripCategories = $relationships['trip_category'] ?? null;
         $priceTypes = $relationships['price_types'] ?? null;
         $highlights = $relationships['highlights'] ?? null;
         $galleryImages = $relationships['gallery_images'] ?? null;
@@ -679,6 +789,7 @@ class TripRepository extends BaseRepository
         unset(
             $data['destinations'], 
             $data['activities'], 
+            $data['trip_category'],
             $data['price_types'],
             $data['highlights'],
             $data['gallery_images'],
@@ -697,6 +808,10 @@ class TripRepository extends BaseRepository
         
         if ($activities !== null) {
             $this->saveActivities($id, $activities);
+        }
+        
+        if ($tripCategories !== null) {
+            $this->saveTripCategories($id, $tripCategories);
         }
         
         if ($priceTypes !== null) {

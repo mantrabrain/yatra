@@ -430,6 +430,7 @@
 
 .yatra-view-all-photos-btn:hover {
     background: #f9fafb;
+    color: #111827;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
@@ -691,6 +692,17 @@
 .yatra-trip-tag-value {
     color: #111827;
     font-weight: 500;
+}
+
+.yatra-trip-tag-value a {
+    color: #059669;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.yatra-trip-tag-value a:hover {
+    color: #047857;
+    text-decoration: underline;
 }
 
 
@@ -1968,6 +1980,242 @@
 .yatra-quantity-subtitle {
     font-size: 13px;
     color: #6b7280;
+}
+
+.yatra-quantity-price {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #059669;
+    margin-top: 2px;
+}
+
+.yatra-booking-price-label-top {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+/* Simple Travelers Input (Regular Pricing) */
+.yatra-booking-field-group {
+    margin-bottom: 16px;
+}
+
+.yatra-booking-field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.yatra-booking-travelers-simple {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+
+.yatra-quantity-controls-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.yatra-quantity-input-simple {
+    width: 50px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    border: none;
+    background: transparent;
+    -moz-appearance: textfield;
+}
+
+.yatra-quantity-input-simple::-webkit-outer-spin-button,
+.yatra-quantity-input-simple::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.yatra-travelers-range,
+.yatra-travelers-available {
+    font-size: 12px;
+    color: #6b7280;
+    margin-left: auto;
+}
+
+/* Availability Info */
+.yatra-availability-info {
+    padding: 8px 12px;
+    background: #ecfdf5;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.yatra-availability-count {
+    font-size: 13px;
+    font-weight: 500;
+    color: #059669;
+}
+
+/* Departure Dates List */
+.yatra-departure-dates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.yatra-departure-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.yatra-departure-option:hover {
+    border-color: #3b82f6;
+    background: #f8fafc;
+}
+
+.yatra-departure-option.selected {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.yatra-departure-option.limited {
+    border-color: #f59e0b;
+}
+
+.yatra-departure-option.limited.selected {
+    background: #fffbeb;
+}
+
+.yatra-departure-option input[type="radio"] {
+    display: none;
+}
+
+.yatra-departure-info {
+    flex: 1;
+}
+
+.yatra-departure-date {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.yatra-departure-day {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+}
+
+.yatra-departure-full {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.yatra-return-date {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.yatra-departure-meta {
+    margin-top: 4px;
+}
+
+.yatra-departure-seats {
+    font-size: 11px;
+    color: #059669;
+}
+
+.yatra-departure-seats.limited {
+    color: #f59e0b;
+    font-weight: 500;
+}
+
+.yatra-departure-price {
+    text-align: right;
+}
+
+.yatra-departure-original-price {
+    font-size: 12px;
+    color: #9ca3af;
+    text-decoration: line-through;
+    display: block;
+}
+
+.yatra-departure-current-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #059669;
+}
+
+.yatra-departure-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.yatra-departure-check svg {
+    color: transparent;
+    transition: color 0.2s ease;
+}
+
+.yatra-departure-option.selected .yatra-departure-check {
+    background: #3b82f6;
+}
+
+.yatra-departure-option.selected .yatra-departure-check svg {
+    color: #fff;
+}
+
+/* Scrollbar styling for departure list */
+.yatra-departure-dates-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.yatra-departure-dates-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.yatra-departure-dates-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.yatra-departure-dates-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 .yatra-quantity-controls {
@@ -4818,6 +5066,31 @@ input.yatra-datepicker,
     background: #f9fafb;
 }
 
+/* Day Trip Date Header */
+.yatra-card-date-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.yatra-card-date-header svg {
+    width: 16px;
+    height: 16px;
+    color: #2563eb;
+}
+
+/* Day Trip Grid - adjusted for time display */
+.yatra-day-trip-grid .yatra-card-header-date {
+    font-size: 18px;
+    font-weight: 700;
+}
+
 .yatra-card-header-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 180px auto;
@@ -5115,6 +5388,73 @@ input.yatra-datepicker,
 
 .yatra-card-traveler-section .yatra-booking-field-select {
     width: 100%;
+}
+
+/* Simple Travelers Display in Availability Cards */
+.yatra-availability-travelers-simple {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.yatra-availability-travelers-simple .yatra-booking-field-icon {
+    flex-shrink: 0;
+}
+
+.yatra-availability-travelers-simple .yatra-quantity-controls-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yatra-availability-travelers-simple .yatra-quantity-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.yatra-availability-travelers-simple .yatra-quantity-btn:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: #2563eb;
+}
+
+.yatra-availability-travelers-simple .yatra-quantity-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.yatra-availability-travelers-simple .yatra-quantity-btn svg {
+    width: 14px;
+    height: 14px;
+    color: #374151;
+}
+
+.yatra-availability-travelers-simple .yatra-quantity-input-simple {
+    width: 40px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.yatra-availability-travelers-simple .yatra-travelers-label {
+    font-size: 13px;
+    color: #6b7280;
+    margin-left: 4px;
 }
 
 /* Booking Row */

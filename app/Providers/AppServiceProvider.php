@@ -74,6 +74,9 @@ class AppServiceProvider extends ServiceProvider
         // Handle listing pages - use early priority to catch before 404
         add_action('template_redirect', [$this, 'handleListingPages'], 1);
 
+        // Handle single taxonomy pages (destination, activity, category)
+        add_action('template_redirect', [$this, 'handleSingleTaxonomyPage'], 1);
+
         // Handle booking page - use early priority to catch before 404
         add_action('template_redirect', [$this, 'handleBookingPage'], 1);
         
@@ -413,18 +416,28 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Add CSS for the Edit Trip admin bar link
+     * Add CSS for the Edit Trip/Taxonomy admin bar links
      */
     public function addAdminBarTripEditCSS(): void
     {
-        // Only output CSS if we're on a single trip page and user can see admin bar
+        // Only output CSS if user can see admin bar
+        if (!is_user_logged_in() || !is_admin_bar_showing()) {
+            return;
+        }
+
+        // Check if we're on a trip page or taxonomy page
         global $trip;
-        if (empty($trip) || !is_user_logged_in() || !is_admin_bar_showing()) {
+        $taxonomy_data = $GLOBALS['yatra_taxonomy_data'] ?? null;
+        
+        if (empty($trip) && empty($taxonomy_data)) {
             return;
         }
 
         echo '<style>
-            #wpadminbar #wp-admin-bar-yatra-edit-trip > .ab-item:before {
+            #wpadminbar #wp-admin-bar-yatra-edit-trip > .ab-item:before,
+            #wpadminbar #wp-admin-bar-yatra-edit-destination > .ab-item:before,
+            #wpadminbar #wp-admin-bar-yatra-edit-activity > .ab-item:before,
+            #wpadminbar #wp-admin-bar-yatra-edit-category > .ab-item:before {
                 content: "\f464";
                 font-family: dashicons;
                 top: 2px;
@@ -434,34 +447,74 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Add "Edit Trip" link to admin bar on single trip page
+     * Add "Edit Destination/Activity/Category" links on taxonomy pages
      *
      * @param \WP_Admin_Bar $admin_bar
      */
     public function addEditTripAdminBarLink($admin_bar): void
     {
-        // Only for logged-in users who can edit trips
+        // Only for logged-in users who can edit
         if (!is_user_logged_in() || !current_user_can('edit_posts')) {
             return;
         }
 
         // Check if we're on a single trip page
         global $trip;
-        if (empty($trip) || empty($trip->id)) {
+        if (!empty($trip) && !empty($trip->id)) {
+            // Build the edit URL for the trip
+            $edit_url = admin_url('admin.php?page=yatra&subpage=trips&action=edit&id=' . (int) $trip->id);
+
+            // Add the Edit Trip node
+            $admin_bar->add_node([
+                'id'    => 'yatra-edit-trip',
+                'title' => __('Edit Trip', 'yatra'),
+                'href'  => $edit_url,
+                'meta'  => [
+                    'title' => __('Edit this trip in Yatra admin', 'yatra'),
+                ],
+            ]);
             return;
         }
 
-        // Build the edit URL for the trip
-        $edit_url = admin_url('admin.php?page=yatra&subpage=trips&action=edit&id=' . (int) $trip->id);
-
-        // Add the Edit Trip node
-        $admin_bar->add_node([
-            'id'    => 'yatra-edit-trip',
-            'title' => __('Edit Trip', 'yatra'),
-            'href'  => $edit_url,
-            'meta'  => [
-                'title' => __('Edit this trip in Yatra admin', 'yatra'),
-            ],
-        ]);
+        // Check if we're on a taxonomy page (destination, activity, category)
+        $taxonomy_data = $GLOBALS['yatra_taxonomy_data'] ?? null;
+        if (!empty($taxonomy_data) && !empty($taxonomy_data['entity']) && !empty($taxonomy_data['type'])) {
+            $entity = $taxonomy_data['entity'];
+            $type = $taxonomy_data['type'];
+            
+            // Map type to subpage and label
+            $type_config = [
+                'destination' => [
+                    'subpage' => 'destinations',
+                    'label' => __('Edit Destination', 'yatra'),
+                    'icon_id' => 'yatra-edit-destination',
+                ],
+                'activity' => [
+                    'subpage' => 'activities',
+                    'label' => __('Edit Activity', 'yatra'),
+                    'icon_id' => 'yatra-edit-activity',
+                ],
+                'category' => [
+                    'subpage' => 'trip-categories',
+                    'label' => __('Edit Category', 'yatra'),
+                    'icon_id' => 'yatra-edit-category',
+                ],
+            ];
+            
+            if (isset($type_config[$type])) {
+                $config = $type_config[$type];
+                $edit_url = admin_url('admin.php?page=yatra&subpage=' . $config['subpage'] . '&action=edit&id=' . (int) $entity->id);
+                
+                $admin_bar->add_node([
+                    'id'    => $config['icon_id'],
+                    'title' => $config['label'],
+                    'href'  => $edit_url,
+                    'meta'  => [
+                        'title' => sprintf(__('Edit this %s in Yatra admin', 'yatra'), $type),
+                    ],
+                ]);
+            }
+        }
     }
 
     /**
@@ -794,6 +847,10 @@ class AppServiceProvider extends ServiceProvider
         $vars[] = 'yatra_booking_page';
         $vars[] = 'yatra_booking_confirmation';
         $vars[] = 'yatra_verify_email';
+        // Single taxonomy pages
+        $vars[] = 'yatra_destination_slug';
+        $vars[] = 'yatra_activity_slug';
+        $vars[] = 'yatra_category_slug';
         return $vars;
     }
 
@@ -823,6 +880,10 @@ class AppServiceProvider extends ServiceProvider
         add_rewrite_tag('%yatra_booking_page%', '([^&]+)');
         add_rewrite_tag('%yatra_booking_confirmation%', '([^&]+)');
         add_rewrite_tag('%yatra_verify_email%', '([^&]+)');
+        // Single taxonomy page tags
+        add_rewrite_tag('%yatra_destination_slug%', '([^&]+)');
+        add_rewrite_tag('%yatra_activity_slug%', '([^&]+)');
+        add_rewrite_tag('%yatra_category_slug%', '([^&]+)');
         
         // Add rewrite rule for email verification: /yatra-verify-email/{token}/
         add_rewrite_rule(
@@ -835,6 +896,28 @@ class AppServiceProvider extends ServiceProvider
         add_rewrite_rule(
             '^' . $trip_base . '/([^/]+)/?$',
             'index.php?yatra_trip_slug=$matches[1]',
+            'top'
+        );
+
+        // Add rewrite rules for SINGLE taxonomy pages (must come before listing pages)
+        // Single destination: /destination/{slug}/
+        add_rewrite_rule(
+            '^' . $destination_base . '/([^/]+)/?$',
+            'index.php?yatra_destination_slug=$matches[1]',
+            'top'
+        );
+
+        // Single activity: /activity/{slug}/
+        add_rewrite_rule(
+            '^' . $activity_base . '/([^/]+)/?$',
+            'index.php?yatra_activity_slug=$matches[1]',
+            'top'
+        );
+
+        // Single trip category: /trip-category/{slug}/
+        add_rewrite_rule(
+            '^' . $trip_category_base . '/([^/]+)/?$',
+            'index.php?yatra_category_slug=$matches[1]',
             'top'
         );
 
@@ -1082,6 +1165,198 @@ class AppServiceProvider extends ServiceProvider
         } else {
             // Fallback: simple message
             wp_die(sprintf('Listing page template not found for: %s', esc_html($listing_page)));
+        }
+    }
+
+    /**
+     * Handle single taxonomy pages (destination, activity, category)
+     * Shows trips filtered by the selected destination/activity/category
+     */
+    public function handleSingleTaxonomyPage(): void
+    {
+        global $wp_query, $wpdb;
+
+        // Check which taxonomy we're viewing
+        $destination_slug = get_query_var('yatra_destination_slug');
+        $activity_slug = get_query_var('yatra_activity_slug');
+        $category_slug = get_query_var('yatra_category_slug');
+
+        // Determine type and slug
+        $type = '';
+        $slug = '';
+
+        if (!empty($destination_slug)) {
+            $type = 'destination';
+            $slug = sanitize_text_field($destination_slug);
+        } elseif (!empty($activity_slug)) {
+            $type = 'activity';
+            $slug = sanitize_text_field($activity_slug);
+        } elseif (!empty($category_slug)) {
+            $type = 'category';
+            $slug = sanitize_text_field($category_slug);
+        }
+
+        if (empty($type) || empty($slug)) {
+            return;
+        }
+
+        // Get the entity from database
+        $entity = null;
+        $trips = [];
+
+        switch ($type) {
+            case 'destination':
+                $table = $wpdb->prefix . 'yatra_destinations';
+                $entity = $wpdb->get_row($wpdb->prepare(
+                    "SELECT * FROM {$table} WHERE slug = %s AND status IN ('publish', 'published')",
+                    $slug
+                ));
+                if ($entity) {
+                    // Get trips for this destination
+                    $trips_table = $wpdb->prefix . 'yatra_trips';
+                    $relation_table = $wpdb->prefix . 'yatra_trip_destinations';
+                    $trips = $wpdb->get_results($wpdb->prepare(
+                        "SELECT t.* FROM {$trips_table} t
+                         INNER JOIN {$relation_table} td ON t.id = td.trip_id
+                         WHERE td.destination_id = %d AND t.status IN ('publish', 'published')
+                         ORDER BY t.created_at DESC",
+                        $entity->id
+                    ));
+                    
+                }
+                break;
+
+            case 'activity':
+                $table = $wpdb->prefix . 'yatra_activities';
+                $entity = $wpdb->get_row($wpdb->prepare(
+                    "SELECT * FROM {$table} WHERE slug = %s AND status IN ('publish', 'published')",
+                    $slug
+                ));
+                if ($entity) {
+                    // Get trips for this activity
+                    $trips_table = $wpdb->prefix . 'yatra_trips';
+                    $relation_table = $wpdb->prefix . 'yatra_trip_activities';
+                    $trips = $wpdb->get_results($wpdb->prepare(
+                        "SELECT t.* FROM {$trips_table} t
+                         INNER JOIN {$relation_table} ta ON t.id = ta.trip_id
+                         WHERE ta.activity_id = %d AND t.status IN ('publish', 'published')
+                         ORDER BY t.created_at DESC",
+                        $entity->id
+                    ));
+                }
+                break;
+
+            case 'category':
+                $table = $wpdb->prefix . 'yatra_trip_categories';
+                $entity = $wpdb->get_row($wpdb->prepare(
+                    "SELECT * FROM {$table} WHERE slug = %s AND status IN ('publish', 'published')",
+                    $slug
+                ));
+                if ($entity) {
+                    // Get trips for this category
+                    $trips_table = $wpdb->prefix . 'yatra_trips';
+                    $relation_table = $wpdb->prefix . 'yatra_trip_trip_categories';
+                    $trips = $wpdb->get_results($wpdb->prepare(
+                        "SELECT t.* FROM {$trips_table} t
+                         INNER JOIN {$relation_table} tc ON t.id = tc.trip_id
+                         WHERE tc.category_id = %d AND t.status IN ('publish', 'published')
+                         ORDER BY t.created_at DESC",
+                        $entity->id
+                    ));
+                }
+                break;
+        }
+
+        // If entity not found, return 404
+        if (!$entity) {
+            return; // Let WordPress handle the 404
+        }
+
+        // Prepare trips with additional data
+        foreach ($trips as $trip) {
+            // Add permalink
+            $trip->permalink = yatra_get_trip_permalink($trip);
+            
+            // Get featured image URL
+            if (!empty($trip->featured_image)) {
+                $trip->featured_image_url = wp_get_attachment_url($trip->featured_image);
+            } else {
+                // Fallback to first gallery image
+                $gallery_table = $wpdb->prefix . 'yatra_trip_gallery_images';
+                $first_image = $wpdb->get_row($wpdb->prepare(
+                    "SELECT image_url FROM {$gallery_table} WHERE trip_id = %d ORDER BY `order` ASC LIMIT 1",
+                    $trip->id
+                ));
+                $trip->featured_image_url = $first_image ? $first_image->image_url : '';
+            }
+            
+            // Get destinations for this trip
+            $dest_table = $wpdb->prefix . 'yatra_destinations';
+            $trip_dest_table = $wpdb->prefix . 'yatra_trip_destinations';
+            $trip->destinations = $wpdb->get_results($wpdb->prepare(
+                "SELECT d.name, d.slug FROM {$dest_table} d
+                 INNER JOIN {$trip_dest_table} td ON d.id = td.destination_id
+                 WHERE td.trip_id = %d",
+                $trip->id
+            ));
+            $trip->location = !empty($trip->destinations) ? $trip->destinations[0]->name : '';
+            
+            // Get activities for this trip
+            $act_table = $wpdb->prefix . 'yatra_activities';
+            $trip_act_table = $wpdb->prefix . 'yatra_trip_activities';
+            $trip->activities = $wpdb->get_results($wpdb->prepare(
+                "SELECT a.name, a.slug FROM {$act_table} a
+                 INNER JOIN {$trip_act_table} ta ON a.id = ta.activity_id
+                 WHERE ta.trip_id = %d",
+                $trip->id
+            ));
+            
+            // Get categories for this trip
+            $cat_table = $wpdb->prefix . 'yatra_trip_categories';
+            $trip_cat_table = $wpdb->prefix . 'yatra_trip_trip_categories';
+            $trip->trip_categories = $wpdb->get_results($wpdb->prepare(
+                "SELECT c.name, c.slug FROM {$cat_table} c
+                 INNER JOIN {$trip_cat_table} tc ON c.id = tc.category_id
+                 WHERE tc.trip_id = %d",
+                $trip->id
+            ));
+            
+            // Calculate average rating
+            $reviews_table = $wpdb->prefix . 'yatra_reviews';
+            $trip->average_rating = $wpdb->get_var($wpdb->prepare(
+                "SELECT AVG(rating) FROM {$reviews_table} WHERE trip_id = %d AND status = 'approved'",
+                $trip->id
+            )) ?: 0;
+            $trip->review_count = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM {$reviews_table} WHERE trip_id = %d AND status = 'approved'",
+                $trip->id
+            )) ?: 0;
+        }
+
+        // Prevent 404 handling
+        $wp_query->is_404 = false;
+        status_header(200);
+
+        // Set up template variables
+        $taxonomy_data = [
+            'type' => $type,
+            'entity' => $entity,
+            'trips' => $trips,
+        ];
+
+        // Enqueue listing page assets
+        $this->enqueueListingPageAssets();
+
+        // Load the template
+        $template_path = YATRA_PLUGIN_PATH . 'templates/single-taxonomy.php';
+        
+        if (file_exists($template_path)) {
+            // Make data available to template
+            $GLOBALS['yatra_taxonomy_data'] = $taxonomy_data;
+            include $template_path;
+            exit;
+        } else {
+            wp_die(sprintf('Single taxonomy template not found'));
         }
     }
 
@@ -1629,7 +1904,7 @@ class AppServiceProvider extends ServiceProvider
                         </div>
                         <div>
                             <p style="color: #6b7280; margin-bottom: 4px;">Total Amount</p>
-                            <p style="font-weight: 600; color: #111827;"><?php echo esc_html(yatra_format_price($booking->total_amount, $booking->currency)); ?></p>
+                            <p style="font-weight: 600; color: #111827;"><?php echo esc_html(yatra_format_price($booking->total_amount)); ?></p>
                         </div>
                     </div>
                 </div>

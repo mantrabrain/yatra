@@ -133,12 +133,24 @@ class SingleTripController
         $trip->tags = $this->decodeJson($trip->tags ?? '');
         $trip->included_items = $this->decodeJson($trip->included_items ?? '');
         $trip->excluded_items = $this->decodeJson($trip->excluded_items ?? '');
-        $trip->gallery_images = $this->decodeJson($trip->gallery_images ?? '');
-        $trip->price_types = $this->decodeJson($trip->price_types ?? '');
+        // Gallery images from separate table (with attachment IDs)
+        $trip->gallery_images = $this->getGalleryImages((int) $trip->id);
+        
+        // Get price types from database table (for traveler-based pricing)
+        $trip->price_types = $this->getPriceTypes((int) $trip->id);
+        
+        // Determine pricing type
+        $trip->pricing_type = $trip->pricing_type ?? 'regular';
+        if (empty($trip->pricing_type) && !empty($trip->price_types)) {
+            $trip->pricing_type = 'traveler_based';
+        }
         $trip->itinerary_days = $this->decodeJson($trip->itinerary_days ?? '');
         $trip->faqs = $this->decodeJson($trip->faqs ?? '');
         $trip->frontend_tabs = $this->decodeJson($trip->frontend_tabs ?? '');
-        $trip->availability_dates = $this->decodeJson($trip->availability_dates ?? '');
+        
+        // Fetch availability dates from database table
+        $trip->availability_dates = $this->getAvailabilityDates((int) $trip->id);
+        $trip->blackout_dates = $this->decodeJson($trip->blackout_dates ?? '');
 
         // Set default values for numeric fields
         $trip->duration_days = (int) ($trip->duration_days ?? 1);
@@ -169,6 +181,7 @@ class SingleTripController
         // Fetch related data
         $trip->destinations = $this->getDestinations($trip_id);
         $trip->activities = $this->getActivities($trip_id);
+        $trip->trip_categories = $this->getTripCategories($trip_id);
         $trip->reviews = $this->getReviews($trip_id);
         $trip->similar_trips = $this->getSimilarTrips($trip);
 
@@ -199,6 +212,89 @@ class SingleTripController
     }
 
     /**
+     * Get availability dates for trip from database
+     *
+     * @param int $trip_id Trip ID
+     * @return array Availability dates with pricing and seat info
+     */
+    private function getAvailabilityDates(int $trip_id): array
+    {
+        $table = $this->wpdb->prefix . 'yatra_trip_availability_dates';
+        
+        // Get future availability dates only
+        $availability = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$table} 
+                 WHERE trip_id = %d 
+                 AND departure_date >= CURDATE()
+                 AND status IN ('available', 'limited')
+                 ORDER BY departure_date ASC",
+                $trip_id
+            )
+        ) ?: [];
+        
+        // Format availability dates for frontend
+        foreach ($availability as $avail) {
+            $avail->departure_date = $avail->departure_date;
+            $avail->return_date = $avail->return_date;
+            $avail->original_price = $avail->original_price ? (float) $avail->original_price : null;
+            $avail->discounted_price = $avail->discounted_price ? (float) $avail->discounted_price : null;
+            $avail->seats_total = (int) $avail->seats_total;
+            $avail->seats_available = (int) $avail->seats_available;
+            $avail->seats_reserved = (int) ($avail->seats_reserved ?? 0);
+            
+            // Calculate effective price for this date
+            $avail->effective_price = $avail->discounted_price ?? $avail->original_price;
+            
+            // Calculate if limited availability
+            $avail->is_limited = ($avail->seats_available <= 5 && $avail->seats_available > 0);
+            $avail->is_sold_out = ($avail->seats_available <= 0 || $avail->status === 'sold_out');
+        }
+        
+        return $availability;
+    }
+
+    /**
+     * Get price types for trip (traveler-based pricing)
+     *
+     * @param int $trip_id Trip ID
+     * @return array Price types with category info
+     */
+    private function getPriceTypes(int $trip_id): array
+    {
+        $table = $this->wpdb->prefix . 'yatra_trip_price_types';
+        $categories_table = $this->wpdb->prefix . 'yatra_traveler_categories';
+        
+        $price_types = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, 
+                        tc.description as category_description, tc.age_min, tc.age_max
+                 FROM {$table} pt
+                 LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
+                 WHERE pt.trip_id = %d
+                 ORDER BY tc.sort_order ASC, pt.id ASC",
+                $trip_id
+            )
+        ) ?: [];
+        
+        // Format price types for frontend use
+        foreach ($price_types as $pt) {
+            $pt->original_price = (float) $pt->original_price;
+            $pt->discounted_price = $pt->discounted_price ? (float) $pt->discounted_price : null;
+            $pt->sale_price = $pt->sale_price ? (float) $pt->sale_price : null;
+            $pt->min_quantity = (int) ($pt->min_quantity ?? 1);
+            $pt->max_quantity = $pt->max_quantity ? (int) $pt->max_quantity : null;
+            $pt->age_min = $pt->age_min ? (int) $pt->age_min : null;
+            $pt->age_max = $pt->age_max ? (int) $pt->age_max : null;
+            
+            // Calculate effective price (sale_price > discounted_price > original_price)
+            $pt->effective_price = $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price;
+        }
+        
+        return $price_types;
+    }
+
+    /**
      * Get destinations for trip
      *
      * @param int $trip_id Trip ID
@@ -219,13 +315,20 @@ class SingleTripController
         }
 
         $placeholders = implode(',', array_fill(0, count($destination_ids), '%d'));
-        return $this->wpdb->get_results(
+        $destinations = $this->wpdb->get_results(
             $this->wpdb->prepare(
                 "SELECT * FROM {$this->table_destinations} 
                  WHERE id IN ($placeholders)",
                 ...$destination_ids
             )
         ) ?: [];
+        
+        // Add permalink to each destination
+        foreach ($destinations as $destination) {
+            $destination->url = home_url('/destination/' . ($destination->slug ?? '') . '/');
+        }
+        
+        return $destinations;
     }
 
     /**
@@ -254,6 +357,95 @@ class SingleTripController
                 "SELECT * FROM {$this->table_activities} 
                  WHERE id IN ($placeholders)",
                 ...$activity_ids
+            )
+        ) ?: [];
+    }
+
+    /**
+     * Get gallery images for trip
+     *
+     * @param int $trip_id Trip ID
+     * @return array Gallery images with URLs
+     */
+    private function getGalleryImages(int $trip_id): array
+    {
+        $table = $this->wpdb->prefix . 'yatra_trip_gallery_images';
+        
+        // Check if table exists
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $table
+            )
+        ) === $table;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $images = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$table} 
+                 WHERE trip_id = %d
+                 ORDER BY `order` ASC, id ASC",
+                $trip_id
+            )
+        ) ?: [];
+        
+        // Convert to array of URLs (using attachment ID when available)
+        $gallery = [];
+        foreach ($images as $img) {
+            $url = '';
+            
+            // If we have an attachment ID, get the URL from WordPress
+            if (!empty($img->image_id) && $img->image_id > 0) {
+                $url = wp_get_attachment_url((int) $img->image_id);
+            }
+            
+            // Fallback to stored URL
+            if (empty($url) && !empty($img->image_url)) {
+                $url = $img->image_url;
+            }
+            
+            if (!empty($url)) {
+                $gallery[] = $url;
+            }
+        }
+        
+        return $gallery;
+    }
+
+    /**
+     * Get trip categories for trip
+     *
+     * @param int $trip_id Trip ID
+     * @return array Trip categories
+     */
+    private function getTripCategories(int $trip_id): array
+    {
+        $relation_table = $this->wpdb->prefix . 'yatra_trip_trip_categories';
+        $categories_table = $this->wpdb->prefix . 'yatra_trip_categories';
+        
+        // Check if relation table exists
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $relation_table
+            )
+        ) === $relation_table;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        return $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT tc.id, tc.name, tc.slug 
+                 FROM {$relation_table} ttc
+                 LEFT JOIN {$categories_table} tc ON ttc.category_id = tc.id
+                 WHERE ttc.trip_id = %d
+                 ORDER BY ttc.`order` ASC, ttc.id ASC",
+                $trip_id
             )
         ) ?: [];
     }

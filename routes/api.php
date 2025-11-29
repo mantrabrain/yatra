@@ -50,6 +50,7 @@ $controllers = [
     // TRIP DETAILS
     // =============================================
     \Yatra\Controllers\AvailabilityController::class,
+    \Yatra\Controllers\RecurringAvailabilityController::class,
     \Yatra\Controllers\ItineraryController::class,
     \Yatra\Controllers\DiscountController::class,
 

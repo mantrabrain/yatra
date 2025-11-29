@@ -153,7 +153,8 @@ abstract class BaseController
                 'default' => 10,
                 'sanitize_callback' => 'absint',
                 'validate_callback' => function($value) {
-                    return is_numeric($value) && $value > 0 && $value <= 100;
+                    // Allow up to 1000 for bulk operations like dropdowns
+                    return is_numeric($value) && $value > 0 && $value <= 1000;
                 },
             ],
             'orderby' => [

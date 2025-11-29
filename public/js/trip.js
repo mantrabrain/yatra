@@ -338,7 +338,86 @@
             }
         }
 
+        initInlineQuantityControls() {
+            // Handle inline quantity controls for simple booking (num_travelers)
+            const inlineControls = document.querySelectorAll('.yatra-quantity-controls-inline');
+            
+            inlineControls.forEach(controlsContainer => {
+                const input = controlsContainer.querySelector('.yatra-quantity-input-simple');
+                if (!input) return;
+                
+                const minusBtn = controlsContainer.querySelector('.yatra-quantity-minus');
+                const plusBtn = controlsContainer.querySelector('.yatra-quantity-plus');
+                
+                if (!minusBtn || !plusBtn) return;
+                
+                const updateButtonStates = () => {
+                    const current = parseInt(input.value) || 1;
+                    const min = parseInt(input.getAttribute('min')) || 1;
+                    const max = parseInt(input.getAttribute('max')) || 20;
+                    
+                    minusBtn.disabled = current <= min;
+                    plusBtn.disabled = current >= max;
+                };
+                
+                // Minus button click
+                minusBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const current = parseInt(input.value) || 1;
+                    const min = parseInt(input.getAttribute('min')) || 1;
+                    
+                    if (current > min) {
+                        input.value = current - 1;
+                        updateButtonStates();
+                        this.updateTotalDisplay();
+                    }
+                });
+                
+                // Plus button click
+                plusBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const current = parseInt(input.value) || 1;
+                    const max = parseInt(input.getAttribute('max')) || 20;
+                    
+                    if (current < max) {
+                        input.value = current + 1;
+                        updateButtonStates();
+                        this.updateTotalDisplay();
+                    }
+                });
+                
+                // Initialize button states
+                updateButtonStates();
+            });
+        }
+        
+        updateTotalDisplay() {
+            // Update total price display based on current travelers count
+            const numTravelersInput = document.getElementById('num_travelers');
+            const totalAmountEl = document.getElementById('total-amount');
+            const displayPriceEl = document.getElementById('display-price');
+            
+            if (!numTravelersInput) return;
+            
+            const travelers = parseInt(numTravelersInput.value) || 1;
+            const pricePerPerson = parseFloat(numTravelersInput.getAttribute('data-price')) || 0;
+            const totalPrice = travelers * pricePerPerson;
+            
+            // Update total display if exists
+            if (totalAmountEl && typeof yatra_format_price_js === 'function') {
+                totalAmountEl.textContent = yatra_format_price_js(totalPrice);
+            }
+        }
+
         initTravelersField() {
+            // First, initialize inline quantity controls for num_travelers (simple booking)
+            this.initInlineQuantityControls();
+            
+            // Then initialize the dropdown travelers field (if exists)
             if (!this.participantsSelect) return;
 
             const display = document.getElementById('participants-display');
@@ -443,16 +522,25 @@
         handleCheckAvailability() {
             console.log('Check Availability clicked');
             
-            // Get form values
+            // Get form values - support both old (adults/children) and new (num_travelers) structures
             const dateInput = document.getElementById('travel_date');
             const adultsInput = document.getElementById('adults');
             const childrenInput = document.getElementById('children');
+            const numTravelersInput = document.getElementById('num_travelers');
 
             const date = dateInput ? dateInput.value : '';
-            const adults = adultsInput ? parseInt(adultsInput.value) || 0 : 0;
-            const children = childrenInput ? parseInt(childrenInput.value) || 0 : 0;
+            
+            // Check for travelers - either from num_travelers or adults/children
+            let totalTravelers = 0;
+            if (numTravelersInput) {
+                totalTravelers = parseInt(numTravelersInput.value) || 0;
+            } else {
+                const adults = adultsInput ? parseInt(adultsInput.value) || 0 : 0;
+                const children = childrenInput ? parseInt(childrenInput.value) || 0 : 0;
+                totalTravelers = adults + children;
+            }
 
-            console.log('Form values:', { date, adults, children });
+            console.log('Form values:', { date, totalTravelers });
 
             // Basic validation
             if (!date) {
@@ -460,7 +548,7 @@
                 return;
             }
 
-            if (adults === 0 && children === 0) {
+            if (totalTravelers === 0) {
                 alert('Please select number of travelers');
                 return;
             }

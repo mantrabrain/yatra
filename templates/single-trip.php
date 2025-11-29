@@ -69,15 +69,36 @@ get_header();
             </div>
         </div>
 
+        <?php 
+        // Determine hero images
+        // 1. If featured image is set, use it as main image
+        // 2. If no featured image, use first gallery image as main
+        // 3. Side images are gallery images 2, 3, 4 (indices 1, 2, 3)
+        $gallery_images = $trip->gallery_images ?? [];
+        $has_featured = !empty($trip->featured_image_url);
+        
+        // Main image: featured image OR first gallery image
+        $main_image_url = '';
+        if ($has_featured) {
+            $main_image_url = $trip->featured_image_url;
+            // If featured is set, side images start from index 0
+            $side_images = array_slice($gallery_images, 0, 3);
+        } else {
+            // No featured image - use first gallery as main
+            $main_image_url = !empty($gallery_images[0]) ? $gallery_images[0] : '';
+            // Side images start from index 1
+            $side_images = array_slice($gallery_images, 1, 3);
+        }
+        
+        $total_images = count($gallery_images) + ($has_featured ? 1 : 0);
+        ?>
         <div class="yatra-hero-images">
             <div class="yatra-hero-main-image">
                 <?php if ($trip->discount_percentage > 0): ?>
                 <div class="yatra-hero-discount-tag"><?php echo esc_html__('SAVE', 'yatra'); ?> <?php echo esc_html($trip->discount_percentage); ?>%</div>
                 <?php endif; ?>
-                <?php if (!empty($trip->featured_image_url)): ?>
-                <img src="<?php echo esc_url($trip->featured_image_url); ?>" alt="<?php echo esc_attr($trip->title); ?>" class="yatra-hero-main-img">
-                <?php elseif (!empty($trip->gallery_images) && isset($trip->gallery_images[0])): ?>
-                <img src="<?php echo esc_url(is_numeric($trip->gallery_images[0]) ? wp_get_attachment_url($trip->gallery_images[0]) : $trip->gallery_images[0]); ?>" alt="<?php echo esc_attr($trip->title); ?>" class="yatra-hero-main-img">
+                <?php if (!empty($main_image_url)): ?>
+                <img src="<?php echo esc_url($main_image_url); ?>" alt="<?php echo esc_attr($trip->title); ?>" class="yatra-hero-main-img">
                 <?php else: ?>
                 <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1920&q=80" alt="<?php echo esc_attr($trip->title); ?>" class="yatra-hero-main-img">
                 <?php endif; ?>
@@ -85,32 +106,28 @@ get_header();
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    <?php echo esc_html__('Book Now', 'yatra'); ?> - <?php echo esc_html(yatra_format_price($trip->sale_price, $trip->currency)); ?>
+                    <?php echo esc_html__('Book Now', 'yatra'); ?> - <?php echo esc_html(yatra_format_price($trip->sale_price)); ?>
                 </a>
             </div>
             <div class="yatra-hero-side-images">
-                <?php 
-                $side_images = array_slice($trip->gallery_images, 1, 3);
-                $image_count = count($trip->gallery_images);
-                foreach ($side_images as $index => $image): 
-                    $img_url = is_numeric($image) ? wp_get_attachment_url($image) : $image;
-                ?>
-                <div class="yatra-side-image-item">
-                    <img src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr__('Gallery Image', 'yatra'); ?>">
-                    <?php if ($index === 0): ?>
-                    <button type="button" class="yatra-favorite-btn" aria-label="<?php echo esc_attr__('Add to favorites', 'yatra'); ?>">
-                        <?php echo yatra_svg_icon('heart', 'yatra-icon-sm'); ?>
-                    </button>
-                    <?php endif; ?>
-                    <?php if ($index === count($side_images) - 1 && $image_count > 4): ?>
-                    <button type="button" class="yatra-view-all-photos-btn yatra-gallery-play-btn" data-gallery="hero-gallery">
-                        <?php echo yatra_svg_icon('camera', 'yatra-icon-sm'); ?>
-                        <?php echo sprintf(esc_html__('View all %d photos', 'yatra'), $image_count); ?>
-                    </button>
-                    <?php endif; ?>
-                </div>
-                <?php endforeach; ?>
-                <?php if (empty($side_images)): ?>
+                <?php if (!empty($side_images)): ?>
+                    <?php foreach ($side_images as $index => $img_url): ?>
+                    <div class="yatra-side-image-item">
+                        <img src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr__('Gallery Image', 'yatra'); ?>">
+                        <?php if ($index === 0): ?>
+                        <button type="button" class="yatra-favorite-btn" aria-label="<?php echo esc_attr__('Add to favorites', 'yatra'); ?>">
+                            <?php echo yatra_svg_icon('heart', 'yatra-icon-sm'); ?>
+                        </button>
+                        <?php endif; ?>
+                        <?php if ($index === count($side_images) - 1 && $total_images > 4): ?>
+                        <button type="button" class="yatra-view-all-photos-btn yatra-gallery-play-btn" data-gallery="hero-gallery">
+                            <?php echo yatra_svg_icon('camera', 'yatra-icon-sm'); ?>
+                            <?php echo sprintf(esc_html__('View all %d photos', 'yatra'), $total_images); ?>
+                        </button>
+                        <?php endif; ?>
+                    </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
                 <div class="yatra-side-image-item">
                     <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80" alt="<?php echo esc_attr__('Gallery Image', 'yatra'); ?>">
                 </div>
@@ -123,27 +140,57 @@ get_header();
     <?php 
     $destinations = isset($trip->destinations) ? $trip->destinations : [];
     $activities = isset($trip->activities) ? $trip->activities : [];
-    $trip_category = esc_html($trip->trip_category ?? '');
+    $trip_categories = isset($trip->trip_categories) ? $trip->trip_categories : [];
     ?>
-    <?php if (!empty($trip_category) || !empty($activities) || !empty($destinations)): ?>
+    <?php if (!empty($trip_categories) || !empty($activities) || !empty($destinations)): ?>
     <div class="yatra-trip-tags">
         <div class="yatra-trip-tags-container">
-            <?php if (!empty($trip_category)): ?>
+            <?php if (!empty($trip_categories)): ?>
             <div class="yatra-trip-tag">
                 <span class="yatra-trip-tag-label"><?php echo esc_html__('Category:', 'yatra'); ?></span>
-                <span class="yatra-trip-tag-value"><?php echo $trip_category; ?></span>
+                <span class="yatra-trip-tag-value">
+                    <?php 
+                    $category_links = [];
+                    foreach ($trip_categories as $category) {
+                        $name = esc_html($category->name ?? '');
+                        $permalink = yatra_get_category_permalink($category);
+                        $category_links[] = $permalink ? '<a href="' . esc_url($permalink) . '">' . $name . '</a>' : $name;
+                    }
+                    echo implode(', ', $category_links);
+                    ?>
+                </span>
             </div>
             <?php endif; ?>
             <?php if (!empty($activities)): ?>
             <div class="yatra-trip-tag">
                 <span class="yatra-trip-tag-label"><?php echo esc_html__('Activity:', 'yatra'); ?></span>
-                <span class="yatra-trip-tag-value"><?php echo esc_html(implode(', ', array_map(function($a) { return $a->name ?? ''; }, $activities))); ?></span>
+                <span class="yatra-trip-tag-value">
+                    <?php 
+                    $activity_links = [];
+                    foreach ($activities as $activity) {
+                        $name = esc_html($activity->name ?? '');
+                        $permalink = yatra_get_activity_permalink($activity);
+                        $activity_links[] = $permalink ? '<a href="' . esc_url($permalink) . '">' . $name . '</a>' : $name;
+                    }
+                    echo implode(', ', $activity_links);
+                    ?>
+                </span>
             </div>
             <?php endif; ?>
             <?php if (!empty($destinations)): ?>
             <div class="yatra-trip-tag">
                 <span class="yatra-trip-tag-label"><?php echo esc_html__('Destination:', 'yatra'); ?></span>
-                <span class="yatra-trip-tag-value"><?php echo esc_html(implode(', ', array_map(function($d) { return $d->name ?? ''; }, $destinations))); ?></span>
+                <span class="yatra-trip-tag-value">
+                    <?php 
+                    $destination_links = [];
+                    foreach ($destinations as $destination) {
+                        $name = esc_html($destination->name ?? '');
+                        $permalink = yatra_get_destination_permalink($destination);
+                        $destination_links[] = $permalink ? '<a href="' . esc_url($permalink) . '">' . $name . '</a>' : $name;
+                    }
+                    echo implode(', ', $destination_links);
+                    ?>
+                </span>
             </div>
             <?php endif; ?>
         </div>
@@ -158,28 +205,38 @@ get_header();
             </div>
             <div class="yatra-quick-fact-content">
                 <div class="yatra-quick-fact-label"><?php echo esc_html__('Duration', 'yatra'); ?></div>
-                <div class="yatra-quick-fact-value"><?php echo esc_html(yatra_format_duration($trip->duration_days, $trip->duration_nights)); ?></div>
+                <div class="yatra-quick-fact-value">
+                    <?php 
+                    if ($trip->trip_type === 'single_day') {
+                        echo esc_html__('Day Trip', 'yatra');
+                    } else {
+                        echo esc_html(yatra_format_duration($trip->duration_days, $trip->duration_nights)); 
+                    }
+                    ?>
+                </div>
             </div>
         </div>
         
+        <?php if (!empty($trip->difficulty_level)): ?>
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
                 <?php echo yatra_svg_icon('mountain', 'yatra-icon-lg'); ?>
             </div>
             <div class="yatra-quick-fact-content">
-                <div class="yatra-quick-fact-label">Difficulty</div>
-                <div class="yatra-quick-fact-value"><?php echo esc_html(ucfirst($trip->difficulty_level ?? 'moderate')); ?></div>
+                <div class="yatra-quick-fact-label"><?php echo esc_html__('Difficulty', 'yatra'); ?></div>
+                <div class="yatra-quick-fact-value"><?php echo esc_html(ucfirst($trip->difficulty_level)); ?></div>
             </div>
         </div>
+        <?php endif; ?>
 
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
                 <?php echo yatra_svg_icon('users', 'yatra-icon-lg'); ?>
             </div>
             <div class="yatra-quick-fact-content">
-                <div class="yatra-quick-fact-label">Group Size</div>
+                <div class="yatra-quick-fact-label"><?php echo esc_html__('Group Size', 'yatra'); ?></div>
                 <div class="yatra-quick-fact-value">
-                    <?php echo esc_html($trip->min_travelers . '-' . $trip->max_travelers . ' travelers'); ?>
+                    <?php echo esc_html(sprintf(__('%d-%d travelers', 'yatra'), $trip->min_travelers, $trip->max_travelers)); ?>
                 </div>
             </div>
         </div>
@@ -189,20 +246,48 @@ get_header();
                 <?php echo yatra_svg_icon('star', 'yatra-icon-lg'); ?>
             </div>
             <div class="yatra-quick-fact-content">
-                <div class="yatra-quick-fact-label">Rating</div>
-                <div class="yatra-quick-fact-value">4.9 (247 reviews)</div>
+                <div class="yatra-quick-fact-label"><?php echo esc_html__('Rating', 'yatra'); ?></div>
+                <div class="yatra-quick-fact-value">
+                    <?php if ($trip->average_rating > 0): ?>
+                        <?php echo esc_html(number_format($trip->average_rating, 1)); ?> (<?php echo esc_html($trip->review_count); ?> <?php echo esc_html(_n('review', 'reviews', $trip->review_count, 'yatra')); ?>)
+                    <?php else: ?>
+                        <?php echo esc_html__('No reviews yet', 'yatra'); ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
+
+        <?php if (!empty($trip->starting_location) || !empty($trip->ending_location)): ?>
+        <div class="yatra-quick-fact">
+            <div class="yatra-quick-fact-icon">
+                <?php echo yatra_svg_icon('map-pin', 'yatra-icon-lg'); ?>
+            </div>
+            <div class="yatra-quick-fact-content">
+                <div class="yatra-quick-fact-label"><?php echo esc_html__('Route', 'yatra'); ?></div>
+                <div class="yatra-quick-fact-value">
+                    <?php 
+                    if (!empty($trip->starting_location) && !empty($trip->ending_location)) {
+                        echo esc_html($trip->starting_location . ' → ' . $trip->ending_location);
+                    } elseif (!empty($trip->starting_location)) {
+                        echo esc_html__('From:', 'yatra') . ' ' . esc_html($trip->starting_location);
+                    } else {
+                        echo esc_html__('To:', 'yatra') . ' ' . esc_html($trip->ending_location);
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <div class="yatra-quick-fact">
             <div class="yatra-quick-fact-icon">
                 <?php echo yatra_svg_icon('dollar', 'yatra-icon-lg'); ?>
             </div>
             <div class="yatra-quick-fact-content">
-                <div class="yatra-quick-fact-label">Starting From</div>
+                <div class="yatra-quick-fact-label"><?php echo esc_html__('Starting From', 'yatra'); ?></div>
                 <div class="yatra-quick-fact-price">
-                    <?php echo yatra_format_price($trip->sale_price, $trip->currency); ?>
-                    <span class="yatra-quick-fact-price-label">per person</span>
+                    <?php echo yatra_format_price($trip->sale_price); ?>
+                    <span class="yatra-quick-fact-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
                 </div>
             </div>
         </div>
@@ -246,7 +331,7 @@ get_header();
             </a>
             <div class="yatra-sticky-nav-price">
                 <?php echo yatra_svg_icon('dollar', 'yatra-icon-sm'); ?>
-                <span><?php echo yatra_format_price($trip->sale_price, $trip->currency); ?></span>
+                <span><?php echo yatra_format_price($trip->sale_price); ?></span>
             </div>
         </div>
     </div>
@@ -301,46 +386,53 @@ get_header();
                     <?php echo wp_kses_post($trip->description ?? ''); ?>
                 </div>
 
+                <?php if (!empty($trip->highlights) && is_array($trip->highlights)): ?>
                 <div class="yatra-trip-highlights">
+                    <?php foreach ($trip->highlights as $highlight): ?>
+                    <?php if (!empty($highlight)): ?>
                     <div class="yatra-highlight-item">
                         <?php echo yatra_svg_icon('star', 'yatra-highlight-icon'); ?>
-                        <p class="yatra-highlight-text">Small group sizes (max 12 travelers) for personalized attention</p>
+                        <p class="yatra-highlight-text"><?php echo esc_html($highlight); ?></p>
                     </div>
-                    <div class="yatra-highlight-item">
-                        <?php echo yatra_svg_icon('star', 'yatra-highlight-icon'); ?>
-                        <p class="yatra-highlight-text">Expert local guides with 10+ years of experience</p>
-                    </div>
-                    <div class="yatra-highlight-item">
-                        <?php echo yatra_svg_icon('star', 'yatra-highlight-icon'); ?>
-                        <p class="yatra-highlight-text">Proper acclimatization schedule to ensure safety</p>
-                    </div>
-                    <div class="yatra-highlight-item">
-                        <?php echo yatra_svg_icon('star', 'yatra-highlight-icon'); ?>
-                        <p class="yatra-highlight-text">Authentic cultural experiences with local communities</p>
-                    </div>
+                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
+                <?php endif; ?>
 
                 <div class="yatra-trip-features">
                     <div class="yatra-feature-card">
-                        <?php echo yatra_svg_icon('shield', 'yatra-feature-icon'); ?>
-                        <h3 class="yatra-feature-title">Fully Insured</h3>
-                        <p class="yatra-feature-desc">Comprehensive travel insurance included</p>
-                    </div>
-                    <div class="yatra-feature-card">
                         <?php echo yatra_svg_icon('users', 'yatra-feature-icon'); ?>
-                        <h3 class="yatra-feature-title">Small Groups</h3>
-                        <p class="yatra-feature-desc">Maximum 12 travelers per group</p>
+                        <h3 class="yatra-feature-title"><?php echo esc_html__('Group Size', 'yatra'); ?></h3>
+                        <p class="yatra-feature-desc"><?php echo esc_html(sprintf(__('%d-%d travelers', 'yatra'), $trip->min_travelers, $trip->max_travelers)); ?></p>
                     </div>
+                    <?php if (!empty($trip->accommodation_type)): ?>
                     <div class="yatra-feature-card">
                         <?php echo yatra_svg_icon('home', 'yatra-feature-icon'); ?>
-                        <h3 class="yatra-feature-title">Teahouse Stay</h3>
-                        <p class="yatra-feature-desc">Authentic local accommodations</p>
+                        <h3 class="yatra-feature-title"><?php echo esc_html__('Accommodation', 'yatra'); ?></h3>
+                        <p class="yatra-feature-desc"><?php echo esc_html(ucfirst(str_replace('_', ' ', $trip->accommodation_type))); ?></p>
                     </div>
+                    <?php endif; ?>
+                    <?php if (!empty($trip->meal_plan)): ?>
+                    <div class="yatra-feature-card">
+                        <?php echo yatra_svg_icon('utensils', 'yatra-feature-icon'); ?>
+                        <h3 class="yatra-feature-title"><?php echo esc_html__('Meals', 'yatra'); ?></h3>
+                        <p class="yatra-feature-desc"><?php echo esc_html(ucfirst(str_replace('_', ' ', $trip->meal_plan))); ?></p>
+                    </div>
+                    <?php endif; ?>
+                    <?php if (!empty($trip->transportation_included) && $trip->transportation_included): ?>
                     <div class="yatra-feature-card">
                         <?php echo yatra_svg_icon('truck', 'yatra-feature-icon'); ?>
-                        <h3 class="yatra-feature-title">All Transport</h3>
-                        <p class="yatra-feature-desc">Airport transfers and flights included</p>
+                        <h3 class="yatra-feature-title"><?php echo esc_html__('Transport', 'yatra'); ?></h3>
+                        <p class="yatra-feature-desc"><?php echo esc_html__('Included', 'yatra'); ?></p>
                     </div>
+                    <?php endif; ?>
+                    <?php if (!empty($trip->best_season)): ?>
+                    <div class="yatra-feature-card">
+                        <?php echo yatra_svg_icon('sun', 'yatra-feature-icon'); ?>
+                        <h3 class="yatra-feature-title"><?php echo esc_html__('Best Season', 'yatra'); ?></h3>
+                        <p class="yatra-feature-desc"><?php echo esc_html(ucfirst($trip->best_season)); ?></p>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </section>
 
@@ -860,88 +952,129 @@ get_header();
             </section>
 
             <!-- What's Included/Excluded -->
+            <?php if (!empty($trip->included_items) || !empty($trip->excluded_items)): ?>
             <section class="yatra-trip-section" id="included">
                 <h2 class="yatra-trip-section-title">
                     <?php echo yatra_svg_icon('check', 'yatra-trip-section-title-icon'); ?>
-                    What's Included & Excluded
+                    <?php echo esc_html__("What's Included & Excluded", 'yatra'); ?>
                 </h2>
                 <div class="yatra-included-excluded">
+                    <?php if (!empty($trip->included_items)): ?>
                     <div class="yatra-included-section">
                         <h3>
                             <?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?>
-                            Included
+                            <?php echo esc_html__('Included', 'yatra'); ?>
                         </h3>
                         <ul class="yatra-included-list">
-                            <li><?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?> All airport transfers</li>
-                            <li><?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?> Domestic flights (Kathmandu-Lukla-Kathmandu)</li>
-                            <li><?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?> Teahouse accommodation (13 nights)</li>
-                            <li><?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?> All meals (breakfast, lunch, dinner)</li>
-                            <li><?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?> Experienced English-speaking guide</li>
-                            <li><?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?> Porters (1 porter per 2 travelers)</li>
-                            <li><?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?> All necessary permits (Sagarmatha National Park, TIMS)</li>
-                            <li><?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?> First aid kit and oxygen cylinder</li>
-                            <li><?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?> Trip completion certificate</li>
+                            <?php foreach ($trip->included_items as $item): ?>
+                            <?php 
+                                $item_title = is_array($item) ? ($item['title'] ?? '') : (is_object($item) ? ($item->title ?? '') : $item);
+                                $item_desc = is_array($item) ? ($item['description'] ?? '') : (is_object($item) ? ($item->description ?? '') : '');
+                            ?>
+                            <?php if (!empty($item_title)): ?>
+                            <li>
+                                <?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?>
+                                <span>
+                                    <?php echo esc_html($item_title); ?>
+                                    <?php if (!empty($item_desc)): ?>
+                                    <small class="yatra-item-desc"><?php echo esc_html($item_desc); ?></small>
+                                    <?php endif; ?>
+                                </span>
+                            </li>
+                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
+                    <?php endif; ?>
+                    <?php if (!empty($trip->excluded_items)): ?>
                     <div class="yatra-excluded-section">
                         <h3>
                             <?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?>
-                            Excluded
+                            <?php echo esc_html__('Excluded', 'yatra'); ?>
                         </h3>
                         <ul class="yatra-excluded-list">
-                            <li><?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?> International flights</li>
-                            <li><?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?> Nepal visa ($30 USD)</li>
-                            <li><?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?> Travel insurance</li>
-                            <li><?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?> Personal expenses (drinks, snacks, tips)</li>
-                            <li><?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?> Tips for guide and porters</li>
-                            <li><?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?> Hot showers and charging (available at extra cost)</li>
-                            <li><?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?> Extra nights in Kathmandu</li>
+                            <?php foreach ($trip->excluded_items as $item): ?>
+                            <?php 
+                                $item_title = is_array($item) ? ($item['title'] ?? '') : (is_object($item) ? ($item->title ?? '') : $item);
+                                $item_desc = is_array($item) ? ($item['description'] ?? '') : (is_object($item) ? ($item->description ?? '') : '');
+                            ?>
+                            <?php if (!empty($item_title)): ?>
+                            <li>
+                                <?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?>
+                                <span>
+                                    <?php echo esc_html($item_title); ?>
+                                    <?php if (!empty($item_desc)): ?>
+                                    <small class="yatra-item-desc"><?php echo esc_html($item_desc); ?></small>
+                                    <?php endif; ?>
+                                </span>
+                            </li>
+                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
+                    <?php endif; ?>
                 </div>
             </section>
+            <?php endif; ?>
 
             <!-- Gallery Section -->
+            <?php if (!empty($trip->gallery_images) && is_array($trip->gallery_images)): ?>
             <section class="yatra-trip-section" id="gallery">
                 <h2 class="yatra-trip-section-title">
                     <?php echo yatra_svg_icon('camera', 'yatra-trip-section-title-icon'); ?>
-                    Photo Gallery
+                    <?php echo esc_html__('Photo Gallery', 'yatra'); ?>
                 </h2>
                 <div class="yatra-trip-gallery" data-gallery="hero-gallery">
-                    <div class="yatra-gallery-item" data-image-index="0">
-                        <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80" alt="Everest Base Camp">
+                    <?php foreach ($trip->gallery_images as $index => $image): ?>
+                    <?php $img_url = is_numeric($image) ? wp_get_attachment_url($image) : $image; ?>
+                    <?php if ($img_url): ?>
+                    <div class="yatra-gallery-item" data-image-index="<?php echo esc_attr($index); ?>">
+                        <img src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr(sprintf(__('Gallery Image %d', 'yatra'), $index + 1)); ?>">
                     </div>
-                    <div class="yatra-gallery-item" data-image-index="1">
-                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80" alt="Mountain Views">
-                    </div>
-                    <div class="yatra-gallery-item" data-image-index="2">
-                        <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80" alt="Trekking Trail">
-                    </div>
-                    <div class="yatra-gallery-item" data-image-index="3">
-                        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80" alt="Sherpa Village">
-                    </div>
-                    <div class="yatra-gallery-item" data-image-index="4">
-                        <img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800&q=80" alt="Mountain Sunrise">
-                    </div>
-                    <div class="yatra-gallery-item" data-image-index="5">
-                        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&q=80" alt="Base Camp">
-                    </div>
+                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
             </section>
+            <?php endif; ?>
 
             <!-- Location/Map Section -->
             <section class="yatra-trip-section" id="location">
                 <h2 class="yatra-trip-section-title">
                     <?php echo yatra_svg_icon('map-pin', 'yatra-trip-section-title-icon'); ?>
-                    Location
+                    <?php echo esc_html__('Location', 'yatra'); ?>
                 </h2>
-                <div class="yatra-trip-map">
-                    <p>Interactive map will be displayed here</p>
+                
+                <?php if (!empty($trip->latitude) && !empty($trip->longitude)): ?>
+                <div class="yatra-trip-map" id="yatra-trip-map" data-lat="<?php echo esc_attr($trip->latitude); ?>" data-lng="<?php echo esc_attr($trip->longitude); ?>">
+                    <iframe
+                        width="100%"
+                        height="400"
+                        style="border:0; border-radius: 12px;"
+                        loading="lazy"
+                        allowfullscreen
+                        referrerpolicy="no-referrer-when-downgrade"
+                        src="https://www.google.com/maps?q=<?php echo esc_attr($trip->latitude); ?>,<?php echo esc_attr($trip->longitude); ?>&output=embed">
+                    </iframe>
                 </div>
-                <div style="margin-top: 24px; font-size: 15px; color: #374151;">
-                    <p><strong>Starting Point:</strong> <?php echo esc_html($trip->starting_location); ?></p>
-                    <p><strong>Ending Point:</strong> <?php echo esc_html($trip->ending_location); ?></p>
+                <?php else: ?>
+                <div class="yatra-trip-map yatra-map-placeholder">
+                    <p><?php echo esc_html__('Map location not available', 'yatra'); ?></p>
                 </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($trip->starting_location) || !empty($trip->ending_location) || !empty($trip->landmarks)): ?>
+                <div class="yatra-location-details" style="margin-top: 24px;">
+                    <?php if (!empty($trip->starting_location)): ?>
+                    <p><strong><?php echo esc_html__('Starting Point:', 'yatra'); ?></strong> <?php echo esc_html($trip->starting_location); ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($trip->ending_location)): ?>
+                    <p><strong><?php echo esc_html__('Ending Point:', 'yatra'); ?></strong> <?php echo esc_html($trip->ending_location); ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($trip->landmarks) && is_array($trip->landmarks)): ?>
+                    <p><strong><?php echo esc_html__('Key Landmarks:', 'yatra'); ?></strong> <?php echo esc_html(implode(', ', $trip->landmarks)); ?></p>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
             </section>
 
             <!-- Important Information Section -->
@@ -1020,162 +1153,334 @@ get_header();
             </section>
 
             <!-- FAQ Section -->
+            <?php if (!empty($trip->faqs) && is_array($trip->faqs)): ?>
             <section class="yatra-trip-section" id="faq">
                 <h2 class="yatra-trip-section-title">
                     <?php echo yatra_svg_icon('info', 'yatra-trip-section-title-icon'); ?>
-                    Frequently Asked Questions
+                    <?php echo esc_html__('Frequently Asked Questions', 'yatra'); ?>
                 </h2>
                 <ul class="yatra-trip-faq">
+                    <?php foreach ($trip->faqs as $faq): ?>
+                    <?php 
+                        $question = is_array($faq) ? ($faq['question'] ?? '') : (is_object($faq) ? ($faq->question ?? '') : '');
+                        $answer = is_array($faq) ? ($faq['answer'] ?? '') : (is_object($faq) ? ($faq->answer ?? '') : '');
+                    ?>
+                    <?php if (!empty($question) && !empty($answer)): ?>
                     <li class="yatra-faq-item">
                         <h3 class="yatra-faq-question">
-                            What is the best time to do the Everest Base Camp trek?
+                            <?php echo esc_html($question); ?>
                             <?php echo yatra_svg_icon('chevron-down', 'yatra-faq-toggle'); ?>
                         </h3>
                         <div class="yatra-faq-answer">
-                            <p>The best times are during the pre-monsoon (March to May) and post-monsoon (September to November) seasons. These periods offer clear skies, stable weather, and excellent visibility of the mountains.</p>
+                            <p><?php echo wp_kses_post($answer); ?></p>
                         </div>
                     </li>
-                    <li class="yatra-faq-item">
-                        <h3 class="yatra-faq-question">
-                            Do I need previous trekking experience?
-                            <?php echo yatra_svg_icon('chevron-down', 'yatra-faq-toggle'); ?>
-                        </h3>
-                        <div class="yatra-faq-answer">
-                            <p>While previous trekking experience is helpful, it's not mandatory. However, you should be in good physical condition and able to walk 5-7 hours per day on uneven terrain. Regular exercise and training before the trip is highly recommended.</p>
-                        </div>
-                    </li>
-                    <li class="yatra-faq-item">
-                        <h3 class="yatra-faq-question">
-                            What about altitude sickness?
-                            <?php echo yatra_svg_icon('chevron-down', 'yatra-faq-toggle'); ?>
-                        </h3>
-                        <div class="yatra-faq-answer">
-                            <p>Our itinerary includes proper acclimatization days to minimize the risk of altitude sickness. We ascend gradually, and our guides are trained to recognize symptoms. However, it's important to stay hydrated, avoid alcohol, and inform your guide immediately if you experience any symptoms.</p>
-                        </div>
-                    </li>
-                    <li class="yatra-faq-item">
-                        <h3 class="yatra-faq-question">
-                            What should I pack for the trek?
-                            <?php echo yatra_svg_icon('chevron-down', 'yatra-faq-toggle'); ?>
-                        </h3>
-                        <div class="yatra-faq-answer">
-                            <p>Essential items include: warm layers, waterproof jacket and pants, good trekking boots, sleeping bag (rated to -20°C), headlamp, water bottles, first aid kit, and personal medications. A detailed packing list will be provided upon booking confirmation.</p>
-                        </div>
-                    </li>
-                    <li class="yatra-faq-item">
-                        <h3 class="yatra-faq-question">
-                            Is travel insurance required?
-                            <?php echo yatra_svg_icon('chevron-down', 'yatra-faq-toggle'); ?>
-                        </h3>
-                        <div class="yatra-faq-answer">
-                            <p>Yes, comprehensive travel insurance covering high-altitude trekking (up to 6,000m) and emergency evacuation is mandatory. You must provide proof of insurance before the trek begins.</p>
-                        </div>
-                    </li>
-                    <li class="yatra-faq-item">
-                        <h3 class="yatra-faq-question">
-                            What is the cancellation policy?
-                            <?php echo yatra_svg_icon('chevron-down', 'yatra-faq-toggle'); ?>
-                        </h3>
-                        <div class="yatra-faq-answer">
-                            <p>Full refund if cancelled 60+ days before departure. 50% refund for cancellations 30-59 days before. No refund for cancellations less than 30 days before departure. We recommend purchasing trip cancellation insurance.</p>
-                        </div>
-                    </li>
+                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </ul>
             </section>
+            <?php endif; ?>
 
         </div>
 
         <!-- Sidebar - Booking Card -->
         <aside class="yatra-trip-sidebar" id="booking">
-            <div class="yatra-booking-card">
-                <!-- Price -->
+            <?php 
+            // Check if availability dates exist (PRIORITY)
+            $has_availability = !empty($trip->availability_dates) && is_array($trip->availability_dates) && count($trip->availability_dates) > 0;
+            
+            // Determine pricing type from trip settings
+            $pricing_type = $trip->pricing_type ?? 'regular';
+            $has_traveler_pricing = ($pricing_type === 'traveler_based' && !empty($trip->price_types));
+            
+            // Determine if this is a multi-day trip
+            $is_multi_day = ($trip->duration_days ?? 1) > 1;
+            
+            // Calculate base price (for display)
+            if ($has_availability) {
+                // Get the lowest price from availability dates
+                $min_price = PHP_FLOAT_MAX;
+                foreach ($trip->availability_dates as $avail) {
+                    $avail_price = $avail->effective_price ?? $avail->original_price ?? 0;
+                    if ($avail_price > 0 && $avail_price < $min_price) {
+                        $min_price = $avail_price;
+                    }
+                }
+                $base_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($trip->sale_price ?: $trip->original_price);
+            } elseif ($has_traveler_pricing) {
+                // Get default or first traveler category price
+                $default_price_type = null;
+                foreach ($trip->price_types as $pt) {
+                    if (!empty($pt->is_default)) {
+                        $default_price_type = $pt;
+                        break;
+                    }
+                }
+                if (!$default_price_type && !empty($trip->price_types)) {
+                    $default_price_type = $trip->price_types[0];
+                }
+                $base_price = $default_price_type ? $default_price_type->effective_price : ($trip->sale_price ?: $trip->original_price);
+            } else {
+                // Regular pricing
+                $base_price = $trip->sale_price > 0 ? $trip->sale_price : $trip->original_price;
+            }
+            
+            // Prepare availability data for JavaScript
+            $availability_json = [];
+            if ($has_availability) {
+                foreach ($trip->availability_dates as $avail) {
+                    $availability_json[] = [
+                        'id' => (int) $avail->id,
+                        'date' => $avail->departure_date,
+                        'departure_date' => $avail->departure_date,
+                        'return_date' => $avail->return_date,
+                        'price' => $avail->effective_price ?? $avail->original_price,
+                        'original_price' => $avail->original_price,
+                        'discounted_price' => $avail->discounted_price,
+                        'seats_available' => $avail->seats_available,
+                        'seats_total' => $avail->seats_total,
+                        'status' => $avail->status,
+                        'is_limited' => $avail->is_limited ?? false,
+                        'is_sold_out' => $avail->is_sold_out ?? false,
+                    ];
+                }
+            }
+            ?>
+            <div class="yatra-booking-card" 
+                 data-has-availability="<?php echo $has_availability ? 'true' : 'false'; ?>"
+                 data-is-multi-day="<?php echo $is_multi_day ? 'true' : 'false'; ?>"
+                 data-pricing-type="<?php echo esc_attr($pricing_type); ?>"
+                 data-availability='<?php echo esc_attr(json_encode($availability_json)); ?>'>
+                
+                <!-- Price Display -->
                 <div class="yatra-booking-price">
-                    <div class="yatra-booking-price-from">
-                        <?php if ($trip->original_price > $trip->sale_price): ?>
-                        <span class="yatra-booking-price-original"><?php echo yatra_format_price($trip->original_price, $trip->currency); ?></span>
-                        <?php endif; ?>
-                    </div>
                     <div class="yatra-booking-price-main">
-                        <span class="yatra-booking-price-amount"><?php echo yatra_format_price($trip->sale_price, $trip->currency); ?></span>
-                        <span class="yatra-booking-price-label">per person</span>
+                        <?php if ($has_availability || $has_traveler_pricing): ?>
+                        <span class="yatra-booking-price-label-top"><?php echo esc_html__('From', 'yatra'); ?></span>
+                        <?php elseif ($trip->original_price > $trip->sale_price && $trip->sale_price > 0): ?>
+                        <span class="yatra-booking-price-original"><?php echo yatra_format_price($trip->original_price); ?></span>
+                        <?php endif; ?>
+                        <span class="yatra-booking-price-amount" id="display-price"><?php echo yatra_format_price($base_price); ?></span>
+                        <span class="yatra-booking-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
                     </div>
                 </div>
 
-                <!-- Availability Alert (Compact) -->
-                <div class="yatra-booking-availability-compact">
-                    <span class="yatra-booking-availability-text">Only <strong>3 spots</strong> left for March</span>
+                <?php if ($has_availability): ?>
+                <!-- ========================================== -->
+                <!-- AVAILABILITY-BASED BOOKING -->
+                <!-- ========================================== -->
+                <div class="yatra-availability-info">
+                    <span class="yatra-availability-count">
+                        <?php echo esc_html(sprintf(_n('%d departure available', '%d departures available', count($trip->availability_dates), 'yatra'), count($trip->availability_dates))); ?>
+                    </span>
                 </div>
 
-                <form class="yatra-booking-form">
+                <form class="yatra-booking-form" data-booking-mode="availability">
                     <!-- Date Selection -->
                     <div class="yatra-booking-field-select">
                         <div class="yatra-booking-field-icon">
                             <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
                         </div>
-                        <input type="text" id="travel_date" name="travel_date" class="yatra-booking-select yatra-datepicker" placeholder="Select date" readonly required>
+                        <input type="text" 
+                               id="travel_date" 
+                               name="travel_date" 
+                               class="yatra-booking-select yatra-datepicker" 
+                               placeholder="<?php esc_attr_e('Select date', 'yatra'); ?>" 
+                               readonly 
+                               required>
+                        <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+
+                    <!-- Number of Travelers -->
+                    <div class="yatra-booking-field-group">
+                        <label for="num_travelers" class="yatra-booking-field-label"><?php echo esc_html__('Number of Travelers', 'yatra'); ?></label>
+                        <div class="yatra-booking-travelers-simple">
+                            <div class="yatra-booking-field-icon">
+                                <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
+                            </div>
+                            <div class="yatra-quantity-controls-inline">
+                                <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="num_travelers" aria-label="<?php esc_attr_e('Decrease travelers', 'yatra'); ?>">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                    </svg>
+                                </button>
+                                <input type="number" 
+                                       id="num_travelers" 
+                                       name="num_travelers" 
+                                       class="yatra-quantity-input-simple" 
+                                       value="1" 
+                                       min="<?php echo esc_attr($trip->min_travelers ?: 1); ?>" 
+                                       max="<?php echo esc_attr($trip->max_travelers ?: 20); ?>" 
+                                       readonly
+                                       data-price="<?php echo esc_attr($base_price); ?>">
+                                <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="num_travelers" aria-label="<?php esc_attr_e('Increase travelers', 'yatra'); ?>">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <span class="yatra-travelers-range"><?php echo esc_html(sprintf(__('Min: %d, Max: %d', 'yatra'), $trip->min_travelers ?: 1, $trip->max_travelers ?: 20)); ?></span>
+                        </div>
+                    </div>
+                <?php else: ?>
+                <!-- ========================================== -->
+                <!-- REGULAR BOOKING (No Availability Setup) -->
+                <!-- ========================================== -->
+                
+                <?php if (!empty($trip->available_from) || !empty($trip->available_to)): ?>
+                <div class="yatra-booking-availability-compact">
+                    <span class="yatra-booking-availability-text">
+                        <?php 
+                        if (!empty($trip->available_from) && !empty($trip->available_to)) {
+                            echo esc_html(sprintf(__('Available: %s - %s', 'yatra'), 
+                                date_i18n(get_option('date_format'), strtotime($trip->available_from)),
+                                date_i18n(get_option('date_format'), strtotime($trip->available_to))
+                            ));
+                        } elseif (!empty($trip->available_from)) {
+                            echo esc_html(sprintf(__('Available from: %s', 'yatra'), 
+                                date_i18n(get_option('date_format'), strtotime($trip->available_from))
+                            ));
+                        } else {
+                            echo esc_html(sprintf(__('Available until: %s', 'yatra'), 
+                                date_i18n(get_option('date_format'), strtotime($trip->available_to))
+                            ));
+                        }
+                        ?>
+                    </span>
+                </div>
+                <?php endif; ?>
+
+                <form class="yatra-booking-form" data-booking-mode="regular">
+                    <!-- Date Selection (Flexible) -->
+                    <div class="yatra-booking-field-select">
+                        <div class="yatra-booking-field-icon">
+                            <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
+                        </div>
+                        <input type="text" 
+                               id="travel_date" 
+                               name="travel_date" 
+                               class="yatra-booking-select yatra-datepicker" 
+                               placeholder="<?php esc_attr_e('Select date', 'yatra'); ?>" 
+                               data-min-date="<?php echo esc_attr($trip->available_from ?: date('Y-m-d')); ?>"
+                               data-max-date="<?php echo esc_attr($trip->available_to ?: ''); ?>"
+                               readonly 
+                               required>
                         <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </div>
 
                     <!-- Travelers Selection -->
-                    <div class="yatra-booking-field-select yatra-participants-select">
-                        <div class="yatra-booking-field-icon">
-                            <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
-                        </div>
-                        <div class="yatra-participants-display" id="participants-display">
-                            Adult x 1
-                        </div>
-                        <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                        <div class="yatra-booking-quantity-selector" id="quantity-selector">
-                            <div class="yatra-quantity-row">
-                                <div class="yatra-quantity-label">
-                                    <span class="yatra-quantity-title">Adult</span>
-                                    <span class="yatra-quantity-subtitle">(Age 13-99)</span>
+                    <?php if ($has_traveler_pricing): ?>
+                        <!-- Traveler-Based Pricing: Show dynamic categories with prices -->
+                        <div class="yatra-booking-field-select yatra-participants-select">
+                            <div class="yatra-booking-field-icon">
+                                <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
+                            </div>
+                            <div class="yatra-participants-display" id="participants-display">
+                                <?php 
+                                if (!empty($trip->price_types[0]->category_label)) {
+                                    echo esc_html($trip->price_types[0]->category_label) . ' x 1';
+                                } else {
+                                    echo esc_html__('1 Traveler', 'yatra');
+                                }
+                                ?>
+                            </div>
+                            <svg class="yatra-select-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                            <div class="yatra-booking-quantity-selector" id="quantity-selector">
+                                <!-- Dynamic Traveler Categories from Database -->
+                                <?php foreach ($trip->price_types as $index => $price_type): ?>
+                                <div class="yatra-quantity-row" data-category-id="<?php echo esc_attr($price_type->category_id); ?>" data-price="<?php echo esc_attr($price_type->effective_price); ?>">
+                                    <div class="yatra-quantity-label">
+                                        <span class="yatra-quantity-title"><?php echo esc_html($price_type->category_label ?: __('Traveler', 'yatra')); ?></span>
+                                        <?php if ($price_type->age_min !== null || $price_type->age_max !== null): ?>
+                                        <span class="yatra-quantity-subtitle">
+                                            <?php 
+                                            if ($price_type->age_min !== null && $price_type->age_max !== null) {
+                                                echo esc_html(sprintf(__('(Age %d-%d)', 'yatra'), $price_type->age_min, $price_type->age_max));
+                                            } elseif ($price_type->age_min !== null) {
+                                                echo esc_html(sprintf(__('(Age %d+)', 'yatra'), $price_type->age_min));
+                                            } else {
+                                                echo esc_html(sprintf(__('(Up to age %d)', 'yatra'), $price_type->age_max));
+                                            }
+                                            ?>
+                                        </span>
+                                        <?php endif; ?>
+                                        <span class="yatra-quantity-price"><?php echo yatra_format_price($price_type->effective_price); ?></span>
+                                    </div>
+                                    <div class="yatra-quantity-controls">
+                                        <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="traveler_<?php echo esc_attr($price_type->category_id); ?>" aria-label="<?php echo esc_attr(sprintf(__('Decrease %s', 'yatra'), $price_type->category_label)); ?>" <?php echo ($index === 0) ? '' : 'disabled'; ?>>
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                            </svg>
+                                        </button>
+                                        <input type="number" 
+                                               id="traveler_<?php echo esc_attr($price_type->category_id); ?>" 
+                                               name="travelers[<?php echo esc_attr($price_type->category_id); ?>]" 
+                                               class="yatra-quantity-input" 
+                                               value="<?php echo ($index === 0) ? '1' : '0'; ?>" 
+                                               min="0" 
+                                               max="<?php echo esc_attr($price_type->max_quantity ?: $trip->max_travelers); ?>" 
+                                               readonly
+                                               data-category-label="<?php echo esc_attr($price_type->category_label); ?>"
+                                               data-price="<?php echo esc_attr($price_type->effective_price); ?>">
+                                        <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="traveler_<?php echo esc_attr($price_type->category_id); ?>" aria-label="<?php echo esc_attr(sprintf(__('Increase %s', 'yatra'), $price_type->category_label)); ?>">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="yatra-quantity-controls">
-                                    <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="adults" aria-label="Decrease adults">
+                                <?php endforeach; ?>
+                                
+                                <?php if (!empty($trip->age_min) && $trip->age_min > 0): ?>
+                                <div class="yatra-quantity-note"><?php echo esc_html(sprintf(__('Ages %d and younger are not permitted.', 'yatra'), $trip->age_min - 1)); ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <!-- Regular Pricing: Simple number of travelers input -->
+                        <div class="yatra-booking-field-group">
+                            <label for="num_travelers" class="yatra-booking-field-label"><?php echo esc_html__('Number of Travelers', 'yatra'); ?></label>
+                            <div class="yatra-booking-travelers-simple">
+                                <div class="yatra-booking-field-icon">
+                                    <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
+                                </div>
+                                <div class="yatra-quantity-controls-inline">
+                                    <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="num_travelers" aria-label="<?php esc_attr_e('Decrease travelers', 'yatra'); ?>">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
                                         </svg>
                                     </button>
-                                    <input type="number" id="adults" name="adults" class="yatra-quantity-input" value="1" min="1" max="<?php echo esc_attr($trip->max_travelers); ?>" readonly>
-                                    <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="adults" aria-label="Increase adults">
+                                    <input type="number" 
+                                           id="num_travelers" 
+                                           name="num_travelers" 
+                                           class="yatra-quantity-input-simple" 
+                                           value="1" 
+                                           min="<?php echo esc_attr($trip->min_travelers ?: 1); ?>" 
+                                           max="<?php echo esc_attr($trip->max_travelers ?: 20); ?>" 
+                                           readonly
+                                           data-price="<?php echo esc_attr($base_price); ?>">
+                                    <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="num_travelers" aria-label="<?php esc_attr_e('Increase travelers', 'yatra'); ?>">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                         </svg>
                                     </button>
                                 </div>
+                                <span class="yatra-travelers-range"><?php echo esc_html(sprintf(__('Min: %d, Max: %d', 'yatra'), $trip->min_travelers ?: 1, $trip->max_travelers ?: 20)); ?></span>
                             </div>
-                            <div class="yatra-quantity-row">
-                                <div class="yatra-quantity-label">
-                                    <span class="yatra-quantity-title">Child</span>
-                                    <span class="yatra-quantity-subtitle">(Age 4-12)</span>
-                                </div>
-                                <div class="yatra-quantity-controls">
-                                    <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="children" aria-label="Decrease children" disabled>
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                                        </svg>
-                                    </button>
-                                    <input type="number" id="children" name="children" class="yatra-quantity-input" value="0" min="0" max="10" readonly>
-                                    <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="children" aria-label="Increase children">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="yatra-quantity-note">Ages 3 and younger are not permitted.</div>
                         </div>
-                    </div>
+                    <?php endif; ?>
+                <?php endif; ?>
 
                     <!-- Total Price Display (Dynamic) -->
-                    <div class="yatra-booking-total" id="booking-total" style="display: none;">
-                        <div class="yatra-booking-total-label">Total</div>
-                        <div class="yatra-booking-total-amount" id="total-amount"><?php echo yatra_format_price($trip->sale_price, $trip->currency); ?></div>
+                    <div class="yatra-booking-total" id="booking-total">
+                        <div class="yatra-booking-total-label"><?php echo esc_html__('Total', 'yatra'); ?></div>
+                        <div class="yatra-booking-total-amount" id="total-amount"><?php echo yatra_format_price($base_price); ?></div>
                     </div>
 
                     <!-- Action Buttons -->
@@ -1407,9 +1712,9 @@ get_header();
                                 <div class="yatra-trip-footer">
                                     <div class="yatra-trip-price">
                                         <?php if ($st_original_price > $st_sale_price): ?>
-                                        <div class="yatra-original-price"><?php echo esc_html(yatra_format_price($st_original_price, $st_currency)); ?></div>
+                                        <div class="yatra-original-price"><?php echo esc_html(yatra_format_price($st_original_price)); ?></div>
                                         <?php endif; ?>
-                                        <div class="yatra-current-price"><?php echo esc_html(yatra_format_price($st_sale_price, $st_currency)); ?></div>
+                                        <div class="yatra-current-price"><?php echo esc_html(yatra_format_price($st_sale_price)); ?></div>
                                         <div class="yatra-price-note"><?php echo esc_html__('per person', 'yatra'); ?></div>
                                     </div>
                                     <a href="<?php echo esc_url(home_url('/trip/' . $st_slug)); ?>" class="yatra-card-view-btn"><?php echo esc_html__('View Details', 'yatra'); ?></a>

@@ -238,6 +238,8 @@ class BookingSessionController extends BaseController
      */
     public function create_booking(WP_REST_Request $request): WP_REST_Response
     {
+        global $wpdb;
+        
         $data = $request->get_json_params();
 
         // ========================================
@@ -1037,10 +1039,9 @@ class BookingSessionController extends BaseController
             return;
         }
         
-        // Format currency
-        $currency = $trip->currency ?: 'USD';
-        $formatted_total = yatra_format_price($total_amount, $currency);
-        $formatted_due = yatra_format_price($amount_due, $currency);
+        // Format prices using global currency settings
+        $formatted_total = yatra_format_price($total_amount);
+        $formatted_due = yatra_format_price($amount_due);
         
         // Determine email subject and intro based on booking status
         $to = sanitize_email($customer_email);
@@ -1077,11 +1078,11 @@ class BookingSessionController extends BaseController
         if ($payment_method === 'deposit') {
             $body .= sprintf(__("Payment Type: Deposit\n", 'yatra'));
             $body .= sprintf(__("Amount Due Now: %s\n", 'yatra'), $formatted_due);
-            $body .= sprintf(__("Remaining Balance: %s (due before trip)\n", 'yatra'), yatra_format_price($total_amount - $amount_due, $currency));
+            $body .= sprintf(__("Remaining Balance: %s (due before trip)\n", 'yatra'), yatra_format_price($total_amount - $amount_due));
         } elseif ($payment_method === 'partial') {
             $body .= sprintf(__("Payment Type: Partial Payment\n", 'yatra'));
             $body .= sprintf(__("Amount Due Now: %s\n", 'yatra'), $formatted_due);
-            $body .= sprintf(__("Remaining Balance: %s\n", 'yatra'), yatra_format_price($total_amount - $amount_due, $currency));
+            $body .= sprintf(__("Remaining Balance: %s\n", 'yatra'), yatra_format_price($total_amount - $amount_due));
         } else {
             $body .= sprintf(__("Payment Type: Full Payment\n", 'yatra'));
         }

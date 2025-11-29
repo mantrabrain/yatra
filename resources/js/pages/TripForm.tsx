@@ -51,6 +51,7 @@ import { HelpText } from '../components/ui/help-text';
 import { ItinerarySection } from '../components/trip-form/sections/ItinerarySection';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { useToast } from '../components/ui/toast';
+import { MultiSelect } from '../components/ui/multi-select';
 
 type SectionId = 
   | 'basic'             // 1. Basic Information (title, description, highlights, featured image, trip type, duration)
@@ -140,29 +141,6 @@ const buildCategoryOptionNodes = (
   });
 };
 
-const findCategoryByValue = (
-  categories: TripCategoryOption[],
-  value: string | number | null | undefined
-): TripCategoryOption | null => {
-  if (!value) return null;
-  const normalizedValue = value.toString();
-
-  for (const category of categories) {
-    const categoryValue = category.slug || category.name || category.id?.toString() || '';
-    if (categoryValue === normalizedValue) {
-      return category;
-    }
-    if (Array.isArray(category.subcategories) && category.subcategories.length > 0) {
-      const found = findCategoryByValue(category.subcategories, normalizedValue);
-      if (found) {
-        return found;
-      }
-    }
-  }
-
-  return null;
-};
-
 const extractArrayPayload = (payload: any): any[] => {
   if (!payload) return [];
   if (Array.isArray(payload)) return payload;
@@ -240,9 +218,7 @@ interface TripFormData {
   // Activity & Category
   activity_types: number[]; // Array of activity IDs (changed from string[])
   difficulty_level: string;
-  trip_category: string;
-  trip_category_parent: string; // Parent category for hierarchy
-  trip_category_sub: string; // Sub-category
+  trip_category: number[]; // Array of category IDs
   tags: string[];
   featured_priority: 'none' | 'featured' | 'popular' | 'new' | 'limited'; // Featured Priority
   
@@ -289,7 +265,7 @@ interface TripFormData {
   itinerary_days: ItineraryDay[];
   
   // Gallery
-  gallery_images: string[];
+  gallery_images: Array<{ id: number; url: string; thumbnail_url?: string; alt_text?: string; caption?: string }>;
   featured_image: string;
   
   // FAQs
@@ -391,8 +367,30 @@ const TripForm: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
   
-  const [currentSection, setCurrentSection] = useState<SectionId>('basic');
+  // Get section from URL on initial load
+  const getInitialSection = (): SectionId => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sectionFromUrl = urlParams.get('section') as SectionId | null;
+    const validSections: SectionId[] = ['basic', 'location', 'duration', 'pricing', 'booking', 'itinerary', 'included', 'media', 'categorization', 'faqs', 'seo', 'advanced'];
+    if (sectionFromUrl && validSections.includes(sectionFromUrl)) {
+      return sectionFromUrl;
+    }
+    return 'basic';
+  };
+  
+  const [currentSection, setCurrentSection] = useState<SectionId>(getInitialSection);
+  const [visitedSections, setVisitedSections] = useState<Set<SectionId>>(() => new Set([getInitialSection()]));
   const [showCategorySelector, setShowCategorySelector] = useState(false);
+
+  // Track visited sections for lazy loading and update URL
+  useEffect(() => {
+    setVisitedSections(prev => new Set([...prev, currentSection]));
+    
+    // Update URL with current section (without page reload)
+    const url = new URL(window.location.href);
+    url.searchParams.set('section', currentSection);
+    window.history.replaceState({}, '', url.toString());
+  }, [currentSection]);
   
   // Modal states for adding items
   const [showHighlightModal, setShowHighlightModal] = useState(false);
@@ -450,9 +448,7 @@ const TripForm: React.FC = () => {
       off_season: 'November to March',
       activity_types: [], // Will be populated based on available activities
       difficulty_level: 'beginner',
-      trip_category: 'beach',
-      trip_category_parent: 'beach',
-      trip_category_sub: 'relaxation',
+      trip_category: [],
       tags: ['family-friendly', 'beach', 'relaxation', 'cultural', 'spa'],
       featured_priority: 'featured',
       accommodation_type: 'Resort',
@@ -561,9 +557,7 @@ const TripForm: React.FC = () => {
       off_season: 'December to February, June to August',
       activity_types: [],
       difficulty_level: 'challenging',
-      trip_category: 'adventure',
-      trip_category_parent: 'adventure',
-      trip_category_sub: 'trekking',
+      trip_category: [],
       tags: ['trekking', 'mountains', 'adventure', 'challenging', 'everest'],
       featured_priority: 'popular',
       accommodation_type: 'Teahouse',
@@ -669,9 +663,7 @@ const TripForm: React.FC = () => {
       off_season: 'November to March',
       activity_types: [],
       difficulty_level: 'easy',
-      trip_category: 'cultural',
-      trip_category_parent: 'cultural',
-      trip_category_sub: 'city-tour',
+      trip_category: [],
       tags: ['cultural', 'city-tour', 'history', 'art', 'food'],
       featured_priority: 'popular',
       accommodation_type: 'Hotel',
@@ -777,9 +769,7 @@ const TripForm: React.FC = () => {
     off_season: '',
     activity_types: [], // Array of activity IDs
     difficulty_level: '',
-    trip_category: '',
-    trip_category_parent: '',
-    trip_category_sub: '',
+    trip_category: [],
     tags: [],
     featured_priority: 'none',
     accommodation_type: '',
@@ -853,7 +843,7 @@ const TripForm: React.FC = () => {
   const isEditMode = action === 'edit' && tripId !== null;
 const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [formData.trip_type]);
 
-  // Fetch traveler categories
+  // Fetch traveler categories - LAZY LOAD: only when pricing section is visited
   const { data: travelerCategoriesData, isLoading: isLoadingCategories } = useQuery({
     queryKey: ['traveler-categories'],
     queryFn: async () => {
@@ -871,7 +861,8 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         return [];
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can('yatra_view_trips') && (currentSection === 'pricing' || visitedSections.has('pricing')),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Get only active/published categories
@@ -900,7 +891,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   // Get global currency from settings, default to USD
   const globalCurrency = settingsData?.currency || settingsData?.default_currency || 'USD';
 
-  // Fetch activities from API
+  // Fetch activities from API - LAZY LOAD: only when categorization section is visited
   const { data: activitiesData } = useQuery({
     queryKey: ['activities-published'],
     queryFn: async () => {
@@ -917,9 +908,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         return [];
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can('yatra_view_trips') && (currentSection === 'categorization' || visitedSections.has('categorization')),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
+  // LAZY LOAD: only when categorization section is visited
   const { data: tripCategoriesResponse, isLoading: isLoadingTripCategories } = useQuery({
     queryKey: ['trip-categories', 'published'],
     queryFn: async () => {
@@ -939,9 +932,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         return [];
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can('yatra_view_trips') && (currentSection === 'categorization' || visitedSections.has('categorization')),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
+  // LAZY LOAD: only when categorization section is visited
   const { data: difficultyLevelsResponse, isLoading: isLoadingDifficultyLevels } = useQuery({
     queryKey: ['difficulty-levels', 'published'],
     queryFn: async () => {
@@ -960,7 +955,8 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         return [];
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can('yatra_view_trips') && (currentSection === 'categorization' || visitedSections.has('categorization')),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   const tripCategories: TripCategoryOption[] = useMemo(() => {
@@ -975,18 +971,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     });
   }, [tripCategoriesResponse]);
 
-  const topLevelCategories = useMemo(
-    () => tripCategories.filter((category) => !category.parent_id),
-    [tripCategories]
-  );
-
-  const selectedParentCategory = useMemo(
-    () => findCategoryByValue(topLevelCategories, formData.trip_category_parent),
-    [topLevelCategories, formData.trip_category_parent]
-  );
-
-  const subcategoryOptions = selectedParentCategory?.subcategories || [];
-
   const difficultyLevels: DifficultyLevelOption[] = useMemo(() => {
     const payload = extractArrayPayload(difficultyLevelsResponse);
     return (payload as DifficultyLevelOption[]).filter((level) => {
@@ -999,7 +983,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     });
   }, [difficultyLevelsResponse]);
 
-  // Fetch destinations from API
+  // Fetch destinations from API - LAZY LOAD: only when location section is visited
   const { data: destinationsData } = useQuery({
     queryKey: ['destinations-published'],
     queryFn: async () => {
@@ -1016,7 +1000,8 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         return [];
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can('yatra_view_trips') && (currentSection === 'location' || visitedSections.has('location')),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Fetch trip data if editing
@@ -1056,7 +1041,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
             if (typeof item === 'number') return item;
             if (typeof item === 'string') return parseInt(item) || 0;
             if (item && typeof item === 'object') {
-              return item.id || item.destination_id || item.activity_id || 0;
+              return item.id || item.destination_id || item.activity_id || item.category_id || 0;
             }
             return 0;
           })
@@ -1087,23 +1072,31 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       };
 
       // Helper to normalize gallery images
-      const normalizeGalleryImages = (images: any): string[] => {
+      const normalizeGalleryImages = (images: any): Array<{ id: number; url: string; thumbnail_url?: string; alt_text?: string; caption?: string }> => {
         if (!images) return [];
         if (Array.isArray(images)) {
           return images.map((img: any) => {
-            if (typeof img === 'string') return img;
-            if (img && typeof img === 'object') {
-              return img.image_url || img.url || img.src || String(img);
+            if (typeof img === 'string') {
+              return { id: 0, url: img };
             }
-            return String(img);
-          }).filter((img: string) => img.trim().length > 0);
+            if (img && typeof img === 'object') {
+              return {
+                id: img.id || img.image_id || 0,
+                url: img.url || img.image_url || img.src || '',
+                thumbnail_url: img.thumbnail_url || '',
+                alt_text: img.alt_text || '',
+                caption: img.caption || '',
+              };
+            }
+            return { id: 0, url: String(img) };
+          }).filter((img) => img.url.trim().length > 0);
         }
         if (typeof images === 'string') {
           try {
             const parsed = JSON.parse(images);
             return normalizeGalleryImages(parsed);
           } catch {
-            return [images];
+            return [{ id: 0, url: images }];
           }
         }
         return [];
@@ -1196,9 +1189,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         off_season: tripData.off_season || '',
         activity_types: extractIds(tripData.activity_types || []),
         difficulty_level: tripData.difficulty_level || '',
-        trip_category: tripData.trip_category || '',
-        trip_category_parent: tripData.trip_category_parent || '',
-        trip_category_sub: tripData.trip_category_sub || '',
+        trip_category: extractIds(tripData.trip_category || []),
         tags: Array.isArray(tripData.tags) ? tripData.tags : [],
         featured_priority: tripData.featured_priority || 'none',
         accommodation_type: tripData.accommodation_type || '',
@@ -1367,7 +1358,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     },
     { 
       id: 'categorization', 
-      label: __('Categorization & Tags', 'Categorization & Tags'), 
+      label: __('Categorization', 'Categorization'), 
       icon: Tag, 
       required: false, 
       completed: !!(formData.trip_category || formData.activity_types.length > 0 || formData.tags.length > 0),
@@ -1518,13 +1509,44 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   };
 
   const handleGalleryAdd = () => {
-    // In a real implementation, this would open a media library
-    const imageUrl = prompt(__('Enter image URL or upload image', 'Enter image URL or upload image'));
-    if (imageUrl && imageUrl.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        gallery_images: [...prev.gallery_images, imageUrl.trim()],
-      }));
+    // Use WordPress media library with multiple selection
+    if (window.wp && window.wp.media) {
+      const mediaUploader = window.wp.media({
+        title: __('Select Gallery Images', 'Select Gallery Images'),
+        button: { text: __('Add to Gallery', 'Add to Gallery') },
+        multiple: true, // Allow multiple image selection
+        library: { type: 'image' }
+      });
+      
+      mediaUploader.on('select', () => {
+        const selection = mediaUploader.state().get('selection');
+        const newImages: Array<{ id: number; url: string; thumbnail_url?: string; alt_text?: string; caption?: string }> = [];
+        
+        selection.each((attachment: any) => {
+          const image = attachment.toJSON();
+          if (image.url) {
+            newImages.push({
+              id: image.id || 0,
+              url: image.url,
+              thumbnail_url: image.sizes?.thumbnail?.url || image.sizes?.medium?.url || image.url,
+              alt_text: image.alt || '',
+              caption: image.caption || '',
+            });
+          }
+        });
+        
+        if (newImages.length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            gallery_images: [...prev.gallery_images, ...newImages],
+          }));
+        }
+      });
+      
+      mediaUploader.open();
+    } else {
+      // Fallback for when wp.media is not available
+      showToast(__('Media library not available. Please ensure you are logged in as admin.', 'Media library not available. Please ensure you are logged in as admin.'), 'error');
     }
   };
 
@@ -1533,6 +1555,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         ...prev,
         gallery_images: prev.gallery_images.filter((_, i) => i !== index),
       }));
+  };
+
+  const handleGalleryReorder = (fromIndex: number, toIndex: number) => {
+    setFormData(prev => {
+      const newImages = [...prev.gallery_images];
+      const [movedImage] = newImages.splice(fromIndex, 1);
+      newImages.splice(toIndex, 0, movedImage);
+      return { ...prev, gallery_images: newImages };
+    });
   };
 
   const handlePriceTypeAdd = (categoryId: number) => {
@@ -1842,9 +1873,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         off_season: data.off_season.trim(),
         activity_types: data.activity_types || [], // Array of activity IDs
         difficulty_level: data.difficulty_level || '',
-        trip_category: data.trip_category || '',
-        trip_category_parent: data.trip_category_parent || '',
-        trip_category_sub: data.trip_category_sub || '',
+        trip_category: data.trip_category || [],
         tags: data.tags || [],
         featured_priority: data.featured_priority,
         accommodation_type: data.accommodation_type || '',
@@ -1954,18 +1983,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       }
       showToast(successMessage, 'success');
       
-      if (variables.status === 'published') {
-        // Redirect to trips list after publishing (both create and edit)
-        setTimeout(() => {
-          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=all`;
-        }, 1000);
-      } else if (!isEditMode && data?.id) {
-        // If creating new trip as draft, redirect to edit mode
+      // Only redirect when creating a NEW trip - stay on page when editing
+      if (!isEditMode && data?.id) {
+        // If creating new trip, redirect to edit mode so user can continue editing
         setTimeout(() => {
           window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${data.id}`;
         }, 1000);
       }
-      // If editing and saving as draft, stay on the same page (no redirect)
+      // When editing (isEditMode), always stay on the same page - no redirect
     },
     onError: (error: any) => {
       const errorMessage = error?.response?.data?.message || error?.message || __('An error occurred while saving', 'An error occurred while saving');
@@ -2012,8 +2037,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   const isLoadingRevisions = false;
 
   const handlePreview = () => {
-    // Open preview in new window
-    const previewUrl = `${window.yatraAdmin?.siteUrl || ''}/trips/${formData.slug || 'preview'}`;
+    // Open preview in new window - use trip_base from settings
+    const tripBase = settingsData?.trip_base || 'trip';
+    const previewUrl = `${window.yatraAdmin?.siteUrl || ''}/${tripBase}/${formData.slug || 'preview'}`;
     window.open(previewUrl, '_blank');
   };
 
@@ -2318,13 +2344,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                         <div>
                           <span className="text-gray-500 dark:text-gray-400">{__('Preview URL:', 'Preview URL:')} </span>
                           <span className="font-mono text-blue-600 dark:text-blue-400">
-                            {(window as any).yatraAdmin?.siteUrl || 'yoursite.com'}/trips/{formData.slug}
+                            {(window as any).yatraAdmin?.siteUrl || 'yoursite.com'}/{settingsData?.trip_base || 'trip'}/{formData.slug}
                           </span>
                         </div>
                         <button
                           type="button"
                           onClick={() => {
-                            const url = `${(window as any).yatraAdmin?.siteUrl || 'yoursite.com'}/trips/${formData.slug}`;
+                            const tripBase = settingsData?.trip_base || 'trip';
+                            const url = `${(window as any).yatraAdmin?.siteUrl || 'yoursite.com'}/${tripBase}/${formData.slug}`;
                             navigator.clipboard.writeText(url);
                             showToast(__('URL copied to clipboard', 'URL copied to clipboard'), 'success');
                           }}
@@ -2784,26 +2811,17 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   {__('Destinations', 'Destinations')}
                 </label>
                 {destinationsData && destinationsData.length > 0 ? (
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {destinationsData.map((destination: any) => (
-                      <label key={destination.id} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.destinations.some((id: number) => id === destination.id || id === Number(destination.id))}
-                          onChange={(e) => {
-                            const destId = Number(destination.id);
-                            if (e.target.checked) {
-                              handleFieldChange('destinations', [...formData.destinations, destId]);
-                            } else {
-                              handleFieldChange('destinations', formData.destinations.filter((id: number) => Number(id) !== destId));
-                            }
-                          }}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{destination.name}</span>
-                      </label>
-                    ))}
-                  </div>
+                  <MultiSelect
+                    value={formData.destinations}
+                    onChange={(values) => handleFieldChange('destinations', values.map(v => Number(v)))}
+                    options={destinationsData.map((destination: any) => ({
+                      value: destination.id,
+                      label: destination.name,
+                    }))}
+                    placeholder={__('Select destinations...', 'Select destinations...')}
+                    searchPlaceholder={__('Search destinations...', 'Search destinations...')}
+                    error={!!errors.destinations}
+                  />
                 ) : (
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -3042,7 +3060,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Tag className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Categorization & Tags', 'Categorization & Tags')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Categorization', 'Categorization')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
                 {__('Recommended', 'Recommended')}
               </Badge>
@@ -3057,100 +3075,46 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
             <div className="space-y-4">
               {/* Trip Category */}
               <div>
-                <label htmlFor="trip_category" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Trip Category', 'Trip Category')}
+                <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                  {__('Trip Categories', 'Trip Categories')}
                 </label>
-                <Select
-                  id="trip_category"
-                  value={formData.trip_category}
-                  onChange={(e) => handleFieldChange('trip_category', e.target.value)}
-                  disabled={isLoadingTripCategories}
-                >
-                  <option value="">{__('Select a category', 'Select a category')}</option>
-                  {isLoadingTripCategories && (
-                    <option value="" disabled>
-                      {__('Loading categories...', 'Loading categories...')}
-                    </option>
-                  )}
-                  {!isLoadingTripCategories && tripCategories.length === 0 && (
-                    <option value="" disabled>
-                      {__('No published categories available', 'No published categories available')}
-                    </option>
-                  )}
-                  {!isLoadingTripCategories && tripCategories.length > 0 && buildCategoryOptionNodes(tripCategories)}
-                </Select>
-              </div>
-
-              {/* Category Hierarchy */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="trip_category_parent" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Parent Category', 'Parent Category')}
-                  </label>
-                  <Select
-                    id="trip_category_parent"
-                    value={formData.trip_category_parent}
-                    onChange={(e) => {
-                      handleFieldChange('trip_category_parent', e.target.value);
-                      handleFieldChange('trip_category_sub', '');
-                    }}
-                    disabled={isLoadingTripCategories || topLevelCategories.length === 0}
-                  >
-                    <option value="">{__('None', 'None')}</option>
-                    {isLoadingTripCategories && (
-                      <option value="" disabled>
-                        {__('Loading categories...', 'Loading categories...')}
-                      </option>
-                    )}
-                    {!isLoadingTripCategories &&
-                      topLevelCategories.map((category) => (
-                        <option
-                          key={`parent-category-${category.id}`}
-                          value={category.slug || category.name || category.id?.toString() || ''}
-                        >
-                          {category.name}
-                        </option>
-                      ))}
-                  </Select>
-                  <HelpText
-                    text={__('Main category for hierarchical organization', 'Main category for hierarchical organization')}
-                    className="mt-2"
+                {tripCategories && tripCategories.length > 0 ? (
+                  <MultiSelect
+                    value={formData.trip_category}
+                    onChange={(values) => handleFieldChange('trip_category', values.map(v => Number(v)))}
+                    options={(() => {
+                      // Flatten categories with hierarchy indication
+                      const flattenCategories = (cats: any[], prefix = ''): { value: number; label: string }[] => {
+                        const result: { value: number; label: string }[] = [];
+                        cats.forEach(cat => {
+                          result.push({
+                            value: cat.id,
+                            label: prefix + cat.name,
+                          });
+                          if (cat.subcategories && cat.subcategories.length > 0) {
+                            result.push(...flattenCategories(cat.subcategories, prefix + '— '));
+                          }
+                        });
+                        return result;
+                      };
+                      return flattenCategories(tripCategories);
+                    })()}
+                    placeholder={__('Select categories...', 'Select categories...')}
+                    searchPlaceholder={__('Search categories...', 'Search categories...')}
                   />
-                </div>
-                {formData.trip_category_parent && (
-                  <div>
-                    <label htmlFor="trip_category_sub" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Sub-Category', 'Sub-Category')}
-                    </label>
-                    <Select
-                      id="trip_category_sub"
-                      value={formData.trip_category_sub}
-                      onChange={(e) => handleFieldChange('trip_category_sub', e.target.value)}
-                      disabled={!selectedParentCategory || subcategoryOptions.length === 0}
-                    >
-                      <option value="">{__('Select sub-category', 'Select sub-category')}</option>
-                      {!selectedParentCategory && (
-                        <option value="" disabled>
-                          {__('Select a parent category first', 'Select a parent category first')}
-                        </option>
-                      )}
-                      {selectedParentCategory &&
-                        subcategoryOptions.length === 0 && (
-                          <option value="" disabled>
-                            {__('No subcategories available', 'No subcategories available')}
-                          </option>
-                        )}
-                      {subcategoryOptions.map((subcategory) => (
-                        <option
-                          key={`subcategory-${subcategory.id}`}
-                          value={subcategory.slug || subcategory.name || subcategory.id?.toString() || ''}
-                        >
-                          {subcategory.name}
-                        </option>
-                      ))}
-                    </Select>
+                ) : (
+                  <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {isLoadingTripCategories 
+                        ? __('Loading categories...', 'Loading categories...') 
+                        : __('No categories available. Please create categories first.', 'No categories available. Please create categories first.')}
+                    </p>
                   </div>
                 )}
+                <HelpText
+                  text={__('Select one or more categories for this trip', 'Select one or more categories for this trip')}
+                  className="mt-2"
+                />
               </div>
 
               {/* Difficulty Level */}
@@ -3197,25 +3161,16 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   {__('Activity Types', 'Activity Types')}
                 </label>
                 {activitiesData && activitiesData.length > 0 ? (
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {activitiesData.map((activity: any) => (
-                      <label key={activity.id} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.activity_types.includes(activity.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              handleFieldChange('activity_types', [...formData.activity_types, activity.id]);
-                            } else {
-                              handleFieldChange('activity_types', formData.activity_types.filter((id: number) => id !== activity.id));
-                            }
-                          }}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">{activity.name}</span>
-                      </label>
-                    ))}
-                  </div>
+                  <MultiSelect
+                    value={formData.activity_types}
+                    onChange={(values) => handleFieldChange('activity_types', values.map(v => Number(v)))}
+                    options={activitiesData.map((activity: any) => ({
+                      value: activity.id,
+                      label: activity.name,
+                    }))}
+                    placeholder={__('Select activities...', 'Select activities...')}
+                    searchPlaceholder={__('Search activities...', 'Search activities...')}
+                  />
                 ) : (
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -3285,8 +3240,36 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     {formData.gallery_images.map((image, index) => (
                       <div key={index} className="relative group">
                         <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
-                          <img src={image} alt={`Gallery ${index + 1}`} className="w-full h-full object-cover" />
+                          <img src={image.thumbnail_url || image.url} alt={image.alt_text || `Gallery ${index + 1}`} className="w-full h-full object-cover" />
                         </div>
+                        {/* Reorder buttons */}
+                        <div className="absolute top-2 left-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {index > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => handleGalleryReorder(index, index - 1)}
+                              className="bg-black/60 text-white rounded p-1 hover:bg-black/80"
+                              title={__('Move left', 'Move left')}
+                            >
+                              <ChevronLeft className="w-4 h-4" />
+                            </button>
+                          )}
+                          {index < formData.gallery_images.length - 1 && (
+                            <button
+                              type="button"
+                              onClick={() => handleGalleryReorder(index, index + 1)}
+                              className="bg-black/60 text-white rounded p-1 hover:bg-black/80"
+                              title={__('Move right', 'Move right')}
+                            >
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                        {/* Order badge */}
+                        <span className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                          {index + 1}
+                        </span>
+                        {/* Remove button */}
                         <button
                           type="button"
                           onClick={() => handleGalleryRemove(index)}

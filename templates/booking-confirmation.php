@@ -206,25 +206,25 @@ get_header();
                         <div class="yatra-payment-rows">
                             <div class="yatra-payment-row">
                                 <span><?php esc_html_e('Total Amount', 'yatra'); ?></span>
-                                <span><?php echo esc_html(yatra_format_price($booking->total_amount, $booking->currency)); ?></span>
+                                <span><?php echo esc_html(yatra_format_price($booking->total_amount)); ?></span>
                             </div>
                             
                             <?php if ($booking->discount_amount > 0) : ?>
                             <div class="yatra-payment-row yatra-discount-row">
                                 <span><?php esc_html_e('Discount', 'yatra'); ?></span>
-                                <span>-<?php echo esc_html(yatra_format_price($booking->discount_amount, $booking->currency)); ?></span>
+                                <span>-<?php echo esc_html(yatra_format_price($booking->discount_amount)); ?></span>
                             </div>
                             <?php endif; ?>
                             
                             <div class="yatra-payment-row">
                                 <span><?php esc_html_e('Amount Paid', 'yatra'); ?></span>
-                                <span><?php echo esc_html(yatra_format_price($booking->amount_paid, $booking->currency)); ?></span>
+                                <span><?php echo esc_html(yatra_format_price($booking->amount_paid)); ?></span>
                             </div>
                             
                             <?php if ($booking->amount_due > 0 && $booking->amount_due < $booking->total_amount) : ?>
                             <div class="yatra-payment-row yatra-due-row">
                                 <span><?php esc_html_e('Amount Due', 'yatra'); ?></span>
-                                <span><?php echo esc_html(yatra_format_price($booking->amount_due, $booking->currency)); ?></span>
+                                <span><?php echo esc_html(yatra_format_price($booking->amount_due)); ?></span>
                             </div>
                             <?php endif; ?>
                         </div>

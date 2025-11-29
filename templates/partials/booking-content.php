@@ -72,7 +72,7 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                                 <line x1="1" y1="10" x2="23" y2="10"></line>
                             </svg>
                             <span id="pay-button-text"><?php esc_html_e('Complete Booking', 'yatra'); ?></span>
-                            <span id="pay-amount"><?php echo esc_html(yatra_format_price($trip->price * $total_travelers, $trip->currency)); ?></span>
+                            <span id="pay-amount"><?php echo esc_html(yatra_format_price($trip->price * $total_travelers)); ?></span>
                         </button>
                         <a href="<?php echo esc_url(home_url('/trip/' . $trip->slug)); ?>" class="yatra-booking-cancel-btn">
                             <?php esc_html_e('Cancel', 'yatra'); ?>
@@ -131,7 +131,7 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                     <div class="yatra-summary-pricing">
                         <div class="yatra-price-row">
                             <span><?php esc_html_e('Price per person', 'yatra'); ?></span>
-                            <span data-price="<?php echo esc_attr($trip->price); ?>"><?php echo esc_html(yatra_format_price($trip->price, $trip->currency)); ?></span>
+                            <span data-price="<?php echo esc_attr($trip->price); ?>"><?php echo esc_html(yatra_format_price($trip->price)); ?></span>
                         </div>
                         <div class="yatra-price-row">
                             <span><?php esc_html_e('Number of travelers', 'yatra'); ?></span>
@@ -141,18 +141,18 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                         <?php if ($deposit_required) : ?>
                         <div class="yatra-price-row yatra-price-deposit" style="display: none;">
                             <span><?php printf(esc_html__('Deposit (%d%%)', 'yatra'), $deposit_percentage); ?></span>
-                            <span id="summary-deposit"><?php echo esc_html(yatra_format_price(($trip->price * $total_travelers) * ($deposit_percentage / 100), $trip->currency)); ?></span>
+                            <span id="summary-deposit"><?php echo esc_html(yatra_format_price(($trip->price * $total_travelers) * ($deposit_percentage / 100))); ?></span>
                         </div>
                         <?php endif; ?>
                         
                         <div class="yatra-price-row yatra-price-total">
                             <span><strong><?php esc_html_e('Total Amount', 'yatra'); ?></strong></span>
-                            <span id="summary-total"><strong><?php echo esc_html(yatra_format_price($trip->price * $total_travelers, $trip->currency)); ?></strong></span>
+                            <span id="summary-total"><strong><?php echo esc_html(yatra_format_price($trip->price * $total_travelers)); ?></strong></span>
                         </div>
                         
                         <div class="yatra-price-row yatra-price-due" style="display: none;">
                             <span><?php esc_html_e('Due Now', 'yatra'); ?></span>
-                            <span id="summary-due"><strong><?php echo esc_html(yatra_format_price($trip->price * $total_travelers, $trip->currency)); ?></strong></span>
+                            <span id="summary-due"><strong><?php echo esc_html(yatra_format_price($trip->price * $total_travelers)); ?></strong></span>
                         </div>
                     </div>
 

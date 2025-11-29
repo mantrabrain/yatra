@@ -3,18 +3,18 @@
     "file": "css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-CmYySbNx.js": {
-    "file": "js/index-CmYySbNx.js",
+  "_index-BTTFyBox.js": {
+    "file": "js/index-BTTFyBox.js",
     "name": "index",
     "imports": [
-      "_react-vendor-eze4RMXi.js"
+      "_react-vendor-Cvi7Fh9Y.js"
     ],
     "css": [
       "css/index.css"
     ]
   },
-  "_react-vendor-eze4RMXi.js": {
-    "file": "js/react-vendor-eze4RMXi.js",
+  "_react-vendor-Cvi7Fh9Y.js": {
+    "file": "js/react-vendor-Cvi7Fh9Y.js",
     "name": "react-vendor"
   },
   "resources/js/account-page.tsx": {
@@ -23,8 +23,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-eze4RMXi.js",
-      "_index-CmYySbNx.js"
+      "_react-vendor-Cvi7Fh9Y.js",
+      "_index-BTTFyBox.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -33,8 +33,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-eze4RMXi.js",
-      "_index-CmYySbNx.js"
+      "_react-vendor-Cvi7Fh9Y.js",
+      "_index-BTTFyBox.js"
     ]
   }
 }

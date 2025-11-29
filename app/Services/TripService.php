@@ -292,6 +292,7 @@ class TripService extends BaseService
             'faqs',
             'itinerary_days',
             'availability_dates',
+            'trip_category',
         ];
         
         foreach ($relationshipFields as $field) {
@@ -324,12 +325,22 @@ class TripService extends BaseService
             'faqs',
             'itinerary_days',
             'availability_dates',
+            'trip_category',
         ];
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Yatra TripService: updateWithRelations - trip_category in data: " . json_encode($data['trip_category'] ?? 'NOT SET'));
+            error_log("Yatra TripService: updateWithRelations - trip_category in relationships: " . json_encode($relationships['trip_category'] ?? 'NOT SET'));
+        }
         
         foreach ($relationshipFields as $field) {
             if (!isset($relationships[$field]) && isset($data[$field])) {
                 $relationships[$field] = $data[$field];
             }
+        }
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Yatra TripService: After extraction - trip_category in relationships: " . json_encode($relationships['trip_category'] ?? 'NOT SET'));
         }
         
         // Remove relationship fields from data before processing

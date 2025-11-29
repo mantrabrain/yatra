@@ -228,27 +228,101 @@ function yatra_get_booking_url(string $trip_slug, array $params = []): string
 /**
  * Format price with currency
  * 
- * @param float  $amount   The amount to format
- * @param string $currency The currency code
+ * @param float       $amount   The amount to format
+ * @param string|null $currency The currency code (optional, uses global setting if not provided)
  * @return string Formatted price
  */
 if (!function_exists('yatra_format_price')) {
-    function yatra_format_price(float $amount, string $currency = 'USD'): string
+    function yatra_format_price(float $amount, ?string $currency = null): string
     {
         if (empty($amount) || $amount == 0) {
-            return 'Contact for pricing';
+            return __('Contact for pricing', 'yatra');
         }
         
+        // Get currency from global settings if not provided
+        if (empty($currency)) {
+            $currency = SettingsService::getCurrency();
+        }
+        
+        // Get formatting settings from global settings
         $currency_position = SettingsService::getCurrencyPosition();
-        $currency_decimals = SettingsService::getInt('decimal_places', 2);
+        $decimal_places = SettingsService::getInt('decimal_places', 2);
+        $thousand_separator = SettingsService::getString('thousand_separator', ',');
+        $decimal_separator = SettingsService::getString('decimal_separator', '.');
         
-        $formatted_amount = number_format($amount, $currency_decimals);
+        // Format the amount with proper separators
+        $formatted_amount = number_format($amount, $decimal_places, $decimal_separator, $thousand_separator);
         
-        if ($currency_position === 'right') {
-            return $formatted_amount . ' ' . $currency;
+        // Get currency symbol
+        $currency_symbol = yatra_get_currency_symbol($currency);
+        
+        // Position currency based on settings
+        if ($currency_position === 'right' || $currency_position === 'after') {
+            return $formatted_amount . ' ' . $currency_symbol;
         }
         
-        return $currency . ' ' . $formatted_amount;
+        return $currency_symbol . ' ' . $formatted_amount;
+    }
+}
+
+/**
+ * Get currency symbol from currency code
+ * 
+ * @param string $currency_code The currency code (e.g., 'USD', 'EUR', 'NPR')
+ * @return string The currency symbol or code
+ */
+if (!function_exists('yatra_get_currency_symbol')) {
+    function yatra_get_currency_symbol(string $currency_code): string
+    {
+        $symbols = [
+            'USD' => '$',
+            'EUR' => '€',
+            'GBP' => '£',
+            'JPY' => '¥',
+            'CNY' => '¥',
+            'INR' => '₹',
+            'NPR' => 'Rs',
+            'AUD' => 'A$',
+            'CAD' => 'C$',
+            'CHF' => 'CHF',
+            'NZD' => 'NZ$',
+            'SGD' => 'S$',
+            'HKD' => 'HK$',
+            'KRW' => '₩',
+            'THB' => '฿',
+            'MYR' => 'RM',
+            'PHP' => '₱',
+            'IDR' => 'Rp',
+            'VND' => '₫',
+            'BRL' => 'R$',
+            'MXN' => 'MX$',
+            'RUB' => '₽',
+            'ZAR' => 'R',
+            'AED' => 'د.إ',
+            'SAR' => '﷼',
+            'TRY' => '₺',
+            'SEK' => 'kr',
+            'NOK' => 'kr',
+            'DKK' => 'kr',
+            'PLN' => 'zł',
+            'CZK' => 'Kč',
+            'HUF' => 'Ft',
+            'ILS' => '₪',
+            'TWD' => 'NT$',
+            'PKR' => '₨',
+            'BDT' => '৳',
+            'LKR' => 'Rs',
+            'EGP' => 'E£',
+            'NGN' => '₦',
+            'KES' => 'KSh',
+            'GHS' => 'GH₵',
+            'ARS' => 'AR$',
+            'CLP' => 'CL$',
+            'COP' => 'CO$',
+            'PEN' => 'S/',
+        ];
+        
+        return $symbols[strtoupper($currency_code)] ?? $currency_code;
     }
 }
 
@@ -555,3 +629,148 @@ function yatra_get_checkout_url(): string
     return home_url('/' . $base . '/');
 }
 
+/**
+ * ============================================
+ * PERMALINK HELPERS
+ * ============================================
+ */
+
+/**
+ * Get destination permalink
+ * 
+ * @param object|int $destination Destination object with slug property, or destination ID
+ * @return string Destination permalink URL
+ */
+function yatra_get_destination_permalink($destination): string
+{
+    if (is_numeric($destination)) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_destinations';
+        $destination = $wpdb->get_row($wpdb->prepare(
+            "SELECT slug FROM {$table} WHERE id = %d",
+            (int) $destination
+        ));
+    }
+    
+    $slug = is_object($destination) ? ($destination->slug ?? '') : '';
+    
+    if (empty($slug)) {
+        return '';
+    }
+    
+    $base = SettingsService::getString('destination_base', 'destination');
+    
+    return home_url('/' . $base . '/' . $slug . '/');
+}
+
+/**
+ * Get activity permalink
+ * 
+ * @param object|int $activity Activity object with slug property, or activity ID
+ * @return string Activity permalink URL
+ */
+function yatra_get_activity_permalink($activity): string
+{
+    if (is_numeric($activity)) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_activities';
+        $activity = $wpdb->get_row($wpdb->prepare(
+            "SELECT slug FROM {$table} WHERE id = %d",
+            (int) $activity
+        ));
+    }
+    
+    $slug = is_object($activity) ? ($activity->slug ?? '') : '';
+    
+    if (empty($slug)) {
+        return '';
+    }
+    
+    $base = SettingsService::getString('activity_base', 'activity');
+    
+    return home_url('/' . $base . '/' . $slug . '/');
+}
+
+/**
+ * Get trip category permalink
+ * 
+ * @param object|int $category Category object with slug property, or category ID
+ * @return string Category permalink URL
+ */
+function yatra_get_category_permalink($category): string
+{
+    if (is_numeric($category)) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_trip_categories';
+        $category = $wpdb->get_row($wpdb->prepare(
+            "SELECT slug FROM {$table} WHERE id = %d",
+            (int) $category
+        ));
+    }
+    
+    $slug = is_object($category) ? ($category->slug ?? '') : '';
+    
+    if (empty($slug)) {
+        return '';
+    }
+    
+    $base = SettingsService::getString('trip_category_base', 'trip-category');
+    
+    return home_url('/' . $base . '/' . $slug . '/');
+}
+
+/**
+ * Get trip permalink
+ * 
+ * @param object|int $trip Trip object with slug property, or trip ID
+ * @return string Trip permalink URL
+ */
+function yatra_get_trip_permalink($trip): string
+{
+    if (is_numeric($trip)) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_trips';
+        $trip = $wpdb->get_row($wpdb->prepare(
+            "SELECT slug FROM {$table} WHERE id = %d",
+            (int) $trip
+        ));
+    }
+    
+    $slug = is_object($trip) ? ($trip->slug ?? '') : '';
+    
+    if (empty($slug)) {
+        return '';
+    }
+    
+    $base = SettingsService::getTripBase();
+    
+    return home_url('/' . $base . '/' . $slug . '/');
+}
+
+/**
+ * Get difficulty level permalink
+ * 
+ * @param object|int $difficulty Difficulty object with slug property, or difficulty ID
+ * @return string Difficulty permalink URL
+ */
+function yatra_get_difficulty_permalink($difficulty): string
+{
+    if (is_numeric($difficulty)) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_difficulty_levels';
+        $difficulty = $wpdb->get_row($wpdb->prepare(
+            "SELECT slug FROM {$table} WHERE id = %d",
+            (int) $difficulty
+        ));
+    }
+    
+    $slug = is_object($difficulty) ? ($difficulty->slug ?? '') : '';
+    
+    if (empty($slug)) {
+        return '';
+    }
+    
+    $base = SettingsService::getString('difficulty_base', 'difficulty');
+    
+    return home_url('/' . $base . '/' . $slug . '/');
+}

@@ -67,13 +67,20 @@ class AvailabilityService
             }
         }
         
-        // Validate time format if provided
-        if (!empty($data['departure_time']) && !preg_match('/^\d{2}:\d{2}$/', $data['departure_time'])) {
-            throw new \InvalidArgumentException('Invalid departure time format. Use HH:MM');
+        // Validate and normalize time format if provided
+        // Accept HH:MM, HH:MM:SS, or H:MM formats
+        if (!empty($data['departure_time'])) {
+            $data['departure_time'] = $this->normalizeTimeFormat($data['departure_time']);
+            if ($data['departure_time'] === false) {
+                throw new \InvalidArgumentException('Invalid departure time format. Use HH:MM');
+            }
         }
         
-        if (!empty($data['arrival_time']) && !preg_match('/^\d{2}:\d{2}$/', $data['arrival_time'])) {
-            throw new \InvalidArgumentException('Invalid arrival time format. Use HH:MM');
+        if (!empty($data['arrival_time'])) {
+            $data['arrival_time'] = $this->normalizeTimeFormat($data['arrival_time']);
+            if ($data['arrival_time'] === false) {
+                throw new \InvalidArgumentException('Invalid arrival time format. Use HH:MM');
+            }
         }
         
         // Validate status
@@ -206,6 +213,46 @@ class AvailabilityService
     public function find(int $id): ?Availability
     {
         return $this->repository->findModel($id);
+    }
+
+    /**
+     * Normalize time format to HH:MM
+     * Accepts: HH:MM, HH:MM:SS, H:MM, H:MM:SS
+     * 
+     * @param string $time
+     * @return string|false Returns normalized HH:MM format or false if invalid
+     */
+    private function normalizeTimeFormat(string $time): string|false
+    {
+        $time = trim($time);
+        
+        // Already in HH:MM format
+        if (preg_match('/^\d{2}:\d{2}$/', $time)) {
+            return $time;
+        }
+        
+        // HH:MM:SS format - strip seconds
+        if (preg_match('/^(\d{2}:\d{2}):\d{2}$/', $time, $matches)) {
+            return $matches[1];
+        }
+        
+        // H:MM format - pad with zero
+        if (preg_match('/^(\d):(\d{2})$/', $time, $matches)) {
+            return sprintf('%02d:%s', $matches[1], $matches[2]);
+        }
+        
+        // H:MM:SS format - pad and strip seconds
+        if (preg_match('/^(\d):(\d{2}):\d{2}$/', $time, $matches)) {
+            return sprintf('%02d:%s', $matches[1], $matches[2]);
+        }
+        
+        // Try to parse with strtotime as fallback
+        $timestamp = strtotime($time);
+        if ($timestamp !== false) {
+            return date('H:i', $timestamp);
+        }
+        
+        return false;
     }
 }
 

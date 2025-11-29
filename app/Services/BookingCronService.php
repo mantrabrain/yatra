@@ -134,7 +134,6 @@ class BookingCronService
         }
 
         $reminder_days = (int) SettingsService::get('booking_reminder_days', 3);
-        $currency = $booking->currency ?: 'USD';
         
         $subject = sprintf(
             __('[%s] Trip Reminder - Your adventure is %d days away!', 'yatra'),
@@ -158,7 +157,7 @@ class BookingCronService
         if ($amount_due > 0) {
             $body .= "⚠️ " . __("PAYMENT REMINDER\n", 'yatra');
             $body .= "───────────────────────────────────────\n";
-            $body .= sprintf(__("Outstanding Balance: %s\n", 'yatra'), yatra_format_price($amount_due, $currency));
+            $body .= sprintf(__("Outstanding Balance: %s\n", 'yatra'), yatra_format_price($amount_due));
             $body .= __("Please ensure payment is completed before your travel date.\n\n", 'yatra');
         }
 

@@ -37,6 +37,7 @@ import TravelerCategories from './pages/TravelerCategories';
 import TravelerCategoryForm from './pages/TravelerCategoryForm';
 import Availability from './pages/Availability';
 import AvailabilityForm from './pages/AvailabilityForm';
+import RecurringRuleForm from './pages/RecurringRuleForm';
 import Enquiries from './pages/Enquiries';
 import ViewEnquiry from './pages/ViewEnquiry';
 import EnquiryForm from './pages/EnquiryForm';
@@ -117,6 +118,10 @@ const App: React.FC = () => {
             }
             return <DifficultyLevels />;
           case 'availability':
+            // Check if we're creating or editing a recurring rule
+            if (action === 'create-rule' || action === 'edit-rule') {
+              return <RecurringRuleForm />;
+            }
             // Check if we're creating or editing an availability date
             if (action === 'create' || action === 'edit') {
               return <AvailabilityForm />;

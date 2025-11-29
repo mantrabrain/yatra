@@ -122,9 +122,7 @@ export interface TripFormData {
   // Activity & Category
   activity_types: number[]; // Array of activity IDs (changed from string[])
   difficulty_level: string;
-  trip_category: string;
-  trip_category_parent: string;
-  trip_category_sub: string;
+  trip_category: number[]; // Array of category IDs
   tags: string[];
   featured_priority: 'none' | 'featured' | 'popular' | 'new' | 'limited';
   
@@ -171,7 +169,7 @@ export interface TripFormData {
   itinerary_days: ItineraryDay[];
   
   // Gallery
-  gallery_images: string[];
+  gallery_images: Array<{ id: number; url: string; thumbnail_url?: string; alt_text?: string; caption?: string }>;
   featured_image: string;
   
   // FAQs

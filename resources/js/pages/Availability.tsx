@@ -37,6 +37,7 @@ import { Badge } from '../components/ui/badge';
 import { Alert } from '../components/ui/alert';
 import { useNavigate } from '../hooks/useNavigate';
 import { AvailabilityCalendar } from '../components/availability/AvailabilityCalendar';
+import { RecurringRules } from '../components/availability/RecurringRules';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
 
@@ -125,6 +126,9 @@ const Availability: React.FC = () => {
   
   // View mode: 'list' or 'calendar'
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  
+  // Tab mode: 'specific' or 'recurring'
+  const [tabMode, setTabMode] = useState<'specific' | 'recurring'>('specific');
   
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -506,6 +510,44 @@ const Availability: React.FC = () => {
 
       {selectedTripId && (
         <>
+          {/* Tab Navigation */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1 inline-flex">
+            <button
+              onClick={() => setTabMode('specific')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                tabMode === 'specific'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              <CalendarDays className="w-4 h-4 inline mr-2" />
+              {__('Specific Dates', 'Specific Dates')}
+            </button>
+            <button
+              onClick={() => setTabMode('recurring')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                tabMode === 'recurring'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+            >
+              <RefreshCw className="w-4 h-4 inline mr-2" />
+              {__('Recurring Rules', 'Recurring Rules')}
+            </button>
+          </div>
+
+          {/* Recurring Rules Tab Content */}
+          {tabMode === 'recurring' && (
+            <RecurringRules
+              tripId={selectedTripId}
+              onAddRule={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create-rule', trip_id: selectedTripId.toString() })}
+              onEditRule={(id) => navigate({ subpage: 'trips', tab: 'availability', action: 'edit-rule', id: id.toString() })}
+            />
+          )}
+
+          {/* Specific Dates Tab Content */}
+          {tabMode === 'specific' && (
+            <>
           {/* Inventory Alerts */}
           {showAlerts && inventoryAlerts.length > 0 && (
             <Alert variant="warning" className="border-yellow-300 bg-yellow-50 dark:bg-yellow-900/10">
@@ -1016,6 +1058,8 @@ const Availability: React.FC = () => {
           </Card>
         </>
       ) : null}
+            </>
+          )}
     </div>
   );
 };

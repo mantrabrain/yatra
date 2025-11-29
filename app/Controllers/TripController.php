@@ -233,6 +233,7 @@ class TripController extends BaseController
             $relationships = [
                 'destinations' => $data['destinations'] ?? [],
                 'activities' => $data['activity_types'] ?? [],
+                'trip_category' => $data['trip_category'] ?? [],
                 'price_types' => $data['price_types'] ?? [],
                 'highlights' => $data['highlights'] ?? [],
                 'gallery_images' => $data['gallery_images'] ?? [],
@@ -245,6 +246,7 @@ class TripController extends BaseController
             unset(
                 $data['destinations'], 
                 $data['activity_types'], 
+                $data['trip_category'],
                 $data['price_types'],
                 $data['highlights'],
                 $data['gallery_images'],
@@ -283,6 +285,9 @@ class TripController extends BaseController
             if (isset($data['activity_types'])) {
                 $relationships['activities'] = $data['activity_types'];
             }
+            if (isset($data['trip_category'])) {
+                $relationships['trip_category'] = $data['trip_category'];
+            }
             if (isset($data['price_types'])) {
                 $relationships['price_types'] = $data['price_types'];
             }
@@ -306,6 +311,7 @@ class TripController extends BaseController
             unset(
                 $data['destinations'], 
                 $data['activity_types'], 
+                $data['trip_category'],
                 $data['price_types'],
                 $data['highlights'],
                 $data['gallery_images'],
@@ -655,6 +661,33 @@ class TripController extends BaseController
             }, $item->activities);
         }
 
+        if (isset($item->trip_category)) {
+            // Check if trip_category is an array (from relation table) or string (old serialized data)
+            if (is_array($item->trip_category)) {
+                $data['trip_category'] = array_map(function ($cat) {
+                    return [
+                        'id' => (int) ($cat->category_id ?? $cat->id ?? 0),
+                        'name' => $cat->category_name ?? $cat->name ?? '',
+                        'slug' => $cat->category_slug ?? $cat->slug ?? '',
+                        'is_primary' => (bool) ($cat->is_primary ?? false),
+                        'order' => (int) ($cat->order ?? 0),
+                    ];
+                }, $item->trip_category);
+            } else {
+                // It's likely old serialized data - set to empty array
+                $data['trip_category'] = [];
+            }
+            
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("Yatra: prepare_item_for_response - trip_category formatted: " . json_encode($data['trip_category']));
+            }
+        } else {
+            $data['trip_category'] = [];
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("Yatra: prepare_item_for_response - trip_category not set in item");
+            }
+        }
+
         if (isset($item->price_types)) {
             $data['price_types'] = array_map(function ($pt) {
                 return [
@@ -684,7 +717,15 @@ class TripController extends BaseController
         // Handle gallery images relationship
         if (isset($item->gallery_images)) {
             $data['gallery_images'] = array_map(function ($img) {
-                return $img->image_url ?? '';
+                return [
+                    'id' => (int) ($img->image_id ?? 0),
+                    'url' => $img->image_url ?? '',
+                    'thumbnail_url' => $img->thumbnail_url ?? '',
+                    'alt_text' => $img->alt_text ?? '',
+                    'caption' => $img->caption ?? '',
+                    'order' => (int) ($img->order ?? 0),
+                    'is_featured' => (bool) ($img->is_featured ?? false),
+                ];
             }, $item->gallery_images);
         }
 
@@ -832,6 +873,40 @@ class TripController extends BaseController
                 return $this->error_response('Trip not found', 404);
             }
 
+            // Fetch availability dates from database (specific dates)
+            global $wpdb;
+            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
+            $specific_dates = $wpdb->get_results($wpdb->prepare(
+                "SELECT *, 0 as is_recurring FROM {$availability_table} 
+                 WHERE trip_id = %d 
+                 AND departure_date >= CURDATE()
+                 AND status IN ('available', 'limited')
+                 ORDER BY departure_date ASC",
+                $id
+            )) ?: [];
+            
+            // Fetch recurring dates
+            $recurring_dates = [];
+            try {
+                $recurringService = new \Yatra\Services\RecurringAvailabilityService(
+                    new \Yatra\Repositories\RecurringAvailabilityRepository()
+                );
+                $fromDate = date('Y-m-d');
+                $toDate = date('Y-m-d', strtotime('+90 days')); // Show next 90 days
+                $generatedDates = $recurringService->generateDatesForTrip($id, $fromDate, $toDate);
+                
+                // Convert to objects to match specific dates format
+                foreach ($generatedDates as $date) {
+                    $recurring_dates[] = (object) array_merge($date, ['is_recurring' => 1]);
+                }
+            } catch (\Exception $e) {
+                // Log error but continue with specific dates only
+                error_log('Yatra: Failed to generate recurring dates - ' . $e->getMessage());
+            }
+            
+            // Merge and deduplicate (specific dates take priority)
+            $availability_dates = $this->mergeAvailabilityDates($specific_dates, $recurring_dates);
+
             // Prepare trip data for template
             $trip_data = (object) [
                 'id' => $trip->id,
@@ -841,12 +916,17 @@ class TripController extends BaseController
                 'original_price' => isset($trip->original_price) ? (float) $trip->original_price : 0,
                 'sale_price' => isset($trip->sale_price) ? (float) $trip->sale_price : 0,
                 'currency' => $trip->currency ?? 'USD',
+                'duration_days' => isset($trip->duration_days) ? (int) $trip->duration_days : 1,
+                'max_travelers' => isset($trip->max_travelers) ? (int) $trip->max_travelers : 20,
+                'min_travelers' => isset($trip->min_travelers) ? (int) $trip->min_travelers : 1,
+                'pricing_type' => $trip->pricing_type ?? 'regular',
+                'availability_dates' => $availability_dates,
             ];
 
             // Start output buffering
             ob_start();
             
-            // Generate availability HTML inline (since we're using dummy data)
+            // Generate availability HTML
             $this->render_availability_template($trip_data);
             
             $html = ob_get_clean();
@@ -864,339 +944,211 @@ class TripController extends BaseController
      */
     private function render_availability_template($trip_data): void
     {
-        // Get trip slug from query var or create from title
-        global $wp_query;
-        $trip_slug = get_query_var('yatra_trip_slug');
-        if (empty($trip_slug) && !empty($trip_data->title)) {
-            $trip_slug = sanitize_title($trip_data->title);
-        }
-        if (empty($trip_slug)) {
-            $trip_slug = 'trip';
+        // Check if we have real availability data
+        $has_availability = !empty($trip_data->availability_dates) && is_array($trip_data->availability_dates);
+
+        // Build cards from real availability data or use sample data
+        $availability_cards = [];
+        $month_filters = [];
+        
+        // Determine if this is a day trip (duration <= 1 day)
+        $is_single_day = ($trip_data->duration_days ?? 1) <= 1;
+        
+        if ($has_availability) {
+            $current_time = time();
+            
+            foreach ($trip_data->availability_dates as $avail) {
+                $departure_date = strtotime($avail->departure_date);
+                
+                // Check booking cutoff - skip if past cutoff time
+                $cutoff_hours = (int) ($avail->cutoff_hours ?? 24); // Default 24 hours before
+                $departure_time_str = !empty($avail->departure_time) ? $avail->departure_time : '00:00:00';
+                $departure_datetime = strtotime($avail->departure_date . ' ' . $departure_time_str);
+                $cutoff_datetime = $departure_datetime - ($cutoff_hours * 3600);
+                
+                // Skip this availability if we're past the cutoff time
+                if ($current_time > $cutoff_datetime) {
+                    continue;
+                }
+                
+                // Also skip if no seats available
+                $seats = (int) ($avail->seats_available ?? 0);
+                if ($seats <= 0) {
+                    continue;
+                }
+                
+                $return_date = !empty($avail->return_date) ? strtotime($avail->return_date) : strtotime($avail->departure_date . ' + ' . (($trip_data->duration_days ?? 1) - 1) . ' days');
+                
+                $original_price = !empty($avail->original_price) ? (float) $avail->original_price : (float) ($trip_data->original_price ?? 0);
+                $sale_price = !empty($avail->discounted_price) ? (float) $avail->discounted_price : $original_price;
+                
+                // Calculate discount
+                $discount_percent = 0;
+                if ($original_price > 0 && $sale_price < $original_price) {
+                    $discount_percent = round((($original_price - $sale_price) / $original_price) * 100);
+                }
+                
+                // For day trips, use day-based filters; for multi-day trips, use month-based filters
+                if ($is_single_day) {
+                    $day_key = date('Y-m-d', $departure_date);
+                    $today = date('Y-m-d');
+                    $tomorrow = date('Y-m-d', strtotime('+1 day'));
+                    
+                    // Show "Today", "Tomorrow", or day name with date
+                    if ($day_key === $today) {
+                        $month_filters[$day_key] = __('Today', 'yatra');
+                    } elseif ($day_key === $tomorrow) {
+                        $month_filters[$day_key] = __('Tomorrow', 'yatra');
+                    } else {
+                        $month_filters[$day_key] = date_i18n('D, j M', $departure_date); // e.g., "Sat, 30 Nov"
+                    }
+                } else {
+                    $month_key = strtolower(date('M-Y', $departure_date));
+                    $month_filters[$month_key] = date('M Y', $departure_date);
+                }
+                
+                $from_location = !empty($avail->from_location) ? $avail->from_location : ($trip_data->starting_location ?? '');
+                $to_location = !empty($avail->to_location) ? $avail->to_location : ($trip_data->ending_location ?? $from_location);
+                
+                // For day trips, format time; for multi-day trips, format date
+                $departure_time = !empty($avail->departure_time) ? $avail->departure_time : null;
+                $arrival_time = !empty($avail->arrival_time) ? $avail->arrival_time : null;
+                
+                // Format display strings based on trip type
+                if ($is_single_day && $departure_time) {
+                    // Day trip: Show time as main value, date as sub-label
+                    $from_display = date_i18n('g:i A', strtotime($departure_time)); // e.g., "9:00 AM"
+                    $to_display = $arrival_time ? date_i18n('g:i A', strtotime($arrival_time)) : ''; // e.g., "5:00 PM"
+                    $date_display = date_i18n('l, j M Y', $departure_date); // e.g., "Saturday, 30 Nov 2025"
+                    $from_label = __('Start', 'yatra');
+                    $to_label = __('End', 'yatra');
+                } else {
+                    // Multi-day trip: Show dates
+                    $from_display = date_i18n('j M Y', $departure_date);
+                    $to_display = date_i18n('j M Y', $return_date);
+                    $date_display = ''; // Not needed for multi-day
+                    $from_label = __('Departure', 'yatra');
+                    $to_label = __('Return', 'yatra');
+                }
+                
+                // Use the same key format for filtering
+                $filter_key = $is_single_day 
+                    ? date('Y-m-d', $departure_date)
+                    : strtolower(date('M-Y', $departure_date));
+                
+                $availability_cards[] = [
+                    'id' => $avail->id,
+                    'from_label' => $from_label,
+                    'from_date' => $from_display,
+                    'from_location' => $from_location,
+                    'to_label' => $to_label,
+                    'to_date' => $to_display,
+                    'to_location' => $to_location,
+                    'date_display' => $date_display, // For day trips: "Saturday, 30 Nov 2025"
+                    'seats' => $seats > 10 ? '10+' : (string) $seats,
+                    'seats_available' => $seats,
+                    'discount_text' => $discount_percent > 0 ? sprintf(__('%d%% OFF', 'yatra'), $discount_percent) : '',
+                    'original_price' => $original_price,
+                    'sale_price' => $sale_price,
+                    'title' => $trip_data->title,
+                    'type' => __('Group Departure', 'yatra'),
+                    'start_date' => $from_display,
+                    'end_date' => $to_display,
+                    'start_location' => $from_location,
+                    'end_location' => $to_location,
+                    'data_month' => $filter_key,
+                    'data_date' => $avail->departure_date,
+                    'departure_time' => $departure_time,
+                    'arrival_time' => $arrival_time,
+                    'is_day_trip' => $is_single_day,
+                    'status' => $avail->status ?? 'available',
+                    'is_limited' => $seats <= 5 && $seats > 0,
+                ];
+            }
         }
         
-        // Get trip ID from the trip data object (always use this)
-        $trip_id = !empty($trip_data->id) ? (int) $trip_data->id : 0;
-
-        $format_price = function($price) {
-            return 'USD ' . number_format($price, 0);
-        };
-
-        $svg_icon = function($name, $class = '') {
-            $icons = [
-                'calendar' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
-                'info' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>',
-                'users' => '<svg class="' . esc_attr($class) . '" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>',
+        // Use sample data only if no real availability
+        if (empty($availability_cards)) {
+            $availability_cards = [
+                [
+                    'id' => 'sample-1',
+                    'from_label' => __('Departure', 'yatra'),
+                    'from_date' => date_i18n('j M Y', strtotime('+7 days')),
+                    'from_location' => $trip_data->starting_location ?: __('Starting Point', 'yatra'),
+                    'to_label' => __('Return', 'yatra'),
+                    'to_date' => date_i18n('j M Y', strtotime('+' . (7 + ($trip_data->duration_days ?? 5) - 1) . ' days')),
+                    'to_location' => $trip_data->ending_location ?: ($trip_data->starting_location ?: __('Ending Point', 'yatra')),
+                    'seats' => '10+',
+                    'seats_available' => 15,
+                    'discount_text' => '',
+                    'original_price' => $trip_data->original_price ?? 0,
+                    'sale_price' => $trip_data->sale_price ?? $trip_data->original_price ?? 0,
+                    'title' => $trip_data->title,
+                    'type' => __('Group Departure', 'yatra'),
+                    'start_date' => date_i18n('j M Y', strtotime('+7 days')),
+                    'end_date' => date_i18n('j M Y', strtotime('+' . (7 + ($trip_data->duration_days ?? 5) - 1) . ' days')),
+                    'start_location' => $trip_data->starting_location ?: __('Starting Point', 'yatra'),
+                    'end_location' => $trip_data->ending_location ?: ($trip_data->starting_location ?: __('Ending Point', 'yatra')),
+                    'data_month' => strtolower(date('M-Y', strtotime('+7 days'))),
+                    'data_date' => date('Y-m-d', strtotime('+7 days')),
+                    'status' => 'available',
+                    'is_limited' => false,
+                ],
             ];
-            return $icons[$name] ?? '';
-        };
+            $month_filters[strtolower(date('M-Y', strtotime('+7 days')))] = date('M Y', strtotime('+7 days'));
+        }
 
-        $sample_cards = [
-            [
-                'from_label' => 'From Naples',
-                'from_date' => '14 Dec 2025',
-                'from_location' => 'Naples, Italy',
-                'to_label' => 'To Naples',
-                'to_date' => '18 Dec 2025',
-                'to_location' => 'Naples, Italy',
-                'seats' => '10+',
-                'discount_text' => '37% OFF TODAY',
-                'original_price' => 2060,
-                'sale_price' => 1299,
-                'title' => 'Sorrento, Positano, Amalfi, Capri & Pompeii',
-                'type' => 'Group Departure',
-                'start_date' => '14 Dec 2025',
-                'end_date' => '18 Dec 2025',
-                'start_location' => 'Naples, Italy',
-                'end_location' => 'Naples, Italy',
-                'data_month' => 'dec-2025',
-                'data_date' => '2025-12-14',
-            ],
-            [
-                'from_label' => 'From Naples',
-                'from_date' => '15 Dec 2025',
-                'from_location' => 'Naples, Italy',
-                'to_label' => 'To Naples',
-                'to_date' => '19 Dec 2025',
-                'to_location' => 'Naples, Italy',
-                'seats' => '8+',
-                'discount_text' => '32% OFF TODAY',
-                'original_price' => 2060,
-                'sale_price' => 1399,
-                'title' => 'Amalfi Coast Discovery',
-                'type' => 'Group Departure',
-                'start_date' => '15 Dec 2025',
-                'end_date' => '19 Dec 2025',
-                'start_location' => 'Naples, Italy',
-                'end_location' => 'Naples, Italy',
-                'data_month' => 'dec-2025',
-                'data_date' => '2025-12-15',
-            ],
-            [
-                'from_label' => 'From Naples',
-                'from_date' => '16 Dec 2025',
-                'from_location' => 'Naples, Italy',
-                'to_label' => 'To Naples',
-                'to_date' => '20 Dec 2025',
-                'to_location' => 'Naples, Italy',
-                'seats' => '12+',
-                'discount_text' => '30% OFF TODAY',
-                'original_price' => 2060,
-                'sale_price' => 1499,
-                'title' => 'Capri & Pompeii Explorer',
-                'type' => 'Group Departure',
-                'start_date' => '16 Dec 2025',
-                'end_date' => '20 Dec 2025',
-                'start_location' => 'Naples, Italy',
-                'end_location' => 'Naples, Italy',
-                'data_month' => 'dec-2025',
-                'data_date' => '2025-12-16',
-            ],
-        ];
-        ?>
-        <section class="yatra-trip-section yatra-availability-section" id="availability">
-            <div class="yatra-availability-header">
-                <div class="yatra-availability-header-top">
-                    <h2 class="yatra-trip-section-title">
-                        <?php echo $svg_icon('calendar', 'yatra-trip-section-title-icon'); ?>
-                        Availability
-                    </h2>
-                    <div class="yatra-availability-sort">
-                        <select class="yatra-availability-sort-select" id="availability-sort">
-                            <option value="date-asc">Sort by: Date (Earliest)</option>
-                            <option value="date-desc">Sort by: Date (Latest)</option>
-                            <option value="price-asc">Sort by: Price (Low to High)</option>
-                            <option value="price-desc">Sort by: Price (High to Low)</option>
-                            <option value="seats-desc">Sort by: Availability (Most)</option>
-                        </select>
-                    </div>
-                </div>
-                <p class="yatra-availability-subtitle">Choose your preferred departure date and book your spot</p>
-            </div>
+        // Prepare additional data for the template
+        $pricing_type = $trip_data->pricing_type ?? 'regular';
+        $price_types = $trip_data->price_types ?? [];
+        $is_day_trip = ($trip_data->duration_days ?? 1) <= 1;
+        
+        // Include the template file
+        $template_path = YATRA_PLUGIN_PATH . 'templates/partials/availability-section.php';
+        
+        if (file_exists($template_path)) {
+            include $template_path;
+        }
+    }
 
-            <div class="yatra-availability-filters">
-                <button type="button" class="yatra-availability-filter-btn active" data-filter="all">All Dates</button>
-                <button type="button" class="yatra-availability-filter-btn" data-filter="dec-2025">Dec 2025</button>
-                <button type="button" class="yatra-availability-filter-btn" data-filter="jan-2026">Jan 2026</button>
-                <button type="button" class="yatra-availability-filter-btn" data-filter="feb-2026">Feb 2026</button>
-                <button type="button" class="yatra-availability-filter-btn" data-filter="mar-2026">Mar 2026</button>
-            </div>
-
-            <div class="yatra-availability-list">
-                <?php foreach ($sample_cards as $index => $card):
-                    $item_id = (string) $index;
-                    $sale_price = (string) $card['sale_price'];
-                ?>
-                <div class="yatra-availability-card <?php echo $index === 0 ? 'open' : ''; ?>"
-                     data-month="<?php echo esc_attr($card['data_month']); ?>"
-                     data-date="<?php echo esc_attr($card['data_date']); ?>"
-                     data-price="<?php echo esc_attr($sale_price); ?>"
-                     data-seats="<?php echo esc_attr($card['seats']); ?>"
-                     data-item="<?php echo esc_attr($item_id); ?>">
-                    
-                    <!-- Card Header (Clickable) -->
-                    <div class="yatra-availability-card-header yatra-availability-toggle" role="button" tabindex="0" aria-label="Toggle availability details">
-                        <div class="yatra-card-header-grid">
-                            <!-- From -->
-                            <div class="yatra-card-header-item">
-                                <div class="yatra-card-header-label"><?php echo esc_html($card['from_label']); ?></div>
-                                <div class="yatra-card-header-date"><?php echo esc_html($card['from_date']); ?></div>
-                                <div class="yatra-card-header-location"><?php echo esc_html($card['from_location']); ?></div>
-                            </div>
-                            
-                            <!-- To -->
-                            <div class="yatra-card-header-item">
-                                <div class="yatra-card-header-label"><?php echo esc_html($card['to_label']); ?></div>
-                                <div class="yatra-card-header-date"><?php echo esc_html($card['to_date']); ?></div>
-                                <div class="yatra-card-header-location"><?php echo esc_html($card['to_location']); ?></div>
-                            </div>
-                            
-                            <!-- Seats -->
-                            <div class="yatra-card-header-item">
-                                <div class="yatra-card-header-label">Seats remaining</div>
-                                <div class="yatra-card-header-seats"><?php echo esc_html($card['seats']); ?></div>
-                                <div class="yatra-card-header-sub">per departure</div>
-                            </div>
-                            
-                            <!-- Price -->
-                            <div class="yatra-card-header-price">
-                                <?php if (!empty($card['discount_text'])): ?>
-                                <div class="yatra-card-discount-badge"><?php echo esc_html($card['discount_text']); ?></div>
-                                <?php endif; ?>
-                                <div class="yatra-card-price-group">
-                                    <span class="yatra-card-price-original"><?php echo esc_html($format_price($card['original_price'])); ?></span>
-                                    <span class="yatra-card-price-sale"><?php echo esc_html($format_price($card['sale_price'])); ?></span>
-                                </div>
-                            </div>
-                            
-                            <!-- Arrow -->
-                            <div class="yatra-card-header-arrow">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card Body (Expandable) -->
-                    <div class="yatra-availability-card-body">
-                        <div class="yatra-card-body-content">
-                            <div class="yatra-card-tour-header">
-                                <h4 class="yatra-card-tour-title"><?php echo esc_html($card['title']); ?></h4>
-                                <div class="yatra-card-tour-meta">
-                                    <span class="yatra-card-tour-type"><?php echo esc_html($card['type']); ?></span>
-                                    <span class="yatra-card-tour-separator">•</span>
-                                    <span class="yatra-card-tour-location"><?php echo esc_html($card['from_location']); ?></span>
-                                </div>
-                            </div>
-                            
-                            <div class="yatra-card-info-grid">
-                                <div class="yatra-card-info-item">
-                                    <div class="yatra-card-info-icon">
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="yatra-card-info-content">
-                                        <div class="yatra-card-info-label">Duration</div>
-                                        <div class="yatra-card-info-value">
-                                            <?php
-                                            $start = strtotime($card['data_date']);
-                                            $end = strtotime($card['to_date']);
-                                            $days = round(($end - $start) / (60 * 60 * 24)) + 1;
-                                            echo esc_html((string) $days) . ' ' . ($days === 1 ? 'Day' : 'Days');
-                                            ?>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="yatra-card-info-item">
-                                    <div class="yatra-card-info-icon">
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h-1.5a4.5 4.5 0 00-9 0H7m3-2a4 4 0 100-8 4 4 0 000 8zm-2 10h7a4 4 0 004-4v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2a4 4 0 004 4z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="yatra-card-info-content">
-                                        <div class="yatra-card-info-label">Group Size</div>
-                                        <div class="yatra-card-info-value">Up to 20 travelers</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="yatra-card-info-item">
-                                    <div class="yatra-card-info-icon">
-                                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="yatra-card-info-content">
-                                        <div class="yatra-card-info-label">Free Cancellation</div>
-                                        <div class="yatra-card-info-value">Up to 24 hours before</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="yatra-card-timeline">
-                                <div class="yatra-timeline-item">
-                                    <div class="yatra-timeline-dot yatra-timeline-dot-start"></div>
-                                    <div class="yatra-timeline-content">
-                                        <div class="yatra-timeline-label">Trip start</div>
-                                        <div class="yatra-timeline-date"><?php echo esc_html($card['start_date']); ?></div>
-                                        <div class="yatra-timeline-location"><?php echo esc_html($card['start_location']); ?></div>
-                                    </div>
-                                </div>
-                                <div class="yatra-timeline-item">
-                                    <div class="yatra-timeline-dot yatra-timeline-dot-end"></div>
-                                    <div class="yatra-timeline-content">
-                                        <div class="yatra-timeline-label">Trip end</div>
-                                        <div class="yatra-timeline-date"><?php echo esc_html($card['end_date']); ?></div>
-                                        <div class="yatra-timeline-location"><?php echo esc_html($card['end_location']); ?></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="yatra-card-traveler-section">
-                                <label class="yatra-card-traveler-label">Travelers</label>
-                                <div class="yatra-booking-field-select yatra-participants-select yatra-availability-participants" data-item="<?php echo esc_attr($item_id); ?>">
-                                    <div class="yatra-booking-field-icon">
-                                        <?php echo $svg_icon('users', 'yatra-icon-sm'); ?>
-                                    </div>
-                                    <div class="yatra-participants-display yatra-availability-participants-display" data-item="<?php echo esc_attr($item_id); ?>">
-                                        Adult x 1
-                                    </div>
-                                    <svg class="yatra-select-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                    <div class="yatra-booking-quantity-selector yatra-availability-quantity-selector" data-item="<?php echo esc_attr($item_id); ?>">
-                                        <div class="yatra-quantity-row">
-                                            <div class="yatra-quantity-label">
-                                                <span class="yatra-quantity-title">Adult</span>
-                                                <span class="yatra-quantity-subtitle">(Age 13-99)</span>
-                                            </div>
-                                            <div class="yatra-quantity-controls">
-                                                <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="adults" data-item="<?php echo esc_attr($item_id); ?>" aria-label="Decrease adults">
-                                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                                                    </svg>
-                                                </button>
-                                                <input type="number" class="yatra-quantity-input yatra-availability-adults" data-item="<?php echo esc_attr($item_id); ?>" value="1" min="1" max="20" readonly>
-                                                <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="adults" data-item="<?php echo esc_attr($item_id); ?>" aria-label="Increase adults">
-                                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="yatra-quantity-row">
-                                            <div class="yatra-quantity-label">
-                                                <span class="yatra-quantity-title">Child</span>
-                                                <span class="yatra-quantity-subtitle">(Age 4-12)</span>
-                                            </div>
-                                            <div class="yatra-quantity-controls">
-                                                <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="children" data-item="<?php echo esc_attr($item_id); ?>" aria-label="Decrease children" disabled>
-                                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                                                    </svg>
-                                                </button>
-                                                <input type="number" class="yatra-quantity-input yatra-availability-children" data-item="<?php echo esc_attr($item_id); ?>" value="0" min="0" max="10" readonly>
-                                                <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="children" data-item="<?php echo esc_attr($item_id); ?>" aria-label="Increase children">
-                                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Booking Row at Bottom -->
-                        <div class="yatra-card-booking-row">
-                            <div class="yatra-card-total-box">
-                                <div class="yatra-card-total-label">Total</div>
-                                <div class="yatra-card-total-note" data-item="<?php echo esc_attr($item_id); ?>">for 1 traveler</div>
-                                <div class="yatra-card-total-amount" data-item="<?php echo esc_attr($item_id); ?>" data-base-price="<?php echo esc_attr($sale_price); ?>" data-currency="USD">
-                                    <?php echo esc_html($format_price($card['sale_price'])); ?>
-                                </div>
-                            </div>
-                            <button type="button" 
-                               class="yatra-card-book-btn" 
-                               data-trip-id="<?php echo esc_attr($trip_id); ?>"
-                               data-date="<?php echo esc_attr($card['data_date']); ?>"
-                               data-price="<?php echo esc_attr($sale_price); ?>"
-                               data-item="<?php echo esc_attr($item_id); ?>">
-                                Book Now
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-
-            <div class="yatra-availability-load-more">
-                <button type="button" class="yatra-availability-load-more-btn">Load more departures</button>
-            </div>
-
-        </section>
-        <?php
+    /**
+     * Merge specific availability dates with recurring generated dates
+     * Specific dates take priority over recurring dates for the same date
+     * 
+     * @param array $specificDates Array of specific date objects from database
+     * @param array $recurringDates Array of generated recurring date objects
+     * @return array Merged and sorted availability dates
+     */
+    private function mergeAvailabilityDates(array $specificDates, array $recurringDates): array
+    {
+        // Index specific dates by departure_date + departure_time for quick lookup
+        $specificIndex = [];
+        foreach ($specificDates as $date) {
+            $key = $date->departure_date . '_' . ($date->departure_time ?? '');
+            $specificIndex[$key] = true;
+        }
+        
+        // Filter out recurring dates that conflict with specific dates
+        $filteredRecurring = [];
+        foreach ($recurringDates as $date) {
+            $key = $date->departure_date . '_' . ($date->departure_time ?? '');
+            if (!isset($specificIndex[$key])) {
+                $filteredRecurring[] = $date;
+            }
+        }
+        
+        // Merge both arrays
+        $merged = array_merge($specificDates, $filteredRecurring);
+        
+        // Sort by departure_date, then departure_time
+        usort($merged, function ($a, $b) {
+            $dateCompare = strcmp($a->departure_date, $b->departure_date);
+            if ($dateCompare !== 0) {
+                return $dateCompare;
+            }
+            return strcmp($a->departure_time ?? '', $b->departure_time ?? '');
+        });
+        
+        return $merged;
     }
 }

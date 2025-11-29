@@ -95,7 +95,7 @@ class Database
             `trip_category` varchar(100) DEFAULT NULL,
             `trip_category_parent` varchar(100) DEFAULT NULL,
             `trip_category_sub` varchar(100) DEFAULT NULL,
-            `difficulty_level` enum('beginner','easy','moderate','challenging','extreme') DEFAULT NULL,
+            `difficulty_level` varchar(100) DEFAULT NULL,
             `activity_intensity` enum('relaxing','light','moderate','active','strenuous') DEFAULT NULL,
             `featured_priority` enum('none','featured','popular','new','limited','bestseller') DEFAULT 'none',
             `trip_style` varchar(50) DEFAULT NULL,
@@ -333,6 +333,26 @@ class Database
         \dbDelta($sql_trip_price_types);
 
         // ============================================
+        // TRIP-CATEGORY RELATIONS (Many-to-Many)
+        // ============================================
+        $table_trip_categories_relation = $wpdb->prefix . 'yatra_trip_trip_categories';
+        
+        $sql_trip_categories_relation = "CREATE TABLE IF NOT EXISTS `{$table_trip_categories_relation}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `trip_id` bigint(20) UNSIGNED NOT NULL,
+            `category_id` bigint(20) UNSIGNED NOT NULL COMMENT 'FK to yatra_trip_categories',
+            `is_primary` tinyint(1) DEFAULT 0,
+            `order` smallint(5) UNSIGNED DEFAULT 0,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `unique_trip_category` (`trip_id`,`category_id`),
+            KEY `idx_trip_id` (`trip_id`),
+            KEY `idx_category_id` (`category_id`)
+        ) {$charset_collate} COMMENT='Trip-Category many-to-many relationship';";
+
+        \dbDelta($sql_trip_categories_relation);
+
+        // ============================================
         // TRIP GALLERY IMAGES
         // ============================================
         $table_trip_gallery = $wpdb->prefix . 'yatra_trip_gallery_images';
@@ -441,6 +461,74 @@ class Database
         ) {$charset_collate} COMMENT='Fixed departure dates with availability';";
 
         \dbDelta($sql_trip_availability);
+
+        // RECURRING AVAILABILITY RULES
+        // ============================================
+        $table_availability_rules = $wpdb->prefix . 'yatra_trip_availability_rules';
+        
+        $sql_availability_rules = "CREATE TABLE IF NOT EXISTS `{$table_availability_rules}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `trip_id` bigint(20) UNSIGNED NOT NULL,
+            `name` varchar(100) DEFAULT NULL COMMENT 'Rule name for easy identification',
+            
+            -- Rule Type: weekly, monthly, interval
+            `rule_type` enum('weekly','monthly','interval') NOT NULL DEFAULT 'weekly',
+            
+            -- Weekly: Days of week (0=Sun, 1=Mon, ..., 6=Sat) as comma-separated
+            `days_of_week` varchar(20) DEFAULT NULL COMMENT 'e.g., 0 or 1,3,5',
+            
+            -- Monthly: Week position + Day
+            `week_of_month` enum('first','second','third','fourth','last') DEFAULT NULL,
+            `day_of_week` tinyint(1) DEFAULT NULL COMMENT '0-6 (Sun-Sat)',
+            
+            -- Interval: Every X days
+            `interval_days` smallint(5) UNSIGNED DEFAULT NULL,
+            `interval_start_date` date DEFAULT NULL COMMENT 'Reference date for interval calculation',
+            
+            -- Active Period
+            `start_date` date NOT NULL,
+            `end_date` date DEFAULT NULL COMMENT 'NULL = no end date',
+            
+            -- Excluded Dates (JSON array of YYYY-MM-DD strings)
+            `excluded_dates` text DEFAULT NULL,
+            
+            -- Multiple time slots per day (JSON array)
+            `time_slots` text DEFAULT NULL COMMENT 'JSON: [{departure_time, arrival_time, seats, price}]',
+            
+            -- Default Pricing & Capacity (used if time_slots is empty)
+            `original_price` decimal(10,2) DEFAULT NULL,
+            `sale_price` decimal(10,2) DEFAULT NULL,
+            `seats_total` smallint(5) UNSIGNED DEFAULT 20,
+            
+            -- Default Times (used if time_slots is empty)
+            `departure_time` time DEFAULT NULL,
+            `arrival_time` time DEFAULT NULL,
+            
+            -- Locations
+            `from_location` varchar(255) DEFAULT NULL,
+            `to_location` varchar(255) DEFAULT NULL,
+            
+            -- Booking Rules
+            `cutoff_hours` smallint(5) UNSIGNED DEFAULT 24,
+            `advance_booking_days` smallint(5) UNSIGNED DEFAULT NULL COMMENT 'Max days in advance to book',
+            
+            -- Day-specific overrides (JSON: {0: {price: 120}, 6: {price: 150}})
+            `day_overrides` text DEFAULT NULL COMMENT 'JSON for day-specific pricing/seats',
+            
+            -- Status
+            `status` enum('active','inactive') DEFAULT 'active',
+            `priority` smallint(5) UNSIGNED DEFAULT 0 COMMENT 'Higher priority rules override',
+            
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_trip_id` (`trip_id`),
+            KEY `idx_status` (`status`),
+            KEY `idx_rule_type` (`rule_type`),
+            KEY `idx_date_range` (`start_date`,`end_date`)
+        ) {$charset_collate} COMMENT='Recurring availability rules for auto-generating dates';";
+
+        \dbDelta($sql_availability_rules);
 
         // Create itinerary tables
         self::createItineraryTables();
@@ -1104,6 +1192,32 @@ class Database
             $wpdb->query($sql);
         }
         
+        // Migrate difficulty_level from enum to varchar (for dynamic difficulty levels)
+        if ($columnExists('difficulty_level')) {
+            $currentType = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS 
+                     WHERE TABLE_SCHEMA = DATABASE() 
+                     AND TABLE_NAME = %s 
+                     AND COLUMN_NAME = 'difficulty_level'",
+                    $table_trips
+                )
+            );
+            
+            // If it's an enum, change it to varchar
+            if ($currentType && strpos(strtolower($currentType), 'enum') !== false) {
+                $after = $getAfterColumn('off_season');
+                $sql = $after
+                    ? "ALTER TABLE `{$table_trips}` MODIFY COLUMN `difficulty_level` varchar(100) DEFAULT NULL AFTER `{$after}`"
+                    : "ALTER TABLE `{$table_trips}` MODIFY COLUMN `difficulty_level` varchar(100) DEFAULT NULL";
+                $wpdb->query($sql);
+                
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('Yatra: Migrated difficulty_level from enum to varchar');
+                }
+            }
+        }
+        
         // Add all other missing columns from the schema
         $columnsToAdd = [
             // After short_description
@@ -1133,7 +1247,7 @@ class Database
             ['name' => 'off_season', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'peak_season'],
             
             // Categorization
-            ['name' => 'difficulty_level', 'def' => "enum('beginner','easy','moderate','challenging','extreme') DEFAULT NULL", 'after' => 'off_season'],
+            ['name' => 'difficulty_level', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'off_season'],
             ['name' => 'trip_category', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'difficulty_level'],
             ['name' => 'trip_category_parent', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'trip_category'],
             ['name' => 'trip_category_sub', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'trip_category_parent'],
@@ -1680,6 +1794,7 @@ class Database
         global $wpdb;
 
         $tables = [
+            $wpdb->prefix . 'yatra_trip_availability_rules',
             $wpdb->prefix . 'yatra_trip_availability_dates',
             $wpdb->prefix . 'yatra_trip_faqs',
             $wpdb->prefix . 'yatra_trip_highlights',

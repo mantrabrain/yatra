@@ -40,7 +40,13 @@ interface Trip {
   duration_nights?: number;
   min_travelers?: number;
   max_travelers?: number;
-  trip_category?: string;
+  trip_category?: Array<{
+    id: number;
+    name: string;
+    slug?: string;
+    is_primary?: boolean;
+    order?: number;
+  }>;
   difficulty_level?: string;
   destinations?: Array<{
     id: number;
@@ -154,6 +160,14 @@ const Trips: React.FC = () => {
 
   const summarizeDestinations = (trip: Trip) => {
     const names = (trip.destinations || []).map(dest => dest.name).filter(Boolean);
+    if (!names.length) return null;
+    const summary = names.slice(0, 2).join(', ');
+    const remaining = names.length - 2;
+    return remaining > 0 ? `${summary} +${remaining}` : summary;
+  };
+
+  const summarizeCategories = (trip: Trip) => {
+    const names = (trip.trip_category || []).map(cat => cat.name).filter(Boolean);
     if (!names.length) return null;
     const summary = names.slice(0, 2).join(', ');
     const remaining = names.length - 2;
@@ -672,7 +686,7 @@ const Trips: React.FC = () => {
                                     ? `${trip.duration_days}${__('d', 'd')}${trip.duration_nights ? ` / ${trip.duration_nights}${__('n', 'n')}` : ''}`
                                     : null;
                                   const travelerLabel = summarizeTravelers(trip);
-                                  const categoryLabel = formatLabel(trip.trip_category);
+                                  const categoryLabel = summarizeCategories(trip);
                                   const difficultyLabel = formatLabel(trip.difficulty_level);
                                   const chips = [
                                     destinationLabel && { key: 'dest', label: destinationLabel, icon: MapPin },

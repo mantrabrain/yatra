@@ -160,6 +160,13 @@ class Bootstrap
             $table_difficulty_levels
         )) === $table_difficulty_levels;
 
+        // Check if trip-trip-categories relation table exists
+        $table_trip_trip_categories = $wpdb->prefix . 'yatra_trip_trip_categories';
+        $trip_trip_categories_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_trip_trip_categories
+        )) === $table_trip_trip_categories;
+
         // If any table doesn't exist, create all tables
         if (
             !$activities_exists ||
@@ -170,8 +177,24 @@ class Bootstrap
             !$items_exists ||
             !$discounts_exists ||
             !$trip_categories_exists ||
-            !$difficulty_levels_exists
+            !$difficulty_levels_exists ||
+            !$trip_trip_categories_exists
         ) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                $missing = [];
+                if (!$activities_exists) $missing[] = 'activities';
+                if (!$trips_exists) $missing[] = 'trips';
+                if (!$destinations_exists) $missing[] = 'destinations';
+                if (!$traveler_categories_exists) $missing[] = 'traveler_categories';
+                if (!$item_types_exists) $missing[] = 'item_types';
+                if (!$items_exists) $missing[] = 'items';
+                if (!$discounts_exists) $missing[] = 'discounts';
+                if (!$trip_categories_exists) $missing[] = 'trip_categories';
+                if (!$difficulty_levels_exists) $missing[] = 'difficulty_levels';
+                if (!$trip_trip_categories_exists) $missing[] = 'trip_trip_categories';
+                error_log('Yatra: Missing tables - ' . implode(', ', $missing));
+            }
+            
             Database::createTables();
             
             if (defined('WP_DEBUG') && WP_DEBUG) {

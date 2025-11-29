@@ -1079,6 +1079,18 @@
     border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+a.yatra-highlight-link {
+    cursor: pointer;
+}
+
+a.yatra-highlight-link:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+    text-decoration: none;
 }
 
 .yatra-trip-rating {
@@ -1902,4 +1914,165 @@
     flex-direction: row;
     justify-content: space-around;
     margin-bottom: 16px;
+}
+
+/* ============================================
+   SINGLE TAXONOMY PAGE STYLES
+   (Destination, Activity, Category single pages)
+   ============================================ */
+
+/* Taxonomy Hero Section */
+.yatra-taxonomy-hero {
+    position: relative;
+    height: 350px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+.yatra-taxonomy-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
+}
+
+.yatra-taxonomy-hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    max-width: 800px;
+    padding: 0 20px;
+}
+
+.yatra-taxonomy-hero-content,
+.yatra-taxonomy-hero-content * {
+    color: #ffffff !important;
+}
+
+.yatra-taxonomy-page .yatra-breadcrumb {
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.yatra-taxonomy-page .yatra-breadcrumb a {
+    color: rgba(255,255,255,0.9) !important;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.yatra-taxonomy-page .yatra-breadcrumb a:hover {
+    color: #ffffff !important;
+    text-decoration: underline;
+}
+
+.yatra-taxonomy-page .yatra-breadcrumb-sep {
+    margin: 0 8px;
+    color: rgba(255,255,255,0.7) !important;
+}
+
+.yatra-taxonomy-page .yatra-breadcrumb-current {
+    color: rgba(255,255,255,0.9) !important;
+}
+
+.yatra-taxonomy-title {
+    font-size: 48px;
+    font-weight: 700;
+    margin: 0 0 16px;
+    color: #ffffff !important;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.6);
+    line-height: 1.2;
+}
+
+.yatra-taxonomy-description {
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.95) !important;
+    margin: 0 0 20px;
+}
+
+.yatra-taxonomy-stats {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+}
+
+.yatra-taxonomy-trip-count {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 500;
+    color: #ffffff !important;
+}
+
+.yatra-taxonomy-trip-count svg {
+    color: #ffffff !important;
+    stroke: #ffffff !important;
+}
+
+/* No Trips Found - Taxonomy Page */
+.yatra-taxonomy-page .yatra-no-trips-found {
+    text-align: center;
+    padding: 80px 20px;
+    background: #f9fafb;
+    border-radius: 16px;
+    margin-top: 20px;
+}
+
+.yatra-taxonomy-page .yatra-no-trips-icon {
+    color: #9ca3af;
+    margin-bottom: 20px;
+}
+
+.yatra-taxonomy-page .yatra-no-trips-found h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 12px;
+}
+
+.yatra-taxonomy-page .yatra-no-trips-found p {
+    color: #6b7280;
+    font-size: 16px;
+    margin: 0 0 24px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.yatra-btn-primary {
+    display: inline-block;
+    background: #059669;
+    color: #fff !important;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.yatra-btn-primary:hover {
+    background: #047857;
+    color: #fff !important;
+}
+
+/* Responsive - Taxonomy Page */
+@media (max-width: 768px) {
+    .yatra-taxonomy-hero {
+        height: 280px;
+    }
+    
+    .yatra-taxonomy-title {
+        font-size: 32px;
+    }
+    
+    .yatra-taxonomy-description {
+        font-size: 16px;
+    }
 }
