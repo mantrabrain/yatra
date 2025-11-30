@@ -36621,13 +36621,10 @@ const RecurringRuleForm = () => {
             }
           )
         ] }) }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Alert, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "ml-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium", children: __("How it works", "How it works") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 dark:text-gray-400 mt-1", children: __("Dates are generated automatically based on your pattern. Manually added specific dates will take priority over generated dates.", "Dates are generated automatically based on your pattern. Manually added specific dates will take priority over generated dates.") })
-          ] })
-        ] })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Alert, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "ml-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium", children: __("How it works", "How it works") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 dark:text-gray-400 mt-1", children: __("Dates are generated automatically based on your pattern. Manually added specific dates will take priority over generated dates.", "Dates are generated automatically based on your pattern. Manually added specific dates will take priority over generated dates.") })
+        ] }) })
       ] })
     ] }) })
   ] });

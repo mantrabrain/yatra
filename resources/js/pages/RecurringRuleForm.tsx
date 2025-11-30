@@ -1636,7 +1636,6 @@ const RecurringRuleForm: React.FC = () => {
 
             {/* Help */}
             <Alert>
-              <AlertCircle className="w-4 h-4" />
               <div className="ml-2">
                 <h4 className="font-medium">{__('How it works', 'How it works')}</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
