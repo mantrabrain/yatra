@@ -277,6 +277,16 @@ class AvailabilityController extends BaseController
             $data['discount_percentage'] = $data['discount_percentage'] !== null ? number_format((float) $data['discount_percentage'], 2, '.', '') : null;
         }
         
+        // Ensure pricing_type has a default value
+        if (!isset($data['pricing_type']) || empty($data['pricing_type'])) {
+            $data['pricing_type'] = 'regular';
+        }
+        
+        // Ensure price_types is an array
+        if (!isset($data['price_types']) || !is_array($data['price_types'])) {
+            $data['price_types'] = [];
+        }
+        
         // Ensure status matches frontend expectations
         if ($data['status'] === 'blocked' || !empty($data['is_blocked'])) {
             $data['status'] = 'blocked';

@@ -146,6 +146,8 @@ const AvailabilityForm: React.FC = () => {
         ...prev,
         from_location: tripData.starting_location || '',
         to_location: tripData.ending_location || '',
+        // Default pricing type based on trip's pricing type
+        pricing_type: (tripData.pricing_type || 'regular') as 'regular' | 'traveler_based',
       }));
     }
   }, [tripData, isEditMode]);
@@ -156,6 +158,9 @@ const AvailabilityForm: React.FC = () => {
       const availableSeats = availabilityData.available_seats || availabilityData.seats_available || 0;
       const bookedSeats = totalSeats - availableSeats;
       
+      // Determine pricing type from availability data or fallback to trip's pricing type
+      const pricingType = availabilityData.pricing_type || tripData?.pricing_type || 'regular';
+      
       setFormData({
         departure_date: availabilityData.departure_date || '',
         departure_time: availabilityData.departure_time || '',
@@ -164,10 +169,10 @@ const AvailabilityForm: React.FC = () => {
         total_seats: totalSeats.toString(),
         booked_seats: bookedSeats.toString(),
         seats_remaining: availableSeats > 10 ? '10+' : availableSeats.toString(),
-        pricing_type: 'regular' as 'regular' | 'traveler_based',
+        pricing_type: pricingType as 'regular' | 'traveler_based',
         original_price: availabilityData.original_price?.toString() || '',
         discounted_price: availabilityData.discounted_price?.toString() || '',
-        price_types: [],
+        price_types: availabilityData.price_types || [],
         status: (availabilityData.status || (availabilityData.is_blocked ? 'blocked' : 'available')) as 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked',
         is_blocked: availabilityData.is_blocked || availabilityData.status === 'blocked' || false,
         block_reason: availabilityData.block_reason || '',

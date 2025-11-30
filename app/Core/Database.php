@@ -442,9 +442,11 @@ class Database
             `seats_available` smallint(5) UNSIGNED NOT NULL,
             `seats_reserved` smallint(5) UNSIGNED DEFAULT 0,
             `seats_waitlist` smallint(5) UNSIGNED DEFAULT 0,
+            `pricing_type` enum('regular','traveler_based') DEFAULT 'regular',
             `original_price` decimal(10,2) DEFAULT NULL,
             `discounted_price` decimal(10,2) DEFAULT NULL,
             `discount_percentage` decimal(5,2) DEFAULT NULL,
+            `price_types` text DEFAULT NULL COMMENT 'JSON: [{category_id, original_price, discounted_price}]',
             `status` enum('available','limited','sold_out','closed','cancelled','blocked') DEFAULT 'available',
             `from_location` varchar(255) DEFAULT NULL,
             `to_location` varchar(255) DEFAULT NULL,
@@ -495,10 +497,15 @@ class Database
             -- Multiple time slots per day (JSON array)
             `time_slots` text DEFAULT NULL COMMENT 'JSON: [{departure_time, arrival_time, seats, price}]',
             
+            -- Pricing Type
+            `pricing_type` enum('regular','traveler_based') DEFAULT 'regular',
+            
             -- Default Pricing & Capacity (used if time_slots is empty)
             `original_price` decimal(10,2) DEFAULT NULL,
             `sale_price` decimal(10,2) DEFAULT NULL,
+            `traveler_pricing` text DEFAULT NULL COMMENT 'JSON: [{category_id, original_price, sale_price}]',
             `seats_total` smallint(5) UNSIGNED DEFAULT 20,
+            `alert_threshold` smallint(5) UNSIGNED DEFAULT 5,
             
             -- Default Times (used if time_slots is empty)
             `departure_time` time DEFAULT NULL,
@@ -1633,6 +1640,45 @@ class Database
                 "ALTER TABLE `{$table_availability}` 
                  MODIFY COLUMN `status` enum('available','limited','sold_out','closed','cancelled','blocked') DEFAULT 'available'"
             );
+            
+            // Check and add pricing_type column
+            $pricingTypeExists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM information_schema.columns 
+                     WHERE table_schema = DATABASE() 
+                     AND table_name = %s 
+                     AND column_name = 'pricing_type'",
+                    $table_availability
+                )
+            ) > 0;
+            
+            if (!$pricingTypeExists) {
+                $wpdb->query(
+                    "ALTER TABLE `{$table_availability}` 
+                     ADD COLUMN `pricing_type` enum('regular','traveler_based') DEFAULT 'regular' 
+                     AFTER `seats_waitlist`"
+                );
+            }
+            
+            // Check and add price_types column for traveler-based pricing
+            $priceTypesExists = (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM information_schema.columns 
+                     WHERE table_schema = DATABASE() 
+                     AND table_name = %s 
+                     AND column_name = 'price_types'",
+                    $table_availability
+                )
+            ) > 0;
+            
+            if (!$priceTypesExists) {
+                $wpdb->query(
+                    "ALTER TABLE `{$table_availability}` 
+                     ADD COLUMN `price_types` text DEFAULT NULL 
+                     COMMENT 'JSON: [{category_id, original_price, discounted_price}]' 
+                     AFTER `discount_percentage`"
+                );
+            }
         }
         
         // ============================================

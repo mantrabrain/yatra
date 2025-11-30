@@ -50,6 +50,13 @@ interface RecurringRule {
   cutoff_hours: number;
   status: 'active' | 'inactive';
   generated_count?: number;
+  pricing_type?: 'regular' | 'traveler_based';
+  traveler_pricing?: Array<{
+    category_id: number;
+    category_name?: string;
+    original_price: number;
+    sale_price?: number;
+  }>;
   preview?: {
     total: number;
     dates: any[];
@@ -59,6 +66,8 @@ interface RecurringRule {
 
 interface RecurringRulesProps {
   tripId: number;
+  tripType?: 'single_day' | 'multi_day';
+  pricingType?: 'regular' | 'traveler_based';
   onAddRule: () => void;
   onEditRule: (id: number) => void;
 }
@@ -83,9 +92,13 @@ const weekPositions = [
 
 export const RecurringRules: React.FC<RecurringRulesProps> = ({
   tripId,
+  tripType = 'multi_day',
+  pricingType = 'regular',
   onAddRule,
   onEditRule,
 }) => {
+  const isSingleDayTrip = tripType === 'single_day';
+  const isTravelerBased = pricingType === 'traveler_based';
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [previewRuleId, setPreviewRuleId] = useState<number | null>(null);
@@ -191,18 +204,34 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-            {__('Recurring Rules', 'Recurring Rules')}
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Automatically generate availability dates based on patterns', 'Automatically generate availability dates based on patterns')}
-          </p>
-        </div>
-        <Button onClick={onAddRule}>
+        <div className="flex items-center gap-3">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              {__('Recurring Rules', 'Recurring Rules')}
+            </h3>
+            <Badge className={isSingleDayTrip 
+              ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400' 
+              : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+            }>
+              {isSingleDayTrip ? __('Single-Day Trip', 'Single-Day Trip') : __('Multi-Day Trip', 'Multi-Day Trip')}
+            </Badge>
+            <Badge className={isTravelerBased 
+              ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' 
+              : 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400'
+            }>
+              {isTravelerBased ? __('Traveler-Based Pricing', 'Traveler-Based Pricing') : __('Regular Pricing', 'Regular Pricing')}
+            </Badge>
+          </div>
+        <Button variant="outline" onClick={onAddRule}>
           <Plus className="w-4 h-4 mr-2" />
-          {__('Add Recurring Rule', 'Add Recurring Rule')}
+          {isSingleDayTrip ? __('Add Time Slots Rule', 'Add Time Slots Rule') : __('Add Recurring Rule', 'Add Recurring Rule')}
         </Button>
+      </div>
+      <div className="mt-2">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {isSingleDayTrip 
+            ? __('Create recurring time slots for your single-day trip (supports multiple time slots per day)', 'Create recurring time slots for your single-day trip (supports multiple time slots per day)')
+            : __('Automatically generate availability dates based on patterns', 'Automatically generate availability dates based on patterns')}
+        </p>
       </div>
 
       {/* Rules List */}
@@ -233,10 +262,12 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
             <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
               {__('Create recurring patterns to automatically generate availability dates', 'Create recurring patterns to automatically generate availability dates')}
             </p>
+            <div className="flex justify-end">
             <Button onClick={onAddRule}>
               <Plus className="w-4 h-4 mr-2" />
               {__('Create First Rule', 'Create First Rule')}
             </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (
@@ -292,6 +323,19 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
                           {rule.original_price && rule.original_price > rule.sale_price && (
                             <span className="line-through text-gray-400">${rule.original_price}</span>
                           )}
+                        </div>
+                      )}
+                      
+                      {/* Traveler Pricing Indicator */}
+                      {rule.pricing_type === 'traveler_based' && (
+                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                          <Users className="w-4 h-4" />
+                          <span className="text-xs">
+                            {rule.traveler_pricing && rule.traveler_pricing.length > 0 
+                              ? `${rule.traveler_pricing.length} categories` 
+                              : 'No categories configured'
+                            }
+                          </span>
                         </div>
                       )}
                     </div>

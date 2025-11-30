@@ -165,10 +165,10 @@ class RecurringAvailabilityRepository extends BaseRepository
         $allowed = [
             'trip_id', 'name', 'rule_type', 'days_of_week', 'week_of_month',
             'day_of_week', 'interval_days', 'interval_start_date', 'start_date',
-            'end_date', 'excluded_dates', 'time_slots', 'original_price', 'sale_price',
-            'seats_total', 'departure_time', 'arrival_time', 'from_location',
-            'to_location', 'cutoff_hours', 'advance_booking_days', 'day_overrides',
-            'status', 'priority'
+            'end_date', 'excluded_dates', 'time_slots', 'pricing_type', 'original_price', 
+            'sale_price', 'traveler_pricing', 'seats_total', 'alert_threshold',
+            'departure_time', 'arrival_time', 'from_location', 'to_location', 
+            'cutoff_hours', 'advance_booking_days', 'day_overrides', 'status', 'priority'
         ];
         
         $prepared = [];
@@ -178,7 +178,7 @@ class RecurringAvailabilityRepository extends BaseRepository
                 $value = $data[$field];
                 
                 // JSON encode array fields
-                if (in_array($field, ['excluded_dates', 'time_slots', 'day_overrides'], true)) {
+                if (in_array($field, ['excluded_dates', 'time_slots', 'day_overrides', 'traveler_pricing'], true)) {
                     if (is_array($value)) {
                         $value = wp_json_encode($value);
                     }
@@ -220,6 +220,12 @@ class RecurringAvailabilityRepository extends BaseRepository
             $rule->day_overrides = json_decode($rule->day_overrides, true) ?: [];
         } else {
             $rule->day_overrides = [];
+        }
+        
+        if (!empty($rule->traveler_pricing)) {
+            $rule->traveler_pricing = json_decode($rule->traveler_pricing, true) ?: [];
+        } else {
+            $rule->traveler_pricing = [];
         }
         
         // Convert days_of_week string to array

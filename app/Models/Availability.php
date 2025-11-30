@@ -21,9 +21,11 @@ class Availability
     public int $seats_available = 0;
     public int $seats_reserved = 0;
     public int $seats_waitlist = 0;
+    public string $pricing_type = 'regular';
     public ?float $original_price = null;
     public ?float $discounted_price = null;
     public ?float $discount_percentage = null;
+    public array $price_types = [];
     public string $status = 'available';
     public ?string $from_location = null;
     public ?string $to_location = null;
@@ -57,6 +59,15 @@ class Availability
                     $availability->$key = (int) $value;
                 } elseif (in_array($key, ['original_price', 'discounted_price', 'discount_percentage'], true)) {
                     $availability->$key = $value !== null ? (float) $value : null;
+                } elseif ($key === 'price_types') {
+                    // Handle price_types as JSON
+                    if (is_string($value)) {
+                        $availability->$key = json_decode($value, true) ?: [];
+                    } elseif (is_array($value)) {
+                        $availability->$key = $value;
+                    } else {
+                        $availability->$key = [];
+                    }
                 } else {
                     $availability->$key = $value;
                 }
@@ -87,9 +98,11 @@ class Availability
             'total_seats' => $this->seats_total,
             'available_seats' => $this->seats_available,
             'waitlist_count' => $this->seats_waitlist,
+            'pricing_type' => $this->pricing_type,
             'original_price' => $this->original_price,
             'discounted_price' => $this->discounted_price,
             'discount_percentage' => $this->discount_percentage,
+            'price_types' => $this->price_types,
             'status' => $this->status,
             'from_location' => $this->from_location,
             'to_location' => $this->to_location,

@@ -32878,9 +32878,13 @@ const weekPositions = [
 ];
 const RecurringRules = ({
   tripId,
+  tripType = "multi_day",
+  pricingType = "regular",
   onAddRule,
   onEditRule
 }) => {
+  const isSingleDayTrip = tripType === "single_day";
+  const isTravelerBased = pricingType === "traveler_based";
   const queryClient2 = useQueryClient();
   const { showToast } = useToast();
   const [previewRuleId, setPreviewRuleId] = reactExports.useState(null);
@@ -32969,15 +32973,17 @@ const RecurringRules = ({
   const rules = (rulesData == null ? void 0 : rulesData.rules) || [];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white", children: __("Recurring Rules", "Recurring Rules") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Automatically generate availability dates based on patterns", "Automatically generate availability dates based on patterns") })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: isSingleDayTrip ? "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400" : "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400", children: isSingleDayTrip ? __("Single-Day Trip", "Single-Day Trip") : __("Multi-Day Trip", "Multi-Day Trip") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: isTravelerBased ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400" : "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400", children: isTravelerBased ? __("Traveler-Based Pricing", "Traveler-Based Pricing") : __("Regular Pricing", "Regular Pricing") })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: onAddRule, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: onAddRule, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
-        __("Add Recurring Rule", "Add Recurring Rule")
+        isSingleDayTrip ? __("Add Time Slots Rule", "Add Time Slots Rule") : __("Add Recurring Rule", "Add Recurring Rule")
       ] })
     ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: isSingleDayTrip ? __("Create recurring time slots for your single-day trip (supports multiple time slots per day)", "Create recurring time slots for your single-day trip (supports multiple time slots per day)") : __("Automatically generate availability dates based on patterns", "Automatically generate availability dates based on patterns") }) }),
     isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: [...Array(3)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "py-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "animate-pulse", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-2" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded mb-4" }),
@@ -32989,10 +32995,10 @@ const RecurringRules = ({
       /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: __("No recurring rules set up yet", "No recurring rules set up yet") }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-500 mb-4", children: __("Create recurring patterns to automatically generate availability dates", "Create recurring patterns to automatically generate availability dates") }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: onAddRule, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: onAddRule, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
         __("Create First Rule", "Create First Rule")
-      ] })
+      ] }) })
     ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: rules.map((rule) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: rule.status === "inactive" ? "opacity-60" : "", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "py-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
@@ -33041,6 +33047,10 @@ const RecurringRules = ({
                 "$",
                 rule.original_price
               ] })
+            ] }),
+            rule.pricing_type === "traveler_based" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-gray-600 dark:text-gray-400", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-4 h-4" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: rule.traveler_pricing && rule.traveler_pricing.length > 0 ? `${rule.traveler_pricing.length} categories` : "No categories configured" })
             ] })
           ] }),
           rule.excluded_dates && rule.excluded_dates.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 flex items-center gap-2", children: [
@@ -33194,12 +33204,22 @@ const Availability = () => {
     const tripId = params.get("trip_id");
     return tripId ? parseInt(tripId) : null;
   }, [urlKey]);
-  const [selectedTripId, setSelectedTripId] = reactExports.useState(tripIdFromUrl);
-  reactExports.useEffect(() => {
-    if (tripIdFromUrl !== null) {
-      setSelectedTripId(tripIdFromUrl);
+  const [selectedTripId, setSelectedTripId] = reactExports.useState(() => {
+    const storedTripId = localStorage.getItem("yatra_selected_trip_id");
+    if (storedTripId) {
+      return parseInt(storedTripId);
     }
-  }, [tripIdFromUrl]);
+    return tripIdFromUrl;
+  });
+  reactExports.useEffect(() => {
+    const storedTripId = localStorage.getItem("yatra_selected_trip_id");
+    if (selectedTripId !== (storedTripId ? parseInt(storedTripId) : null)) {
+      setSelectedTripId(selectedTripId);
+      if (selectedTripId !== null) {
+        localStorage.setItem("yatra_selected_trip_id", selectedTripId.toString());
+      }
+    }
+  }, [selectedTripId]);
   const [viewMode, setViewMode] = reactExports.useState("list");
   const [tabMode, setTabMode] = reactExports.useState("specific");
   const [searchTerm, setSearchTerm] = reactExports.useState("");
@@ -33513,7 +33533,7 @@ const Availability = () => {
       ] })
     ] }),
     selectedTripId && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1 inline-flex", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "button",
           {
@@ -33536,7 +33556,7 @@ const Availability = () => {
             ]
           }
         )
-      ] }),
+      ] }) }) }),
       tabMode === "recurring" && /* @__PURE__ */ jsxRuntimeExports.jsx(
         RecurringRules,
         {
@@ -33676,9 +33696,7 @@ const Availability = () => {
               }
             )
           ] }, entry.id)) }) })
-        ] })
-      ] }),
-      selectedTripId ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `grid grid-cols-1 ${(selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? "md:grid-cols-3" : "md:grid-cols-4"} gap-4`, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Search", "Search") }),
@@ -33935,7 +33953,7 @@ const Availability = () => {
             ] }, date.id)) })
           ] }) }) })
         ] })
-      ] }) : null
+      ] })
     ] })
   ] });
 };
@@ -34292,7 +34310,9 @@ const AvailabilityForm = () => {
       setFormData((prev) => ({
         ...prev,
         from_location: tripData.starting_location || "",
-        to_location: tripData.ending_location || ""
+        to_location: tripData.ending_location || "",
+        // Default pricing type based on trip's pricing type
+        pricing_type: tripData.pricing_type || "regular"
       }));
     }
   }, [tripData, isEditMode]);
@@ -34302,6 +34322,7 @@ const AvailabilityForm = () => {
       const totalSeats = availabilityData.total_seats || availabilityData.seats_total || 0;
       const availableSeats = availabilityData.available_seats || availabilityData.seats_available || 0;
       const bookedSeats = totalSeats - availableSeats;
+      const pricingType = availabilityData.pricing_type || (tripData == null ? void 0 : tripData.pricing_type) || "regular";
       setFormData({
         departure_date: availabilityData.departure_date || "",
         departure_time: availabilityData.departure_time || "",
@@ -34310,10 +34331,10 @@ const AvailabilityForm = () => {
         total_seats: totalSeats.toString(),
         booked_seats: bookedSeats.toString(),
         seats_remaining: availableSeats > 10 ? "10+" : availableSeats.toString(),
-        pricing_type: "regular",
+        pricing_type: pricingType,
         original_price: ((_a2 = availabilityData.original_price) == null ? void 0 : _a2.toString()) || "",
         discounted_price: ((_b = availabilityData.discounted_price) == null ? void 0 : _b.toString()) || "",
-        price_types: [],
+        price_types: availabilityData.price_types || [],
         status: availabilityData.status || (availabilityData.is_blocked ? "blocked" : "available"),
         is_blocked: availabilityData.is_blocked || availabilityData.status === "blocked" || false,
         block_reason: availabilityData.block_reason || "",
@@ -35271,7 +35292,7 @@ const weekOptions = [
   { value: "last", label: "Last" }
 ];
 const RecurringRuleForm = () => {
-  var _a, _b, _c;
+  var _a, _b;
   const { navigate } = useNavigate();
   const queryClient2 = useQueryClient();
   const { showToast } = useToast();
@@ -35293,6 +35314,8 @@ const RecurringRuleForm = () => {
     excluded_dates: [],
     time_slots: [],
     // For single-day trips with multiple slots
+    pricing_type: "regular",
+    // Will be updated based on trip's pricing type
     original_price: void 0,
     sale_price: void 0,
     traveler_pricing: [],
@@ -35303,10 +35326,12 @@ const RecurringRuleForm = () => {
     from_location: "",
     to_location: "",
     cutoff_hours: 24,
+    alert_threshold: 5,
     status: "active"
   });
   const [newExcludedDate, setNewExcludedDate] = reactExports.useState("");
   const [previewData, setPreviewData] = reactExports.useState(null);
+  const [showCategorySelector, setShowCategorySelector] = reactExports.useState(false);
   const { data: tripsData } = useQuery({
     queryKey: ["trips", "all"],
     queryFn: async () => {
@@ -35333,7 +35358,7 @@ const RecurringRuleForm = () => {
   });
   const selectedTrip = tripsData == null ? void 0 : tripsData.trips.find((t) => t.id === formData.trip_id);
   const isSingleDayTrip = (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" || ((selectedTrip == null ? void 0 : selectedTrip.duration_days) || 1) <= 1;
-  const isTravelerBasedPricing = (selectedTrip == null ? void 0 : selectedTrip.pricing_type) === "traveler_based";
+  const isTravelerBasedPricing = formData.pricing_type === "traveler_based";
   const { data: existingRule, isLoading: isLoadingRule } = useQuery({
     queryKey: ["recurring-availability", ruleId],
     queryFn: async () => {
@@ -35358,6 +35383,7 @@ const RecurringRuleForm = () => {
         end_date: existingRule.end_date || "",
         excluded_dates: existingRule.excluded_dates || [],
         time_slots: existingRule.time_slots || [],
+        pricing_type: existingRule.pricing_type || "regular",
         original_price: existingRule.original_price,
         sale_price: existingRule.sale_price,
         traveler_pricing: existingRule.traveler_pricing || [],
@@ -35367,10 +35393,21 @@ const RecurringRuleForm = () => {
         from_location: existingRule.from_location || "",
         to_location: existingRule.to_location || "",
         cutoff_hours: existingRule.cutoff_hours || 24,
+        alert_threshold: existingRule.alert_threshold || 5,
         status: existingRule.status || "active"
       });
     }
   }, [existingRule]);
+  reactExports.useEffect(() => {
+    if (!isEditing && selectedTrip && !existingRule) {
+      setFormData((prev) => ({
+        ...prev,
+        pricing_type: selectedTrip.pricing_type || "regular",
+        from_location: prev.from_location || selectedTrip.starting_location || "",
+        to_location: prev.to_location || selectedTrip.ending_location || ""
+      }));
+    }
+  }, [isEditing, selectedTrip, existingRule]);
   const createMutation = useMutation({
     mutationFn: async (data) => {
       return await apiClient.post("/recurring-availability", {
@@ -35506,12 +35543,23 @@ const RecurringRuleForm = () => {
                   SearchableSelect,
                   {
                     value: ((_a = formData.trip_id) == null ? void 0 : _a.toString()) || "",
-                    onChange: (value) => setFormData((prev) => ({ ...prev, trip_id: parseInt(value) || 0 })),
+                    onChange: (value) => setFormData((prev) => {
+                      var _a2;
+                      return {
+                        ...prev,
+                        trip_id: parseInt(value) || 0,
+                        // Reset pricing when trip changes and set pricing_type based on new trip
+                        pricing_type: ((_a2 = tripsData == null ? void 0 : tripsData.trips.find((t) => t.id === parseInt(value))) == null ? void 0 : _a2.pricing_type) || "regular",
+                        traveler_pricing: [],
+                        original_price: void 0,
+                        sale_price: void 0
+                      };
+                    }),
                     options: [
                       { value: "", label: __("-- Select Trip --", "-- Select Trip --") },
                       ...(tripsData == null ? void 0 : tripsData.trips.map((trip) => ({
                         value: trip.id.toString(),
-                        label: trip.title
+                        label: `${trip.title} (${trip.pricing_type === "traveler_based" ? "Traveler-Based" : "Regular"})`
                       }))) || []
                     ],
                     placeholder: __("Select a trip", "Select a trip"),
@@ -35687,14 +35735,74 @@ const RecurringRuleForm = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(DollarSign, { className: "w-5 h-5" }),
-              __("Pricing & Capacity", "Pricing & Capacity")
+              __("Pricing & Availability", "Pricing & Availability")
             ] }),
-            selectedTrip && /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: isTravelerBasedPricing ? "success" : "default", children: isTravelerBasedPricing ? __("Traveler-Based Pricing", "Traveler-Based Pricing") : __("Regular Pricing", "Regular Pricing") }) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __("Set pricing for traveler categories and seat availability for this rule", "Set pricing for traveler categories and seat availability for this rule") })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
-            !isTravelerBasedPricing && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-6", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3", children: [
+                __("Pricing Type", "Pricing Type"),
+                " ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: `relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${formData.pricing_type === "regular" ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"}`, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "radio",
+                      name: "pricing_type",
+                      value: "regular",
+                      checked: formData.pricing_type === "regular",
+                      onChange: () => setFormData((prev) => ({
+                        ...prev,
+                        pricing_type: "regular",
+                        traveler_pricing: []
+                        // Clear traveler pricing when switching to regular
+                      })),
+                      className: "sr-only"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `block text-sm font-medium ${formData.pricing_type === "regular" ? "text-blue-900 dark:text-blue-300" : "text-gray-900 dark:text-white"}`, children: __("Regular Pricing", "Regular Pricing") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `mt-1 flex items-center text-sm ${formData.pricing_type === "regular" ? "text-blue-700 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`, children: __("Set a single price for all travelers", "Set a single price for all travelers") })
+                  ] }) }),
+                  formData.pricing_type === "regular" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-4 right-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 rounded-full bg-blue-600" }) })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: `relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${formData.pricing_type === "traveler_based" ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"}`, children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "radio",
+                      name: "pricing_type",
+                      value: "traveler_based",
+                      checked: formData.pricing_type === "traveler_based",
+                      onChange: () => setFormData((prev) => ({
+                        ...prev,
+                        pricing_type: "traveler_based",
+                        original_price: void 0,
+                        // Clear regular pricing when switching to traveler-based
+                        sale_price: void 0
+                      })),
+                      className: "sr-only"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `block text-sm font-medium ${formData.pricing_type === "traveler_based" ? "text-blue-900 dark:text-blue-300" : "text-gray-900 dark:text-white"}`, children: __("Traveler-Based Pricing", "Traveler-Based Pricing") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `mt-1 flex items-center text-sm ${formData.pricing_type === "traveler_based" ? "text-blue-700 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`, children: __("Set different prices for each traveler category", "Set different prices for each traveler category") })
+                  ] }) }),
+                  formData.pricing_type === "traveler_based" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-4 right-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 rounded-full bg-blue-600" }) })
+                ] })
+              ] })
+            ] }),
+            !isTravelerBasedPricing && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Original Price", "Original Price") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+                  __("Original Price", "Original Price"),
+                  " ",
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   Input,
                   {
@@ -35719,144 +35827,237 @@ const RecurringRuleForm = () => {
                     onChange: (e) => setFormData((prev) => ({ ...prev, sale_price: parseFloat(e.target.value) || void 0 })),
                     placeholder: "0.00"
                   }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Seats per Departure", "Seats per Departure") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    type: "number",
-                    min: 1,
-                    value: formData.seats_total,
-                    onChange: (e) => setFormData((prev) => ({ ...prev, seats_total: parseInt(e.target.value) || 1 }))
-                  }
-                )
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-gray-500", children: __("Leave empty if no discount", "Leave empty if no discount") })
               ] })
-            ] }),
+            ] }) }),
             isTravelerBasedPricing && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300", children: __("Pricing by Traveler Category", "Pricing by Traveler Category") }),
-                travelerCategories.length > 0 && (((_c = formData.traveler_pricing) == null ? void 0 : _c.length) || 0) < travelerCategories.length && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  Button,
-                  {
-                    type: "button",
-                    variant: "outline",
-                    size: "sm",
-                    onClick: () => {
-                      var _a2;
-                      const existingCategoryIds = ((_a2 = formData.traveler_pricing) == null ? void 0 : _a2.map((tp) => tp.category_id)) || [];
-                      const nextCategory = travelerCategories.find((cat) => !existingCategoryIds.includes(cat.id));
-                      if (nextCategory) {
-                        setFormData((prev) => ({
-                          ...prev,
-                          traveler_pricing: [...prev.traveler_pricing || [], {
-                            category_id: nextCategory.id,
-                            original_price: 0,
-                            sale_price: void 0
-                          }]
-                        }));
-                      }
-                    },
-                    children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-1" }),
-                      __("Add Category", "Add Category")
-                    ]
-                  }
-                )
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+                  __("Traveler Category Pricing", "Traveler Category Pricing"),
+                  " ",
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-4", children: __("Add pricing for traveler categories. Categories are managed in Traveler Categories page.", "Add pricing for traveler categories. Categories are managed in Traveler Categories page.") })
               ] }),
-              !formData.traveler_pricing || formData.traveler_pricing.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(DollarSign, { className: "w-8 h-8 text-gray-400 mx-auto mb-2" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-2", children: __("No traveler pricing configured yet", "No traveler pricing configured yet") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-400 dark:text-gray-500", children: __("Add pricing for different traveler categories (e.g., Adult, Child, Senior)", "Add pricing for different traveler categories (e.g., Adult, Child, Senior)") })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: formData.traveler_pricing.map((pricing, index) => {
-                const category = travelerCategories.find((cat) => cat.id === pricing.category_id);
-                return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-medium text-gray-700 dark:text-gray-300", children: [
-                      (category == null ? void 0 : category.name) || `Category ${pricing.category_id}`,
-                      (category == null ? void 0 : category.min_age) !== void 0 && (category == null ? void 0 : category.max_age) !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-400 font-normal ml-2", children: [
-                        "(",
-                        category.min_age,
-                        "-",
-                        category.max_age,
-                        " ",
-                        __("years", "years"),
-                        ")"
-                      ] })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+              (() => {
+                const activeCategories = travelerCategories.filter(
+                  (cat) => cat.status === "active" || cat.status === "publish"
+                );
+                if (activeCategories.length === 0) {
+                  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 border border-gray-200 dark:border-gray-700 rounded-lg text-center", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-3", children: __("No active traveler categories found.", "No active traveler categories found.") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
                       Button,
                       {
                         type: "button",
-                        variant: "ghost",
-                        size: "sm",
-                        onClick: () => setFormData((prev) => {
-                          var _a2;
-                          return {
-                            ...prev,
-                            traveler_pricing: ((_a2 = prev.traveler_pricing) == null ? void 0 : _a2.filter((_, i) => i !== index)) || []
-                          };
-                        }),
-                        className: "text-red-500 hover:text-red-600 h-8 w-8 p-0",
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" })
+                        variant: "outline",
+                        onClick: () => window.location.href = "?page=yatra&subpage=traveler-categories&action=create",
+                        className: "flex items-center gap-2 mx-auto",
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+                          __("Create Category", "Create Category")
+                        ]
                       }
                     )
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Original Price", "Original Price") }),
+                  ] });
+                }
+                return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      Button,
+                      {
+                        type: "button",
+                        variant: "outline",
+                        onClick: () => setShowCategorySelector(!showCategorySelector),
+                        className: "flex items-center gap-2",
+                        disabled: activeCategories.filter((cat) => {
+                          var _a2;
+                          return !((_a2 = formData.traveler_pricing) == null ? void 0 : _a2.some((tp) => tp.category_id === cat.id));
+                        }).length === 0,
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+                          __("Add Pricing", "Add Pricing")
+                        ]
+                      }
+                    ),
+                    showCategorySelector && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Input,
+                        "div",
                         {
-                          type: "number",
-                          min: 0,
-                          step: "0.01",
-                          value: pricing.original_price || "",
-                          onChange: (e) => {
-                            const newPricing = [...formData.traveler_pricing || []];
-                            newPricing[index].original_price = parseFloat(e.target.value) || 0;
-                            setFormData((prev) => ({ ...prev, traveler_pricing: newPricing }));
-                          },
-                          className: "text-sm",
-                          placeholder: "0.00"
+                          className: "fixed inset-0 z-10",
+                          onClick: () => setShowCategorySelector(false)
                         }
-                      )
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Sale Price", "Sale Price") }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Input,
-                        {
-                          type: "number",
-                          min: 0,
-                          step: "0.01",
-                          value: pricing.sale_price || "",
-                          onChange: (e) => {
-                            const newPricing = [...formData.traveler_pricing || []];
-                            newPricing[index].sale_price = parseFloat(e.target.value) || void 0;
-                            setFormData((prev) => ({ ...prev, traveler_pricing: newPricing }));
-                          },
-                          className: "text-sm",
-                          placeholder: "0.00"
-                        }
-                      )
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-full left-0 mt-2 w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1", children: __("Select a category to add pricing", "Select a category to add pricing") }),
+                        activeCategories.filter((cat) => {
+                          var _a2;
+                          return !((_a2 = formData.traveler_pricing) == null ? void 0 : _a2.some((tp) => tp.category_id === cat.id));
+                        }).length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center", children: __("All categories have pricing added", "All categories have pricing added") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1", children: activeCategories.filter((cat) => {
+                          var _a2;
+                          return !((_a2 = formData.traveler_pricing) == null ? void 0 : _a2.some((tp) => tp.category_id === cat.id));
+                        }).map((category) => {
+                          const minAge = category.age_min ?? category.min_age;
+                          const maxAge = category.age_max ?? category.max_age;
+                          const ageRange = minAge !== void 0 || maxAge !== void 0 ? minAge !== void 0 && maxAge !== void 0 ? `${minAge}-${maxAge} ${__("years", "years")}` : minAge !== void 0 ? `${minAge}+ ${__("years", "years")}` : maxAge !== void 0 ? `${__("Under", "Under")} ${maxAge} ${__("years", "years")}` : "" : null;
+                          const categoryName = category.label || category.name || `Category ${category.id}`;
+                          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: () => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  traveler_pricing: [...prev.traveler_pricing || [], {
+                                    category_id: category.id,
+                                    original_price: 0,
+                                    sale_price: void 0
+                                  }]
+                                }));
+                                setShowCategorySelector(false);
+                              },
+                              className: "w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-medium text-sm text-gray-900 dark:text-white", children: [
+                                  categoryName,
+                                  ageRange && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 text-xs font-normal text-gray-500 dark:text-gray-400", children: [
+                                    "(",
+                                    ageRange,
+                                    ")"
+                                  ] })
+                                ] }),
+                                category.description && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: category.description })
+                              ]
+                            },
+                            category.id
+                          );
+                        }) })
+                      ] }) })
                     ] })
-                  ] })
-                ] }, index);
-              }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Seats per Departure", "Seats per Departure") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    type: "number",
-                    min: 1,
-                    value: formData.seats_total,
-                    onChange: (e) => setFormData((prev) => ({ ...prev, seats_total: parseInt(e.target.value) || 1 })),
-                    className: "max-w-xs"
-                  }
-                )
+                  ] }),
+                  formData.traveler_pricing && formData.traveler_pricing.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: formData.traveler_pricing.map((pricing, index) => {
+                    const category = activeCategories.find((cat) => cat.id === pricing.category_id);
+                    if (!category) return null;
+                    const minAge = category.age_min ?? category.min_age;
+                    const maxAge = category.age_max ?? category.max_age;
+                    const categoryName = category.label || category.name || `Category ${pricing.category_id}`;
+                    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-3", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2 mb-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
+                            categoryName,
+                            (minAge !== void 0 || maxAge !== void 0) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 text-xs font-normal text-gray-500 dark:text-gray-400", children: [
+                              "(",
+                              minAge !== void 0 && maxAge !== void 0 ? `${minAge}-${maxAge} ${__("years", "years")}` : minAge !== void 0 ? `${minAge}+ ${__("years", "years")}` : maxAge !== void 0 ? `${__("Under", "Under")} ${maxAge} ${__("years", "years")}` : "",
+                              ")"
+                            ] })
+                          ] }) }),
+                          category.description && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 dark:text-gray-400", children: category.description })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "button",
+                          {
+                            type: "button",
+                            onClick: () => setFormData((prev) => {
+                              var _a2;
+                              return {
+                                ...prev,
+                                traveler_pricing: ((_a2 = prev.traveler_pricing) == null ? void 0 : _a2.filter((_, i) => i !== index)) || []
+                              };
+                            }),
+                            className: "p-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors",
+                            title: __("Remove Pricing", "Remove Pricing"),
+                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" })
+                          }
+                        )
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                            __("Original Price", "Original Price"),
+                            " ",
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                          ] }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Input,
+                            {
+                              type: "number",
+                              min: 0,
+                              step: "0.01",
+                              value: pricing.original_price || "",
+                              onChange: (e) => {
+                                const newPricing = [...formData.traveler_pricing || []];
+                                newPricing[index].original_price = parseFloat(e.target.value) || 0;
+                                setFormData((prev) => ({ ...prev, traveler_pricing: newPricing }));
+                              },
+                              placeholder: "0.00"
+                            }
+                          )
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                            __("Sale Price", "Sale Price"),
+                            " (",
+                            __("Optional", "Optional"),
+                            ")"
+                          ] }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Input,
+                            {
+                              type: "number",
+                              min: 0,
+                              step: "0.01",
+                              value: pricing.sale_price || "",
+                              onChange: (e) => {
+                                const newPricing = [...formData.traveler_pricing || []];
+                                newPricing[index].sale_price = parseFloat(e.target.value) || void 0;
+                                setFormData((prev) => ({ ...prev, traveler_pricing: newPricing }));
+                              },
+                              className: "text-sm",
+                              placeholder: "0.00"
+                            }
+                          )
+                        ] })
+                      ] })
+                    ] }, pricing.category_id);
+                  }) })
+                ] });
+              })()
+            ] }),
+            selectedTrip && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: __("Inventory Management", "Inventory Management") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+                    __("Total Capacity", "Total Capacity"),
+                    " ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      type: "number",
+                      min: 1,
+                      value: formData.seats_total,
+                      onChange: (e) => setFormData((prev) => ({ ...prev, seats_total: parseInt(e.target.value) || 1 }))
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-gray-500", children: __("Maximum number of seats available for this rule", "Maximum number of seats available for this rule") })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Alert Threshold", "Alert Threshold") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      type: "number",
+                      min: 0,
+                      value: formData.alert_threshold,
+                      onChange: (e) => setFormData((prev) => ({ ...prev, alert_threshold: parseInt(e.target.value) || 0 }))
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-gray-500", children: __("Alert when available seats drop below this number", "Alert when available seats drop below this number") })
+                ] })
               ] })
             ] }),
             !selectedTrip && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg", children: [
@@ -35901,7 +36102,13 @@ const RecurringRuleForm = () => {
                     size: "sm",
                     onClick: () => setFormData((prev) => ({
                       ...prev,
-                      time_slots: [...prev.time_slots, { departure_time: "09:00", arrival_time: "17:00", seats: 20, price: 0 }]
+                      time_slots: [...prev.time_slots, {
+                        departure_time: "09:00",
+                        arrival_time: "17:00",
+                        seats: 20,
+                        price: 0,
+                        traveler_pricing: isTravelerBasedPricing ? [] : void 0
+                      }]
                     })),
                     children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-1" }),
@@ -35936,38 +36143,97 @@ const RecurringRuleForm = () => {
                     }
                   )
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-3", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Start Time", "Start Time") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      TimePicker,
-                      {
-                        value: slot.departure_time,
-                        onChange: (value) => {
-                          const newSlots = [...formData.time_slots];
-                          newSlots[index].departure_time = value;
-                          setFormData((prev) => ({ ...prev, time_slots: newSlots }));
-                        },
-                        placeholder: "09:00"
-                      }
-                    )
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Departure Time", "Departure Time") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        TimePicker,
+                        {
+                          value: slot.departure_time || "",
+                          onChange: (value) => {
+                            const newSlots = [...formData.time_slots];
+                            newSlots[index].departure_time = value;
+                            setFormData((prev) => ({ ...prev, time_slots: newSlots }));
+                          },
+                          placeholder: "09:00"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Arrival Time", "Arrival Time") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        TimePicker,
+                        {
+                          value: slot.arrival_time || "",
+                          onChange: (value) => {
+                            const newSlots = [...formData.time_slots];
+                            newSlots[index].arrival_time = value;
+                            setFormData((prev) => ({ ...prev, time_slots: newSlots }));
+                          },
+                          placeholder: "17:00"
+                        }
+                      )
+                    ] })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("End Time", "End Time") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      TimePicker,
-                      {
-                        value: slot.arrival_time,
-                        onChange: (value) => {
-                          const newSlots = [...formData.time_slots];
-                          newSlots[index].arrival_time = value;
-                          setFormData((prev) => ({ ...prev, time_slots: newSlots }));
-                        },
-                        placeholder: "17:00"
-                      }
-                    )
+                  !isTravelerBasedPricing && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Seats", "Seats") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          type: "number",
+                          min: 1,
+                          value: slot.seats,
+                          onChange: (e) => {
+                            const newSlots = [...formData.time_slots];
+                            newSlots[index].seats = parseInt(e.target.value) || 1;
+                            setFormData((prev) => ({ ...prev, time_slots: newSlots }));
+                          },
+                          className: "text-sm"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Price", "Price") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          type: "number",
+                          min: 0,
+                          step: "0.01",
+                          value: slot.price || "",
+                          onChange: (e) => {
+                            const newSlots = [...formData.time_slots];
+                            newSlots[index].price = parseFloat(e.target.value) || 0;
+                            setFormData((prev) => ({ ...prev, time_slots: newSlots }));
+                          },
+                          className: "text-sm",
+                          placeholder: "0.00"
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Sale Price", "Sale Price") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Input,
+                        {
+                          type: "number",
+                          min: 0,
+                          step: "0.01",
+                          value: slot.sale_price || "",
+                          onChange: (e) => {
+                            const newSlots = [...formData.time_slots];
+                            newSlots[index].sale_price = parseFloat(e.target.value) || void 0;
+                            setFormData((prev) => ({ ...prev, time_slots: newSlots }));
+                          },
+                          className: "text-sm",
+                          placeholder: "0.00"
+                        }
+                      )
+                    ] })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  isTravelerBasedPricing && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Seats", "Seats") }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx(
                       Input,
@@ -35983,26 +36249,180 @@ const RecurringRuleForm = () => {
                         className: "text-sm"
                       }
                     )
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-500 dark:text-gray-400 mb-1", children: __("Price", "Price") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        type: "number",
-                        min: 0,
-                        step: "0.01",
-                        value: slot.price || "",
-                        onChange: (e) => {
-                          const newSlots = [...formData.time_slots];
-                          newSlots[index].price = parseFloat(e.target.value) || 0;
-                          setFormData((prev) => ({ ...prev, time_slots: newSlots }));
-                        },
-                        className: "text-sm",
-                        placeholder: "0.00"
-                      }
-                    )
                   ] })
+                ] }),
+                isTravelerBasedPricing && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 pt-3 border-t border-gray-200 dark:border-gray-700", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between mb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-gray-700 dark:text-gray-300", children: __("Traveler Category Pricing", "Traveler Category Pricing") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __("Set pricing for each traveler category for this time slot", "Set pricing for each traveler category for this time slot") })
+                  ] }) }),
+                  (() => {
+                    const activeCategories = travelerCategories.filter(
+                      (cat) => cat.status === "active" || cat.status === "publish"
+                    );
+                    const slotTravelerPricing = slot.traveler_pricing || [];
+                    const availableCategories = activeCategories.filter(
+                      (cat) => !slotTravelerPricing.some((tp) => tp.category_id === cat.id)
+                    );
+                    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "outline",
+                            size: "sm",
+                            onClick: () => {
+                              const dropdownId = `slot-${index}-category-dropdown`;
+                              const dropdown = document.getElementById(dropdownId);
+                              if (dropdown) {
+                                dropdown.classList.toggle("hidden");
+                              }
+                            },
+                            disabled: availableCategories.length === 0,
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-3 h-3 mr-1" }),
+                              __("Add Pricing", "Add Pricing")
+                            ]
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "div",
+                          {
+                            id: `slot-${index}-category-dropdown`,
+                            className: "hidden absolute top-full left-0 mt-2 w-full max-w-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-64 overflow-y-auto",
+                            children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-2", children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1", children: __("Select a category to add pricing", "Select a category to add pricing") }),
+                              availableCategories.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-3 text-xs text-gray-500 dark:text-gray-400 text-center", children: __("All categories have pricing added", "All categories have pricing added") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1", children: availableCategories.map((category) => {
+                                const minAge = category.age_min ?? category.min_age;
+                                const maxAge = category.age_max ?? category.max_age;
+                                const ageRange = minAge !== void 0 || maxAge !== void 0 ? minAge !== void 0 && maxAge !== void 0 ? `${minAge}-${maxAge} ${__("years", "years")}` : minAge !== void 0 ? `${minAge}+ ${__("years", "years")}` : `${__("Under", "Under")} ${maxAge} ${__("years", "years")}` : null;
+                                const categoryName = category.label || category.name || `Category ${category.id}`;
+                                return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                                  "button",
+                                  {
+                                    type: "button",
+                                    onClick: () => {
+                                      const newSlots = [...formData.time_slots];
+                                      if (!newSlots[index].traveler_pricing) {
+                                        newSlots[index].traveler_pricing = [];
+                                      }
+                                      newSlots[index].traveler_pricing = [...newSlots[index].traveler_pricing, {
+                                        category_id: category.id,
+                                        original_price: 0,
+                                        sale_price: void 0
+                                      }];
+                                      setFormData((prev) => ({ ...prev, time_slots: newSlots }));
+                                      const dropdown = document.getElementById(`slot-${index}-category-dropdown`);
+                                      if (dropdown) dropdown.classList.add("hidden");
+                                    },
+                                    className: "w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
+                                    children: [
+                                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-medium text-xs text-gray-900 dark:text-white", children: [
+                                        categoryName,
+                                        ageRange && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 text-xs font-normal text-gray-500 dark:text-gray-400", children: [
+                                          "(",
+                                          ageRange,
+                                          ")"
+                                        ] })
+                                      ] }),
+                                      category.description && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate", children: category.description })
+                                    ]
+                                  },
+                                  category.id
+                                );
+                              }) })
+                            ] })
+                          }
+                        )
+                      ] }),
+                      slotTravelerPricing.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: slotTravelerPricing.map((tp, tpIndex) => {
+                        const category = activeCategories.find((cat) => cat.id === tp.category_id);
+                        if (!category) return null;
+                        const minAge = category.age_min ?? category.min_age;
+                        const maxAge = category.age_max ?? category.max_age;
+                        const categoryName = category.label || category.name || `Category ${tp.category_id}`;
+                        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-2", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-semibold text-gray-900 dark:text-white", children: [
+                              categoryName,
+                              (minAge !== void 0 || maxAge !== void 0) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-1 text-xs font-normal text-gray-500 dark:text-gray-400", children: [
+                                "(",
+                                minAge !== void 0 && maxAge !== void 0 ? `${minAge}-${maxAge}` : minAge !== void 0 ? `${minAge}+` : `<${maxAge}`,
+                                " ",
+                                __("yrs", "yrs"),
+                                ")"
+                              ] })
+                            ] }) }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "button",
+                              {
+                                type: "button",
+                                onClick: () => {
+                                  const newSlots = [...formData.time_slots];
+                                  if (newSlots[index] && newSlots[index].traveler_pricing) {
+                                    newSlots[index].traveler_pricing = newSlots[index].traveler_pricing.filter((_, i) => i !== tpIndex);
+                                    setFormData((prev) => ({ ...prev, time_slots: newSlots }));
+                                  }
+                                },
+                                className: "p-0.5 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors",
+                                children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-3 h-3" })
+                              }
+                            )
+                          ] }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-2", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-xs text-gray-600 dark:text-gray-400 mb-1", children: [
+                                __("Price", "Price"),
+                                " ",
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                              ] }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                Input,
+                                {
+                                  type: "number",
+                                  min: 0,
+                                  step: "0.01",
+                                  value: tp.original_price || "",
+                                  onChange: (e) => {
+                                    const newSlots = [...formData.time_slots];
+                                    if (newSlots[index] && newSlots[index].traveler_pricing) {
+                                      newSlots[index].traveler_pricing[tpIndex].original_price = parseFloat(e.target.value) || 0;
+                                      setFormData((prev) => ({ ...prev, time_slots: newSlots }));
+                                    }
+                                  },
+                                  className: "text-xs",
+                                  placeholder: "0.00"
+                                }
+                              )
+                            ] }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs text-gray-600 dark:text-gray-400 mb-1", children: __("Sale", "Sale") }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                Input,
+                                {
+                                  type: "number",
+                                  min: 0,
+                                  step: "0.01",
+                                  value: tp.sale_price || "",
+                                  onChange: (e) => {
+                                    const newSlots = [...formData.time_slots];
+                                    if (newSlots[index] && newSlots[index].traveler_pricing) {
+                                      newSlots[index].traveler_pricing[tpIndex].sale_price = parseFloat(e.target.value) || void 0;
+                                      setFormData((prev) => ({ ...prev, time_slots: newSlots }));
+                                    }
+                                  },
+                                  className: "text-xs",
+                                  placeholder: "0.00"
+                                }
+                              )
+                            ] })
+                          ] })
+                        ] }, tp.category_id);
+                      }) }),
+                      slotTravelerPricing.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-3 bg-gray-100 dark:bg-gray-800 rounded border border-dashed border-gray-300 dark:border-gray-600", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500", children: __('Click "Add Pricing" to set prices for traveler categories', 'Click "Add Pricing" to set prices for traveler categories') }) })
+                    ] });
+                  })()
                 ] })
               ] }, index)) }),
               formData.time_slots.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: [

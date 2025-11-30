@@ -114,16 +114,28 @@ const Availability: React.FC = () => {
     return tripId ? parseInt(tripId) : null;
   }, [urlKey]);
   
-  // Trip selection - initialize from URL if available
-  const [selectedTripId, setSelectedTripId] = useState<number | null>(tripIdFromUrl);
-
-  // Update selectedTripId when URL changes
-  useEffect(() => {
-    if (tripIdFromUrl !== null) {
-      setSelectedTripId(tripIdFromUrl);
+  // Trip selection - initialize from localStorage or URL if available
+  const [selectedTripId, setSelectedTripId] = useState<number | null>(() => {
+    // First try to get from localStorage
+    const storedTripId = localStorage.getItem('yatra_selected_trip_id');
+    if (storedTripId) {
+      return parseInt(storedTripId);
     }
-  }, [tripIdFromUrl]);
-  
+    // Fall back to URL if no localStorage value
+    return tripIdFromUrl;
+  });
+
+  // Update selectedTripId when URL changes or localStorage changes
+  useEffect(() => {
+    const storedTripId = localStorage.getItem('yatra_selected_trip_id');
+    if (selectedTripId !== (storedTripId ? parseInt(storedTripId) : null)) {
+      setSelectedTripId(selectedTripId);
+      if (selectedTripId !== null) {
+        localStorage.setItem('yatra_selected_trip_id', selectedTripId.toString());
+      }
+    }
+  }, [selectedTripId]);
+
   // View mode: 'list' or 'calendar'
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   
@@ -511,7 +523,9 @@ const Availability: React.FC = () => {
       {selectedTripId && (
         <>
           {/* Tab Navigation */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1 inline-flex">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
             <button
               onClick={() => setTabMode('specific')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -534,6 +548,9 @@ const Availability: React.FC = () => {
               <RefreshCw className="w-4 h-4 inline mr-2" />
               {__('Recurring Rules', 'Recurring Rules')}
             </button>
+              </div>
+              
+            </div>
           </div>
 
           {/* Recurring Rules Tab Content */}
@@ -548,8 +565,8 @@ const Availability: React.FC = () => {
           {/* Specific Dates Tab Content */}
           {tabMode === 'specific' && (
             <>
-          {/* Inventory Alerts */}
-          {showAlerts && inventoryAlerts.length > 0 && (
+              {/* Inventory Alerts */}
+              {showAlerts && inventoryAlerts.length > 0 && (
             <Alert variant="warning" className="border-yellow-300 bg-yellow-50 dark:bg-yellow-900/10">
               <div className="flex items-start justify-between w-full">
                 <div className="flex items-start gap-3 flex-1">
@@ -693,14 +710,9 @@ const Availability: React.FC = () => {
               </CardContent>
             </Card>
           )}
-        </>
-      )}
-
-      {selectedTripId ? (
-        <>
-          {/* Filters */}
-          <Card>
-            <CardContent className="pt-6">
+              {/* Filters */}
+              <Card>
+                <CardContent className="pt-6">
               <div className={`grid grid-cols-1 ${selectedTrip?.trip_type === 'single_day' ? 'md:grid-cols-3' : 'md:grid-cols-4'} gap-4`}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1056,10 +1068,10 @@ const Availability: React.FC = () => {
               )}
             </CardContent>
           </Card>
-        </>
-      ) : null}
             </>
           )}
+        </>
+      )}
     </div>
   );
 };

@@ -437,6 +437,7 @@ class RecurringAvailabilityService
             foreach ($rule->time_slots as $index => $slot) {
                 $slotPrice = $slot['price'] ?? $dayOverrides['original_price'] ?? $rule->original_price;
                 $slotSeats = $slot['seats'] ?? $dayOverrides['seats_total'] ?? $rule->seats_total;
+                $slotTravelerPricing = $slot['traveler_pricing'] ?? $rule->traveler_pricing ?? [];
                 
                 $availabilities[] = [
                     'id' => 'rule_' . $rule->id . '_' . $date . '_slot_' . $index,
@@ -457,6 +458,8 @@ class RecurringAvailabilityService
                     'is_recurring' => true,
                     'rule_name' => $rule->name,
                     'slot_index' => $index,
+                    'pricing_type' => $rule->pricing_type ?? 'regular',
+                    'traveler_pricing' => $slotTravelerPricing,
                 ];
             }
             return $availabilities;
@@ -466,6 +469,7 @@ class RecurringAvailabilityService
         $originalPrice = $dayOverrides['original_price'] ?? $rule->original_price;
         $salePrice = $dayOverrides['sale_price'] ?? $rule->sale_price ?? $originalPrice;
         $seats = $dayOverrides['seats_total'] ?? $rule->seats_total;
+        $travelerPricing = $rule->traveler_pricing ?? [];
         
         return [[
             'id' => 'rule_' . $rule->id . '_' . $date,
@@ -485,6 +489,8 @@ class RecurringAvailabilityService
             'status' => 'available',
             'is_recurring' => true,
             'rule_name' => $rule->name,
+            'pricing_type' => $rule->pricing_type ?? 'regular',
+            'traveler_pricing' => $travelerPricing,
         ]];
     }
 

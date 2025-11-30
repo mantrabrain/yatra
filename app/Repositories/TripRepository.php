@@ -680,17 +680,29 @@ class TripRepository extends BaseRepository
         if (!empty($availabilityDates)) {
             foreach ($availabilityDates as $date) {
                 if (is_array($date) && !empty($date['departure_date'])) {
+                    $seatsTotal = isset($date['seats_total']) ? (int) $date['seats_total'] : 20;
+                    $seatsAvailable = isset($date['seats_available']) ? (int) $date['seats_available'] : $seatsTotal;
+                    
+                    $insertData = [
+                        'trip_id' => $tripId,
+                        'departure_date' => sanitize_text_field($date['departure_date']),
+                        'arrival_date' => isset($date['arrival_date']) ? sanitize_text_field($date['arrival_date']) : ($date['return_date'] ?? null),
+                        'return_date' => isset($date['return_date']) ? sanitize_text_field($date['return_date']) : null,
+                        'departure_time' => isset($date['departure_time']) ? sanitize_text_field($date['departure_time']) : null,
+                        'arrival_time' => isset($date['arrival_time']) ? sanitize_text_field($date['arrival_time']) : null,
+                        'seats_total' => $seatsTotal,
+                        'seats_available' => $seatsAvailable,
+                        'original_price' => isset($date['original_price']) ? (float) $date['original_price'] : (isset($date['price_override']) ? (float) $date['price_override'] : null),
+                        'discounted_price' => isset($date['discounted_price']) ? (float) $date['discounted_price'] : null,
+                        'from_location' => isset($date['from_location']) ? sanitize_text_field($date['from_location']) : null,
+                        'to_location' => isset($date['to_location']) ? sanitize_text_field($date['to_location']) : null,
+                        'status' => isset($date['is_blackout']) && $date['is_blackout'] ? 'blocked' : (isset($date['status']) ? sanitize_text_field($date['status']) : 'available'),
+                    ];
+                    
                     $wpdb->insert(
                         $table,
-                        [
-                            'trip_id' => $tripId,
-                            'departure_date' => sanitize_text_field($date['departure_date']),
-                            'return_date' => isset($date['return_date']) ? sanitize_text_field($date['return_date']) : null,
-                            'available_spots' => isset($date['available_spots']) ? (int) $date['available_spots'] : null,
-                            'price_override' => isset($date['price_override']) ? (float) $date['price_override'] : null,
-                            'is_blackout' => isset($date['is_blackout']) ? (int) $date['is_blackout'] : 0,
-                        ],
-                        ['%d', '%s', '%s', '%d', '%f', '%d']
+                        $insertData,
+                        ['%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%f', '%f', '%s', '%s', '%s']
                     );
                 }
             }

@@ -43,9 +43,14 @@ interface Trip {
 
 interface TravelerCategory {
   id: number;
-  name: string;
+  name?: string;
+  label?: string;
+  description?: string;
   min_age?: number;
   max_age?: number;
+  age_min?: number;
+  age_max?: number;
+  status?: string;
 }
 
 interface TravelerPricing {
@@ -59,6 +64,7 @@ interface TimeSlot {
   arrival_time: string;
   seats: number;
   price: number;
+  sale_price?: number;
   traveler_pricing?: TravelerPricing[];
 }
 
@@ -75,6 +81,7 @@ interface RecurringRule {
   end_date?: string;
   excluded_dates: string[];
   time_slots: TimeSlot[]; // For single-day trips with multiple slots
+  pricing_type: 'regular' | 'traveler_based'; // Allow override of trip's pricing type
   original_price?: number;
   sale_price?: number;
   traveler_pricing?: TravelerPricing[]; // For traveler-based pricing
@@ -84,6 +91,7 @@ interface RecurringRule {
   from_location?: string;
   to_location?: string;
   cutoff_hours: number;
+  alert_threshold: number;
   status: 'active' | 'inactive';
 }
 
@@ -129,6 +137,7 @@ const RecurringRuleForm: React.FC = () => {
     end_date: '',
     excluded_dates: [],
     time_slots: [], // For single-day trips with multiple slots
+    pricing_type: 'regular', // Will be updated based on trip's pricing type
     original_price: undefined,
     sale_price: undefined,
     traveler_pricing: [], // For traveler-based pricing
@@ -138,11 +147,13 @@ const RecurringRuleForm: React.FC = () => {
     from_location: '',
     to_location: '',
     cutoff_hours: 24,
+    alert_threshold: 5,
     status: 'active',
   });
 
   const [newExcludedDate, setNewExcludedDate] = useState('');
   const [previewData, setPreviewData] = useState<{ total: number; dates: any[] } | null>(null);
+  const [showCategorySelector, setShowCategorySelector] = useState(false);
 
   // Fetch trips for dropdown
   const { data: tripsData } = useQuery({
@@ -175,7 +186,8 @@ const RecurringRuleForm: React.FC = () => {
   // Get selected trip details
   const selectedTrip = tripsData?.trips.find(t => t.id === formData.trip_id);
   const isSingleDayTrip = selectedTrip?.trip_type === 'single_day' || (selectedTrip?.duration_days || 1) <= 1;
-  const isTravelerBasedPricing = selectedTrip?.pricing_type === 'traveler_based';
+  // Use form's pricing_type which defaults to trip's pricing type but can be overridden
+  const isTravelerBasedPricing = formData.pricing_type === 'traveler_based';
 
   // Fetch existing rule if editing
   const { data: existingRule, isLoading: isLoadingRule } = useQuery({
@@ -203,6 +215,7 @@ const RecurringRuleForm: React.FC = () => {
         end_date: existingRule.end_date || '',
         excluded_dates: existingRule.excluded_dates || [],
         time_slots: existingRule.time_slots || [],
+        pricing_type: existingRule.pricing_type || 'regular',
         original_price: existingRule.original_price,
         sale_price: existingRule.sale_price,
         traveler_pricing: existingRule.traveler_pricing || [],
@@ -212,10 +225,23 @@ const RecurringRuleForm: React.FC = () => {
         from_location: existingRule.from_location || '',
         to_location: existingRule.to_location || '',
         cutoff_hours: existingRule.cutoff_hours || 24,
+        alert_threshold: existingRule.alert_threshold || 5,
         status: existingRule.status || 'active',
       });
     }
   }, [existingRule]);
+
+  // Set pricing type based on selected trip when not editing
+  useEffect(() => {
+    if (!isEditing && selectedTrip && !existingRule) {
+      setFormData(prev => ({
+        ...prev,
+        pricing_type: (selectedTrip.pricing_type || 'regular') as 'regular' | 'traveler_based',
+        from_location: prev.from_location || selectedTrip.starting_location || '',
+        to_location: prev.to_location || selectedTrip.ending_location || '',
+      }));
+    }
+  }, [isEditing, selectedTrip, existingRule]);
 
   // Create mutation
   const createMutation = useMutation({
@@ -375,7 +401,8 @@ const RecurringRuleForm: React.FC = () => {
                       onChange={(value) => setFormData(prev => ({ 
                         ...prev, 
                         trip_id: parseInt(value) || 0,
-                        // Reset pricing when trip changes
+                        // Reset pricing when trip changes and set pricing_type based on new trip
+                        pricing_type: (tripsData?.trips.find(t => t.id === parseInt(value))?.pricing_type || 'regular') as 'regular' | 'traveler_based',
                         traveler_pricing: [],
                         original_price: undefined,
                         sale_price: undefined,
@@ -567,58 +594,137 @@ const RecurringRuleForm: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="w-5 h-5" />
-                  {__('Pricing & Capacity', 'Pricing & Capacity')}
+                  {__('Pricing & Availability', 'Pricing & Availability')}
                 </CardTitle>
-                {selectedTrip && (
-                  <CardDescription>
-                    <Badge variant={isTravelerBasedPricing ? 'success' : 'default'}>
-                      {isTravelerBasedPricing 
-                        ? __('Traveler-Based Pricing', 'Traveler-Based Pricing') 
-                        : __('Regular Pricing', 'Regular Pricing')}
-                    </Badge>
-                  </CardDescription>
-                )}
+                <CardDescription>
+                  {__('Set pricing for traveler categories and seat availability for this rule', 'Set pricing for traveler categories and seat availability for this rule')}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Regular Pricing */}
+              <CardContent className="space-y-6">
+                {/* Pricing Type Selector */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    {__('Pricing Type', 'Pricing Type')} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                      formData.pricing_type === 'regular'
+                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="pricing_type"
+                        value="regular"
+                        checked={formData.pricing_type === 'regular'}
+                        onChange={() => setFormData(prev => ({ 
+                          ...prev, 
+                          pricing_type: 'regular',
+                          traveler_pricing: [] // Clear traveler pricing when switching to regular
+                        }))}
+                        className="sr-only"
+                      />
+                      <div className="flex flex-1">
+                        <div className="flex flex-col">
+                          <span className={`block text-sm font-medium ${
+                            formData.pricing_type === 'regular'
+                              ? 'text-blue-900 dark:text-blue-300'
+                              : 'text-gray-900 dark:text-white'
+                          }`}>
+                            {__('Regular Pricing', 'Regular Pricing')}
+                          </span>
+                          <span className={`mt-1 flex items-center text-sm ${
+                            formData.pricing_type === 'regular'
+                              ? 'text-blue-700 dark:text-blue-400'
+                              : 'text-gray-500 dark:text-gray-400'
+                          }`}>
+                            {__('Set a single price for all travelers', 'Set a single price for all travelers')}
+                          </span>
+                        </div>
+                      </div>
+                      {formData.pricing_type === 'regular' && (
+                        <div className="absolute top-4 right-4">
+                          <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                        </div>
+                      )}
+                    </label>
+
+                    <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
+                      formData.pricing_type === 'traveler_based'
+                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600'
+                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="pricing_type"
+                        value="traveler_based"
+                        checked={formData.pricing_type === 'traveler_based'}
+                        onChange={() => setFormData(prev => ({ 
+                          ...prev, 
+                          pricing_type: 'traveler_based',
+                          original_price: undefined, // Clear regular pricing when switching to traveler-based
+                          sale_price: undefined,
+                        }))}
+                        className="sr-only"
+                      />
+                      <div className="flex flex-1">
+                        <div className="flex flex-col">
+                          <span className={`block text-sm font-medium ${
+                            formData.pricing_type === 'traveler_based'
+                              ? 'text-blue-900 dark:text-blue-300'
+                              : 'text-gray-900 dark:text-white'
+                          }`}>
+                            {__('Traveler-Based Pricing', 'Traveler-Based Pricing')}
+                          </span>
+                          <span className={`mt-1 flex items-center text-sm ${
+                            formData.pricing_type === 'traveler_based'
+                              ? 'text-blue-700 dark:text-blue-400'
+                              : 'text-gray-500 dark:text-gray-400'
+                          }`}>
+                            {__('Set different prices for each traveler category', 'Set different prices for each traveler category')}
+                          </span>
+                        </div>
+                      </div>
+                      {formData.pricing_type === 'traveler_based' && (
+                        <div className="absolute top-4 right-4">
+                          <div className="h-4 w-4 rounded-full bg-blue-600"></div>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                </div>
+
+                {/* Regular Pricing Fields */}
                 {!isTravelerBasedPricing && (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Original Price', 'Original Price')}
-                      </label>
-                      <Input
-                        type="number"
-                        min={0}
-                        step="0.01"
-                        value={formData.original_price || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, original_price: parseFloat(e.target.value) || undefined }))}
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Sale Price', 'Sale Price')}
-                      </label>
-                      <Input
-                        type="number"
-                        min={0}
-                        step="0.01"
-                        value={formData.sale_price || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, sale_price: parseFloat(e.target.value) || undefined }))}
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Seats per Departure', 'Seats per Departure')}
-                      </label>
-                      <Input
-                        type="number"
-                        min={1}
-                        value={formData.seats_total}
-                        onChange={(e) => setFormData(prev => ({ ...prev, seats_total: parseInt(e.target.value) || 1 }))}
-                      />
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
+                        </label>
+                        <Input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          value={formData.original_price || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, original_price: parseFloat(e.target.value) || undefined }))}
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {__('Sale Price', 'Sale Price')}
+                        </label>
+                        <Input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          value={formData.sale_price || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, sale_price: parseFloat(e.target.value) || undefined }))}
+                          placeholder="0.00"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">{__('Leave empty if no discount', 'Leave empty if no discount')}</p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -626,79 +732,187 @@ const RecurringRuleForm: React.FC = () => {
                 {/* Traveler-Based Pricing */}
                 {isTravelerBasedPricing && (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {__('Pricing by Traveler Category', 'Pricing by Traveler Category')}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-red-500">*</span>
                       </label>
-                      {travelerCategories.length > 0 && (formData.traveler_pricing?.length || 0) < travelerCategories.length && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                        {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'Add pricing for traveler categories. Categories are managed in Traveler Categories page.')}
+                      </p>
+                    </div>
+
+                    {/* Active Categories Filter */}
+                    {(() => {
+                      const activeCategories = travelerCategories.filter((cat: TravelerCategory) => 
+                        cat.status === 'active' || cat.status === 'publish'
+                      );
+                      
+                      if (activeCategories.length === 0) {
+                        return (
+                          <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg text-center">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                              {__('No active traveler categories found.', 'No active traveler categories found.')}
+                            </p>
                         <Button
                           type="button"
                           variant="outline"
-                          size="sm"
+                              onClick={() => window.location.href = '?page=yatra&subpage=traveler-categories&action=create'}
+                              className="flex items-center gap-2 mx-auto"
+                            >
+                              <Plus className="w-4 h-4" />
+                              {__('Create Category', 'Create Category')}
+                            </Button>
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <div className="space-y-4">
+                          {/* Add Pricing Button with Dropdown */}
+                          <div className="relative">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setShowCategorySelector(!showCategorySelector)}
+                              className="flex items-center gap-2"
+                              disabled={activeCategories.filter(cat => !formData.traveler_pricing?.some(tp => tp.category_id === cat.id)).length === 0}
+                            >
+                              <Plus className="w-4 h-4" />
+                              {__('Add Pricing', 'Add Pricing')}
+                            </Button>
+                            
+                            {/* Category Selection Dropdown */}
+                            {showCategorySelector && (
+                              <>
+                                <div 
+                                  className="fixed inset-0 z-10" 
+                                  onClick={() => setShowCategorySelector(false)}
+                                />
+                                <div className="absolute top-full left-0 mt-2 w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
+                                  <div className="p-2">
+                                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1">
+                                      {__('Select a category to add pricing', 'Select a category to add pricing')}
+                                    </div>
+                                    {activeCategories
+                                      .filter(cat => !formData.traveler_pricing?.some(tp => tp.category_id === cat.id))
+                                      .length === 0 ? (
+                                      <div className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                        {__('All categories have pricing added', 'All categories have pricing added')}
+                                      </div>
+                                    ) : (
+                                      <div className="space-y-1">
+                                        {activeCategories
+                                          .filter(cat => !formData.traveler_pricing?.some(tp => tp.category_id === cat.id))
+                                          .map((category: TravelerCategory) => {
+                                            const minAge = category.age_min ?? category.min_age;
+                                            const maxAge = category.age_max ?? category.max_age;
+                                            const ageRange = minAge !== undefined || maxAge !== undefined
+                                              ? minAge !== undefined && maxAge !== undefined
+                                                ? `${minAge}-${maxAge} ${__('years', 'years')}`
+                                                : minAge !== undefined
+                                                ? `${minAge}+ ${__('years', 'years')}`
+                                                : maxAge !== undefined
+                                                ? `${__('Under', 'Under')} ${maxAge} ${__('years', 'years')}`
+                                                : ''
+                                              : null;
+                                            const categoryName = category.label || category.name || `Category ${category.id}`;
+
+                                            return (
+                                              <button
+                                                key={category.id}
+                                                type="button"
                           onClick={() => {
-                            // Add the first unassigned category
-                            const existingCategoryIds = formData.traveler_pricing?.map(tp => tp.category_id) || [];
-                            const nextCategory = travelerCategories.find(cat => !existingCategoryIds.includes(cat.id));
-                            if (nextCategory) {
                               setFormData(prev => ({
                                 ...prev,
                                 traveler_pricing: [...(prev.traveler_pricing || []), {
-                                  category_id: nextCategory.id,
+                                                      category_id: category.id,
                                   original_price: 0,
                                   sale_price: undefined,
                                 }]
                               }));
-                            }
+                                                  setShowCategorySelector(false);
                           }}
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          {__('Add Category', 'Add Category')}
-                        </Button>
+                                                className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                              >
+                                                <div className="font-medium text-sm text-gray-900 dark:text-white">
+                                                  {categoryName}
+                                                  {ageRange && (
+                                                    <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                      ({ageRange})
+                                                    </span>
                       )}
                     </div>
-
-                    {(!formData.traveler_pricing || formData.traveler_pricing.length === 0) ? (
-                      <div className="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
-                        <DollarSign className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                          {__('No traveler pricing configured yet', 'No traveler pricing configured yet')}
-                        </p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">
-                          {__('Add pricing for different traveler categories (e.g., Adult, Child, Senior)', 'Add pricing for different traveler categories (e.g., Adult, Child, Senior)')}
-                        </p>
+                                                {category.description && (
+                                                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                    {category.description}
                       </div>
-                    ) : (
+                                                )}
+                                              </button>
+                                            );
+                                          })}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </div>
+
+                          {/* Added Pricing List */}
+                          {formData.traveler_pricing && formData.traveler_pricing.length > 0 && (
                       <div className="space-y-3">
                         {formData.traveler_pricing.map((pricing, index) => {
-                          const category = travelerCategories.find(cat => cat.id === pricing.category_id);
+                                const category = activeCategories.find(cat => cat.id === pricing.category_id);
+                                if (!category) return null;
+                                
+                                const minAge = category.age_min ?? category.min_age;
+                                const maxAge = category.age_max ?? category.max_age;
+                                const categoryName = category.label || category.name || `Category ${pricing.category_id}`;
+
                           return (
-                            <div key={index} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                              <div className="flex items-center justify-between mb-3">
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                  {category?.name || `Category ${pricing.category_id}`}
-                                  {category?.min_age !== undefined && category?.max_age !== undefined && (
-                                    <span className="text-gray-400 font-normal ml-2">
-                                      ({category.min_age}-{category.max_age} {__('years', 'years')})
+                                  <div key={pricing.category_id} className="p-4 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                    <div className="flex items-start justify-between mb-3">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                                            {categoryName}
+                                            {(minAge !== undefined || maxAge !== undefined) && (
+                                              <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                (
+                                                {minAge !== undefined && maxAge !== undefined
+                                                  ? `${minAge}-${maxAge} ${__('years', 'years')}`
+                                                  : minAge !== undefined
+                                                  ? `${minAge}+ ${__('years', 'years')}`
+                                                  : maxAge !== undefined
+                                                  ? `${__('Under', 'Under')} ${maxAge} ${__('years', 'years')}`
+                                                  : ''}
+                                                )
                                     </span>
                                   )}
-                                </span>
-                                <Button
+                                          </h4>
+                                        </div>
+                                        {category.description && (
+                                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                                            {category.description}
+                                          </p>
+                                        )}
+                                      </div>
+                                      <button
                                   type="button"
-                                  variant="ghost"
-                                  size="sm"
                                   onClick={() => setFormData(prev => ({
                                     ...prev,
                                     traveler_pricing: prev.traveler_pricing?.filter((_, i) => i !== index) || []
                                   }))}
-                                  className="text-red-500 hover:text-red-600 h-8 w-8 p-0"
+                                        className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                        title={__('Remove Pricing', 'Remove Pricing')}
                                 >
                                   <X className="w-4 h-4" />
-                                </Button>
+                                      </button>
                               </div>
-                              <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
-                                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                    {__('Original Price', 'Original Price')}
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                          {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
                                   </label>
                                   <Input
                                     type="number"
@@ -710,13 +924,12 @@ const RecurringRuleForm: React.FC = () => {
                                       newPricing[index].original_price = parseFloat(e.target.value) || 0;
                                       setFormData(prev => ({ ...prev, traveler_pricing: newPricing }));
                                     }}
-                                    className="text-sm"
                                     placeholder="0.00"
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                    {__('Sale Price', 'Sale Price')}
+                                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                          {__('Sale Price', 'Sale Price')} ({__('Optional', 'Optional')})
                                   </label>
                                   <Input
                                     type="number"
@@ -738,19 +951,43 @@ const RecurringRuleForm: React.FC = () => {
                         })}
                       </div>
                     )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
 
-                    {/* Seats - always needed for traveler-based pricing */}
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Seats per Departure', 'Seats per Departure')}
-                      </label>
-                      <Input
-                        type="number"
-                        min={1}
-                        value={formData.seats_total}
-                        onChange={(e) => setFormData(prev => ({ ...prev, seats_total: parseInt(e.target.value) || 1 }))}
-                        className="max-w-xs"
-                      />
+                {/* Inventory Management - Common for both pricing types */}
+                {selectedTrip && (
+                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+                      {__('Inventory Management', 'Inventory Management')}
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {__('Total Capacity', 'Total Capacity')} <span className="text-red-500">*</span>
+                        </label>
+                        <Input
+                          type="number"
+                          min={1}
+                          value={formData.seats_total}
+                          onChange={(e) => setFormData(prev => ({ ...prev, seats_total: parseInt(e.target.value) || 1 }))}
+                        />
+                        <p className="mt-1 text-xs text-gray-500">{__('Maximum number of seats available for this rule', 'Maximum number of seats available for this rule')}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {__('Alert Threshold', 'Alert Threshold')}
+                        </label>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={formData.alert_threshold}
+                          onChange={(e) => setFormData(prev => ({ ...prev, alert_threshold: parseInt(e.target.value) || 0 }))}
+                        />
+                        <p className="mt-1 text-xs text-gray-500">{__('Alert when available seats drop below this number', 'Alert when available seats drop below this number')}</p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -800,7 +1037,13 @@ const RecurringRuleForm: React.FC = () => {
                         size="sm"
                         onClick={() => setFormData(prev => ({
                           ...prev,
-                          time_slots: [...prev.time_slots, { departure_time: '09:00', arrival_time: '17:00', seats: 20, price: 0 }]
+                          time_slots: [...prev.time_slots, { 
+                            departure_time: '09:00', 
+                            arrival_time: '17:00', 
+                            seats: 20, 
+                            price: 0,
+                            traveler_pricing: isTravelerBasedPricing ? [] : undefined
+                          }]
                         }))}
                       >
                         <Plus className="w-4 h-4 mr-1" />
@@ -839,13 +1082,15 @@ const RecurringRuleForm: React.FC = () => {
                                 <X className="w-4 h-4" />
                               </Button>
                             </div>
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div className="space-y-3">
+                              {/* Time fields on first line */}
+                              <div className="grid grid-cols-2 gap-3">
                                               <div>
                                                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                                  {__('Start Time', 'Start Time')}
+                                  {__('Departure Time', 'Departure Time')}
                                                 </label>
                                                 <TimePicker
-                                                  value={slot.departure_time}
+                                  value={slot.departure_time || ''}
                                                   onChange={(value: string) => {
                                                     const newSlots = [...formData.time_slots];
                                                     newSlots[index].departure_time = value;
@@ -856,10 +1101,10 @@ const RecurringRuleForm: React.FC = () => {
                                               </div>
                                               <div>
                                                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                                  {__('End Time', 'End Time')}
+                                  {__('Arrival Time', 'Arrival Time')}
                                                 </label>
                                                 <TimePicker
-                                                  value={slot.arrival_time}
+                                  value={slot.arrival_time || ''}
                                                   onChange={(value: string) => {
                                                     const newSlots = [...formData.time_slots];
                                                     newSlots[index].arrival_time = value;
@@ -868,6 +1113,11 @@ const RecurringRuleForm: React.FC = () => {
                                                   placeholder="17:00"
                                                 />
                                               </div>
+                              </div>
+                              
+                              {/* Seats, Price and Sale Price on second line */}
+                              {!isTravelerBasedPricing && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                               <div>
                                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                                   {__('Seats', 'Seats')}
@@ -902,7 +1152,265 @@ const RecurringRuleForm: React.FC = () => {
                                   placeholder="0.00"
                                 />
                               </div>
+                                  <div>
+                                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                      {__('Sale Price', 'Sale Price')}
+                                    </label>
+                                    <Input
+                                      type="number"
+                                      min={0}
+                                      step="0.01"
+                                      value={slot.sale_price || ''}
+                                      onChange={(e) => {
+                                        const newSlots = [...formData.time_slots];
+                                        newSlots[index].sale_price = parseFloat(e.target.value) || undefined;
+                                        setFormData(prev => ({ ...prev, time_slots: newSlots }));
+                                      }}
+                                      className="text-sm"
+                                      placeholder="0.00"
+                                    />
                             </div>
+                                </div>
+                              )}
+                              
+                              {/* For traveler-based pricing, only show seats on second line */}
+                              {isTravelerBasedPricing && (
+                                <div>
+                                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                    {__('Seats', 'Seats')}
+                                  </label>
+                                  <Input
+                                    type="number"
+                                    min={1}
+                                    value={slot.seats}
+                                    onChange={(e) => {
+                                      const newSlots = [...formData.time_slots];
+                                      newSlots[index].seats = parseInt(e.target.value) || 1;
+                                      setFormData(prev => ({ ...prev, time_slots: newSlots }));
+                                    }}
+                                    className="text-sm"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Traveler Pricing for Time Slot - only show when traveler-based */}
+                            {isTravelerBasedPricing && (
+                              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div>
+                                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                      {__('Traveler Category Pricing', 'Traveler Category Pricing')}
+                                    </span>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                      {__('Set pricing for each traveler category for this time slot', 'Set pricing for each traveler category for this time slot')}
+                                    </p>
+                                  </div>
+                                </div>
+                                
+                                {(() => {
+                                  const activeCategories = travelerCategories.filter((cat: TravelerCategory) => 
+                                    cat.status === 'active' || cat.status === 'publish'
+                                  );
+                                  const slotTravelerPricing = slot.traveler_pricing || [];
+                                  const availableCategories = activeCategories.filter(cat => 
+                                    !slotTravelerPricing.some(tp => tp.category_id === cat.id)
+                                  );
+                                  
+                                  return (
+                                    <div className="space-y-3">
+                                      {/* Add Pricing Button with Dropdown */}
+                                      <div className="relative">
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => {
+                                            // Toggle dropdown for this specific slot
+                                            const dropdownId = `slot-${index}-category-dropdown`;
+                                            const dropdown = document.getElementById(dropdownId);
+                                            if (dropdown) {
+                                              dropdown.classList.toggle('hidden');
+                                            }
+                                          }}
+                                          disabled={availableCategories.length === 0}
+                                        >
+                                          <Plus className="w-3 h-3 mr-1" />
+                                          {__('Add Pricing', 'Add Pricing')}
+                                        </Button>
+                                        
+                                        {/* Category Selection Dropdown */}
+                                        <div 
+                                          id={`slot-${index}-category-dropdown`}
+                                          className="hidden absolute top-full left-0 mt-2 w-full max-w-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-64 overflow-y-auto"
+                                        >
+                                          <div className="p-2">
+                                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1">
+                                              {__('Select a category to add pricing', 'Select a category to add pricing')}
+                                            </div>
+                                            {availableCategories.length === 0 ? (
+                                              <div className="px-3 py-3 text-xs text-gray-500 dark:text-gray-400 text-center">
+                                                {__('All categories have pricing added', 'All categories have pricing added')}
+                                              </div>
+                                            ) : (
+                                              <div className="space-y-1">
+                                                {availableCategories.map((category: TravelerCategory) => {
+                                                  const minAge = category.age_min ?? category.min_age;
+                                                  const maxAge = category.age_max ?? category.max_age;
+                                                  const ageRange = minAge !== undefined || maxAge !== undefined
+                                                    ? minAge !== undefined && maxAge !== undefined
+                                                      ? `${minAge}-${maxAge} ${__('years', 'years')}`
+                                                      : minAge !== undefined
+                                                      ? `${minAge}+ ${__('years', 'years')}`
+                                                      : `${__('Under', 'Under')} ${maxAge} ${__('years', 'years')}`
+                                                    : null;
+                                                  const categoryName = category.label || category.name || `Category ${category.id}`;
+
+                                                  return (
+                                                    <button
+                                                      key={category.id}
+                                                      type="button"
+                                                      onClick={() => {
+                                                        const newSlots = [...formData.time_slots];
+                                                        if (!newSlots[index].traveler_pricing) {
+                                                          newSlots[index].traveler_pricing = [];
+                                                        }
+                                                        newSlots[index].traveler_pricing = [...newSlots[index].traveler_pricing!, {
+                                                          category_id: category.id,
+                                                          original_price: 0,
+                                                          sale_price: undefined,
+                                                        }];
+                                                        setFormData(prev => ({ ...prev, time_slots: newSlots }));
+                                                        // Hide dropdown
+                                                        const dropdown = document.getElementById(`slot-${index}-category-dropdown`);
+                                                        if (dropdown) dropdown.classList.add('hidden');
+                                                      }}
+                                                      className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                    >
+                                                      <div className="font-medium text-xs text-gray-900 dark:text-white">
+                                                        {categoryName}
+                                                        {ageRange && (
+                                                          <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                            ({ageRange})
+                                                          </span>
+                                                        )}
+                                                      </div>
+                                                      {category.description && (
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                                                          {category.description}
+                                                        </div>
+                                                      )}
+                                                    </button>
+                                                  );
+                                                })}
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {/* Added Pricing List */}
+                                      {slotTravelerPricing.length > 0 && (
+                                        <div className="space-y-2">
+                                          {slotTravelerPricing.map((tp, tpIndex) => {
+                                            const category = activeCategories.find(cat => cat.id === tp.category_id);
+                                            if (!category) return null;
+                                            
+                                            const minAge = category.age_min ?? category.min_age;
+                                            const maxAge = category.age_max ?? category.max_age;
+                                            const categoryName = category.label || category.name || `Category ${tp.category_id}`;
+
+                                            return (
+                                              <div key={tp.category_id} className="p-3 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                                <div className="flex items-start justify-between mb-2">
+                                                  <div className="flex-1">
+                                                    <span className="text-xs font-semibold text-gray-900 dark:text-white">
+                                                      {categoryName}
+                                                      {(minAge !== undefined || maxAge !== undefined) && (
+                                                        <span className="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                          ({minAge !== undefined && maxAge !== undefined
+                                                            ? `${minAge}-${maxAge}`
+                                                            : minAge !== undefined
+                                                            ? `${minAge}+`
+                                                            : `<${maxAge}`} {__('yrs', 'yrs')})
+                                                        </span>
+                                                      )}
+                                                    </span>
+                                                  </div>
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                      const newSlots = [...formData.time_slots];
+                                                      if (newSlots[index] && newSlots[index].traveler_pricing) {
+                                                        newSlots[index].traveler_pricing = newSlots[index].traveler_pricing!.filter((_, i) => i !== tpIndex);
+                                                        setFormData(prev => ({ ...prev, time_slots: newSlots }));
+                                                      }
+                                                    }}
+                                                    className="p-0.5 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                                  >
+                                                    <X className="w-3 h-3" />
+                                                  </button>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                  <div>
+                                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                                      {__('Price', 'Price')} <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <Input
+                                                      type="number"
+                                                      min={0}
+                                                      step="0.01"
+                                                      value={tp.original_price || ''}
+                                                      onChange={(e) => {
+                                                        const newSlots = [...formData.time_slots];
+                                                        if (newSlots[index] && newSlots[index].traveler_pricing) {
+                                                          newSlots[index].traveler_pricing![tpIndex].original_price = parseFloat(e.target.value) || 0;
+                                                          setFormData(prev => ({ ...prev, time_slots: newSlots }));
+                                                        }
+                                                      }}
+                                                      className="text-xs"
+                                                      placeholder="0.00"
+                                                    />
+                                                  </div>
+                                                  <div>
+                                                    <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                                      {__('Sale', 'Sale')}
+                                                    </label>
+                                                    <Input
+                                                      type="number"
+                                                      min={0}
+                                                      step="0.01"
+                                                      value={tp.sale_price || ''}
+                                                      onChange={(e) => {
+                                                        const newSlots = [...formData.time_slots];
+                                                        if (newSlots[index] && newSlots[index].traveler_pricing) {
+                                                          newSlots[index].traveler_pricing![tpIndex].sale_price = parseFloat(e.target.value) || undefined;
+                                                          setFormData(prev => ({ ...prev, time_slots: newSlots }));
+                                                        }
+                                                      }}
+                                                      className="text-xs"
+                                                      placeholder="0.00"
+                                                    />
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      )}
+                                      
+                                      {slotTravelerPricing.length === 0 && (
+                                        <div className="text-center py-3 bg-gray-100 dark:bg-gray-800 rounded border border-dashed border-gray-300 dark:border-gray-600">
+                                          <p className="text-xs text-gray-500">
+                                            {__('Click "Add Pricing" to set prices for traveler categories', 'Click "Add Pricing" to set prices for traveler categories')}
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

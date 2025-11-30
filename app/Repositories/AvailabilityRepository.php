@@ -149,9 +149,11 @@ class AvailabilityRepository extends BaseRepository
             'seats_available' => (int) ($data['seats_available'] ?? ($data['seats_total'] ?? 0)),
             'seats_reserved' => (int) ($data['seats_reserved'] ?? 0),
             'seats_waitlist' => (int) ($data['seats_waitlist'] ?? 0),
+            'pricing_type' => sanitize_text_field($data['pricing_type'] ?? 'regular'),
             'original_price' => !empty($data['original_price']) ? (float) $data['original_price'] : null,
             'discounted_price' => !empty($data['discounted_price']) ? (float) $data['discounted_price'] : null,
             'discount_percentage' => !empty($data['discount_percentage']) ? (float) $data['discount_percentage'] : null,
+            'price_types' => !empty($data['price_types']) ? (is_array($data['price_types']) ? wp_json_encode($data['price_types']) : $data['price_types']) : null,
             'status' => sanitize_text_field($data['status'] ?? 'available'),
             'from_location' => !empty($data['from_location']) ? sanitize_text_field($data['from_location']) : null,
             'to_location' => !empty($data['to_location']) ? sanitize_text_field($data['to_location']) : null,
@@ -167,7 +169,7 @@ class AvailabilityRepository extends BaseRepository
         
         $this->wpdb->insert($table, $insertData, [
             '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d',
-            '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%d'
+            '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%d'
         ]);
         
         return $this->wpdb->insert_id;
@@ -192,9 +194,11 @@ class AvailabilityRepository extends BaseRepository
         if (isset($data['seats_available'])) $updateData['seats_available'] = (int) $data['seats_available'];
         if (isset($data['seats_reserved'])) $updateData['seats_reserved'] = (int) $data['seats_reserved'];
         if (isset($data['seats_waitlist'])) $updateData['seats_waitlist'] = (int) $data['seats_waitlist'];
+        if (isset($data['pricing_type'])) $updateData['pricing_type'] = sanitize_text_field($data['pricing_type']);
         if (isset($data['original_price'])) $updateData['original_price'] = !empty($data['original_price']) ? (float) $data['original_price'] : null;
         if (isset($data['discounted_price'])) $updateData['discounted_price'] = !empty($data['discounted_price']) ? (float) $data['discounted_price'] : null;
         if (isset($data['discount_percentage'])) $updateData['discount_percentage'] = !empty($data['discount_percentage']) ? (float) $data['discount_percentage'] : null;
+        if (isset($data['price_types'])) $updateData['price_types'] = !empty($data['price_types']) ? (is_array($data['price_types']) ? wp_json_encode($data['price_types']) : $data['price_types']) : null;
         if (isset($data['status'])) $updateData['status'] = sanitize_text_field($data['status']);
         if (isset($data['from_location'])) $updateData['from_location'] = !empty($data['from_location']) ? sanitize_text_field($data['from_location']) : null;
         if (isset($data['to_location'])) $updateData['to_location'] = !empty($data['to_location']) ? sanitize_text_field($data['to_location']) : null;
