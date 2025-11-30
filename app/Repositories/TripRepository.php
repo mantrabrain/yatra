@@ -199,16 +199,25 @@ class TripRepository extends BaseRepository
         global $wpdb;
         $table = $wpdb->prefix . 'yatra_trip_price_types';
         
-        return $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT tpt.*, tc.label as category_label, tc.slug as category_slug 
-                 FROM `{$table}` tpt
-                 LEFT JOIN `{$wpdb->prefix}yatra_traveler_categories` tc ON tpt.category_id = tc.id
-                 WHERE tpt.trip_id = %d
-                 ORDER BY tpt.id ASC",
-                $tripId
-            )
-        ) ?: [];
+        $sql = $wpdb->prepare(
+            "SELECT tpt.*, tc.label as category_label, tc.slug as category_slug 
+             FROM `{$table}` tpt
+             LEFT JOIN `{$wpdb->prefix}yatra_traveler_categories` tc ON tpt.category_id = tc.id
+             WHERE tpt.trip_id = %d
+             ORDER BY tpt.id ASC",
+            $tripId
+        );
+        
+        error_log("Yatra getPriceTypes: SQL=" . $sql);
+        
+        $results = $wpdb->get_results($sql) ?: [];
+        
+        error_log("Yatra getPriceTypes: tripId={$tripId}, count=" . count($results));
+        if (!empty($results)) {
+            error_log("Yatra getPriceTypes: results=" . json_encode($results));
+        }
+        
+        return $results;
     }
 
     /**
@@ -482,30 +491,69 @@ class TripRepository extends BaseRepository
         global $wpdb;
         $table = $wpdb->prefix . 'yatra_trip_price_types';
         
-        // Delete existing
-        $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
+        error_log("Yatra savePriceTypes: START - tripId={$tripId}, count=" . count($priceTypes));
+        error_log("Yatra savePriceTypes: priceTypes=" . json_encode($priceTypes));
         
-        // Insert new
+        // Delete existing price types for this trip first
+        $deleteResult = $wpdb->query($wpdb->prepare(
+            "DELETE FROM `{$table}` WHERE `trip_id` = %d",
+            $tripId
+        ));
+        
+        error_log("Yatra savePriceTypes: Deleted {$deleteResult} existing price types");
+        
+        // Insert new price types
         if (!empty($priceTypes)) {
-            foreach ($priceTypes as $priceType) {
-                $wpdb->insert(
-                    $table,
-                    [
-                        'trip_id' => $tripId,
-                        'category_id' => (int) ($priceType['category_id'] ?? 0),
-                        'original_price' => (float) ($priceType['original_price'] ?? 0),
-                        'discounted_price' => isset($priceType['discounted_price']) ? (float) $priceType['discounted_price'] : null,
-                        'sale_price' => isset($priceType['sale_price']) ? (float) $priceType['sale_price'] : null,
-                        'is_default' => (bool) ($priceType['is_default'] ?? false) ? 1 : 0,
-                        'min_quantity' => isset($priceType['min_quantity']) ? (int) $priceType['min_quantity'] : 1,
-                        'max_quantity' => isset($priceType['max_quantity']) ? (int) $priceType['max_quantity'] : null,
-                        'valid_from' => $priceType['valid_from'] ?? null,
-                        'valid_to' => $priceType['valid_to'] ?? null,
-                    ],
-                    ['%d', '%d', '%f', '%f', '%f', '%d', '%d', '%d', '%s', '%s']
-                );
+            // Track category IDs to prevent duplicates in input
+            $processedCategories = [];
+            
+            foreach ($priceTypes as $index => $priceType) {
+                error_log("Yatra savePriceTypes: Processing index={$index}, priceType=" . json_encode($priceType));
+                
+                $categoryId = (int) ($priceType['category_id'] ?? 0);
+                
+                // Skip if category_id is 0 or already processed (duplicate in input)
+                if ($categoryId <= 0) {
+                    error_log("Yatra savePriceTypes: Skipping - invalid category_id={$categoryId}");
+                    continue;
+                }
+                
+                if (in_array($categoryId, $processedCategories, true)) {
+                    error_log("Yatra savePriceTypes: Skipping - duplicate category_id={$categoryId}");
+                    continue;
+                }
+                
+                $processedCategories[] = $categoryId;
+                
+                // Simple insert with all required fields
+                $insertData = [
+                    'trip_id' => $tripId,
+                    'category_id' => $categoryId,
+                    'original_price' => (float) ($priceType['original_price'] ?? 0),
+                    'is_default' => 0,
+                    'min_quantity' => 1,
+                ];
+                
+                // Add optional fields if they have values
+                if (isset($priceType['discounted_price']) && $priceType['discounted_price'] !== '' && $priceType['discounted_price'] !== null) {
+                    $insertData['discounted_price'] = (float) $priceType['discounted_price'];
+                }
+                
+                error_log("Yatra savePriceTypes: Inserting data=" . json_encode($insertData));
+                
+                $result = $wpdb->insert($table, $insertData);
+                
+                if ($result === false) {
+                    error_log("Yatra savePriceTypes: INSERT FAILED - " . $wpdb->last_error);
+                } else {
+                    error_log("Yatra savePriceTypes: INSERT SUCCESS - insert_id=" . $wpdb->insert_id);
+                }
             }
+        } else {
+            error_log("Yatra savePriceTypes: No price types to insert (empty array)");
         }
+        
+        error_log("Yatra savePriceTypes: END");
     }
 
     /**

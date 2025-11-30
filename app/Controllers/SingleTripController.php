@@ -139,10 +139,11 @@ class SingleTripController
         // Get price types from database table (for traveler-based pricing)
         $trip->price_types = $this->getPriceTypes((int) $trip->id);
         
-        // Determine pricing type
-        $trip->pricing_type = $trip->pricing_type ?? 'regular';
-        if (empty($trip->pricing_type) && !empty($trip->price_types)) {
-            $trip->pricing_type = 'traveler_based';
+        // Determine pricing type - use database value, fallback to 'regular'
+        // If pricing_type is set to 'traveler_based' in DB, use that
+        // If pricing_type is empty but price_types exist, infer 'traveler_based'
+        if (empty($trip->pricing_type)) {
+            $trip->pricing_type = !empty($trip->price_types) ? 'traveler_based' : 'regular';
         }
         $trip->itinerary_days = $this->decodeJson($trip->itinerary_days ?? '');
         $trip->faqs = $this->decodeJson($trip->faqs ?? '');
@@ -265,17 +266,17 @@ class SingleTripController
         $table = $this->wpdb->prefix . 'yatra_trip_price_types';
         $categories_table = $this->wpdb->prefix . 'yatra_traveler_categories';
         
-        $price_types = $this->wpdb->get_results(
-            $this->wpdb->prepare(
-                "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, 
-                        tc.description as category_description, tc.age_min, tc.age_max
-                 FROM {$table} pt
-                 LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
-                 WHERE pt.trip_id = %d
-                 ORDER BY tc.sort_order ASC, pt.id ASC",
-                $trip_id
-            )
-        ) ?: [];
+        $sql = $this->wpdb->prepare(
+            "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, 
+                    tc.description as category_description, tc.age_min, tc.age_max
+             FROM {$table} pt
+             LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
+             WHERE pt.trip_id = %d
+             ORDER BY pt.id ASC",
+            $trip_id
+        );
+        
+        $price_types = $this->wpdb->get_results($sql) ?: [];
         
         // Format price types for frontend use
         foreach ($price_types as $pt) {

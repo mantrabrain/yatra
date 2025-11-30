@@ -129,19 +129,151 @@ class BookingSessionController extends BaseController
             ], 404);
         }
 
+        global $wpdb;
+        
+        // Get availability-specific data if date provided
+        $availability = null;
+        $availability_id = !empty($data['availability_id']) ? sanitize_text_field($data['availability_id']) : null;
+        $travel_date = !empty($data['travel_date']) ? sanitize_text_field($data['travel_date']) : '';
+        $departure_time = !empty($data['departure_time']) ? sanitize_text_field($data['departure_time']) : '';
+        
+        // Try to find specific availability
+        if ($travel_date) {
+            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
+            $query = "SELECT * FROM {$availability_table} WHERE trip_id = %d AND departure_date = %s";
+            $params = [(int) $data['trip_id'], $travel_date];
+            
+            if ($departure_time) {
+                $query .= " AND departure_time = %s";
+                $params[] = $departure_time;
+            }
+            
+            $query .= " LIMIT 1";
+            $availability = $wpdb->get_row($wpdb->prepare($query, ...$params));
+        }
+        
+        // Priority: Use data sent from frontend (availability card) first
+        // 1. Frontend-sent pricing_type and price_types (from availability card)
+        // 2. Database availability pricing
+        // 3. Trip pricing
+        
+        $pricing_type = !empty($data['pricing_type']) ? sanitize_text_field($data['pricing_type']) : ($trip->pricing_type ?? 'regular');
+        $trip_price = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
+        $price_types = [];
+        
+        // First priority: price_types sent from frontend (from availability card)
+        if (!empty($data['price_types']) && is_array($data['price_types'])) {
+            $price_types = $data['price_types'];
+        }
+        // Second priority: availability from database
+        elseif ($availability) {
+            $pricing_type = $availability->pricing_type ?? $pricing_type;
+            
+            // Get availability price
+            if (!empty($availability->discounted_price)) {
+                $trip_price = (float) $availability->discounted_price;
+            } elseif (!empty($availability->original_price)) {
+                $trip_price = (float) $availability->original_price;
+            }
+            
+            // Get price_types if traveler-based
+            if (!empty($availability->price_types)) {
+                $price_types = is_string($availability->price_types) 
+                    ? (json_decode($availability->price_types, true) ?: []) 
+                    : $availability->price_types;
+            }
+        }
+        
+        // Third priority: If no price_types yet, use trip's price_types
+        if (empty($price_types) && $pricing_type === 'traveler_based' && !empty($trip->price_types)) {
+            $price_types = is_array($trip->price_types) ? $trip->price_types : [];
+        }
+        
+        // Enrich price_types with category labels if needed (some might already have them from frontend)
+        if (!empty($price_types)) {
+            $needsEnrichment = false;
+            foreach ($price_types as $pt) {
+                $pt = (array) $pt;
+                if (empty($pt['category_label']) && !empty($pt['category_id'])) {
+                    $needsEnrichment = true;
+                    break;
+                }
+            }
+            
+            if ($needsEnrichment) {
+                $categoryIds = array_filter(array_map(function($p) {
+                    $p = (array) $p;
+                    return isset($p['category_id']) ? (int) $p['category_id'] : null;
+                }, $price_types));
+                
+                if (!empty($categoryIds)) {
+                    $categories_table = $wpdb->prefix . 'yatra_traveler_categories';
+                    $placeholders = implode(',', array_fill(0, count($categoryIds), '%d'));
+                    $cats = $wpdb->get_results($wpdb->prepare(
+                        "SELECT id, label, slug, age_min, age_max FROM {$categories_table} WHERE id IN ({$placeholders})",
+                        ...$categoryIds
+                    ));
+                    
+                    $catIndex = [];
+                    foreach ($cats as $cat) {
+                        $catIndex[(int) $cat->id] = $cat;
+                    }
+                    
+                    foreach ($price_types as &$pt) {
+                        $pt = (array) $pt;
+                        $catId = isset($pt['category_id']) ? (int) $pt['category_id'] : null;
+                        if ($catId && isset($catIndex[$catId]) && empty($pt['category_label'])) {
+                            $cat = $catIndex[$catId];
+                            $pt['category_label'] = $cat->label;
+                            $pt['category_slug'] = $cat->slug;
+                            $pt['age_min'] = $cat->age_min ? (int) $cat->age_min : null;
+                            $pt['age_max'] = $cat->age_max ? (int) $cat->age_max : null;
+                        }
+                        // Ensure effective price is set
+                        if (!isset($pt['effective_price'])) {
+                            $pt['effective_price'] = $pt['sale_price'] ?? $pt['discounted_price'] ?? $pt['original_price'] ?? 0;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Parse traveler_counts if provided (for traveler-based pricing)
+        $traveler_counts = [];
+        if (!empty($data['traveler_counts']) && is_array($data['traveler_counts'])) {
+            $traveler_counts = $data['traveler_counts'];
+        }
+        
+        // Calculate total travelers
+        $travelers_count = isset($data['travelers']) ? max(1, (int) $data['travelers']) : 1;
+        if (!empty($traveler_counts)) {
+            $travelers_count = array_sum(array_map('intval', $traveler_counts));
+            if ($travelers_count < 1) $travelers_count = 1;
+        }
+
+        // Determine if day trip - prefer frontend value, fallback to trip duration
+        $is_day_trip = isset($data['is_day_trip']) ? (bool) $data['is_day_trip'] : (($trip->duration_days ?? 1) <= 1);
+        
         // Prepare session data
         $session_data = [
             'trip_id' => (int) $trip->id,
             'trip_title' => $trip->title,
             'trip_slug' => $trip->slug,
-            'trip_price' => !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price,
+            'trip_price' => $trip_price,
             'currency' => $trip->currency ?: 'USD',
             'min_travelers' => (int) ($trip->min_travelers ?: 1),
             'max_travelers' => (int) ($trip->max_travelers ?: 20),
             'duration_days' => (int) ($trip->duration_days ?: 1),
-            'travelers' => isset($data['travelers']) ? max(1, (int) $data['travelers']) : 1,
-            'travel_date' => !empty($data['travel_date']) ? sanitize_text_field($data['travel_date']) : '',
+            'travelers' => $travelers_count,
+            'travel_date' => $travel_date,
+            'departure_time' => $departure_time,
             'timestamp' => time(),
+            // Availability-specific data
+            'availability_id' => $availability_id,
+            'pricing_type' => $pricing_type,
+            'price_types' => $price_types,
+            'traveler_counts' => $traveler_counts,
+            'is_day_trip' => $is_day_trip,
         ];
 
         // Set session
@@ -356,10 +488,80 @@ class BookingSessionController extends BaseController
             ], 404);
         }
 
-        // Calculate price
-        $price_per_person = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
+        // Calculate price - Priority: 1. Availability date, 2. Trip price
+        $total_amount = 0;
+        $price_per_person = 0;
         $travelers_count = count($travelers);
-        $total_amount = $price_per_person * $travelers_count;
+        $availability = null;
+        
+        // Try to find availability-specific pricing
+        if (!empty($travel_date)) {
+            global $wpdb;
+            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
+            $availability = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM {$availability_table} WHERE trip_id = %d AND departure_date = %s LIMIT 1",
+                $trip_id,
+                $travel_date
+            ));
+        }
+        
+        // Determine pricing type and calculate total
+        $pricing_type = 'regular';
+        if ($availability) {
+            $pricing_type = $availability->pricing_type ?? $trip->pricing_type ?? 'regular';
+        } else {
+            $pricing_type = $trip->pricing_type ?? 'regular';
+        }
+        
+        if ($pricing_type === 'traveler_based') {
+            // Traveler-based pricing: Calculate based on each traveler's category
+            $price_types = [];
+            
+            if ($availability && !empty($availability->price_types)) {
+                $price_types = is_string($availability->price_types) 
+                    ? (json_decode($availability->price_types, true) ?: []) 
+                    : $availability->price_types;
+            }
+            
+            // If no availability pricing, use trip price types
+            if (empty($price_types) && !empty($trip->price_types)) {
+                $price_types = is_array($trip->price_types) ? $trip->price_types : [];
+            }
+            
+            // Index price types by category_id
+            $priceByCategory = [];
+            foreach ($price_types as $pt) {
+                $pt = (object) $pt;
+                $catId = $pt->category_id ?? null;
+                if ($catId) {
+                    $priceByCategory[$catId] = $pt->effective_price ?? $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0;
+                }
+            }
+            
+            // Calculate total for each traveler based on their category
+            foreach ($travelers as $traveler) {
+                $categoryId = $traveler['category_id'] ?? null;
+                if ($categoryId && isset($priceByCategory[$categoryId])) {
+                    $total_amount += (float) $priceByCategory[$categoryId];
+                } else {
+                    // Fallback to first category price or trip price
+                    $firstPrice = !empty($priceByCategory) ? reset($priceByCategory) : 0;
+                    $total_amount += $firstPrice > 0 ? (float) $firstPrice : ((float) ($trip->sale_price ?? $trip->original_price));
+                }
+            }
+            
+            $price_per_person = $travelers_count > 0 ? $total_amount / $travelers_count : 0;
+        } else {
+            // Regular pricing
+            if ($availability && !empty($availability->discounted_price)) {
+                $price_per_person = (float) $availability->discounted_price;
+            } elseif ($availability && !empty($availability->original_price)) {
+                $price_per_person = (float) $availability->original_price;
+            } else {
+                $price_per_person = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
+            }
+            $total_amount = $price_per_person * $travelers_count;
+        }
 
         // Handle payment method
         $payment_method = sanitize_text_field($data['payment_method'] ?? 'full');

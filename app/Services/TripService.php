@@ -293,6 +293,7 @@ class TripService extends BaseService
             'itinerary_days',
             'availability_dates',
             'trip_category',
+            'price_types', // Include price_types in relationship fields
         ];
         
         foreach ($relationshipFields as $field) {
@@ -301,12 +302,17 @@ class TripService extends BaseService
             }
         }
         
+        // For validation, we need price_types in data temporarily
+        $priceTypesForValidation = $relationships['price_types'] ?? $data['price_types'] ?? [];
+        $data['price_types'] = $priceTypesForValidation;
+        
+        $this->validate($data);
+        
         // Remove relationship fields from data before processing
         foreach ($relationshipFields as $field) {
             unset($data[$field]);
         }
         
-        $this->validate($data);
         $data = $this->processBeforeCreate($data);
         
         return $this->repository->createWithRelations($data, $relationships);
@@ -326,12 +332,11 @@ class TripService extends BaseService
             'itinerary_days',
             'availability_dates',
             'trip_category',
+            'price_types', // Include price_types in relationship fields
         ];
         
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("Yatra TripService: updateWithRelations - trip_category in data: " . json_encode($data['trip_category'] ?? 'NOT SET'));
-            error_log("Yatra TripService: updateWithRelations - trip_category in relationships: " . json_encode($relationships['trip_category'] ?? 'NOT SET'));
-        }
+        error_log("Yatra TripService: updateWithRelations START - id={$id}");
+        error_log("Yatra TripService: price_types in relationships BEFORE: " . json_encode($relationships['price_types'] ?? 'NOT SET'));
         
         foreach ($relationshipFields as $field) {
             if (!isset($relationships[$field]) && isset($data[$field])) {
@@ -339,19 +344,143 @@ class TripService extends BaseService
             }
         }
         
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("Yatra TripService: After extraction - trip_category in relationships: " . json_encode($relationships['trip_category'] ?? 'NOT SET'));
-        }
+        error_log("Yatra TripService: price_types in relationships AFTER: " . json_encode($relationships['price_types'] ?? 'NOT SET'));
+        
+        // For validation, we need price_types in data temporarily
+        $priceTypesForValidation = $relationships['price_types'] ?? $data['price_types'] ?? [];
+        $data['price_types'] = $priceTypesForValidation;
+        
+        $this->validate($data, $id);
         
         // Remove relationship fields from data before processing
         foreach ($relationshipFields as $field) {
             unset($data[$field]);
         }
         
-        $this->validate($data, $id);
         $data = $this->processBeforeUpdate($id, $data);
         
-        return $this->repository->updateWithRelations($id, $data, $relationships);
+        $result = $this->repository->updateWithRelations($id, $data, $relationships);
+        
+        // Always sync pricing_type to availability dates and recurring rules when saving
+        if (isset($data['pricing_type'])) {
+            $this->syncPricingTypeToAvailability($id, $data['pricing_type']);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Sync pricing type to all availability dates and recurring rules for a trip
+     * This ensures availability/rules always match the trip's pricing type
+     * 
+     * @param int $tripId Trip ID
+     * @param string $pricingType The pricing type to sync ('regular' or 'traveler_based')
+     */
+    public function syncPricingTypeToAvailability(int $tripId, string $pricingType): void
+    {
+        global $wpdb;
+        
+        error_log("Yatra: Syncing pricing_type '{$pricingType}' for trip {$tripId}");
+        
+        // Update availability dates
+        $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
+        $updated_dates = $wpdb->update(
+            $availability_table,
+            ['pricing_type' => $pricingType],
+            ['trip_id' => $tripId],
+            ['%s'],
+            ['%d']
+        );
+        error_log("Yatra: Updated {$updated_dates} availability dates");
+        
+        // Update recurring rules
+        $rules_table = $wpdb->prefix . 'yatra_trip_availability_rules';
+        $updated_rules = $wpdb->update(
+            $rules_table,
+            ['pricing_type' => $pricingType],
+            ['trip_id' => $tripId],
+            ['%s'],
+            ['%d']
+        );
+        error_log("Yatra: Updated {$updated_rules} recurring rules");
+        
+        // If changing to regular pricing, clear traveler_pricing and price_types
+        if ($pricingType === 'regular') {
+            // Clear price_types from availability dates
+            $wpdb->query($wpdb->prepare(
+                "UPDATE {$availability_table} 
+                 SET price_types = NULL 
+                 WHERE trip_id = %d",
+                $tripId
+            ));
+            
+            // Clear traveler_pricing from recurring rules
+            $wpdb->query($wpdb->prepare(
+                "UPDATE {$rules_table} 
+                 SET traveler_pricing = NULL 
+                 WHERE trip_id = %d",
+                $tripId
+            ));
+            
+            // Also clear traveler_pricing from time_slots in rules
+            $rules = $wpdb->get_results($wpdb->prepare(
+                "SELECT id, time_slots FROM {$rules_table} WHERE trip_id = %d",
+                $tripId
+            ));
+            
+            foreach ($rules as $rule) {
+                if (!empty($rule->time_slots)) {
+                    $time_slots = json_decode($rule->time_slots, true);
+                    if (is_array($time_slots)) {
+                        $updated = false;
+                        foreach ($time_slots as &$slot) {
+                            if (isset($slot['traveler_pricing'])) {
+                                unset($slot['traveler_pricing']);
+                                $updated = true;
+                            }
+                        }
+                        if ($updated) {
+                            $wpdb->update(
+                                $rules_table,
+                                ['time_slots' => wp_json_encode($time_slots)],
+                                ['id' => $rule->id],
+                                ['%s'],
+                                ['%d']
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        
+        error_log("Yatra: Completed pricing sync for trip {$tripId}");
+    }
+    
+    /**
+     * Sync all trips' pricing types to their availability dates and rules
+     * This is useful for fixing existing data after code updates
+     * 
+     * @return int Number of trips synced
+     */
+    public static function syncAllTripsPricingType(): int
+    {
+        global $wpdb;
+        
+        $trips_table = $wpdb->prefix . 'yatra_trips';
+        $trips = $wpdb->get_results("SELECT id, pricing_type FROM {$trips_table} WHERE deleted_at IS NULL");
+        
+        $service = new self();
+        $count = 0;
+        
+        foreach ($trips as $trip) {
+            $pricingType = $trip->pricing_type ?: 'regular';
+            $service->syncPricingTypeToAvailability((int) $trip->id, $pricingType);
+            $count++;
+        }
+        
+        error_log("Yatra: Synced pricing type for {$count} trips");
+        
+        return $count;
     }
 
     /**

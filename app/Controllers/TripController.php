@@ -277,6 +277,11 @@ class TripController extends BaseController
             $id = (int) $request->get_param('id');
             $data = $request->get_json_params();
 
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("Yatra TripController update_item: pricing_type=" . ($data['pricing_type'] ?? 'NOT SET'));
+                error_log("Yatra TripController update_item: price_types=" . json_encode($data['price_types'] ?? 'NOT SET'));
+            }
+
             // Extract relationships (fields stored in separate tables)
             $relationships = [];
             if (isset($data['destinations'])) {
@@ -290,6 +295,9 @@ class TripController extends BaseController
             }
             if (isset($data['price_types'])) {
                 $relationships['price_types'] = $data['price_types'];
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log("Yatra TripController update_item: Added price_types to relationships: " . json_encode($data['price_types']));
+                }
             }
             if (isset($data['highlights'])) {
                 $relationships['highlights'] = $data['highlights'];
@@ -689,6 +697,7 @@ class TripController extends BaseController
         }
 
         if (isset($item->price_types)) {
+            error_log("Yatra prepare_item_for_response: price_types found, count=" . count($item->price_types));
             $data['price_types'] = array_map(function ($pt) {
                 return [
                     'id' => (int) $pt->id,
@@ -705,6 +714,10 @@ class TripController extends BaseController
                     'valid_to' => $pt->valid_to,
                 ];
             }, $item->price_types);
+            error_log("Yatra prepare_item_for_response: price_types formatted=" . json_encode($data['price_types']));
+        } else {
+            error_log("Yatra prepare_item_for_response: price_types NOT SET on item");
+            $data['price_types'] = [];
         }
 
         // Handle highlights relationship
@@ -920,6 +933,7 @@ class TripController extends BaseController
                 'max_travelers' => isset($trip->max_travelers) ? (int) $trip->max_travelers : 20,
                 'min_travelers' => isset($trip->min_travelers) ? (int) $trip->min_travelers : 1,
                 'pricing_type' => $trip->pricing_type ?? 'regular',
+                'price_types' => $trip->price_types ?? [], // Include price_types for traveler-based pricing
                 'availability_dates' => $availability_dates,
             ];
 
@@ -1036,6 +1050,25 @@ class TripController extends BaseController
                     ? date('Y-m-d', $departure_date)
                     : strtolower(date('M-Y', $departure_date));
                 
+                // Determine pricing for this availability card
+                // Priority: 1. Availability date pricing, 2. Rule pricing (inherited), 3. Trip pricing
+                $card_pricing_type = $avail->pricing_type ?? $trip_data->pricing_type ?? 'regular';
+                $card_traveler_pricing = [];
+                
+                // Get traveler pricing from availability or rule
+                if (!empty($avail->traveler_pricing)) {
+                    // From recurring rule
+                    $card_traveler_pricing = is_array($avail->traveler_pricing) ? $avail->traveler_pricing : (json_decode($avail->traveler_pricing, true) ?: []);
+                } elseif (!empty($avail->price_types)) {
+                    // From specific availability date
+                    $card_traveler_pricing = is_array($avail->price_types) ? $avail->price_types : (json_decode($avail->price_types, true) ?: []);
+                }
+                
+                // If no availability-specific pricing, fall back to trip pricing
+                if (empty($card_traveler_pricing) && $card_pricing_type === 'traveler_based' && !empty($trip_data->price_types)) {
+                    $card_traveler_pricing = $trip_data->price_types;
+                }
+                
                 $availability_cards[] = [
                     'id' => $avail->id,
                     'from_label' => $from_label,
@@ -1063,6 +1096,11 @@ class TripController extends BaseController
                     'is_day_trip' => $is_single_day,
                     'status' => $avail->status ?? 'available',
                     'is_limited' => $seats <= 5 && $seats > 0,
+                    // Card-specific pricing
+                    'pricing_type' => $card_pricing_type,
+                    'traveler_pricing' => $card_traveler_pricing,
+                    'is_recurring' => !empty($avail->is_recurring),
+                    'rule_id' => $avail->rule_id ?? null,
                 ];
             }
         }
@@ -1093,6 +1131,11 @@ class TripController extends BaseController
                     'data_date' => date('Y-m-d', strtotime('+7 days')),
                     'status' => 'available',
                     'is_limited' => false,
+                    // Use trip-level pricing for sample data
+                    'pricing_type' => $trip_data->pricing_type ?? 'regular',
+                    'traveler_pricing' => $trip_data->price_types ?? [],
+                    'is_recurring' => false,
+                    'rule_id' => null,
                 ],
             ];
             $month_filters[strtolower(date('M-Y', strtotime('+7 days')))] = date('M Y', strtotime('+7 days'));

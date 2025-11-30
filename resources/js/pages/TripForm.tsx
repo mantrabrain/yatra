@@ -1030,9 +1030,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
   // Load trip data into form when editing
   useEffect(() => {
-    console.log('useEffect triggered - tripData:', tripData, 'isEditMode:', isEditMode, 'tripId:', tripId);
     if (tripData && isEditMode) {
-      console.log('Loading trip data into form:', tripData);
       // Helper to extract IDs from relationship objects
       const extractIds = (items: any[]): number[] => {
         if (!Array.isArray(items)) return [];
@@ -1203,7 +1201,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         original_price: tripData.original_price?.toString() || '',
         discounted_price: tripData.discounted_price?.toString() || '',
         price_types: Array.isArray(tripData.price_types) ? tripData.price_types.map((pt: any) => ({
-          category_id: pt.category_id || 0,
+          category_id: Number(pt.category_id) || 0,
           original_price: pt.original_price?.toString() || '',
           discounted_price: pt.discounted_price?.toString() || '',
         })) : [],
@@ -1249,7 +1247,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         meta_description: tripData.meta_description || '',
         meta_keywords: tripData.meta_keywords || '',
       });
-      console.log('Form data set successfully');
     } else {
       console.log('Not loading data - tripData:', tripData, 'isEditMode:', isEditMode);
     }
@@ -1567,8 +1564,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   };
 
   const handlePriceTypeAdd = (categoryId: number) => {
-    // Check if category already exists
-    if (formData.price_types.some(pt => pt.category_id === categoryId)) {
+    // Check if category already exists (compare as numbers to handle string/number mismatch)
+    if (formData.price_types.some(pt => Number(pt.category_id) === Number(categoryId))) {
+      showToast(__('This category already has pricing set', 'This category already has pricing set'), 'warning');
       return;
     }
     setFormData(prev => ({
@@ -3655,7 +3653,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                         variant="outline"
                         onClick={() => setShowCategorySelector(!showCategorySelector)}
                         className="flex items-center gap-2"
-                        disabled={activeCategories.filter(cat => !formData.price_types.some(pt => pt.category_id === cat.id)).length === 0}
+                        disabled={activeCategories.filter(cat => !formData.price_types.some(pt => Number(pt.category_id) === Number(cat.id))).length === 0}
                       >
                         <Plus className="w-4 h-4" />
                         {__('Add Pricing', 'Add Pricing')}
@@ -3674,7 +3672,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                 {__('Select a category to add pricing', 'Select a category to add pricing')}
                               </div>
                               {activeCategories
-                                .filter(cat => !formData.price_types.some(pt => pt.category_id === cat.id))
+                                .filter(cat => !formData.price_types.some(pt => Number(pt.category_id) === Number(cat.id)))
                                 .length === 0 ? (
                                 <div className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
                                   {__('All categories have pricing added', 'All categories have pricing added')}
@@ -3682,7 +3680,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                               ) : (
                                 <div className="space-y-1">
                                   {activeCategories
-                                    .filter(cat => !formData.price_types.some(pt => pt.category_id === cat.id))
+                                    .filter(cat => !formData.price_types.some(pt => Number(pt.category_id) === Number(cat.id)))
                                     .map(category => {
                                       const ageRange = category.age_min !== undefined || category.age_max !== undefined
                                         ? category.age_min !== undefined && category.age_max !== undefined
@@ -3730,8 +3728,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     {formData.price_types.length > 0 && (
                       <div className="space-y-3">
                         {formData.price_types.map((priceType, index) => {
-                          const category = activeCategories.find(cat => cat.id === priceType.category_id);
-                          if (!category) return null;
+                          // Use Number() to ensure consistent comparison (handles string/number mismatch)
+                          const category = activeCategories.find(cat => Number(cat.id) === Number(priceType.category_id));
+                          if (!category) {
+                            console.log('Category not found for priceType:', priceType, 'activeCategories:', activeCategories);
+                            return null;
+                          }
 
                           return (
                             <div key={priceType.category_id} className="p-4 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg">

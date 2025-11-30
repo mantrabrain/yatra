@@ -5008,9 +5008,7 @@ const TripForm = () => {
   });
   reactExports.useEffect(() => {
     var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
-    console.log("useEffect triggered - tripData:", tripData, "isEditMode:", isEditMode, "tripId:", tripId);
     if (tripData && isEditMode) {
-      console.log("Loading trip data into form:", tripData);
       const extractIds = (items) => {
         if (!Array.isArray(items)) return [];
         return items.map((item) => {
@@ -5169,7 +5167,7 @@ const TripForm = () => {
         price_types: Array.isArray(tripData.price_types) ? tripData.price_types.map((pt) => {
           var _a3, _b3;
           return {
-            category_id: pt.category_id || 0,
+            category_id: Number(pt.category_id) || 0,
             original_price: ((_a3 = pt.original_price) == null ? void 0 : _a3.toString()) || "",
             discounted_price: ((_b3 = pt.discounted_price) == null ? void 0 : _b3.toString()) || ""
           };
@@ -5216,7 +5214,6 @@ const TripForm = () => {
         meta_description: tripData.meta_description || "",
         meta_keywords: tripData.meta_keywords || ""
       });
-      console.log("Form data set successfully");
     } else {
       console.log("Not loading data - tripData:", tripData, "isEditMode:", isEditMode);
     }
@@ -5477,7 +5474,8 @@ const TripForm = () => {
     });
   };
   const handlePriceTypeAdd = (categoryId) => {
-    if (formData.price_types.some((pt) => pt.category_id === categoryId)) {
+    if (formData.price_types.some((pt) => Number(pt.category_id) === Number(categoryId))) {
+      showToast(__("This category already has pricing set", "This category already has pricing set"), "warning");
       return;
     }
     setFormData((prev) => ({
@@ -7195,7 +7193,7 @@ const TripForm = () => {
                       variant: "outline",
                       onClick: () => setShowCategorySelector(!showCategorySelector),
                       className: "flex items-center gap-2",
-                      disabled: activeCategories.filter((cat) => !formData.price_types.some((pt) => pt.category_id === cat.id)).length === 0,
+                      disabled: activeCategories.filter((cat) => !formData.price_types.some((pt) => Number(pt.category_id) === Number(cat.id))).length === 0,
                       children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
                         __("Add Pricing", "Add Pricing")
@@ -7212,7 +7210,7 @@ const TripForm = () => {
                     ),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-full left-0 mt-2 w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1", children: __("Select a category to add pricing", "Select a category to add pricing") }),
-                      activeCategories.filter((cat) => !formData.price_types.some((pt) => pt.category_id === cat.id)).length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center", children: __("All categories have pricing added", "All categories have pricing added") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1", children: activeCategories.filter((cat) => !formData.price_types.some((pt) => pt.category_id === cat.id)).map((category) => {
+                      activeCategories.filter((cat) => !formData.price_types.some((pt) => Number(pt.category_id) === Number(cat.id))).length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center", children: __("All categories have pricing added", "All categories have pricing added") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1", children: activeCategories.filter((cat) => !formData.price_types.some((pt) => Number(pt.category_id) === Number(cat.id))).map((category) => {
                         const ageRange = category.age_min !== void 0 || category.age_max !== void 0 ? category.age_min !== void 0 && category.age_max !== void 0 ? `${category.age_min}-${category.age_max} ${__("years", "years")}` : category.age_min !== void 0 ? `${category.age_min}+ ${__("years", "years")}` : category.age_max !== void 0 ? `${__("Under", "Under")} ${category.age_max} ${__("years", "years")}` : "" : null;
                         return /* @__PURE__ */ jsxRuntimeExports.jsxs(
                           "button",
@@ -7242,8 +7240,11 @@ const TripForm = () => {
                   ] })
                 ] }),
                 formData.price_types.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: formData.price_types.map((priceType, index) => {
-                  const category = activeCategories.find((cat) => cat.id === priceType.category_id);
-                  if (!category) return null;
+                  const category = activeCategories.find((cat) => Number(cat.id) === Number(priceType.category_id));
+                  if (!category) {
+                    console.log("Category not found for priceType:", priceType, "activeCategories:", activeCategories);
+                    return null;
+                  }
                   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-3", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
@@ -34835,51 +34836,13 @@ const AvailabilityForm = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __("Set pricing for traveler categories and seat availability for this date", "Set pricing for traveler categories and seat availability for this date") })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3", children: [
-              __("Pricing Type", "Pricing Type"),
-              " ",
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: `relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${formData.pricing_type === "regular" ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"}`, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "input",
-                  {
-                    type: "radio",
-                    name: "pricing_type",
-                    value: "regular",
-                    checked: formData.pricing_type === "regular",
-                    onChange: (e) => handleFieldChange("pricing_type", e.target.value),
-                    className: "sr-only"
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `block text-sm font-medium ${formData.pricing_type === "regular" ? "text-blue-900 dark:text-blue-300" : "text-gray-900 dark:text-white"}`, children: __("Regular Pricing", "Regular Pricing") }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `mt-1 flex items-center text-sm ${formData.pricing_type === "regular" ? "text-blue-700 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`, children: __("Set a single price for all travelers", "Set a single price for all travelers") })
-                ] }) }),
-                formData.pricing_type === "regular" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-4 right-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 rounded-full bg-blue-600" }) })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: `relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${formData.pricing_type === "traveler_based" ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"}`, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "input",
-                  {
-                    type: "radio",
-                    name: "pricing_type",
-                    value: "traveler_based",
-                    checked: formData.pricing_type === "traveler_based",
-                    onChange: (e) => handleFieldChange("pricing_type", e.target.value),
-                    className: "sr-only"
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `block text-sm font-medium ${formData.pricing_type === "traveler_based" ? "text-blue-900 dark:text-blue-300" : "text-gray-900 dark:text-white"}`, children: __("Traveler-Based Pricing", "Traveler-Based Pricing") }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `mt-1 flex items-center text-sm ${formData.pricing_type === "traveler_based" ? "text-blue-700 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`, children: __("Set different prices for each traveler category", "Set different prices for each traveler category") })
-                ] }) }),
-                formData.pricing_type === "traveler_based" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-4 right-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 rounded-full bg-blue-600" }) })
-              ] })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `p-2 rounded-full ${formData.pricing_type === "traveler_based" ? "bg-green-100 dark:bg-green-900/30" : "bg-blue-100 dark:bg-blue-900/30"}`, children: formData.pricing_type === "traveler_based" ? /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-5 h-5 text-green-600 dark:text-green-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-5 h-5 text-blue-600 dark:text-blue-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }) }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formData.pricing_type === "traveler_based" ? __("Traveler-Based Pricing", "Traveler-Based Pricing") : __("Regular Pricing", "Regular Pricing") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 dark:text-gray-400", children: formData.pricing_type === "traveler_based" ? __("This trip uses traveler category pricing. Set prices for each category below.", "This trip uses traveler category pricing. Set prices for each category below.") : __("This trip uses regular pricing. Set a single price for all travelers below.", "This trip uses regular pricing. Set a single price for all travelers below.") })
             ] })
-          ] }),
+          ] }) }),
           formData.pricing_type === "regular" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
@@ -35740,62 +35703,13 @@ const RecurringRuleForm = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __("Set pricing for traveler categories and seat availability for this rule", "Set pricing for traveler categories and seat availability for this rule") })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-6", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3", children: [
-                __("Pricing Type", "Pricing Type"),
-                " ",
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: `relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${formData.pricing_type === "regular" ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"}`, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      type: "radio",
-                      name: "pricing_type",
-                      value: "regular",
-                      checked: formData.pricing_type === "regular",
-                      onChange: () => setFormData((prev) => ({
-                        ...prev,
-                        pricing_type: "regular",
-                        traveler_pricing: []
-                        // Clear traveler pricing when switching to regular
-                      })),
-                      className: "sr-only"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `block text-sm font-medium ${formData.pricing_type === "regular" ? "text-blue-900 dark:text-blue-300" : "text-gray-900 dark:text-white"}`, children: __("Regular Pricing", "Regular Pricing") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `mt-1 flex items-center text-sm ${formData.pricing_type === "regular" ? "text-blue-700 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`, children: __("Set a single price for all travelers", "Set a single price for all travelers") })
-                  ] }) }),
-                  formData.pricing_type === "regular" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-4 right-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 rounded-full bg-blue-600" }) })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: `relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${formData.pricing_type === "traveler_based" ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-600" : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"}`, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      type: "radio",
-                      name: "pricing_type",
-                      value: "traveler_based",
-                      checked: formData.pricing_type === "traveler_based",
-                      onChange: () => setFormData((prev) => ({
-                        ...prev,
-                        pricing_type: "traveler_based",
-                        original_price: void 0,
-                        // Clear regular pricing when switching to traveler-based
-                        sale_price: void 0
-                      })),
-                      className: "sr-only"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `block text-sm font-medium ${formData.pricing_type === "traveler_based" ? "text-blue-900 dark:text-blue-300" : "text-gray-900 dark:text-white"}`, children: __("Traveler-Based Pricing", "Traveler-Based Pricing") }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `mt-1 flex items-center text-sm ${formData.pricing_type === "traveler_based" ? "text-blue-700 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`, children: __("Set different prices for each traveler category", "Set different prices for each traveler category") })
-                  ] }) }),
-                  formData.pricing_type === "traveler_based" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-4 right-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 rounded-full bg-blue-600" }) })
-                ] })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `p-2 rounded-full ${isTravelerBasedPricing ? "bg-green-100 dark:bg-green-900/30" : "bg-blue-100 dark:bg-blue-900/30"}`, children: isTravelerBasedPricing ? /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-5 h-5 text-green-600 dark:text-green-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-5 h-5 text-blue-600 dark:text-blue-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" }) }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: isTravelerBasedPricing ? __("Traveler-Based Pricing", "Traveler-Based Pricing") : __("Regular Pricing", "Regular Pricing") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 dark:text-gray-400", children: isTravelerBasedPricing ? __("This trip uses traveler category pricing. Set prices for each category below.", "This trip uses traveler category pricing. Set prices for each category below.") : __("This trip uses regular pricing. Set a single price for all travelers below.", "This trip uses regular pricing. Set a single price for all travelers below.") })
               ] })
-            ] }),
+            ] }) }),
             !isTravelerBasedPricing && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [

@@ -57,22 +57,29 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
         <h3><?php esc_html_e('No Departures Available', 'yatra'); ?></h3>
         <p><?php esc_html_e('There are currently no scheduled departures for this trip. Please check back later or make an enquiry.', 'yatra'); ?></p>
     </div>
-    <?php else: ?>
-    <div class="yatra-availability-list">
+    <?php else: 
+        $initial_display_count = 10; // Show first 10 departures
+        $total_cards = count($availability_cards);
+        $has_more = $total_cards > $initial_display_count;
+    ?>
+    <div class="yatra-availability-list" data-total="<?php echo esc_attr($total_cards); ?>" data-displayed="<?php echo esc_attr(min($initial_display_count, $total_cards)); ?>">
         <?php foreach ($availability_cards as $index => $card): 
+            $is_hidden = $index >= $initial_display_count; 
             $item_id = isset($card['id']) ? (string) $card['id'] : (string) $index;
             $sale_price = (float) ($card['sale_price'] ?? 0);
             $original_price = (float) ($card['original_price'] ?? $sale_price);
             $seats_available = (int) ($card['seats_available'] ?? 0);
             $is_limited = !empty($card['is_limited']);
         ?>
-        <div class="yatra-availability-card <?php echo $index === 0 ? 'open' : ''; ?> <?php echo $is_limited ? 'limited' : ''; ?>"
+        <div class="yatra-availability-card <?php echo $index === 0 ? 'open' : ''; ?> <?php echo $is_limited ? 'limited' : ''; ?> <?php echo $is_hidden ? 'yatra-hidden-departure' : ''; ?>"
              data-availability-id="<?php echo esc_attr($item_id); ?>"
              data-month="<?php echo esc_attr($card['data_month'] ?? ''); ?>"
              data-date="<?php echo esc_attr($card['data_date'] ?? ''); ?>"
              data-price="<?php echo esc_attr($sale_price); ?>"
              data-seats="<?php echo esc_attr($seats_available); ?>"
-             data-item="<?php echo esc_attr($item_id); ?>">
+             data-item="<?php echo esc_attr($item_id); ?>"
+             data-index="<?php echo esc_attr($index); ?>"
+             <?php if ($is_hidden): ?>style="display: none;"<?php endif; ?>>
             
             <!-- Card Header (Clickable) -->
             <div class="yatra-availability-card-header yatra-availability-toggle" role="button" tabindex="0" aria-label="<?php esc_attr_e('Toggle availability details', 'yatra'); ?>">
@@ -198,45 +205,84 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                     <div class="yatra-card-traveler-section">
                         <label class="yatra-card-traveler-label"><?php esc_html_e('Travelers', 'yatra'); ?></label>
                         
-                        <?php if (!empty($pricing_type) && $pricing_type === 'traveler_based' && !empty($price_types)): ?>
-                        <!-- Traveler-based pricing: Show dynamic categories from settings -->
+                        <?php 
+                        // Use card-specific pricing (priority: availability date > rule > trip)
+                        $card_pricing_type = $card['pricing_type'] ?? $pricing_type ?? 'regular';
+                        $card_price_types = $card['traveler_pricing'] ?? [];
+                        
+                        // If empty, fallback to trip-level price_types
+                        if (empty($card_price_types) && $card_pricing_type === 'traveler_based' && !empty($price_types)) {
+                            $card_price_types = $price_types;
+                        }
+                        
+                        // Normalize traveler pricing to objects if array
+                        $normalized_price_types = [];
+                        foreach ($card_price_types as $cpt) {
+                            if (is_array($cpt)) {
+                                $normalized_price_types[] = (object) $cpt;
+                            } else {
+                                $normalized_price_types[] = $cpt;
+                            }
+                        }
+                        ?>
+                        
+                        <?php if ($card_pricing_type === 'traveler_based' && !empty($normalized_price_types)): ?>
+                        <!-- Traveler-based pricing: Show dynamic categories -->
                         <div class="yatra-booking-field-select yatra-participants-select yatra-availability-participants" data-item="<?php echo esc_attr($item_id); ?>">
                             <div class="yatra-booking-field-icon">
                                 <?php echo yatra_svg_icon('users', 'yatra-icon-sm'); ?>
                             </div>
                             <div class="yatra-participants-display yatra-availability-participants-display" data-item="<?php echo esc_attr($item_id); ?>">
                                 <?php 
-                                $first_category = isset($price_types[0]) ? $price_types[0] : null;
-                                echo esc_html(($first_category && !empty($first_category->category_label) ? $first_category->category_label : __('Traveler', 'yatra')) . ' x 1');
+                                $first_category = isset($normalized_price_types[0]) ? $normalized_price_types[0] : null;
+                                $first_label = '';
+                                if ($first_category) {
+                                    $first_label = $first_category->category_label ?? $first_category->label ?? __('Traveler', 'yatra');
+                                }
+                                echo esc_html(($first_label ?: __('Traveler', 'yatra')) . ' x 1');
                                 ?>
                             </div>
                             <svg class="yatra-select-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                             <div class="yatra-booking-quantity-selector yatra-availability-quantity-selector" data-item="<?php echo esc_attr($item_id); ?>">
-                                <?php foreach ($price_types as $pt_index => $pt): 
+                                <?php foreach ($normalized_price_types as $pt_index => $pt): 
                                     $pt_min = isset($pt->age_min) ? (int) $pt->age_min : 0;
                                     $pt_max = isset($pt->age_max) ? (int) $pt->age_max : 99;
-                                    $pt_label = !empty($pt->category_label) ? $pt->category_label : __('Traveler', 'yatra');
+                                    $pt_label = $pt->category_label ?? $pt->label ?? __('Traveler', 'yatra');
                                     $pt_age_text = ($pt_min > 0 || $pt_max < 99) ? sprintf(__('(Age %d-%d)', 'yatra'), $pt_min, $pt_max) : '';
                                     $pt_default = $pt_index === 0 ? 1 : 0;
-                                    $pt_price = isset($pt->effective_price) ? (float) $pt->effective_price : 0;
+                                    
+                                    // Calculate effective price: sale_price > discounted_price > original_price
+                                    $pt_price = 0;
+                                    if (isset($pt->effective_price) && $pt->effective_price > 0) {
+                                        $pt_price = (float) $pt->effective_price;
+                                    } elseif (isset($pt->sale_price) && $pt->sale_price > 0) {
+                                        $pt_price = (float) $pt->sale_price;
+                                    } elseif (isset($pt->discounted_price) && $pt->discounted_price > 0) {
+                                        $pt_price = (float) $pt->discounted_price;
+                                    } elseif (isset($pt->original_price) && $pt->original_price > 0) {
+                                        $pt_price = (float) $pt->original_price;
+                                    }
+                                    
+                                    $pt_category_id = $pt->category_id ?? $pt_index;
                                 ?>
-                                <div class="yatra-quantity-row" data-category-id="<?php echo esc_attr($pt->category_id ?? $pt_index); ?>" data-price="<?php echo esc_attr($pt_price); ?>">
+                                <div class="yatra-quantity-row" data-category-id="<?php echo esc_attr($pt_category_id); ?>" data-price="<?php echo esc_attr($pt_price); ?>">
                                     <div class="yatra-quantity-label">
                                         <span class="yatra-quantity-title"><?php echo esc_html($pt_label); ?></span>
                                         <?php if ($pt_age_text): ?>
                                         <span class="yatra-quantity-subtitle"><?php echo esc_html($pt_age_text); ?></span>
                                         <?php endif; ?>
+                                        <span class="yatra-quantity-price"><?php echo $pt_price > 0 ? esc_html(yatra_format_price($pt_price)) : ''; ?></span>
                                     </div>
                                     <div class="yatra-quantity-controls">
-                                        <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="category-<?php echo esc_attr($pt->category_id ?? $pt_index); ?>" data-item="<?php echo esc_attr($item_id); ?>" aria-label="<?php esc_attr_e('Decrease', 'yatra'); ?>" <?php echo $pt_default <= 0 ? 'disabled' : ''; ?>>
+                                        <button type="button" class="yatra-quantity-btn yatra-quantity-minus" data-target="category-<?php echo esc_attr($pt_category_id); ?>" data-item="<?php echo esc_attr($item_id); ?>" aria-label="<?php esc_attr_e('Decrease', 'yatra'); ?>" <?php echo $pt_default <= 0 ? 'disabled' : ''; ?>>
                                             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
                                             </svg>
                                         </button>
-                                        <input type="number" class="yatra-quantity-input yatra-availability-category" data-item="<?php echo esc_attr($item_id); ?>" data-category="<?php echo esc_attr($pt->category_id ?? $pt_index); ?>" value="<?php echo esc_attr($pt_default); ?>" min="0" max="<?php echo esc_attr(min($seats_available, $max_travelers)); ?>" readonly>
-                                        <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="category-<?php echo esc_attr($pt->category_id ?? $pt_index); ?>" data-item="<?php echo esc_attr($item_id); ?>" aria-label="<?php esc_attr_e('Increase', 'yatra'); ?>">
+                                        <input type="number" class="yatra-quantity-input yatra-availability-category" data-item="<?php echo esc_attr($item_id); ?>" data-category="<?php echo esc_attr($pt_category_id); ?>" value="<?php echo esc_attr($pt_default); ?>" min="0" max="<?php echo esc_attr(min($seats_available, $max_travelers)); ?>" readonly>
+                                        <button type="button" class="yatra-quantity-btn yatra-quantity-plus" data-target="category-<?php echo esc_attr($pt_category_id); ?>" data-item="<?php echo esc_attr($item_id); ?>" aria-label="<?php esc_attr_e('Increase', 'yatra'); ?>">
                                             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                             </svg>
@@ -288,11 +334,46 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                             <?php echo esc_html(yatra_format_price($sale_price)); ?>
                         </div>
                     </div>
+                    <?php 
+                    // Prepare price_types JSON for JavaScript
+                    $price_types_json = '';
+                    if (!empty($normalized_price_types)) {
+                        $price_types_for_js = array_map(function($pt) {
+                            $pt = (object) $pt;
+                            return [
+                                'category_id' => $pt->category_id ?? null,
+                                'category_label' => $pt->category_label ?? $pt->label ?? '',
+                                'original_price' => $pt->original_price ?? 0,
+                                'sale_price' => $pt->sale_price ?? null,
+                                'discounted_price' => $pt->discounted_price ?? null,
+                                'effective_price' => $pt->effective_price ?? $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0,
+                                'age_min' => $pt->age_min ?? null,
+                                'age_max' => $pt->age_max ?? null,
+                            ];
+                        }, $normalized_price_types);
+                        $price_types_json = wp_json_encode($price_types_for_js);
+                    }
+                    
+                    // Get departure time - prefer card data, fallback to from_date if it looks like time
+                    $card_departure_time = '';
+                    if (!empty($card['departure_time'])) {
+                        $card_departure_time = $card['departure_time'];
+                    } elseif (!empty($card['from_date']) && preg_match('/^\d{1,2}:\d{2}\s*(AM|PM)?$/i', $card['from_date'])) {
+                        $card_departure_time = $card['from_date'];
+                    }
+                    
+                    // Is this a day trip?
+                    $is_card_day_trip = !empty($card['is_day_trip']) || !empty($card['date_display']);
+                    ?>
                     <button type="button" 
                        class="yatra-card-book-btn" 
                        data-trip-id="<?php echo esc_attr($trip_id); ?>"
                        data-availability-id="<?php echo esc_attr($item_id); ?>"
                        data-date="<?php echo esc_attr($card['data_date'] ?? ''); ?>"
+                       data-departure-time="<?php echo esc_attr($card_departure_time); ?>"
+                       data-is-day-trip="<?php echo $is_card_day_trip ? '1' : '0'; ?>"
+                       data-pricing-type="<?php echo esc_attr($card_pricing_type); ?>"
+                       data-price-types="<?php echo esc_attr($price_types_json); ?>"
                        data-price="<?php echo esc_attr($sale_price); ?>"
                        data-item="<?php echo esc_attr($item_id); ?>">
                         <?php echo yatra_svg_icon('shopping-cart', 'yatra-icon-sm'); ?>
@@ -304,9 +385,15 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
         <?php endforeach; ?>
     </div>
 
-    <?php if (count($availability_cards) > 5): ?>
-    <div class="yatra-availability-load-more">
-        <button type="button" class="yatra-availability-load-more-btn"><?php esc_html_e('Load more departures', 'yatra'); ?></button>
+    <?php if ($has_more): ?>
+    <div class="yatra-availability-load-more" data-per-page="10" data-current-page="1" data-total-pages="<?php echo esc_attr(ceil($total_cards / $initial_display_count)); ?>">
+        <button type="button" class="yatra-availability-load-more-btn">
+            <?php echo yatra_svg_icon('plus', 'yatra-icon-sm'); ?>
+            <?php echo esc_html(sprintf(__('Load more departures (%d remaining)', 'yatra'), $total_cards - $initial_display_count)); ?>
+        </button>
+        <span class="yatra-availability-count-info">
+            <?php echo esc_html(sprintf(__('Showing %d of %d departures', 'yatra'), min($initial_display_count, $total_cards), $total_cards)); ?>
+        </span>
     </div>
     <?php endif; ?>
     <?php endif; ?>

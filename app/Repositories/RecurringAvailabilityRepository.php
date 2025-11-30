@@ -158,6 +158,20 @@ class RecurringAvailabilityRepository extends BaseRepository
     }
 
     /**
+     * Find a rule by ID (override to hydrate data)
+     */
+    public function find(int $id, bool $includeDeleted = false): ?\stdClass
+    {
+        $result = parent::find($id, $includeDeleted);
+        
+        if ($result) {
+            return $this->hydrateRule($result);
+        }
+        
+        return null;
+    }
+
+    /**
      * Prepare data for database
      */
     private function prepareData(array $data): array
@@ -224,8 +238,19 @@ class RecurringAvailabilityRepository extends BaseRepository
         
         if (!empty($rule->traveler_pricing)) {
             $rule->traveler_pricing = json_decode($rule->traveler_pricing, true) ?: [];
+            // Enrich traveler pricing with category labels
+            $rule->traveler_pricing = $this->enrichTravelerPricing($rule->traveler_pricing);
         } else {
             $rule->traveler_pricing = [];
+        }
+        
+        // Also enrich time_slots traveler_pricing
+        if (!empty($rule->time_slots)) {
+            foreach ($rule->time_slots as &$slot) {
+                if (!empty($slot['traveler_pricing'])) {
+                    $slot['traveler_pricing'] = $this->enrichTravelerPricing($slot['traveler_pricing']);
+                }
+            }
         }
         
         // Convert days_of_week string to array
@@ -236,6 +261,58 @@ class RecurringAvailabilityRepository extends BaseRepository
         }
         
         return $rule;
+    }
+    
+    /**
+     * Enrich traveler pricing with category labels from database
+     */
+    private function enrichTravelerPricing(array $pricing): array
+    {
+        if (empty($pricing)) {
+            return [];
+        }
+        
+        // Get all category IDs
+        $categoryIds = array_filter(array_map(function($p) {
+            return isset($p['category_id']) ? (int) $p['category_id'] : null;
+        }, $pricing));
+        
+        if (empty($categoryIds)) {
+            return $pricing;
+        }
+        
+        // Fetch category details
+        $categories_table = $this->wpdb->prefix . 'yatra_traveler_categories';
+        $placeholders = implode(',', array_fill(0, count($categoryIds), '%d'));
+        $sql = $this->wpdb->prepare(
+            "SELECT id, label, slug, description, age_min, age_max 
+             FROM {$categories_table} 
+             WHERE id IN ({$placeholders})",
+            ...$categoryIds
+        );
+        $categories = $this->wpdb->get_results($sql);
+        
+        // Index by ID
+        $categoryIndex = [];
+        foreach ($categories as $cat) {
+            $categoryIndex[(int) $cat->id] = $cat;
+        }
+        
+        // Enrich pricing with category info
+        foreach ($pricing as &$p) {
+            $catId = isset($p['category_id']) ? (int) $p['category_id'] : null;
+            if ($catId && isset($categoryIndex[$catId])) {
+                $cat = $categoryIndex[$catId];
+                $p['category_label'] = $cat->label;
+                $p['category_slug'] = $cat->slug;
+                $p['age_min'] = $cat->age_min ? (int) $cat->age_min : null;
+                $p['age_max'] = $cat->age_max ? (int) $cat->age_max : null;
+                // Calculate effective price
+                $p['effective_price'] = $p['sale_price'] ?? $p['discounted_price'] ?? $p['original_price'] ?? 0;
+            }
+        }
+        
+        return $pricing;
     }
 }
 

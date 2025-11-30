@@ -1068,10 +1068,10 @@ const Availability: React.FC = () => {
               )}
             </CardContent>
           </Card>
-            </>
+              </>
           )}
-        </>
-      )}
+          </>
+        )}
     </div>
   );
 };

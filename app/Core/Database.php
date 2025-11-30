@@ -1723,6 +1723,65 @@ class Database
                 );
             }
         }
+        
+        // ============================================
+        // UPDATE RECURRING AVAILABILITY RULES TABLE
+        // ============================================
+        $table_availability_rules = $wpdb->prefix . 'yatra_trip_availability_rules';
+        
+        // Check if table exists
+        $rulesTableExists = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM information_schema.tables 
+                 WHERE table_schema = DATABASE() 
+                 AND table_name = %s",
+                $table_availability_rules
+            )
+        ) > 0;
+        
+        if ($rulesTableExists) {
+            // Helper to check if column exists
+            $rulesColumnExists = function($column) use ($wpdb, $table_availability_rules) {
+                return (int) $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT COUNT(*) FROM information_schema.columns 
+                         WHERE table_schema = DATABASE() 
+                         AND table_name = %s 
+                         AND column_name = %s",
+                        $table_availability_rules,
+                        $column
+                    )
+                ) > 0;
+            };
+            
+            // List of all columns that should exist in the recurring rules table
+            $columnsToAdd = [
+                ['name' => 'time_slots', 'def' => "text DEFAULT NULL COMMENT 'JSON: [{departure_time, arrival_time, seats, price}]'"],
+                ['name' => 'pricing_type', 'def' => "enum('regular','traveler_based') DEFAULT 'regular'"],
+                ['name' => 'original_price', 'def' => "decimal(10,2) DEFAULT NULL"],
+                ['name' => 'sale_price', 'def' => "decimal(10,2) DEFAULT NULL"],
+                ['name' => 'traveler_pricing', 'def' => "text DEFAULT NULL COMMENT 'JSON: [{category_id, original_price, sale_price}]'"],
+                ['name' => 'seats_total', 'def' => "smallint(5) UNSIGNED DEFAULT 20"],
+                ['name' => 'alert_threshold', 'def' => "smallint(5) UNSIGNED DEFAULT 5"],
+                ['name' => 'departure_time', 'def' => "time DEFAULT NULL"],
+                ['name' => 'arrival_time', 'def' => "time DEFAULT NULL"],
+                ['name' => 'from_location', 'def' => "varchar(255) DEFAULT NULL"],
+                ['name' => 'to_location', 'def' => "varchar(255) DEFAULT NULL"],
+                ['name' => 'cutoff_hours', 'def' => "smallint(5) UNSIGNED DEFAULT 24"],
+                ['name' => 'advance_booking_days', 'def' => "smallint(5) UNSIGNED DEFAULT NULL COMMENT 'Max days in advance to book'"],
+                ['name' => 'day_overrides', 'def' => "text DEFAULT NULL COMMENT 'JSON: {dayOfWeek: {original_price, seats_total}}'"],
+                ['name' => 'status', 'def' => "enum('active','inactive') DEFAULT 'active'"],
+                ['name' => 'priority', 'def' => "smallint(5) UNSIGNED DEFAULT 0 COMMENT 'Higher priority rules override lower'"],
+            ];
+            
+            foreach ($columnsToAdd as $column) {
+                if (!$rulesColumnExists($column['name'])) {
+                    $wpdb->query(
+                        "ALTER TABLE `{$table_availability_rules}` ADD COLUMN `{$column['name']}` {$column['def']}"
+                    );
+                }
+            }
+        }
     }
     
     /**

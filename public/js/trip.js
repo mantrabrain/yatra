@@ -417,43 +417,63 @@
             // First, initialize inline quantity controls for num_travelers (simple booking)
             this.initInlineQuantityControls();
             
-            // Then initialize the dropdown travelers field (if exists)
-            if (!this.participantsSelect) return;
+            // Initialize all dropdown travelers fields (there may be multiple instances)
+            const participantsSelects = document.querySelectorAll('.yatra-participants-select');
+            
+            participantsSelects.forEach((participantsSelect) => {
+                this.initSingleTravelersField(participantsSelect);
+            });
+        }
 
-            const display = document.getElementById('participants-display');
-            const selector = document.getElementById('quantity-selector');
-            const adultsInput = document.getElementById('adults');
-            const childrenInput = document.getElementById('children');
+        initSingleTravelersField(participantsSelect) {
+            if (!participantsSelect) return;
 
-            if (!display || !selector || !adultsInput || !childrenInput) return;
+            // Find display and selector within this specific participants select container
+            const display = participantsSelect.querySelector('.yatra-participants-display');
+            const selector = participantsSelect.querySelector('.yatra-booking-quantity-selector');
+
+            if (!display || !selector) return;
+
+            // Get all traveler category inputs dynamically
+            const travelerInputs = selector.querySelectorAll('input[id^="traveler_"]');
+
+            if (travelerInputs.length === 0) return;
 
             // Make display clickable
             display.style.cursor = 'pointer';
 
             // Toggle dropdown
-            this.participantsSelect.onclick = (e) => {
+            participantsSelect.onclick = (e) => {
                 if (e.target.closest('.yatra-quantity-btn')) return;
                 if (selector.contains(e.target)) return;
                 e.preventDefault();
                 e.stopPropagation();
-                this.participantsSelect.classList.toggle('active');
+                participantsSelect.classList.toggle('active');
             };
 
-            // Update display function
+            // Update display function - dynamically build text from all traveler inputs
             const updateDisplay = () => {
-                const adults = parseInt(adultsInput.value || 1);
-                const children = parseInt(childrenInput.value || 0);
-                let text = '';
-                if (adults > 0 && children > 0) {
-                    text = `Adult x ${adults}, Child x ${children}`;
-                } else if (adults > 0) {
-                    text = `Adult x ${adults}`;
-                } else if (children > 0) {
-                    text = `Child x ${children}`;
+                const parts = [];
+                travelerInputs.forEach((input) => {
+                    const value = parseInt(input.value || 0);
+                    if (value > 0) {
+                        const categoryLabel = input.getAttribute('data-category-label') || 'Traveler';
+                        parts.push(`${categoryLabel} x ${value}`);
+                    }
+                });
+                
+                if (parts.length === 0) {
+                    // Default to first category with value 1
+                    const firstInput = travelerInputs[0];
+                    if (firstInput) {
+                        const categoryLabel = firstInput.getAttribute('data-category-label') || 'Traveler';
+                        display.textContent = `${categoryLabel} x 1`;
+                    } else {
+                        display.textContent = '1 Traveler';
+                    }
                 } else {
-                    text = 'Adult x 1';
+                    display.textContent = parts.join(', ');
                 }
-                display.textContent = text;
             };
 
             // Quantity button handlers
@@ -493,19 +513,74 @@
                         if (minusBtn) minusBtn.disabled = newValue <= min;
                         if (plusBtn) plusBtn.disabled = newValue >= max;
                     }
+                    
+                    // Sync to availability cards
+                    syncToAvailabilityCards(travelerInputs);
                 }
+            };
+            
+            // Function to sync sidebar travelers to availability cards
+            const syncToAvailabilityCards = (inputs) => {
+                const availabilitySection = document.getElementById('availability');
+                if (!availabilitySection) return;
+                
+                inputs.forEach((input) => {
+                    const categoryId = input.id.replace('traveler_', '');
+                    const value = parseInt(input.value) || 0;
+                    
+                    // Find all matching inputs in availability cards
+                    const availInputs = availabilitySection.querySelectorAll(`.yatra-availability-category[data-category="${categoryId}"]`);
+                    availInputs.forEach((availInput) => {
+                        availInput.value = value;
+                        
+                        // Update button states
+                        const row = availInput.closest('.yatra-quantity-row');
+                        if (row) {
+                            const min = parseInt(availInput.getAttribute('min') || 0);
+                            const max = parseInt(availInput.getAttribute('max') || 999);
+                            const minusBtn = row.querySelector('.yatra-quantity-minus');
+                            const plusBtn = row.querySelector('.yatra-quantity-plus');
+                            if (minusBtn) minusBtn.disabled = value <= min;
+                            if (plusBtn) plusBtn.disabled = value >= max;
+                        }
+                        
+                        // Update display for this card
+                        const participantsSelect = availInput.closest('.yatra-availability-participants');
+                        if (participantsSelect) {
+                            const display = participantsSelect.querySelector('.yatra-availability-participants-display');
+                            const categoryInputs = participantsSelect.querySelectorAll('.yatra-availability-category');
+                            if (display && categoryInputs.length > 0) {
+                                const parts = [];
+                                categoryInputs.forEach((catInput) => {
+                                    const catValue = parseInt(catInput.value) || 0;
+                                    if (catValue > 0) {
+                                        const catRow = catInput.closest('.yatra-quantity-row');
+                                        const categoryLabel = catRow ? catRow.querySelector('.yatra-quantity-title')?.textContent : 'Traveler';
+                                        parts.push(`${categoryLabel} x ${catValue}`);
+                                    }
+                                });
+                                if (parts.length > 0) {
+                                    display.textContent = parts.join(', ');
+                                }
+                            }
+                        }
+                    });
+                });
             };
 
             // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!this.participantsSelect.contains(e.target)) {
-                    this.participantsSelect.classList.remove('active');
+            const closeHandler = (e) => {
+                if (!participantsSelect.contains(e.target)) {
+                    participantsSelect.classList.remove('active');
                 }
-            });
+            };
+            document.addEventListener('click', closeHandler);
 
-            // Initialize
+            // Initialize display
             updateDisplay();
-            [adultsInput, childrenInput].forEach((input) => {
+            
+            // Initialize button states for all traveler inputs
+            travelerInputs.forEach((input) => {
                 const value = parseInt(input.value || 0);
                 const min = parseInt(input.getAttribute('min') || 0);
                 const max = parseInt(input.getAttribute('max') || 999);
@@ -522,25 +597,35 @@
         handleCheckAvailability() {
             console.log('Check Availability clicked');
             
-            // Get form values - support both old (adults/children) and new (num_travelers) structures
+            // Get form values - support regular pricing (num_travelers), old structure (adults/children), and traveler-based pricing
             const dateInput = document.getElementById('travel_date');
+            const numTravelersInput = document.getElementById('num_travelers');
             const adultsInput = document.getElementById('adults');
             const childrenInput = document.getElementById('children');
-            const numTravelersInput = document.getElementById('num_travelers');
+            
+            // Check for traveler-based pricing inputs (dynamic category inputs)
+            const travelerInputs = document.querySelectorAll('input[id^="traveler_"]');
 
             const date = dateInput ? dateInput.value : '';
             
-            // Check for travelers - either from num_travelers or adults/children
+            // Check for travelers - prioritize traveler-based pricing, then num_travelers, then adults/children
             let totalTravelers = 0;
-            if (numTravelersInput) {
+            if (travelerInputs.length > 0) {
+                // Traveler-based pricing: sum all category inputs
+                travelerInputs.forEach((input) => {
+                    totalTravelers += parseInt(input.value) || 0;
+                });
+            } else if (numTravelersInput) {
+                // Regular pricing: single number input
                 totalTravelers = parseInt(numTravelersInput.value) || 0;
             } else {
+                // Old structure: adults + children
                 const adults = adultsInput ? parseInt(adultsInput.value) || 0 : 0;
                 const children = childrenInput ? parseInt(childrenInput.value) || 0 : 0;
                 totalTravelers = adults + children;
             }
 
-            console.log('Form values:', { date, totalTravelers });
+            console.log('Form values:', { date, totalTravelers, travelerInputsCount: travelerInputs.length });
 
             // Basic validation
             if (!date) {
@@ -1386,9 +1471,53 @@
                     const tripId = btn.getAttribute('data-trip-id') || window.yatraTripData?.tripId;
                     const date = btn.getAttribute('data-date');
                     const itemIndex = btn.getAttribute('data-item');
-                    const adults = this.getTravelerCount(itemIndex, 'adults');
-                    const children = this.getTravelerCount(itemIndex, 'children');
-                    const travelers = parseInt(adults) + parseInt(children);
+                    const availabilityId = btn.getAttribute('data-availability-id') || itemIndex;
+                    
+                    // Get the availability card to extract more info
+                    const card = btn.closest('.yatra-availability-card');
+                    
+                    // Get departure time from the card if available (single-day trips)
+                    let departureTime = '';
+                    if (card) {
+                        const timeElement = card.querySelector('.yatra-card-header-date');
+                        if (timeElement) {
+                            const timeText = timeElement.textContent?.trim();
+                            // Check if it's a time format (e.g., "9:00 AM")
+                            if (timeText && /^\d{1,2}:\d{2}\s*(AM|PM)?$/i.test(timeText)) {
+                                departureTime = timeText;
+                            }
+                        }
+                    }
+                    
+                    // Get traveler counts - support both category-based and simple counting
+                    let travelers = 0;
+                    const travelerCounts = {};
+                    
+                    // Check for category-based traveler inputs
+                    const categoryInputs = card?.querySelectorAll('.yatra-availability-category[data-item="' + itemIndex + '"]');
+                    if (categoryInputs && categoryInputs.length > 0) {
+                        categoryInputs.forEach((input) => {
+                            const categoryId = input.getAttribute('data-category');
+                            const count = parseInt(input.value) || 0;
+                            if (categoryId && count > 0) {
+                                travelerCounts[categoryId] = count;
+                                travelers += count;
+                            }
+                        });
+                    } else {
+                        // Fallback to simple traveler input
+                        const simpleInput = card?.querySelector('.yatra-availability-num-travelers[data-item="' + itemIndex + '"]');
+                        if (simpleInput) {
+                            travelers = parseInt(simpleInput.value) || 1;
+                        } else {
+                            // Legacy: adults + children
+                            const adults = this.getTravelerCount(itemIndex, 'adults');
+                            const children = this.getTravelerCount(itemIndex, 'children');
+                            travelers = parseInt(adults) + parseInt(children);
+                        }
+                    }
+                    
+                    if (travelers < 1) travelers = 1;
                     
                     // Show loading state
                     const originalText = btn.innerHTML;
@@ -1404,6 +1533,42 @@
                         return;
                     }
                     
+                    // Get pricing data from button attributes
+                    const pricingType = btn.getAttribute('data-pricing-type') || 'regular';
+                    const isDayTrip = btn.getAttribute('data-is-day-trip') === '1';
+                    let priceTypesJson = btn.getAttribute('data-price-types') || '';
+                    let priceTypes = [];
+                    try {
+                        if (priceTypesJson) {
+                            priceTypes = JSON.parse(priceTypesJson);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing price types:', e);
+                    }
+                    
+                    // Get departure time from button data attribute
+                    const btnDepartureTime = btn.getAttribute('data-departure-time') || '';
+                    if (btnDepartureTime) {
+                        departureTime = btnDepartureTime;
+                    }
+                    
+                    // Build session payload
+                    const sessionPayload = {
+                        trip_id: parseInt(tripId),
+                        travelers: travelers,
+                        travel_date: date || '',
+                        departure_time: departureTime,
+                        availability_id: availabilityId,
+                        pricing_type: pricingType,
+                        price_types: priceTypes,
+                        is_day_trip: isDayTrip,
+                    };
+                    
+                    // Add traveler_counts if using category-based pricing
+                    if (Object.keys(travelerCounts).length > 0) {
+                        sessionPayload.traveler_counts = travelerCounts;
+                    }
+                    
                     // Set booking session via REST API
                     // credentials: 'same-origin' is required to send cookies for session
                     fetch(window.yatraTripData.apiUrl + '/booking/session', {
@@ -1413,11 +1578,7 @@
                             'Content-Type': 'application/json',
                             'X-WP-Nonce': window.yatraTripData.nonce
                         },
-                        body: JSON.stringify({
-                            trip_id: parseInt(tripId),
-                            travelers: travelers || 1,
-                            travel_date: date || ''
-                        })
+                        body: JSON.stringify(sessionPayload)
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -1451,36 +1612,48 @@
         }
 
         initTravelerSelectors() {
+            // Initialize traveler-based pricing selectors (dropdowns with categories)
             const participantsSelects = this.section.querySelectorAll('.yatra-availability-participants');
             
             participantsSelects.forEach((select) => {
                 const itemIndex = select.getAttribute('data-item');
                 const display = select.querySelector('.yatra-availability-participants-display');
-                const adultsInput = select.querySelector('.yatra-availability-adults');
-                const childrenInput = select.querySelector('.yatra-availability-children');
+                const quantitySelector = select.querySelector('.yatra-availability-quantity-selector');
+                const categoryInputs = select.querySelectorAll('.yatra-availability-category');
                 
-                if (!display || !adultsInput || !childrenInput) return;
+                if (!display || !quantitySelector || categoryInputs.length === 0) return;
                 
-                // Toggle dropdown on display click
-                display.addEventListener('click', (e) => {
+                // Make the whole select area clickable
+                select.style.cursor = 'pointer';
+                
+                // Toggle dropdown on select click
+                select.addEventListener('click', (e) => {
+                    // Don't toggle if clicking on buttons or inputs
+                    if (e.target.closest('.yatra-quantity-btn') || e.target.closest('.yatra-quantity-input')) return;
                     e.stopPropagation();
                     select.classList.toggle('active');
                 });
                 
-                // Update display text
+                // Update display text based on category inputs
                 const updateDisplay = () => {
-                    const adults = parseInt(adultsInput.value) || 0;
-                    const children = parseInt(childrenInput.value) || 0;
-                    let displayText = '';
-                    if (adults > 0) {
-                        displayText = `Adult${adults > 1 ? 's' : ''} x ${adults}`;
+                    const parts = [];
+                    categoryInputs.forEach((input) => {
+                        const value = parseInt(input.value) || 0;
+                        if (value > 0) {
+                            const row = input.closest('.yatra-quantity-row');
+                            const categoryLabel = row ? row.querySelector('.yatra-quantity-title')?.textContent : 'Traveler';
+                            parts.push(`${categoryLabel} x ${value}`);
+                        }
+                    });
+                    
+                    if (parts.length === 0) {
+                        // Default to first category
+                        const firstRow = categoryInputs[0]?.closest('.yatra-quantity-row');
+                        const firstLabel = firstRow ? firstRow.querySelector('.yatra-quantity-title')?.textContent : 'Traveler';
+                        display.textContent = `${firstLabel} x 1`;
+                    } else {
+                        display.textContent = parts.join(', ');
                     }
-                    if (children > 0) {
-                        if (displayText) displayText += ', ';
-                        displayText += `Child${children > 1 ? 'ren' : ''} x ${children}`;
-                    }
-                    if (!displayText) displayText = 'Adult x 1';
-                    display.textContent = displayText;
                 };
                 
                 // Quantity button handlers
@@ -1489,8 +1662,14 @@
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        const target = btn.getAttribute('data-target');
-                        const input = target === 'adults' ? adultsInput : childrenInput;
+                        
+                        const targetId = btn.getAttribute('data-target');
+                        // Find the input in the same row
+                        const row = btn.closest('.yatra-quantity-row');
+                        const input = row ? row.querySelector('.yatra-quantity-input') : null;
+                        
+                        if (!input) return;
+                        
                         const isMinus = btn.classList.contains('yatra-quantity-minus');
                         const isPlus = btn.classList.contains('yatra-quantity-plus');
                         
@@ -1510,16 +1689,16 @@
                             updateDisplay();
                             
                             // Update button states
-                            const row = btn.closest('.yatra-quantity-row');
-                            if (row) {
-                                const minusBtn = row.querySelector('.yatra-quantity-minus');
-                                const plusBtn = row.querySelector('.yatra-quantity-plus');
-                                if (minusBtn) minusBtn.disabled = newValue <= min;
-                                if (plusBtn) plusBtn.disabled = newValue >= max;
-                            }
+                            const minusBtn = row.querySelector('.yatra-quantity-minus');
+                            const plusBtn = row.querySelector('.yatra-quantity-plus');
+                            if (minusBtn) minusBtn.disabled = newValue <= min;
+                            if (plusBtn) plusBtn.disabled = newValue >= max;
                             
                             // Update total price
                             this.updateTotalPrice(itemIndex);
+                            
+                            // Sync with sidebar if exists
+                            this.syncSidebarTravelers(categoryInputs);
                         }
                     });
                 });
@@ -1535,7 +1714,7 @@
                 updateDisplay();
                 
                 // Initialize button states
-                [adultsInput, childrenInput].forEach((input) => {
+                categoryInputs.forEach((input) => {
                     const value = parseInt(input.value || 0);
                     const min = parseInt(input.getAttribute('min') || 0);
                     const max = parseInt(input.getAttribute('max') || 999);
@@ -1546,6 +1725,50 @@
                         if (minusBtn) minusBtn.disabled = value <= min;
                         if (plusBtn) plusBtn.disabled = value >= max;
                     }
+                });
+            });
+            
+            // Initialize regular pricing selectors (simple number inputs)
+            const simpleTravelerInputs = this.section.querySelectorAll('.yatra-availability-travelers-simple');
+            simpleTravelerInputs.forEach((container) => {
+                const itemIndex = container.getAttribute('data-item');
+                const input = container.querySelector('.yatra-availability-num-travelers');
+                const quantityButtons = container.querySelectorAll('.yatra-quantity-btn');
+                
+                if (!input) return;
+                
+                quantityButtons.forEach((btn) => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const isMinus = btn.classList.contains('yatra-quantity-minus');
+                        const isPlus = btn.classList.contains('yatra-quantity-plus');
+                        
+                        let current = parseInt(input.value) || 1;
+                        const min = parseInt(input.getAttribute('min')) || 1;
+                        const max = parseInt(input.getAttribute('max')) || 999;
+                        let newValue = current;
+                        
+                        if (isPlus && current < max) {
+                            newValue = current + 1;
+                        } else if (isMinus && current > min) {
+                            newValue = current - 1;
+                        }
+                        
+                        if (newValue !== current) {
+                            input.value = newValue;
+                            
+                            // Update button states
+                            const minusBtn = container.querySelector('.yatra-quantity-minus');
+                            const plusBtn = container.querySelector('.yatra-quantity-plus');
+                            if (minusBtn) minusBtn.disabled = newValue <= min;
+                            if (plusBtn) plusBtn.disabled = newValue >= max;
+                            
+                            // Update total price
+                            this.updateTotalPrice(itemIndex);
+                        }
+                    });
                 });
             });
         }
@@ -1581,27 +1804,86 @@
             return type === 'adults' && value === 0 ? 1 : value;
         }
 
-        updateTotalPrice(itemIndex) {
-            const adults = this.getTravelerCount(itemIndex, 'adults');
-            const children = this.getTravelerCount(itemIndex, 'children');
-            const totalTravelers = adults + children;
+        syncSidebarTravelers(categoryInputs) {
+            // Sync availability card travelers to sidebar
+            const sidebarDisplay = document.querySelector('.yatra-booking-card .yatra-participants-display');
+            if (!sidebarDisplay) return;
+            
+            const sidebarSelector = document.querySelector('.yatra-booking-card .yatra-booking-quantity-selector');
+            if (!sidebarSelector) return;
+            
+            // Build display text from category inputs
+            const parts = [];
+            categoryInputs.forEach((input) => {
+                const value = parseInt(input.value) || 0;
+                if (value > 0) {
+                    const row = input.closest('.yatra-quantity-row');
+                    const categoryLabel = row ? row.querySelector('.yatra-quantity-title')?.textContent : 'Traveler';
+                    parts.push(`${categoryLabel} x ${value}`);
+                    
+                    // Also update sidebar inputs if they exist
+                    const categoryId = input.getAttribute('data-category');
+                    const sidebarInput = sidebarSelector.querySelector(`input[id="traveler_${categoryId}"]`);
+                    if (sidebarInput) {
+                        sidebarInput.value = value;
+                        // Update button states
+                        const sidebarRow = sidebarInput.closest('.yatra-quantity-row');
+                        if (sidebarRow) {
+                            const min = parseInt(sidebarInput.getAttribute('min') || 0);
+                            const max = parseInt(sidebarInput.getAttribute('max') || 999);
+                            const minusBtn = sidebarRow.querySelector('.yatra-quantity-minus');
+                            const plusBtn = sidebarRow.querySelector('.yatra-quantity-plus');
+                            if (minusBtn) minusBtn.disabled = value <= min;
+                            if (plusBtn) plusBtn.disabled = value >= max;
+                        }
+                    }
+                }
+            });
+            
+            // Update sidebar display text
+            if (parts.length > 0) {
+                sidebarDisplay.textContent = parts.join(', ');
+            }
+        }
 
+        updateTotalPrice(itemIndex) {
             const totalAmountElement = this.section.querySelector(
-                `.yatra-availability-total-amount[data-item="${itemIndex}"]`
+                `.yatra-card-total-amount[data-item="${itemIndex}"]`
             );
             if (!totalAmountElement) return;
 
-            const basePrice = parseFloat(totalAmountElement.getAttribute('data-base-price')) || 0;
-            // Assume children are 50% of adult price (can be adjusted)
-            const childPrice = basePrice * 0.5;
-            const totalPrice = (adults * basePrice) + (children * childPrice);
+            // Check for traveler-based pricing first
+            const categoryInputs = this.section.querySelectorAll(`.yatra-availability-category[data-item="${itemIndex}"]`);
+            let totalPrice = 0;
+            let totalTravelers = 0;
+            
+            if (categoryInputs.length > 0) {
+                // Traveler-based pricing: sum up each category's price * quantity
+                categoryInputs.forEach((input) => {
+                    const quantity = parseInt(input.value) || 0;
+                    const row = input.closest('.yatra-quantity-row');
+                    const price = row ? parseFloat(row.getAttribute('data-price')) || 0 : 0;
+                    totalPrice += quantity * price;
+                    totalTravelers += quantity;
+                });
+            } else {
+                // Regular pricing: simple number of travelers
+                const numTravelersInput = this.section.querySelector(`.yatra-availability-num-travelers[data-item="${itemIndex}"]`);
+                if (numTravelersInput) {
+                    totalTravelers = parseInt(numTravelersInput.value) || 1;
+                    const basePrice = parseFloat(numTravelersInput.getAttribute('data-price')) || parseFloat(totalAmountElement.getAttribute('data-base-price')) || 0;
+                    totalPrice = totalTravelers * basePrice;
+                }
+            }
 
-            // Get currency from data attribute or default to USD
-            const currency = totalAmountElement.getAttribute('data-currency') || 'USD';
-            totalAmountElement.textContent = currency + totalPrice.toFixed(2);
+            // Format price using the existing format from the element
+            const existingText = totalAmountElement.textContent.trim();
+            const currencySymbol = existingText.match(/^[^\d]+/)?.[0] || '£ ';
+            totalAmountElement.textContent = currencySymbol + totalPrice.toFixed(2);
 
+            // Update the note text
             const noteElement = this.section.querySelector(
-                `.yatra-availability-total-note[data-item="${itemIndex}"]`
+                `.yatra-card-total-note[data-item="${itemIndex}"]`
             );
             if (noteElement) {
                 const travelerText = totalTravelers === 1
@@ -1695,19 +1977,143 @@
         }
 
         handleLoadMore() {
-            // Simulate loading more departures
+            const loadMoreContainer = this.section.querySelector('.yatra-availability-load-more');
             const btn = this.section.querySelector('.yatra-availability-load-more-btn');
-            if (btn) {
-                const originalText = btn.textContent;
-                btn.textContent = 'Loading...';
+            const countInfo = this.section.querySelector('.yatra-availability-count-info');
+            const list = this.section.querySelector('.yatra-availability-list');
+            
+            if (!btn || !list || !loadMoreContainer) return;
+            
+            const perPage = parseInt(loadMoreContainer.dataset.perPage) || 10;
+            const totalItems = parseInt(list.dataset.total) || 0;
+            let displayedCount = parseInt(list.dataset.displayed) || 0;
+            
+            // Get all hidden cards
+            const hiddenCards = this.section.querySelectorAll('.yatra-availability-card.yatra-hidden-departure');
+            
+            if (hiddenCards.length === 0) {
+                // No more items to show, hide the button
+                loadMoreContainer.style.display = 'none';
+                return;
+            }
+            
+            // Show loading state
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<svg class="yatra-spinner" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Loading...';
                 btn.disabled = true;
 
+            // Simulate a small delay for UX
                 setTimeout(() => {
-                    btn.textContent = originalText;
+                // Show next batch of cards
+                let shown = 0;
+                hiddenCards.forEach((card) => {
+                    if (shown < perPage) {
+                        card.style.display = '';
+                        card.classList.remove('yatra-hidden-departure');
+                        shown++;
+                    }
+                });
+                
+                // Update displayed count
+                displayedCount += shown;
+                list.dataset.displayed = displayedCount;
+                
+                // Update the availability items array for sorting/filtering
+                this.availabilityItems = this.section.querySelectorAll('.yatra-availability-card');
+                
+                // Re-setup toggle handlers for newly visible cards
+                this.setupToggleHandlers();
+                
+                // Re-initialize traveler selectors for newly visible cards
+                this.initTravelerSelectors();
+                
+                // Re-attach book now handlers
+                this.attachBookNowHandlers();
+                
+                // Calculate remaining
+                const remaining = totalItems - displayedCount;
+                
+                if (remaining <= 0) {
+                    // No more items, hide the load more section
+                    loadMoreContainer.style.display = 'none';
+                } else {
+                    // Update button text and count info
+                    btn.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Load more departures (${remaining} remaining)`;
                     btn.disabled = false;
-                    // In real implementation, this would load more items via AJAX
-                }, 1000);
-            }
+                    
+                    if (countInfo) {
+                        countInfo.textContent = `Showing ${displayedCount} of ${totalItems} departures`;
+                    }
+                }
+            }, 300);
+        }
+        
+        attachBookNowHandlers() {
+            // Re-attach book now button handlers for newly visible cards
+            const bookButtons = this.section.querySelectorAll('.yatra-card-book-btn');
+            bookButtons.forEach((btn) => {
+                // Remove existing listener by cloning
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                newBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Get booking details
+                    const tripId = newBtn.getAttribute('data-trip-id') || window.yatraTripData?.tripId;
+                    const date = newBtn.getAttribute('data-date');
+                    const itemIndex = newBtn.getAttribute('data-item');
+                    const adults = this.getTravelerCount(itemIndex, 'adults');
+                    const children = this.getTravelerCount(itemIndex, 'children');
+                    const travelers = parseInt(adults) + parseInt(children);
+                    
+                    // Show loading state
+                    const originalText = newBtn.innerHTML;
+                    newBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Processing...';
+                    newBtn.disabled = true;
+                    
+                    // Validate trip ID before making request
+                    if (!tripId || isNaN(parseInt(tripId)) || parseInt(tripId) <= 0) {
+                        console.error('Invalid trip ID:', tripId);
+                        newBtn.innerHTML = originalText;
+                        newBtn.disabled = false;
+                        this.showBookingError(newBtn, 'Unable to process booking. Invalid trip data.');
+                        return;
+                    }
+                    
+                    // Set booking session via REST API
+                    fetch(window.yatraTripData.apiUrl + '/booking/session', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': window.yatraTripData.nonce
+                        },
+                        body: JSON.stringify({
+                            trip_id: parseInt(tripId),
+                            travelers: travelers || 1,
+                            travel_date: date || ''
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            console.error('Booking session error:', data);
+                            newBtn.innerHTML = originalText;
+                            newBtn.disabled = false;
+                            this.showBookingError(newBtn, data.message || 'Unable to process booking. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error setting booking session:', error);
+                        newBtn.innerHTML = originalText;
+                        newBtn.disabled = false;
+                        this.showBookingError(newBtn, 'Unable to process booking. Please try again.');
+                    });
+                });
+            });
         }
 
         /**

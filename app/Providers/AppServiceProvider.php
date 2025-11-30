@@ -44,6 +44,12 @@ class AppServiceProvider extends ServiceProvider
         add_action('init', [$this, 'startSession'], 1);
         add_action('rest_api_init', [$this, 'startSession'], 1);
         
+        // Admin action to sync all trip pricing types (one-time fix)
+        add_action('admin_init', [$this, 'maybeSyncTripPricing']);
+        
+        // Auto-run one-time pricing sync on upgrade
+        add_action('admin_init', [$this, 'maybeAutoSyncPricing']);
+        
         // Register cron jobs for booking reminders and expiry
         \Yatra\Services\BookingCronService::register();
         
@@ -528,6 +534,59 @@ class AppServiceProvider extends ServiceProvider
             dirname(YATRA_PLUGIN_BASENAME) . '/resources/lang'
         );
     }
+    
+    /**
+     * Sync trip pricing types to availability dates and rules
+     * Triggered by ?yatra_sync_pricing=1 in admin
+     */
+    public function maybeSyncTripPricing(): void
+    {
+        // Only run if explicitly requested and user is admin
+        if (!isset($_GET['yatra_sync_pricing']) || !current_user_can('manage_options')) {
+            return;
+        }
+        
+        // Verify nonce for security
+        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'yatra_sync_pricing')) {
+            // For convenience, also allow without nonce in development
+            if (!defined('WP_DEBUG') || !WP_DEBUG) {
+                return;
+            }
+        }
+        
+        // Run the sync
+        $count = \Yatra\Services\TripService::syncAllTripsPricingType();
+        
+        // Show admin notice
+        add_action('admin_notices', function() use ($count) {
+            echo '<div class="notice notice-success is-dismissible">';
+            echo '<p>' . sprintf(__('Yatra: Synced pricing type for %d trips to their availability dates and rules.', 'yatra'), $count) . '</p>';
+            echo '</div>';
+        });
+    }
+    
+    /**
+     * Auto-run one-time pricing sync on upgrade
+     * This ensures existing data is synced after code update
+     */
+    public function maybeAutoSyncPricing(): void
+    {
+        $sync_version = '1.0.1'; // Increment this to force re-sync
+        $synced_version = get_option('yatra_pricing_sync_version', '');
+        
+        if ($synced_version === $sync_version) {
+            return; // Already synced this version
+        }
+        
+        // Run the sync
+        $count = \Yatra\Services\TripService::syncAllTripsPricingType();
+        
+        // Mark as synced
+        update_option('yatra_pricing_sync_version', $sync_version);
+        
+        // Log
+        error_log("Yatra: Auto-synced pricing type for {$count} trips (version {$sync_version})");
+    }
 
     /**
      * Initialize plugin settings
@@ -584,6 +643,10 @@ class AppServiceProvider extends ServiceProvider
             // Use centralized Database class to create ALL tables
             \Yatra\Core\Database::createTables();
         }
+        
+        // Always run updateTables to ensure schema is up to date
+        // This handles migrations for existing installations
+        \Yatra\Core\Database::updateTables();
     }
     /**
      * Register shortcodes
@@ -1462,6 +1525,15 @@ class AppServiceProvider extends ServiceProvider
         $trip_id = (int) ($session['trip_id'] ?? 0);
         $booking->travel_date = $session['travel_date'] ?? '';
         $booking->travelers = max(1, (int) ($session['travelers'] ?? 1));
+        
+        // Session-based availability data
+        $booking->departure_time = $session['departure_time'] ?? '';
+        $booking->availability_id = $session['availability_id'] ?? null;
+        $booking->pricing_type = $session['pricing_type'] ?? 'regular';
+        $booking->price_types = $session['price_types'] ?? [];
+        $booking->traveler_counts = $session['traveler_counts'] ?? [];
+        $booking->is_day_trip = $session['is_day_trip'] ?? false;
+        $booking->session_price = isset($session['trip_price']) ? (float) $session['trip_price'] : 0;
 
         // Fetch trip from database using TripRepository
         $tripRepository = new TripRepository();
@@ -1472,6 +1544,37 @@ class AppServiceProvider extends ServiceProvider
             $booking->has_session = false;
             $booking->error = 'trip_not_found';
             return $booking;
+        }
+
+        // Use session price if available, otherwise use trip price
+        $price = $booking->session_price > 0 ? $booking->session_price : (!empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price);
+        
+        // If no pricing_type from session, use trip's
+        if (empty($booking->pricing_type) || $booking->pricing_type === 'regular') {
+            $booking->pricing_type = $trip->pricing_type ?? 'regular';
+        }
+        
+        // If no price_types from session and traveler_based, get from trip
+        if (empty($booking->price_types) && $booking->pricing_type === 'traveler_based') {
+            // Fetch price types from database
+            global $wpdb;
+            $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
+            $categories_table = $wpdb->prefix . 'yatra_traveler_categories';
+            
+            $price_types = $wpdb->get_results($wpdb->prepare(
+                "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, tc.age_min, tc.age_max
+                 FROM {$price_types_table} pt
+                 LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
+                 WHERE pt.trip_id = %d
+                 ORDER BY pt.id ASC",
+                $trip_id
+            ));
+            
+            foreach ($price_types as $pt) {
+                $pt->effective_price = $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0;
+            }
+            
+            $booking->price_types = $price_types;
         }
 
         // Prepare trip data
@@ -1487,10 +1590,11 @@ class AppServiceProvider extends ServiceProvider
             'max_travelers' => (int) ($trip->max_travelers ?: 20),
             'original_price' => (float) $trip->original_price,
             'sale_price' => (float) $trip->sale_price,
-            'price' => !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price,
+            'price' => $price,
             'currency' => $trip->currency ?: 'USD',
             'starting_location' => $trip->starting_location,
             'ending_location' => $trip->ending_location,
+            'pricing_type' => $booking->pricing_type,
         ];
 
         // Load enabled payment gateways

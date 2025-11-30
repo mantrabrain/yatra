@@ -93,11 +93,80 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                     
                     <!-- Travel Details -->
                     <div class="yatra-summary-travel-details">
+                        <?php 
+                        $departure_time = $booking->departure_time ?? '';
+                        $is_day_trip = $booking->is_day_trip ?? false;
+                        $pricing_type = $booking->pricing_type ?? 'regular';
+                        $price_types = $booking->price_types ?? [];
+                        $traveler_counts = $booking->traveler_counts ?? [];
+                        ?>
+                        
                         <div class="yatra-summary-form-group">
                             <label for="travel-date"><?php esc_html_e('Travel Date', 'yatra'); ?> <span class="required">*</span></label>
-                            <input type="date" id="travel-date" name="travel_date" form="yatra-booking-form" required value="<?php echo esc_attr($travel_date); ?>">
+                            <?php if ($is_day_trip && !empty($departure_time)): ?>
+                                <!-- Single day trip with time slot - show as read-only -->
+                                <div class="yatra-selected-datetime">
+                                    <span class="yatra-date-display"><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?></span>
+                                    <span class="yatra-time-display"><?php echo esc_html($departure_time); ?></span>
+                                </div>
+                                <input type="hidden" id="travel-date" name="travel_date" form="yatra-booking-form" value="<?php echo esc_attr($travel_date); ?>">
+                                <input type="hidden" name="departure_time" form="yatra-booking-form" value="<?php echo esc_attr($departure_time); ?>">
+                            <?php else: ?>
+                                <input type="date" id="travel-date" name="travel_date" form="yatra-booking-form" required value="<?php echo esc_attr($travel_date); ?>">
+                            <?php endif; ?>
                         </div>
                         
+                        <?php if ($pricing_type === 'traveler_based' && !empty($price_types)): ?>
+                        <!-- Traveler-based pricing: Show categories -->
+                        <div class="yatra-summary-form-group yatra-traveler-categories">
+                            <label><?php esc_html_e('Travelers', 'yatra'); ?></label>
+                            <?php 
+                            $total_price = 0;
+                            foreach ($price_types as $index => $pt): 
+                                $pt = (object) $pt;
+                                $category_id = $pt->category_id ?? $index;
+                                $category_label = $pt->category_label ?? __('Traveler', 'yatra');
+                                $category_price = isset($pt->effective_price) ? (float) $pt->effective_price : ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                                $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
+                                $age_info = '';
+                                if (isset($pt->age_min) || isset($pt->age_max)) {
+                                    if (isset($pt->age_min) && isset($pt->age_max)) {
+                                        $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $pt->age_min, $pt->age_max);
+                                    } elseif (isset($pt->age_min)) {
+                                        $age_info = sprintf(__('(Age %d+)', 'yatra'), $pt->age_min);
+                                    } else {
+                                        $age_info = sprintf(__('(Up to age %d)', 'yatra'), $pt->age_max);
+                                    }
+                                }
+                                $total_price += $category_price * $count;
+                            ?>
+                            <div class="yatra-category-row" data-category-id="<?php echo esc_attr($category_id); ?>" data-price="<?php echo esc_attr($category_price); ?>">
+                                <div class="yatra-category-info">
+                                    <span class="yatra-category-name"><?php echo esc_html($category_label); ?></span>
+                                    <?php if ($age_info): ?>
+                                    <span class="yatra-category-age"><?php echo esc_html($age_info); ?></span>
+                                    <?php endif; ?>
+                                    <span class="yatra-category-price"><?php echo esc_html(yatra_format_price($category_price)); ?></span>
+                                </div>
+                                <div class="yatra-traveler-selector">
+                                    <button type="button" class="yatra-quantity-btn minus" data-category="<?php echo esc_attr($category_id); ?>">-</button>
+                                    <input type="number" 
+                                           name="traveler_counts[<?php echo esc_attr($category_id); ?>]" 
+                                           class="yatra-category-input"
+                                           value="<?php echo esc_attr($count); ?>" 
+                                           min="0" 
+                                           max="<?php echo esc_attr($trip->max_travelers ?? 20); ?>" 
+                                           readonly
+                                           data-category-id="<?php echo esc_attr($category_id); ?>"
+                                           data-price="<?php echo esc_attr($category_price); ?>"
+                                           form="yatra-booking-form">
+                                    <button type="button" class="yatra-quantity-btn plus" data-category="<?php echo esc_attr($category_id); ?>">+</button>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php else: ?>
+                        <!-- Regular pricing: Simple number of travelers -->
                         <div class="yatra-summary-form-group">
                             <label for="number-of-travelers"><?php esc_html_e('Number of Travelers', 'yatra'); ?></label>
                             <div class="yatra-traveler-selector">
@@ -106,6 +175,7 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                                 <button type="button" class="yatra-quantity-btn plus" data-field="travelers">+</button>
                             </div>
                         </div>
+                        <?php endif; ?>
                     </div>
                     
                     <!-- Trip Info -->
@@ -128,7 +198,55 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                     </div>
 
                     <!-- Price Breakdown -->
-                    <div class="yatra-summary-pricing">
+                    <div class="yatra-summary-pricing" data-pricing-type="<?php echo esc_attr($pricing_type); ?>">
+                        <?php if ($pricing_type === 'traveler_based' && !empty($price_types)): 
+                            // Calculate total for traveler-based pricing
+                            $calculated_total = 0;
+                            foreach ($price_types as $index => $pt) {
+                                $pt = (object) $pt;
+                                $category_id = $pt->category_id ?? $index;
+                                $category_price = isset($pt->effective_price) ? (float) $pt->effective_price : ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                                $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
+                                $calculated_total += $category_price * $count;
+                            }
+                        ?>
+                        <!-- Traveler-based price breakdown -->
+                        <div class="yatra-price-breakdown-categories" id="price-breakdown-categories">
+                            <?php foreach ($price_types as $index => $pt): 
+                                $pt = (object) $pt;
+                                $category_id = $pt->category_id ?? $index;
+                                $category_label = $pt->category_label ?? __('Traveler', 'yatra');
+                                $category_price = isset($pt->effective_price) ? (float) $pt->effective_price : ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                                $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
+                                $subtotal = $category_price * $count;
+                                if ($count > 0):
+                            ?>
+                            <div class="yatra-price-row yatra-category-subtotal" data-category-id="<?php echo esc_attr($category_id); ?>">
+                                <span><?php echo esc_html($category_label); ?> x <span class="category-count"><?php echo esc_html($count); ?></span></span>
+                                <span class="category-subtotal"><?php echo esc_html(yatra_format_price($subtotal)); ?></span>
+                            </div>
+                            <?php endif; endforeach; ?>
+                        </div>
+                        
+                        <?php if ($deposit_required) : ?>
+                        <div class="yatra-price-row yatra-price-deposit" style="display: none;">
+                            <span><?php printf(esc_html__('Deposit (%d%%)', 'yatra'), $deposit_percentage); ?></span>
+                            <span id="summary-deposit"><?php echo esc_html(yatra_format_price($calculated_total * ($deposit_percentage / 100))); ?></span>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <div class="yatra-price-row yatra-price-total">
+                            <span><strong><?php esc_html_e('Total Amount', 'yatra'); ?></strong></span>
+                            <span id="summary-total"><strong><?php echo esc_html(yatra_format_price($calculated_total)); ?></strong></span>
+                        </div>
+                        
+                        <div class="yatra-price-row yatra-price-due" style="display: none;">
+                            <span><?php esc_html_e('Due Now', 'yatra'); ?></span>
+                            <span id="summary-due"><strong><?php echo esc_html(yatra_format_price($calculated_total)); ?></strong></span>
+                        </div>
+                        
+                        <?php else: ?>
+                        <!-- Regular pricing breakdown -->
                         <div class="yatra-price-row">
                             <span><?php esc_html_e('Price per person', 'yatra'); ?></span>
                             <span data-price="<?php echo esc_attr($trip->price); ?>"><?php echo esc_html(yatra_format_price($trip->price)); ?></span>
@@ -154,6 +272,7 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                             <span><?php esc_html_e('Due Now', 'yatra'); ?></span>
                             <span id="summary-due"><strong><?php echo esc_html(yatra_format_price($trip->price * $total_travelers)); ?></strong></span>
                         </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Cancellation & Refund Policy -->

@@ -60,15 +60,83 @@
          * Get current traveler count
          */
         function getTravelerCount() {
+            // Check if we have category-based pricing
+            const categoryInputs = $('.yatra-category-input');
+            if (categoryInputs.length > 0) {
+                let total = 0;
+                categoryInputs.each(function() {
+                    total += parseInt($(this).val()) || 0;
+                });
+                return total || 1;
+            }
+            
+            // Fallback to simple number input or traveler forms
+            const simpleInput = $('#number-of-travelers').val();
+            if (simpleInput) {
+                return parseInt(simpleInput) || 1;
+            }
+            
             return $('.yatra-traveler-form').length || 1;
+        }
+        
+        /**
+         * Check if using traveler-based pricing
+         */
+        function isTravelerBasedPricing() {
+            return $('.yatra-summary-pricing').data('pricing-type') === 'traveler_based';
+        }
+        
+        /**
+         * Calculate total for traveler-based pricing
+         */
+        function calculateTravelerBasedTotal() {
+            let total = 0;
+            $('.yatra-category-input').each(function() {
+                const count = parseInt($(this).val()) || 0;
+                const price = parseFloat($(this).data('price')) || 0;
+                total += count * price;
+            });
+            return total;
         }
 
         /**
          * Update booking summary prices
          */
         function updateBookingSummary() {
-            const travelers = getTravelerCount();
-            const total = pricePerPerson * travelers;
+            let total = 0;
+            let travelers = 0;
+            
+            if (isTravelerBasedPricing()) {
+                // Traveler-based pricing: sum up category prices
+                total = calculateTravelerBasedTotal();
+                travelers = getTravelerCount();
+                
+                // Update category breakdown
+                $('#price-breakdown-categories').empty();
+                $('.yatra-category-input').each(function() {
+                    const count = parseInt($(this).val()) || 0;
+                    const price = parseFloat($(this).data('price')) || 0;
+                    const categoryId = $(this).data('category-id');
+                    const categoryRow = $(this).closest('.yatra-category-row');
+                    const categoryLabel = categoryRow.find('.yatra-category-name').text();
+                    
+                    if (count > 0) {
+                        const subtotal = count * price;
+                        $('#price-breakdown-categories').append(
+                            `<div class="yatra-price-row yatra-category-subtotal" data-category-id="${categoryId}">
+                                <span>${categoryLabel} x <span class="category-count">${count}</span></span>
+                                <span class="category-subtotal">${formatCurrency(subtotal, currency)}</span>
+                            </div>`
+                        );
+                    }
+                });
+            } else {
+                // Regular pricing
+                travelers = getTravelerCount();
+                total = pricePerPerson * travelers;
+                $('#summary-travelers').text(travelers);
+            }
+            
             const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
             const selectedGateway = $('input[name="payment_gateway"]:checked').val() || 'pay_later';
             
@@ -80,10 +148,14 @@
             }
 
             // Update UI
-            $('#summary-travelers').text(travelers);
             $('#summary-total').html('<strong>' + formatCurrency(total, currency) + '</strong>');
             $('#summary-due strong').text(formatCurrency(dueNow, currency));
             $('#pay-amount').text(formatCurrency(dueNow, currency));
+            
+            // Update deposit display
+            if ($('.yatra-price-deposit').length) {
+                $('#summary-deposit').text(formatCurrency(total * (depositPercentage / 100), currency));
+            }
             
             // Update button text based on gateway
             updateButtonText(selectedGateway, dueNow);
@@ -328,8 +400,8 @@
         // Event Handlers
         // =====================
 
-        // Quantity selector - add/remove traveler forms dynamically
-        $('.yatra-quantity-btn').on('click', function() {
+        // Quantity selector for regular pricing - add/remove traveler forms dynamically
+        $('.yatra-quantity-btn[data-field="travelers"]').on('click', function() {
             const $btn = $(this);
             const $input = $('#number-of-travelers');
             let currentValue = parseInt($input.val()) || 1;
@@ -351,6 +423,54 @@
             $input.val(currentValue);
             updateBookingSummary();
         });
+        
+        // Quantity selector for traveler-based category pricing
+        $('.yatra-category-row .yatra-quantity-btn').on('click', function() {
+            const $btn = $(this);
+            const $row = $btn.closest('.yatra-category-row');
+            const $input = $row.find('.yatra-category-input');
+            let currentValue = parseInt($input.val()) || 0;
+            const min = parseInt($input.attr('min')) || 0;
+            const max = parseInt($input.attr('max')) || 20;
+
+            if ($btn.hasClass('plus')) {
+                if (currentValue < max) {
+                    currentValue++;
+                }
+            } else if ($btn.hasClass('minus')) {
+                if (currentValue > min) {
+                    currentValue--;
+                }
+            }
+
+            $input.val(currentValue);
+            
+            // Update traveler forms based on total count
+            const totalTravelers = getTravelerCount();
+            updateTravelerFormsForCategories();
+            
+            updateBookingSummary();
+        });
+        
+        /**
+         * Update traveler forms based on category selections
+         */
+        function updateTravelerFormsForCategories() {
+            const targetCount = getTravelerCount();
+            const currentFormCount = $('.yatra-traveler-form').length;
+            
+            if (targetCount > currentFormCount) {
+                // Add forms
+                for (let i = currentFormCount + 1; i <= targetCount; i++) {
+                    addTravelerForm(i);
+                }
+            } else if (targetCount < currentFormCount && targetCount > 0) {
+                // Remove forms
+                for (let i = currentFormCount; i > targetCount; i--) {
+                    removeTravelerForm(i);
+                }
+            }
+        }
 
         // Update summary when payment method changes
         $('input[name="payment_method"]').on('change', function() {
