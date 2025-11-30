@@ -30,6 +30,7 @@ import { Alert } from '../components/ui/alert';
 import { useNavigate } from '../hooks/useNavigate';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
+import { RecurringRuleFormSkeleton } from '../components/availability/RecurringRuleFormSkeleton';
 
 interface Trip {
   id: number;
@@ -355,14 +356,7 @@ const RecurringRuleForm: React.FC = () => {
   const isLoading = createMutation.isPending || updateMutation.isPending;
 
   if (isEditing && isLoadingRule) {
-    return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
-          <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded" />
-        </div>
-      </div>
-    );
+    return <RecurringRuleFormSkeleton />;
   }
 
   return (

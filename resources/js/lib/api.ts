@@ -131,3 +131,17 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 
+// Format time with AM/PM for display
+export const formatTimeForDisplay = (timeString: string): string => {
+  if (!timeString) return '';
+  
+  // Try to parse the time string
+  const time = new Date(`1970-01-01T${timeString}`);
+  if (isNaN(time.getTime())) {
+    return timeString; // Return original if invalid
+  }
+  
+  // Format using JavaScript's Intl.DateTimeFormat for localized time display
+  return time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+};
+

@@ -468,9 +468,9 @@
                     if (firstInput) {
                         const categoryLabel = firstInput.getAttribute('data-category-label') || 'Traveler';
                         display.textContent = `${categoryLabel} x 1`;
-                    } else {
+                } else {
                         display.textContent = '1 Traveler';
-                    }
+                }
                 } else {
                     display.textContent = parts.join(', ');
                 }
@@ -518,7 +518,7 @@
                     syncToAvailabilityCards(travelerInputs);
                 }
             };
-            
+
             // Function to sync sidebar travelers to availability cards
             const syncToAvailabilityCards = (inputs) => {
                 const availabilitySection = document.getElementById('availability');
@@ -658,6 +658,8 @@
                 // Section already loaded, just show it
                 availabilitySection.style.display = 'block';
                 this.scrollToAvailability(availabilitySection);
+                // Sync sidebar travelers to cards
+                this.syncSidebarTravelersToCards();
                 this.resetButton(originalText);
                 return;
             }
@@ -756,6 +758,9 @@
 
                 // Scroll to the new section
                 this.scrollToAvailability(newSection);
+
+                // Sync sidebar travelers to cards
+                this.syncSidebarTravelersToCards();
 
                 // Reset button state
                 this.resetButton(originalText);
@@ -876,6 +881,162 @@
                 this.checkAvailabilityBtn.disabled = false;
             }
         }
+
+        /**
+         * Sync sidebar travelers to all availability cards
+         */
+        syncSidebarTravelersToCards() {
+            // Get sidebar traveler values
+            const travelerInputs = document.querySelectorAll('#quantity-selector input[id^="traveler_"]');
+            const numTravelersInput = document.getElementById('num_travelers');
+            
+            if (travelerInputs.length === 0 && !numTravelersInput) {
+                return; // No traveler inputs found
+            }
+
+            // Get all availability cards
+            const availabilityCards = document.querySelectorAll('.yatra-availability-card');
+            if (availabilityCards.length === 0) {
+                return; // No availability cards found
+            }
+
+            availabilityCards.forEach((card) => {
+                const itemId = card.getAttribute('data-availability-id') || card.getAttribute('data-item');
+                if (!itemId) return;
+
+                // Check if this card uses traveler-based pricing or simple pricing
+                const travelerSelector = card.querySelector('.yatra-availability-quantity-selector[data-item="' + itemId + '"]');
+                const simpleTravelers = card.querySelector('.yatra-availability-num-travelers[data-item="' + itemId + '"]');
+
+                if (travelerSelector && travelerInputs.length > 0) {
+                    // Traveler-based pricing - sync by category
+                    travelerInputs.forEach((input) => {
+                        const categoryId = input.id.replace('traveler_', '');
+                        const value = parseInt(input.value) || 0;
+                        
+                        const row = travelerSelector.querySelector('.yatra-quantity-row[data-category-id="' + categoryId + '"]');
+                        if (row) {
+                            const cardInput = row.querySelector('input[type="number"]');
+                            if (cardInput) {
+                                const max = parseInt(cardInput.getAttribute('max')) || 99;
+                                cardInput.value = Math.min(value, max);
+                                
+                                // Update button states
+                                const minusBtn = row.querySelector('.yatra-quantity-minus');
+                                const plusBtn = row.querySelector('.yatra-quantity-plus');
+                                const min = parseInt(cardInput.getAttribute('min')) || 0;
+                                if (minusBtn) minusBtn.disabled = cardInput.value <= min;
+                                if (plusBtn) plusBtn.disabled = cardInput.value >= max;
+                            }
+                        }
+                    });
+                    
+                    // Update the display text for this card
+                    this.updateAvailabilityCardDisplay(itemId);
+                    
+                } else if (simpleTravelers && numTravelersInput) {
+                    // Simple pricing - sync total count
+                    const totalCount = parseInt(numTravelersInput.value) || 1;
+                    const max = parseInt(simpleTravelers.getAttribute('max')) || 99;
+                    simpleTravelers.value = Math.min(totalCount, max);
+                    
+                    // Update button states
+                    const controls = simpleTravelers.closest('.yatra-quantity-controls-inline');
+                    if (controls) {
+                        const minusBtn = controls.querySelector('.yatra-quantity-minus');
+                        const plusBtn = controls.querySelector('.yatra-quantity-plus');
+                        const min = parseInt(simpleTravelers.getAttribute('min')) || 1;
+                        if (minusBtn) minusBtn.disabled = simpleTravelers.value <= min;
+                        if (plusBtn) plusBtn.disabled = simpleTravelers.value >= max;
+                    }
+                }
+
+                // Update card totals
+                this.updateAvailabilityCardTotals(itemId);
+            });
+        }
+
+        /**
+         * Update availability card participants display
+         */
+        updateAvailabilityCardDisplay(itemId) {
+            const display = document.querySelector('.yatra-availability-participants-display[data-item="' + itemId + '"]');
+            if (!display) return;
+
+            const selector = document.querySelector('.yatra-availability-quantity-selector[data-item="' + itemId + '"]');
+            if (!selector) return;
+
+            const rows = selector.querySelectorAll('.yatra-quantity-row');
+            const parts = [];
+            
+            rows.forEach((row) => {
+                const input = row.querySelector('input[type="number"]');
+                const labelEl = row.querySelector('.yatra-quantity-title');
+                if (input && labelEl) {
+                    const count = parseInt(input.value) || 0;
+                    if (count > 0) {
+                        parts.push(labelEl.textContent.trim() + ' x ' + count);
+                    }
+                }
+            });
+
+            display.textContent = parts.length > 0 ? parts.join(', ') : '0 Travelers';
+        }
+
+        /**
+         * Update availability card total price
+         */
+        updateAvailabilityCardTotals(itemId) {
+            const totalAmountEl = document.querySelector('.yatra-card-total-amount[data-item="' + itemId + '"]');
+            const totalNoteEl = document.querySelector('.yatra-card-total-note[data-item="' + itemId + '"]');
+            if (!totalAmountEl) return;
+
+            let total = 0;
+            let totalTravelers = 0;
+
+            // Check for traveler-based pricing first
+            const selector = document.querySelector('.yatra-availability-quantity-selector[data-item="' + itemId + '"]');
+            
+            if (selector) {
+                // Traveler-based pricing
+                const rows = selector.querySelectorAll('.yatra-quantity-row');
+                rows.forEach((row) => {
+                    const input = row.querySelector('input[type="number"]');
+                    const price = parseFloat(row.getAttribute('data-price')) || 0;
+                    const count = parseInt(input?.value) || 0;
+                    total += price * count;
+                    totalTravelers += count;
+                });
+            } else {
+                // Simple pricing
+                const numTravelersInput = document.querySelector('.yatra-availability-num-travelers[data-item="' + itemId + '"]');
+                if (numTravelersInput) {
+                    const price = parseFloat(numTravelersInput.getAttribute('data-price')) || parseFloat(totalAmountEl.getAttribute('data-base-price')) || 0;
+                    const count = parseInt(numTravelersInput.value) || 1;
+                    total = price * count;
+                    totalTravelers = count;
+                } else {
+                    total = parseFloat(totalAmountEl.getAttribute('data-base-price')) || 0;
+                    totalTravelers = 1;
+                }
+            }
+
+            // Format price (use existing format function if available)
+            if (typeof yatra_format_price_js === 'function') {
+                totalAmountEl.textContent = yatra_format_price_js(total);
+            } else {
+                // Fallback formatting
+                totalAmountEl.textContent = '£ ' + total.toFixed(2);
+            }
+            
+            if (totalNoteEl) {
+                totalNoteEl.textContent = 'for ' + totalTravelers + ' traveler' + (totalTravelers !== 1 ? 's' : '');
+            }
+
+            // Update the card participants display
+            this.updateAvailabilityCardDisplay(itemId);
+        }
+
 
         handleMakeEnquiry() {
             // This will be handled by EnquiryModal class
@@ -1511,8 +1672,8 @@
                             travelers = parseInt(simpleInput.value) || 1;
                         } else {
                             // Legacy: adults + children
-                            const adults = this.getTravelerCount(itemIndex, 'adults');
-                            const children = this.getTravelerCount(itemIndex, 'children');
+                    const adults = this.getTravelerCount(itemIndex, 'adults');
+                    const children = this.getTravelerCount(itemIndex, 'children');
                             travelers = parseInt(adults) + parseInt(children);
                         }
                     }
@@ -1643,7 +1804,7 @@
                             const row = input.closest('.yatra-quantity-row');
                             const categoryLabel = row ? row.querySelector('.yatra-quantity-title')?.textContent : 'Traveler';
                             parts.push(`${categoryLabel} x ${value}`);
-                        }
+                    }
                     });
                     
                     if (parts.length === 0) {
@@ -1689,10 +1850,10 @@
                             updateDisplay();
                             
                             // Update button states
-                            const minusBtn = row.querySelector('.yatra-quantity-minus');
-                            const plusBtn = row.querySelector('.yatra-quantity-plus');
-                            if (minusBtn) minusBtn.disabled = newValue <= min;
-                            if (plusBtn) plusBtn.disabled = newValue >= max;
+                                const minusBtn = row.querySelector('.yatra-quantity-minus');
+                                const plusBtn = row.querySelector('.yatra-quantity-plus');
+                                if (minusBtn) minusBtn.disabled = newValue <= min;
+                                if (plusBtn) plusBtn.disabled = newValue >= max;
                             
                             // Update total price
                             this.updateTotalPrice(itemIndex);

@@ -121,8 +121,18 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     const [hours, minutes] = timeString.split(':');
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+    return `${hour % 12 || 12}:${minutes} ${ampm}`;
+  };
+
+  const formatTimeForDisplay = (timeString: string): string => {
+    if (!timeString) return '';
+    const time = new Date(`1970-01-01T${timeString}`);
+    const timeStringFormatted = time.toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+    return timeStringFormatted;
   };
 
   const getCurrencySymbol = (currency: string) => {
@@ -282,7 +292,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                 
                                 {tripType === 'single_day' && availability.departure_time && (
                                   <div className="text-xs text-gray-600 dark:text-gray-400">
-                                    {__('Time', 'Time')}: {formatTime(availability.departure_time)} - {availability.arrival_time ? formatTime(availability.arrival_time) : ''}
+                                    {__('Time', 'Time')}: {formatTimeForDisplay(availability.departure_time)} - {availability.arrival_time ? formatTimeForDisplay(availability.arrival_time) : ''}
                                   </div>
                                 )}
 

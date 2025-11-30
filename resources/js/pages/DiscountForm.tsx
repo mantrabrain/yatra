@@ -17,6 +17,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { HelpText } from '../components/ui/help-text';
+import { DatePicker } from '../components/ui/date-picker';
 
 interface DiscountFormData {
   code: string;
@@ -181,12 +182,8 @@ const DiscountForm: React.FC = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    if (formData.valid_from) {
-      const validFrom = new Date(formData.valid_from);
-      if (validFrom < today) {
-        newErrors.valid_from = __('Valid from date cannot be in the past', 'Valid from date cannot be in the past');
-      }
-    }
+    // Valid from date can be in the past (backdating allowed)
+    // No validation needed for valid_from date
 
     if (formData.expiry_date) {
       const expiryDate = new Date(formData.expiry_date);
@@ -626,16 +623,15 @@ const DiscountForm: React.FC = () => {
                       {__('Valid From Date', 'Valid From Date')}
                     </label>
                     <HelpText 
-                      text={__('Date when this coupon becomes active. Leave empty to activate immediately.', 'Date when this coupon becomes active. Leave empty to activate immediately.')}
+                      text={__('Date when this coupon becomes active. Leave empty to activate immediately. You can select a past date if needed.', 'Date when this coupon becomes active. Leave empty to activate immediately. You can select a past date if needed.')}
                       className="mb-2"
                     />
-                    <Input
-                      id="valid_from"
-                      type="date"
+                    <DatePicker
                       value={formData.valid_from}
-                      onChange={(e) => handleFieldChange('valid_from', e.target.value)}
+                      onChange={(value) => handleFieldChange('valid_from', value)}
+                      placeholder={__('Select start date', 'Select start date')}
+                      error={!!errors.valid_from}
                       className={errors.valid_from ? 'border-red-500' : ''}
-                      min={new Date().toISOString().split('T')[0]}
                     />
                     {errors.valid_from && (
                       <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -654,13 +650,13 @@ const DiscountForm: React.FC = () => {
                       text={__('Date when this coupon expires. Leave empty for no expiry. Must be after the valid from date.', 'Date when this coupon expires. Leave empty for no expiry. Must be after the valid from date.')}
                       className="mb-2"
                     />
-                    <Input
-                      id="expiry_date"
-                      type="date"
+                    <DatePicker
                       value={formData.expiry_date}
-                      onChange={(e) => handleFieldChange('expiry_date', e.target.value)}
+                      onChange={(value) => handleFieldChange('expiry_date', value)}
+                      placeholder={__('Select expiry date', 'Select expiry date')}
+                      minDate={formData.valid_from ? new Date(formData.valid_from) : new Date()}
+                      error={!!errors.expiry_date}
                       className={errors.expiry_date ? 'border-red-500' : ''}
-                      min={formData.valid_from || new Date().toISOString().split('T')[0]}
                     />
                     {errors.expiry_date && (
                       <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">

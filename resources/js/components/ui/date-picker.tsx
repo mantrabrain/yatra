@@ -27,7 +27,21 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   error = false,
 }) => {
   const [open, setOpen] = React.useState(false);
-  const selectedDate = value ? parse(value, "yyyy-MM-dd", new Date()) : undefined;
+  
+  // Parse date safely - check if value is valid and parse correctly
+  let selectedDate: Date | undefined = undefined;
+  if (value && value.trim()) {
+    try {
+      const parsed = parse(value, "yyyy-MM-dd", new Date());
+      // Check if parsed date is valid
+      if (!isNaN(parsed.getTime())) {
+        selectedDate = parsed;
+      }
+    } catch (e) {
+      // Invalid date format, leave as undefined
+      selectedDate = undefined;
+    }
+  }
 
   const handleSelect = (date: Date | undefined) => {
     if (date) {
@@ -36,7 +50,15 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     }
   };
 
-  const displayValue = selectedDate ? format(selectedDate, "MMM dd, yyyy") : "";
+  // Format display value safely
+  let displayValue = "";
+  if (selectedDate && !isNaN(selectedDate.getTime())) {
+    try {
+      displayValue = format(selectedDate, "MMM dd, yyyy");
+    } catch (e) {
+      displayValue = "";
+    }
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

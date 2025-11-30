@@ -187,7 +187,7 @@ class FormatHelper
     }
 
     /**
-     * Format time for display (24h to 12h)
+     * Format time for display (24h to 12h) with uppercase AM/PM
      * 
      * @param string $time Time string (e.g., "14:30")
      * @return string Formatted time (e.g., "2:30 PM")
@@ -203,7 +203,29 @@ class FormatHelper
             return $time;
         }
 
-        return date_i18n(get_option('time_format', 'g:i a'), $timestamp);
+        // Always use uppercase AM/PM format (g:i A)
+        return date_i18n('g:i A', $timestamp);
+    }
+
+    /**
+     * Format time for display with uppercase AM/PM
+     * 
+     * @param string $time Time string (e.g., "14:30")
+     * @return string Formatted time (e.g., "2:30 PM")
+     */
+    public static function formatTimeForDisplay(string $time): string
+    {
+        if (empty($time)) {
+            return '';
+        }
+        
+        $timestamp = strtotime($time);
+        if ($timestamp === false) {
+            return $time;
+        }
+        
+        // Always use uppercase AM/PM format (g:i A)
+        return date_i18n('g:i A', $timestamp);
     }
 
     /**

@@ -267,13 +267,13 @@ class SingleTripController
         $categories_table = $this->wpdb->prefix . 'yatra_traveler_categories';
         
         $sql = $this->wpdb->prepare(
-            "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, 
-                    tc.description as category_description, tc.age_min, tc.age_max
-             FROM {$table} pt
-             LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
-             WHERE pt.trip_id = %d
+                "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, 
+                        tc.description as category_description, tc.age_min, tc.age_max
+                 FROM {$table} pt
+                 LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
+                 WHERE pt.trip_id = %d
              ORDER BY pt.id ASC",
-            $trip_id
+                $trip_id
         );
         
         $price_types = $this->wpdb->get_results($sql) ?: [];

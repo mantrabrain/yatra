@@ -200,12 +200,12 @@ class TripRepository extends BaseRepository
         $table = $wpdb->prefix . 'yatra_trip_price_types';
         
         $sql = $wpdb->prepare(
-            "SELECT tpt.*, tc.label as category_label, tc.slug as category_slug 
-             FROM `{$table}` tpt
-             LEFT JOIN `{$wpdb->prefix}yatra_traveler_categories` tc ON tpt.category_id = tc.id
-             WHERE tpt.trip_id = %d
-             ORDER BY tpt.id ASC",
-            $tripId
+                "SELECT tpt.*, tc.label as category_label, tc.slug as category_slug 
+                 FROM `{$table}` tpt
+                 LEFT JOIN `{$wpdb->prefix}yatra_traveler_categories` tc ON tpt.category_id = tc.id
+                 WHERE tpt.trip_id = %d
+                 ORDER BY tpt.id ASC",
+                $tripId
         );
         
         error_log("Yatra getPriceTypes: SQL=" . $sql);
@@ -527,9 +527,9 @@ class TripRepository extends BaseRepository
                 
                 // Simple insert with all required fields
                 $insertData = [
-                    'trip_id' => $tripId,
+                        'trip_id' => $tripId,
                     'category_id' => $categoryId,
-                    'original_price' => (float) ($priceType['original_price'] ?? 0),
+                        'original_price' => (float) ($priceType['original_price'] ?? 0),
                     'is_default' => 0,
                     'min_quantity' => 1,
                 ];

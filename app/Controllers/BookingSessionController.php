@@ -11,6 +11,7 @@ use Yatra\Repositories\TravellerRepository;
 use Yatra\Repositories\CustomerRepository;
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\BookingRepository;
+use Yatra\Repositories\DiscountRepository;
 
 /**
  * Booking Session REST API Controller
@@ -39,6 +40,11 @@ class BookingSessionController extends BaseController
     private BookingRepository $bookingRepository;
 
     /**
+     * @var DiscountRepository
+     */
+    private DiscountRepository $discountRepository;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -47,6 +53,7 @@ class BookingSessionController extends BaseController
         $this->customerRepository = new CustomerRepository();
         $this->tripRepository = new TripRepository();
         $this->bookingRepository = new BookingRepository();
+        $this->discountRepository = new DiscountRepository();
     }
 
     /**
@@ -100,10 +107,25 @@ class BookingSessionController extends BaseController
             'callback' => [$this, 'create_booking'],
             'permission_callback' => '__return_true',
         ]);
+        
+        // Apply coupon code
+        register_rest_route($this->namespace, '/booking/coupon/apply', [
+            'methods' => 'POST',
+            'callback' => [$this, 'apply_coupon'],
+            'permission_callback' => '__return_true',
+        ]);
+        
+        // Remove coupon code
+        register_rest_route($this->namespace, '/booking/coupon/remove', [
+            'methods' => 'POST',
+            'callback' => [$this, 'remove_coupon'],
+            'permission_callback' => '__return_true',
+        ]);
     }
 
     /**
      * Set booking session data
+     * Supports full creation (requires trip_id) or partial updates (travelers, traveler_counts)
      */
     public function set_session(WP_REST_Request $request): WP_REST_Response
     {
@@ -111,6 +133,33 @@ class BookingSessionController extends BaseController
         yatra_start_session();
         
         $data = $request->get_json_params();
+        
+        // Check if this is a partial update (updating travelers in existing session)
+        $existing_session = yatra_get_booking_session();
+        $is_partial_update = empty($data['trip_id']) && !empty($existing_session['trip_id']) && 
+                             (isset($data['travelers']) || isset($data['traveler_counts']));
+        
+        if ($is_partial_update) {
+            // Partial update: merge new data with existing session
+            if (isset($data['travelers'])) {
+                $existing_session['travelers'] = max(1, (int) $data['travelers']);
+            }
+            if (isset($data['traveler_counts']) && is_array($data['traveler_counts'])) {
+                $existing_session['traveler_counts'] = $data['traveler_counts'];
+                // Recalculate total travelers from counts
+                $existing_session['travelers'] = max(1, array_sum(array_map('intval', $data['traveler_counts'])));
+            }
+            $existing_session['timestamp'] = time();
+            
+            // Save updated session
+            yatra_set_booking_session($existing_session);
+            
+            return new WP_REST_Response([
+                'success' => true,
+                'message' => __('Booking session updated.', 'yatra'),
+                'data' => $existing_session,
+            ]);
+        }
 
         if (empty($data['trip_id'])) {
             return new WP_REST_Response([
@@ -560,7 +609,7 @@ class BookingSessionController extends BaseController
             } else {
                 $price_per_person = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
             }
-            $total_amount = $price_per_person * $travelers_count;
+        $total_amount = $price_per_person * $travelers_count;
         }
 
         // Handle payment method
@@ -1376,6 +1425,285 @@ class BookingSessionController extends BaseController
         $admin_body .= sprintf(__("View Booking: %s\n", 'yatra'), admin_url('admin.php?page=yatra&subpage=bookings&action=view&id=' . $booking_id));
 
         wp_mail($admin_email, $admin_subject, $admin_body, $headers);
+    }
+
+    /**
+     * Apply coupon code to booking session
+     */
+    public function apply_coupon(WP_REST_Request $request): WP_REST_Response
+    {
+        yatra_start_session();
+        
+        $data = $request->get_json_params();
+        $code = isset($data['code']) ? strtoupper(sanitize_text_field($data['code'])) : '';
+        
+        if (empty($code)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Please enter a coupon code.', 'yatra'),
+            ], 400);
+        }
+        
+        // Get current session
+        $session = yatra_get_booking_session();
+        if (empty($session) || empty($session['trip_id'])) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('No active booking session found.', 'yatra'),
+            ], 400);
+        }
+        
+        // Find the coupon
+        $discount = $this->discountRepository->findByCode($code);
+        
+        if (!$discount) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Invalid coupon.', 'yatra'),
+            ], 404);
+        }
+        
+        // Validate coupon
+        $validation = $this->validateCoupon($discount, $session);
+        if (!$validation['valid']) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $validation['message'],
+            ], 400);
+        }
+        
+        // Calculate discount amount
+        $total_amount = $this->calculateSessionTotal($session);
+        $discount_amount = $this->calculateDiscountAmount($discount, $total_amount, $session);
+        
+        // Store coupon in session
+        $session['coupon'] = [
+            'id' => (int) $discount->id,
+            'code' => $discount->code,
+            'type' => $discount->type,
+            'amount' => (float) $discount->amount,
+            'discount_amount' => $discount_amount,
+            'description' => $discount->description ?? '',
+        ];
+        $session['timestamp'] = time();
+        
+        yatra_set_booking_session($session);
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => __('Coupon applied successfully!', 'yatra'),
+            'data' => [
+                'code' => $discount->code,
+                'type' => $discount->type,
+                'discount_amount' => $discount_amount,
+                'discount_formatted' => yatra_format_price($discount_amount),
+                'new_total' => $total_amount - $discount_amount,
+                'new_total_formatted' => yatra_format_price($total_amount - $discount_amount),
+            ],
+        ]);
+    }
+
+    /**
+     * Remove coupon code from booking session
+     */
+    public function remove_coupon(WP_REST_Request $request): WP_REST_Response
+    {
+        yatra_start_session();
+        
+        $session = yatra_get_booking_session();
+        if (empty($session)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('No active booking session found.', 'yatra'),
+            ], 400);
+        }
+        
+        // Remove coupon from session
+        unset($session['coupon']);
+        $session['timestamp'] = time();
+        
+        yatra_set_booking_session($session);
+        
+        $total_amount = $this->calculateSessionTotal($session);
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => __('Coupon removed.', 'yatra'),
+            'data' => [
+                'new_total' => $total_amount,
+                'new_total_formatted' => yatra_format_price($total_amount),
+            ],
+        ]);
+    }
+
+    /**
+     * Validate coupon against current session
+     */
+    private function validateCoupon(\stdClass $discount, array $session): array
+    {
+        // Check if coupon is active (draft or not published = invalid)
+        if ($discount->status !== 'publish') {
+            return ['valid' => false, 'message' => __('Invalid coupon.', 'yatra')];
+        }
+        
+        // Check validity dates
+        $now = current_time('Y-m-d');
+        
+        if (!empty($discount->valid_from) && $now < $discount->valid_from) {
+            return ['valid' => false, 'message' => __('Invalid coupon.', 'yatra')];
+        }
+        
+        if (!empty($discount->expiry_date) && $now > $discount->expiry_date) {
+            return ['valid' => false, 'message' => __('Invalid coupon.', 'yatra')];
+        }
+        
+        // Check usage limit
+        if ($discount->usage_limit > 0 && $discount->usage_count >= $discount->usage_limit) {
+            return ['valid' => false, 'message' => __('This coupon has reached its usage limit.', 'yatra')];
+        }
+        
+        // Check usage limit per customer (if logged in)
+        if ($discount->usage_limit_per_customer > 0 && is_user_logged_in()) {
+            $user_id = get_current_user_id();
+            $user_usage = $this->getCouponUsageByUser($discount->code, $user_id);
+            if ($user_usage >= $discount->usage_limit_per_customer) {
+                return ['valid' => false, 'message' => __('You have already used this coupon the maximum number of times.', 'yatra')];
+            }
+        }
+        
+        // Check if applicable to this trip
+        if ($discount->applicable_to === 'specific_trips') {
+            $trip_ids = is_string($discount->trip_ids) ? maybe_unserialize($discount->trip_ids) : ($discount->trip_ids ?? []);
+            if (!empty($trip_ids) && !in_array((int) $session['trip_id'], array_map('intval', $trip_ids), true)) {
+                return ['valid' => false, 'message' => __('This coupon is not applicable to this trip.', 'yatra')];
+            }
+        }
+        
+        // Check minimum amount
+        $total = $this->calculateSessionTotal($session);
+        if (!empty($discount->min_amount) && $total < (float) $discount->min_amount) {
+            return [
+                'valid' => false, 
+                'message' => sprintf(
+                    __('Minimum order amount of %s required for this coupon.', 'yatra'),
+                    yatra_format_price((float) $discount->min_amount)
+                ),
+            ];
+        }
+        
+        // Check first-time customer
+        if ($discount->first_time_customer_only && is_user_logged_in()) {
+            $user_id = get_current_user_id();
+            $has_previous_booking = $this->bookingRepository->hasUserMadeBooking($user_id);
+            if ($has_previous_booking) {
+                return ['valid' => false, 'message' => __('This coupon is only for first-time customers.', 'yatra')];
+            }
+        }
+        
+        // Check group size requirements
+        if ($discount->is_group_discount && !empty($discount->min_group_size)) {
+            $travelers = (int) ($session['travelers'] ?? 1);
+            if ($travelers < (int) $discount->min_group_size) {
+                return [
+                    'valid' => false,
+                    'message' => sprintf(
+                        __('This coupon requires a minimum group size of %d travelers.', 'yatra'),
+                        (int) $discount->min_group_size
+                    ),
+                ];
+            }
+        }
+        
+        return ['valid' => true, 'message' => ''];
+    }
+
+    /**
+     * Calculate total amount from session
+     */
+    private function calculateSessionTotal(array $session): float
+    {
+        $pricing_type = $session['pricing_type'] ?? 'regular';
+        
+        if ($pricing_type === 'traveler_based' && !empty($session['price_types'])) {
+            $total = 0;
+            $traveler_counts = $session['traveler_counts'] ?? [];
+            
+            foreach ($session['price_types'] as $index => $pt) {
+                $pt = (array) $pt;
+                $category_id = $pt['category_id'] ?? $index;
+                $price = (float) ($pt['effective_price'] ?? $pt['sale_price'] ?? $pt['discounted_price'] ?? $pt['original_price'] ?? 0);
+                $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
+                $total += $price * $count;
+            }
+            
+            return $total;
+        }
+        
+        // Regular pricing
+        $price = (float) ($session['trip_price'] ?? 0);
+        $travelers = (int) ($session['travelers'] ?? 1);
+        
+        return $price * $travelers;
+    }
+
+    /**
+     * Calculate discount amount
+     */
+    private function calculateDiscountAmount(\stdClass $discount, float $total, array $session): float
+    {
+        $discount_amount = 0;
+        
+        // Check if group discount applies
+        if ($discount->is_group_discount && !empty($discount->min_group_size)) {
+            $travelers = (int) ($session['travelers'] ?? 1);
+            if ($travelers >= (int) $discount->min_group_size && !empty($discount->group_discount_amount)) {
+                // Apply group discount
+                if ($discount->group_discount_type === 'percentage') {
+                    $discount_amount = $total * ((float) $discount->group_discount_amount / 100);
+                } else {
+                    $discount_amount = (float) $discount->group_discount_amount;
+                }
+            }
+        }
+        
+        // If no group discount, apply regular discount
+        if ($discount_amount === 0) {
+            if ($discount->type === 'percentage') {
+                $discount_amount = $total * ((float) $discount->amount / 100);
+            } else {
+                $discount_amount = (float) $discount->amount;
+            }
+        }
+        
+        // Apply max discount cap if set
+        if (!empty($discount->max_discount_amount) && $discount_amount > (float) $discount->max_discount_amount) {
+            $discount_amount = (float) $discount->max_discount_amount;
+        }
+        
+        // Ensure discount doesn't exceed total
+        if ($discount_amount > $total) {
+            $discount_amount = $total;
+        }
+        
+        return round($discount_amount, 2);
+    }
+
+    /**
+     * Get coupon usage count by user
+     */
+    private function getCouponUsageByUser(string $discount_code, int $user_id): int
+    {
+        global $wpdb;
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        
+        // Count bookings with this coupon code by this user
+        $count = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$bookings_table} WHERE customer_id = %d AND discount_code = %s AND status NOT IN ('cancelled', 'refunded', 'failed')",
+            $user_id,
+            strtoupper(sanitize_text_field($discount_code))
+        ));
+        
+        return (int) $count;
     }
 }
 

@@ -20,7 +20,8 @@
         
         // Get pricing data
         const pricePerPerson = parseFloat($('input[name="trip_price"]').val()) || window.yatraBookingData?.tripPrice || 0;
-        const currency = $('input[name="currency"]').val() || window.yatraBookingData?.currency || 'USD';
+        // Use global currency from settings (prioritize yatraBookingData which uses global currency)
+        const currency = window.yatraBookingData?.currency || $('input[name="currency"]').val() || 'USD';
         const depositPercentage = window.yatraBookingData?.depositPercentage || 20;
         const partialPercentage = window.yatraBookingData?.partialPercentage || 30;
 
@@ -60,8 +61,8 @@
          * Get current traveler count
          */
         function getTravelerCount() {
-            // Check if we have category-based pricing
-            const categoryInputs = $('.yatra-category-input');
+            // Check if we have category-based pricing (dropdown style)
+            const categoryInputs = $('.yatra-qty-input[data-category-id]');
             if (categoryInputs.length > 0) {
                 let total = 0;
                 categoryInputs.each(function() {
@@ -91,7 +92,7 @@
          */
         function calculateTravelerBasedTotal() {
             let total = 0;
-            $('.yatra-category-input').each(function() {
+            $('.yatra-qty-input[data-category-id]').each(function() {
                 const count = parseInt($(this).val()) || 0;
                 const price = parseFloat($(this).data('price')) || 0;
                 total += count * price;
@@ -113,12 +114,12 @@
                 
                 // Update category breakdown
                 $('#price-breakdown-categories').empty();
-                $('.yatra-category-input').each(function() {
+                $('.yatra-qty-input[data-category-id]').each(function() {
                     const count = parseInt($(this).val()) || 0;
                     const price = parseFloat($(this).data('price')) || 0;
                     const categoryId = $(this).data('category-id');
-                    const categoryRow = $(this).closest('.yatra-category-row');
-                    const categoryLabel = categoryRow.find('.yatra-category-name').text();
+                    const quantityRow = $(this).closest('.yatra-quantity-row');
+                    const categoryLabel = quantityRow.find('.yatra-quantity-title').text();
                     
                     if (count > 0) {
                         const subtotal = count * price;
@@ -130,11 +131,17 @@
                         );
                     }
                 });
+                
+                // Update the dropdown display text
+                updateTravelersDisplayText();
             } else {
                 // Regular pricing
                 travelers = getTravelerCount();
                 total = pricePerPerson * travelers;
                 $('#summary-travelers').text(travelers);
+                
+                // Update display for regular pricing
+                updateRegularTravelersDisplayText(travelers);
             }
             
             const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
@@ -160,17 +167,75 @@
             // Update button text based on gateway
             updateButtonText(selectedGateway, dueNow);
         }
+        
+        /**
+         * Update the dropdown display text for traveler-based pricing
+         */
+        function updateTravelersDisplayText() {
+            const parts = [];
+            $('.yatra-qty-input[data-category-id]').each(function() {
+                const count = parseInt($(this).val()) || 0;
+                const categoryLabel = $(this).closest('.yatra-quantity-row').find('.yatra-quantity-title').text();
+                if (count > 0) {
+                    parts.push(categoryLabel + ' x ' + count);
+                }
+            });
+            const displayText = parts.length > 0 ? parts.join(', ') : 'Select travelers';
+            $('#yatra-travelers-display').text(displayText);
+        }
+        
+        /**
+         * Update display text for regular pricing
+         */
+        function updateRegularTravelersDisplayText(count) {
+            const label = count === 1 ? 'traveler' : 'travelers';
+            $('#yatra-travelers-display-regular').text(count + ' ' + label);
+        }
 
         /**
          * Format currency
          */
         function formatCurrency(amount, currencyCode) {
+            // Get currency formatting settings from global settings
+            const currencyPosition = window.yatraBookingData?.currencyPosition || 'before';
+            const decimalPlaces = window.yatraBookingData?.decimalPlaces || 2;
+            const thousandSeparator = window.yatraBookingData?.thousandSeparator || ',';
+            const decimalSeparator = window.yatraBookingData?.decimalSeparator || '.';
+            
+            // Currency symbols matching PHP yatra_get_currency_symbol function
             const symbols = {
-                'USD': '$', 'EUR': '€', 'GBP': '£', 'NPR': 'Rs.', 'INR': '₹',
-                'AUD': 'A$', 'CAD': 'C$', 'JPY': '¥', 'CNY': '¥'
+                'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'CNY': '¥',
+                'INR': '₹', 'NPR': 'Rs', 'AUD': 'A$', 'CAD': 'C$', 'CHF': 'CHF',
+                'NZD': 'NZ$', 'SGD': 'S$', 'HKD': 'HK$', 'KRW': '₩', 'THB': '฿',
+                'MYR': 'RM', 'PHP': '₱', 'IDR': 'Rp', 'VND': '₫', 'BRL': 'R$',
+                'MXN': 'MX$', 'RUB': '₽', 'ZAR': 'R', 'AED': 'د.إ', 'SAR': '﷼',
+                'TRY': '₺', 'SEK': 'kr', 'NOK': 'kr', 'DKK': 'kr', 'PLN': 'zł',
+                'CZK': 'Kč', 'HUF': 'Ft', 'ILS': '₪', 'TWD': 'NT$', 'PKR': '₨',
+                'BDT': '৳', 'LKR': 'Rs', 'EGP': 'E£', 'NGN': '₦', 'KES': 'KSh',
+                'GHS': 'GH₵', 'ARS': 'AR$', 'CLP': 'CL$', 'COP': 'CO$', 'PEN': 'S/'
             };
-            const symbol = symbols[currencyCode] || currencyCode + ' ';
-            return symbol + amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            
+            const symbol = symbols[currencyCode?.toUpperCase()] || (currencyCode ? currencyCode + ' ' : '');
+            
+            // Format amount with proper separators
+            // First format with standard separators, then replace with custom ones
+            const tempFormatted = amount.toLocaleString('en-US', {
+                minimumFractionDigits: decimalPlaces,
+                maximumFractionDigits: decimalPlaces
+            });
+            // Replace thousand separator
+            const formattedAmount = tempFormatted
+                .split(',').join('__THOUSAND__')
+                .split('.').join('__DECIMAL__')
+                .replace(/__THOUSAND__/g, thousandSeparator)
+                .replace(/__DECIMAL__/g, decimalSeparator);
+            
+            // Position currency based on settings (before or after)
+            if (currencyPosition === 'right' || currencyPosition === 'after') {
+                return formattedAmount + ' ' + symbol;
+            }
+            
+            return symbol + ' ' + formattedAmount;
         }
 
         /**
@@ -399,21 +464,50 @@
         // =====================
         // Event Handlers
         // =====================
+        
+        // Dropdown toggle for traveler selector
+        $(document).on('click', '.yatra-booking-participants-select', function(e) {
+            // Don't toggle if clicking on buttons or inputs inside
+            if ($(e.target).closest('.yatra-qty-btn, .yatra-qty-input, .yatra-quantity-controls').length) {
+                return;
+            }
+            
+            const $select = $(this);
+            const wasActive = $select.hasClass('active');
+            
+            // Close all dropdowns first
+            $('.yatra-booking-participants-select').removeClass('active');
+            
+            // Toggle this one
+            if (!wasActive) {
+                $select.addClass('active');
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.yatra-booking-participants-select').length) {
+                $('.yatra-booking-participants-select').removeClass('active');
+            }
+        });
 
-        // Quantity selector for regular pricing - add/remove traveler forms dynamically
-        $('.yatra-quantity-btn[data-field="travelers"]').on('click', function() {
+        // Quantity selector for regular pricing (dropdown style)
+        $(document).on('click', '.yatra-qty-btn[data-field="travelers"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
             const $btn = $(this);
             const $input = $('#number-of-travelers');
             let currentValue = parseInt($input.val()) || 1;
             const min = parseInt($input.attr('min')) || 1;
             const max = parseInt($input.attr('max')) || 20;
 
-            if ($btn.hasClass('plus')) {
+            if ($btn.hasClass('yatra-qty-plus')) {
                 if (currentValue < max) {
                     currentValue++;
                     addTravelerForm(currentValue);
                 }
-            } else if ($btn.hasClass('minus')) {
+            } else if ($btn.hasClass('yatra-qty-minus')) {
                 if (currentValue > min) {
                     removeTravelerForm(currentValue);
                     currentValue--;
@@ -421,23 +515,32 @@
             }
 
             $input.val(currentValue);
+            
+            // Update button disabled states
+            $btn.closest('.yatra-quantity-controls').find('.yatra-qty-minus').prop('disabled', currentValue <= min);
+            $btn.closest('.yatra-quantity-controls').find('.yatra-qty-plus').prop('disabled', currentValue >= max);
+            
             updateBookingSummary();
+            updateBookingSession();
         });
         
-        // Quantity selector for traveler-based category pricing
-        $('.yatra-category-row .yatra-quantity-btn').on('click', function() {
+        // Quantity selector for traveler-based category pricing (dropdown style)
+        $(document).on('click', '.yatra-qty-btn[data-category]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
             const $btn = $(this);
-            const $row = $btn.closest('.yatra-category-row');
-            const $input = $row.find('.yatra-category-input');
+            const $row = $btn.closest('.yatra-quantity-row');
+            const $input = $row.find('.yatra-qty-input');
             let currentValue = parseInt($input.val()) || 0;
             const min = parseInt($input.attr('min')) || 0;
             const max = parseInt($input.attr('max')) || 20;
 
-            if ($btn.hasClass('plus')) {
+            if ($btn.hasClass('yatra-qty-plus')) {
                 if (currentValue < max) {
                     currentValue++;
                 }
-            } else if ($btn.hasClass('minus')) {
+            } else if ($btn.hasClass('yatra-qty-minus')) {
                 if (currentValue > min) {
                     currentValue--;
                 }
@@ -445,11 +548,19 @@
 
             $input.val(currentValue);
             
+            // Update button disabled states
+            $row.find('.yatra-qty-minus').prop('disabled', currentValue <= min);
+            $row.find('.yatra-qty-plus').prop('disabled', currentValue >= max);
+            
             // Update traveler forms based on total count
-            const totalTravelers = getTravelerCount();
             updateTravelerFormsForCategories();
             
+            // Update travelers display text immediately
+            updateTravelersDisplayText();
+
+            
             updateBookingSummary();
+            updateBookingSession();
         });
         
         /**
@@ -470,6 +581,49 @@
                     removeTravelerForm(i);
                 }
             }
+        }
+        
+        /**
+         * Update booking session with new traveler counts
+         * This ensures checkout/confirmation reflects the updated travelers
+         */
+        function updateBookingSession() {
+            const sessionPayload = {
+                travelers: getTravelerCount()
+            };
+            
+            // Add traveler_counts for category-based pricing
+            if (isTravelerBasedPricing()) {
+                const travelerCounts = {};
+                $('.yatra-qty-input[data-category-id]').each(function() {
+                    const categoryId = $(this).data('category-id');
+                    const count = parseInt($(this).val()) || 0;
+                    if (categoryId !== undefined) {
+                        travelerCounts[categoryId] = count;
+                    }
+                });
+                sessionPayload.traveler_counts = travelerCounts;
+            }
+            
+            // Update session via REST API
+            fetch(apiUrl + '/booking/session', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                body: JSON.stringify(sessionPayload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.warn('Failed to update booking session:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating booking session:', error);
+            });
         }
 
         // Update summary when payment method changes
@@ -571,6 +725,288 @@
         // Set minimum date to today for travel date
         const today = new Date().toISOString().split('T')[0];
         $('input[name="travel_date"], #travel-date').attr('min', today);
+        
+        // =====================
+        // Coupon Handling
+        // =====================
+        
+        let appliedCoupon = null;
+        
+        // Toggle coupon form visibility
+        $('#yatra-coupon-toggle-btn').on('click', function() {
+            const $form = $('#yatra-coupon-form');
+            const $chevron = $(this).find('.yatra-coupon-chevron');
+            
+            $form.slideToggle(200);
+            $chevron.toggleClass('rotated');
+        });
+        
+        // Apply coupon
+        $('#yatra-apply-coupon').on('click', function() {
+            applyCoupon();
+        });
+        
+        // Apply coupon on Enter key
+        $('#yatra-coupon-code').on('keypress', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                applyCoupon();
+            }
+        });
+        
+        // Remove coupon
+        $('#yatra-remove-coupon').on('click', function() {
+            removeCoupon();
+        });
+        
+        function applyCoupon() {
+            const code = $('#yatra-coupon-code').val().trim().toUpperCase();
+            const $btn = $('#yatra-apply-coupon');
+            const $message = $('#yatra-coupon-message');
+            
+            if (!code) {
+                showCouponMessage('Please enter a coupon code.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            $btn.prop('disabled', true).text('Applying...');
+            $message.hide();
+            
+            fetch(apiUrl + '/booking/coupon/apply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(response => {
+                $btn.prop('disabled', false).text('Apply');
+                
+                if (response.success) {
+                    appliedCoupon = response.data;
+                    
+                    // Hide the form and show applied coupon
+                    $('#yatra-coupon-form').hide();
+                    $('#yatra-coupon-toggle-btn').hide();
+                    
+                    // Show applied coupon display
+                    const $applied = $('#yatra-applied-coupon');
+                    $applied.find('.yatra-coupon-code-display').text(response.data.code);
+                    $applied.find('.yatra-coupon-discount').text('-' + response.data.discount_formatted);
+                    $applied.show();
+                    
+                    // Update price display
+                    updatePriceWithDiscount(response.data);
+                    
+                    showCouponMessage(response.message, 'success');
+                } else {
+                    showCouponMessage(response.message || 'Invalid coupon code.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Coupon error:', error);
+                $btn.prop('disabled', false).text('Apply');
+                showCouponMessage('An error occurred. Please try again.', 'error');
+            });
+        }
+        
+        function removeCoupon() {
+            const $btn = $('#yatra-remove-coupon');
+            
+            $btn.prop('disabled', true);
+            
+            fetch(apiUrl + '/booking/coupon/remove', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(response => {
+                $btn.prop('disabled', false);
+                
+                if (response.success) {
+                    appliedCoupon = null;
+                    
+                    // Hide applied coupon and show toggle button
+                    $('#yatra-applied-coupon').hide();
+                    $('#yatra-coupon-toggle-btn').show();
+                    $('#yatra-coupon-code').val('');
+                    $('#yatra-coupon-message').hide();
+                    
+                    // Hide discount rows
+                    $('#yatra-discount-row, #yatra-discount-row-regular').hide();
+                    
+                    // Update the summary
+                    updateBookingSummary();
+                }
+            })
+            .catch(error => {
+                console.error('Remove coupon error:', error);
+                $btn.prop('disabled', false);
+            });
+        }
+        
+        function showCouponMessage(message, type) {
+            const $message = $('#yatra-coupon-message');
+            $message.removeClass('success error').addClass(type);
+            $message.text(message).show();
+            
+            // Auto-hide success messages
+            if (type === 'success') {
+                setTimeout(() => $message.fadeOut(), 3000);
+            }
+        }
+        
+        function updatePriceWithDiscount(couponData) {
+            const discountAmount = parseFloat(couponData.discount_amount) || 0;
+            const discountFormatted = couponData.discount_formatted || formatCurrency(discountAmount, currency);
+            
+            // Show discount row
+            const $discountRow = isTravelerBasedPricing() ? $('#yatra-discount-row') : $('#yatra-discount-row-regular');
+            $discountRow.find('.yatra-discount-code').text('(' + couponData.code + ')');
+            $discountRow.find('.yatra-discount-amount').text('-' + discountFormatted);
+            $discountRow.show();
+            
+            // Recalculate and update totals
+            updateBookingSummaryWithDiscount();
+        }
+        
+        function updateBookingSummaryWithDiscount() {
+            let subtotal = 0;
+            
+            if (isTravelerBasedPricing()) {
+                subtotal = calculateTravelerBasedTotal();
+            } else {
+                subtotal = pricePerPerson * getTravelerCount();
+            }
+            
+            let discountAmount = 0;
+            if (appliedCoupon) {
+                discountAmount = parseFloat(appliedCoupon.discount_amount) || 0;
+            }
+            
+            const total = Math.max(0, subtotal - discountAmount);
+            
+            const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
+            let dueNow = total;
+            if (paymentMethod === 'deposit') {
+                dueNow = total * (depositPercentage / 100);
+            } else if (paymentMethod === 'partial') {
+                dueNow = total * (partialPercentage / 100);
+            }
+            
+            // Update UI
+            $('#summary-total').html('<strong>' + formatCurrency(total, currency) + '</strong>');
+            $('#summary-due strong').text(formatCurrency(dueNow, currency));
+            $('#pay-amount').text(formatCurrency(dueNow, currency));
+            
+            // Update deposit display
+            if ($('.yatra-price-deposit').length) {
+                $('#summary-deposit').text(formatCurrency(total * (depositPercentage / 100), currency));
+            }
+        }
+        
+        // Override the original updateBookingSummary to include discount
+        const originalUpdateBookingSummary = updateBookingSummary;
+        updateBookingSummary = function() {
+            originalUpdateBookingSummary();
+            
+            // If we have an applied coupon, recalculate with discount
+            if (appliedCoupon) {
+                updateBookingSummaryWithDiscount();
+            }
+        };
+        
+
+        /**
+         * Load existing coupon from session and display it
+         */
+        function loadCouponFromSession() {
+            fetch(apiUrl + '/booking/session', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(response => {
+                if (response.success && response.data && response.data.coupon) {
+                    const coupon = response.data.coupon;
+                    // Calculate discount formatted if not present
+                    const discountFormatted = coupon.discount_formatted || formatCurrency(coupon.discount_amount || 0, currency);
+                    
+                    appliedCoupon = {
+                        code: coupon.code,
+                        type: coupon.type,
+                        discount_amount: parseFloat(coupon.discount_amount) || 0,
+                        discount_formatted: discountFormatted,
+                        new_total: coupon.new_total || 0,
+                        new_total_formatted: coupon.new_total_formatted || ''
+                    };
+                    
+                    // Hide the form and show applied coupon
+                    $('#yatra-coupon-form').hide();
+                    $('#yatra-coupon-toggle-btn').hide();
+                    
+                    // Show applied coupon display
+                    const $applied = $('#yatra-applied-coupon');
+                    $applied.find('.yatra-coupon-code-display').text(coupon.code);
+                    $applied.find('.yatra-coupon-discount').text('-' + appliedCoupon.discount_formatted);
+                    $applied.show();
+                    
+                    // Update price display
+                    updatePriceWithDiscount(appliedCoupon);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading coupon from session:', error);
+            });
+        }
+        
+        /**
+         * Check URL for coupon parameter and auto-apply
+         */
+        function checkUrlForCoupon() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const couponCode = urlParams.get('coupon');
+            
+            if (couponCode && couponCode.trim()) {
+                // Set the coupon code in the input
+                $('#yatra-coupon-code').val(couponCode.trim().toUpperCase());
+                
+                // Auto-apply the coupon
+                applyCoupon();
+                
+                // Remove coupon parameter from URL without page reload
+                urlParams.delete('coupon');
+                const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+                window.history.replaceState({}, '', newUrl);
+            }
+        }
+        
+        // Check URL for coupon parameter first (takes priority)
+        // If URL has coupon, it will be applied and session updated
+        // If no URL coupon, load existing coupon from session
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCoupon = urlParams.get('coupon');
+        
+        if (urlCoupon && urlCoupon.trim()) {
+            // URL coupon takes priority - apply it
+            checkUrlForCoupon();
+        } else {
+            // No URL coupon - load from session
+            loadCouponFromSession();
+        }
         
         // Initial update
         updateBookingSummary();

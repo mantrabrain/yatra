@@ -879,8 +879,244 @@
     color: #111827;
 }
 
-.yatra-booking-sidebar .yatra-quantity-btn:active {
+/* =============================================
+   Dropdown Traveler Selector (Trip Single Style)
+   ============================================= */
+
+.yatra-booking-participants-select {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 10px;
+}
+
+.yatra-booking-participants-select:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+}
+
+.yatra-booking-participants-select.active {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.yatra-booking-field-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.yatra-booking-field-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.yatra-booking-participants-select:hover .yatra-booking-field-icon,
+.yatra-booking-participants-select.active .yatra-booking-field-icon {
+    color: #3b82f6;
+}
+
+.yatra-booking-participants-display {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.yatra-booking-participants-select .yatra-select-arrow {
+    flex-shrink: 0;
+    color: #9ca3af;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.yatra-booking-participants-select:hover .yatra-select-arrow,
+.yatra-booking-participants-select.active .yatra-select-arrow {
+    color: #3b82f6;
+}
+
+.yatra-booking-participants-select.active .yatra-select-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Container */
+.yatra-booking-quantity-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 6px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    display: none;
+    overflow: visible;
+    animation: slideDownDropdown 0.2s ease-out;
+    padding: 6px;
+}
+
+@keyframes slideDownDropdown {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.yatra-booking-participants-select.active .yatra-booking-quantity-dropdown {
+    display: block;
+}
+
+/* Quantity Rows inside dropdown */
+.yatra-booking-quantity-dropdown .yatra-quantity-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    gap: 12px;
+    border-radius: 8px;
+    transition: background-color 0.15s ease;
+}
+
+.yatra-booking-quantity-dropdown .yatra-quantity-row:hover {
+    background-color: #f9fafb;
+}
+
+.yatra-booking-quantity-dropdown .yatra-quantity-row:not(:last-child) {
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 2px;
+}
+
+.yatra-booking-quantity-dropdown .yatra-quantity-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.yatra-booking-quantity-dropdown .yatra-quantity-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.yatra-booking-quantity-dropdown .yatra-quantity-subtitle {
+    font-size: 11px;
+    color: #6b7280;
+    line-height: 1.2;
+}
+
+.yatra-booking-quantity-dropdown .yatra-quantity-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #059669;
+}
+
+/* Quantity Controls - Container */
+.yatra-booking-quantity-dropdown .yatra-quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f3f4f6;
+    padding: 4px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+/* Quantity Buttons */
+.yatra-qty-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: #374151;
+    padding: 0;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.yatra-qty-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
+    pointer-events: none;
+}
+
+.yatra-qty-btn:hover:not(:disabled) {
+    background: #3b82f6;
+    color: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.yatra-qty-btn:active:not(:disabled) {
     transform: scale(0.95);
+    background: #2563eb;
+}
+
+.yatra-qty-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #e5e7eb;
+    box-shadow: none;
+}
+
+/* Quantity Input */
+.yatra-qty-input {
+    width: 36px;
+    height: 28px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+    padding: 0;
+    -moz-appearance: textfield;
+}
+
+/* Quantity Input in Booking Summary - Wider */
+.yatra-booking-summary .yatra-qty-input {
+    width: 60px;
+    min-width: 60px;
+}
+
+.yatra-qty-input::-webkit-outer-spin-button,
+.yatra-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.yatra-qty-input:focus {
+    outline: none;
 }
 
 .yatra-booking-summary h3 + .yatra-summary-travel-details {
@@ -1451,6 +1687,243 @@
         flex-direction: column;
         gap: 12px;
         align-items: flex-start;
+    }
+}
+
+/* =====================
+ * Coupon Section Styles
+ * ===================== */
+
+.yatra-coupon-section {
+    padding: 16px 0;
+    border-top: 1px dashed #e5e7eb;
+    border-bottom: 1px dashed #e5e7eb;
+    margin: 16px 0;
+}
+
+.yatra-coupon-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border: 1px dashed #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yatra-coupon-toggle-btn:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    color: #111827;
+}
+
+.yatra-coupon-toggle-btn svg:first-child {
+    color: #6b7280;
+}
+
+.yatra-coupon-chevron {
+    margin-left: auto;
+    color: #9ca3af;
+    transition: transform 0.2s ease;
+}
+
+.yatra-coupon-chevron.rotated {
+    transform: rotate(180deg);
+}
+
+.yatra-coupon-form {
+    margin-top: 12px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.yatra-coupon-input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.yatra-coupon-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.yatra-coupon-input::placeholder {
+    text-transform: none;
+    letter-spacing: normal;
+    color: #9ca3af;
+}
+
+.yatra-coupon-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.yatra-apply-coupon-btn {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+}
+
+.yatra-apply-coupon-btn:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.yatra-apply-coupon-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.yatra-coupon-message {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yatra-coupon-message.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.yatra-coupon-message.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+/* Applied Coupon Display */
+.yatra-applied-coupon {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+}
+
+.yatra-applied-coupon-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #065f46;
+}
+
+.yatra-applied-coupon-info svg {
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+.yatra-coupon-code-display {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px dashed #10b981;
+}
+
+.yatra-coupon-discount {
+    font-weight: 600;
+    font-size: 14px;
+    color: #059669;
+}
+
+.yatra-remove-coupon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yatra-remove-coupon-btn:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+/* Discount Row in Price Summary */
+.yatra-price-discount {
+    background: #ecfdf5;
+    margin: 8px -16px;
+    padding: 10px 16px !important;
+    border-top: 1px dashed #a7f3d0;
+    border-bottom: 1px dashed #a7f3d0;
+}
+
+.yatra-discount-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #065f46;
+}
+
+.yatra-discount-label .yatra-discount-code {
+    font-size: 12px;
+    color: #059669;
+    font-weight: 500;
+}
+
+.yatra-discount-amount {
+    color: #059669;
+    font-weight: 600;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    .yatra-coupon-input-group {
+        flex-direction: column;
+    }
+    
+    .yatra-apply-coupon-btn {
+        width: 100%;
+    }
+    
+    .yatra-applied-coupon {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .yatra-applied-coupon-info {
+        flex-direction: column;
+        gap: 8px;
     }
 }
 

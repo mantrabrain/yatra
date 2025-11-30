@@ -1534,7 +1534,7 @@ class AppServiceProvider extends ServiceProvider
             'original_price' => (float) $trip->original_price,
             'sale_price' => (float) $trip->sale_price,
             'price' => $price,
-            'currency' => $trip->currency ?: 'USD',
+            'currency' => SettingsService::getCurrency(),
             'starting_location' => $trip->starting_location,
             'ending_location' => $trip->ending_location,
             'pricing_type' => $booking->pricing_type,
@@ -1693,6 +1693,10 @@ class AppServiceProvider extends ServiceProvider
                 'partialPercentage' => $booking->partial_payment_percentage ?? SettingsService::getInt('partial_payment_percentage', 30),
                 'tripPrice' => 0,
                 'currency' => SettingsService::getCurrency(),
+                'currencyPosition' => SettingsService::getCurrencyPosition(),
+                'decimalPlaces' => SettingsService::getInt('decimal_places', 2),
+                'thousandSeparator' => SettingsService::getString('thousand_separator', ','),
+                'decimalSeparator' => SettingsService::getString('decimal_separator', '.'),
                 'minTravelers' => 1,
                 'maxTravelers' => 20,
             ];
@@ -1700,7 +1704,8 @@ class AppServiceProvider extends ServiceProvider
             // Add trip-specific data if available
             if ($booking && $booking->trip) {
                 $localized_data['tripPrice'] = $booking->trip->price ?? 0;
-                $localized_data['currency'] = $booking->trip->currency ?? SettingsService::getCurrency();
+                // Always use global currency setting
+                $localized_data['currency'] = SettingsService::getCurrency();
                 $localized_data['minTravelers'] = $booking->trip->min_travelers ?? 1;
                 $localized_data['maxTravelers'] = $booking->trip->max_travelers ?? 20;
             }

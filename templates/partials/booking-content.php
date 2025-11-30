@@ -80,7 +80,7 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                     </div>
                     
                     <input type="hidden" name="trip_price" value="<?php echo esc_attr($trip->price); ?>">
-                    <input type="hidden" name="currency" value="<?php echo esc_attr($trip->currency); ?>">
+                    <input type="hidden" name="currency" value="<?php echo esc_attr(\Yatra\Services\SettingsService::getCurrency()); ?>">
                     <?php wp_nonce_field('yatra_booking_nonce', 'yatra_booking_nonce'); ?>
                 </form>
                 <?php endif; ?>
@@ -107,72 +107,155 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                                 <!-- Single day trip with time slot - show as read-only -->
                                 <div class="yatra-selected-datetime">
                                     <span class="yatra-date-display"><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?></span>
-                                    <span class="yatra-time-display"><?php echo esc_html($departure_time); ?></span>
+                                    <span class="yatra-time-display"><?php echo esc_html(\Yatra\Helpers\FormatHelper::formatTimeForDisplay($departure_time)); ?></span>
                                 </div>
                                 <input type="hidden" id="travel-date" name="travel_date" form="yatra-booking-form" value="<?php echo esc_attr($travel_date); ?>">
                                 <input type="hidden" name="departure_time" form="yatra-booking-form" value="<?php echo esc_attr($departure_time); ?>">
                             <?php else: ?>
-                                <input type="date" id="travel-date" name="travel_date" form="yatra-booking-form" required value="<?php echo esc_attr($travel_date); ?>">
+                            <input type="date" id="travel-date" name="travel_date" form="yatra-booking-form" required value="<?php echo esc_attr($travel_date); ?>">
                             <?php endif; ?>
                         </div>
                         
                         <?php if ($pricing_type === 'traveler_based' && !empty($price_types)): ?>
-                        <!-- Traveler-based pricing: Show categories -->
+                        <!-- Traveler-based pricing: Dropdown selector -->
                         <div class="yatra-summary-form-group yatra-traveler-categories">
                             <label><?php esc_html_e('Travelers', 'yatra'); ?></label>
                             <?php 
                             $total_price = 0;
-                            foreach ($price_types as $index => $pt): 
+                            $display_parts = [];
+                            foreach ($price_types as $index => $pt) {
                                 $pt = (object) $pt;
                                 $category_id = $pt->category_id ?? $index;
                                 $category_label = $pt->category_label ?? __('Traveler', 'yatra');
                                 $category_price = isset($pt->effective_price) ? (float) $pt->effective_price : ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
                                 $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
-                                $age_info = '';
-                                if (isset($pt->age_min) || isset($pt->age_max)) {
-                                    if (isset($pt->age_min) && isset($pt->age_max)) {
-                                        $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $pt->age_min, $pt->age_max);
-                                    } elseif (isset($pt->age_min)) {
-                                        $age_info = sprintf(__('(Age %d+)', 'yatra'), $pt->age_min);
-                                    } else {
-                                        $age_info = sprintf(__('(Up to age %d)', 'yatra'), $pt->age_max);
-                                    }
+                                if ($count > 0) {
+                                    $display_parts[] = $category_label . ' x ' . $count;
                                 }
                                 $total_price += $category_price * $count;
+                            }
+                            $display_text = !empty($display_parts) ? implode(', ', $display_parts) : __('Select travelers', 'yatra');
                             ?>
-                            <div class="yatra-category-row" data-category-id="<?php echo esc_attr($category_id); ?>" data-price="<?php echo esc_attr($category_price); ?>">
-                                <div class="yatra-category-info">
-                                    <span class="yatra-category-name"><?php echo esc_html($category_label); ?></span>
-                                    <?php if ($age_info): ?>
-                                    <span class="yatra-category-age"><?php echo esc_html($age_info); ?></span>
-                                    <?php endif; ?>
-                                    <span class="yatra-category-price"><?php echo esc_html(yatra_format_price($category_price)); ?></span>
+                            <div class="yatra-booking-participants-select" id="yatra-booking-travelers-select">
+                                <div class="yatra-booking-field-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
                                 </div>
-                                <div class="yatra-traveler-selector">
-                                    <button type="button" class="yatra-quantity-btn minus" data-category="<?php echo esc_attr($category_id); ?>">-</button>
-                                    <input type="number" 
-                                           name="traveler_counts[<?php echo esc_attr($category_id); ?>]" 
-                                           class="yatra-category-input"
-                                           value="<?php echo esc_attr($count); ?>" 
-                                           min="0" 
-                                           max="<?php echo esc_attr($trip->max_travelers ?? 20); ?>" 
-                                           readonly
-                                           data-category-id="<?php echo esc_attr($category_id); ?>"
-                                           data-price="<?php echo esc_attr($category_price); ?>"
-                                           form="yatra-booking-form">
-                                    <button type="button" class="yatra-quantity-btn plus" data-category="<?php echo esc_attr($category_id); ?>">+</button>
+                                <div class="yatra-booking-participants-display" id="yatra-travelers-display">
+                                    <?php echo esc_html($display_text); ?>
+                                </div>
+                                <svg class="yatra-select-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                                
+                                <!-- Dropdown -->
+                                <div class="yatra-booking-quantity-dropdown" id="yatra-travelers-dropdown">
+                                    <?php foreach ($price_types as $index => $pt): 
+                                        $pt = (object) $pt;
+                                        $category_id = $pt->category_id ?? $index;
+                                        $category_label = $pt->category_label ?? __('Traveler', 'yatra');
+                                        $category_price = isset($pt->effective_price) ? (float) $pt->effective_price : ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                                        $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
+                                        $age_info = '';
+                                        if (isset($pt->age_min) || isset($pt->age_max)) {
+                                            if (isset($pt->age_min) && isset($pt->age_max)) {
+                                                $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $pt->age_min, $pt->age_max);
+                                            } elseif (isset($pt->age_min)) {
+                                                $age_info = sprintf(__('(Age %d+)', 'yatra'), $pt->age_min);
+                                            } else {
+                                                $age_info = sprintf(__('(Up to age %d)', 'yatra'), $pt->age_max);
+                                            }
+                                        }
+                                    ?>
+                                    <div class="yatra-quantity-row" data-category-id="<?php echo esc_attr($category_id); ?>" data-price="<?php echo esc_attr($category_price); ?>">
+                                        <div class="yatra-quantity-label">
+                                            <span class="yatra-quantity-title"><?php echo esc_html($category_label); ?></span>
+                                            <?php if ($age_info): ?>
+                                            <span class="yatra-quantity-subtitle"><?php echo esc_html($age_info); ?></span>
+                                            <?php endif; ?>
+                                            <span class="yatra-quantity-price"><?php echo esc_html(yatra_format_price($category_price)); ?></span>
+                                        </div>
+                                        <div class="yatra-quantity-controls">
+                                            <button type="button" class="yatra-qty-btn yatra-qty-minus" data-category="<?php echo esc_attr($category_id); ?>" <?php echo $count <= 0 ? 'disabled' : ''; ?>>
+                                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                                </svg>
+                                            </button>
+                                            <input type="number" 
+                                                   name="traveler_counts[<?php echo esc_attr($category_id); ?>]" 
+                                                   class="yatra-qty-input"
+                                                   value="<?php echo esc_attr($count); ?>" 
+                                                   min="0" 
+                                                   max="<?php echo esc_attr($trip->max_travelers ?? 20); ?>" 
+                                                   readonly
+                                                   data-category-id="<?php echo esc_attr($category_id); ?>"
+                                                   data-price="<?php echo esc_attr($category_price); ?>"
+                                                   form="yatra-booking-form">
+                                            <button type="button" class="yatra-qty-btn yatra-qty-plus" data-category="<?php echo esc_attr($category_id); ?>">
+                                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
-                            <?php endforeach; ?>
                         </div>
                         <?php else: ?>
-                        <!-- Regular pricing: Simple number of travelers -->
+                        <!-- Regular pricing: Dropdown selector -->
                         <div class="yatra-summary-form-group">
                             <label for="number-of-travelers"><?php esc_html_e('Number of Travelers', 'yatra'); ?></label>
-                            <div class="yatra-traveler-selector">
-                                <button type="button" class="yatra-quantity-btn minus" data-field="travelers">-</button>
-                                <input type="number" id="number-of-travelers" name="number_of_travelers" value="<?php echo esc_attr($total_travelers); ?>" min="<?php echo esc_attr($trip->min_travelers ?? 1); ?>" max="<?php echo esc_attr($trip->max_travelers ?? 20); ?>" readonly form="yatra-booking-form">
-                                <button type="button" class="yatra-quantity-btn plus" data-field="travelers">+</button>
+                            <div class="yatra-booking-participants-select" id="yatra-booking-travelers-select-regular">
+                                <div class="yatra-booking-field-icon">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                                <div class="yatra-booking-participants-display" id="yatra-travelers-display-regular">
+                                    <?php echo esc_html($total_travelers . ' ' . _n('traveler', 'travelers', $total_travelers, 'yatra')); ?>
+                                </div>
+                                <svg class="yatra-select-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                                
+                                <!-- Dropdown -->
+                                <div class="yatra-booking-quantity-dropdown" id="yatra-travelers-dropdown-regular">
+                                    <div class="yatra-quantity-row">
+                                        <div class="yatra-quantity-label">
+                                            <span class="yatra-quantity-title"><?php esc_html_e('Travelers', 'yatra'); ?></span>
+                                            <span class="yatra-quantity-price"><?php echo esc_html(yatra_format_price($trip->price)); ?> <?php esc_html_e('per person', 'yatra'); ?></span>
+                                        </div>
+                                        <div class="yatra-quantity-controls">
+                                            <button type="button" class="yatra-qty-btn yatra-qty-minus" data-field="travelers" <?php echo $total_travelers <= ($trip->min_travelers ?? 1) ? 'disabled' : ''; ?>>
+                                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                                </svg>
+                                            </button>
+                                            <input type="number" 
+                                                   id="number-of-travelers" 
+                                                   name="number_of_travelers" 
+                                                   class="yatra-qty-input"
+                                                   value="<?php echo esc_attr($total_travelers); ?>" 
+                                                   min="<?php echo esc_attr($trip->min_travelers ?? 1); ?>" 
+                                                   max="<?php echo esc_attr($trip->max_travelers ?? 20); ?>" 
+                                                   readonly 
+                                                   form="yatra-booking-form">
+                                            <button type="button" class="yatra-qty-btn yatra-qty-plus" data-field="travelers">
+                                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <?php endif; ?>
@@ -194,6 +277,51 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                                 <span><?php echo esc_html(ucfirst($trip->difficulty_level)); ?></span>
                                 <?php endif; ?>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Coupon Code Section -->
+                    <div class="yatra-coupon-section">
+                        <div class="yatra-coupon-toggle">
+                            <button type="button" id="yatra-coupon-toggle-btn" class="yatra-coupon-toggle-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6"></path>
+                                    <path d="M12 2v10"></path>
+                                    <path d="m4.93 10.93 1.41 1.41"></path>
+                                    <path d="m17.66 10.93-1.41 1.41"></path>
+                                    <circle cx="12" cy="2" r="2"></circle>
+                                </svg>
+                                <?php esc_html_e('Have a coupon code?', 'yatra'); ?>
+                                <svg class="yatra-coupon-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="yatra-coupon-form" id="yatra-coupon-form" style="display: none;">
+                            <div class="yatra-coupon-input-group">
+                                <input type="text" id="yatra-coupon-code" name="coupon_code" placeholder="<?php esc_attr_e('Enter coupon code', 'yatra'); ?>" class="yatra-coupon-input" autocomplete="off">
+                                <button type="button" id="yatra-apply-coupon" class="yatra-apply-coupon-btn">
+                                    <?php esc_html_e('Apply', 'yatra'); ?>
+                                </button>
+                            </div>
+                            <div id="yatra-coupon-message" class="yatra-coupon-message" style="display: none;"></div>
+                        </div>
+                        <!-- Applied Coupon Display -->
+                        <div class="yatra-applied-coupon" id="yatra-applied-coupon" style="display: none;">
+                            <div class="yatra-applied-coupon-info">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                <span class="yatra-coupon-code-display"></span>
+                                <span class="yatra-coupon-discount"></span>
+                            </div>
+                            <button type="button" id="yatra-remove-coupon" class="yatra-remove-coupon-btn" title="<?php esc_attr_e('Remove coupon', 'yatra'); ?>">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
                         </div>
                     </div>
 
@@ -228,6 +356,15 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                             <?php endif; endforeach; ?>
                         </div>
                         
+                        <!-- Coupon Discount Row (hidden by default) -->
+                        <div class="yatra-price-row yatra-price-discount" id="yatra-discount-row" style="display: none;">
+                            <span class="yatra-discount-label">
+                                <?php esc_html_e('Discount', 'yatra'); ?>
+                                <span class="yatra-discount-code"></span>
+                            </span>
+                            <span id="summary-discount" class="yatra-discount-amount">-$0.00</span>
+                        </div>
+                        
                         <?php if ($deposit_required) : ?>
                         <div class="yatra-price-row yatra-price-deposit" style="display: none;">
                             <span><?php printf(esc_html__('Deposit (%d%%)', 'yatra'), $deposit_percentage); ?></span>
@@ -254,6 +391,15 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                         <div class="yatra-price-row">
                             <span><?php esc_html_e('Number of travelers', 'yatra'); ?></span>
                             <span id="summary-travelers"><?php echo esc_html($total_travelers); ?></span>
+                        </div>
+                        
+                        <!-- Coupon Discount Row (hidden by default) -->
+                        <div class="yatra-price-row yatra-price-discount" id="yatra-discount-row-regular" style="display: none;">
+                            <span class="yatra-discount-label">
+                                <?php esc_html_e('Discount', 'yatra'); ?>
+                                <span class="yatra-discount-code"></span>
+                            </span>
+                            <span class="yatra-discount-amount">-$0.00</span>
                         </div>
                         
                         <?php if ($deposit_required) : ?>

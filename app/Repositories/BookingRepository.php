@@ -678,5 +678,21 @@ class BookingRepository extends BaseRepository
 
         return $prepared;
     }
+
+    /**
+     * Check if a user has made any previous bookings
+     * 
+     * @param int $user_id User ID
+     * @return bool True if user has made at least one booking
+     */
+    public function hasUserMadeBooking(int $user_id): bool
+    {
+        $count = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->table} WHERE customer_id = %d AND status NOT IN ('cancelled', 'refunded', 'failed')",
+            $user_id
+        ));
+
+        return (int) $count > 0;
+    }
 }
 
