@@ -455,33 +455,6 @@ class TripService extends BaseService
         
         error_log("Yatra: Completed pricing sync for trip {$tripId}");
     }
-    
-    /**
-     * Sync all trips' pricing types to their availability dates and rules
-     * This is useful for fixing existing data after code updates
-     * 
-     * @return int Number of trips synced
-     */
-    public static function syncAllTripsPricingType(): int
-    {
-        global $wpdb;
-        
-        $trips_table = $wpdb->prefix . 'yatra_trips';
-        $trips = $wpdb->get_results("SELECT id, pricing_type FROM {$trips_table} WHERE deleted_at IS NULL");
-        
-        $service = new self();
-        $count = 0;
-        
-        foreach ($trips as $trip) {
-            $pricingType = $trip->pricing_type ?: 'regular';
-            $service->syncPricingTypeToAvailability((int) $trip->id, $pricingType);
-            $count++;
-        }
-        
-        error_log("Yatra: Synced pricing type for {$count} trips");
-        
-        return $count;
-    }
 
     /**
      * Get trip with relationships

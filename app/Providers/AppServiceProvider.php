@@ -44,11 +44,6 @@ class AppServiceProvider extends ServiceProvider
         add_action('init', [$this, 'startSession'], 1);
         add_action('rest_api_init', [$this, 'startSession'], 1);
         
-        // Admin action to sync all trip pricing types (one-time fix)
-        add_action('admin_init', [$this, 'maybeSyncTripPricing']);
-        
-        // Auto-run one-time pricing sync on upgrade
-        add_action('admin_init', [$this, 'maybeAutoSyncPricing']);
         
         // Register cron jobs for booking reminders and expiry
         \Yatra\Services\BookingCronService::register();
@@ -535,58 +530,6 @@ class AppServiceProvider extends ServiceProvider
         );
     }
     
-    /**
-     * Sync trip pricing types to availability dates and rules
-     * Triggered by ?yatra_sync_pricing=1 in admin
-     */
-    public function maybeSyncTripPricing(): void
-    {
-        // Only run if explicitly requested and user is admin
-        if (!isset($_GET['yatra_sync_pricing']) || !current_user_can('manage_options')) {
-            return;
-        }
-        
-        // Verify nonce for security
-        if (!isset($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'yatra_sync_pricing')) {
-            // For convenience, also allow without nonce in development
-            if (!defined('WP_DEBUG') || !WP_DEBUG) {
-                return;
-            }
-        }
-        
-        // Run the sync
-        $count = \Yatra\Services\TripService::syncAllTripsPricingType();
-        
-        // Show admin notice
-        add_action('admin_notices', function() use ($count) {
-            echo '<div class="notice notice-success is-dismissible">';
-            echo '<p>' . sprintf(__('Yatra: Synced pricing type for %d trips to their availability dates and rules.', 'yatra'), $count) . '</p>';
-            echo '</div>';
-        });
-    }
-    
-    /**
-     * Auto-run one-time pricing sync on upgrade
-     * This ensures existing data is synced after code update
-     */
-    public function maybeAutoSyncPricing(): void
-    {
-        $sync_version = '1.0.1'; // Increment this to force re-sync
-        $synced_version = get_option('yatra_pricing_sync_version', '');
-        
-        if ($synced_version === $sync_version) {
-            return; // Already synced this version
-        }
-        
-        // Run the sync
-        $count = \Yatra\Services\TripService::syncAllTripsPricingType();
-        
-        // Mark as synced
-        update_option('yatra_pricing_sync_version', $sync_version);
-        
-        // Log
-        error_log("Yatra: Auto-synced pricing type for {$count} trips (version {$sync_version})");
-    }
 
     /**
      * Initialize plugin settings
