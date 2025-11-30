@@ -1,0 +1,399 @@
+import React from 'react';
+import {
+  Calendar as CalendarIcon,
+  Users,
+  DollarSign as DollarSignIcon,
+  CreditCard,
+  Mail,
+  Phone as PhoneIcon,
+  FileText as FileTextIcon,
+  AlertCircle,
+  ArrowRight,
+} from 'lucide-react';
+import { __ } from '../../lib/i18n';
+import { formatDate, getBadge, formatPriceForBooking } from './utils';
+
+interface BookingDetailsData {
+  id: number;
+  booking_number: string;
+  customer_name: string;
+  customer_email?: string;
+  customer_phone?: string;
+  customer_country?: string;
+  trip_id: number;
+  trip_title: string;
+  trip_image?: string;
+  trip_price: number;
+  booking_date: string;
+  travel_date: string;
+  travelers: number;
+  travelers_data?: any[];
+  total_amount: number;
+  amount_paid: number;
+  amount_due: number;
+  currency: string;
+  payment_status: string;
+  booking_status: string;
+  payment_method?: string;
+  payment_date?: string;
+  notes?: string;
+  emergency_contact?: any;
+  contact_data?: any;
+  payments?: any[];
+  created_at: string;
+  updated_at?: string;
+}
+
+interface BookingDetailsProps {
+  booking: BookingDetailsData | null;
+  isLoading: boolean;
+  onBack: () => void;
+}
+
+const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onBack }) => {
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'Booking Details')}</h2>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!booking) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'Booking Details')}</h2>
+          </div>
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={onBack}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+          >
+            <ArrowRight className="w-4 h-4 rotate-180" />
+            {__('Back to Bookings', 'Back to Bookings')}
+          </div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6 text-center text-red-500">
+          {__('Booking not found or error loading booking', 'Booking not found or error loading booking')}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'Booking Details')}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {__('Complete booking information', 'Complete booking information')}
+          </p>
+        </div>
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={onBack}
+          className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+        >
+          <ArrowRight className="w-4 h-4 rotate-180" />
+          {__('Back to Bookings', 'Back to Bookings')}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Booking Overview */}
+          <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Overview', 'Booking Overview')}</h3>
+              <div className="flex items-center gap-2">
+                <span className={getBadge(booking.booking_status)}>{__(booking.booking_status || 'pending', booking.booking_status || 'pending')}</span>
+                <span className={getBadge(booking.payment_status)}>{__(booking.payment_status || 'pending', booking.payment_status || 'pending')}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Booking Number', 'Booking Number')}
+                </div>
+                <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {booking.booking_number || `#${booking.id}`}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Trip', 'Trip')}
+                </div>
+                <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {booking.trip_title}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                  <CalendarIcon className="w-3 h-3" />
+                  {__('Booking Date', 'Booking Date')}
+                </div>
+                <div className="text-sm text-gray-900 dark:text-white">
+                  {formatDate(booking.booking_date || booking.created_at)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                  <CalendarIcon className="w-3 h-3" />
+                  {__('Travel Date', 'Travel Date')}
+                </div>
+                <div className="text-sm text-gray-900 dark:text-white">
+                  {formatDate(booking.travel_date)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  {__('Number of Travelers', 'Number of Travelers')}
+                </div>
+                <div className="text-sm text-gray-900 dark:text-white">
+                  {booking.travelers} {booking.travelers === 1 ? __('Traveler', 'Traveler') : __('Travelers', 'Travelers')}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                  <DollarSignIcon className="w-3 h-3" />
+                  {__('Total Amount', 'Total Amount')}
+                </div>
+                <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {formatPriceForBooking(booking.total_amount, booking.currency)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Customer Information */}
+          <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Customer Information', 'Customer Information')}</h3>
+            <div className="space-y-3">
+              <div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                  {booking.customer_name}
+                </div>
+                <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                  {booking.customer_email && (
+                    <div className="flex items-center gap-1.5">
+                      <Mail className="w-4 h-4" />
+                      {booking.customer_email}
+                    </div>
+                  )}
+                  {booking.customer_phone && (
+                    <div className="flex items-center gap-1.5">
+                      <PhoneIcon className="w-4 h-4" />
+                      {booking.customer_phone}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Travelers Information */}
+          {booking.travelers_data && booking.travelers_data.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                {__('Travelers Information', 'Travelers Information')}
+                <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                  ({booking.travelers_data.length} {booking.travelers_data.length === 1 ? __('traveler', 'traveler') : __('travelers', 'travelers')})
+                </span>
+              </h3>
+              <div className="space-y-4">
+                {booking.travelers_data.map((traveler: any, index: number) => {
+                  const travelerEntries = Object.entries(traveler).filter(([_, value]) => value && String(value).trim() !== '');
+                  return (
+                    <div 
+                      key={index} 
+                      className={`p-4 rounded-lg ${index === 0 ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'}`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {index === 0 ? __('Lead Traveler', 'Lead Traveler') : `${__('Traveler', 'Traveler')} ${index + 1}`}
+                          {(traveler.first_name || traveler.last_name) && (
+                            <span className="font-normal text-gray-500 dark:text-gray-400 ml-2">
+                              - {[traveler.first_name, traveler.last_name].filter(Boolean).join(' ')}
+                            </span>
+                          )}
+                        </h4>
+                        {index === 0 && (
+                          <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded">
+                            {__('Primary Contact', 'Primary Contact')}
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {travelerEntries.map(([fieldId, fieldValue]) => {
+                          if (fieldId === 'first_name' || fieldId === 'last_name') return null;
+                          const label = fieldId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                          let displayValue = String(fieldValue);
+                          if (fieldId.includes('date') || fieldId.includes('expiry')) {
+                            try {
+                              displayValue = formatDate(fieldValue as string);
+                            } catch {
+                              displayValue = String(fieldValue);
+                            }
+                          }
+                          return (
+                            <div key={fieldId}>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{label}</div>
+                              <div className={`text-sm text-gray-900 dark:text-white ${fieldId === 'passport' ? 'font-mono' : ''}`}>
+                                {displayValue}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Emergency Contact */}
+          {booking.emergency_contact && Object.values(booking.emergency_contact).some((v: any) => v && String(v).trim() !== '') && (
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5" />
+                {__('Emergency Contact', 'Emergency Contact')}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {Object.entries(booking.emergency_contact)
+                  .filter(([_, value]) => value && String(value).trim() !== '')
+                  .map(([fieldId, fieldValue]) => {
+                    const label = fieldId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    return (
+                      <div key={fieldId}>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{label}</div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {String(fieldValue)}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+
+          {/* Special Requests */}
+          {booking.notes && (
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <FileTextIcon className="w-5 h-5" />
+                {__('Special Requests', 'Special Requests')}
+              </h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                {booking.notes}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Payment Information */}
+          <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Payment Information', 'Payment Information')}</h3>
+            <div className="space-y-3">
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Payment Status', 'Payment Status')}
+                </div>
+                <div className="mt-1">
+                  <span className={getBadge(booking.payment_status)}>{__(booking.payment_status || 'pending', booking.payment_status || 'pending')}</span>
+                </div>
+              </div>
+              {booking.payment_method && (
+                <div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                    <CreditCard className="w-3 h-3" />
+                    {__('Payment Method', 'Payment Method')}
+                  </div>
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    {booking.payment_method}
+                  </div>
+                </div>
+              )}
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Total Amount', 'Total Amount')}
+                </div>
+                <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {formatPriceForBooking(booking.total_amount, booking.currency)}
+                </div>
+              </div>
+              {booking.amount_paid > 0 && (
+                <div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    {__('Amount Paid', 'Amount Paid')}
+                  </div>
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    {formatPriceForBooking(booking.amount_paid, booking.currency)}
+                  </div>
+                </div>
+              )}
+              {booking.amount_due > 0 && (
+                <div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    {__('Amount Due', 'Amount Due')}
+                  </div>
+                  <div className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                    {formatPriceForBooking(booking.amount_due, booking.currency)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Timeline */}
+          <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Timeline', 'Timeline')}</h3>
+            <div className="space-y-3">
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Created', 'Created')}
+                </div>
+                <div className="text-sm text-gray-900 dark:text-white">
+                  {formatDate(booking.created_at || booking.booking_date)}
+                </div>
+              </div>
+              {booking.updated_at && booking.updated_at !== booking.created_at && (
+                <div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    {__('Last Updated', 'Last Updated')}
+                  </div>
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    {formatDate(booking.updated_at)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BookingDetails;
+

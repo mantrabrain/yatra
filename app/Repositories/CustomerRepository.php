@@ -497,6 +497,18 @@ class CustomerRepository extends BaseRepository
      */
     public function getBookings(int $customerId): array
     {
+        return $this->getCustomerBookings($customerId, 1000);
+    }
+
+    /**
+     * Get customer bookings with limit
+     * 
+     * @param int $customerId Customer ID
+     * @param int $limit Limit results
+     * @return array
+     */
+    public function getCustomerBookings(int $customerId, int $limit = 10): array
+    {
         global $wpdb;
         
         $bookingsTable = $wpdb->prefix . 'yatra_bookings';
@@ -507,8 +519,10 @@ class CustomerRepository extends BaseRepository
              FROM {$bookingsTable} b
              LEFT JOIN {$tripsTable} t ON b.trip_id = t.id
              WHERE b.customer_id = %d
-             ORDER BY b.created_at DESC",
-            $customerId
+             ORDER BY b.created_at DESC
+             LIMIT %d",
+            $customerId,
+            $limit
         )) ?: [];
     }
 

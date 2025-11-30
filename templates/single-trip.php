@@ -37,6 +37,43 @@ add_filter('wp_title', function($title) {
 }, 10, 1);
 
 get_header();
+
+// Calculate base price (for display) - used in hero, quick facts, sticky nav, and sidebar
+// Check if availability dates exist (PRIORITY)
+$has_availability = !empty($trip->availability_dates) && is_array($trip->availability_dates) && count($trip->availability_dates) > 0;
+
+// Determine pricing type from trip settings
+$pricing_type = $trip->pricing_type ?? 'regular';
+$has_traveler_pricing = ($pricing_type === 'traveler_based' && !empty($trip->price_types));
+
+// Calculate base price (for display)
+if ($has_availability) {
+    // Get the lowest price from availability dates
+    $min_price = PHP_FLOAT_MAX;
+    foreach ($trip->availability_dates as $avail) {
+        $avail_price = $avail->effective_price ?? $avail->original_price ?? 0;
+        if ($avail_price > 0 && $avail_price < $min_price) {
+            $min_price = $avail_price;
+        }
+    }
+    $base_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($trip->sale_price ?: $trip->original_price);
+} elseif ($has_traveler_pricing) {
+    // Get default or first traveler category price
+    $default_price_type = null;
+    foreach ($trip->price_types as $pt) {
+        if (!empty($pt->is_default)) {
+            $default_price_type = $pt;
+            break;
+        }
+    }
+    if (!$default_price_type && !empty($trip->price_types)) {
+        $default_price_type = $trip->price_types[0];
+    }
+    $base_price = $default_price_type ? $default_price_type->effective_price : ($trip->sale_price ?: $trip->original_price);
+} else {
+    // Regular pricing
+    $base_price = $trip->sale_price > 0 ? $trip->sale_price : $trip->original_price;
+}
 ?>
 
 <!-- Flatpickr CSS -->
@@ -106,7 +143,7 @@ get_header();
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    <?php echo esc_html__('Book Now', 'yatra'); ?> - <?php echo esc_html(yatra_format_price($trip->sale_price)); ?>
+                    <?php echo esc_html__('Book Now', 'yatra'); ?> - <?php echo esc_html(yatra_format_price($base_price)); ?>
                 </a>
             </div>
             <div class="yatra-hero-side-images">
@@ -278,19 +315,6 @@ get_header();
             </div>
         </div>
         <?php endif; ?>
-
-        <div class="yatra-quick-fact">
-            <div class="yatra-quick-fact-icon">
-                <?php echo yatra_svg_icon('dollar', 'yatra-icon-lg'); ?>
-            </div>
-            <div class="yatra-quick-fact-content">
-                <div class="yatra-quick-fact-label"><?php echo esc_html__('Starting From', 'yatra'); ?></div>
-                <div class="yatra-quick-fact-price">
-                    <?php echo yatra_format_price($trip->sale_price); ?>
-                    <span class="yatra-quick-fact-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
-                </div>
-            </div>
-        </div>
     </div>
 
 
@@ -330,8 +354,14 @@ get_header();
                 <span>Reviews</span>
             </a>
             <div class="yatra-sticky-nav-price">
-                <?php echo yatra_svg_icon('dollar', 'yatra-icon-sm'); ?>
-                <span><?php echo yatra_format_price($trip->sale_price); ?></span>
+                <?php if ($has_availability || $has_traveler_pricing): ?>
+                <div class="yatra-sticky-nav-price-label"><?php echo esc_html__('Starting From', 'yatra'); ?></div>
+                <?php endif; ?>
+                <div class="yatra-sticky-nav-price-amount">
+                    <?php echo yatra_svg_icon('dollar', 'yatra-icon-sm'); ?>
+                    <span><?php echo yatra_format_price($base_price); ?></span>
+                </div>
+                <div class="yatra-sticky-nav-price-note"><?php echo esc_html__('per person', 'yatra'); ?></div>
             </div>
         </div>
     </div>
@@ -1186,44 +1216,8 @@ get_header();
         <!-- Sidebar - Booking Card -->
         <aside class="yatra-trip-sidebar" id="booking">
             <?php 
-            // Check if availability dates exist (PRIORITY)
-            $has_availability = !empty($trip->availability_dates) && is_array($trip->availability_dates) && count($trip->availability_dates) > 0;
-            
-            // Determine pricing type from trip settings
-            $pricing_type = $trip->pricing_type ?? 'regular';
-            $has_traveler_pricing = ($pricing_type === 'traveler_based' && !empty($trip->price_types));
-            
             // Determine if this is a multi-day trip
             $is_multi_day = ($trip->duration_days ?? 1) > 1;
-            
-            // Calculate base price (for display)
-            if ($has_availability) {
-                // Get the lowest price from availability dates
-                $min_price = PHP_FLOAT_MAX;
-                foreach ($trip->availability_dates as $avail) {
-                    $avail_price = $avail->effective_price ?? $avail->original_price ?? 0;
-                    if ($avail_price > 0 && $avail_price < $min_price) {
-                        $min_price = $avail_price;
-                    }
-                }
-                $base_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($trip->sale_price ?: $trip->original_price);
-            } elseif ($has_traveler_pricing) {
-                // Get default or first traveler category price
-                $default_price_type = null;
-                foreach ($trip->price_types as $pt) {
-                    if (!empty($pt->is_default)) {
-                        $default_price_type = $pt;
-                        break;
-                    }
-                }
-                if (!$default_price_type && !empty($trip->price_types)) {
-                    $default_price_type = $trip->price_types[0];
-                }
-                $base_price = $default_price_type ? $default_price_type->effective_price : ($trip->sale_price ?: $trip->original_price);
-            } else {
-                // Regular pricing
-                $base_price = $trip->sale_price > 0 ? $trip->sale_price : $trip->original_price;
-            }
             
             // Prepare availability data for JavaScript
             $availability_json = [];

@@ -6,6 +6,7 @@ namespace Yatra\Services;
 
 use Yatra\Repositories\CustomerRepository;
 use Yatra\Repositories\BookingRepository;
+use Yatra\Repositories\PaymentRepository;
 
 /**
  * Customer Service
@@ -18,11 +19,13 @@ class CustomerService
 {
     private CustomerRepository $customerRepository;
     private BookingRepository $bookingRepository;
+    private PaymentRepository $paymentRepository;
 
     public function __construct()
     {
         $this->customerRepository = new CustomerRepository();
         $this->bookingRepository = new BookingRepository();
+        $this->paymentRepository = new PaymentRepository();
     }
 
     /**
@@ -246,6 +249,176 @@ class CustomerService
     public function getCustomerBookings(int $customerId, int $limit = 10): array
     {
         return $this->customerRepository->getCustomerBookings($customerId, $limit);
+    }
+
+    /**
+     * Get bookings by WordPress user ID (checks both customer_id and user_id)
+     * 
+     * @param int $userId WordPress user ID
+     * @param int $limit  Limit results
+     * @return array
+     */
+    public function getBookingsByUserId(int $userId, int $limit = 10): array
+    {
+        // First, try to get customer and bookings by customer_id
+        $customer = $this->getCustomerByUserId($userId);
+        $bookings = [];
+        
+        if ($customer) {
+            $bookings = $this->getCustomerBookings((int) $customer['id'], $limit);
+        }
+        
+        // Also get bookings directly by user_id (in case bookings were made before customer record was created)
+        $bookingsByUserId = $this->bookingRepository->findByUserId($userId, $limit);
+        
+        // Merge and deduplicate by booking ID
+        $bookingIds = [];
+        $allBookings = [];
+        
+        foreach ($bookings as $booking) {
+            $bookingId = is_array($booking) ? ($booking['id'] ?? $booking['booking_id'] ?? null) : ($booking->id ?? null);
+            if ($bookingId && !in_array($bookingId, $bookingIds)) {
+                $bookingIds[] = $bookingId;
+                $allBookings[] = $booking;
+            }
+        }
+        
+        foreach ($bookingsByUserId as $booking) {
+            $bookingId = is_array($booking) ? ($booking['id'] ?? $booking['booking_id'] ?? null) : ($booking->id ?? null);
+            if ($bookingId && !in_array($bookingId, $bookingIds)) {
+                $bookingIds[] = $bookingId;
+                $allBookings[] = $booking;
+            }
+        }
+        
+        // Limit results
+        if ($limit > 0 && count($allBookings) > $limit) {
+            $allBookings = array_slice($allBookings, 0, $limit);
+        }
+        
+        return $allBookings;
+    }
+
+    /**
+     * Get customer's payments
+     * 
+     * @param int $customerId Customer ID
+     * @param int $limit      Limit results
+     * @return array
+     */
+    public function getCustomerPayments(int $customerId, int $limit = 50): array
+    {
+        // Get customer's bookings first
+        $bookings = $this->customerRepository->getCustomerBookings($customerId, 1000);
+        $bookingIds = array_map(function($booking) {
+            return (int) $booking['id'];
+        }, $bookings);
+
+        if (empty($bookingIds)) {
+            return [];
+        }
+
+        // Get payments for these bookings
+        global $wpdb;
+        $payments_table = $wpdb->prefix . 'yatra_payments';
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $trips_table = $wpdb->prefix . 'yatra_trips';
+        
+        $bookingIdsPlaceholder = implode(',', array_fill(0, count($bookingIds), '%d'));
+        
+        $query = $wpdb->prepare(
+            "SELECT p.*, 
+                    b.reference as booking_reference,
+                    t.title as trip_title
+             FROM {$payments_table} p
+             LEFT JOIN {$bookings_table} b ON p.booking_id = b.id
+             LEFT JOIN {$trips_table} t ON b.trip_id = t.id
+             WHERE p.booking_id IN ($bookingIdsPlaceholder)
+             ORDER BY p.created_at DESC
+             LIMIT %d",
+            array_merge($bookingIds, [$limit])
+        );
+
+        $payments = $wpdb->get_results($query) ?: [];
+
+        // Format payments
+        return array_map(function($payment) {
+            return [
+                'id' => (int) $payment->id,
+                'reference' => 'PAY-' . str_pad((string) $payment->id, 6, '0', STR_PAD_LEFT),
+                'booking_number' => $payment->booking_reference ?? 'N/A',
+                'trip_title' => $payment->trip_title ?? '',
+                'amount' => (float) $payment->amount,
+                'status' => $payment->status ?? 'pending',
+                'method' => $payment->gateway ?? 'N/A',
+                'date' => $payment->created_at ?? $payment->processed_at ?? '',
+                'type' => $payment->type ?? 'balance',
+                'transaction_id' => $payment->transaction_id ?? '',
+            ];
+        }, $payments);
+    }
+
+    /**
+     * Get customer's documents (invoices, vouchers, itineraries)
+     * 
+     * @param int $customerId Customer ID
+     * @return array
+     */
+    public function getCustomerDocuments(int $customerId): array
+    {
+        // Get customer's bookings
+        $bookings = $this->customerRepository->getCustomerBookings($customerId, 1000);
+        
+        $documents = [];
+        
+        foreach ($bookings as $booking) {
+            $bookingId = (int) $booking['id'];
+            $tripTitle = $booking['trip_title'] ?? 'N/A';
+            
+            // Generate invoice document
+            if (!empty($booking['total_amount'])) {
+                $documents[] = [
+                    'id' => 'invoice-' . $bookingId,
+                    'name' => sprintf(__('Invoice #%s.pdf', 'yatra'), $booking['reference'] ?? $bookingId),
+                    'trip_title' => $tripTitle,
+                    'category' => 'invoice',
+                    'updated_at' => $booking['created_at'] ?? date('Y-m-d H:i:s'),
+                    'url' => rest_url('yatra/v1/bookings/' . $bookingId . '/invoice'),
+                ];
+            }
+            
+            // Generate voucher document if booking is confirmed
+            if (($booking['status'] ?? '') === 'confirmed') {
+                $documents[] = [
+                    'id' => 'voucher-' . $bookingId,
+                    'name' => sprintf(__('Travel Voucher #%s.pdf', 'yatra'), $booking['reference'] ?? $bookingId),
+                    'trip_title' => $tripTitle,
+                    'category' => 'voucher',
+                    'updated_at' => $booking['created_at'] ?? date('Y-m-d H:i:s'),
+                    'url' => rest_url('yatra/v1/bookings/' . $bookingId . '/voucher'),
+                ];
+            }
+        }
+        
+        // Sort by updated_at descending
+        usort($documents, function($a, $b) {
+            return strtotime($b['updated_at']) - strtotime($a['updated_at']);
+        });
+        
+        return $documents;
+    }
+
+    /**
+     * Get customer's support tickets
+     * 
+     * @param int $customerId Customer ID
+     * @return array
+     */
+    public function getCustomerSupportTickets(int $customerId): array
+    {
+        // For now, return empty array as support tickets system may not be implemented yet
+        // This can be extended when support ticket system is added
+        return [];
     }
 
     /**

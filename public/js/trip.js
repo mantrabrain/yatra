@@ -2783,11 +2783,256 @@
         }
     }
 
-    // Initialize all classes
+
+    /**
+     * Wishlist Handler
+     * Handles save/remove trip from wishlist functionality
+     */
+    class WishlistHandler {
+        constructor() {
+            this.apiUrl = window.yatraTripData?.apiUrl || '/wp-json/yatra/v1';
+            this.nonce = window.yatraTripData?.nonce || '';
+            this.tripId = window.yatraTripData?.tripId || 0;
+            this.isLoggedIn = window.yatraTripData?.isLoggedIn || false;
+            this.init();
+        }
+
+        init() {
+            // Check if user is logged in and update button states
+            if (this.isLoggedIn && this.tripId) {
+                this.checkSavedStatus();
+            }
+
+            // Handle wishlist button clicks
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.yatra-favorite-btn');
+                if (btn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.handleWishlistClick(btn);
+                }
+            });
+        }
+
+        async checkSavedStatus() {
+            if (!this.tripId) return;
+
+            try {
+                const response = await fetch(
+                    `${this.apiUrl}/saved-trips/check/${this.tripId}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'X-WP-Nonce': this.nonce
+                        },
+                        credentials: 'same-origin'
+                    }
+                );
+
+                const data = await response.json();
+                if (data.success && data.data.is_saved) {
+                    this.updateButtonState(true);
+                }
+            } catch (error) {
+                console.error('Error checking wishlist status:', error);
+            }
+        }
+
+        handleWishlistClick(btn) {
+            if (!this.isLoggedIn) {
+                this.showLoginPopup();
+                return;
+            }
+
+            const isSaved = btn.classList.contains('saved');
+            if (isSaved) {
+                this.removeFromWishlist(btn);
+            } else {
+                this.addToWishlist(btn);
+            }
+        }
+
+        async addToWishlist(btn) {
+            btn.disabled = true;
+            btn.classList.add('loading');
+
+            try {
+                const response = await fetch(`${this.apiUrl}/saved-trips`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WP-Nonce': this.nonce
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ trip_id: this.tripId })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    this.updateButtonState(true);
+                    this.showMessage(data.message || 'Trip saved to wishlist', 'success', btn);
+                } else {
+                    this.showMessage(data.message || 'Failed to save trip', 'error', btn);
+                }
+            } catch (error) {
+                console.error('Error saving trip:', error);
+                this.showMessage('An error occurred. Please try again.', 'error', btn);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        }
+
+        async removeFromWishlist(btn) {
+            btn.disabled = true;
+            btn.classList.add('loading');
+
+            try {
+                const response = await fetch(`${this.apiUrl}/saved-trips/${this.tripId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-WP-Nonce': this.nonce
+                    },
+                    credentials: 'same-origin'
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    this.updateButtonState(false);
+                    this.showMessage(data.message || 'Trip removed from wishlist', 'success', btn);
+                } else {
+                    this.showMessage(data.message || 'Failed to remove trip', 'error', btn);
+                }
+            } catch (error) {
+                console.error('Error removing trip:', error);
+                this.showMessage('An error occurred. Please try again.', 'error', btn);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        }
+
+        updateButtonState(isSaved) {
+            const buttons = document.querySelectorAll('.yatra-favorite-btn');
+            buttons.forEach(btn => {
+                if (isSaved) {
+                    btn.classList.add('saved', 'is-saved');
+                    btn.setAttribute('aria-label', 'Remove from favorites');
+                    // Fill the heart icon and change color
+                    const svg = btn.querySelector('svg');
+                    if (svg) {
+                        svg.style.fill = 'currentColor';
+                        svg.style.stroke = 'currentColor';
+                        btn.style.color = '#ef4444';
+                    }
+                } else {
+                    btn.classList.remove('saved', 'is-saved');
+                    btn.setAttribute('aria-label', 'Add to favorites');
+                    // Unfill the heart icon
+                    const svg = btn.querySelector('svg');
+                    if (svg) {
+                        svg.style.fill = 'none';
+                        svg.style.stroke = 'currentColor';
+                        btn.style.color = '';
+                    }
+                }
+            });
+        }
+
+        showLoginPopup() {
+            // Check if enquiry modal exists and reuse its structure, or create a simple login prompt
+            const enquiryModal = document.getElementById('enquiry-modal');
+            if (enquiryModal) {
+                // Show enquiry modal with login message
+                enquiryModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // Update modal content to show login message
+                const modalContent = enquiryModal.querySelector('.yatra-enquiry-modal-content');
+                if (modalContent) {
+                    const loginMessage = document.createElement('div');
+                    loginMessage.className = 'yatra-login-prompt';
+                    loginMessage.style.cssText = 'padding: 40px; text-align: center;';
+                    loginMessage.innerHTML = `
+                        <h3 style="margin-bottom: 20px;">Login Required</h3>
+                        <p style="margin-bottom: 30px;">Please login to save trips to your wishlist.</p>
+                        <a href="${window.yatraTripData?.loginUrl || '/wp-login.php'}" class="yatra-btn" style="display: inline-block; margin-right: 10px;">Login</a>
+                        <button type="button" class="yatra-btn-secondary" onclick="this.closest('.yatra-enquiry-modal').classList.remove('active'); document.body.style.overflow = '';">Cancel</button>
+                    `;
+                    modalContent.innerHTML = '';
+                    modalContent.appendChild(loginMessage);
+                }
+            } else {
+                // Fallback: show alert and redirect to login
+                if (confirm('Please login to save trips to your wishlist. Would you like to go to the login page?')) {
+                    window.location.href = window.yatraTripData?.loginUrl || '/wp-login.php';
+                }
+            }
+        }
+
+        showMessage(message, type, button) {
+            // Remove existing toast if any
+            const existingToast = document.getElementById('yatra-wishlist-toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            // Create toast near the button
+            const toast = document.createElement('div');
+            toast.id = 'yatra-wishlist-toast';
+            toast.textContent = message;
+            
+            // Position relative to button
+            const rect = button.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            
+            toast.style.cssText = `
+                position: absolute;
+                top: ${rect.bottom + scrollTop + 10}px;
+                left: ${rect.left + scrollLeft}px;
+                padding: 10px 16px;
+                border-radius: 8px;
+                z-index: 10001;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+                white-space: nowrap;
+                font-size: 14px;
+                pointer-events: none;
+                background-color: ${type === 'success' ? '#10b981' : '#ef4444'};
+                color: #ffffff;
+                opacity: 0;
+                transform: translateY(-10px);
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateY(0)';
+            });
+
+            // Remove after delay
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+    }
+
+
+        // Initialize all classes
     window.galleryModal = new GalleryModal();
     window.bookingSidebar = new BookingSidebar();
     window.enquiryModal = new EnquiryModal();
     window.stickyNav = new StickyNav();
+    window.wishlistHandler = new WishlistHandler();
     window.availabilitySection = new AvailabilitySection();
     window.itinerarySection = new ItinerarySection();
     window.reviewForm = new ReviewForm();

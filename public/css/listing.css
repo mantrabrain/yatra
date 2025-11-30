@@ -1032,6 +1032,26 @@
     display: block !important;
 }
 
+.yatra-favorite-btn.saved,
+.yatra-favorite-btn.is-saved {
+    background: #ffffff !important;
+    color: #ef4444 !important;
+    border-color: #ef4444 !important;
+}
+
+.yatra-favorite-btn.saved svg,
+.yatra-favorite-btn.is-saved svg {
+    fill: #ef4444 !important;
+    stroke: #ef4444 !important;
+}
+
+.yatra-favorite-btn.saved:hover,
+.yatra-favorite-btn.is-saved:hover {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    border-color: #dc2626 !important;
+}
+
 .yatra-trip-content {
     padding: 20px;
     display: flex;

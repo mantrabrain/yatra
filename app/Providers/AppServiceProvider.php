@@ -760,8 +760,24 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Enqueue account page assets
      */
-    public function enqueueAccountPageAssets(): void
+public function enqueueAccountPageAssets(): void
     {
+        // Enqueue common CSS first
+        $this->enqueueCommonAssets();
+        
+        // Enqueue listing CSS for saved trips display
+        $listing_css = YATRA_PLUGIN_PATH . 'public/css/listing.css';
+        if (file_exists($listing_css)) {
+            $css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $listing_css);
+            $css_version = YATRA_VERSION . '.' . filemtime($listing_css);
+            wp_enqueue_style(
+                'yatra-listing',
+                $css_url,
+                ['yatra-common'],
+                $css_version
+            );
+        }
+        
         // Check for CSS file (could be app.css or index.css)
         $css_files = [
             YATRA_PLUGIN_PATH . 'public/css/app.css',
@@ -782,7 +798,7 @@ class AppServiceProvider extends ServiceProvider
             wp_enqueue_style(
                 'yatra-account-page',
                 $css_url,
-                [],
+                ['yatra-common', 'yatra-listing'],
                 $css_version
             );
             
@@ -832,13 +848,18 @@ class AppServiceProvider extends ServiceProvider
             // Get current user
             $current_user = wp_get_current_user();
             
-            // Localize script with API data
+            // Localize script with API data and currency settings
             wp_localize_script('yatra-account-page', 'yatraAdmin', [
                 'apiUrl' => rest_url('yatra/v1'),
                 'nonce' => wp_create_nonce('wp_rest'),
                 'currentUser' => $current_user->ID,
                 'siteUrl' => home_url(),
                 'locale' => get_locale(),
+                'currency' => SettingsService::getCurrency(),
+                'currencyPosition' => SettingsService::getCurrencyPosition(),
+                'decimalPlaces' => SettingsService::getInt('decimal_places', 2),
+                'thousandSeparator' => SettingsService::getString('thousand_separator', ','),
+                'decimalSeparator' => SettingsService::getString('decimal_separator', '.'),
             ]);
         }
     }
@@ -1817,6 +1838,8 @@ class AppServiceProvider extends ServiceProvider
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('wp_rest'),
                 'bookingUrl' => yatra_get_checkout_url(),
+                'isLoggedIn' => is_user_logged_in(),
+                'loginUrl' => wp_login_url(get_permalink()),
             ]);
         }
     }

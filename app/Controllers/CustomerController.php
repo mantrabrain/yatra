@@ -68,6 +68,33 @@ class CustomerController extends BaseController
             ],
         ]);
 
+        // Current customer's payments
+        register_rest_route($namespace, '/' . $base . '/my-payments', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getMyPayments'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+            ],
+        ]);
+
+        // Current customer's documents
+        register_rest_route($namespace, '/' . $base . '/my-documents', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getMyDocuments'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+            ],
+        ]);
+
+        // Current customer's support tickets
+        register_rest_route($namespace, '/' . $base . '/my-support-tickets', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getMySupportTickets'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+            ],
+        ]);
+
         // =====================
         // ADMIN ROUTES
         // =====================
@@ -199,6 +226,22 @@ class CustomerController extends BaseController
     {
         $userId = get_current_user_id();
 
+        // Get bookings by user ID (checks both customer_id and user_id)
+        $bookings = $this->customerService->getBookingsByUserId($userId);
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $bookings,
+        ]);
+    }
+
+    /**
+     * GET /customers/my-payments - Get current customer's payments
+     */
+    public function getMyPayments(WP_REST_Request $request): WP_REST_Response
+    {
+        $userId = get_current_user_id();
+
         $customer = $this->customerService->getCustomerByUserId($userId);
 
         if (!$customer) {
@@ -208,11 +251,59 @@ class CustomerController extends BaseController
             ]);
         }
 
-        $bookings = $this->customerService->getCustomerBookings((int) $customer['id']);
+        $payments = $this->customerService->getCustomerPayments((int) $customer['id']);
 
         return new WP_REST_Response([
             'success' => true,
-            'data' => $bookings,
+            'data' => $payments,
+        ]);
+    }
+
+    /**
+     * GET /customers/my-documents - Get current customer's documents
+     */
+    public function getMyDocuments(WP_REST_Request $request): WP_REST_Response
+    {
+        $userId = get_current_user_id();
+
+        $customer = $this->customerService->getCustomerByUserId($userId);
+
+        if (!$customer) {
+            return new WP_REST_Response([
+                'success' => true,
+                'data' => [],
+            ]);
+        }
+
+        $documents = $this->customerService->getCustomerDocuments((int) $customer['id']);
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $documents,
+        ]);
+    }
+
+    /**
+     * GET /customers/my-support-tickets - Get current customer's support tickets
+     */
+    public function getMySupportTickets(WP_REST_Request $request): WP_REST_Response
+    {
+        $userId = get_current_user_id();
+
+        $customer = $this->customerService->getCustomerByUserId($userId);
+
+        if (!$customer) {
+            return new WP_REST_Response([
+                'success' => true,
+                'data' => [],
+            ]);
+        }
+
+        $tickets = $this->customerService->getCustomerSupportTickets((int) $customer['id']);
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $tickets,
         ]);
     }
 

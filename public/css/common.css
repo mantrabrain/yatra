@@ -375,3 +375,172 @@
     margin-right: auto;
 }
 
+/* ============================================
+   QUICK FACTS BAR - Single Trip Page
+   ============================================ */
+.yatra-trip-quick-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: var(--yatra-shadow-sm);
+    margin-bottom: 32px;
+}
+
+.yatra-quick-fact {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+    min-width: 200px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f9fafb;
+    transition: background 0.2s;
+}
+
+.yatra-quick-fact:hover {
+    background: #f3f4f6;
+}
+
+.yatra-quick-fact-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: var(--yatra-shadow-sm);
+}
+
+.yatra-quick-fact-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.yatra-quick-fact-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--yatra-text-muted);
+    line-height: 1.2;
+}
+
+.yatra-quick-fact-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--yatra-text-primary);
+    line-height: 1.3;
+}
+
+.yatra-quick-fact-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--yatra-primary);
+    line-height: 1.2;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.yatra-quick-fact-price-label {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--yatra-text-muted);
+}
+
+/* Ensure all quick facts align on the same baseline */
+.yatra-trip-quick-facts .yatra-quick-fact {
+    align-items: flex-start;
+}
+
+.yatra-trip-quick-facts .yatra-quick-fact-content {
+    align-items: flex-start;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .yatra-trip-quick-facts {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .yatra-quick-fact {
+        min-width: 100%;
+        width: 100%;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .yatra-quick-fact {
+        min-width: calc(50% - 8px);
+    }
+}
+
+/* ============================================
+   STICKY NAVIGATION - Single Trip Page
+   ============================================ */
+.yatra-sticky-nav-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    padding: 8px 16px;
+    margin-left: auto;
+    min-width: 140px;
+    text-align: right;
+}
+
+.yatra-sticky-nav-price-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--yatra-text-muted);
+    line-height: 1.2;
+}
+
+.yatra-sticky-nav-price-amount {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--yatra-primary);
+    line-height: 1.2;
+}
+
+.yatra-sticky-nav-price-amount svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.yatra-sticky-nav-price-note {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--yatra-text-muted);
+    line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+    .yatra-sticky-nav-price {
+        min-width: 120px;
+        padding: 6px 12px;
+    }
+    
+    .yatra-sticky-nav-price-amount {
+        font-size: 16px;
+    }
+}
+

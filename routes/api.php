@@ -67,6 +67,7 @@ $controllers = [
     \Yatra\Controllers\CustomerController::class,
     \Yatra\Controllers\ReviewController::class,
     \Yatra\Controllers\EnquiryController::class,
+    \Yatra\Controllers\SavedTripController::class,
 
     // =============================================
     // AUTHENTICATION
