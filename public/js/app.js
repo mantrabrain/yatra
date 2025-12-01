@@ -37167,6 +37167,63 @@ const DateRangePicker = ({
     ] }) })
   ] });
 };
+const DeparturesTableSkeleton = ({
+  visibleColumns
+}) => {
+  const visibleColumnCount = Object.values(visibleColumns).filter(Boolean).length + 1;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "animate-pulse", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "grid gap-4 pb-3 mb-3 border-b border-gray-200 dark:border-gray-700",
+        style: { gridTemplateColumns: `repeat(${visibleColumnCount}, 1fr)` },
+        children: [
+          visibleColumns.trip && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16" }),
+          visibleColumns.date && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-12" }),
+          visibleColumns.time && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-12" }),
+          visibleColumns.capacity && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16" }),
+          visibleColumns.booked && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-14" }),
+          visibleColumns.available && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16" }),
+          visibleColumns.revenue && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16" }),
+          visibleColumns.travelers && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-18" }),
+          visibleColumns.bookings && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16" }),
+          visibleColumns.status && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-14" }),
+          visibleColumns.source && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-14" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16" }),
+          " "
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: Array.from({ length: 5 }).map((_, rowIndex) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "grid gap-4",
+        style: { gridTemplateColumns: `repeat(${visibleColumnCount}, 1fr)` },
+        children: [
+          visibleColumns.trip && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-32" }),
+          visibleColumns.date && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-24" }),
+          visibleColumns.time && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16" }),
+          visibleColumns.capacity && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-8" }),
+          visibleColumns.booked && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-8" }),
+          visibleColumns.available && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-8" }),
+          visibleColumns.revenue && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20" }),
+          visibleColumns.travelers && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 bg-gray-200 dark:bg-gray-700 rounded w-24" }),
+          visibleColumns.bookings && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-8" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-8" })
+          ] }),
+          visibleColumns.status && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 bg-gray-200 dark:bg-gray-700 rounded w-16" }),
+          visibleColumns.source && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 bg-gray-200 dark:bg-gray-700 rounded w-20" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded" })
+          ] })
+        ]
+      },
+      rowIndex
+    )) })
+  ] });
+};
 const formatDate = (dateString) => {
   if (!dateString) return "--";
   try {
@@ -37275,30 +37332,8 @@ const Departures = () => {
       return (response == null ? void 0 : response.data) || [];
     }
   });
-  const queryParams = reactExports.useMemo(() => {
-    const params = {
-      page,
-      per_page: 20
-    };
-    if (statusFilter !== "all") {
-      params.status = statusFilter;
-    }
-    if (sourceFilter !== "all") {
-      params.source = sourceFilter;
-    }
-    if (searchTerm) {
-      params.search = searchTerm;
-    }
-    if (dateFrom) {
-      params.date_from = dateFrom;
-    }
-    if (dateTo) {
-      params.date_to = dateTo;
-    }
-    return params;
-  }, [statusFilter, sourceFilter, searchTerm, dateFrom, dateTo, page]);
   const { data: departuresData, isLoading } = useQuery({
-    queryKey: ["departures", selectedTripId, queryParams],
+    queryKey: ["departures", selectedTripId, statusFilter, sourceFilter, searchTerm, dateFrom, dateTo, page],
     queryFn: async () => {
       const endpoint = selectedTripId ? `/trips/${selectedTripId}/departures` : "/departures";
       const response = await apiClient.get(endpoint, {
@@ -37308,7 +37343,9 @@ const Departures = () => {
           search: searchTerm || void 0,
           date_from: dateFrom || void 0,
           date_to: dateTo || void 0,
-          include_past: dateFrom || dateTo ? "true" : "false"
+          include_past: dateFrom || dateTo ? "true" : "false",
+          page,
+          per_page: 20
         }
       });
       return {
@@ -37527,7 +37564,7 @@ const Departures = () => {
           ] })
         ] })
       ] }) }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: __("Loading...", "Loading...") }) : !((_a = departuresData == null ? void 0 : departuresData.data) == null ? void 0 : _a.length) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-8", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(DeparturesTableSkeleton, { visibleColumns }) : !((_a = departuresData == null ? void 0 : departuresData.data) == null ? void 0 : _a.length) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-8", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-12 h-12 text-gray-400 mx-auto mb-4" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500", children: __("No departures found", "No departures found") }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: navigateToAdd, variant: "outline", className: "mt-4", children: [

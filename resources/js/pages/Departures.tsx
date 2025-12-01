@@ -3,7 +3,7 @@
  * Manage trip departures (manual and recurring-generated)
  */
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, AlertCircle, Edit, Trash2, Columns } from 'lucide-react';
 import { __ } from '../lib/i18n';
@@ -15,6 +15,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Badge } from '../components/ui/badge';
 import { DateRangePicker } from '../components/ui/date-range-picker';
+import { DeparturesTableSkeleton } from '../components/ui/table-skeleton';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
 // Format date helper
@@ -184,40 +185,11 @@ const Departures: React.FC = () => {
     },
   });
 
-  // Build query params
-  const queryParams = useMemo(() => {
-    const params: Record<string, any> = {
-      page,
-      per_page: 20,
-    };
-
-    if (statusFilter !== 'all') {
-      params.status = statusFilter;
-    }
-
-    if (sourceFilter !== 'all') {
-      params.source = sourceFilter;
-    }
-
-    if (searchTerm) {
-      params.search = searchTerm;
-    }
-
-    // Add date range filters
-    if (dateFrom) {
-      params.date_from = dateFrom; // Already in YYYY-MM-DD format
-    }
-
-    if (dateTo) {
-      params.date_to = dateTo; // Already in YYYY-MM-DD format
-    }
-
-    return params;
-  }, [statusFilter, sourceFilter, searchTerm, dateFrom, dateTo, page]);
+  // Note: We pass filter values directly to the API call instead of building queryParams
 
   // Fetch departures data
   const { data: departuresData, isLoading } = useQuery({
-    queryKey: ['departures', selectedTripId, queryParams],
+    queryKey: ['departures', selectedTripId, statusFilter, sourceFilter, searchTerm, dateFrom, dateTo, page],
     queryFn: async () => {
       // API endpoint based on if a trip is selected
       const endpoint = selectedTripId ? `/trips/${selectedTripId}/departures` : '/departures';
@@ -230,6 +202,8 @@ const Departures: React.FC = () => {
           date_from: dateFrom || undefined,
           date_to: dateTo || undefined,
           include_past: dateFrom || dateTo ? 'true' : 'false',
+          page: page,
+          per_page: 20,
         },
       });
       
@@ -485,7 +459,7 @@ const Departures: React.FC = () => {
           <Card>
             <CardContent className="pt-6">
               {isLoading ? (
-                <div className="text-center py-8 text-gray-500">{__('Loading...', 'Loading...')}</div>
+                <DeparturesTableSkeleton visibleColumns={visibleColumns} />
               ) : !departuresData?.data?.length ? (
                 <div className="text-center py-8">
                   <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
