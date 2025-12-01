@@ -70,6 +70,90 @@ class DepartureRepository extends BaseRepository
     }
 
     /**
+     * Find all departures across all trips
+     * 
+     * @param array $filters Filters: status, date_from, date_to, source
+     * @return array Array of Departure models
+     */
+    public function findAll(array $filters = []): array
+    {
+        // Return empty array if table doesn't exist
+        if (!$this->tableExists()) {
+            return [];
+        }
+
+        $table = esc_sql($this->table);
+        $where = ['1=1']; // Always true for base condition
+        $params = [];
+        
+        // Status filter
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $where[] = 'status = %s';
+            $params[] = $filters['status'];
+        }
+        
+        // Date range filter - check both start_date and date columns
+        $columns = $this->wpdb->get_col("DESCRIBE {$table}");
+        $hasStartDate = in_array('start_date', $columns, true);
+        
+        if (!empty($filters['date_from'])) {
+            if ($hasStartDate) {
+                $where[] = '(start_date >= %s OR (start_date IS NULL OR start_date = "") AND date >= %s)';
+                $params[] = $filters['date_from'];
+                $params[] = $filters['date_from'];
+            } else {
+                $where[] = 'date >= %s';
+                $params[] = $filters['date_from'];
+            }
+        }
+        
+        if (!empty($filters['date_to'])) {
+            if ($hasStartDate) {
+                $where[] = '(start_date <= %s OR (start_date IS NULL OR start_date = "") AND date <= %s)';
+                $params[] = $filters['date_to'];
+                $params[] = $filters['date_to'];
+            } else {
+                $where[] = 'date <= %s';
+                $params[] = $filters['date_to'];
+            }
+        }
+        
+        // Source filter
+        if (!empty($filters['source']) && $filters['source'] !== 'all') {
+            $where[] = 'source = %s';
+            $params[] = $filters['source'];
+        }
+        
+        // Past/upcoming filter
+        if (isset($filters['include_past'])) {
+            if (!$filters['include_past']) {
+                $where[] = 'date >= CURDATE()';
+            }
+        }
+        
+        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
+        $query .= " ORDER BY date ASC, time ASC";
+        
+        if (!empty($filters['per_page'])) {
+            $perPage = (int) $filters['per_page'];
+            $page = max(1, (int) ($filters['page'] ?? 1));
+            $offset = ($page - 1) * $perPage;
+            $query .= " LIMIT %d OFFSET %d";
+            $params[] = $perPage;
+            $params[] = $offset;
+        }
+        
+        $results = $this->wpdb->get_results(
+            $this->wpdb->prepare($query, ...$params),
+            ARRAY_A
+        );
+        
+        return array_map(function ($row) {
+            return Departure::fromArray($row);
+        }, $results ?: []);
+    }
+
+    /**
      * Find all departures by trip ID
      * 
      * @param int $tripId Trip ID
@@ -279,7 +363,6 @@ class DepartureRepository extends BaseRepository
             'status' => sanitize_text_field($data['status'] ?? 'upcoming'),
             'source' => sanitize_text_field($data['source'] ?? 'booking_created'),
             'price_override' => !empty($data['price_override']) ? (float) $data['price_override'] : null,
-            'total_revenue' => !empty($data['total_revenue']) ? (float) $data['total_revenue'] : 0.00,
             'notes' => !empty($data['notes']) ? sanitize_textarea_field($data['notes']) : null,
             'created_at' => current_time('mysql'),
             'updated_at' => current_time('mysql'),
@@ -291,6 +374,12 @@ class DepartureRepository extends BaseRepository
         }
         if ($hasEndDate && !empty($endDate)) {
             $insertData['end_date'] = sanitize_text_field($endDate);
+        }
+        
+        // Only add total_revenue if column exists
+        $hasTotalRevenue = in_array('total_revenue', $columns, true);
+        if ($hasTotalRevenue) {
+            $insertData['total_revenue'] = !empty($data['total_revenue']) ? (float) $data['total_revenue'] : 0.00;
         }
         
         // Handle price_by_traveler_type as JSON
@@ -363,7 +452,13 @@ class DepartureRepository extends BaseRepository
         if (isset($data['status'])) $updateData['status'] = sanitize_text_field($data['status']);
         if (isset($data['source'])) $updateData['source'] = sanitize_text_field($data['source']);
         if (isset($data['price_override'])) $updateData['price_override'] = !empty($data['price_override']) ? (float) $data['price_override'] : null;
-        if (isset($data['total_revenue'])) $updateData['total_revenue'] = !empty($data['total_revenue']) ? (float) $data['total_revenue'] : 0.00;
+        
+        // Only update total_revenue if column exists
+        $hasTotalRevenue = in_array('total_revenue', $columns, true);
+        if (isset($data['total_revenue']) && $hasTotalRevenue) {
+            $updateData['total_revenue'] = !empty($data['total_revenue']) ? (float) $data['total_revenue'] : 0.00;
+        }
+        
         if (isset($data['notes'])) $updateData['notes'] = !empty($data['notes']) ? sanitize_textarea_field($data['notes']) : null;
         
         if (isset($data['price_by_traveler_type'])) {

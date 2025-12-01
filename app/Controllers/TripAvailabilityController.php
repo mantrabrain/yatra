@@ -36,6 +36,16 @@ class TripAvailabilityController extends BaseController
     public function register_routes(): void
     {
         $namespace = 'yatra/v1';
+        
+        // All departures endpoint (without trip ID)
+        register_rest_route($namespace, '/departures', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_all_departures'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+        
         $base = 'trips/(?P<trip_id>[\d]+)/departures';
 
         // Departures endpoints
@@ -192,6 +202,25 @@ class TripAvailabilityController extends BaseController
                     $bookingIds = $bookingDepartureRepo->getBookingsForDeparture($d->id);
                     $departureArray['booking_ids'] = $bookingIds;
                     $departureArray['bookings_count'] = count($bookingIds);
+                    
+                    // Recalculate revenue for departures with bookings
+                    if (!empty($bookingIds)) {
+                        try {
+                            // Call the service method to recalculate revenue
+                            $totalRevenue = 0.00;
+                            foreach ($bookingIds as $bookingId) {
+                                $booking = $bookingRepo->find($bookingId);
+                                if ($booking && !empty($booking->total_amount)) {
+                                    $totalRevenue += (float) $booking->total_amount;
+                                }
+                            }
+                            // Set revenue in the array directly
+                            $departureArray['total_revenue'] = $totalRevenue;
+                        } catch (\Exception $e) {
+                            // If any error occurs, leave the original value
+                            error_log('Error calculating departure revenue: ' . $e->getMessage());
+                        }
+                    }
                     
                     // Get all travelers for this departure
                     $allTravelers = [];
@@ -357,6 +386,137 @@ class TripAvailabilityController extends BaseController
         }
     }
 
+    /**
+     * GET /departures
+     * Get departures from all trips
+     */
+    public function get_all_departures(WP_REST_Request $request): WP_REST_Response
+    {
+        $status = $request->get_param('status');
+        $source = $request->get_param('source');
+        $dateFrom = $request->get_param('date_from');
+        $dateTo = $request->get_param('date_to');
+        $includePast = $request->get_param('include_past') !== 'false';
+        
+        $filters = [];
+        if ($status) $filters['status'] = $status;
+        if ($source) $filters['source'] = $source;
+        if ($dateFrom) $filters['date_from'] = $dateFrom;
+        if ($dateTo) $filters['date_to'] = $dateTo;
+        $filters['include_past'] = $includePast;
+        
+        try {
+            // Get all departures (no trip filter)
+            $departures = $this->departureService->getAllDepartures($filters);
+            
+            // Get repository for additional data
+            $bookingDepartureRepo = new \Yatra\Repositories\BookingDepartureRepository();
+            $travellerRepo = new \Yatra\Repositories\TravellerRepository();
+            $bookingRepo = new \Yatra\Repositories\BookingRepository();
+            $tripRepository = new \Yatra\Repositories\TripRepository();
+            
+            // Process each departure to add related data
+            $processed = array_map(function ($d) use ($tripRepository, $bookingDepartureRepo, $travellerRepo, $bookingRepo) {
+                $departureArray = $d->toArray();
+                
+                // Add trip information
+                $trip = $tripRepository->find($d->trip_id);
+                if ($trip) {
+                    $departureArray['trip'] = [
+                        'id' => (int) $trip->id,
+                        'title' => $trip->title ?? '',
+                        'slug' => $trip->slug ?? '',
+                    ];
+                }
+                
+                // Add booking links and get travelers
+                $bookingIds = $bookingDepartureRepo->getBookingsForDeparture($d->id);
+                $departureArray['booking_ids'] = $bookingIds;
+                $departureArray['bookings_count'] = count($bookingIds);
+                
+                // Recalculate revenue for departures with bookings
+                if (!empty($bookingIds)) {
+                    try {
+                        $totalRevenue = 0.00;
+                        foreach ($bookingIds as $bookingId) {
+                            $booking = $bookingRepo->find($bookingId);
+                            if ($booking && !empty($booking->total_amount)) {
+                                $totalRevenue += (float) $booking->total_amount;
+                            }
+                        }
+                        $departureArray['total_revenue'] = $totalRevenue;
+                    } catch (\Exception $e) {
+                        error_log('Error calculating departure revenue: ' . $e->getMessage());
+                    }
+                }
+                
+                // Get all travelers for this departure
+                $allTravelers = [];
+                foreach ($bookingIds as $bookingId) {
+                    $travelers = $travellerRepo->getByBookingId($bookingId);
+                    $booking = $bookingRepo->find($bookingId);
+                    foreach ($travelers as $traveler) {
+                        $fields = $traveler['fields'] ?? [];
+                        
+                        $firstName = $fields['first_name']
+                            ?? $traveler['first_name']
+                            ?? ($booking->contact_first_name ?? '');
+                        $lastName = $fields['last_name']
+                            ?? $traveler['last_name']
+                            ?? ($booking->contact_last_name ?? '');
+                        
+                        $email = $fields['email']
+                            ?? $fields['contact_email']
+                            ?? $fields['primary_email']
+                            ?? ($booking->contact_email ?? '');
+                        
+                        $phone = $fields['phone']
+                            ?? $fields['contact_phone']
+                            ?? $fields['mobile_phone']
+                            ?? $fields['whatsapp']
+                            ?? ($booking->contact_phone ?? '');
+                        
+                        $allTravelers[] = [
+                            'id' => (int) $traveler['id'],
+                            'booking_id' => $bookingId,
+                            'booking_reference' => $booking ? ($booking->reference ?? '') : '',
+                            'is_lead' => (bool) ($traveler['is_lead'] ?? false),
+                            'first_name' => $firstName,
+                            'last_name' => $lastName,
+                            'email' => $email,
+                            'phone' => $phone,
+                        ];
+                    }
+                }
+                $departureArray['travelers'] = $allTravelers;
+                $departureArray['travelers_count'] = count($allTravelers);
+                
+                // Format time for display (remove seconds if present)
+                if (!empty($departureArray['time'])) {
+                    $time = $departureArray['time'];
+                    if (strlen($time) > 5 && substr_count($time, ':') === 2) {
+                        $departureArray['time'] = substr($time, 0, 5);
+                    }
+                }
+                
+                return $departureArray;
+            }, $departures);
+            
+            return new WP_REST_Response([
+                'success' => true,
+                'data' => $processed,
+                'meta' => [
+                    'total' => count($processed),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+    
     /**
      * GET /trips/{trip_id}/departures/past
      */

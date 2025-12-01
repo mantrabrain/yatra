@@ -1199,6 +1199,25 @@ class Database
             $wpdb->query($sql);
         }
         
+        // Add total_revenue column to departures table
+        $table_departures = $wpdb->prefix . 'yatra_trip_departures';
+        $departureColumnExists = function($column) use ($wpdb, $table_departures) {
+            return (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                     WHERE TABLE_SCHEMA = DATABASE() 
+                     AND TABLE_NAME = %s 
+                     AND COLUMN_NAME = %s",
+                    $table_departures,
+                    $column
+                )
+            ) > 0;
+        };
+        
+        if (!$departureColumnExists('total_revenue')) {
+            $wpdb->query("ALTER TABLE `{$table_departures}` ADD COLUMN `total_revenue` decimal(10,2) DEFAULT 0.00 AFTER `price_by_traveler_type`");
+        }
+        
         // Migrate difficulty_level from enum to varchar (for dynamic difficulty levels)
         if ($columnExists('difficulty_level')) {
             $currentType = $wpdb->get_var(

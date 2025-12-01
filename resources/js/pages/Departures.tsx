@@ -3,9 +3,9 @@
  * Manage trip departures (manual and recurring-generated)
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Calendar, AlertCircle, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, AlertCircle, Edit, Trash2, Columns } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -102,9 +102,65 @@ const Departures: React.FC = () => {
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
   const [page, setPage] = useState(1);
+  const [showColumnMenu, setShowColumnMenu] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    try {
+      const saved = localStorage.getItem('yatra_departures_visible_columns');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch {
+      // Ignore errors
+    }
+    // Default column visibility (source hidden by default)
+    return {
+      trip: true,
+      date: true,
+      time: true,
+      capacity: true,
+      booked: true,
+      available: true,
+      revenue: true,
+      travelers: true,
+      bookings: true,
+      status: true,
+      source: false,
+    };
+  });
+  const columnMenuRef = useRef<HTMLDivElement>(null);
   const [travelerModalDeparture, setTravelerModalDeparture] = useState<Departure | null>(null);
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+
+  // Save column visibility to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('yatra_departures_visible_columns', JSON.stringify(visibleColumns));
+    } catch (error) {
+      console.error('Failed to save column visibility to localStorage:', error);
+    }
+  }, [visibleColumns]);
+
+  // Close column menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (columnMenuRef.current && !columnMenuRef.current.contains(event.target as Node)) {
+        setShowColumnMenu(false);
+      }
+    };
+
+    if (showColumnMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showColumnMenu]);
+
+  const toggleColumn = (column: keyof typeof visibleColumns) => {
+    setVisibleColumns((prev: typeof visibleColumns) => ({ ...prev, [column]: !prev[column] }));
+  };
 
   // Save selected trip to localStorage whenever it changes
   useEffect(() => {
@@ -293,9 +349,7 @@ const Departures: React.FC = () => {
         </CardContent>
       </Card>
 
-      {selectedTripId && (
-        <>
-          {/* Filters */}
+      {/* Filters */}
           <Card>
             <CardContent className="pt-6">
               <div className="space-y-4">
@@ -392,6 +446,39 @@ const Departures: React.FC = () => {
                       </Button>
                     </div>
                   )}
+                  <div className="relative ml-auto" ref={columnMenuRef}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowColumnMenu(!showColumnMenu)}
+                      className="h-10"
+                    >
+                      <Columns className="w-4 h-4 mr-2" />
+                      {__('Columns', 'Columns')}
+                    </Button>
+                    {showColumnMenu && (
+                      <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 py-2">
+                        <div className="px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                          {__('Show Columns', 'Show Columns')}
+                        </div>
+                        {Object.entries(visibleColumns).map(([key, value]) => (
+                          <label
+                            key={key}
+                            className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={Boolean(value)}
+                              onChange={() => toggleColumn(key as keyof typeof visibleColumns)}
+                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize">
+                              {__(key.charAt(0).toUpperCase() + key.slice(1), key.charAt(0).toUpperCase() + key.slice(1))}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -415,109 +502,128 @@ const Departures: React.FC = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{__('Trip', 'Trip')}</TableHead>
-                      <TableHead>{__('Date', 'Date')}</TableHead>
-                      <TableHead>{__('Time', 'Time')}</TableHead>
-                      <TableHead>{__('Capacity', 'Capacity')}</TableHead>
-                      <TableHead>{__('Booked', 'Booked')}</TableHead>
-                      <TableHead>{__('Available', 'Available')}</TableHead>
-                      <TableHead>{__('Revenue', 'Revenue')}</TableHead>
-                      <TableHead>{__('Travelers', 'Travelers')}</TableHead>
-                      <TableHead>{__('Bookings', 'Bookings')}</TableHead>
-                      <TableHead>{__('Status', 'Status')}</TableHead>
-                      <TableHead>{__('Source', 'Source')}</TableHead>
+                      {visibleColumns.trip && <TableHead>{__('Trip', 'Trip')}</TableHead>}
+                      {visibleColumns.date && <TableHead>{__('Date', 'Date')}</TableHead>}
+                      {visibleColumns.time && <TableHead>{__('Time', 'Time')}</TableHead>}
+                      {visibleColumns.capacity && <TableHead>{__('Capacity', 'Capacity')}</TableHead>}
+                      {visibleColumns.booked && <TableHead>{__('Booked', 'Booked')}</TableHead>}
+                      {visibleColumns.available && <TableHead>{__('Available', 'Available')}</TableHead>}
+                      {visibleColumns.revenue && <TableHead>{__('Revenue', 'Revenue')}</TableHead>}
+                      {visibleColumns.travelers && <TableHead>{__('Travelers', 'Travelers')}</TableHead>}
+                      {visibleColumns.bookings && <TableHead>{__('Bookings', 'Bookings')}</TableHead>}
+                      {visibleColumns.status && <TableHead>{__('Status', 'Status')}</TableHead>}
+                      {visibleColumns.source && <TableHead>{__('Source', 'Source')}</TableHead>}
                       <TableHead>{__('Actions', 'Actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {departuresData.data.map((departure: Departure) => (
                       <TableRow key={departure.id}>
-                        <TableCell>
-                          {departure.trip?.title ? (
-                            <a
-                              href={`?page=yatra&subpage=trips&action=edit&id=${departure.trip.id}`}
-                              className="text-blue-600 hover:text-blue-800 hover:underline"
-                              title={__('View trip', 'View trip')}
-                            >
-                              {departure.trip.title}
-                            </a>
-                          ) : (
-                            <span className="text-gray-400">--</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {formatDate(departure.start_date || departure.date)}
-                        </TableCell>
-                        <TableCell>
-                          {departure.time ? (
-                            <span className="font-mono">{departure.time}</span>
-                          ) : (
-                            <span className="text-gray-400">--</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <span title={__('Max Capacity', 'Max Capacity')}>
-                            {departure.max_capacity}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <span title={__('Booked Count', 'Booked Count')}>
-                            {departure.booked_count}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <span 
-                            className={departure.available_capacity === 0 ? 'text-red-600 font-semibold' : ''}
-                            title={__('Available Capacity', 'Available Capacity')}
-                          >
-                            {departure.available_capacity}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          {departure.total_revenue !== undefined && departure.total_revenue > 0 ? (
-                            <span className="font-semibold text-green-600">
-                              {formatCurrency(departure.total_revenue)}
+                        {visibleColumns.trip && (
+                          <TableCell>
+                            {departure.trip?.title ? (
+                              <a
+                                href={`?page=yatra&subpage=trips&action=edit&id=${departure.trip.id}`}
+                                className="text-blue-600 hover:text-blue-800 hover:underline"
+                                title={__('View trip', 'View trip')}
+                              >
+                                {departure.trip.title}
+                              </a>
+                            ) : (
+                              <span className="text-gray-400">--</span>
+                            )}
+                          </TableCell>
+                        )}
+                        {visibleColumns.date && (
+                          <TableCell>
+                            {formatDate(departure.start_date || departure.date)}
+                          </TableCell>
+                        )}
+                        {visibleColumns.time && (
+                          <TableCell>
+                            {departure.time ? (
+                              <span className="font-mono">{departure.time}</span>
+                            ) : (
+                              <span className="text-gray-400">--</span>
+                            )}
+                          </TableCell>
+                        )}
+                        {visibleColumns.capacity && (
+                          <TableCell>
+                            <span title={__('Max Capacity', 'Max Capacity')}>
+                              {departure.max_capacity}
                             </span>
-                          ) : (
-                            <span className="text-gray-400">--</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openTravelerModal(departure)}
-                            disabled={!departure.travelers || departure.travelers.length === 0}
-                          >
-                            {departure.travelers_count || departure.travelers?.length || 0}{' '}
-                            {__('Traveler(s)', 'Traveler(s)')}
-                          </Button>
-                        </TableCell>
-                        <TableCell>
-                          {departure.booking_ids && departure.booking_ids.length > 0 ? (
-                            <div className="flex flex-wrap gap-1">
-                              {departure.booking_ids.slice(0, 3).map((bookingId) => (
-                                <a
-                                  key={bookingId}
-                                  href={`?page=yatra&subpage=bookings&action=view&id=${bookingId}`}
-                                  className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
-                                  title={__('View booking', 'View booking')}
-                                >
-                                  #{bookingId}
-                                </a>
-                              ))}
-                              {departure.booking_ids.length > 3 && (
-                                <span className="text-gray-500 text-sm">
-                                  +{departure.booking_ids.length - 3}
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-gray-400">--</span>
-                          )}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(departure.status)}</TableCell>
-                        <TableCell>{getSourceBadge(departure.source)}</TableCell>
+                          </TableCell>
+                        )}
+                        {visibleColumns.booked && (
+                          <TableCell>
+                            <span title={__('Booked Count', 'Booked Count')}>
+                              {departure.booked_count}
+                            </span>
+                          </TableCell>
+                        )}
+                        {visibleColumns.available && (
+                          <TableCell>
+                            <span 
+                              className={departure.available_capacity === 0 ? 'text-red-600 font-semibold' : ''}
+                              title={__('Available Capacity', 'Available Capacity')}
+                            >
+                              {departure.available_capacity}
+                            </span>
+                          </TableCell>
+                        )}
+                        {visibleColumns.revenue && (
+                          <TableCell>
+                            {departure.total_revenue !== undefined && departure.total_revenue > 0 ? (
+                              <span className="font-semibold text-green-600">
+                                {formatCurrency(departure.total_revenue)}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">--</span>
+                            )}
+                          </TableCell>
+                        )}
+                        {visibleColumns.travelers && (
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openTravelerModal(departure)}
+                              disabled={!departure.travelers || departure.travelers.length === 0}
+                              className="px-3 py-1.5"
+                            >
+                              {departure.travelers_count || departure.travelers?.length || 0}{' '}
+                              {__('Traveler(s)', 'Traveler(s)')}
+                            </Button>
+                          </TableCell>
+                        )}
+                        {visibleColumns.bookings && (
+                          <TableCell>
+                            {departure.booking_ids && departure.booking_ids.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {departure.booking_ids.slice(0, 3).map((bookingId) => (
+                                  <a
+                                    key={bookingId}
+                                    href={`?page=yatra&subpage=bookings&action=view&id=${bookingId}`}
+                                    className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
+                                    title={__('View booking', 'View booking')}
+                                  >
+                                    #{bookingId}
+                                  </a>
+                                ))}
+                                {departure.booking_ids.length > 3 && (
+                                  <span className="text-gray-500 text-sm">
+                                    +{departure.booking_ids.length - 3}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-gray-400">--</span>
+                            )}
+                          </TableCell>
+                        )}
+                        {visibleColumns.status && <TableCell>{getStatusBadge(departure.status)}</TableCell>}
+                        {visibleColumns.source && <TableCell>{getSourceBadge(departure.source)}</TableCell>}
                         <TableCell>
                           <div className="flex gap-2">
                             <Button
@@ -548,19 +654,6 @@ const Departures: React.FC = () => {
               )}
             </CardContent>
           </Card>
-        </>
-      )}
-
-      {!selectedTripId && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-8">
-              <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">{__('Please select a trip to view departures', 'Please select a trip to view departures')}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
 
       {travelerModalDeparture && travelerModalDeparture.travelers && (

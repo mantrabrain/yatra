@@ -225,6 +225,14 @@ class DepartureService
     }
 
     /**
+     * Get all departures across all trips
+     */
+    public function getAllDepartures(array $filters = []): array
+    {
+        return $this->repository->findAll($filters);
+    }
+
+    /**
      * Get departures by trip ID
      */
     public function getByTripId(int $tripId, array $filters = []): array
@@ -341,10 +349,11 @@ class DepartureService
      * @param string $endDate End date (YYYY-MM-DD)
      * @param int $travelersCount Number of travelers in the booking
      * @param int|null $defaultMaxCapacity Default max capacity if creating new departure (null = unlimited)
+     * @param string|null $time Time in HH:MM:SS format (optional)
      * @return Departure The departure (existing or newly created)
      * @throws \Exception
      */
-    public function findOrCreateForBooking(int $tripId, string $startDate, string $endDate, int $travelersCount = 0, ?int $defaultMaxCapacity = null): Departure
+    public function findOrCreateForBooking(int $tripId, string $startDate, string $endDate, int $travelersCount = 0, ?int $defaultMaxCapacity = null, ?string $time = null): Departure
     {
         // Get capacity based on priority
         $maxCapacity = $this->capacityService->getCapacityForDate($tripId, $startDate);
@@ -390,34 +399,13 @@ class DepartureService
         if ($defaultMaxCapacity !== null) {
             $maxCapacity = $defaultMaxCapacity;
         } else {
-            // Priority 1: Check availability dates
-            $availabilityRepo = new \Yatra\Repositories\AvailabilityRepository();
-            $availability = $availabilityRepo->findByTripIdAndDate($tripId, $startDate);
-            if ($availability && !empty($availability->seats_total)) {
-                $maxCapacity = (int) $availability->seats_total;
-            } else {
-                // Priority 2: Check recurring rules
-                $recurringRuleRepo = new \Yatra\Repositories\RecurringRuleRepository();
-                $activeRules = $recurringRuleRepo->findByTripId($tripId, true); // true = active only
-                foreach ($activeRules as $rule) {
-                    // Check if this date matches the rule
-                    if ($this->dateMatchesRecurringRule($startDate, $rule)) {
-                        if (!empty($rule->max_capacity)) {
-                            $maxCapacity = (int) $rule->max_capacity;
-                            break;
-                        }
-                    }
-                }
-                
-                // Priority 3: Use trip's max_travelers
-                if ($maxCapacity === null && $trip && !empty($trip->max_travelers)) {
-                    $maxCapacity = (int) $trip->max_travelers;
-                }
-                
-                // Priority 4: Default to 50
-                if ($maxCapacity === null) {
-                    $maxCapacity = 50;
-                }
+            // Use CapacityService to get the correct capacity based on priority
+            // Priority: Availability Date > Recurring Availability Rule > Trip Default
+            $maxCapacity = $this->capacityService->getCapacityForDate($tripId, $startDate);
+            
+            // If no capacity found, default to 50
+            if ($maxCapacity === null || $maxCapacity <= 0) {
+                $maxCapacity = 50;
             }
         }
 
@@ -426,6 +414,7 @@ class DepartureService
             'start_date' => $startDate,
             'end_date' => $endDate,
             'date' => $startDate, // Keep for backward compatibility
+            'time' => $time, // Add time if provided
             'max_capacity' => $maxCapacity,
             'booked_count' => 0, // Will be incremented after creation
             'source' => 'booking_created', // Created from booking
@@ -671,6 +660,16 @@ class DepartureService
     }
 
     /**
+     * Get the departure repository
+     * 
+     * @return \Yatra\Repositories\DepartureRepository
+     */
+    public function getRepository(): \Yatra\Repositories\DepartureRepository
+    {
+        return $this->repository;
+    }
+    
+    /**
      * Recalculate total revenue for a departure from all linked bookings
      * 
      * @param int $departureId Departure ID
@@ -689,10 +688,18 @@ class DepartureService
         
         foreach ($bookingIds as $bookingId) {
             $booking = $this->bookingRepository->find($bookingId);
-            if ($booking && !empty($booking->total_amount)) {
+            if ($booking) {
                 // Only count confirmed/pending bookings, exclude cancelled/refunded
                 if (!in_array($booking->status ?? '', ['cancelled', 'refunded', 'failed'], true)) {
-                    $totalRevenue += (float) $booking->total_amount;
+                    // If total_amount is not set, try to calculate from price * travelers
+                    if (!empty($booking->total_amount)) {
+                        $totalRevenue += (float) $booking->total_amount;
+                    } else if (!empty($booking->price) && !empty($booking->traveler_count)) {
+                        $totalRevenue += ((float) $booking->price * (int) $booking->traveler_count);
+                    } else if (!empty($booking->price)) {
+                        // Fallback to just price if traveler count not available
+                        $totalRevenue += (float) $booking->price;
+                    }
                 }
             }
         }
