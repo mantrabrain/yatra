@@ -141,6 +141,16 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                         <h4 class="yatra-card-tour-title"><?php echo esc_html($card['title'] ?? ''); ?></h4>
                         <div class="yatra-card-tour-meta">
                             <span class="yatra-card-tour-type"><?php echo esc_html($card['type'] ?? __('Group Departure', 'yatra')); ?></span>
+                            <?php if (isset($card['max_capacity'])): ?>
+                            <span class="yatra-card-tour-capacity">
+                                <?php 
+                                echo sprintf(
+                                    _n('%s spot available', '%s spots available', $card['max_capacity'] - ($card['booked_count'] ?? 0), 'yatra'),
+                                    '<span class="yatra-available-spots">' . ($card['max_capacity'] - ($card['booked_count'] ?? 0)) . '</span> / ' . $card['max_capacity']
+                                );
+                                ?>
+                            </span>
+                            <?php endif; ?>
                             <span class="yatra-card-tour-separator">•</span>
                             <span class="yatra-card-tour-location"><?php echo esc_html($card['from_location'] ?? ''); ?></span>
                         </div>

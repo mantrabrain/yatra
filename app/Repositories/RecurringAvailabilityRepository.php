@@ -116,6 +116,34 @@ class RecurringAvailabilityRepository extends BaseRepository
     }
 
     /**
+     * Find active rules that apply to a specific date
+     * 
+     * @param int $tripId Trip ID
+     * @param string $date Date in YYYY-MM-DD format
+     * @return array Array of matching rules ordered by priority
+     */
+    public function findActiveRulesForDate(int $tripId, string $date): array
+    {
+        $table = esc_sql($this->table);
+        
+        $query = $this->wpdb->prepare(
+            "SELECT * FROM `{$table}` 
+             WHERE trip_id = %d 
+               AND status = 'active'
+               AND start_date <= %s
+               AND (end_date IS NULL OR end_date >= %s)
+             ORDER BY priority DESC",
+            $tripId,
+            $date,
+            $date
+        );
+        
+        $results = $this->wpdb->get_results($query);
+        
+        return array_map([$this, 'hydrateRule'], $results ?: []);
+    }
+
+    /**
      * Create a new rule
      */
     public function create(array $data): int

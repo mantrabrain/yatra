@@ -9,6 +9,7 @@ use Yatra\Repositories\BookingDepartureRepository;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\TripRepository;
 use Yatra\Models\Departure;
+use Yatra\Services\CapacityService;
 
 /**
  * Departure Service
@@ -20,17 +21,20 @@ class DepartureService
     private BookingDepartureRepository $bookingDepartureRepository;
     private BookingRepository $bookingRepository;
     private TripRepository $tripRepository;
+    private CapacityService $capacityService;
 
     public function __construct(
         DepartureRepository $repository,
         ?BookingDepartureRepository $bookingDepartureRepository = null,
         ?BookingRepository $bookingRepository = null,
-        ?TripRepository $tripRepository = null
+        ?TripRepository $tripRepository = null,
+        ?CapacityService $capacityService = null
     ) {
         $this->repository = $repository;
         $this->bookingDepartureRepository = $bookingDepartureRepository ?? new BookingDepartureRepository();
         $this->bookingRepository = $bookingRepository ?? new BookingRepository();
         $this->tripRepository = $tripRepository ?? new TripRepository();
+        $this->capacityService = $capacityService ?? new CapacityService();
     }
 
     /**
@@ -49,7 +53,18 @@ class DepartureService
             throw new \InvalidArgumentException('Start date is required');
         }
         
-        if (empty($data['max_capacity']) || (int) $data['max_capacity'] < 1) {
+        // Calculate capacity based on the date if not provided
+        if (empty($data['max_capacity'])) {
+            $data['max_capacity'] = $this->capacityService->getCapacityForDate(
+                (int) $data['trip_id'],
+                $startDate
+            );
+            
+            // If still no capacity, throw an error
+            if ($data['max_capacity'] <= 0) {
+                throw new \InvalidArgumentException('No valid capacity found for the selected date. Please check availability settings.');
+            }
+        } elseif ((int) $data['max_capacity'] < 1) {
             throw new \InvalidArgumentException('Max capacity must be at least 1');
         }
         
@@ -331,6 +346,13 @@ class DepartureService
      */
     public function findOrCreateForBooking(int $tripId, string $startDate, string $endDate, int $travelersCount = 0, ?int $defaultMaxCapacity = null): Departure
     {
+        // Get capacity based on priority
+        $maxCapacity = $this->capacityService->getCapacityForDate($tripId, $startDate);
+        
+        // If no capacity found from availability or rules, use the provided default
+        if ($maxCapacity <= 0 && $defaultMaxCapacity !== null) {
+            $maxCapacity = $defaultMaxCapacity;
+        }
         // Validate date format
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate)) {
             throw new \InvalidArgumentException('Invalid start date format. Use YYYY-MM-DD');

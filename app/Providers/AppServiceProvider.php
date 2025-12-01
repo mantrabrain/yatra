@@ -1752,6 +1752,7 @@ class AppServiceProvider extends ServiceProvider
      */
     private function enqueueCommonAssets(): void
     {
+        // Enqueue common CSS
         $css_file = YATRA_PLUGIN_PATH . 'public/css/common.css';
         if (file_exists($css_file)) {
             $css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $css_file);
@@ -1760,6 +1761,19 @@ class AppServiceProvider extends ServiceProvider
                 'yatra-common',
                 $css_url,
                 [],
+                $css_version
+            );
+        }
+        
+        // Enqueue capacity CSS
+        $capacity_css = YATRA_PLUGIN_PATH . 'assets/css/yatra-capacity.css';
+        if (file_exists($capacity_css)) {
+            $capacity_css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $capacity_css);
+            $css_version = YATRA_VERSION . '.' . filemtime($capacity_css);
+            wp_enqueue_style(
+                'yatra-capacity',
+                $capacity_css_url,
+                ['yatra-common'],
                 $css_version
             );
         }

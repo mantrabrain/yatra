@@ -3,7 +3,7 @@
  * Manage trip departures (manual and recurring-generated)
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Calendar, AlertCircle, Edit, Trash2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
@@ -87,7 +87,15 @@ const formatCurrency = (value?: number | null) => {
 };
 
 const Departures: React.FC = () => {
-  const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
+  // Load selected trip from localStorage on initial render
+  const [selectedTripId, setSelectedTripId] = useState<number | null>(() => {
+    try {
+      const saved = localStorage.getItem('yatra_selected_trip_id');
+      return saved ? parseInt(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [statusFilter, setStatusFilter] = useState<'all' | 'upcoming' | 'full' | 'past' | 'cancelled'>('all');
   const [sourceFilter, setSourceFilter] = useState<'all' | 'manual' | 'booking_created'>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -97,6 +105,19 @@ const Departures: React.FC = () => {
   const [travelerModalDeparture, setTravelerModalDeparture] = useState<Departure | null>(null);
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+
+  // Save selected trip to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      if (selectedTripId) {
+        localStorage.setItem('yatra_selected_trip_id', selectedTripId.toString());
+      } else {
+        localStorage.removeItem('yatra_selected_trip_id');
+      }
+    } catch (error) {
+      console.error('Failed to save trip selection to localStorage:', error);
+    }
+  }, [selectedTripId]);
 
   // Fetch trips for dropdown
   const { data: tripsData } = useQuery({

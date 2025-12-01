@@ -37005,7 +37005,14 @@ const formatCurrency = (value) => {
 };
 const Departures = () => {
   var _a, _b;
-  const [selectedTripId, setSelectedTripId] = reactExports.useState(null);
+  const [selectedTripId, setSelectedTripId] = reactExports.useState(() => {
+    try {
+      const saved = localStorage.getItem("yatra_selected_trip_id");
+      return saved ? parseInt(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sourceFilter, setSourceFilter] = reactExports.useState("all");
   const [searchTerm, setSearchTerm] = reactExports.useState("");
@@ -37015,6 +37022,17 @@ const Departures = () => {
   const [travelerModalDeparture, setTravelerModalDeparture] = reactExports.useState(null);
   const queryClient2 = useQueryClient();
   const { showToast } = useToast();
+  reactExports.useEffect(() => {
+    try {
+      if (selectedTripId) {
+        localStorage.setItem("yatra_selected_trip_id", selectedTripId.toString());
+      } else {
+        localStorage.removeItem("yatra_selected_trip_id");
+      }
+    } catch (error) {
+      console.error("Failed to save trip selection to localStorage:", error);
+    }
+  }, [selectedTripId]);
   const { data: tripsData } = useQuery({
     queryKey: ["trips", "all"],
     queryFn: async () => {
