@@ -92,12 +92,12 @@ class DepartureRepository extends BaseRepository
             $params[] = $filters['status'];
         }
         
-        // Date range filter - use COALESCE to handle NULL/empty start_date
+        // Date range filter - simple approach
         if (isset($filters['date_from']) && is_string($filters['date_from']) && trim($filters['date_from']) !== '') {
             $dateFrom = trim($filters['date_from']);
             // Validate date format AND that it's a real date
             if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom) && strtotime($dateFrom) !== false) {
-                $where[] = "COALESCE(NULLIF(start_date, ''), date) >= %s";
+                $where[] = 'date >= %s';
                 $params[] = $dateFrom;
             }
         }
@@ -106,7 +106,7 @@ class DepartureRepository extends BaseRepository
             $dateTo = trim($filters['date_to']);
             // Validate date format AND that it's a real date
             if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo) && strtotime($dateTo) !== false) {
-                $where[] = "COALESCE(NULLIF(start_date, ''), date) <= %s";
+                $where[] = 'date <= %s';
                 $params[] = $dateTo;
             }
         }
