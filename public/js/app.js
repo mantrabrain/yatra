@@ -29507,6 +29507,14 @@ function isToday(date, options2) {
     constructNow(date)
   );
 }
+function isWithinInterval(date, interval, options2) {
+  const time = +toDate(date, options2 == null ? void 0 : options2.in);
+  const [startTime, endTime] = [
+    +toDate(interval.start, options2 == null ? void 0 : options2.in),
+    +toDate(interval.end, options2 == null ? void 0 : options2.in)
+  ].sort((a, b) => a - b);
+  return time >= startTime && time <= endTime;
+}
 function parseISO(argument, options2) {
   const invalidDate = () => constructFrom(options2 == null ? void 0 : options2.in, NaN);
   const additionalDigits = 2;
@@ -36979,6 +36987,186 @@ const RecurringRuleForm = () => {
     ] }) })
   ] });
 };
+const DateRangePicker = ({
+  dateFrom,
+  dateTo,
+  onDateFromChange,
+  onDateToChange,
+  onClear,
+  placeholder = "Select date range",
+  disabled = false,
+  className = "",
+  error = false
+}) => {
+  const [open, setOpen] = reactExports.useState(false);
+  const [currentMonth, setCurrentMonth] = reactExports.useState(/* @__PURE__ */ new Date());
+  const [hoverDate, setHoverDate] = reactExports.useState();
+  let fromDate = void 0;
+  let toDate2 = void 0;
+  if (dateFrom && dateFrom.trim()) {
+    try {
+      const parsed = parse(dateFrom, "yyyy-MM-dd", /* @__PURE__ */ new Date());
+      if (!isNaN(parsed.getTime())) {
+        fromDate = parsed;
+      }
+    } catch (e) {
+      fromDate = void 0;
+    }
+  }
+  if (dateTo && dateTo.trim()) {
+    try {
+      const parsed = parse(dateTo, "yyyy-MM-dd", /* @__PURE__ */ new Date());
+      if (!isNaN(parsed.getTime())) {
+        toDate2 = parsed;
+      }
+    } catch (e) {
+      toDate2 = void 0;
+    }
+  }
+  const handleSelect = (date) => {
+    if (!fromDate || fromDate && toDate2) {
+      onDateFromChange == null ? void 0 : onDateFromChange(format(date, "yyyy-MM-dd"));
+      onDateToChange == null ? void 0 : onDateToChange("");
+      setHoverDate(void 0);
+    } else if (fromDate && !toDate2) {
+      if (date < fromDate) {
+        onDateToChange == null ? void 0 : onDateToChange(format(fromDate, "yyyy-MM-dd"));
+        onDateFromChange == null ? void 0 : onDateFromChange(format(date, "yyyy-MM-dd"));
+      } else {
+        onDateToChange == null ? void 0 : onDateToChange(format(date, "yyyy-MM-dd"));
+      }
+      setHoverDate(void 0);
+      setOpen(false);
+    }
+  };
+  const handleClear = (e) => {
+    e.stopPropagation();
+    onClear == null ? void 0 : onClear();
+    setHoverDate(void 0);
+  };
+  const isInRange = (date) => {
+    if (!fromDate) return false;
+    const endDate = toDate2 || hoverDate;
+    if (!endDate) return false;
+    const start = fromDate < endDate ? fromDate : endDate;
+    const end = fromDate < endDate ? endDate : fromDate;
+    try {
+      return isWithinInterval(date, { start, end });
+    } catch {
+      return false;
+    }
+  };
+  const isRangeStart = (date) => {
+    return fromDate && isSameDay(date, fromDate);
+  };
+  const isRangeEnd = (date) => {
+    const endDate = toDate2 || hoverDate;
+    return endDate && isSameDay(date, endDate);
+  };
+  const getDaysForMonth = (monthDate) => {
+    const monthStart = startOfMonth(monthDate);
+    const monthEnd = endOfMonth(monthDate);
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+  };
+  const nextMonthDate = addMonths(currentMonth, 1);
+  const currentMonthDays = getDaysForMonth(currentMonth);
+  const nextMonthDays = getDaysForMonth(nextMonthDate);
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  let displayValue = "";
+  if (fromDate && !isNaN(fromDate.getTime())) {
+    try {
+      displayValue = format(fromDate, "MMM dd, yyyy");
+      if (toDate2 && !isNaN(toDate2.getTime())) {
+        displayValue += " - " + format(toDate2, "MMM dd, yyyy");
+      }
+    } catch (e) {
+      displayValue = "";
+    }
+  }
+  const hasValue = dateFrom || dateTo;
+  const renderMonth = (monthDate, days) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-[280px]", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-center mb-4", children: format(monthDate, "MMMM yyyy") }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-7 gap-1 mb-2", children: weekDays.map((day) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-xs font-medium text-gray-500 dark:text-gray-400 p-2", children: day }, day)) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-7 gap-1", children: days.map((day, idx) => {
+      const isCurrentMonth = isSameMonth(day, monthDate);
+      const isSelected = isRangeStart(day) || isRangeEnd(day);
+      const inRange = isInRange(day);
+      const isTodayDate = isToday(day);
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => handleSelect(day),
+          onMouseEnter: () => fromDate && !toDate2 && setHoverDate(day),
+          onMouseLeave: () => setHoverDate(void 0),
+          className: `
+                p-2 text-sm rounded transition-colors relative w-9 h-9 flex items-center justify-center mx-auto
+                ${!isCurrentMonth ? "text-gray-300 dark:text-gray-700 invisible" : ""}
+                ${isSelected ? "bg-blue-600 text-white font-semibold hover:bg-blue-700 z-10" : ""}
+                ${inRange && !isSelected ? "bg-blue-100 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100 rounded-none" : ""}
+                ${!isSelected && !inRange && isCurrentMonth ? "hover:bg-gray-100 dark:hover:bg-gray-700" : ""}
+                ${isTodayDate && !isSelected ? "border border-blue-500" : ""}
+                ${isRangeStart(day) && inRange ? "rounded-l-md" : ""}
+                ${isRangeEnd(day) && inRange ? "rounded-r-md" : ""}
+              `,
+          disabled: !isCurrentMonth,
+          children: format(day, "d")
+        },
+        idx
+      );
+    }) })
+  ] });
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Popover, { open, onOpenChange: setOpen, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Button,
+      {
+        type: "button",
+        variant: "outline",
+        disabled,
+        className: `w-full justify-start text-left font-normal ${error ? "border-red-500" : ""} ${!displayValue ? "text-gray-500" : ""} ${className}`,
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "mr-2 h-4 w-4" }),
+          displayValue || /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500", children: placeholder }),
+          hasValue && !disabled && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            X,
+            {
+              className: "ml-auto h-4 w-4 opacity-50 hover:opacity-100",
+              onClick: handleClear
+            }
+          )
+        ]
+      }
+    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverContent, { className: "w-auto p-0", align: "start", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4 px-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            type: "button",
+            onClick: () => setCurrentMonth(subMonths(currentMonth)),
+            className: "p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronLeft, { className: "h-4 w-4" })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            type: "button",
+            onClick: () => setCurrentMonth(addMonths(currentMonth, 1)),
+            className: "p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "h-4 w-4" })
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-8", children: [
+        renderMonth(currentMonth, currentMonthDays),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-l border-gray-200 dark:border-gray-700 pl-8", children: renderMonth(nextMonthDate, nextMonthDays) })
+      ] })
+    ] }) })
+  ] });
+};
 const formatDate = (dateString) => {
   if (!dateString) return "--";
   try {
@@ -37123,7 +37311,10 @@ const Departures = () => {
           include_past: dateFrom || dateTo ? "true" : "false"
         }
       });
-      return (response == null ? void 0 : response.data) || { data: [], meta: { total: 0 } };
+      return {
+        data: (response == null ? void 0 : response.data) || [],
+        meta: (response == null ? void 0 : response.meta) || { total: 0 }
+      };
     },
     // Always enabled, whether trip is selected or not
     enabled: true
@@ -37278,44 +37469,26 @@ const Departures = () => {
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 items-end flex-wrap border-t pt-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-48", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Date From", "Date From") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-80", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Date Range", "Date Range") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
-              DatePicker,
+              DateRangePicker,
               {
-                value: dateFrom,
-                onChange: (dateStr) => {
+                dateFrom,
+                dateTo,
+                onDateFromChange: (dateStr) => {
                   setDateFrom(dateStr || "");
                   setPage(1);
                 },
-                placeholder: __("Start date", "Start date")
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-48", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Date To", "Date To") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              DatePicker,
-              {
-                value: dateTo,
-                onChange: (dateStr) => {
+                onDateToChange: (dateStr) => {
                   setDateTo(dateStr || "");
                   setPage(1);
                 },
-                placeholder: __("End date", "End date"),
-                minDate: dateFrom ? new Date(dateFrom) : void 0
+                onClear: clearDateFilters,
+                placeholder: __("Select date range...", "Select date range...")
               }
             )
           ] }),
-          (dateFrom || dateTo) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              onClick: clearDateFilters,
-              className: "h-10",
-              children: __("Clear Dates", "Clear Dates")
-            }
-          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative ml-auto", ref: columnMenuRef, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
               Button,

@@ -14,7 +14,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Badge } from '../components/ui/badge';
-import { DatePicker } from '../components/ui/date-picker';
+import { DateRangePicker } from '../components/ui/date-range-picker';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
 // Format date helper
@@ -233,7 +233,13 @@ const Departures: React.FC = () => {
         },
       });
       
-      return response?.data || { data: [], meta: { total: 0 } };
+      // apiClient returns the full response: {success, data, meta}
+      // response.data is the array of departures
+      // We need to return the structure as {data: [...], meta: {...}}
+      return {
+        data: response?.data || [],
+        meta: response?.meta || { total: 0 }
+      };
     },
     // Always enabled, whether trip is selected or not
     enabled: true,
@@ -418,44 +424,25 @@ const Departures: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex gap-4 items-end flex-wrap border-t pt-4">
-                  <div className="w-48">
+                  <div className="w-80">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Date From', 'Date From')}
+                      {__('Date Range', 'Date Range')}
                     </label>
-                    <DatePicker
-                      value={dateFrom}
-                      onChange={(dateStr) => {
+                    <DateRangePicker
+                      dateFrom={dateFrom}
+                      dateTo={dateTo}
+                      onDateFromChange={(dateStr) => {
                         setDateFrom(dateStr || '');
                         setPage(1);
                       }}
-                      placeholder={__('Start date', 'Start date')}
-                    />
-                  </div>
-                  <div className="w-48">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Date To', 'Date To')}
-                    </label>
-                    <DatePicker
-                      value={dateTo}
-                      onChange={(dateStr) => {
+                      onDateToChange={(dateStr) => {
                         setDateTo(dateStr || '');
                         setPage(1);
                       }}
-                      placeholder={__('End date', 'End date')}
-                      minDate={dateFrom ? new Date(dateFrom) : undefined}
+                      onClear={clearDateFilters}
+                      placeholder={__('Select date range...', 'Select date range...')}
                     />
                   </div>
-                  {(dateFrom || dateTo) && (
-                    <div>
-                      <Button
-                        variant="outline"
-                        onClick={clearDateFilters}
-                        className="h-10"
-                      >
-                        {__('Clear Dates', 'Clear Dates')}
-                      </Button>
-                    </div>
-                  )}
                   <div className="relative ml-auto" ref={columnMenuRef}>
                     <Button
                       variant="outline"
