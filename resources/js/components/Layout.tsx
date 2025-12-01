@@ -225,6 +225,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'itinerary', label: 'Itinerary', icon: FileText },
       ]
     },
+    { subpage: 'departures', label: 'Departures', icon: Calendar },
     { subpage: 'discounts', label: 'Discount', icon: BadgePercent },
     { subpage: 'payments', label: 'Payments', icon: CreditCard },
     { subpage: 'bookings', label: 'Bookings', icon: Calendar },

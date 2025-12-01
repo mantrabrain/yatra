@@ -259,6 +259,32 @@ if (!empty($emergency_config) && (!isset($emergency_config['enabled']) || $emerg
 $traveler_config = $form_config['traveler_form'] ?? [];
 $traveler_count = isset($total_travelers) ? max(1, (int)$total_travelers) : 1;
 
+// Check if we have traveler-based pricing info
+$pricing_type = isset($pricing_type) ? $pricing_type : 'regular';
+$price_types = isset($price_types) ? $price_types : [];
+$traveler_counts = isset($traveler_counts) ? $traveler_counts : [];
+
+// Build traveler-to-category mapping for traveler-based pricing
+$traveler_category_map = [];
+if ($pricing_type === 'traveler_based' && !empty($price_types) && !empty($traveler_counts)) {
+    $traveler_index = 1;
+    foreach ($price_types as $index => $pt) {
+        $pt = (object) $pt;
+        $category_id = $pt->category_id ?? $index;
+        $category_label = $pt->category_label ?? __('Traveler', 'yatra');
+        $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : 0;
+        
+        for ($c = 1; $c <= $count; $c++) {
+            $traveler_category_map[$traveler_index] = [
+                'category_id' => $category_id,
+                'category_label' => $category_label,
+                'category_index' => $c,
+            ];
+            $traveler_index++;
+        }
+    }
+}
+
 if (!empty($traveler_config)) : 
 ?>
 <div class="yatra-booking-section">
@@ -287,9 +313,20 @@ if (!empty($traveler_config)) :
         }
         
         for ($i = 1; $i <= $traveler_count; $i++) : 
+            // Determine traveler label based on category if traveler-based pricing
+            if (!empty($traveler_category_map[$i])) {
+                $category_info = $traveler_category_map[$i];
+                $category_label = $category_info['category_label'];
+                $category_index = $category_info['category_index'];
+                $traveler_label = sprintf(__('%s %d', 'yatra'), $category_label, $category_index);
+                if ($i === 1) {
+                    $traveler_label .= ' (' . __('Lead Traveler', 'yatra') . ')';
+                }
+            } else {
             $traveler_label = ($i === 1) ? __('Traveler 1 (Lead Traveler)', 'yatra') : sprintf(__('Traveler %d', 'yatra'), $i);
+            }
         ?>
-        <div class="yatra-traveler-form" data-traveler-index="<?php echo esc_attr($i); ?>">
+        <div class="yatra-traveler-form" data-traveler-index="<?php echo esc_attr($i); ?>" <?php if (!empty($traveler_category_map[$i])): ?>data-category-id="<?php echo esc_attr($traveler_category_map[$i]['category_id']); ?>" data-category-label="<?php echo esc_attr($traveler_category_map[$i]['category_label']); ?>"<?php endif; ?>>
             <div class="yatra-traveler-header">
                 <h3 class="yatra-traveler-title"><?php echo esc_html($traveler_label); ?></h3>
                 <?php if ($i > 1) : ?>

@@ -60,6 +60,10 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                     <!-- Booking Form -->
                     <form class="yatra-booking-form" id="yatra-booking-form">
                         <?php 
+                        // Pass pricing type info to form fields partial
+                        $pricing_type = $booking->pricing_type ?? 'regular';
+                        $price_types = $booking->price_types ?? [];
+                        $traveler_counts = $booking->traveler_counts ?? [];
                         // Include shared booking form fields
                         include YATRA_PLUGIN_PATH . 'templates/partials/booking-form-fields.php'; 
                         ?>

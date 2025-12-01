@@ -585,6 +585,9 @@ video {
 .relative {
   position: relative;
 }
+.sticky {
+  position: sticky;
+}
 .-inset-0\.5 {
   inset: -0.125rem;
 }
@@ -1052,6 +1055,9 @@ video {
 .min-w-\[140px\] {
   min-width: 140px;
 }
+.min-w-\[200px\] {
+  min-width: 200px;
+}
 .min-w-\[320px\] {
   min-width: 320px;
 }
@@ -1063,6 +1069,9 @@ video {
 }
 .max-w-2xl {
   max-width: 42rem;
+}
+.max-w-3xl {
+  max-width: 48rem;
 }
 .max-w-4xl {
   max-width: 56rem;
@@ -2006,6 +2015,9 @@ video {
 }
 .pr-10 {
   padding-right: 2.5rem;
+}
+.pr-2 {
+  padding-right: 0.5rem;
 }
 .pr-3 {
   padding-right: 0.75rem;

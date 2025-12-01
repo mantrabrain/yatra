@@ -81,14 +81,13 @@ export const formatPriceForBooking = (price: number, currency?: string) => {
   
   const currencyToUse = currency || globalCurrency;
   
-  if (!price || price === 0) {
-    return __('Contact for pricing', 'Contact for pricing');
-  }
+  // Always format the price, even if 0 - don't show "Contact for pricing" for bookings
+  const numPrice = Number(price) || 0;
   
   const formattedAmount = new Intl.NumberFormat(undefined, {
     minimumFractionDigits: decimalPlaces,
     maximumFractionDigits: decimalPlaces,
-  }).format(price).replace(/,/g, 'TEMP_THOUSAND').replace(/\./g, decimalSeparator).replace(/TEMP_THOUSAND/g, thousandSeparator);
+  }).format(numPrice).replace(/,/g, 'TEMP_THOUSAND').replace(/\./g, decimalSeparator).replace(/TEMP_THOUSAND/g, thousandSeparator);
   
   const currencySymbol = new Intl.NumberFormat(undefined, {
     style: 'currency',

@@ -313,7 +313,7 @@ const AccountPage: React.FC = () => {
   const renderSection = () => {
     switch (section) {
       case 'dashboard':
-        return (
+    return (
           <Dashboard
             bookings={bookings}
             payments={payments}
@@ -324,34 +324,34 @@ const AccountPage: React.FC = () => {
           />
         );
       case 'bookings':
-        return (
+    return (
           <Bookings
             bookings={bookings}
             onSectionChange={(section: string) => handleSectionChange(section as Section)}
           />
         );
       case 'payments':
-        return (
+    return (
           <Payments
             payments={payments}
             onSectionChange={(section: string) => handleSectionChange(section as Section)}
           />
         );
       case 'documents':
-        return (
+    return (
           <Documents
             documents={documents}
           />
         );
       case 'saved-trips':
-        return (
+    return (
           <SavedTrips
             savedTrips={savedTrips}
             isLoading={isLoadingSavedTrips}
           />
         );
       case 'profile':
-        return (
+    return (
           <Profile
             profile={displayProfile || null}
             savedTrips={savedTrips}

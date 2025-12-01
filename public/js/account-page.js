@@ -1,5 +1,5 @@
-import { j as jsxRuntimeExports, i as Calendar, g as FileText, P as Plane, z as ArrowRight, d as MapPin, U as User, p as ChevronRight, aw as Sparkles, V as Package, h as CreditCard, aZ as LifeBuoy, w as Bell, E as AlertCircle, al as CheckCircle2, y as Clock, x as Users, D as DollarSign, ar as Mail, aE as Phone, r as reactExports, u as useQuery, G as CheckCircle, Y as Eye, aH as Download, Z as PenSquare, X as XCircle, a_ as ShieldCheck, a2 as Heart, ap as AlertTriangle, L as LayoutDashboard, aD as React, a$ as LogOut, aW as QueryClient, aX as client, aY as QueryClientProvider } from "./react-vendor-Cvi7Fh9Y.js";
-import { _ as __, a as apiClient, T as ToastProvider } from "./index-BTTFyBox.js";
+import { j as jsxRuntimeExports, h as Calendar, g as FileText, P as Plane, z as ArrowRight, d as MapPin, U as User, p as ChevronRight, aw as Sparkles, V as Package, i as CreditCard, aZ as LifeBuoy, w as Bell, E as AlertCircle, al as CheckCircle2, y as Clock, x as Users, D as DollarSign, ar as Mail, aE as Phone, r as reactExports, u as useQuery, G as CheckCircle, Y as Eye, aH as Download, Z as PenSquare, X as XCircle, a_ as ShieldCheck, a2 as Heart, ap as AlertTriangle, L as LayoutDashboard, aD as React, a$ as LogOut, aW as QueryClient, aX as client, aY as QueryClientProvider } from "./react-vendor-CH-AgOpU.js";
+import { _ as __, a as apiClient, T as ToastProvider } from "./index-DBFgwDZd.js";
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "N/A");
@@ -66,13 +66,11 @@ const formatPriceForBooking = (price, currency2) => {
   const thousandSeparator = ((_d = window.yatraAdmin) == null ? void 0 : _d.thousandSeparator) || ",";
   const decimalSeparator = ((_e = window.yatraAdmin) == null ? void 0 : _e.decimalSeparator) || ".";
   const currencyToUse = currency2 || globalCurrency;
-  if (!price || price === 0) {
-    return __("Contact for pricing", "Contact for pricing");
-  }
+  const numPrice = Number(price) || 0;
   const formattedAmount = new Intl.NumberFormat(void 0, {
     minimumFractionDigits: decimalPlaces,
     maximumFractionDigits: decimalPlaces
-  }).format(price).replace(/,/g, "TEMP_THOUSAND").replace(/\./g, decimalSeparator).replace(/TEMP_THOUSAND/g, thousandSeparator);
+  }).format(numPrice).replace(/,/g, "TEMP_THOUSAND").replace(/\./g, decimalSeparator).replace(/TEMP_THOUSAND/g, thousandSeparator);
   const currencySymbol = new Intl.NumberFormat(void 0, {
     style: "currency",
     currency: currencyToUse
@@ -231,17 +229,17 @@ const Dashboard = ({
         ]
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-dashboard-stats grid gap-4 sm:grid-cols-2 lg:grid-cols-4 items-stretch", children: enhancedStats.map((stat) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-dashboard-stats grid gap-4 sm:grid-cols-2 lg:grid-cols-4", children: enhancedStats.map((stat) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "div",
       {
-        className: `yatra-stat-card yatra-stat-card-${stat.label.toLowerCase().replace(/\s+/g, "-")} group relative bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col h-full`,
+        className: `yatra-stat-card yatra-stat-card-${stat.label.toLowerCase().replace(/\s+/g, "-")} group relative bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden`,
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 flex-1 flex flex-col", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-4", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `p-3 rounded-lg ${stat.bgColor}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(stat.icon, { className: `w-6 h-6 ${stat.iconColor}` }) }),
               stat.badge && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 font-medium", children: stat.badge })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-1", children: stat.label }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-bold text-gray-900 dark:text-white", children: stat.value })
             ] })
@@ -451,6 +449,209 @@ const Dashboard = ({
     ] })
   ] });
 };
+const COUNTRY_NAMES = {
+  "AF": "Afghanistan",
+  "AL": "Albania",
+  "DZ": "Algeria",
+  "AD": "Andorra",
+  "AO": "Angola",
+  "AG": "Antigua and Barbuda",
+  "AR": "Argentina",
+  "AM": "Armenia",
+  "AU": "Australia",
+  "AT": "Austria",
+  "AZ": "Azerbaijan",
+  "BS": "Bahamas",
+  "BH": "Bahrain",
+  "BD": "Bangladesh",
+  "BB": "Barbados",
+  "BY": "Belarus",
+  "BE": "Belgium",
+  "BZ": "Belize",
+  "BJ": "Benin",
+  "BT": "Bhutan",
+  "BO": "Bolivia",
+  "BA": "Bosnia and Herzegovina",
+  "BW": "Botswana",
+  "BR": "Brazil",
+  "BN": "Brunei",
+  "BG": "Bulgaria",
+  "BF": "Burkina Faso",
+  "BI": "Burundi",
+  "KH": "Cambodia",
+  "CM": "Cameroon",
+  "CA": "Canada",
+  "CV": "Cape Verde",
+  "CF": "Central African Republic",
+  "TD": "Chad",
+  "CL": "Chile",
+  "CN": "China",
+  "CO": "Colombia",
+  "KM": "Comoros",
+  "CG": "Congo",
+  "CD": "DR Congo",
+  "CR": "Costa Rica",
+  "CI": "Ivory Coast",
+  "HR": "Croatia",
+  "CU": "Cuba",
+  "CY": "Cyprus",
+  "CZ": "Czech Republic",
+  "DK": "Denmark",
+  "DJ": "Djibouti",
+  "DM": "Dominica",
+  "DO": "Dominican Republic",
+  "EC": "Ecuador",
+  "EG": "Egypt",
+  "SV": "El Salvador",
+  "GQ": "Equatorial Guinea",
+  "ER": "Eritrea",
+  "EE": "Estonia",
+  "SZ": "Eswatini",
+  "ET": "Ethiopia",
+  "FJ": "Fiji",
+  "FI": "Finland",
+  "FR": "France",
+  "GA": "Gabon",
+  "GM": "Gambia",
+  "GE": "Georgia",
+  "DE": "Germany",
+  "GH": "Ghana",
+  "GR": "Greece",
+  "GD": "Grenada",
+  "GT": "Guatemala",
+  "GN": "Guinea",
+  "GW": "Guinea-Bissau",
+  "GY": "Guyana",
+  "HT": "Haiti",
+  "HN": "Honduras",
+  "HU": "Hungary",
+  "IS": "Iceland",
+  "IN": "India",
+  "ID": "Indonesia",
+  "IR": "Iran",
+  "IQ": "Iraq",
+  "IE": "Ireland",
+  "IL": "Israel",
+  "IT": "Italy",
+  "JM": "Jamaica",
+  "JP": "Japan",
+  "JO": "Jordan",
+  "KZ": "Kazakhstan",
+  "KE": "Kenya",
+  "KI": "Kiribati",
+  "KP": "North Korea",
+  "KR": "South Korea",
+  "KW": "Kuwait",
+  "KG": "Kyrgyzstan",
+  "LA": "Laos",
+  "LV": "Latvia",
+  "LB": "Lebanon",
+  "LS": "Lesotho",
+  "LR": "Liberia",
+  "LY": "Libya",
+  "LI": "Liechtenstein",
+  "LT": "Lithuania",
+  "LU": "Luxembourg",
+  "MG": "Madagascar",
+  "MW": "Malawi",
+  "MY": "Malaysia",
+  "MV": "Maldives",
+  "ML": "Mali",
+  "MT": "Malta",
+  "MH": "Marshall Islands",
+  "MR": "Mauritania",
+  "MU": "Mauritius",
+  "MX": "Mexico",
+  "FM": "Micronesia",
+  "MD": "Moldova",
+  "MC": "Monaco",
+  "MN": "Mongolia",
+  "ME": "Montenegro",
+  "MA": "Morocco",
+  "MZ": "Mozambique",
+  "MM": "Myanmar",
+  "NA": "Namibia",
+  "NR": "Nauru",
+  "NP": "Nepal",
+  "NL": "Netherlands",
+  "NZ": "New Zealand",
+  "NI": "Nicaragua",
+  "NE": "Niger",
+  "NG": "Nigeria",
+  "MK": "North Macedonia",
+  "NO": "Norway",
+  "OM": "Oman",
+  "PK": "Pakistan",
+  "PW": "Palau",
+  "PS": "Palestine",
+  "PA": "Panama",
+  "PG": "Papua New Guinea",
+  "PY": "Paraguay",
+  "PE": "Peru",
+  "PH": "Philippines",
+  "PL": "Poland",
+  "PT": "Portugal",
+  "QA": "Qatar",
+  "RO": "Romania",
+  "RU": "Russia",
+  "RW": "Rwanda",
+  "KN": "Saint Kitts and Nevis",
+  "LC": "Saint Lucia",
+  "VC": "Saint Vincent and the Grenadines",
+  "WS": "Samoa",
+  "SM": "San Marino",
+  "ST": "Sao Tome and Principe",
+  "SA": "Saudi Arabia",
+  "SN": "Senegal",
+  "RS": "Serbia",
+  "SC": "Seychelles",
+  "SL": "Sierra Leone",
+  "SG": "Singapore",
+  "SK": "Slovakia",
+  "SI": "Slovenia",
+  "SB": "Solomon Islands",
+  "SO": "Somalia",
+  "ZA": "South Africa",
+  "SS": "South Sudan",
+  "ES": "Spain",
+  "LK": "Sri Lanka",
+  "SD": "Sudan",
+  "SR": "Suriname",
+  "SE": "Sweden",
+  "CH": "Switzerland",
+  "SY": "Syria",
+  "TW": "Taiwan",
+  "TJ": "Tajikistan",
+  "TZ": "Tanzania",
+  "TH": "Thailand",
+  "TL": "Timor-Leste",
+  "TG": "Togo",
+  "TO": "Tonga",
+  "TT": "Trinidad and Tobago",
+  "TN": "Tunisia",
+  "TR": "Turkey",
+  "TM": "Turkmenistan",
+  "TV": "Tuvalu",
+  "UG": "Uganda",
+  "UA": "Ukraine",
+  "AE": "United Arab Emirates",
+  "GB": "United Kingdom",
+  "US": "United States",
+  "UY": "Uruguay",
+  "UZ": "Uzbekistan",
+  "VU": "Vanuatu",
+  "VA": "Vatican City",
+  "VE": "Venezuela",
+  "VN": "Vietnam",
+  "YE": "Yemen",
+  "ZM": "Zambia",
+  "ZW": "Zimbabwe"
+};
+const getCountryName = (code) => {
+  if (!code) return "";
+  const upperCode = code.toUpperCase();
+  return COUNTRY_NAMES[upperCode] || code;
+};
 const BookingDetails = ({ booking, isLoading, onBack }) => {
   if (isLoading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
@@ -585,7 +786,16 @@ const BookingDetails = ({ booking, isLoading, onBack }) => {
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: booking.travelers_data.map((traveler, index) => {
-            const travelerEntries = Object.entries(traveler).filter(([_, value]) => value && String(value).trim() !== "");
+            const travelerFieldsData = traveler.fields || traveler;
+            const systemFields = ["id", "booking_id", "traveller_index", "is_lead", "created_at", "updated_at", "fields"];
+            const travelerEntries = Object.entries(travelerFieldsData).filter(([key, value]) => {
+              if (systemFields.includes(key)) return false;
+              if (!value || typeof value === "string" && value.trim() === "") return false;
+              if (typeof value === "object" && !Array.isArray(value)) return false;
+              return true;
+            });
+            const firstName = travelerFieldsData.first_name || traveler.first_name || "";
+            const lastName = travelerFieldsData.last_name || traveler.last_name || "";
             return /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "div",
               {
@@ -594,9 +804,9 @@ const BookingDetails = ({ booking, isLoading, onBack }) => {
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
                       index === 0 ? __("Lead Traveler", "Lead Traveler") : `${__("Traveler", "Traveler")} ${index + 1}`,
-                      (traveler.first_name || traveler.last_name) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-normal text-gray-500 dark:text-gray-400 ml-2", children: [
+                      (firstName || lastName) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-normal text-gray-500 dark:text-gray-400 ml-2", children: [
                         "- ",
-                        [traveler.first_name, traveler.last_name].filter(Boolean).join(" ")
+                        [firstName, lastName].filter(Boolean).join(" ")
                       ] })
                     ] }),
                     index === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded", children: __("Primary Contact", "Primary Contact") })
@@ -611,6 +821,9 @@ const BookingDetails = ({ booking, isLoading, onBack }) => {
                       } catch {
                         displayValue = String(fieldValue);
                       }
+                    }
+                    if ((fieldId === "nationality" || fieldId === "country") && fieldValue && typeof fieldValue === "string" && fieldValue.length === 2) {
+                      displayValue = getCountryName(fieldValue);
                     }
                     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mb-0.5", children: label }),
@@ -696,7 +909,7 @@ const Bookings = ({ bookings, onSectionChange }) => {
   const { data: bookingDetails, isLoading: isLoadingBookingDetails } = useQuery({
     queryKey: ["account-booking-details", selectedBookingId],
     queryFn: async () => {
-      var _a;
+      var _a, _b, _c;
       if (!selectedBookingId) return null;
       try {
         const response = await apiClient.get(`/bookings/${selectedBookingId}`);
@@ -705,7 +918,7 @@ const Bookings = ({ bookings, onSectionChange }) => {
           return {
             id: data.id,
             booking_number: data.reference || data.booking_number,
-            customer_name: data.customer_name || `${data.contact_first_name || ""} ${data.contact_last_name || ""}`.trim() || "N/A",
+            customer_name: data.customer_name || (((_a = data.contact) == null ? void 0 : _a.first_name) && ((_b = data.contact) == null ? void 0 : _b.last_name) ? `${data.contact.first_name} ${data.contact.last_name}`.trim() : `${data.contact_first_name || ""} ${data.contact_last_name || ""}`.trim()) || "N/A",
             customer_email: data.customer_email || data.contact_email,
             customer_phone: data.customer_phone || data.contact_phone,
             customer_country: data.contact_country,
@@ -720,7 +933,7 @@ const Bookings = ({ bookings, onSectionChange }) => {
             total_amount: data.total_amount,
             amount_paid: data.amount_paid || 0,
             amount_due: data.amount_due || 0,
-            currency: data.currency || ((_a = window.yatraAdmin) == null ? void 0 : _a.currency) || "USD",
+            currency: data.currency || ((_c = window.yatraAdmin) == null ? void 0 : _c.currency) || "USD",
             payment_status: data.payment_status,
             booking_status: data.status,
             payment_method: data.payment_gateway,

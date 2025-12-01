@@ -12,6 +12,9 @@ use Yatra\Repositories\CustomerRepository;
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\DiscountRepository;
+use Yatra\Services\DepartureService;
+use Yatra\Repositories\DepartureRepository;
+use Yatra\Repositories\BookingDepartureRepository;
 
 /**
  * Booking Session REST API Controller
@@ -45,6 +48,11 @@ class BookingSessionController extends BaseController
     private DiscountRepository $discountRepository;
 
     /**
+     * @var DepartureService
+     */
+    private DepartureService $departureService;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -54,6 +62,12 @@ class BookingSessionController extends BaseController
         $this->tripRepository = new TripRepository();
         $this->bookingRepository = new BookingRepository();
         $this->discountRepository = new DiscountRepository();
+        $this->departureService = new DepartureService(
+            new DepartureRepository(),
+            new \Yatra\Repositories\BookingDepartureRepository(),
+            $this->bookingRepository,
+            $this->tripRepository
+        );
     }
 
     /**
@@ -661,13 +675,95 @@ class BookingSessionController extends BaseController
         }
 
         // ========================================
+        // CREATE WORDPRESS USER ACCOUNT (if requested)
+        // ========================================
+        $user_id = get_current_user_id();
+        $create_account = !empty($data['create_account']) && !empty($data['account_password']);
+        
+        if (!$user_id && $create_account && !empty($data['account_password'])) {
+            $account_password = sanitize_text_field($data['account_password']);
+            $account_password_confirm = sanitize_text_field($data['account_password_confirm'] ?? '');
+            
+            // Validate password
+            if (strlen($account_password) < 8) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => __('Password must be at least 8 characters long.', 'yatra'),
+                ], 400);
+            }
+            
+            if ($account_password !== $account_password_confirm) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => __('Passwords do not match.', 'yatra'),
+                ], 400);
+            }
+            
+            // Check if user already exists
+            if (email_exists($contact_email)) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => __('An account with this email already exists. Please log in.', 'yatra'),
+                ], 400);
+            }
+            
+            // Create WordPress user
+            $username = sanitize_user(current(explode('@', $contact_email)));
+            $original_username = $username;
+            $counter = 1;
+            
+            while (username_exists($username)) {
+                $username = $original_username . $counter;
+                $counter++;
+            }
+            
+            $user_id = wp_create_user($username, $account_password, $contact_email);
+            
+            if (is_wp_error($user_id)) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => wp_strip_all_tags($user_id->get_error_message()),
+                ], 400);
+            }
+            
+            // Assign Yatra Customer role
+            $user = new \WP_User($user_id);
+            $user->set_role('yatra_customer');
+            
+            // Update user meta with contact information
+            wp_update_user([
+                'ID' => $user_id,
+                'first_name' => $contact_data['first_name'],
+                'last_name' => $contact_data['last_name'],
+                'display_name' => $contact_data['first_name'] . ' ' . $contact_data['last_name'],
+            ]);
+            
+            if (!empty($contact_phone)) {
+                update_user_meta($user_id, 'billing_phone', $contact_phone);
+                update_user_meta($user_id, 'phone', $contact_phone);
+            }
+            
+            if (!empty($contact_country)) {
+                update_user_meta($user_id, 'billing_country', $contact_country);
+            }
+            
+            if (!empty($contact_address)) {
+                update_user_meta($user_id, 'billing_address_1', $contact_address);
+            }
+            
+            // Auto-login the user
+            wp_set_current_user($user_id);
+            wp_set_auth_cookie($user_id);
+        }
+        
+        // ========================================
         // CREATE OR UPDATE CUSTOMER
         // ========================================
         // Customers are separate from WordPress users - this is for CRM purposes
         $customer_id = null;
         try {
             $customer_id = $this->customerRepository->findOrCreate([
-                'user_id' => get_current_user_id() ?: null,
+                'user_id' => $user_id ?: null,
                 'first_name' => $contact_data['first_name'],
                 'last_name' => $contact_data['last_name'],
                 'email' => $contact_data['email'],
@@ -696,7 +792,7 @@ class BookingSessionController extends BaseController
                 'reference' => $booking_reference,
                 'trip_id' => $trip_id,
                 'customer_id' => $customer_id,
-                'user_id' => get_current_user_id() ?: null,
+                'user_id' => $user_id ?: null,
                 'contact_first_name' => $contact_data['first_name'],
                 'contact_last_name' => $contact_data['last_name'],
                 'contact_email' => $contact_data['email'],
@@ -749,6 +845,63 @@ class BookingSessionController extends BaseController
                 $is_lead,
                 $traveler_fields
             );
+        }
+
+        // ========================================
+        // HANDLE DEPARTURE CREATION/UPDATE
+        // ========================================
+        // Automatically create or update departure for the booking date
+        if (!empty($travel_date)) {
+            try {
+                // Calculate start_date and end_date
+                $start_date = $travel_date;
+                $duration_days = !empty($trip->duration_days) ? (int) $trip->duration_days : 1;
+                $end_date = date('Y-m-d', strtotime($start_date . ' + ' . ($duration_days - 1) . ' days'));
+
+                // Update booking with start_date and end_date (only if columns exist)
+                // Check if columns exist before trying to update
+                global $wpdb;
+                $bookingTable = $wpdb->prefix . 'yatra_bookings';
+                $bookingColumns = $wpdb->get_col("DESCRIBE {$bookingTable}");
+                
+                $bookingUpdateData = [];
+                if (in_array('start_date', $bookingColumns, true)) {
+                    $bookingUpdateData['start_date'] = $start_date;
+                }
+                if (in_array('end_date', $bookingColumns, true)) {
+                    $bookingUpdateData['end_date'] = $end_date;
+                }
+                
+                if (!empty($bookingUpdateData)) {
+                    $this->bookingRepository->update($booking_id, $bookingUpdateData);
+                }
+
+                // Get trip's default max capacity if available
+                $defaultMaxCapacity = null;
+                if (!empty($trip->max_capacity)) {
+                    $defaultMaxCapacity = (int) $trip->max_capacity;
+                }
+
+                // Find or create departure for this date
+                $departure = $this->departureService->findOrCreateForBooking(
+                    $trip_id,
+                    $start_date,
+                    $end_date,
+                    $travelers_count,
+                    $defaultMaxCapacity
+                );
+
+                // Link booking to departure
+                $this->departureService->linkBookingToDeparture($booking_id, $departure->id);
+
+                // Increment booked count for this departure
+                $this->departureService->incrementBookedCount($departure->id, $travelers_count);
+
+                error_log("Yatra: Created/updated departure ID {$departure->id} for booking {$booking_id} on date {$start_date} (end: {$end_date})");
+            } catch (\Exception $e) {
+                // Log error but don't fail the booking
+                error_log('Yatra: Failed to create/update departure for booking: ' . $e->getMessage());
+            }
         }
 
         // Clear booking session

@@ -9,6 +9,8 @@ use Yatra\Repositories\PaymentRepository;
 use Yatra\Repositories\TravellerRepository;
 use Yatra\Repositories\CustomerRepository;
 use Yatra\Repositories\TripRepository;
+use Yatra\Repositories\DepartureRepository;
+use Yatra\Repositories\BookingDepartureRepository;
 
 /**
  * Booking Service
@@ -28,6 +30,7 @@ class BookingService
     private TravellerRepository $travellerRepository;
     private CustomerRepository $customerRepository;
     private TripRepository $tripRepository;
+    private DepartureService $departureService;
 
     public function __construct()
     {
@@ -36,6 +39,12 @@ class BookingService
         $this->travellerRepository = new TravellerRepository();
         $this->customerRepository = new CustomerRepository();
         $this->tripRepository = new TripRepository();
+        $this->departureService = new DepartureService(
+            new DepartureRepository(),
+            new BookingDepartureRepository(),
+            $this->bookingRepository,
+            $this->tripRepository
+        );
     }
 
     /**
@@ -106,6 +115,15 @@ class BookingService
             return ['success' => false, 'message' => __('Trip is not available for booking.', 'yatra')];
         }
 
+        // Calculate start_date and end_date if travel_date is provided
+        if (!empty($data['travel_date']) && empty($data['start_date'])) {
+            $data['start_date'] = $data['travel_date'];
+        }
+        
+        if (!empty($data['start_date']) && empty($data['end_date'])) {
+            $data['end_date'] = $this->calculateEndDate($data['start_date'], (int) $data['trip_id']);
+        }
+
         // Generate unique reference
         $data['reference'] = $this->bookingRepository->generateReference();
 
@@ -130,6 +148,39 @@ class BookingService
 
         if (!$bookingId) {
             return ['success' => false, 'message' => __('Failed to create booking.', 'yatra')];
+        }
+
+        // Link booking to departure if start_date is provided
+        if (!empty($data['start_date']) && !empty($data['end_date'])) {
+            try {
+                $trip = $this->tripRepository->find((int) $data['trip_id']);
+                // Get max capacity from trip's max_travelers, or use default
+                $maxCapacity = null;
+                if ($trip && !empty($trip->max_travelers)) {
+                    $maxCapacity = (int) $trip->max_travelers;
+                }
+                $travelersCount = (int) ($data['travelers_count'] ?? 0);
+
+                // Find or create departure
+                $departure = $this->departureService->findOrCreateForBooking(
+                    (int) $data['trip_id'],
+                    $data['start_date'],
+                    $data['end_date'],
+                    $travelersCount,
+                    $maxCapacity
+                );
+
+                // Link booking to departure
+                $this->departureService->linkBookingToDeparture($bookingId, $departure->id);
+
+                // Increment booked count
+                $this->departureService->incrementBookedCount($departure->id, $travelersCount);
+
+                error_log("Yatra: Linked booking {$bookingId} to departure {$departure->id}");
+            } catch (\Exception $e) {
+                // Log error but don't fail the booking
+                error_log('Yatra: Failed to link booking to departure: ' . $e->getMessage());
+            }
         }
 
         // Save travelers
@@ -163,11 +214,43 @@ class BookingService
             return ['success' => false, 'message' => __('Booking not found.', 'yatra')];
         }
 
+        // Check if date is being changed
+        $oldStartDate = $booking->start_date ?? $booking->travel_date ?? null;
+        $newStartDate = $data['start_date'] ?? $data['travel_date'] ?? null;
+        $dateChanged = false;
+
+        if ($newStartDate && $oldStartDate && $newStartDate !== $oldStartDate) {
+            $dateChanged = true;
+        }
+
+        // Calculate end_date if start_date is provided
+        if (!empty($data['start_date']) && empty($data['end_date'])) {
+            $data['end_date'] = $this->calculateEndDate($data['start_date'], (int) $booking->trip_id);
+        } elseif (!empty($data['travel_date']) && empty($data['start_date']) && empty($data['end_date'])) {
+            $data['start_date'] = $data['travel_date'];
+            $data['end_date'] = $this->calculateEndDate($data['travel_date'], (int) $booking->trip_id);
+        }
+
         // Update booking
         $updated = $this->bookingRepository->update($id, $data);
 
         if (!$updated) {
             return ['success' => false, 'message' => __('Failed to update booking.', 'yatra')];
+        }
+
+        // Handle departure date change if date was changed
+        if ($dateChanged && !empty($data['start_date']) && !empty($data['end_date'])) {
+            try {
+                $this->departureService->handleBookingDateChange(
+                    $id,
+                    $data['start_date'],
+                    $data['end_date']
+                );
+                error_log("Yatra: Handled date change for booking {$id}");
+            } catch (\Exception $e) {
+                // Log error but don't fail the update
+                error_log('Yatra: Failed to handle booking date change: ' . $e->getMessage());
+            }
         }
 
         // Update travelers if provided
@@ -182,6 +265,18 @@ class BookingService
             'success' => true,
             'message' => __('Booking updated successfully.', 'yatra'),
         ];
+    }
+
+    /**
+     * Calculate end date from start date and trip duration
+     * 
+     * @param string $startDate Start date (YYYY-MM-DD)
+     * @param int $tripId Trip ID
+     * @return string End date (YYYY-MM-DD)
+     */
+    private function calculateEndDate(string $startDate, int $tripId): string
+    {
+        return $this->bookingRepository->calculateEndDate($startDate, $tripId);
     }
 
     /**
@@ -205,14 +300,65 @@ class BookingService
             return ['success' => false, 'message' => __('Booking not found.', 'yatra')];
         }
 
+        $oldStatus = $booking->status;
         $updated = $this->bookingRepository->updateStatus($id, $status);
 
         if (!$updated) {
             return ['success' => false, 'message' => __('Failed to update status.', 'yatra')];
         }
 
+        // ========================================
+        // HANDLE DEPARTURE BOOKED_COUNT UPDATE
+        // ========================================
+        // If booking is cancelled or refunded, unlink from departure and decrement booked_count
+        // If booking status changes from cancelled/refunded to active, link and increment booked_count
+        try {
+            $departure = $this->departureService->getDepartureForBooking($id);
+            $travelersCount = (int) ($booking->travelers_count ?? 0);
+
+            if ($departure) {
+                // If booking is being cancelled or refunded
+                if (in_array($status, ['cancelled', 'refunded'], true) && 
+                    !in_array($oldStatus, ['cancelled', 'refunded'], true)) {
+                    // Unlink booking from departure (this will handle cancellation if no bookings remain)
+                    $this->departureService->unlinkBookingFromDeparture($id, $departure->id);
+                    error_log("Yatra: Unlinked booking {$id} from departure {$departure->id} (cancelled/refunded)");
+                }
+                // If booking status changes from cancelled/refunded back to active
+                elseif (in_array($oldStatus, ['cancelled', 'refunded'], true) && 
+                        !in_array($status, ['cancelled', 'refunded'], true)) {
+                    // Ensure booking is linked and increment booked count
+                    $this->departureService->linkBookingToDeparture($id, $departure->id);
+                    $this->departureService->incrementBookedCount($departure->id, $travelersCount);
+                    error_log("Yatra: Reactivated booking {$id} on departure {$departure->id}");
+                }
+            } elseif (!empty($booking->start_date) || !empty($booking->travel_date)) {
+                // Booking doesn't have a departure yet, but has a date - create and link
+                $startDate = $booking->start_date ?? $booking->travel_date;
+                $endDate = $booking->end_date ?? $this->calculateEndDate($startDate, (int) $booking->trip_id);
+                
+                $trip = $this->tripRepository->find((int) $booking->trip_id);
+                $maxCapacity = $trip ? ($trip->max_capacity ?? 9999) : 9999;
+                
+                $departure = $this->departureService->findOrCreateForBooking(
+                    (int) $booking->trip_id,
+                    $startDate,
+                    $endDate,
+                    $travelersCount,
+                    $maxCapacity
+                );
+                
+                $this->departureService->linkBookingToDeparture($id, $departure->id);
+                $this->departureService->incrementBookedCount($departure->id, $travelersCount);
+                error_log("Yatra: Created and linked departure {$departure->id} for reactivated booking {$id}");
+            }
+        } catch (\Exception $e) {
+            // Log error but don't fail the status update
+            error_log('Yatra: Failed to update departure for booking status change: ' . $e->getMessage());
+        }
+
         // Send status change notification
-        $this->sendStatusChangeNotification($id, $booking->status, $status);
+        $this->sendStatusChangeNotification($id, $oldStatus, $status);
 
         return [
             'success' => true,
@@ -290,6 +436,11 @@ class BookingService
      */
     private function formatBooking(object $booking): array
     {
+        // Build customer name from contact fields
+        $customerName = trim(
+            ($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? '')
+        ) ?: null;
+
         return [
             'id' => (int) $booking->id,
             'reference' => $booking->reference,
@@ -298,6 +449,9 @@ class BookingService
             'trip_slug' => $booking->trip_slug ?? '',
             'customer_id' => $booking->customer_id ? (int) $booking->customer_id : null,
             'user_id' => $booking->user_id ? (int) $booking->user_id : null,
+            'customer_name' => $customerName,
+            'customer_email' => $booking->contact_email ?? null,
+            'customer_phone' => $booking->contact_phone ?? null,
             'contact' => [
                 'first_name' => $booking->contact_first_name,
                 'last_name' => $booking->contact_last_name,
@@ -305,6 +459,11 @@ class BookingService
                 'phone' => $booking->contact_phone,
                 'country' => $booking->contact_country,
             ],
+            'contact_first_name' => $booking->contact_first_name ?? null,
+            'contact_last_name' => $booking->contact_last_name ?? null,
+            'contact_email' => $booking->contact_email ?? null,
+            'contact_phone' => $booking->contact_phone ?? null,
+            'contact_country' => $booking->contact_country ?? null,
             'travel_date' => $booking->travel_date,
             'travelers_count' => (int) $booking->travelers_count,
             'total_amount' => (float) $booking->total_amount,
@@ -328,6 +487,20 @@ class BookingService
     private function formatBookingWithDetails(object $booking): array
     {
         $formatted = $this->formatBooking($booking);
+
+        // Add customer name for easier access
+        $formatted['customer_name'] = trim(
+            ($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? '')
+        ) ?: null;
+        $formatted['customer_email'] = $booking->contact_email ?? null;
+        $formatted['customer_phone'] = $booking->contact_phone ?? null;
+        
+        // Also add contact fields at root level for backward compatibility
+        $formatted['contact_first_name'] = $booking->contact_first_name ?? null;
+        $formatted['contact_last_name'] = $booking->contact_last_name ?? null;
+        $formatted['contact_email'] = $booking->contact_email ?? null;
+        $formatted['contact_phone'] = $booking->contact_phone ?? null;
+        $formatted['contact_country'] = $booking->contact_country ?? null;
 
         // Add full contact data
         $formatted['contact_data'] = $booking->contact_data ? json_decode($booking->contact_data, true) : null;

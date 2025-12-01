@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, B as BadgePercent, h as CreditCard, i as Calendar$1, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Check, ar as Mail, as as Lightbulb, at as Database, au as History, av as Save, aw as Sparkles, ax as ChevronLeft, ay as Box, az as ChevronUp, aA as Upload, aB as ArrowLeft, aC as Pen, aD as React, aE as Phone, aF as Award, aG as Globe, aH as Download, aI as TrendingDown, aJ as PieChart, aK as ClipboardList, aL as Receipt, aM as Plug, aN as Shield, aO as Lock, aP as EyeOff, aQ as MoreVertical, aR as Ban, aS as Send, aT as Crown, aU as reactDomExports, aV as Filter, aW as QueryClient, aX as client, aY as QueryClientProvider } from "./react-vendor-Cvi7Fh9Y.js";
-import { u as useToast, _ as __, a as apiClient, T as ToastProvider } from "./index-BTTFyBox.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Check, ar as Mail, as as Lightbulb, at as Database, au as History, av as Save, aw as Sparkles, ax as ChevronLeft, ay as Box, az as ChevronUp, aA as Upload, aB as ArrowLeft, aC as Pen, aD as React, aE as Phone, aF as Award, aG as Globe, aH as Download, aI as TrendingDown, aJ as PieChart, aK as ClipboardList, aL as Receipt, aM as Plug, aN as Shield, aO as Lock, aP as EyeOff, aQ as MoreVertical, aR as Ban, aS as Send, aT as Crown, aU as reactDomExports, aV as Filter, aW as QueryClient, aX as client, aY as QueryClientProvider } from "./react-vendor-CH-AgOpU.js";
+import { u as useToast, _ as __, a as apiClient, T as ToastProvider } from "./index-DBFgwDZd.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -400,6 +400,7 @@ const Layout = ({ children }) => {
         { tab: "itinerary", label: "Itinerary", icon: FileText }
       ]
     },
+    { subpage: "departures", label: "Departures", icon: Calendar$1 },
     { subpage: "discounts", label: "Discount", icon: BadgePercent },
     { subpage: "payments", label: "Payments", icon: CreditCard },
     { subpage: "bookings", label: "Bookings", icon: Calendar$1 },
@@ -882,7 +883,7 @@ const UpcomingDepartures = ({
   loading = false,
   onView
 }) => {
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -927,7 +928,7 @@ const UpcomingDepartures = ({
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-4 h-4" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatDate(departure.departure_date) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatDate2(departure.departure_date) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-4 h-4" }),
@@ -967,13 +968,13 @@ const PendingPayments = ({
   onView,
   onCollect
 }) => {
-  const formatCurrency = (amount) => {
+  const formatCurrency2 = (amount) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD"
     }).format(amount);
   };
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString();
   };
   const totalPending = (payments == null ? void 0 : payments.reduce((sum, p) => sum + p.amount, 0)) || 0;
@@ -986,7 +987,7 @@ const PendingPayments = ({
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Pending Payments", "Pending Payments") }),
-      totalPending > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "warning", className: "text-sm", children: formatCurrency(totalPending) })
+      totalPending > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "warning", className: "text-sm", children: formatCurrency2(totalPending) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: payments && payments.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: payments.slice(0, 2).map((payment) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "div",
@@ -1012,12 +1013,12 @@ const PendingPayments = ({
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
                   __("Due", "Due"),
                   ": ",
-                  formatDate(payment.due_date)
+                  formatDate2(payment.due_date)
                 ] })
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-gray-900 dark:text-white", children: formatCurrency(payment.amount) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-semibold text-gray-900 dark:text-white", children: formatCurrency2(payment.amount) }),
               payment.payment_method && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: payment.payment_method })
             ] })
           ] }),
@@ -1056,14 +1057,14 @@ const RecentBookings = ({
   loading = false,
   onView
 }) => {
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric"
     });
   };
-  const formatCurrency = (amount) => {
+  const formatCurrency2 = (amount) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD"
@@ -1109,13 +1110,13 @@ const RecentBookings = ({
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatDate(booking.booking_date) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatDate2(booking.booking_date) })
               ] })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 ml-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: formatCurrency(booking.total_amount) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: formatCurrency2(booking.total_amount) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: booking.booking_id })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { className: "w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" })
@@ -1788,7 +1789,7 @@ const Trips = () => {
       setIsSlugManuallyEdited(true);
     }
   };
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -2173,7 +2174,7 @@ const Trips = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(trip.status) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getTripTypeBadge(trip.trip_type) }),
             isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: trip.bookings_count || 0 }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(trip.created_at) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(trip.created_at) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                 Button,
@@ -8561,7 +8562,7 @@ const Activities = () => {
   const activities = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
       const date = new Date(dateString);
@@ -8880,11 +8881,11 @@ const Activities = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(activity.status) }),
           isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: activity.trips_count || 0 }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate(activity.created_at) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(activity.created_at) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
               __("Updated", "Updated"),
               ": ",
-              formatDate(activity.updated_at)
+              formatDate2(activity.updated_at)
             ] })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -9781,7 +9782,7 @@ const Destinations = () => {
   const destinations = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
       const date = new Date(dateString);
@@ -10103,11 +10104,11 @@ const Destinations = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(destination.status) }),
           isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: destination.trips_count || 0 }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate(destination.created_at) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(destination.created_at) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
               __("Updated", "Updated"),
               ": ",
-              formatDate(destination.updated_at)
+              formatDate2(destination.updated_at)
             ] })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -10588,7 +10589,7 @@ const Categories = () => {
     }
     return normalized;
   }, [categories, parentFilter]);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
       const date = new Date(dateString);
@@ -10715,7 +10716,7 @@ const Categories = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-xs text-gray-600 dark:text-gray-400", children: category.slug }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-xs truncate text-sm text-gray-600 dark:text-gray-400", children: category.description || "—" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(category.status) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-gray-600 dark:text-gray-400", children: formatDate(category.created_at) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-gray-600 dark:text-gray-400", children: formatDate2(category.created_at) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-end gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_edit_trips", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Button,
@@ -11273,7 +11274,7 @@ const DifficultyLevels = () => {
   const levels = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 20);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
       const date = new Date(dateString);
@@ -11466,7 +11467,7 @@ const DifficultyLevels = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-xs text-gray-600 dark:text-gray-400", children: level.slug }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-xs truncate text-sm text-gray-600 dark:text-gray-400", children: level.description || "—" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(level.status) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-gray-600 dark:text-gray-400", children: formatDate(level.created_at) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-gray-600 dark:text-gray-400", children: formatDate2(level.created_at) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-end gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_edit_trips", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "ghost", size: "sm", onClick: () => handleEdit(level), className: "h-9 w-9 p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -11903,7 +11904,7 @@ const Bookings = () => {
   const bookings = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -12234,8 +12235,8 @@ const Bookings = () => {
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-900 dark:text-white", children: booking.trip_title }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: booking.travelers }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(booking.booking_date) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(booking.travel_date) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(booking.booking_date) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(booking.travel_date) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(booking.total_amount) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getPaymentStatusBadge(booking.payment_status) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getBookingStatusBadge(booking.booking_status) }),
@@ -13384,7 +13385,7 @@ const ViewBooking = () => {
   const { data: booking, isLoading, error } = useQuery({
     queryKey: ["booking", bookingId],
     queryFn: async () => {
-      var _a2, _b2;
+      var _a2, _b2, _c, _d;
       if (!bookingId) return null;
       const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/bookings/${bookingId}`, {
         headers: {
@@ -13400,7 +13401,7 @@ const ViewBooking = () => {
         return {
           id: data.id,
           booking_number: data.reference,
-          customer_name: data.customer_name || `${data.contact_first_name || ""} ${data.contact_last_name || ""}`.trim() || "N/A",
+          customer_name: data.customer_name || (((_c = data.contact) == null ? void 0 : _c.first_name) && ((_d = data.contact) == null ? void 0 : _d.last_name) ? `${data.contact.first_name} ${data.contact.last_name}`.trim() : `${data.contact_first_name || ""} ${data.contact_last_name || ""}`.trim()) || "N/A",
           customer_email: data.customer_email,
           customer_phone: data.customer_phone,
           customer_country: data.contact_country,
@@ -13438,7 +13439,7 @@ const ViewBooking = () => {
     },
     enabled: !!bookingId && can("yatra_view_bookings")
   });
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -13446,11 +13447,215 @@ const ViewBooking = () => {
       day: "numeric"
     });
   };
-  const formatPrice = (price) => {
+  const formatPrice = (price, currency = "USD") => {
+    const numPrice = Number(price) || 0;
     return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD"
-    }).format(price);
+      currency: currency || "USD"
+    }).format(numPrice);
+  };
+  const COUNTRY_NAMES2 = {
+    "AF": "Afghanistan",
+    "AL": "Albania",
+    "DZ": "Algeria",
+    "AD": "Andorra",
+    "AO": "Angola",
+    "AG": "Antigua and Barbuda",
+    "AR": "Argentina",
+    "AM": "Armenia",
+    "AU": "Australia",
+    "AT": "Austria",
+    "AZ": "Azerbaijan",
+    "BS": "Bahamas",
+    "BH": "Bahrain",
+    "BD": "Bangladesh",
+    "BB": "Barbados",
+    "BY": "Belarus",
+    "BE": "Belgium",
+    "BZ": "Belize",
+    "BJ": "Benin",
+    "BT": "Bhutan",
+    "BO": "Bolivia",
+    "BA": "Bosnia and Herzegovina",
+    "BW": "Botswana",
+    "BR": "Brazil",
+    "BN": "Brunei",
+    "BG": "Bulgaria",
+    "BF": "Burkina Faso",
+    "BI": "Burundi",
+    "KH": "Cambodia",
+    "CM": "Cameroon",
+    "CA": "Canada",
+    "CV": "Cape Verde",
+    "CF": "Central African Republic",
+    "TD": "Chad",
+    "CL": "Chile",
+    "CN": "China",
+    "CO": "Colombia",
+    "KM": "Comoros",
+    "CG": "Congo",
+    "CD": "DR Congo",
+    "CR": "Costa Rica",
+    "CI": "Ivory Coast",
+    "HR": "Croatia",
+    "CU": "Cuba",
+    "CY": "Cyprus",
+    "CZ": "Czech Republic",
+    "DK": "Denmark",
+    "DJ": "Djibouti",
+    "DM": "Dominica",
+    "DO": "Dominican Republic",
+    "EC": "Ecuador",
+    "EG": "Egypt",
+    "SV": "El Salvador",
+    "GQ": "Equatorial Guinea",
+    "ER": "Eritrea",
+    "EE": "Estonia",
+    "SZ": "Eswatini",
+    "ET": "Ethiopia",
+    "FJ": "Fiji",
+    "FI": "Finland",
+    "FR": "France",
+    "GA": "Gabon",
+    "GM": "Gambia",
+    "GE": "Georgia",
+    "DE": "Germany",
+    "GH": "Ghana",
+    "GR": "Greece",
+    "GD": "Grenada",
+    "GT": "Guatemala",
+    "GN": "Guinea",
+    "GW": "Guinea-Bissau",
+    "GY": "Guyana",
+    "HT": "Haiti",
+    "HN": "Honduras",
+    "HU": "Hungary",
+    "IS": "Iceland",
+    "IN": "India",
+    "ID": "Indonesia",
+    "IR": "Iran",
+    "IQ": "Iraq",
+    "IE": "Ireland",
+    "IL": "Israel",
+    "IT": "Italy",
+    "JM": "Jamaica",
+    "JP": "Japan",
+    "JO": "Jordan",
+    "KZ": "Kazakhstan",
+    "KE": "Kenya",
+    "KI": "Kiribati",
+    "KP": "North Korea",
+    "KR": "South Korea",
+    "KW": "Kuwait",
+    "KG": "Kyrgyzstan",
+    "LA": "Laos",
+    "LV": "Latvia",
+    "LB": "Lebanon",
+    "LS": "Lesotho",
+    "LR": "Liberia",
+    "LY": "Libya",
+    "LI": "Liechtenstein",
+    "LT": "Lithuania",
+    "LU": "Luxembourg",
+    "MG": "Madagascar",
+    "MW": "Malawi",
+    "MY": "Malaysia",
+    "MV": "Maldives",
+    "ML": "Mali",
+    "MT": "Malta",
+    "MH": "Marshall Islands",
+    "MR": "Mauritania",
+    "MU": "Mauritius",
+    "MX": "Mexico",
+    "FM": "Micronesia",
+    "MD": "Moldova",
+    "MC": "Monaco",
+    "MN": "Mongolia",
+    "ME": "Montenegro",
+    "MA": "Morocco",
+    "MZ": "Mozambique",
+    "MM": "Myanmar",
+    "NA": "Namibia",
+    "NR": "Nauru",
+    "NP": "Nepal",
+    "NL": "Netherlands",
+    "NZ": "New Zealand",
+    "NI": "Nicaragua",
+    "NE": "Niger",
+    "NG": "Nigeria",
+    "MK": "North Macedonia",
+    "NO": "Norway",
+    "OM": "Oman",
+    "PK": "Pakistan",
+    "PW": "Palau",
+    "PS": "Palestine",
+    "PA": "Panama",
+    "PG": "Papua New Guinea",
+    "PY": "Paraguay",
+    "PE": "Peru",
+    "PH": "Philippines",
+    "PL": "Poland",
+    "PT": "Portugal",
+    "QA": "Qatar",
+    "RO": "Romania",
+    "RU": "Russia",
+    "RW": "Rwanda",
+    "KN": "Saint Kitts and Nevis",
+    "LC": "Saint Lucia",
+    "VC": "Saint Vincent and the Grenadines",
+    "WS": "Samoa",
+    "SM": "San Marino",
+    "ST": "Sao Tome and Principe",
+    "SA": "Saudi Arabia",
+    "SN": "Senegal",
+    "RS": "Serbia",
+    "SC": "Seychelles",
+    "SL": "Sierra Leone",
+    "SG": "Singapore",
+    "SK": "Slovakia",
+    "SI": "Slovenia",
+    "SB": "Solomon Islands",
+    "SO": "Somalia",
+    "ZA": "South Africa",
+    "SS": "South Sudan",
+    "ES": "Spain",
+    "LK": "Sri Lanka",
+    "SD": "Sudan",
+    "SR": "Suriname",
+    "SE": "Sweden",
+    "CH": "Switzerland",
+    "SY": "Syria",
+    "TW": "Taiwan",
+    "TJ": "Tajikistan",
+    "TZ": "Tanzania",
+    "TH": "Thailand",
+    "TL": "Timor-Leste",
+    "TG": "Togo",
+    "TO": "Tonga",
+    "TT": "Trinidad and Tobago",
+    "TN": "Tunisia",
+    "TR": "Turkey",
+    "TM": "Turkmenistan",
+    "TV": "Tuvalu",
+    "UG": "Uganda",
+    "UA": "Ukraine",
+    "AE": "United Arab Emirates",
+    "GB": "United Kingdom",
+    "US": "United States",
+    "UY": "Uruguay",
+    "UZ": "Uzbekistan",
+    "VU": "Vanuatu",
+    "VA": "Vatican City",
+    "VE": "Venezuela",
+    "VN": "Vietnam",
+    "YE": "Yemen",
+    "ZM": "Zambia",
+    "ZW": "Zimbabwe"
+  };
+  const getCountryName2 = (code) => {
+    if (!code) return "";
+    const upperCode = code.toUpperCase();
+    return COUNTRY_NAMES2[upperCode] || code;
   };
   const getBookingStatusBadge = (status) => {
     const statusMap = {
@@ -13669,14 +13874,14 @@ const ViewBooking = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3" }),
                 __("Booking Date", "Booking Date")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(booking.booking_date) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate2(booking.booking_date) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3" }),
                 __("Travel Date", "Travel Date")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(booking.travel_date) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate2(booking.travel_date) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
@@ -13694,7 +13899,7 @@ const ViewBooking = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(DollarSign, { className: "w-3 h-3" }),
                 __("Total Amount", "Total Amount")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: formatPrice(booking.total_amount) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: formatPrice(booking.total_amount || 0, booking.currency) })
             ] })
           ] }) })
         ] }),
@@ -13727,7 +13932,16 @@ const ViewBooking = () => {
             ] })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-4", children: booking.travelers_data.map((traveler, index) => {
-            const travelerEntries = Object.entries(traveler).filter(([_, value]) => value && String(value).trim() !== "");
+            const travelerFieldsData = traveler.fields || traveler;
+            const systemFields = ["id", "booking_id", "traveller_index", "is_lead", "created_at", "updated_at", "fields"];
+            const travelerEntries = Object.entries(travelerFieldsData).filter(([key, value]) => {
+              if (systemFields.includes(key)) return false;
+              if (!value || typeof value === "string" && value.trim() === "") return false;
+              if (typeof value === "object" && !Array.isArray(value)) return false;
+              return true;
+            });
+            const firstName = travelerFieldsData.first_name || traveler.first_name || "";
+            const lastName = travelerFieldsData.last_name || traveler.last_name || "";
             return /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "div",
               {
@@ -13736,9 +13950,9 @@ const ViewBooking = () => {
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
                       index === 0 ? __("Lead Traveler", "Lead Traveler") : `${__("Traveler", "Traveler")} ${index + 1}`,
-                      (traveler.first_name || traveler.last_name) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-normal text-gray-500 dark:text-gray-400 ml-2", children: [
+                      (firstName || lastName) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-normal text-gray-500 dark:text-gray-400 ml-2", children: [
                         "- ",
-                        [traveler.first_name, traveler.last_name].filter(Boolean).join(" ")
+                        [firstName, lastName].filter(Boolean).join(" ")
                       ] })
                     ] }),
                     index === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded", children: __("Primary Contact", "Primary Contact") })
@@ -13755,6 +13969,9 @@ const ViewBooking = () => {
                       } catch {
                         displayValue = String(fieldValue);
                       }
+                    }
+                    if ((fieldId === "nationality" || fieldId === "country") && fieldValue && typeof fieldValue === "string" && fieldValue.length === 2) {
+                      displayValue = getCountryName2(fieldValue);
                     }
                     return /* @__PURE__ */ jsxRuntimeExports.jsxs(
                       "div",
@@ -13817,7 +14034,7 @@ const ViewBooking = () => {
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Total Amount", "Total Amount") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: formatPrice(booking.total_amount) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: formatPrice(booking.total_amount || 0, booking.currency) })
             ] })
           ] })
         ] }),
@@ -13826,11 +14043,11 @@ const ViewBooking = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Created", "Created") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(booking.created_at) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate2(booking.created_at) })
             ] }),
             booking.updated_at && booking.updated_at !== booking.created_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Last Updated", "Last Updated") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(booking.updated_at) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate2(booking.updated_at) })
             ] })
           ] })
         ] })
@@ -13904,7 +14121,7 @@ const Customers = () => {
   const customers = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = (data == null ? void 0 : data.pages) || Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
@@ -14240,7 +14457,7 @@ const Customers = () => {
           isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(customer.total_spent) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getLoyaltyBadge(customer.loyalty_tier || "bronze") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(customer.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(customer.created_at) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(customer.created_at) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
@@ -15042,7 +15259,7 @@ const ViewCustomer = () => {
     },
     enabled: !!customerId && can("yatra_view_bookings")
   });
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
@@ -15480,7 +15697,7 @@ const ViewCustomer = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3" }),
                 __("Registered", "Registered")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(customer.created_at) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate2(customer.created_at) })
             ] }),
             customer.last_booking_date && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Last Booking", "Last Booking") }),
@@ -15578,7 +15795,7 @@ const Reviews = () => {
   const reviews = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -15891,7 +16108,7 @@ const Reviews = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 line-clamp-2", children: review.comment })
             ] }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(review.status) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(review.created_at) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(review.created_at) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                 Button,
@@ -16400,7 +16617,7 @@ const ViewReview = () => {
     },
     enabled: !!reviewId && can("yatra_view_reviews")
   });
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -16646,11 +16863,11 @@ const ViewReview = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3" }),
                 __("Created", "Created")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(review.created_at) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate2(review.created_at) })
             ] }),
             review.updated_at && review.updated_at !== review.created_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Last Updated", "Last Updated") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate(review.updated_at) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: formatDate2(review.updated_at) })
             ] })
           ] })
         ] })
@@ -21115,7 +21332,7 @@ const ItemTypes = () => {
   const itemTypes = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
       const date = new Date(dateString);
@@ -21451,11 +21668,11 @@ const ItemTypes = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(itemType.status) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "font-medium", children: itemType.items_count ?? 0 }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate(itemType.created_at) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(itemType.created_at) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
               __("Updated", "Updated"),
               ": ",
-              formatDate(itemType.updated_at)
+              formatDate2(itemType.updated_at)
             ] })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -21950,7 +22167,7 @@ const Items = () => {
     }
   }, [data]);
   const types = availableTypes;
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
       const date = new Date(dateString);
@@ -22281,11 +22498,11 @@ const Items = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(item.status) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "font-medium", children: item.usage_count ?? 0 }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate(item.created_at) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(item.created_at) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
               __("Updated", "Updated"),
               ": ",
-              formatDate(item.updated_at)
+              formatDate2(item.updated_at)
             ] })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -25630,7 +25847,7 @@ const Discounts = () => {
   const discounts = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
       const date = new Date(dateString);
@@ -25983,7 +26200,7 @@ const Discounts = () => {
             " / ",
             discount.usage_limit === 0 ? "∞" : discount.usage_limit
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: discount.expiry_date ? formatDate(discount.expiry_date) : __("No expiry", "No expiry") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: discount.expiry_date ? formatDate2(discount.expiry_date) : __("No expiry", "No expiry") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(discount.status) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_edit_bookings", children: [
@@ -30696,7 +30913,7 @@ const Payments = () => {
   const payments = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -30994,7 +31211,7 @@ const Payments = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-semibold text-gray-900 dark:text-white", children: formatPrice(payment.amount) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: payment.payment_method }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(payment.payment_status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(payment.payment_date) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(payment.payment_date) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
@@ -31541,7 +31758,7 @@ const ViewPayment = () => {
     },
     enabled: !!paymentId && can("yatra_view_bookings")
   });
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -31701,7 +31918,7 @@ const ViewPayment = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Payment Date", "Payment Date") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex items-center gap-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-4 h-4 text-gray-400" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formatDate(payment.payment_date) })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formatDate2(payment.payment_date) })
                 ] })
               ] }),
               payment.transaction_id && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -31764,11 +31981,11 @@ const ViewPayment = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Created", "Created") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-gray-900 dark:text-white", children: formatDate(payment.created_at) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-gray-900 dark:text-white", children: formatDate2(payment.created_at) })
             ] }),
             payment.updated_at && payment.updated_at !== payment.created_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Last Updated", "Last Updated") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-gray-900 dark:text-white", children: formatDate(payment.updated_at) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-gray-900 dark:text-white", children: formatDate2(payment.updated_at) })
             ] })
           ] })
         ] })
@@ -31833,7 +32050,7 @@ const TravelerCategories = () => {
   const categories = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
       const date = new Date(dateString);
@@ -32162,11 +32379,11 @@ const TravelerCategories = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: formatAgeRange(category.age_min, category.age_max) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(category.status) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate(category.created_at) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(category.created_at) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
               __("Updated", "Updated"),
               ": ",
-              formatDate(category.updated_at)
+              formatDate2(category.updated_at)
             ] })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -33455,7 +33672,7 @@ const Availability = () => {
       showToast((error == null ? void 0 : error.message) || __("Failed to delete availability date", "Failed to delete availability date"), "error");
     }
   });
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
@@ -33733,7 +33950,7 @@ const Availability = () => {
                     onClick: () => navigate({ subpage: "trips", tab: "availability", action: "edit", id: alert2.id }),
                     className: "text-xs border-yellow-300 text-yellow-800 hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-300",
                     children: [
-                      formatDate(alert2.departure_date),
+                      formatDate2(alert2.departure_date),
                       alert2.departure_time && ` ${formatTime(alert2.departure_time)}`,
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-1 font-semibold", children: [
                         "(",
@@ -33795,7 +34012,7 @@ const Availability = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { className: "w-4 h-4 text-blue-600 dark:text-blue-400" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: [
-                  formatDate(entry.departure_date),
+                  formatDate2(entry.departure_date),
                   entry.departure_time && ` ${formatTime(entry.departure_time)}`
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
@@ -33825,7 +34042,7 @@ const Availability = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsx(Ban, { className: "w-4 h-4 text-red-600 dark:text-red-400" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: [
-                  formatDate(entry.departure_date),
+                  formatDate2(entry.departure_date),
                   entry.departure_time && ` ${formatTime(entry.departure_time)}`
                 ] }),
                 entry.block_reason && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
@@ -34007,17 +34224,17 @@ const Availability = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { className: "w-4 h-4 text-gray-400" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium", children: formatDate(date.departure_date) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium", children: formatDate2(date.departure_date) }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: date.departure_time ? formatTime(date.departure_time) : "" })
                 ] })
               ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { className: "w-4 h-4 text-gray-400" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium", children: formatDate(date.departure_date) })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium", children: formatDate2(date.departure_date) })
               ] }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium", children: formatDate(date.arrival_date) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium", children: formatDate2(date.arrival_date) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: date.arrival_time ? formatTime(date.arrival_time) : "" })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: formatDate(date.arrival_date) }) }),
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: formatDate2(date.arrival_date) }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3 h-3" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: date.from_location || (selectedTrip == null ? void 0 : selectedTrip.starting_location) }),
@@ -36762,6 +36979,651 @@ const RecurringRuleForm = () => {
     ] }) })
   ] });
 };
+const formatDate = (dateString) => {
+  if (!dateString) return "--";
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  } catch {
+    return dateString;
+  }
+};
+const formatCurrency = (value) => {
+  var _a;
+  if (value === void 0 || value === null) {
+    return "--";
+  }
+  const currency = ((_a = window.yatraAdmin) == null ? void 0 : _a.currency) || "USD";
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency
+    }).format(value);
+  } catch {
+    return `${currency} ${value.toFixed(2)}`;
+  }
+};
+const Departures = () => {
+  var _a, _b;
+  const [selectedTripId, setSelectedTripId] = reactExports.useState(null);
+  const [statusFilter, setStatusFilter] = reactExports.useState("all");
+  const [sourceFilter, setSourceFilter] = reactExports.useState("all");
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const [dateFrom, setDateFrom] = reactExports.useState("");
+  const [dateTo, setDateTo] = reactExports.useState("");
+  const [page, setPage] = reactExports.useState(1);
+  const [travelerModalDeparture, setTravelerModalDeparture] = reactExports.useState(null);
+  const queryClient2 = useQueryClient();
+  const { showToast } = useToast();
+  const { data: tripsData } = useQuery({
+    queryKey: ["trips", "all"],
+    queryFn: async () => {
+      const response = await apiClient.get("/trips", { params: { per_page: 1e3 } });
+      return (response == null ? void 0 : response.data) || [];
+    }
+  });
+  const queryParams = reactExports.useMemo(() => {
+    const params = {
+      page,
+      per_page: 20
+    };
+    if (statusFilter !== "all") {
+      params.status = statusFilter;
+    }
+    if (sourceFilter !== "all") {
+      params.source = sourceFilter;
+    }
+    if (searchTerm) {
+      params.search = searchTerm;
+    }
+    if (dateFrom) {
+      params.date_from = dateFrom;
+    }
+    if (dateTo) {
+      params.date_to = dateTo;
+    }
+    return params;
+  }, [statusFilter, sourceFilter, searchTerm, dateFrom, dateTo, page]);
+  const { data: departuresData, isLoading } = useQuery({
+    queryKey: ["departures", selectedTripId, queryParams],
+    queryFn: async () => {
+      var _a2;
+      if (!selectedTripId) return { data: [], total: 0 };
+      const response = await apiClient.get(`/trips/${selectedTripId}/departures`, { params: queryParams });
+      return {
+        data: (response == null ? void 0 : response.data) || [],
+        total: ((_a2 = response == null ? void 0 : response.meta) == null ? void 0 : _a2.total) || 0
+      };
+    },
+    enabled: !!selectedTripId
+  });
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      if (!selectedTripId) return;
+      await apiClient.delete(`/trips/${selectedTripId}/departures/${id}`);
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["departures", selectedTripId] });
+      showToast(__("Departure deleted successfully", "Departure deleted successfully"), "success");
+    },
+    onError: (error) => {
+      showToast((error == null ? void 0 : error.message) || __("Failed to delete departure", "Failed to delete departure"), "error");
+    }
+  });
+  const handleDelete = (id) => {
+    if (!confirm(__("Are you sure you want to delete this departure?", "Are you sure you want to delete this departure?"))) {
+      return;
+    }
+    deleteMutation.mutate(id);
+  };
+  const getStatusBadge = (status) => {
+    const statusMap = {
+      upcoming: { label: __("Upcoming", "Upcoming"), className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400" },
+      full: { label: __("Full", "Full"), className: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400" },
+      past: { label: __("Past", "Past"), className: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400" },
+      cancelled: { label: __("Cancelled", "Cancelled"), className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400" }
+    };
+    const statusInfo = statusMap[status] || statusMap.upcoming;
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: statusInfo.className, children: statusInfo.label });
+  };
+  const getSourceBadge = (source) => {
+    if (source === "manual") {
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400", children: __("Manual", "Manual") });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400", children: __("Booking Created", "Booking Created") });
+  };
+  const navigateToAdd = () => {
+    if (!selectedTripId) {
+      showToast(__("Please select a trip first", "Please select a trip first"), "error");
+      return;
+    }
+    window.location.href = `?page=yatra&subpage=departures&action=create&trip_id=${selectedTripId}`;
+  };
+  const navigateToEdit = (id) => {
+    if (!selectedTripId) return;
+    window.location.href = `?page=yatra&subpage=departures&action=edit&id=${id}&trip_id=${selectedTripId}`;
+  };
+  const clearDateFilters = () => {
+    setDateFrom("");
+    setDateTo("");
+    setPage(1);
+  };
+  const openTravelerModal = (departure) => {
+    if (!departure.travelers || !departure.travelers.length) {
+      return;
+    }
+    setTravelerModalDeparture(departure);
+  };
+  const closeTravelerModal = () => setTravelerModalDeparture(null);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PageHeader,
+        {
+          title: __("Departures", "Departures"),
+          description: __("Manage trip departure dates and capacity", "Manage trip departure dates and capacity"),
+          actions: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex gap-2", children: selectedTripId && /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: navigateToAdd, variant: "default", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
+            __("Add Departure", "Add Departure")
+          ] }) })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex gap-4 items-end", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Select Trip", "Select Trip") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Select,
+          {
+            value: (selectedTripId == null ? void 0 : selectedTripId.toString()) || "",
+            onChange: (e) => {
+              const value = e.target.value;
+              setSelectedTripId(value ? parseInt(value) : null);
+              setPage(1);
+            },
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("-- Select a trip --", "-- Select a trip --") }),
+              tripsData == null ? void 0 : tripsData.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: trip.id.toString(), children: trip.title }, trip.id))
+            ]
+          }
+        )
+      ] }) }) }) }),
+      selectedTripId && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 items-end flex-wrap", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-[200px]", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Search", "Search") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    type: "text",
+                    placeholder: __("Search by date or notes...", "Search by date or notes..."),
+                    value: searchTerm,
+                    onChange: (e) => {
+                      setSearchTerm(e.target.value);
+                      setPage(1);
+                    },
+                    className: "pl-10"
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-48", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Status", "Status") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: statusFilter,
+                  onChange: (e) => {
+                    setStatusFilter(e.target.value);
+                    setPage(1);
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "upcoming", children: __("Upcoming", "Upcoming") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "full", children: __("Full", "Full") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "past", children: __("Past", "Past") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "cancelled", children: __("Cancelled", "Cancelled") })
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-48", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Source", "Source") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: sourceFilter,
+                  onChange: (e) => {
+                    setSourceFilter(e.target.value);
+                    setPage(1);
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Sources", "All Sources") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "manual", children: __("Manual", "Manual") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booking_created", children: __("Booking Created", "Booking Created") })
+                  ]
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 items-end flex-wrap border-t pt-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-48", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Date From", "Date From") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                DatePicker,
+                {
+                  value: dateFrom,
+                  onChange: (dateStr) => {
+                    setDateFrom(dateStr || "");
+                    setPage(1);
+                  },
+                  placeholder: __("Start date", "Start date")
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-48", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Date To", "Date To") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                DatePicker,
+                {
+                  value: dateTo,
+                  onChange: (dateStr) => {
+                    setDateTo(dateStr || "");
+                    setPage(1);
+                  },
+                  placeholder: __("End date", "End date"),
+                  minDate: dateFrom ? new Date(dateFrom) : void 0
+                }
+              )
+            ] }),
+            (dateFrom || dateTo) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "outline",
+                onClick: clearDateFilters,
+                className: "h-10",
+                children: __("Clear Dates", "Clear Dates")
+              }
+            ) })
+          ] })
+        ] }) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: __("Loading...", "Loading...") }) : !((_a = departuresData == null ? void 0 : departuresData.data) == null ? void 0 : _a.length) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-8", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-12 h-12 text-gray-400 mx-auto mb-4" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500", children: __("No departures found", "No departures found") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: navigateToAdd, variant: "outline", className: "mt-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
+            __("Add Departure", "Add Departure")
+          ] })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Date", "Date") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Time", "Time") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Capacity", "Capacity") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booked", "Booked") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Available", "Available") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Revenue", "Revenue") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travelers", "Travelers") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Bookings", "Bookings") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Source", "Source") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Actions", "Actions") })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: departuresData.data.map((departure) => {
+            var _a2, _b2;
+            return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: ((_a2 = departure.trip) == null ? void 0 : _a2.title) ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "a",
+                {
+                  href: `?page=yatra&subpage=trips&action=edit&id=${departure.trip.id}`,
+                  className: "text-blue-600 hover:text-blue-800 hover:underline",
+                  title: __("View trip", "View trip"),
+                  children: departure.trip.title
+                }
+              ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "--" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatDate(departure.start_date || departure.date) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: departure.time ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono", children: departure.time }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "--" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { title: __("Max Capacity", "Max Capacity"), children: departure.max_capacity }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { title: __("Booked Count", "Booked Count"), children: departure.booked_count }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "span",
+                {
+                  className: departure.available_capacity === 0 ? "text-red-600 font-semibold" : "",
+                  title: __("Available Capacity", "Available Capacity"),
+                  children: departure.available_capacity
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: departure.total_revenue !== void 0 && departure.total_revenue > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-green-600", children: formatCurrency(departure.total_revenue) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "--" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Button,
+                {
+                  variant: "outline",
+                  size: "sm",
+                  onClick: () => openTravelerModal(departure),
+                  disabled: !departure.travelers || departure.travelers.length === 0,
+                  children: [
+                    departure.travelers_count || ((_b2 = departure.travelers) == null ? void 0 : _b2.length) || 0,
+                    " ",
+                    __("Traveler(s)", "Traveler(s)")
+                  ]
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: departure.booking_ids && departure.booking_ids.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-1", children: [
+                departure.booking_ids.slice(0, 3).map((bookingId) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "a",
+                  {
+                    href: `?page=yatra&subpage=bookings&action=view&id=${bookingId}`,
+                    className: "text-blue-600 hover:text-blue-800 hover:underline text-sm",
+                    title: __("View booking", "View booking"),
+                    children: [
+                      "#",
+                      bookingId
+                    ]
+                  },
+                  bookingId
+                )),
+                departure.booking_ids.length > 3 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-500 text-sm", children: [
+                  "+",
+                  departure.booking_ids.length - 3
+                ] })
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "--" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(departure.status) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getSourceBadge(departure.source) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    variant: "ghost",
+                    size: "sm",
+                    onClick: () => navigateToEdit(departure.id),
+                    title: __("Edit departure", "Edit departure"),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
+                  }
+                ),
+                departure.source === "booking_created" && departure.booked_count === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    variant: "ghost",
+                    size: "sm",
+                    onClick: () => handleDelete(departure.id),
+                    className: "text-red-600 hover:text-red-700",
+                    title: __("Delete departure", "Delete departure"),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
+                  }
+                )
+              ] }) })
+            ] }, departure.id);
+          }) })
+        ] }) }) })
+      ] }),
+      !selectedTripId && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-8", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-12 h-12 text-gray-400 mx-auto mb-4" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500", children: __("Please select a trip to view departures", "Please select a trip to view departures") })
+      ] }) }) })
+    ] }),
+    travelerModalDeparture && travelerModalDeparture.travelers && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full max-w-3xl rounded-lg bg-white p-6 shadow-xl dark:bg-gray-900", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 flex items-start justify-between gap-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-semibold text-gray-800 dark:text-gray-100", children: [
+            __("Travelers for", "Travelers for"),
+            " ",
+            ((_b = travelerModalDeparture.trip) == null ? void 0 : _b.title) || __("Trip", "Trip")
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: formatDate(travelerModalDeparture.start_date || travelerModalDeparture.date) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", onClick: closeTravelerModal, children: __("Close", "Close") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[60vh] overflow-y-auto pr-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Traveler", "Traveler") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Lead", "Lead") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Email", "Email") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Phone", "Phone") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: travelerModalDeparture.travelers.map((traveler) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { className: "font-semibold text-gray-800 dark:text-gray-100", children: [
+            traveler.first_name || "—",
+            " ",
+            traveler.last_name || ""
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: traveler.is_lead ? /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300", children: __("Lead", "Lead") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "—" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: traveler.email || "—" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: traveler.phone || "—" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "a",
+            {
+              href: `?page=yatra&subpage=bookings&action=view&id=${traveler.booking_id}`,
+              className: "text-blue-600 hover:underline",
+              children: traveler.booking_reference || `#${traveler.booking_id}`
+            }
+          ) })
+        ] }, traveler.id)) })
+      ] }) })
+    ] }) })
+  ] });
+};
+const DepartureForm = () => {
+  const queryClient2 = useQueryClient();
+  const { showToast } = useToast();
+  const urlParams = new URLSearchParams(window.location.search);
+  const tripId = urlParams.get("trip_id") ? parseInt(urlParams.get("trip_id")) : null;
+  const departureId = urlParams.get("id") || null;
+  const isEditMode = !!departureId;
+  const [formData, setFormData] = reactExports.useState({
+    date: "",
+    time: "",
+    max_capacity: "",
+    price_override: "",
+    notes: ""
+  });
+  const [errors, setErrors] = reactExports.useState({});
+  const { data: departureData, isLoading: isLoadingDeparture } = useQuery({
+    queryKey: ["departure", departureId],
+    queryFn: async () => {
+      if (!departureId || !tripId) return null;
+      const response = await apiClient.get(`/trips/${tripId}/departures/${departureId}`);
+      return (response == null ? void 0 : response.data) || response;
+    },
+    enabled: isEditMode && !!departureId && !!tripId
+  });
+  reactExports.useEffect(() => {
+    var _a, _b;
+    if (departureData) {
+      setFormData({
+        date: departureData.date || "",
+        time: departureData.time || "",
+        max_capacity: ((_a = departureData.max_capacity) == null ? void 0 : _a.toString()) || "",
+        price_override: ((_b = departureData.price_override) == null ? void 0 : _b.toString()) || "",
+        notes: departureData.notes || ""
+      });
+    }
+  }, [departureData]);
+  const saveMutation = useMutation({
+    mutationFn: async (data) => {
+      if (!tripId) throw new Error("Trip ID is required");
+      const payload = {
+        trip_id: tripId,
+        date: data.date,
+        max_capacity: parseInt(data.max_capacity),
+        source: "manual"
+      };
+      if (data.time) payload.time = data.time;
+      if (data.price_override) payload.price_override = parseFloat(data.price_override);
+      if (data.notes) payload.notes = data.notes;
+      if (isEditMode && departureId) {
+        return await apiClient.put(`/trips/${tripId}/departures/${departureId}`, payload);
+      } else {
+        return await apiClient.post(`/trips/${tripId}/departures`, payload);
+      }
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["departures", tripId] });
+      showToast(
+        isEditMode ? __("Departure updated successfully", "Departure updated successfully") : __("Departure created successfully", "Departure created successfully"),
+        "success"
+      );
+      window.location.href = `?page=yatra&subpage=trips&tab=departures&trip_id=${tripId}`;
+    },
+    onError: (error) => {
+      showToast((error == null ? void 0 : error.message) || __("Failed to save departure", "Failed to save departure"), "error");
+    }
+  });
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.date) {
+      newErrors.date = __("Date is required", "Date is required");
+    }
+    if (!formData.max_capacity) {
+      newErrors.max_capacity = __("Max capacity is required", "Max capacity is required");
+    } else if (parseInt(formData.max_capacity) < 1) {
+      newErrors.max_capacity = __("Max capacity must be at least 1", "Max capacity must be at least 1");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      saveMutation.mutate(formData);
+    }
+  };
+  const handleBack = () => {
+    window.location.href = `?page=yatra&subpage=trips&tab=departures${tripId ? `&trip_id=${tripId}` : ""}`;
+  };
+  if (isLoadingDeparture) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "animate-pulse", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-64 bg-gray-200 dark:bg-gray-700 rounded" })
+    ] }) });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: isEditMode ? __("Edit Departure", "Edit Departure") : __("Add Departure", "Add Departure"),
+        description: __("Create or update a departure date for this trip", "Create or update a departure date for this trip"),
+        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "ghost", onClick: handleBack, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4 mr-2" }),
+          __("Back", "Back")
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("form", { onSubmit: handleSubmit, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "pt-6 space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+          __("Departure Date", "Departure Date"),
+          " ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          DatePicker,
+          {
+            value: formData.date,
+            onChange: (value) => setFormData({ ...formData, date: value }),
+            minDate: /* @__PURE__ */ new Date()
+          }
+        ),
+        errors.date && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-600 dark:text-red-400", children: errors.date }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(HelpText, { text: __("Select the departure date for this trip", "Select the departure date for this trip") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+          __("Departure Time", "Departure Time"),
+          " ",
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-400", children: [
+            "(",
+            __("Optional", "Optional"),
+            ")"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          TimePicker,
+          {
+            value: formData.time || "",
+            onChange: (value) => setFormData({ ...formData, time: value })
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(HelpText, { text: __("Optional departure time (e.g., 09:00 AM)", "Optional departure time (e.g., 09:00 AM)") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+          __("Max Capacity", "Max Capacity"),
+          " ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "number",
+            min: "1",
+            value: formData.max_capacity,
+            onChange: (e) => setFormData({ ...formData, max_capacity: e.target.value }),
+            placeholder: __("e.g., 20", "e.g., 20")
+          }
+        ),
+        errors.max_capacity && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-600 dark:text-red-400", children: errors.max_capacity }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(HelpText, { text: __("Maximum number of travelers for this departure", "Maximum number of travelers for this departure") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+          __("Price Override", "Price Override"),
+          " ",
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-400", children: [
+            "(",
+            __("Optional", "Optional"),
+            ")"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            type: "number",
+            step: "0.01",
+            min: "0",
+            value: formData.price_override || "",
+            onChange: (e) => setFormData({ ...formData, price_override: e.target.value }),
+            placeholder: __("e.g., 150.00", "e.g., 150.00")
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(HelpText, { text: __("Override the default trip price for this specific departure", "Override the default trip price for this specific departure") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+          __("Notes", "Notes"),
+          " ",
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-400", children: [
+            "(",
+            __("Optional", "Optional"),
+            ")"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "textarea",
+          {
+            className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white",
+            rows: 4,
+            value: formData.notes || "",
+            onChange: (e) => setFormData({ ...formData, notes: e.target.value }),
+            placeholder: __("Additional notes about this departure...", "Additional notes about this departure...")
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(HelpText, { text: __("Internal notes about this departure (not visible to customers)", "Internal notes about this departure (not visible to customers)") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "outline", onClick: handleBack, children: __("Cancel", "Cancel") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "submit", disabled: saveMutation.isPending, children: saveMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 mr-2 animate-spin" }),
+          __("Saving...", "Saving...")
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { className: "w-4 h-4 mr-2" }),
+          __("Save Departure", "Save Departure")
+        ] }) })
+      ] })
+    ] }) }) })
+  ] });
+};
 const Enquiries = () => {
   var _a;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
@@ -36870,7 +37732,7 @@ const Enquiries = () => {
   const enquiries = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -37156,9 +38018,9 @@ const Enquiries = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 line-clamp-2", children: enquiry.message })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: enquiry.travelers_count || "-" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: enquiry.travel_date ? formatDate(enquiry.travel_date) : "-" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: enquiry.travel_date ? formatDate2(enquiry.travel_date) : "-" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(enquiry.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate(enquiry.created_at) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(enquiry.created_at) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
@@ -37427,7 +38289,7 @@ const ViewEnquiry = () => {
       setResponseMessage("");
     }
   });
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -37618,7 +38480,7 @@ const ViewEnquiry = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Preferred Travel Date", "Preferred Travel Date") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 flex items-center gap-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-4 h-4 text-gray-400" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formatDate(enquiry.travel_date) })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formatDate2(enquiry.travel_date) })
                 ] })
               ] })
             ] }),
@@ -37674,11 +38536,11 @@ const ViewEnquiry = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Submitted", "Submitted") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-gray-900 dark:text-white", children: formatDate(enquiry.created_at) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-gray-900 dark:text-white", children: formatDate2(enquiry.created_at) })
             ] }),
             enquiry.responded_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Responded", "Responded") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-gray-900 dark:text-white", children: formatDate(enquiry.responded_at) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-gray-900 dark:text-white", children: formatDate2(enquiry.responded_at) })
             ] })
           ] })
         ] })
@@ -38957,7 +39819,7 @@ const Travelers = () => {
     var _a2;
     window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
   };
-  const formatDate = (dateString) => {
+  const formatDate2 = (dateString) => {
     if (!dateString) return "-";
     try {
       return new Date(dateString).toLocaleDateString();
@@ -38971,7 +39833,7 @@ const Travelers = () => {
     }
     switch (fieldType) {
       case "date":
-        return formatDate(value);
+        return formatDate2(value);
       case "email":
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3 text-gray-400" }),
@@ -39097,7 +39959,7 @@ const Travelers = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-[200px] truncate", title: traveler.trip_title, children: traveler.trip_title || `Trip #${traveler.trip_id}` }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3 text-gray-400" }),
-            formatDate(traveler.travel_date)
+            formatDate2(traveler.travel_date)
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "a",
@@ -39281,6 +40143,11 @@ const App = () => {
           default:
             return /* @__PURE__ */ jsxRuntimeExports.jsx(ItemTypes, {});
         }
+      case "departures":
+        if (action === "create" || action === "edit") {
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(DepartureForm, {});
+        }
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Departures, {});
       case "discounts":
         if (action === "create" || action === "edit") {
           return /* @__PURE__ */ jsxRuntimeExports.jsx(DiscountForm, {});

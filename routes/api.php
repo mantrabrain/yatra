@@ -51,6 +51,7 @@ $controllers = [
     // =============================================
     \Yatra\Controllers\AvailabilityController::class,
     \Yatra\Controllers\RecurringAvailabilityController::class,
+    \Yatra\Controllers\TripAvailabilityController::class, // New Departures System
     \Yatra\Controllers\ItineraryController::class,
     \Yatra\Controllers\DiscountController::class,
 

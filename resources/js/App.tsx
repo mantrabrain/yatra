@@ -38,6 +38,8 @@ import TravelerCategoryForm from './pages/TravelerCategoryForm';
 import Availability from './pages/Availability';
 import AvailabilityForm from './pages/AvailabilityForm';
 import RecurringRuleForm from './pages/RecurringRuleForm';
+import Departures from './pages/Departures';
+import DepartureForm from './pages/DepartureForm';
 import Enquiries from './pages/Enquiries';
 import ViewEnquiry from './pages/ViewEnquiry';
 import EnquiryForm from './pages/EnquiryForm';
@@ -197,6 +199,12 @@ const App: React.FC = () => {
           default:
             return <ItemTypes />;
         }
+      case 'departures':
+        // Check if we're creating or editing a departure
+        if (action === 'create' || action === 'edit') {
+          return <DepartureForm />;
+        }
+        return <Departures />;
       case 'discounts':
         // Check if we're creating or editing a discount
         if (action === 'create' || action === 'edit') {

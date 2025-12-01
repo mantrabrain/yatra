@@ -40,7 +40,9 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
           return {
             id: data.id,
             booking_number: data.reference || data.booking_number,
-            customer_name: data.customer_name || `${data.contact_first_name || ''} ${data.contact_last_name || ''}`.trim() || 'N/A',
+            customer_name: data.customer_name || (data.contact?.first_name && data.contact?.last_name 
+              ? `${data.contact.first_name} ${data.contact.last_name}`.trim()
+              : `${data.contact_first_name || ''} ${data.contact_last_name || ''}`.trim()) || 'N/A',
             customer_email: data.customer_email || data.contact_email,
             customer_phone: data.customer_phone || data.contact_phone,
             customer_country: data.contact_country,

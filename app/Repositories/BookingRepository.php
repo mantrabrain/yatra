@@ -257,6 +257,18 @@ class BookingRepository extends BaseRepository
         $insertData['created_at'] = current_time('mysql');
         $insertData['updated_at'] = current_time('mysql');
 
+        // Check which columns exist and remove non-existent ones
+        $columns = $this->wpdb->get_col("DESCRIBE {$table}");
+        $hasStartDate = in_array('start_date', $columns, true);
+        $hasEndDate = in_array('end_date', $columns, true);
+        
+        if (!$hasStartDate && isset($insertData['start_date'])) {
+            unset($insertData['start_date']);
+        }
+        if (!$hasEndDate && isset($insertData['end_date'])) {
+            unset($insertData['end_date']);
+        }
+
         $result = $this->wpdb->insert($table, $insertData);
 
         if ($result === false) {
@@ -280,6 +292,22 @@ class BookingRepository extends BaseRepository
         // Sanitize and prepare data
         $updateData = $this->prepareBookingData($data);
         $updateData['updated_at'] = current_time('mysql');
+
+        // Check which columns exist and remove non-existent ones
+        $columns = $this->wpdb->get_col("DESCRIBE {$table}");
+        $hasStartDate = in_array('start_date', $columns, true);
+        $hasEndDate = in_array('end_date', $columns, true);
+        
+        if (!$hasStartDate && isset($updateData['start_date'])) {
+            unset($updateData['start_date']);
+        }
+        if (!$hasEndDate && isset($updateData['end_date'])) {
+            unset($updateData['end_date']);
+        }
+
+        if (empty($updateData)) {
+            return false;
+        }
 
         $result = $this->wpdb->update(
             $table,
@@ -630,7 +658,7 @@ class BookingRepository extends BaseRepository
 
         $jsonFields = ['contact_data', 'emergency_contact', 'travelers_data'];
 
-        $dateFields = ['travel_date', 'payment_date', 'cancelled_at', 'confirmed_at', 'completed_at', 'reminder_sent_at'];
+        $dateFields = ['travel_date', 'start_date', 'end_date', 'payment_date', 'cancelled_at', 'confirmed_at', 'completed_at', 'reminder_sent_at'];
 
         foreach ($stringFields as $field) {
             if (array_key_exists($field, $data)) {
@@ -668,6 +696,28 @@ class BookingRepository extends BaseRepository
             }
         }
 
+        // Calculate end_date if start_date is provided but end_date is not
+        if (isset($prepared['start_date']) && !isset($prepared['end_date']) && !empty($prepared['trip_id'])) {
+            $prepared['end_date'] = $this->calculateEndDate($prepared['start_date'], (int) $prepared['trip_id']);
+        }
+
+        // Sync travel_date with start_date if start_date is provided
+        if (isset($prepared['start_date']) && !isset($prepared['travel_date'])) {
+            $prepared['travel_date'] = $prepared['start_date'];
+        }
+
+        // Check if start_date and end_date columns exist before including them
+        // If columns don't exist, only use travel_date (backward compatibility)
+        $table = $this->getTableName();
+        $columns = $this->wpdb->get_col("DESCRIBE {$table}");
+        
+        if (!in_array('start_date', $columns, true)) {
+            unset($prepared['start_date']);
+        }
+        if (!in_array('end_date', $columns, true)) {
+            unset($prepared['end_date']);
+        }
+
         if (array_key_exists('user_agent', $data)) {
             $prepared['user_agent'] = sanitize_textarea_field((string) $data['user_agent']);
         }
@@ -677,6 +727,53 @@ class BookingRepository extends BaseRepository
         }
 
         return $prepared;
+    }
+
+    /**
+     * Calculate end date from start date and trip duration
+     * 
+     * @param string $startDate Start date (YYYY-MM-DD)
+     * @param int $tripId Trip ID
+     * @return string End date (YYYY-MM-DD)
+     */
+    public function calculateEndDate(string $startDate, int $tripId): string
+    {
+        $tripsTable = $this->wpdb->prefix . 'yatra_trips';
+        
+        $durationDays = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT duration_days FROM {$tripsTable} WHERE id = %d LIMIT 1",
+            $tripId
+        ));
+        
+        $durationDays = $durationDays ? (int) $durationDays : 1;
+        
+        // end_date = start_date + (duration_days - 1) days
+        // Example: 5-day trip starting Jan 1 = Jan 1 + 4 days = Jan 5
+        $endDate = date('Y-m-d', strtotime($startDate . ' + ' . ($durationDays - 1) . ' days'));
+        
+        return $endDate;
+    }
+
+    /**
+     * Find bookings by departure ID
+     * 
+     * @param int $departureId Departure ID
+     * @return array Array of booking objects
+     */
+    public function findByDepartureId(int $departureId): array
+    {
+        $table = $this->getTableName();
+        $relationTable = $this->wpdb->prefix . 'yatra_booking_departures';
+        
+        $bookings = $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT b.* FROM {$table} b
+             INNER JOIN {$relationTable} bd ON b.id = bd.booking_id
+             WHERE bd.departure_id = %d
+             ORDER BY b.created_at DESC",
+            $departureId
+        ));
+        
+        return $bookings ?: [];
     }
 
     /**

@@ -51,6 +51,15 @@ class AppServiceProvider extends ServiceProvider
         // Register scheduled payment processing
         \Yatra\Services\ScheduledPaymentService::register();
 
+        // Register departure status update cron job
+        add_action('init', function() {
+            \Yatra\Services\DepartureCronService::registerCronHook();
+        }, 5);
+        add_action('yatra_daily_departure_status_update', function() {
+            $service = new \Yatra\Services\DepartureCronService();
+            $service->dailyStatusUpdate();
+        });
+
         // Initialize plugin settings
         add_action('init', [$this, 'initSettings'], 5);
         
@@ -760,7 +769,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Enqueue account page assets
      */
-public function enqueueAccountPageAssets(): void
+    public function enqueueAccountPageAssets(): void
     {
         // Enqueue common CSS first
         $this->enqueueCommonAssets();
