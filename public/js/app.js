@@ -37112,15 +37112,21 @@ const Departures = () => {
   const { data: departuresData, isLoading } = useQuery({
     queryKey: ["departures", selectedTripId, queryParams],
     queryFn: async () => {
-      var _a2;
-      if (!selectedTripId) return { data: [], total: 0 };
-      const response = await apiClient.get(`/trips/${selectedTripId}/departures`, { params: queryParams });
-      return {
-        data: (response == null ? void 0 : response.data) || [],
-        total: ((_a2 = response == null ? void 0 : response.meta) == null ? void 0 : _a2.total) || 0
-      };
+      const endpoint = selectedTripId ? `/trips/${selectedTripId}/departures` : "/departures";
+      const response = await apiClient.get(endpoint, {
+        params: {
+          status: statusFilter !== "all" ? statusFilter : void 0,
+          source: sourceFilter !== "all" ? sourceFilter : void 0,
+          search: searchTerm || void 0,
+          date_from: dateFrom || void 0,
+          date_to: dateTo || void 0,
+          include_past: dateFrom || dateTo ? "true" : "false"
+        }
+      });
+      return (response == null ? void 0 : response.data) || { data: [], meta: { total: 0 } };
     },
-    enabled: !!selectedTripId
+    // Always enabled, whether trip is selected or not
+    enabled: true
   });
   const deleteMutation = useMutation({
     mutationFn: async (id) => {

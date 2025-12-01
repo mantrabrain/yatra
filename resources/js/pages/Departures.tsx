@@ -215,18 +215,28 @@ const Departures: React.FC = () => {
     return params;
   }, [statusFilter, sourceFilter, searchTerm, dateFrom, dateTo, page]);
 
-  // Fetch departures
+  // Fetch departures data
   const { data: departuresData, isLoading } = useQuery({
     queryKey: ['departures', selectedTripId, queryParams],
     queryFn: async () => {
-      if (!selectedTripId) return { data: [], total: 0 };
-      const response = await apiClient.get(`/trips/${selectedTripId}/departures`, { params: queryParams });
-      return {
-        data: response?.data || [],
-        total: response?.meta?.total || 0,
-      };
+      // API endpoint based on if a trip is selected
+      const endpoint = selectedTripId ? `/trips/${selectedTripId}/departures` : '/departures';
+      
+      const response = await apiClient.get(endpoint, {
+        params: {
+          status: statusFilter !== 'all' ? statusFilter : undefined,
+          source: sourceFilter !== 'all' ? sourceFilter : undefined,
+          search: searchTerm || undefined,
+          date_from: dateFrom || undefined,
+          date_to: dateTo || undefined,
+          include_past: dateFrom || dateTo ? 'true' : 'false',
+        },
+      });
+      
+      return response?.data || { data: [], meta: { total: 0 } };
     },
-    enabled: !!selectedTripId,
+    // Always enabled, whether trip is selected or not
+    enabled: true,
   });
 
   // Delete departure mutation
