@@ -199,9 +199,9 @@ const Departures: React.FC = () => {
           status: statusFilter !== 'all' ? statusFilter : undefined,
           source: sourceFilter !== 'all' ? sourceFilter : undefined,
           search: searchTerm || undefined,
-          date_from: dateFrom || undefined,
-          date_to: dateTo || undefined,
-          include_past: dateFrom || dateTo ? 'true' : 'false',
+          date_from: (dateFrom && dateFrom.trim() !== '') ? dateFrom : undefined,
+          date_to: (dateTo && dateTo.trim() !== '') ? dateTo : undefined,
+          include_past: (dateFrom && dateFrom.trim() !== '') || (dateTo && dateTo.trim() !== '') ? 'true' : 'false',
           page: page,
           per_page: 20,
         },
@@ -281,7 +281,6 @@ const Departures: React.FC = () => {
   const clearDateFilters = () => {
     setDateFrom('');
     setDateTo('');
-    setPage(1);
   };
 
   const openTravelerModal = (departure: Departure) => {

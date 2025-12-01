@@ -168,8 +168,8 @@ class TripAvailabilityController extends BaseController
         $filters = [];
         if ($status) $filters['status'] = $status;
         if ($source) $filters['source'] = $source;
-        if ($dateFrom) $filters['date_from'] = $dateFrom;
-        if ($dateTo) $filters['date_to'] = $dateTo;
+        if ($dateFrom && trim($dateFrom) !== '') $filters['date_from'] = $dateFrom;
+        if ($dateTo && trim($dateTo) !== '') $filters['date_to'] = $dateTo;
         $filters['include_past'] = $includePast;
         
         try {
@@ -401,8 +401,8 @@ class TripAvailabilityController extends BaseController
         $filters = [];
         if ($status) $filters['status'] = $status;
         if ($source) $filters['source'] = $source;
-        if ($dateFrom) $filters['date_from'] = $dateFrom;
-        if ($dateTo) $filters['date_to'] = $dateTo;
+        if ($dateFrom && trim($dateFrom) !== '') $filters['date_from'] = $dateFrom;
+        if ($dateTo && trim($dateTo) !== '') $filters['date_to'] = $dateTo;
         $filters['include_past'] = $includePast;
         
         try {

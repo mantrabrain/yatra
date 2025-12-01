@@ -92,11 +92,98 @@ class DepartureRepository extends BaseRepository
             $params[] = $filters['status'];
         }
         
+        // Date range filter - use COALESCE to handle NULL/empty start_date
+        if (isset($filters['date_from']) && is_string($filters['date_from']) && trim($filters['date_from']) !== '') {
+            $dateFrom = trim($filters['date_from']);
+            // Validate date format AND that it's a real date
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom) && strtotime($dateFrom) !== false) {
+                $where[] = "COALESCE(NULLIF(start_date, ''), date) >= %s";
+                $params[] = $dateFrom;
+            }
+        }
+        
+        if (isset($filters['date_to']) && is_string($filters['date_to']) && trim($filters['date_to']) !== '') {
+            $dateTo = trim($filters['date_to']);
+            // Validate date format AND that it's a real date
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo) && strtotime($dateTo) !== false) {
+                $where[] = "COALESCE(NULLIF(start_date, ''), date) <= %s";
+                $params[] = $dateTo;
+            }
+        }
+        
+        // Source filter
+        if (!empty($filters['source']) && $filters['source'] !== 'all') {
+            $where[] = 'source = %s';
+            $params[] = $filters['source'];
+        }
+        
+        // Past/upcoming filter
+        if (isset($filters['include_past'])) {
+            if (!$filters['include_past']) {
+                $where[] = 'date >= CURDATE()';
+            }
+        }
+        
+        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
+        $query .= " ORDER BY date ASC, time ASC";
+        
+        if (!empty($filters['per_page'])) {
+            $perPage = (int) $filters['per_page'];
+            $page = max(1, (int) ($filters['page'] ?? 1));
+            $offset = ($page - 1) * $perPage;
+            $query .= " LIMIT %d OFFSET %d";
+            $params[] = $perPage;
+            $params[] = $offset;
+        }
+        
+        // Debug output
+        error_log('FindAll Query: ' . $query);
+        error_log('FindAll Params: ' . print_r($params, true));
+        error_log('FindAll Filters: ' . print_r($filters, true));
+        
+        $prepared_query = $this->wpdb->prepare($query, ...$params);
+        error_log('FindAll Prepared Query: ' . $prepared_query);
+        
+        $results = $this->wpdb->get_results($prepared_query, ARRAY_A);
+        
+        if ($this->wpdb->last_error) {
+            error_log('FindAll SQL Error: ' . $this->wpdb->last_error);
+        }
+        
+        return array_map(function ($row) {
+            return Departure::fromArray($row);
+        }, $results ?: []);
+    }
+
+    /**
+     * Find all departures by trip ID
+     * 
+     * @param int $tripId Trip ID
+     * @param array $filters Filters: status, date_from, date_to, source
+     * @return array Array of Departure models
+     */
+    public function findByTripId(int $tripId, array $filters = []): array
+    {
+        // Return empty array if table doesn't exist
+        if (!$this->tableExists()) {
+            return [];
+        }
+
+        $table = esc_sql($this->table);
+        $where = ['trip_id = %d'];
+        $params = [$tripId];
+        
+        // Status filter
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $where[] = 'status = %s';
+            $params[] = $filters['status'];
+        }
+        
         // Date range filter - check both start_date and date columns
         $columns = $this->wpdb->get_col("DESCRIBE {$table}");
         $hasStartDate = in_array('start_date', $columns, true);
         
-        if (!empty($filters['date_from'])) {
+        if (!empty($filters['date_from']) && trim($filters['date_from']) !== '') {
             if ($hasStartDate) {
                 $where[] = '(start_date >= %s OR ((start_date IS NULL OR start_date = "") AND date >= %s))';
                 $params[] = $filters['date_from'];
@@ -107,7 +194,7 @@ class DepartureRepository extends BaseRepository
             }
         }
         
-        if (!empty($filters['date_to'])) {
+        if (!empty($filters['date_to']) && trim($filters['date_to']) !== '') {
             if ($hasStartDate) {
                 $where[] = '(start_date <= %s OR ((start_date IS NULL OR start_date = "") AND date <= %s))';
                 $params[] = $filters['date_to'];
@@ -143,95 +230,19 @@ class DepartureRepository extends BaseRepository
             $params[] = $offset;
         }
         
-        $results = $this->wpdb->get_results(
-            $this->wpdb->prepare($query, ...$params),
-            ARRAY_A
-        );
-        
-        return array_map(function ($row) {
-            return Departure::fromArray($row);
-        }, $results ?: []);
-    }
-
-    /**
-     * Find all departures by trip ID
-     * 
-     * @param int $tripId Trip ID
-     * @param array $filters Filters: status, date_from, date_to, source
-     * @return array Array of Departure models
-     */
-    public function findByTripId(int $tripId, array $filters = []): array
-    {
-        // Return empty array if table doesn't exist
-        if (!$this->tableExists()) {
-            return [];
-        }
-
-        $table = esc_sql($this->table);
-        $where = ['trip_id = %d'];
-        $params = [$tripId];
-        
-        // Status filter
-        if (!empty($filters['status']) && $filters['status'] !== 'all') {
-            $where[] = 'status = %s';
-            $params[] = $filters['status'];
-        }
-        
-        // Date range filter - check both start_date and date columns
-        $columns = $this->wpdb->get_col("DESCRIBE {$table}");
-        $hasStartDate = in_array('start_date', $columns, true);
-        
-        if (!empty($filters['date_from'])) {
-            if ($hasStartDate) {
-                $where[] = '(start_date >= %s OR (start_date IS NULL OR start_date = "") AND date >= %s)';
-                $params[] = $filters['date_from'];
-                $params[] = $filters['date_from'];
-            } else {
-                $where[] = 'date >= %s';
-                $params[] = $filters['date_from'];
-            }
-        }
-        
-        if (!empty($filters['date_to'])) {
-            if ($hasStartDate) {
-                $where[] = '(start_date <= %s OR (start_date IS NULL OR start_date = "") AND date <= %s)';
-                $params[] = $filters['date_to'];
-                $params[] = $filters['date_to'];
-            } else {
-                $where[] = 'date <= %s';
-                $params[] = $filters['date_to'];
-            }
-        }
-        
-        // Source filter
-        if (!empty($filters['source']) && $filters['source'] !== 'all') {
-            $where[] = 'source = %s';
-            $params[] = $filters['source'];
-        }
-        
-        // Past/upcoming filter
-        if (isset($filters['include_past'])) {
-            if (!$filters['include_past']) {
-                $where[] = 'date >= CURDATE()';
-            }
-        }
-        
-        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
-        $query .= " ORDER BY date ASC, time ASC";
-        
-        if (!empty($filters['per_page'])) {
-            $perPage = (int) $filters['per_page'];
-            $page = max(1, (int) ($filters['page'] ?? 1));
-            $offset = ($page - 1) * $perPage;
-            $query .= " LIMIT %d OFFSET %d";
-            $params[] = $perPage;
-            $params[] = $offset;
-        }
+        // Debug: Log the query and parameters
+        error_log('DepartureRepository findAll Query: ' . $query);
+        error_log('DepartureRepository findAll Params: ' . print_r($params, true));
         
         $results = $this->wpdb->get_results(
             $this->wpdb->prepare($query, ...$params),
             ARRAY_A
         );
+        
+        // Debug: Log any SQL errors
+        if ($this->wpdb->last_error) {
+            error_log('DepartureRepository findAll SQL Error: ' . $this->wpdb->last_error);
+        }
         
         return array_map(function ($row) {
             return Departure::fromArray($row);

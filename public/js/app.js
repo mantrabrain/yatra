@@ -37341,9 +37341,9 @@ const Departures = () => {
           status: statusFilter !== "all" ? statusFilter : void 0,
           source: sourceFilter !== "all" ? sourceFilter : void 0,
           search: searchTerm || void 0,
-          date_from: dateFrom || void 0,
-          date_to: dateTo || void 0,
-          include_past: dateFrom || dateTo ? "true" : "false",
+          date_from: dateFrom && dateFrom.trim() !== "" ? dateFrom : void 0,
+          date_to: dateTo && dateTo.trim() !== "" ? dateTo : void 0,
+          include_past: dateFrom && dateFrom.trim() !== "" || dateTo && dateTo.trim() !== "" ? "true" : "false",
           page,
           per_page: 20
         }
@@ -37405,7 +37405,6 @@ const Departures = () => {
   const clearDateFilters = () => {
     setDateFrom("");
     setDateTo("");
-    setPage(1);
   };
   const openTravelerModal = (departure) => {
     if (!departure.travelers || !departure.travelers.length) {
