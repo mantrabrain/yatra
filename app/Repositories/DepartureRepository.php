@@ -98,7 +98,7 @@ class DepartureRepository extends BaseRepository
         
         if (!empty($filters['date_from'])) {
             if ($hasStartDate) {
-                $where[] = '(start_date >= %s OR (start_date IS NULL OR start_date = "") AND date >= %s)';
+                $where[] = '(start_date >= %s OR ((start_date IS NULL OR start_date = "") AND date >= %s))';
                 $params[] = $filters['date_from'];
                 $params[] = $filters['date_from'];
             } else {
@@ -109,7 +109,7 @@ class DepartureRepository extends BaseRepository
         
         if (!empty($filters['date_to'])) {
             if ($hasStartDate) {
-                $where[] = '(start_date <= %s OR (start_date IS NULL OR start_date = "") AND date <= %s)';
+                $where[] = '(start_date <= %s OR ((start_date IS NULL OR start_date = "") AND date <= %s))';
                 $params[] = $filters['date_to'];
                 $params[] = $filters['date_to'];
             } else {
