@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yatra\PaymentGateways\Gateways;
+namespace Yatra\PaymentGateways\Gateways\Square;
 
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
@@ -11,7 +11,7 @@ class SquareGateway extends AbstractPaymentGateway
     protected string $id = 'square';
     protected string $title = 'Square';
     protected string $description = 'Accept payments via Square';
-    protected string $icon = 'square.svg';
+    protected string $icon = 'icon.svg';
     protected array $supports = ['credit_card', 'debit_card', 'refunds'];
 
     public function getConfigFields(): array

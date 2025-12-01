@@ -42,6 +42,18 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
     {
         // If icon is a relative path (starts with /), convert to full URL
         if (!empty($this->icon) && strpos($this->icon, 'http') !== 0) {
+            // Check if icon is in the new folder structure
+            if ($this->icon === 'icon.svg') {
+                // Get the gateway class name to determine folder
+                $className = get_class($this);
+                $parts = explode('\\', $className);
+                $gatewayFolder = end($parts); // e.g., 'StripeGateway'
+                $folderName = str_replace('Gateway', '', $gatewayFolder); // e.g., 'Stripe'
+                
+                // Return path to icon in gateway folder
+                return plugins_url("app/PaymentGateways/Gateways/{$folderName}/icon.svg", dirname(__DIR__, 2) . '/yatra.php');
+            }
+            // Fallback to old path for backward compatibility
             return plugins_url('public/images/gateways/' . $this->icon, dirname(__DIR__, 2) . '/yatra.php');
         }
         return $this->icon;

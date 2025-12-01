@@ -409,14 +409,25 @@ class DepartureService
             }
         }
 
+        // Get trip details to set default time if not provided
+        $trip = $this->tripRepository->find($tripId);
+        $defaultTime = $time;
+        
+        // If no time provided, try to get from trip settings or use default
+        if (!$defaultTime && $trip) {
+            // Check if trip has a default departure time
+            $defaultTime = $trip->departure_time ?? '09:00'; // Default to 9:00 AM
+        }
+        
         $departureData = [
             'trip_id' => $tripId,
             'start_date' => $startDate,
             'end_date' => $endDate,
             'date' => $startDate, // Keep for backward compatibility
-            'time' => $time, // Add time if provided
+            'time' => $defaultTime, // Add time (default or provided)
             'max_capacity' => $maxCapacity,
             'booked_count' => 0, // Will be incremented after creation
+            'total_revenue' => 0.00, // Initialize revenue
             'source' => 'booking_created', // Created from booking
             'status' => 'upcoming', // Will be recalculated
         ];

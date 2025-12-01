@@ -37348,10 +37348,16 @@ const Departures = () => {
           per_page: 20
         }
       });
-      return {
+      const result = {
         data: (response == null ? void 0 : response.data) || [],
         meta: (response == null ? void 0 : response.meta) || { total: 0 }
       };
+      if (result.data.length > 0) {
+        console.log("First departure data:", result.data[0]);
+        console.log("Time value:", result.data[0].time);
+        console.log("Revenue value:", result.data[0].total_revenue);
+      }
+      return result;
     },
     // Always enabled, whether trip is selected or not
     enabled: true

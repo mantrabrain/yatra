@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yatra\PaymentGateways\Gateways;
+namespace Yatra\PaymentGateways\Gateways\Razorpay;
 
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
@@ -11,7 +11,7 @@ class RazorpayGateway extends AbstractPaymentGateway
     protected string $id = 'razorpay';
     protected string $title = 'Razorpay';
     protected string $description = 'Accept payments via Razorpay (India)';
-    protected string $icon = 'razorpay.svg';
+    protected string $icon = 'icon.svg';
     protected array $supports = ['credit_card', 'debit_card', 'upi', 'netbanking', 'wallet', 'recurring', 'tokenization', 'scheduled_payments'];
 
     private string $apiBase = 'https://api.razorpay.com/v1';

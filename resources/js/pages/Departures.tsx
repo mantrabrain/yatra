@@ -210,10 +210,19 @@ const Departures: React.FC = () => {
       // apiClient returns the full response: {success, data, meta}
       // response.data is the array of departures
       // We need to return the structure as {data: [...], meta: {...}}
-      return {
+      const result = {
         data: response?.data || [],
         meta: response?.meta || { total: 0 }
       };
+      
+      // Debug: Log the first departure to see time and revenue values
+      if (result.data.length > 0) {
+        console.log('First departure data:', result.data[0]);
+        console.log('Time value:', result.data[0].time);
+        console.log('Revenue value:', result.data[0].total_revenue);
+      }
+      
+      return result;
     },
     // Always enabled, whether trip is selected or not
     enabled: true,

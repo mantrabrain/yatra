@@ -272,6 +272,9 @@ class TripAvailabilityController extends BaseController
                         }
                     }
                     
+                    // Debug: Log time and revenue values
+                    error_log('Departure ID: ' . $d->id . ' - Time: ' . ($departureArray['time'] ?? 'NULL') . ' - Revenue: ' . ($departureArray['total_revenue'] ?? 'NULL'));
+                    
                     return $departureArray;
                 }, $departures),
                 'meta' => [

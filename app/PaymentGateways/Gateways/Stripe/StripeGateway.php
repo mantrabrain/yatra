@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yatra\PaymentGateways\Gateways;
+namespace Yatra\PaymentGateways\Gateways\Stripe;
 
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
@@ -11,7 +11,7 @@ class StripeGateway extends AbstractPaymentGateway
     protected string $id = 'stripe';
     protected string $title = 'Stripe';
     protected string $description = 'Accept credit and debit cards via Stripe';
-    protected string $icon = 'stripe.svg';
+    protected string $icon = 'icon.svg';
     protected array $supports = ['credit_card', 'debit_card', 'refunds', 'recurring', 'subscriptions', 'scheduled_payments'];
 
     private string $apiBase = 'https://api.stripe.com/v1';

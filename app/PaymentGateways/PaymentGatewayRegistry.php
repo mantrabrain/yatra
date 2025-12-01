@@ -37,15 +37,17 @@ class PaymentGatewayRegistry
     private function registerBuiltInGateways(): void
     {
         $builtInGateways = [
-            Gateways\PayLaterGateway::class,      // Book Now Pay Later - First
-            Gateways\StripeGateway::class,
-            Gateways\PayPalGateway::class,
-            Gateways\RazorpayGateway::class,
-            Gateways\SquareGateway::class,
-            Gateways\AuthorizeNetGateway::class,
-            Gateways\BankTransferGateway::class,
-            Gateways\EsewaGateway::class,
-            Gateways\KhaltiGateway::class,
+            Gateways\PayLater\PayLaterGateway::class,      // Book Now Pay Later - First
+            Gateways\Stripe\StripeGateway::class,          // Popular worldwide
+            Gateways\PayPal\PayPalGateway::class,          // Popular worldwide
+            Gateways\Razorpay\RazorpayGateway::class,      // Popular in India
+            Gateways\Mollie\MollieGateway::class,          // Popular in Europe
+            Gateways\Paystack\PaystackGateway::class,      // Popular in Africa
+            Gateways\Square\SquareGateway::class,          // Popular in US/Canada
+            Gateways\AuthorizeNet\AuthorizeNetGateway::class,  // Popular in US
+            Gateways\BankTransfer\BankTransferGateway::class,  // Manual/Offline
+            Gateways\Esewa\EsewaGateway::class,             // Popular in Nepal
+            Gateways\Khalti\KhaltiGateway::class,           // Popular in Nepal
         ];
 
         foreach ($builtInGateways as $gatewayClass) {

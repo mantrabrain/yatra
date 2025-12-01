@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yatra\PaymentGateways\Gateways;
+namespace Yatra\PaymentGateways\Gateways\PayPal;
 
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
@@ -11,7 +11,7 @@ class PayPalGateway extends AbstractPaymentGateway
     protected string $id = 'paypal';
     protected string $title = 'PayPal';
     protected string $description = 'Accept PayPal and credit card payments';
-    protected string $icon = 'paypal.svg';
+    protected string $icon = 'icon.svg';
     protected array $supports = ['paypal', 'credit_card', 'refunds', 'recurring', 'tokenization', 'scheduled_payments'];
 
     public function getConfigFields(): array
