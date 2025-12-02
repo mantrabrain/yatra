@@ -93,6 +93,9 @@ class AppServiceProvider extends ServiceProvider
         // Handle booking confirmation page
         add_action('template_redirect', [$this, 'handleBookingConfirmationPage'], 1);
         
+        // Handle invoice download
+        add_action('template_redirect', [$this, 'handleInvoiceDownload'], 1);
+        
         // Handle remaining checkout page
         add_action('template_redirect', [$this, 'handleRemainingCheckoutPage'], 1);
         

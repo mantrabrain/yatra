@@ -23,7 +23,7 @@ export interface Payment {
   booking_number: string;
   booking_id?: number;
   amount: number;
-  status: 'paid' | 'pending' | 'failed' | 'refunded';
+  status: 'paid' | 'pending' | 'failed' | 'refunded' | 'completed';
   method: string;
   date: string;
   type: 'deposit' | 'balance' | 'installment';

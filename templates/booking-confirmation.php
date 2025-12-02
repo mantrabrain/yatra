@@ -377,6 +377,24 @@ get_header();
                     <?php esc_html_e('Return to Home', 'yatra'); ?>
                 </a>
                 
+                <?php 
+                // Get latest payment for this booking to enable invoice download
+                $paymentRepository = new \Yatra\Repositories\PaymentRepository();
+                $latestPayment = $paymentRepository->findLatestByBookingId((int) $booking->id);
+                if ($latestPayment && in_array($latestPayment->status, ['completed', 'paid'], true)) : 
+                ?>
+                <a href="<?php echo esc_url(rest_url('yatra/v1/payment/' . $latestPayment->id . '/invoice')); ?>" 
+                   target="_blank" 
+                   class="yatra-btn yatra-btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <?php esc_html_e('Download Invoice', 'yatra'); ?>
+                </a>
+                <?php endif; ?>
+                
                 <button onclick="window.print();" class="yatra-btn yatra-btn-outline">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 6 2 18 2 18 9"></polyline>

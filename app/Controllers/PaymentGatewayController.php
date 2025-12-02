@@ -134,7 +134,7 @@ class PaymentGatewayController extends BaseController
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'download_invoice'],
-                'permission_callback' => [$this, 'check_customer_permission'],
+                'permission_callback' => '__return_true', // Auth checked inside callback
             ],
         ]);
     }
@@ -702,12 +702,18 @@ class PaymentGatewayController extends BaseController
             return new WP_Error('payment_not_found', __('Payment not found.', 'yatra'), ['status' => 404]);
         }
 
-        // Verify user owns this payment
+        // Verify user is logged in and owns this payment (or is admin)
         $currentUserId = get_current_user_id();
         $bookingUserId = (int) ($payment->booking_user_id ?? $payment->user_id ?? 0);
         
-        if ($currentUserId && $bookingUserId && $currentUserId !== $bookingUserId) {
-            return new WP_Error('unauthorized', __('You do not have permission to access this invoice.', 'yatra'), ['status' => 403]);
+        // Must be logged in
+        if (!$currentUserId) {
+            return new WP_Error('unauthorized', __('You must be logged in to download invoices.', 'yatra'), ['status' => 401]);
+        }
+        
+        // Must own the booking or be admin
+        if ($bookingUserId && $currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
+            return new WP_Error('forbidden', __('You do not have permission to access this invoice.', 'yatra'), ['status' => 403]);
         }
 
         // Get trip details if available

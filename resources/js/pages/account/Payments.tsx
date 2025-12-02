@@ -160,7 +160,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
             const dueRaw = bookingDue ?? (bookingTotal !== null ? bookingTotal - paid : total - paid);
             const due = Math.max(0, dueRaw || 0);
             const canPayRemaining = typeof payment.booking_id === 'number' && due > 0.01;
-            const isPaid = payment.status === 'paid';
+            const isPaid = payment.status === 'paid' || payment.status === 'completed';
             const isPending = payment.status === 'pending';
 
             return (
@@ -233,22 +233,24 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
 
                   {/* Action Buttons */}
                   <div className="yatra-payment-actions flex flex-wrap gap-3">
+                    {/* Download Invoice - show for paid/completed payments */}
                     {isPaid && (
-                      <>
-                        <button type="button" className="yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium">
-                          <FileTextIcon className="w-4 h-4" />
-                          {__('View Receipt', 'View Receipt')}
-                        </button>
-                        <a
-                          href={`${(window as any).yatraAccountData?.apiUrl || '/wp-json/yatra/v1'}/payment/${payment.id}/invoice?_wpnonce=${(window as any).yatraAccountData?.nonce || ''}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="yatra-payment-action yatra-payment-action-invoice inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium"
-                        >
-                          <Download className="w-4 h-4" />
-                          {__('Download Invoice', 'Download Invoice')}
-                        </a>
-                      </>
+                      <a
+                        href={`${(window as any).yatraAccountData?.siteUrl || ''}/?yatra_invoice=${payment.id}&_wpnonce=${(window as any).yatraAccountData?.nonce || ''}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="yatra-payment-action yatra-payment-action-invoice inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
+                        style={{ backgroundColor: '#059669', color: '#ffffff' }}
+                      >
+                        <Download className="w-4 h-4" />
+                        {__('Download Invoice', 'Download Invoice')}
+                      </a>
+                    )}
+                    {isPaid && (
+                      <button type="button" className="yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium">
+                        <FileTextIcon className="w-4 h-4" />
+                        {__('View Receipt', 'View Receipt')}
+                      </button>
                     )}
                     {isPending && !canPayRemaining && (
                       <button type="button" className="yatra-payment-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium">
