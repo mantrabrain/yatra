@@ -48,6 +48,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { MultiSelect, MultiSelectOption } from '../components/ui/multi-select';
 
 // Helper component for form field with description - MUST be outside component to prevent remounts
 const FormField = React.memo(({ 
@@ -133,15 +134,18 @@ interface PaymentGatewayConfig {
 
 interface GatewayField {
   id: string;
-  type: 'text' | 'password' | 'number' | 'checkbox' | 'textarea' | 'select';
+  type: string;
   label: string;
   description?: string;
   placeholder?: string;
   default?: any;
+  options?: Record<string, string>;
+  condition?: string;
   min?: number;
   max?: number;
-  options?: { value: string; label: string }[];
-  condition?: string;
+  readonly?: boolean;
+  help_text?: string;
+  help_url?: string;
 }
 
 interface GatewayDefinition {
@@ -2316,23 +2320,89 @@ onChange={handleFieldChange}
                             );
                           }
 
+                          // Special handling for Stripe enabled payment methods (multi-select UI)
+                          if (gateway.id === 'stripe' && field.id === 'enabled_methods') {
+                            const rawValue = config[field.id];
+                            const selectedValues = Array.isArray(rawValue)
+                              ? rawValue
+                              : typeof rawValue === 'string' && rawValue.length > 0
+                                ? rawValue.split(',').map(val => val.trim()).filter(Boolean)
+                                : ['card', 'google_pay', 'apple_pay'];
+
+                            const methodOptions: MultiSelectOption[] = [
+                              { value: 'card', label: __('Card (Stripe Elements)', 'Card (Stripe Elements)') },
+                              { value: 'google_pay', label: __('Google Pay (Payment Request Button)', 'Google Pay (Payment Request Button)') },
+                              { value: 'apple_pay', label: __('Apple Pay (Payment Request Button)', 'Apple Pay (Payment Request Button)') },
+                            ];
+
+                            const handleStripeMethodsChange = (values: (string | number)[]) => {
+                              handleGatewayConfigChange(gatewayId, field.id, values.join(','));
+                            };
+
+                            return (
+                              <div key={field.id} className="space-y-2">
+                                <FormField
+                                  id={`${gatewayId}_${field.id}`}
+                                  label={field.label}
+                                  description={field.description}
+                                >
+                                  <MultiSelect
+                                    value={selectedValues}
+                                    onChange={handleStripeMethodsChange}
+                                    options={methodOptions}
+                                    placeholder={__('Select payment methods...', 'Select payment methods...')}
+                                  />
+                                </FormField>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {__('Apple Pay requires domain verification inside your Stripe Dashboard.', 'Apple Pay requires domain verification inside your Stripe Dashboard.')}
+                                  {field.help_url && (
+                                    <a
+                                      href={field.help_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent"
+                                    >
+                                      {__('Learn more →', 'Learn more →')}
+                                    </a>
+                                  )}
+                                </p>
+                              </div>
+                            );
+                          }
+
                           // Render text, password, number inputs
                           return (
-                            <FormField
-                              key={field.id}
-                              id={`${gatewayId}_${field.id}`}
-                              label={field.label}
-                              description={field.description}
-                            >
-                              <Input
-                                type={field.type}
-                                value={config[field.id] ?? field.default ?? ''}
-                                onChange={(e) => handleGatewayConfigChange(gatewayId, field.id, field.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value)}
-                                placeholder={field.placeholder}
-                                min={field.min}
-                                max={field.max}
-                              />
-                            </FormField>
+                            <div key={field.id} className="space-y-2">
+                              <FormField
+                                id={`${gatewayId}_${field.id}`}
+                                label={field.label}
+                                description={field.description}
+                              >
+                                <Input
+                                  type={field.type}
+                                  value={config[field.id] ?? field.default ?? ''}
+                                  onChange={(e) => handleGatewayConfigChange(gatewayId, field.id, field.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value)}
+                                  placeholder={field.placeholder}
+                                  min={field.min}
+                                  max={field.max}
+                                />
+                              </FormField>
+                              {field.help_text && (
+                                <p className="text-xs text-blue-600 dark:text-blue-400">
+                                  {field.help_text}
+                                  {field.help_url && (
+                                    <a 
+                                      href={field.help_url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent transition-colors"
+                                    >
+                                      {__('Learn more →', 'Learn more →')}
+                                    </a>
+                                  )}
+                                </p>
+                              )}
+                            </div>
                           );
                         })}
                           </div>

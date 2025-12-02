@@ -275,7 +275,14 @@
     gap: 12px;
 }
 
+
 .yatra-gateway-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.yatra-gateway-option-wrapper {
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -351,6 +358,18 @@
 
 .yatra-gateway-option input[type="radio"]:checked ~ .yatra-gateway-content .yatra-gateway-title {
     color: #3b82f6;
+}
+
+.yatra-gateway-extra {
+    display: none;
+    padding: 20px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #f8fbff;
+}
+
+.yatra-gateway-extra.active {
+    display: block;
 }
 
 .yatra-gateway-label span {

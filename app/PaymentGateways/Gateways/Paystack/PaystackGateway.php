@@ -30,6 +30,8 @@ class PaystackGateway extends AbstractPaymentGateway
                 'description' => __('Your Paystack public key', 'yatra'),
                 'placeholder' => 'pk_test_... or pk_live_...',
                 'default' => '',
+                'help_url' => 'https://dashboard.paystack.com/#/settings/developer',
+                'help_text' => __('Get your API keys from Paystack Dashboard > Settings > API Keys & Webhooks', 'yatra'),
             ],
             [
                 'id' => 'secret_key',
@@ -38,6 +40,8 @@ class PaystackGateway extends AbstractPaymentGateway
                 'description' => __('Your Paystack secret key (keep this secure)', 'yatra'),
                 'placeholder' => 'sk_test_... or sk_live_...',
                 'default' => '',
+                'help_url' => 'https://dashboard.paystack.com/#/settings/developer',
+                'help_text' => __('Get your API keys from Paystack Dashboard > Settings > API Keys & Webhooks', 'yatra'),
             ],
             [
                 'id' => 'test_mode',

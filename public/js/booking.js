@@ -159,6 +159,13 @@
             $('#summary-due strong').text(formatCurrency(dueNow, currency));
             $('#pay-amount').text(formatCurrency(dueNow, currency));
             
+            if ($form && $form.length) {
+                $form.data('paymentDue', dueNow);
+                $form.attr('data-payment-due', dueNow);
+            }
+            window.yatraBookingData = window.yatraBookingData || {};
+            window.yatraBookingData.paymentDue = dueNow;
+
             // Update deposit display
             if ($('.yatra-price-deposit').length) {
                 $('#summary-deposit').text(formatCurrency(total * (depositPercentage / 100), currency));
@@ -656,7 +663,20 @@
             } else if ($gatewayInfo.length) {
                 $gatewayInfo.hide();
             }
+
+            // Toggle gateway-specific content containers
+            $('.yatra-gateway-extra').removeClass('active');
+            const $gatewayExtra = $('#yatra-gateway-extra-' + gateway);
+            if ($gatewayExtra.length) {
+                $gatewayExtra.addClass('active');
+            }
         });
+
+        // Ensure default-selected gateway shows its content on load
+        const $defaultGateway = $('input[name="payment_gateway"]:checked');
+        if ($defaultGateway.length) {
+            $defaultGateway.trigger('change');
+        }
 
         // Form submission - using FormData API
         $form.on('submit', function(e) {
@@ -666,14 +686,8 @@
             if (!validateForm()) {
                 return;
             }
-            
-            // Show loading state
+
             const originalBtnHtml = $submitBtn.html();
-            $submitBtn.prop('disabled', true).html(
-                '<svg class="animate-spin" style="display: inline-block; width: 20px; height: 20px; margin-right: 8px; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                '<circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"></circle></svg>' +
-                '<span>Processing...</span>'
-            );
             
             // Collect form data using FormData API
             const formData = new FormData(this);
@@ -685,8 +699,33 @@
             bookingData.accept_terms = $('input[name="accept_terms"]').is(':checked');
             bookingData.accept_privacy = $('input[name="accept_privacy"]').is(':checked');
             bookingData.subscribe_newsletter = $('input[name="subscribe_newsletter"]').is(':checked');
-            
-            // Submit via REST API
+            bookingData.payment_due = parseFloat($form.attr('data-payment-due')) || window.yatraBookingData?.paymentDue || null;
+            bookingData.currency = window.yatraBookingData?.currency || bookingData.currency || $('input[name="currency"]').val() || 'USD';
+
+            // Allow payment gateways (e.g., Stripe) to intercept submission
+            const beforeSubmitEvent = new CustomEvent('yatraBeforeBookingSubmit', {
+                detail: {
+                    form: this,
+                    bookingData,
+                    submitButton: $submitBtn[0],
+                    originalBtnHtml
+                },
+                cancelable: true
+            });
+
+            const handledByGateway = !document.dispatchEvent(beforeSubmitEvent);
+            if (handledByGateway) {
+                return;
+            }
+
+            // Show loading state for default gateways
+            $submitBtn.prop('disabled', true).html(
+                '<svg class="animate-spin" style="display: inline-block; width: 20px; height: 20px; margin-right: 8px; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                '<circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"></circle></svg>' +
+                '<span>Processing...</span>'
+            );
+
+            // For other payment gateways, submit normally
             fetch(apiUrl + '/booking/create', {
                 method: 'POST',
                 headers: {
@@ -758,7 +797,7 @@
         $('#yatra-remove-coupon').on('click', function() {
             removeCoupon();
         });
-        
+
         function applyCoupon() {
             const code = $('#yatra-coupon-code').val().trim().toUpperCase();
             const $btn = $('#yatra-apply-coupon');
@@ -1335,4 +1374,5 @@
         });
     });
 
+    // End of document ready
 })(jQuery);

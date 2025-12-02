@@ -42,19 +42,30 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
     {
         // If icon is a relative path (starts with /), convert to full URL
         if (!empty($this->icon) && strpos($this->icon, 'http') !== 0) {
-            // Check if icon is in the new folder structure
-            if ($this->icon === 'icon.svg') {
-                // Get the gateway class name to determine folder
-                $className = get_class($this);
-                $parts = explode('\\', $className);
-                $gatewayFolder = end($parts); // e.g., 'StripeGateway'
-                $folderName = str_replace('Gateway', '', $gatewayFolder); // e.g., 'Stripe'
-                
-                // Return path to icon in gateway folder
-                return plugins_url("app/PaymentGateways/Gateways/{$folderName}/icon.svg", dirname(__DIR__, 2) . '/yatra.php');
+            // Get the gateway class name to determine folder
+            $className = get_class($this);
+            $parts = explode('\\', $className);
+            $gatewayFolder = end($parts); // e.g., 'StripeGateway'
+            $folderName = str_replace('Gateway', '', $gatewayFolder); // e.g., 'Stripe'
+            
+            // Get the correct plugin file path
+            $pluginFile = dirname(__DIR__, 3) . '/yatra.php';
+            
+            // Check if the icon exists in the gateway folder
+            $iconPath = dirname(__DIR__, 3) . "/app/PaymentGateways/Gateways/{$folderName}/icon.svg";
+            
+            if (file_exists($iconPath)) {
+                return plugins_url("app/PaymentGateways/Gateways/{$folderName}/icon.svg", $pluginFile);
             }
+            
             // Fallback to old path for backward compatibility
-            return plugins_url('public/images/gateways/' . $this->icon, dirname(__DIR__, 2) . '/yatra.php');
+            $legacyPath = dirname(__DIR__, 3) . '/public/images/gateways/' . $this->icon;
+            if (file_exists($legacyPath)) {
+                return plugins_url('public/images/gateways/' . $this->icon, $pluginFile);
+            }
+            
+            // If no icon found, return empty string
+            return '';
         }
         return $this->icon;
     }
@@ -95,6 +106,10 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
         foreach ($this->getConfigFields() as $field) {
             $defaults[$field['id']] = $field['default'] ?? '';
         }
+        // Ensure 'enabled' is always present
+        if (!isset($defaults['enabled'])) {
+            $defaults['enabled'] = false;
+        }
         return $defaults;
     }
 
@@ -110,7 +125,7 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
 
     public function isAvailable(): bool
     {
-        return !empty($this->config['enabled']);
+        return !empty($this->config['enabled'] ?? false);
     }
 
     /**

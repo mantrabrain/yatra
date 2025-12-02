@@ -24,6 +24,8 @@ class PayPalGateway extends AbstractPaymentGateway
                 'description' => __('Your PayPal application client ID', 'yatra'),
                 'placeholder' => 'AeA1QIZXiflr1...',
                 'default' => '',
+                'help_url' => 'https://developer.paypal.com/developer/applications/',
+                'help_text' => __('Create an app in PayPal Developer Dashboard to get Client ID', 'yatra'),
             ],
             [
                 'id' => 'client_secret',
@@ -32,6 +34,8 @@ class PayPalGateway extends AbstractPaymentGateway
                 'description' => __('Your PayPal application client secret', 'yatra'),
                 'placeholder' => 'EC...',
                 'default' => '',
+                'help_url' => 'https://developer.paypal.com/developer/applications/',
+                'help_text' => __('Get Client Secret from the same PayPal app you created', 'yatra'),
             ],
             [
                 'id' => 'sandbox',

@@ -92,6 +92,9 @@ class AppServiceProvider extends ServiceProvider
         
         // Handle booking confirmation page
         add_action('template_redirect', [$this, 'handleBookingConfirmationPage'], 1);
+        
+        // Handle payment processing page
+        add_action('template_redirect', [$this, 'handlePaymentProcessingPage'], 1);
 
         // Ensure frontend bundles are marked as ES modules
         add_filter('script_loader_tag', [$this, 'addFrontendModuleType'], 10, 2);
@@ -882,6 +885,7 @@ class AppServiceProvider extends ServiceProvider
         $vars[] = 'yatra_listing_page';
         $vars[] = 'yatra_booking_page';
         $vars[] = 'yatra_booking_confirmation';
+        $vars[] = 'yatra_payment_process';
         $vars[] = 'yatra_verify_email';
         // Single taxonomy pages
         $vars[] = 'yatra_destination_slug';
@@ -998,23 +1002,17 @@ class AppServiceProvider extends ServiceProvider
             // Booking page without trip slug (session-based): /{booking_base}/
             add_rewrite_rule(
                 '^' . $booking_base . '/?$',
-                'index.php?yatra_booking_page=checkout',
+                'index.php?yatra_booking_page=session',
                 'top'
             );
         }
         
-        // Booking confirmation page: /booking-confirmation/{reference}/
+        // Add rewrite rule for payment processing page
         add_rewrite_rule(
-            '^booking-confirmation/([^/]+)/?$',
-            'index.php?yatra_booking_confirmation=$matches[1]',
+            '^yatra-payment/process/?$',
+            'index.php?yatra_payment_process=1',
             'top'
         );
-
-        // Debug logging
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log(sprintf('Yatra: Registered rewrite rules for trip_base: %s, destination_base: %s, activity_base: %s, trip_category_base: %s, booking_base: %s (custom page: %s)', 
-                $trip_base, $destination_base, $activity_base, $trip_category_base, $booking_base, $use_booking_page ? 'yes' : 'no'));
-        }
     }
 
     /**
@@ -1641,11 +1639,12 @@ class AppServiceProvider extends ServiceProvider
                 $config = $gateway_configs[$gateway_id] ?? [];
                 
                 // Check if gateway is enabled (support both 'enabled' and '1' formats)
-                $is_enabled = !empty($config['enabled']) || (isset($config['enabled']) && $config['enabled'] === '1') || $config['enabled'] === true;
+                $enabled_value = $config['enabled'] ?? false;
+                $is_enabled = !empty($enabled_value) || $enabled_value === '1' || $enabled_value === true;
                 
                 // Debug logging for each gateway
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log("Yatra Gateway Debug - {$gateway_id}: enabled=" . var_export($config['enabled'] ?? null, true) . ", is_enabled=" . var_export($is_enabled, true));
+                    error_log("Yatra Gateway Debug - {$gateway_id}: enabled=" . var_export($enabled_value, true) . ", is_enabled=" . var_export($is_enabled, true));
                 }
                 
                 if ($is_enabled) {
@@ -1701,24 +1700,88 @@ class AppServiceProvider extends ServiceProvider
             );
         }
 
+        // Enqueue Stripe CSS
+        $stripe_css = YATRA_PLUGIN_PATH . 'public/css/stripe.css';
+        if (file_exists($stripe_css)) {
+            $stripe_css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $stripe_css);
+            $css_version = YATRA_VERSION . '.' . filemtime($stripe_css);
+            wp_enqueue_style(
+                'yatra-stripe',
+                $stripe_css_url,
+                [],
+                $css_version
+            );
+        }
+
         // Enqueue JS
         $js_file = YATRA_PLUGIN_PATH . 'public/js/booking.js';
         if (file_exists($js_file)) {
             $js_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $js_file);
             $js_version = YATRA_VERSION . '.' . filemtime($js_file);
+            
+            // Enqueue Stripe.js as a dependency
             wp_enqueue_script(
-                'yatra-booking',
-                $js_url,
+                'yatra-stripe',
+                YATRA_PLUGIN_URL . 'public/js/stripe.js',
                 ['jquery'],
                 $js_version,
                 true
             );
+            
+            // Enqueue main booking script with Stripe as a dependency
+            wp_enqueue_script(
+                'yatra-booking',
+                $js_url,
+                ['jquery', 'yatra-stripe'],
+                $js_version,
+                true
+            );
+
+            // Get Stripe settings from gateway configs with backward compatibility
+            $gateway_configs = get_option('yatra_gateway_configs', []);
+            if (is_string($gateway_configs)) {
+                $gateway_configs = maybe_unserialize($gateway_configs);
+            }
+
+            $stripe_settings = $gateway_configs['stripe'] ?? [];
+
+            // Fallback to legacy option keys if needed
+            if (empty($stripe_settings)) {
+                $legacy_settings = get_option('yatra_payment_gateway_stripe', []);
+                if (is_array($legacy_settings)) {
+                    $stripe_settings = $legacy_settings;
+                }
+            }
+
+            $is_test_mode = !empty($stripe_settings['test_mode']) && $stripe_settings['test_mode'] !== 'no';
+            $publishable_key = $stripe_settings['api_key']
+                ?? ($is_test_mode ? ($stripe_settings['test_publishable_key'] ?? '') : ($stripe_settings['live_publishable_key'] ?? ''));
+
+            $enabled_methods_raw = $stripe_settings['enabled_methods'] ?? 'card,google_pay,apple_pay';
+            if (is_string($enabled_methods_raw)) {
+                $enabled_methods_raw = explode(',', $enabled_methods_raw);
+            }
+            if (!is_array($enabled_methods_raw)) {
+                $enabled_methods_raw = ['card'];
+            }
+            $enabled_methods = array_values(array_filter(array_map(static function ($method) {
+                return trim((string) $method);
+            }, $enabled_methods_raw)));
+
+            if (empty($enabled_methods)) {
+                $enabled_methods = ['card'];
+            }
 
             // Localize script with booking data using SettingsService
             $localized_data = [
                 'apiUrl' => rest_url('yatra/v1'),
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('wp_rest'),
+                'stripe' => [
+                    'publishableKey' => $publishable_key,
+                    'isTestMode' => $is_test_mode,
+                    'enabledMethods' => $enabled_methods,
+                ],
                 'depositPercentage' => $booking->deposit_percentage ?? SettingsService::getInt('deposit_percentage', 20),
                 'partialPercentage' => $booking->partial_payment_percentage ?? SettingsService::getInt('partial_payment_percentage', 30),
                 'tripPrice' => 0,
@@ -1738,7 +1801,10 @@ class AppServiceProvider extends ServiceProvider
                 $localized_data['currency'] = SettingsService::getCurrency();
                 $localized_data['minTravelers'] = $booking->trip->min_travelers ?? 1;
                 $localized_data['maxTravelers'] = $booking->trip->max_travelers ?? 20;
+                $localized_data['tripTitle'] = $booking->trip->title ?? __('Trip Booking', 'yatra');
             }
+
+            $localized_data['companyCountry'] = SettingsService::get('company_country', 'US');
 
             wp_localize_script('yatra-booking', 'yatraBookingData', $localized_data);
         }
@@ -2031,6 +2097,35 @@ class AppServiceProvider extends ServiceProvider
         }
 
         return $tag;
+    }
+    
+    /**
+     * Handle payment processing page
+     */
+    public function handlePaymentProcessingPage(): void
+    {
+        if (!get_query_var('yatra_payment_process')) {
+            return;
+        }
+        
+        global $wp_query;
+        
+        // Set up WordPress query
+        $wp_query->is_home = false;
+        $wp_query->is_page = true;
+        $wp_query->is_singular = true;
+        $wp_query->is_404 = false;
+        status_header(200);
+        
+        // Load the payment processing template
+        $template_path = YATRA_PLUGIN_PATH . 'templates/payment-process.php';
+        
+        if (file_exists($template_path)) {
+            include $template_path;
+            exit;
+        } else {
+            wp_die(__('Payment processing page template not found.', 'yatra'));
+        }
     }
 }
 

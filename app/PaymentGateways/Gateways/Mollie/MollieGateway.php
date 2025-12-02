@@ -30,6 +30,8 @@ class MollieGateway extends AbstractPaymentGateway
                 'description' => __('Your Mollie API key (live or test)', 'yatra'),
                 'placeholder' => 'live_... or test_...',
                 'default' => '',
+                'help_url' => 'https://my.mollie.com/dashboard/developers/api-keys',
+                'help_text' => __('Get your API key from Mollie Dashboard > Developers > API keys', 'yatra'),
             ],
             [
                 'id' => 'test_mode',

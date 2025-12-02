@@ -19538,26 +19538,84 @@ const Settings = () => {
                             field.id
                           );
                         }
-                        return /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          FormField,
-                          {
-                            id: `${gatewayId}_${field.id}`,
-                            label: field.label,
-                            description: field.description,
-                            children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Input,
+                        if (gateway.id === "stripe" && field.id === "enabled_methods") {
+                          const rawValue = config[field.id];
+                          const selectedValues = Array.isArray(rawValue) ? rawValue : typeof rawValue === "string" && rawValue.length > 0 ? rawValue.split(",").map((val) => val.trim()).filter(Boolean) : ["card", "google_pay", "apple_pay"];
+                          const methodOptions = [
+                            { value: "card", label: __("Card (Stripe Elements)", "Card (Stripe Elements)") },
+                            { value: "google_pay", label: __("Google Pay (Payment Request Button)", "Google Pay (Payment Request Button)") },
+                            { value: "apple_pay", label: __("Apple Pay (Payment Request Button)", "Apple Pay (Payment Request Button)") }
+                          ];
+                          const handleStripeMethodsChange = (values) => {
+                            handleGatewayConfigChange(gatewayId, field.id, values.join(","));
+                          };
+                          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              FormField,
                               {
-                                type: field.type,
-                                value: config[field.id] ?? field.default ?? "",
-                                onChange: (e) => handleGatewayConfigChange(gatewayId, field.id, field.type === "number" ? parseFloat(e.target.value) || 0 : e.target.value),
-                                placeholder: field.placeholder,
-                                min: field.min,
-                                max: field.max
+                                id: `${gatewayId}_${field.id}`,
+                                label: field.label,
+                                description: field.description,
+                                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  MultiSelect,
+                                  {
+                                    value: selectedValues,
+                                    onChange: handleStripeMethodsChange,
+                                    options: methodOptions,
+                                    placeholder: __("Select payment methods...", "Select payment methods...")
+                                  }
+                                )
+                              }
+                            ),
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
+                              __("Apple Pay requires domain verification inside your Stripe Dashboard.", "Apple Pay requires domain verification inside your Stripe Dashboard."),
+                              field.help_url && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                "a",
+                                {
+                                  href: field.help_url,
+                                  target: "_blank",
+                                  rel: "noopener noreferrer",
+                                  className: "ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent",
+                                  children: __("Learn more →", "Learn more →")
+                                }
+                              )
+                            ] })
+                          ] }, field.id);
+                        }
+                        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            FormField,
+                            {
+                              id: `${gatewayId}_${field.id}`,
+                              label: field.label,
+                              description: field.description,
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                Input,
+                                {
+                                  type: field.type,
+                                  value: config[field.id] ?? field.default ?? "",
+                                  onChange: (e) => handleGatewayConfigChange(gatewayId, field.id, field.type === "number" ? parseFloat(e.target.value) || 0 : e.target.value),
+                                  placeholder: field.placeholder,
+                                  min: field.min,
+                                  max: field.max
+                                }
+                              )
+                            }
+                          ),
+                          field.help_text && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-600 dark:text-blue-400", children: [
+                            field.help_text,
+                            field.help_url && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "a",
+                              {
+                                href: field.help_url,
+                                target: "_blank",
+                                rel: "noopener noreferrer",
+                                className: "ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent transition-colors",
+                                children: __("Learn more →", "Learn more →")
                               }
                             )
-                          },
-                          field.id
-                        );
+                          ] })
+                        ] }, field.id);
                       }) })
                     ] })
                   ]

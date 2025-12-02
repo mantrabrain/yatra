@@ -178,6 +178,26 @@ class PaymentGatewayController extends BaseController
             'return_url' => esc_url_raw($request->get_param('return_url')),
         ];
 
+        // Enrich payment data with booking context (reference, trip title, cancel URL)
+        if ($paymentData['booking_id'] > 0) {
+            $booking = $this->bookingRepository->find($paymentData['booking_id']);
+            if ($booking) {
+                $paymentData['reference'] = $booking->reference ?? '';
+                $paymentData['trip_title'] = $booking->trip_title ?? '';
+                if (empty($paymentData['trip_id'])) {
+                    $paymentData['trip_id'] = (int) ($booking->trip_id ?? 0);
+                }
+            }
+        }
+
+        if (empty($paymentData['return_url'])) {
+            $reference = $paymentData['reference'] ?? (string) $paymentData['booking_id'];
+            $paymentData['return_url'] = $this->getConfirmationUrl($reference) . '?payment=success';
+        }
+
+        $cancelParam = esc_url_raw($request->get_param('cancel_url'));
+        $paymentData['cancel_url'] = $cancelParam ?: home_url('/book/?payment=cancelled&ref=' . ($paymentData['reference'] ?? $paymentData['booking_id']));
+
         if ($paymentData['amount'] <= 0) {
             return new WP_Error('invalid_amount', __('Invalid payment amount', 'yatra'), ['status' => 400]);
         }
@@ -185,10 +205,22 @@ class PaymentGatewayController extends BaseController
         $result = $this->registry->processPayment($gatewayId, $paymentData);
 
         if (!$result['success']) {
-            return new WP_Error('payment_error', $result['error'] ?? __('Payment failed', 'yatra'), ['status' => 400]);
+            $errorMessage = $result['error'] ?? $result['message'] ?? __('Payment failed', 'yatra');
+            return new WP_Error('payment_error', $errorMessage, ['status' => 400]);
         }
 
         return new WP_REST_Response($result, 200);
+    }
+
+    private function getConfirmationUrl(string $reference): string
+    {
+        $confirmation_page_id = \Yatra\Services\SettingsService::get('booking_confirmation_page');
+
+        if ($confirmation_page_id) {
+            return add_query_arg('booking', $reference, get_permalink($confirmation_page_id));
+        }
+
+        return home_url('/booking-confirmation/' . $reference . '/');
     }
 
     /**

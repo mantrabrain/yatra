@@ -285,6 +285,75 @@ if ($pricing_type === 'traveler_based' && !empty($price_types) && !empty($travel
     }
 }
 
+$price_candidates = [
+    isset($trip->price) ? (float) $trip->price : 0,
+    isset($booking->session_price) ? (float) $booking->session_price : 0,
+    isset($trip->sale_price) ? (float) $trip->sale_price : 0,
+    isset($trip->original_price) ? (float) $trip->original_price : 0,
+];
+
+$effective_trip_price = 0;
+foreach ($price_candidates as $candidate) {
+    if ($candidate > 0) {
+        $effective_trip_price = $candidate;
+        break;
+    }
+}
+
+$traveler_price_rows = [];
+$calculated_total = 0;
+
+if ($pricing_type === 'traveler_based' && !empty($price_types)) {
+    foreach ($price_types as $index => $pt) {
+        $pt = (object) $pt;
+        $category_id = $pt->category_id ?? $index;
+        $category_label = $pt->category_label ?? __('Traveler', 'yatra');
+        $category_price = isset($pt->effective_price) ? (float) $pt->effective_price : ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+        $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
+        $subtotal = $category_price * $count;
+
+        $age_info = '';
+        if (isset($pt->age_min) || isset($pt->age_max)) {
+            if (isset($pt->age_min) && isset($pt->age_max)) {
+                $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $pt->age_min, $pt->age_max);
+            } elseif (isset($pt->age_min)) {
+                $age_info = sprintf(__('(Age %d+)', 'yatra'), $pt->age_min);
+            } else {
+                $age_info = sprintf(__('(Up to age %d)', 'yatra'), $pt->age_max);
+            }
+        }
+
+        $traveler_price_rows[] = [
+            'category_id' => $category_id,
+            'category_label' => $category_label,
+            'category_price' => $category_price,
+            'count' => $count,
+            'subtotal' => $subtotal,
+            'age_info' => $age_info,
+        ];
+
+        $calculated_total += $subtotal;
+
+        if ($effective_trip_price <= 0 && $category_price > 0) {
+            $effective_trip_price = $category_price;
+        }
+    }
+}
+
+if ($effective_trip_price <= 0) {
+    $effective_trip_price = 0;
+}
+
+$initial_total_amount = $calculated_total > 0
+    ? $calculated_total
+    : ($effective_trip_price * max(1, (int) $total_travelers));
+
+if ($initial_total_amount <= 0 && $effective_trip_price > 0) {
+    $initial_total_amount = $effective_trip_price * max(1, (int) $total_travelers);
+}
+
+$initial_due_amount = $initial_total_amount;
+
 if (!empty($traveler_config)) : 
 ?>
 <div class="yatra-booking-section">
@@ -419,16 +488,19 @@ if (!empty($traveler_config)) :
         foreach ($enabled_gateways as $gateway_id => $gateway) : 
             $icon = !empty($gateway['icon']) ? $gateway['icon'] : plugins_url('public/images/payment-placeholder.png', dirname(__DIR__));
         ?>
-        <label class="yatra-gateway-option">
-            <input type="radio" name="payment_gateway" value="<?php echo esc_attr($gateway_id); ?>" <?php checked($first); ?>>
-            <span class="yatra-gateway-icon-wrap">
-                <img src="<?php echo esc_url($icon); ?>" alt="<?php echo esc_attr($gateway['title']); ?>" class="yatra-gateway-icon">
-            </span>
-            <span class="yatra-gateway-content">
-                <strong class="yatra-gateway-title"><?php echo esc_html($gateway['title']); ?></strong>
-                <span class="yatra-gateway-desc"><?php echo esc_html($gateway['description']); ?></span>
-            </span>
-        </label>
+        <div class="yatra-gateway-option-wrapper">
+            <label class="yatra-gateway-option">
+                <input type="radio" name="payment_gateway" value="<?php echo esc_attr($gateway_id); ?>" <?php checked($first); ?>>
+                <span class="yatra-gateway-icon-wrap">
+                    <img src="<?php echo esc_url($icon); ?>" alt="<?php echo esc_attr($gateway['title']); ?>" class="yatra-gateway-icon">
+                </span>
+                <span class="yatra-gateway-content">
+                    <strong class="yatra-gateway-title"><?php echo esc_html($gateway['title']); ?></strong>
+                    <span class="yatra-gateway-desc"><?php echo esc_html($gateway['description']); ?></span>
+                </span>
+            </label>
+            <div class="yatra-gateway-extra" id="yatra-gateway-extra-<?php echo esc_attr($gateway_id); ?>" data-gateway="<?php echo esc_attr($gateway_id); ?>"></div>
+        </div>
         <?php 
         $first = false;
         endforeach; 

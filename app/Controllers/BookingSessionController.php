@@ -1039,6 +1039,12 @@ class BookingSessionController extends BaseController
                 'status' => $booking_status,
                 'payment_status' => 'pending',
                 'redirect_url' => $this->getConfirmationUrl($booking_reference),
+                'customer_email' => $contact_data['email'],
+                'customer_name' => trim($contact_data['first_name'] . ' ' . $contact_data['last_name']),
+                'trip_id' => $trip_id,
+                'trip_date' => $travel_date,
+                'currency' => $trip->currency ?: 'USD',
+                'amount' => $amount_due,
             ],
         ]);
     }
@@ -1075,19 +1081,28 @@ class BookingSessionController extends BaseController
                 return $this->processStripePayment($params, $config, $is_test_mode);
                 
             case 'paypal':
-                return $this->processPayPalPayment($params, $config, $is_test_mode);
+                return $this->processPaymentWithGateway('paypal', $params, $config);
                 
             case 'razorpay':
-                return $this->processRazorpayPayment($params, $config, $is_test_mode);
+                return $this->processPaymentWithGateway('razorpay', $params, $config);
+                
+            case 'mollie':
+                return $this->processPaymentWithGateway('mollie', $params, $config);
+                
+            case 'paystack':
+                return $this->processPaymentWithGateway('paystack', $params, $config);
+                
+            case 'square':
+                return $this->processPaymentWithGateway('square', $params, $config);
                 
             case 'esewa':
-                return $this->processEsewaPayment($params, $config, $is_test_mode);
+                return $this->processPaymentWithGateway('esewa', $params, $config);
                 
             case 'khalti':
-                return $this->processKhaltiPayment($params, $config, $is_test_mode);
+                return $this->processPaymentWithGateway('khalti', $params, $config);
                 
             case 'authorize_net':
-                return $this->processAuthorizeNetPayment($params, $config, $is_test_mode);
+                return $this->processPaymentWithGateway('authorize_net', $params, $config);
                 
             default:
                 return ['success' => false, 'message' => 'Unknown payment gateway'];
@@ -1095,57 +1110,117 @@ class BookingSessionController extends BaseController
     }
     
     /**
-     * Process Stripe payment
+     * Process payment using PaymentGatewayRegistry
      */
     private function processStripePayment(array $params, array $config, bool $is_test): array
     {
-        $api_key = $is_test ? ($config['api_secret'] ?? '') : ($config['api_secret'] ?? '');
-        
-        if (empty($api_key)) {
-            return ['success' => false, 'message' => 'Stripe API key not configured'];
-        }
-        
+        return $this->processPaymentWithGateway('stripe', $params, $config);
+    }
+    
+    /**
+     * Process payment using the proper gateway system
+     */
+    private function processPaymentWithGateway(string $gatewayId, array $params, array $config): array
+    {
         try {
-            // Create Stripe checkout session
-            $response = wp_remote_post('https://api.stripe.com/v1/checkout/sessions', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $api_key,
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
-                'body' => [
-                    'payment_method_types[]' => 'card',
-                    'line_items[0][price_data][currency]' => strtolower($params['currency']),
-                    'line_items[0][price_data][product_data][name]' => $params['trip_title'],
-                    'line_items[0][price_data][unit_amount]' => (int) ($params['amount'] * 100),
-                    'line_items[0][quantity]' => 1,
-                    'mode' => 'payment',
-                    'success_url' => $this->getConfirmationUrl($params['reference']) . '?payment=success',
-                    'cancel_url' => home_url('/book/?payment=cancelled&ref=' . $params['reference']),
-                    'customer_email' => $params['customer_email'],
-                    'metadata[booking_id]' => $params['booking_id'],
-                    'metadata[reference]' => $params['reference'],
-                ],
-            ]);
+            $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+            $gateway = $registry->get($gatewayId);
             
-            if (is_wp_error($response)) {
-                return ['success' => false, 'message' => $response->get_error_message()];
+            if (!$gateway) {
+                return ['success' => false, 'message' => "Payment gateway '{$gatewayId}' not found"];
             }
             
-            $body = json_decode(wp_remote_retrieve_body($response), true);
-            
-            if (!empty($body['url'])) {
-                // Save session ID for webhook verification
-                $this->bookingRepository->updatePaymentSessionId(
-                    (int) $params['booking_id'],
-                    $body['id'] ?? ''
-                );
-
-                return ['success' => true, 'payment_url' => $body['url']];
+            if (!$gateway->isAvailable()) {
+                return ['success' => false, 'message' => "Payment gateway '{$gatewayId}' is not available"];
             }
             
-            return ['success' => false, 'message' => $body['error']['message'] ?? 'Failed to create Stripe session'];
+            // Prepare payment data with additional Stripe-specific parameters
+            $paymentData = [
+                'amount' => $params['amount'],
+                'currency' => $params['currency'],
+                'booking_id' => $params['booking_id'],
+                'customer_email' => $params['customer_email'],
+                'customer_name' => $params['customer_name'] ?? '',
+                'description' => $params['trip_title'],
+                'reference' => $params['reference'] ?? '',
+                'return_url' => $this->getConfirmationUrl($params['reference']) . '?payment=success',
+                'cancel_url' => home_url('/book/?payment=cancelled&ref=' . $params['reference']),
+                'metadata' => [
+                    'booking_id' => $params['booking_id'],
+                    'reference' => $params['reference'] ?? ''
+                ]
+            ];
+            
+            // Process the payment through the gateway
+            $result = $gateway->processPayment($paymentData);
+            
+            if ($result['success']) {
+                // Save transaction ID for tracking
+                if (!empty($result['transaction_id'])) {
+                    $this->bookingRepository->updatePaymentSessionId(
+                        (int) $params['booking_id'],
+                        $result['transaction_id']
+                    );
+                }
+                
+                // For gateways that return a direct redirect URL (like PayPal)
+                if (!empty($result['redirect_url'])) {
+                    return [
+                        'success' => true, 
+                        'payment_url' => $result['redirect_url']
+                    ];
+                }
+                
+                // For Stripe with client-side confirmation
+                if (!empty($result['client_secret'])) {
+                    // Create a payment processing page URL with the client secret
+                    $payment_url = add_query_arg([
+                        'gateway' => $gatewayId,
+                        'client_secret' => $result['client_secret'],
+                        'publishable_key' => $result['publishable_key'] ?? '',
+                        'booking_ref' => $params['reference'],
+                        'amount' => $params['amount'],
+                        'currency' => $params['currency'] ?? 'USD',
+                    ], home_url('/yatra-payment/process/'));
+                    
+                    return [
+                        'success' => true, 
+                        'payment_url' => $payment_url,
+                        'client_secret' => $result['client_secret']
+                    ];
+                }
+                
+                // For offline gateways or successful direct payments
+                return [
+                    'success' => true, 
+                    'redirect_url' => $this->getConfirmationUrl($params['reference'])
+                ];
+            }
+            
+            // Log the payment failure for debugging
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Payment processing failed: ' . print_r([
+                    'gateway' => $gatewayId,
+                    'params' => $params,
+                    'error' => $result['message'] ?? 'Unknown error',
+                    'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5)
+                ], true));
+            }
+            
+            return [
+                'success' => false, 
+                'message' => $result['message'] ?? 'Payment processing failed. Please try again.'
+            ];
+            
         } catch (\Exception $e) {
-            return ['success' => false, 'message' => $e->getMessage()];
+            // Log the exception for debugging
+            error_log('Payment processing exception: ' . $e->getMessage());
+            error_log('Stack trace: ' . $e->getTraceAsString());
+            
+            return [
+                'success' => false, 
+                'message' => 'An unexpected error occurred. Please try again or contact support.'
+            ];
         }
     }
     
