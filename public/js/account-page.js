@@ -910,6 +910,35 @@ const Bookings = ({ bookings, onSectionChange }) => {
   const [payLoading, setPayLoading] = reactExports.useState(null);
   const apiBase = ((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1";
   const nonce = ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "";
+  const startRemainingPaymentSession = async (bookingId) => {
+    var _a2;
+    try {
+      setPayLoading(bookingId);
+      const response = await fetch(`${apiBase}/payment/remaining/session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": nonce
+        },
+        body: JSON.stringify({ booking_id: bookingId })
+      });
+      const payload = await response.json();
+      if (!response.ok || (payload == null ? void 0 : payload.success) === false) {
+        throw new Error((payload == null ? void 0 : payload.message) || __("Unable to start payment session.", "Unable to start payment session."));
+      }
+      const checkoutUrl = (_a2 = payload == null ? void 0 : payload.data) == null ? void 0 : _a2.checkout_url;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+        return;
+      }
+      alert(__("Unable to find checkout session. Please contact support.", "Unable to find checkout session. Please contact support."));
+    } catch (error) {
+      console.error("Remaining payment session error:", error);
+      alert((error == null ? void 0 : error.message) || __("Failed to start remaining balance payment.", "Failed to start remaining balance payment."));
+    } finally {
+      setPayLoading(null);
+    }
+  };
   const { data: bookingDetails, isLoading: isLoadingBookingDetails } = useQuery({
     queryKey: ["account-booking-details", selectedBookingId],
     queryFn: async () => {
@@ -1047,11 +1076,15 @@ const Bookings = ({ bookings, onSectionChange }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400 font-medium mb-1", children: __("No bookings found", "No bookings found") }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-400 dark:text-gray-500", children: __("Try adjusting your filters or check back later.", "Try adjusting your filters or check back later.") })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: filteredDisplayBookings.map((booking) => {
+      const bookingId = Number(booking.id);
       const isUpcoming = new Date(booking.travel_date) > /* @__PURE__ */ new Date();
       const isCompleted = booking.booking_status === "completed";
-      const totalPaid = typeof booking.amount_paid === "number" ? booking.amount_paid : null;
-      const amountDue = typeof booking.amount_due === "number" ? Math.max(0, booking.amount_due) : null;
-      const canPayRemaining = typeof booking.id === "number" && amountDue !== null && amountDue > 0.01;
+      const paidNumeric = typeof booking.amount_paid === "number" ? booking.amount_paid : booking.amount_paid != null ? parseFloat(String(booking.amount_paid)) : null;
+      const dueNumeric = typeof booking.amount_due === "number" ? booking.amount_due : booking.amount_due != null ? parseFloat(String(booking.amount_due)) : null;
+      const totalPaid = paidNumeric;
+      const derivedDue = dueNumeric != null ? dueNumeric : booking.total_amount - (paidNumeric ?? 0);
+      const amountDue = Math.max(0, derivedDue);
+      const canPayRemaining = Number.isFinite(bookingId) && amountDue > 0.01;
       return /* @__PURE__ */ jsxRuntimeExports.jsx(
         "div",
         {
@@ -1119,7 +1152,7 @@ const Bookings = ({ bookings, onSectionChange }) => {
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-booking-actions flex flex-wrap gap-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { role: "button", tabIndex: 0, onClick: () => setSelectedBookingId(booking.id), className: "yatra-booking-action yatra-booking-action-view inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { role: "button", tabIndex: 0, onClick: () => setSelectedBookingId(bookingId), className: "yatra-booking-action yatra-booking-action-view inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
                 __("View Details", "View Details")
               ] }),
@@ -1136,41 +1169,13 @@ const Bookings = ({ bookings, onSectionChange }) => {
                 "button",
                 {
                   type: "button",
-                  onClick: async () => {
-                    var _a2, _b2;
-                    try {
-                      setPayLoading(booking.id);
-                      const response = await fetch(`${apiBase}/payment/remaining`, {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                          "X-WP-Nonce": nonce
-                        },
-                        body: JSON.stringify({ booking_id: booking.id, method: "stripe" })
-                      });
-                      const payload = await response.json();
-                      if (!response.ok || (payload == null ? void 0 : payload.success) === false) {
-                        throw new Error((payload == null ? void 0 : payload.message) || __("Unable to start payment.", "Unable to start payment."));
-                      }
-                      const redirectUrl = ((_a2 = payload == null ? void 0 : payload.data) == null ? void 0 : _a2.redirect_url) || ((_b2 = payload == null ? void 0 : payload.data) == null ? void 0 : _b2.payment_url);
-                      if (redirectUrl) {
-                        window.location.href = redirectUrl;
-                      } else {
-                        alert(__("Payment intent created. Please check your email for the payment link.", "Payment intent created. Please check your email for the payment link."));
-                      }
-                    } catch (error) {
-                      console.error("Remaining balance error:", error);
-                      alert((error == null ? void 0 : error.message) || __("Failed to start remaining balance payment.", "Failed to start remaining balance payment."));
-                    } finally {
-                      setPayLoading(null);
-                    }
-                  },
-                  disabled: payLoading === booking.id,
+                  onClick: () => bookingId && startRemainingPaymentSession(bookingId),
+                  disabled: payLoading === bookingId,
                   className: "yatra-booking-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50",
                   children: [
-                    payLoading === booking.id ? /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "w-4 h-4 animate-spin", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: [
+                    payLoading === bookingId ? /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "w-4 h-4 animate-spin", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "12", cy: "12", r: "10", strokeOpacity: "0.25" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M4 12a8 8 0 018-8" })
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M4 12a8 8 0 0 1 8-8" })
                     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-4 h-4" }),
                     __("Pay Remaining Balance", "Pay Remaining Balance")
                   ]
@@ -1189,11 +1194,7 @@ const Bookings = ({ bookings, onSectionChange }) => {
   ] });
 };
 const Payments = ({ payments, onSectionChange }) => {
-  var _a, _b;
   const displayPayments = payments;
-  const [payLoading, setPayLoading] = React.useState(null);
-  const apiBase = ((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1";
-  const nonce = ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "";
   const bookingSummaries = React.useMemo(() => {
     const map = /* @__PURE__ */ new Map();
     displayPayments.forEach((payment) => {
@@ -1240,38 +1241,6 @@ const Payments = ({ payments, onSectionChange }) => {
       outstandingAmount: totals.outstanding
     };
   }, [displayPayments, bookingSummaries]);
-  const handlePayRemaining = React.useCallback(async (bookingId) => {
-    var _a2, _b2;
-    if (!bookingId) {
-      return;
-    }
-    try {
-      setPayLoading(bookingId);
-      const response = await fetch(`${apiBase}/payment/remaining`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-WP-Nonce": nonce
-        },
-        body: JSON.stringify({ booking_id: bookingId, method: "stripe" })
-      });
-      const payload = await response.json();
-      if (!response.ok || (payload == null ? void 0 : payload.success) === false) {
-        throw new Error((payload == null ? void 0 : payload.message) || __("Unable to start payment.", "Unable to start payment."));
-      }
-      const redirectUrl = ((_a2 = payload == null ? void 0 : payload.data) == null ? void 0 : _a2.redirect_url) || ((_b2 = payload == null ? void 0 : payload.data) == null ? void 0 : _b2.payment_url);
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-        return;
-      }
-      alert(__("Payment intent created. Please check your email for the payment link.", "Payment intent created. Please check your email for the payment link."));
-    } catch (error) {
-      console.error("Remaining balance error:", error);
-      alert((error == null ? void 0 : error.message) || __("Failed to start remaining balance payment.", "Failed to start remaining balance payment."));
-    } finally {
-      setPayLoading(null);
-    }
-  }, [apiBase, nonce]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-payments-page space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yatra-payments-header bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-lg font-bold text-gray-900 dark:text-white flex items-center gap-3", children: [
@@ -1316,6 +1285,7 @@ const Payments = ({ payments, onSectionChange }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400 font-medium mb-1", children: __("No payments found", "No payments found") }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-400 dark:text-gray-500", children: __("Payment history will appear here once you make a booking.", "Payment history will appear here once you make a booking.") })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: displayPayments.map((payment) => {
+      var _a, _b;
       const bookingTotal = typeof payment.booking_total_amount === "number" ? payment.booking_total_amount : null;
       const bookingPaid = typeof payment.booking_amount_paid === "number" ? payment.booking_amount_paid : null;
       const bookingDue = typeof payment.booking_amount_due === "number" ? payment.booking_amount_due : null;
@@ -1376,26 +1346,25 @@ const Payments = ({ payments, onSectionChange }) => {
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-payment-actions flex flex-wrap gap-3", children: [
-              isPaid && /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "button", className: "yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4" }),
-                __("View Receipt", "View Receipt")
+              isPaid && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "button", className: "yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4" }),
+                  __("View Receipt", "View Receipt")
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "a",
+                  {
+                    href: `${((_a = window.yatraAccountData) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/payment/${payment.id}/invoice?_wpnonce=${((_b = window.yatraAccountData) == null ? void 0 : _b.nonce) || ""}`,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    className: "yatra-payment-action yatra-payment-action-invoice inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4" }),
+                      __("Download Invoice", "Download Invoice")
+                    ]
+                  }
+                )
               ] }),
-              canPayRemaining && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "button",
-                {
-                  type: "button",
-                  onClick: () => handlePayRemaining(payment.booking_id),
-                  disabled: payLoading === payment.booking_id,
-                  className: "yatra-payment-action yatra-payment-action-pay inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50",
-                  children: [
-                    payLoading === payment.booking_id ? /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "w-4 h-4 animate-spin", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "12", cy: "12", r: "10", strokeOpacity: "0.25" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M4 12a8 8 0 018-8" })
-                    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-4 h-4" }),
-                    __("Pay Remaining Balance", "Pay Remaining Balance")
-                  ]
-                }
-              ),
               isPending && !canPayRemaining && /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "button", className: "yatra-payment-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-4 h-4" }),
                 __("Pending approval", "Pending approval")

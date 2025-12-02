@@ -17,6 +17,13 @@
     $(document).ready(function() {
         const $form = $('#yatra-booking-form');
         const $submitBtn = $('#yatra-submit-booking');
+        const isRemainingPayment = Boolean(window.yatraBookingData?.isRemainingPayment) || ($form.data('is-remaining-payment') === 'yes');
+        const remainingAmount = isRemainingPayment
+            ? parseFloat(window.yatraBookingData?.remainingAmount ?? $form.data('payment-due')) || 0
+            : 0;
+        const totalRemainingAmount = isRemainingPayment
+            ? parseFloat(window.yatraBookingData?.totalAmount ?? (remainingAmount + (window.yatraBookingData?.amountPaid || 0))) || remainingAmount
+            : null;
         
         // Get pricing data
         const pricePerPerson = parseFloat($('input[name="trip_price"]').val()) || window.yatraBookingData?.tripPrice || 0;
@@ -106,6 +113,28 @@
         function updateBookingSummary() {
             let total = 0;
             let travelers = 0;
+            const selectedGateway = $('input[name="payment_gateway"]:checked').val() || 'pay_later';
+
+            if (isRemainingPayment) {
+                total = totalRemainingAmount ?? remainingAmount;
+                const dueNow = remainingAmount;
+                $('#summary-total').html('<strong>' + formatCurrency(total, currency) + '</strong>');
+                $('#summary-due strong').text(formatCurrency(dueNow, currency));
+                $('#pay-amount').text(formatCurrency(dueNow, currency));
+                if ($form && $form.length) {
+                    $form.data('paymentDue', dueNow);
+                    $form.attr('data-payment-due', dueNow);
+                }
+                window.yatraBookingData.paymentDue = dueNow;
+                window.yatraBookingSummary = {
+                    totalAmount: total,
+                    amountDue: dueNow,
+                    amountPaid: (window.yatraBookingData?.amountPaid ?? 0),
+                    paymentMethod: 'full',
+                };
+                updateButtonText(selectedGateway, dueNow);
+                return;
+            }
             
             if (isTravelerBasedPricing()) {
                 // Traveler-based pricing: sum up category prices
@@ -145,7 +174,6 @@
             }
             
             const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
-            const selectedGateway = $('input[name="payment_gateway"]:checked').val() || 'pay_later';
             
             let dueNow = total;
             if (paymentMethod === 'deposit') {
@@ -380,6 +408,10 @@
          * Validate form before submission
          */
         function validateForm() {
+            if (isRemainingPayment) {
+                return true;
+            }
+
             let isValid = true;
             const errors = [];
             
@@ -728,14 +760,14 @@
                 return;
             }
 
-            // Show loading state for default gateways
+            // Server handles session type detection - same endpoint for both flows
+            // Show loading state
             $submitBtn.prop('disabled', true).html(
                 '<svg class="animate-spin" style="display: inline-block; width: 20px; height: 20px; margin-right: 8px; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                 '<circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12"></circle></svg>' +
                 '<span>Processing...</span>'
             );
 
-            // For other payment gateways, submit normally
             fetch(apiUrl + '/booking/create', {
                 method: 'POST',
                 headers: {
@@ -749,15 +781,12 @@
             .then(response => {
                 if (response.success) {
                     if (response.data && response.data.payment_url) {
-                        // Redirect to payment gateway
                         window.location.href = response.data.payment_url;
                     } else if (response.data && response.data.redirect_url) {
-                        // Redirect to confirmation page
                         window.location.href = response.data.redirect_url;
                     } else {
-                        // Show success message inline
                         const reference = response.data?.reference || 'N/A';
-                        showSuccessMessage(response.message || 'Your booking has been confirmed!', reference);
+                        showSuccessMessage(response.message || 'Success!', reference);
                     }
                 } else {
                     showFormError(response.message || 'An error occurred. Please try again.');
@@ -765,29 +794,10 @@
                 }
             })
             .catch(error => {
-                console.error('Booking error:', error);
-                showFormError('Network error. Please check your connection and try again.');
+                console.error('Error:', error);
+                showFormError('An error occurred. Please try again.');
                 $submitBtn.prop('disabled', false).html(originalBtnHtml);
             });
-        });
-
-        // Set minimum date to today for travel date
-        const today = new Date().toISOString().split('T')[0];
-        $('input[name="travel_date"], #travel-date').attr('min', today);
-        
-        // =====================
-        // Coupon Handling
-        // =====================
-        
-        let appliedCoupon = null;
-        
-        // Toggle coupon form visibility
-        $('#yatra-coupon-toggle-btn').on('click', function() {
-            const $form = $('#yatra-coupon-form');
-            const $chevron = $(this).find('.yatra-coupon-chevron');
-            
-            $form.slideToggle(200);
-            $chevron.toggleClass('rotated');
         });
         
         // Apply coupon

@@ -31,6 +31,39 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
   const apiBase = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
   const nonce = window.yatraAdmin?.nonce || '';
 
+  const startRemainingPaymentSession = async (bookingId: number) => {
+    try {
+      setPayLoading(bookingId);
+      const response = await fetch(`${apiBase}/payment/remaining/session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': nonce,
+        },
+        body: JSON.stringify({ booking_id: bookingId }),
+      });
+
+      const payload = await response.json();
+      if (!response.ok || payload?.success === false) {
+        throw new Error(payload?.message || __('Unable to start payment session.', 'Unable to start payment session.'));
+      }
+
+      // Redirect to checkout URL (same URL for both new bookings and remaining payments)
+      const checkoutUrl = payload?.data?.checkout_url;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+        return;
+      }
+
+      alert(__('Unable to find checkout session. Please contact support.', 'Unable to find checkout session. Please contact support.'));
+    } catch (error: any) {
+      console.error('Remaining payment session error:', error);
+      alert(error?.message || __('Failed to start remaining balance payment.', 'Failed to start remaining balance payment.'));
+    } finally {
+      setPayLoading(null);
+    }
+  };
+
   // Fetch full booking details when a booking is selected
   const { data: bookingDetails, isLoading: isLoadingBookingDetails } = useQuery<any>({
     queryKey: ['account-booking-details', selectedBookingId],
@@ -220,11 +253,25 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
       ) : (
         <div className="space-y-4">
           {filteredDisplayBookings.map((booking) => {
+            const bookingId = Number(booking.id);
             const isUpcoming = new Date(booking.travel_date) > new Date();
             const isCompleted = booking.booking_status === 'completed';
-            const totalPaid = typeof booking.amount_paid === 'number' ? booking.amount_paid : null;
-            const amountDue = typeof booking.amount_due === 'number' ? Math.max(0, booking.amount_due) : null;
-            const canPayRemaining = typeof booking.id === 'number' && amountDue !== null && amountDue > 0.01;
+            const paidNumeric = typeof booking.amount_paid === 'number'
+              ? booking.amount_paid
+              : booking.amount_paid != null
+                ? parseFloat(String(booking.amount_paid))
+                : null;
+            const dueNumeric = typeof booking.amount_due === 'number'
+              ? booking.amount_due
+              : booking.amount_due != null
+                ? parseFloat(String(booking.amount_due))
+                : null;
+            const totalPaid = paidNumeric;
+            const derivedDue = dueNumeric != null
+              ? dueNumeric
+              : booking.total_amount - (paidNumeric ?? 0);
+            const amountDue = Math.max(0, derivedDue);
+            const canPayRemaining = Number.isFinite(bookingId) && amountDue > 0.01;
 
             return (
               <div
@@ -313,7 +360,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
 
                   {/* Action Buttons */}
                   <div className="yatra-booking-actions flex flex-wrap gap-3">
-                    <div role="button" tabIndex={0} onClick={() => setSelectedBookingId(booking.id)} className="yatra-booking-action yatra-booking-action-view inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer">
+                    <div role="button" tabIndex={0} onClick={() => setSelectedBookingId(bookingId)} className="yatra-booking-action yatra-booking-action-view inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer">
                       <Eye className="w-4 h-4" />
                       {__('View Details', 'View Details')}
                     </div>
@@ -328,41 +375,14 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                     {canPayRemaining && (
                       <button
                         type="button"
-                        onClick={async () => {
-                          try {
-                            setPayLoading(booking.id);
-                            const response = await fetch(`${apiBase}/payment/remaining`, {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/json',
-                                'X-WP-Nonce': nonce,
-                              },
-                              body: JSON.stringify({ booking_id: booking.id, method: 'stripe' }),
-                            });
-                            const payload = await response.json();
-                            if (!response.ok || payload?.success === false) {
-                              throw new Error(payload?.message || __('Unable to start payment.', 'Unable to start payment.'));
-                            }
-                            const redirectUrl = payload?.data?.redirect_url || payload?.data?.payment_url;
-                            if (redirectUrl) {
-                              window.location.href = redirectUrl;
-                            } else {
-                              alert(__('Payment intent created. Please check your email for the payment link.', 'Payment intent created. Please check your email for the payment link.'));
-                            }
-                          } catch (error: any) {
-                            console.error('Remaining balance error:', error);
-                            alert(error?.message || __('Failed to start remaining balance payment.', 'Failed to start remaining balance payment.'));
-                          } finally {
-                            setPayLoading(null);
-                          }
-                        }}
-                        disabled={payLoading === booking.id}
+                        onClick={() => bookingId && startRemainingPaymentSession(bookingId)}
+                        disabled={payLoading === bookingId}
                         className="yatra-booking-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50"
                       >
-                        {payLoading === booking.id ? (
+                        {payLoading === bookingId ? (
                           <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                            <path d="M4 12a8 8 0 018-8" />
+                            <path d="M4 12a8 8 0 0 1 8-8" />
                           </svg>
                         ) : (
                           <CreditCard className="w-4 h-4" />

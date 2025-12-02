@@ -7,6 +7,7 @@ import {
   Calendar as CalendarIcon,
   FileText as FileTextIcon,
   Eye,
+  Download,
 } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { formatDate, getBadge, currency } from './utils';
@@ -19,9 +20,6 @@ interface PaymentsProps {
 
 const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
   const displayPayments = payments;
-  const [payLoading, setPayLoading] = React.useState<number | null>(null);
-  const apiBase = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-  const nonce = window.yatraAdmin?.nonce || '';
 
   const bookingSummaries = React.useMemo(() => {
     const map = new Map<number, { total: number; paid: number; due: number }>();
@@ -75,38 +73,6 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
       outstandingAmount: totals.outstanding,
     };
   }, [displayPayments, bookingSummaries]);
-
-  const handlePayRemaining = React.useCallback(async (bookingId: number | undefined | null) => {
-    if (!bookingId) {
-      return;
-    }
-    try {
-      setPayLoading(bookingId);
-      const response = await fetch(`${apiBase}/payment/remaining`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': nonce,
-        },
-        body: JSON.stringify({ booking_id: bookingId, method: 'stripe' }),
-      });
-      const payload = await response.json();
-      if (!response.ok || payload?.success === false) {
-        throw new Error(payload?.message || __('Unable to start payment.', 'Unable to start payment.'));
-      }
-      const redirectUrl = payload?.data?.redirect_url || payload?.data?.payment_url;
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-        return;
-      }
-      alert(__('Payment intent created. Please check your email for the payment link.', 'Payment intent created. Please check your email for the payment link.'));
-    } catch (error: any) {
-      console.error('Remaining balance error:', error);
-      alert(error?.message || __('Failed to start remaining balance payment.', 'Failed to start remaining balance payment.'));
-    } finally {
-      setPayLoading(null);
-    }
-  }, [apiBase, nonce]);
 
   return (
     <div className="yatra-payments-page space-y-6">
@@ -268,28 +234,21 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                   {/* Action Buttons */}
                   <div className="yatra-payment-actions flex flex-wrap gap-3">
                     {isPaid && (
-                      <button type="button" className="yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium">
-                        <FileTextIcon className="w-4 h-4" />
-                        {__('View Receipt', 'View Receipt')}
-                      </button>
-                    )}
-                    {canPayRemaining && (
-                      <button
-                        type="button"
-                        onClick={() => handlePayRemaining(payment.booking_id)}
-                        disabled={payLoading === payment.booking_id}
-                        className="yatra-payment-action yatra-payment-action-pay inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50"
-                      >
-                        {payLoading === payment.booking_id ? (
-                          <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                            <path d="M4 12a8 8 0 018-8" />
-                          </svg>
-                        ) : (
-                          <CreditCard className="w-4 h-4" />
-                        )}
-                        {__('Pay Remaining Balance', 'Pay Remaining Balance')}
-                      </button>
+                      <>
+                        <button type="button" className="yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium">
+                          <FileTextIcon className="w-4 h-4" />
+                          {__('View Receipt', 'View Receipt')}
+                        </button>
+                        <a
+                          href={`${(window as any).yatraAccountData?.apiUrl || '/wp-json/yatra/v1'}/payment/${payment.id}/invoice?_wpnonce=${(window as any).yatraAccountData?.nonce || ''}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="yatra-payment-action yatra-payment-action-invoice inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium"
+                        >
+                          <Download className="w-4 h-4" />
+                          {__('Download Invoice', 'Download Invoice')}
+                        </a>
+                      </>
                     )}
                     {isPending && !canPayRemaining && (
                       <button type="button" className="yatra-payment-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium">

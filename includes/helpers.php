@@ -605,6 +605,121 @@ function yatra_has_booking_session(): bool
 }
 
 /**
+ * ============================================
+ * REMAINING PAYMENT SESSION MANAGEMENT
+ * ============================================
+ */
+
+/**
+ * Set remaining payment session data
+ * 
+ * @param array $data Remaining payment data to store
+ */
+function yatra_set_remaining_session(array $data): void
+{
+    yatra_start_session();
+    
+    $_SESSION['yatra_remaining'] = array_merge(
+        $data,
+        ['timestamp' => time()]
+    );
+    
+    // Ensure session data is written to storage immediately
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_write_close();
+    }
+}
+
+/**
+ * Get remaining payment session data
+ * 
+ * @param string|null $key Specific key to retrieve, or null for all data
+ * @param mixed $default Default value if key not found
+ * @return mixed
+ */
+function yatra_get_remaining_session(?string $key = null, $default = null)
+{
+    yatra_start_session();
+    
+    $remaining_data = $_SESSION['yatra_remaining'] ?? [];
+    
+    // Check if session is expired (30 minutes)
+    if (!empty($remaining_data['timestamp'])) {
+        $session_age = time() - $remaining_data['timestamp'];
+        if ($session_age > 1800) { // 30 minutes
+            yatra_clear_remaining_session();
+            return $key ? $default : [];
+        }
+    }
+    
+    if ($key === null) {
+        return $remaining_data;
+    }
+    
+    return $remaining_data[$key] ?? $default;
+}
+
+/**
+ * Clear remaining payment session data
+ */
+function yatra_clear_remaining_session(): void
+{
+    yatra_start_session();
+    unset($_SESSION['yatra_remaining']);
+}
+
+/**
+ * Check if remaining payment session exists and is valid
+ * 
+ * @return bool
+ */
+function yatra_has_remaining_session(): bool
+{
+    $remaining_data = yatra_get_remaining_session();
+    return !empty($remaining_data) && !empty($remaining_data['booking_id']);
+}
+
+/**
+ * Get the active checkout session type
+ * 
+ * @return string|null 'remaining' if remaining session exists, 'booking' if booking session exists, null if neither
+ */
+function yatra_get_checkout_session_type(): ?string
+{
+    if (yatra_has_remaining_session()) {
+        return 'remaining';
+    }
+    
+    if (yatra_has_booking_session()) {
+        return 'booking';
+    }
+    
+    return null;
+}
+
+/**
+ * Get the active checkout session data (remaining or booking)
+ * 
+ * @return array Session data with 'type' key indicating session type
+ */
+function yatra_get_active_checkout_session(): array
+{
+    if (yatra_has_remaining_session()) {
+        $data = yatra_get_remaining_session();
+        $data['session_type'] = 'remaining';
+        return $data;
+    }
+    
+    if (yatra_has_booking_session()) {
+        $data = yatra_get_booking_session();
+        $data['session_type'] = 'booking';
+        return $data;
+    }
+    
+    return [];
+}
+
+/**
  * Get booking/checkout URL
  * 
  * Logic:

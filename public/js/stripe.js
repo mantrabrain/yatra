@@ -692,6 +692,7 @@ class YatraStripe {
     }
 
     async prepareStripePayment(bookingData, formElement) {
+        // Always call the same endpoint - server decides based on session type
         const bookingResponse = await fetch(`${this.apiUrl}/booking/create`, {
             method: 'POST',
             headers: {
@@ -704,7 +705,7 @@ class YatraStripe {
         const bookingResult = await bookingResponse.json();
 
         if (!bookingResult.success) {
-            throw new Error(bookingResult.message || 'Failed to create booking. Please try again.');
+            throw new Error(bookingResult.message || 'Failed to process request. Please try again.');
         }
 
         const bookingInfo = bookingResult.data;
@@ -717,7 +718,7 @@ class YatraStripe {
                 .join(' ') || bookingData.full_name;
 
         if (!customerEmail) {
-            throw new Error('Missing customer email. Please fill in your contact email and try again.');
+            throw new Error('Email address is required.');
         }
 
         const paymentIntentResponse = await fetch(`${this.apiUrl}/payment/create-intent`, {

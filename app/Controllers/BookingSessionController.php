@@ -348,6 +348,9 @@ class BookingSessionController extends BaseController
             $session_data['total_amount'] = isset($data['total_amount']) ? (float) $data['total_amount'] : null;
         }
 
+        // Reset any previous session to avoid stale flags
+        yatra_clear_booking_session();
+
         // Set session
         yatra_set_booking_session($session_data);
 
@@ -438,13 +441,21 @@ class BookingSessionController extends BaseController
     }
 
     /**
-     * Create a new booking
+     * Create a new booking OR process remaining payment
+     * Server-side detection: if remaining session exists, process payment only
      */
     public function create_booking(WP_REST_Request $request): WP_REST_Response
     {
         global $wpdb;
         
         $data = $request->get_json_params();
+
+        // ========================================
+        // CHECK FOR REMAINING PAYMENT SESSION FIRST
+        // ========================================
+        if (yatra_has_remaining_session()) {
+            return $this->process_remaining_payment($request);
+        }
 
         // ========================================
         // GET BOOKING SETTINGS
@@ -1085,6 +1096,92 @@ class BookingSessionController extends BaseController
         $baseUrl = $confirmation_page_id ? get_permalink($confirmation_page_id) : home_url('/booking-confirmation/');
 
         return trailingslashit($baseUrl) . $reference . '/';
+    }
+
+    /**
+     * Process remaining payment (no new booking created)
+     */
+    private function process_remaining_payment(WP_REST_Request $request): WP_REST_Response
+    {
+        $session = yatra_get_remaining_session();
+        
+        $booking_id = (int) ($session['booking_id'] ?? 0);
+        $booking_reference = $session['booking_reference'] ?? '';
+        $remaining_amount = (float) ($session['remaining_amount'] ?? 0);
+        $currency = $session['currency'] ?? 'USD';
+        $contact_email = $session['contact_email'] ?? '';
+        $contact_first_name = $session['contact_first_name'] ?? '';
+        $contact_last_name = $session['contact_last_name'] ?? '';
+        $trip_id = (int) ($session['trip_id'] ?? 0);
+        $trip_title = $session['trip_title'] ?? '';
+        $travel_date = $session['travel_date'] ?? '';
+
+        if ($booking_id <= 0) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Invalid booking for remaining payment.', 'yatra'),
+            ], 400);
+        }
+
+        if ($remaining_amount <= 0) {
+            yatra_clear_remaining_session();
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('This booking is already fully paid.', 'yatra'),
+            ], 400);
+        }
+
+        // Verify booking exists
+        $booking = $this->bookingRepository->find($booking_id);
+        if (!$booking) {
+            yatra_clear_remaining_session();
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Booking not found.', 'yatra'),
+            ], 404);
+        }
+
+        // Verify user owns this booking
+        $current_user = get_current_user_id();
+        if ($current_user && (int) $booking->user_id !== $current_user) {
+            yatra_clear_remaining_session();
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('You do not have permission to pay for this booking.', 'yatra'),
+            ], 403);
+        }
+
+        // Use contact info from session or booking
+        $customer_email = $contact_email ?: ($booking->contact_email ?? $booking->customer_email ?? '');
+        $customer_name = trim($contact_first_name . ' ' . $contact_last_name) ?: 
+            trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? ''));
+
+        if (empty($customer_email)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Email address is required.', 'yatra'),
+            ], 400);
+        }
+
+        // Return booking info for payment processing (Stripe will create intent)
+        // Do NOT clear session yet - it will be cleared after successful payment
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => __('Ready to process remaining payment.', 'yatra'),
+            'data' => [
+                'booking_id' => $booking_id,
+                'reference' => $booking_reference,
+                'trip_id' => $trip_id,
+                'trip_title' => $trip_title,
+                'trip_date' => $travel_date,
+                'currency' => $currency,
+                'amount' => $remaining_amount,
+                'customer_email' => $customer_email,
+                'customer_name' => $customer_name,
+                'redirect_url' => $this->getConfirmationUrl($booking_reference),
+                'is_remaining_payment' => true,
+            ],
+        ]);
     }
     
     /**

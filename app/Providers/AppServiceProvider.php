@@ -93,6 +93,9 @@ class AppServiceProvider extends ServiceProvider
         // Handle booking confirmation page
         add_action('template_redirect', [$this, 'handleBookingConfirmationPage'], 1);
         
+        // Handle remaining checkout page
+        add_action('template_redirect', [$this, 'handleRemainingCheckoutPage'], 1);
+        
         // Handle payment processing page
         add_action('template_redirect', [$this, 'handlePaymentProcessingPage'], 1);
 
@@ -919,6 +922,7 @@ class AppServiceProvider extends ServiceProvider
         add_rewrite_tag('%yatra_listing_page%', '([^&]+)');
         add_rewrite_tag('%yatra_booking_page%', '([^&]+)');
         add_rewrite_tag('%yatra_booking_confirmation%', '([^&]+)');
+        add_rewrite_tag('%yatra_remaining_checkout%', '([^&]+)');
         add_rewrite_tag('%yatra_verify_email%', '([^&]+)');
         // Single taxonomy page tags
         add_rewrite_tag('%yatra_destination_slug%', '([^&]+)');
@@ -1011,6 +1015,13 @@ class AppServiceProvider extends ServiceProvider
         add_rewrite_rule(
             '^yatra-payment/process/?$',
             'index.php?yatra_payment_process=1',
+            'top'
+        );
+        
+        // Add rewrite rule for remaining checkout page
+        add_rewrite_rule(
+            '^remaining-checkout/([^/]+)/?$',
+            'index.php?yatra_remaining_checkout=$matches[1]',
             'top'
         );
     }
@@ -1456,18 +1467,49 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
+     * Handle remaining checkout page (legacy URL - redirect to main checkout)
+     */
+    public function handleRemainingCheckoutPage(): void
+    {
+        global $wp;
+
+        // Get the current request path
+        $request_path = isset($wp->request) ? trim((string) $wp->request, '/') : '';
+        
+        if (empty($request_path)) {
+            $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+            $path = trim(wp_parse_url($request_uri, PHP_URL_PATH) ?? '', '/');
+            $home_path = trim(wp_parse_url(home_url('/'), PHP_URL_PATH) ?? '', '/');
+            if ($home_path && str_starts_with($path, $home_path)) {
+                $path = trim(substr($path, strlen($home_path)), '/');
+            }
+            $request_path = $path;
+        }
+
+        // Check if URL matches remaining checkout base - redirect to main checkout
+        if ($request_path === 'remaining-checkout' || str_starts_with($request_path, 'remaining-checkout/')) {
+            // Redirect to main checkout URL - session type determines behavior
+            wp_safe_redirect(yatra_get_checkout_url());
+            exit;
+        }
+    }
+
+    /**
      * Prepare booking page data from session
      * 
      * @return object Booking data object
      */
     private function prepareBookingData(): object
     {
-        // Get booking session
-        $session = yatra_get_booking_session();
+        // Check for remaining payment session first (takes priority)
+        $is_remaining = yatra_has_remaining_session();
+        $session = $is_remaining ? yatra_get_remaining_session() : yatra_get_booking_session();
+        $session_type = $is_remaining ? 'remaining' : 'booking';
 
         // Initialize booking data object using SettingsService
         $booking = (object) [
             'has_session' => false,
+            'session_type' => $session_type,
             'trip' => null,
             'travel_date' => '',
             'travelers' => 1,
@@ -1486,8 +1528,8 @@ class AppServiceProvider extends ServiceProvider
             'allow_guest_checkout' => SettingsService::isEnabled('allow_guest_checkout'),
         ];
 
-        // Check if we have valid session
-        if (!yatra_has_booking_session()) {
+        // Check if we have valid session (remaining or booking)
+        if (!$is_remaining && !yatra_has_booking_session()) {
             $booking->error = 'no_session';
             return $booking;
         }
@@ -1496,6 +1538,20 @@ class AppServiceProvider extends ServiceProvider
         $trip_id = (int) ($session['trip_id'] ?? 0);
         $booking->travel_date = $session['travel_date'] ?? '';
         $booking->travelers = max(1, (int) ($session['travelers'] ?? 1));
+        
+        // Remaining payment specific data
+        $booking->is_remaining_payment = $is_remaining;
+        $booking->existing_booking_id = (int) ($session['booking_id'] ?? $session['existing_booking_id'] ?? 0);
+        $booking->booking_reference = $session['booking_reference'] ?? '';
+        $booking->remaining_amount = isset($session['remaining_amount']) ? (float) $session['remaining_amount'] : null;
+        $booking->amount_paid = isset($session['amount_paid']) ? (float) $session['amount_paid'] : null;
+        $booking->total_amount = isset($session['total_amount']) ? (float) $session['total_amount'] : null;
+        
+        // Contact info from remaining session
+        $booking->contact_first_name = $session['contact_first_name'] ?? '';
+        $booking->contact_last_name = $session['contact_last_name'] ?? '';
+        $booking->contact_email = $session['contact_email'] ?? '';
+        $booking->contact_phone = $session['contact_phone'] ?? '';
         
         // Session-based availability data
         $booking->departure_time = $session['departure_time'] ?? '';
@@ -1563,10 +1619,19 @@ class AppServiceProvider extends ServiceProvider
             'sale_price' => (float) $trip->sale_price,
             'price' => $price,
             'currency' => SettingsService::getCurrency(),
+            'currencyPosition' => SettingsService::getCurrencyPosition(),
+            'decimalPlaces' => SettingsService::getInt('decimal_places', 2),
+            'thousandSeparator' => SettingsService::getString('thousand_separator', ','),
+            'decimalSeparator' => SettingsService::getString('decimal_separator', '.'),
             'starting_location' => $trip->starting_location,
             'ending_location' => $trip->ending_location,
             'pricing_type' => $booking->pricing_type,
         ];
+
+        if ($booking->is_remaining_payment) {
+            $booking->deposit_required = false;
+            $booking->partial_payment = false;
+        }
 
         // Load enabled payment gateways
         $booking->enabled_gateways = $this->getEnabledGateways();
@@ -1577,7 +1642,6 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Get enabled payment gateways
      * 
-     * @param array $settings Plugin settings
      * @return array Enabled gateways
      */
     private function getEnabledGateways(): array
@@ -1680,7 +1744,6 @@ class AppServiceProvider extends ServiceProvider
      * Enqueue booking page assets
      * 
      * @param object|null $booking Booking data object
-     * @param array $settings Plugin settings
      */
     private function enqueueBookingPageAssets(?object $booking = null): void
     {
@@ -1792,6 +1855,20 @@ class AppServiceProvider extends ServiceProvider
                 'decimalSeparator' => SettingsService::getString('decimal_separator', '.'),
                 'minTravelers' => 1,
                 'maxTravelers' => 20,
+                'sessionType' => $booking->session_type ?? 'booking',
+                'isRemainingPayment' => !empty($booking->is_remaining_payment),
+                'existingBookingId' => $booking->existing_booking_id ?? 0,
+                'bookingReference' => $booking->booking_reference ?? '',
+                'remainingAmount' => $booking->remaining_amount ?? 0,
+                'totalAmount' => $booking->total_amount ?? 0,
+                'amountPaid' => $booking->amount_paid ?? 0,
+                'tripTitle' => $booking->trip->title ?? __('Trip Booking', 'yatra'),
+                'tripSlug' => $booking->trip->slug ?? '',
+                'travelerCount' => $booking->travelers ?? 1,
+                'contactEmail' => $booking->contact_email ?? '',
+                'contactFirstName' => $booking->contact_first_name ?? '',
+                'contactLastName' => $booking->contact_last_name ?? '',
+                'contactPhone' => $booking->contact_phone ?? '',
             ];
 
             // Add trip-specific data if available
@@ -1805,6 +1882,10 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $localized_data['companyCountry'] = SettingsService::get('company_country', 'US');
+
+            if (!empty($booking->is_remaining_payment)) {
+                $localized_data['paymentDue'] = $booking->remaining_amount ?? 0;
+            }
 
             wp_localize_script('yatra-booking', 'yatraBookingData', $localized_data);
         }

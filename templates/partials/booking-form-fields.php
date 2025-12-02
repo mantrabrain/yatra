@@ -238,23 +238,48 @@ function yatra_render_form_section($section_config, $prefix = '', $countries = [
 <input type="hidden" name="trip_slug" value="<?php echo esc_attr($trip_slug); ?>">
 <?php endif; ?>
 
-<!-- Contact Form Section -->
-<?php 
-$contact_config = $form_config['contact_form'] ?? [];
-if (!empty($contact_config)) {
-    yatra_render_form_section($contact_config, 'contact_', $countries);
-}
-?>
+<?php if ($is_remaining_payment) : ?>
+    <input type="hidden" name="is_remaining_payment" value="1">
+    <?php if (!empty($existing_booking_id)) : ?>
+        <input type="hidden" name="existing_booking_id" value="<?php echo esc_attr($existing_booking_id); ?>">
+    <?php endif; ?>
+    <?php if (!empty($booking_reference)) : ?>
+        <input type="hidden" name="booking_reference" value="<?php echo esc_attr($booking_reference); ?>">
+    <?php endif; ?>
+    <?php if ($remaining_amount !== null) : ?>
+        <input type="hidden" name="remaining_amount" value="<?php echo esc_attr($remaining_amount); ?>">
+    <?php endif; ?>
+    <?php if (!empty($booking->amount_paid)) : ?>
+        <input type="hidden" name="amount_paid" value="<?php echo esc_attr($booking->amount_paid); ?>">
+    <?php endif; ?>
+    <?php if (!empty($booking->total_amount)) : ?>
+        <input type="hidden" name="total_amount" value="<?php echo esc_attr($booking->total_amount); ?>">
+    <?php endif; ?>
+<?php endif; ?>
 
-<!-- Emergency Contact Section -->
-<?php 
-$emergency_config = $form_config['emergency_contact_form'] ?? [];
-if (!empty($emergency_config) && (!isset($emergency_config['enabled']) || $emergency_config['enabled'])) {
-    yatra_render_form_section($emergency_config, 'emergency_', $countries);
-}
-?>
+<?php if (!$is_remaining_payment) : ?>
+    <!-- Contact Form Section -->
+    <?php 
+    $contact_config = $form_config['contact_form'] ?? [];
+    if (!empty($contact_config)) {
+        yatra_render_form_section($contact_config, 'contact_', $countries);
+    }
+    ?>
 
-<!-- Traveler Information Section -->
+    <!-- Emergency Contact Section -->
+    <?php 
+    $emergency_config = $form_config['emergency_contact_form'] ?? [];
+    if (!empty($emergency_config) && (!isset($emergency_config['enabled']) || $emergency_config['enabled'])) {
+        yatra_render_form_section($emergency_config, 'emergency_', $countries);
+    }
+    ?>
+
+    <!-- Traveler Information Section -->
+    <?php 
+    $traveler_config = $form_config['traveler_form'] ?? [];
+    ?>
+<?php endif; ?>
+
 <?php 
 $traveler_config = $form_config['traveler_form'] ?? [];
 $traveler_count = isset($total_travelers) ? max(1, (int)$total_travelers) : 1;
@@ -354,8 +379,9 @@ if ($initial_total_amount <= 0 && $effective_trip_price > 0) {
 
 $initial_due_amount = $initial_total_amount;
 
-if (!empty($traveler_config)) : 
 ?>
+
+<?php if (!empty($traveler_config) && !$is_remaining_payment) : ?>
 <div class="yatra-booking-section">
     <h2 class="yatra-section-title"><?php echo esc_html($traveler_config['title'] ?? __('Traveler Information', 'yatra')); ?></h2>
     <?php if (!empty($traveler_config['description'])) : ?>
@@ -441,7 +467,7 @@ if (!empty($traveler_config)) :
 <?php endif; ?>
 
 <!-- Payment Method Section -->
-<?php if ($deposit_required || $partial_payment) : ?>
+<?php if (!$is_remaining_payment && ($deposit_required || $partial_payment)) : ?>
 <div class="yatra-booking-section">
     <h2 class="yatra-section-title"><?php esc_html_e('Payment Method', 'yatra'); ?></h2>
     
@@ -509,20 +535,22 @@ if (!empty($traveler_config)) :
 </div>
 <?php endif; ?>
 
-<!-- Special Requests -->
-<div class="yatra-booking-section">
-    <h2 class="yatra-section-title"><?php esc_html_e('Special Requests', 'yatra'); ?></h2>
-    <p class="yatra-section-description"><?php esc_html_e('Any special requests or notes for your trip (optional)', 'yatra'); ?></p>
-    
-    <div class="yatra-form-group yatra-field-full">
-        <textarea 
-            id="special-requests" 
-            name="special_requests" 
-            rows="4" 
-            placeholder="<?php esc_attr_e('E.g., dietary requirements, accessibility needs, celebration requests...', 'yatra'); ?>"
-        ></textarea>
+<?php if (!$is_remaining_payment) : ?>
+    <!-- Special Requests -->
+    <div class="yatra-booking-section">
+        <h2 class="yatra-section-title"><?php esc_html_e('Special Requests', 'yatra'); ?></h2>
+        <p class="yatra-section-description"><?php esc_html_e('Any special requests or notes for your trip (optional)', 'yatra'); ?></p>
+        
+        <div class="yatra-form-group yatra-field-full">
+            <textarea 
+                id="special-requests" 
+                name="special_requests" 
+                rows="4" 
+                placeholder="<?php esc_attr_e('E.g., dietary requirements, accessibility needs, celebration requests...', 'yatra'); ?>"
+            ></textarea>
+        </div>
     </div>
-</div>
+<?php endif; ?>
 
 <!-- Account Creation Section (only for guests) -->
 <?php 
@@ -530,7 +558,7 @@ $allow_guest_checkout = \Yatra\Services\SettingsService::isEnabled('allow_guest_
 $require_login = \Yatra\Services\SettingsService::isEnabled('require_login');
 
 // Show account section if user is not logged in
-if (!is_user_logged_in()) : 
+if (!is_user_logged_in() && !$is_remaining_payment) : 
 ?>
 <div class="yatra-booking-section yatra-account-section">
     <h2 class="yatra-section-title"><?php esc_html_e('Account', 'yatra'); ?></h2>
@@ -637,7 +665,7 @@ if (!is_user_logged_in()) :
         </div>
     <?php endif; ?>
 </div>
-<?php else : ?>
+<?php elseif (!is_user_logged_in()) : ?>
     <!-- User is logged in -->
     <div class="yatra-booking-section yatra-logged-in-notice">
         <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px;">

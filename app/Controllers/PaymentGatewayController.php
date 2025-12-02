@@ -128,6 +128,15 @@ class PaymentGatewayController extends BaseController
                 'permission_callback' => [$this, 'check_customer_permission'],
             ],
         ]);
+
+        // Download invoice for a payment
+        register_rest_route($namespace, '/' . $base . '/(?P<payment_id>[\d]+)/invoice', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'download_invoice'],
+                'permission_callback' => [$this, 'check_customer_permission'],
+            ],
+        ]);
     }
 
     /**
@@ -252,30 +261,31 @@ class PaymentGatewayController extends BaseController
         $travelersCount = max(1, $travelersCount);
         $pricePerPerson = $travelersCount > 0 ? ((float) $booking->total_amount / $travelersCount) : (float) $trip->sale_price;
 
-        $sessionData = [
+        // Use dedicated remaining session (separate from booking session)
+        $remainingSessionData = [
+            'booking_id' => (int) $booking->id,
+            'booking_reference' => $booking->reference ?? '',
             'trip_id' => (int) $trip->id,
             'trip_title' => $trip->title,
             'trip_slug' => $trip->slug,
             'trip_price' => $pricePerPerson,
+            'trip_featured_image' => $trip->featured_image ?? '',
             'currency' => $currency,
             'travel_date' => $booking->travel_date,
             'travelers' => $travelersCount,
-            'timestamp' => time(),
-            'pricing_type' => $trip->pricing_type ?? 'regular',
-            'price_types' => [],
-            'traveler_counts' => [],
-            'is_day_trip' => ($trip->duration_days ?? 1) <= 1,
-            'is_remaining_payment' => true,
-            'existing_booking_id' => (int) $booking->id,
-            'booking_reference' => $booking->reference ?? '',
             'remaining_amount' => $remainingAmount,
             'amount_paid' => (float) ($booking->amount_paid ?? 0),
             'total_amount' => (float) ($booking->total_amount ?? 0),
-            'trip_price_original' => (float) ($trip->original_price ?? 0),
-            'trip_featured_image' => $trip->featured_image ?? '',
+            'contact_first_name' => $booking->contact_first_name ?? '',
+            'contact_last_name' => $booking->contact_last_name ?? '',
+            'contact_email' => $booking->contact_email ?? $booking->customer_email ?? '',
+            'contact_phone' => $booking->contact_phone ?? $booking->customer_phone ?? '',
         ];
 
-        yatra_set_booking_session($sessionData);
+        // Clear any existing booking session to avoid confusion
+        yatra_clear_booking_session();
+        // Set the remaining payment session
+        yatra_set_remaining_session($remainingSessionData);
 
         $checkoutUrl = yatra_get_checkout_url();
 
@@ -566,6 +576,11 @@ class PaymentGatewayController extends BaseController
             );
         }
 
+        // Clear remaining payment session if this was a remaining payment
+        if (function_exists('yatra_has_remaining_session') && yatra_has_remaining_session()) {
+            yatra_clear_remaining_session();
+        }
+
         do_action('yatra_payment_completed', $bookingId, $gateway, $transactionId, [
             'amount' => $paid_amount,
             'remaining' => $new_amount_due,
@@ -667,5 +682,215 @@ class PaymentGatewayController extends BaseController
         ]);
 
         return $tokenId ?: null;
+    }
+
+    /**
+     * Download invoice PDF for a payment
+     */
+    public function download_invoice(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        $paymentId = (int) $request->get_param('payment_id');
+
+        if ($paymentId <= 0) {
+            return new WP_Error('invalid_payment', __('Invalid payment ID.', 'yatra'), ['status' => 400]);
+        }
+
+        // Get payment with booking details
+        $payment = $this->paymentRepository->findWithBooking($paymentId);
+
+        if (!$payment) {
+            return new WP_Error('payment_not_found', __('Payment not found.', 'yatra'), ['status' => 404]);
+        }
+
+        // Verify user owns this payment
+        $currentUserId = get_current_user_id();
+        $bookingUserId = (int) ($payment->booking_user_id ?? $payment->user_id ?? 0);
+        
+        if ($currentUserId && $bookingUserId && $currentUserId !== $bookingUserId) {
+            return new WP_Error('unauthorized', __('You do not have permission to access this invoice.', 'yatra'), ['status' => 403]);
+        }
+
+        // Get trip details if available
+        $trip = null;
+        if (!empty($payment->trip_id)) {
+            $trip = $this->tripRepository->find((int) $payment->trip_id);
+        }
+
+        // Get company settings
+        $companyName = SettingsService::get('company_name', get_bloginfo('name'));
+        $companyAddress = SettingsService::get('company_address', '');
+        $companyEmail = SettingsService::get('company_email', get_option('admin_email'));
+        $companyPhone = SettingsService::get('company_phone', '');
+        $currency = SettingsService::getCurrency();
+        $currencySymbol = SettingsService::getCurrencySymbol();
+
+        // Format dates
+        $paymentDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : '';
+        $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
+
+        // Build invoice HTML
+        $invoiceHtml = $this->generateInvoiceHtml([
+            'payment' => $payment,
+            'trip' => $trip,
+            'company_name' => $companyName,
+            'company_address' => $companyAddress,
+            'company_email' => $companyEmail,
+            'company_phone' => $companyPhone,
+            'currency' => $currency,
+            'currency_symbol' => $currencySymbol,
+            'payment_date' => $paymentDate,
+            'travel_date' => $travelDate,
+        ]);
+
+        // Set headers for HTML download (can be printed to PDF by browser)
+        $filename = 'invoice-' . ($payment->reference ?? $paymentId) . '.html';
+        
+        header('Content-Type: text/html; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        echo $invoiceHtml;
+        exit;
+    }
+
+    /**
+     * Generate invoice HTML
+     */
+    private function generateInvoiceHtml(array $data): string
+    {
+        $payment = $data['payment'];
+        $trip = $data['trip'];
+        $currencySymbol = $data['currency_symbol'];
+
+        $amount = number_format((float) ($payment->amount ?? 0), 2);
+        $bookingTotal = number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2);
+        $amountPaid = number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2);
+        $amountDue = number_format((float) ($payment->booking_amount_due ?? 0), 2);
+
+        $customerName = trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? ''));
+        if (empty($customerName)) {
+            $customerName = $payment->customer_name ?? __('Customer', 'yatra');
+        }
+        $customerEmail = $payment->contact_email ?? $payment->customer_email ?? '';
+
+        $tripTitle = $trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra');
+        $bookingRef = $payment->booking_reference ?? $payment->booking_number ?? '';
+        $paymentRef = $payment->reference ?? '';
+        $paymentMethod = ucfirst($payment->gateway ?? $payment->payment_method ?? 'Online');
+        $paymentStatus = ucfirst($payment->status ?? 'paid');
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - {$paymentRef}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.6; color: #333; background: #f5f5f5; padding: 20px; }
+        .invoice { max-width: 800px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .invoice-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: #fff; padding: 30px 40px; }
+        .invoice-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 5px; }
+        .invoice-header p { opacity: 0.9; font-size: 14px; }
+        .invoice-body { padding: 40px; }
+        .invoice-meta { display: flex; justify-content: space-between; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+        .invoice-meta-block h3 { font-size: 12px; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .invoice-meta-block p { font-size: 14px; color: #111; margin-bottom: 4px; }
+        .invoice-meta-block strong { font-weight: 600; }
+        .invoice-table { width: 100%; border-collapse: collapse; margin: 30px 0; }
+        .invoice-table th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 12px; text-transform: uppercase; color: #6b7280; border-bottom: 2px solid #e5e7eb; }
+        .invoice-table td { padding: 16px; border-bottom: 1px solid #e5e7eb; }
+        .invoice-table .amount { text-align: right; font-weight: 600; }
+        .invoice-totals { margin-top: 20px; border-top: 2px solid #e5e7eb; padding-top: 20px; }
+        .invoice-total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+        .invoice-total-row.grand-total { font-size: 18px; font-weight: 700; color: #1e40af; border-top: 2px solid #1e40af; margin-top: 10px; padding-top: 15px; }
+        .invoice-footer { background: #f9fafb; padding: 20px 40px; text-align: center; font-size: 12px; color: #6b7280; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-paid { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        @media print { body { background: #fff; padding: 0; } .invoice { box-shadow: none; } }
+    </style>
+</head>
+<body>
+    <div class="invoice">
+        <div class="invoice-header">
+            <h1>{$data['company_name']}</h1>
+            <p>Payment Invoice</p>
+        </div>
+        <div class="invoice-body">
+            <div class="invoice-meta">
+                <div class="invoice-meta-block">
+                    <h3>Invoice To</h3>
+                    <p><strong>{$customerName}</strong></p>
+                    <p>{$customerEmail}</p>
+                </div>
+                <div class="invoice-meta-block">
+                    <h3>Invoice Details</h3>
+                    <p><strong>Invoice #:</strong> {$paymentRef}</p>
+                    <p><strong>Date:</strong> {$data['payment_date']}</p>
+                    <p><strong>Status:</strong> <span class="status-badge status-{$payment->status}">{$paymentStatus}</span></p>
+                </div>
+                <div class="invoice-meta-block">
+                    <h3>Company</h3>
+                    <p>{$data['company_name']}</p>
+                    <p>{$data['company_address']}</p>
+                    <p>{$data['company_email']}</p>
+                    <p>{$data['company_phone']}</p>
+                </div>
+            </div>
+
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Booking Ref</th>
+                        <th>Travel Date</th>
+                        <th class="amount">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>{$tripTitle}</strong><br>
+                            <small style="color: #6b7280;">Payment via {$paymentMethod}</small>
+                        </td>
+                        <td>{$bookingRef}</td>
+                        <td>{$data['travel_date']}</td>
+                        <td class="amount">{$currencySymbol}{$amount}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="invoice-totals">
+                <div class="invoice-total-row">
+                    <span>Booking Total</span>
+                    <span>{$currencySymbol}{$bookingTotal}</span>
+                </div>
+                <div class="invoice-total-row">
+                    <span>Total Paid</span>
+                    <span style="color: #059669;">{$currencySymbol}{$amountPaid}</span>
+                </div>
+                <div class="invoice-total-row">
+                    <span>Balance Due</span>
+                    <span>{$currencySymbol}{$amountDue}</span>
+                </div>
+                <div class="invoice-total-row grand-total">
+                    <span>This Payment</span>
+                    <span>{$currencySymbol}{$amount}</span>
+                </div>
+            </div>
+        </div>
+        <div class="invoice-footer">
+            <p>Thank you for your booking! If you have any questions, please contact us at {$data['company_email']}</p>
+            <p style="margin-top: 10px;">This invoice was generated on {$data['payment_date']}</p>
+        </div>
+    </div>
+    <script>window.onload = function() { window.print(); }</script>
+</body>
+</html>
+HTML;
     }
 }

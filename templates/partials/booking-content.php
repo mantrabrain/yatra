@@ -18,6 +18,10 @@
  * - $partial_payment
  * - $partial_payment_percentage
  * - $enabled_gateways
+ * - $is_remaining_payment
+ * - $remaining_amount
+ * - $existing_booking_id
+ * - $booking_reference
  */
 
 if (!defined('ABSPATH')) {
@@ -27,6 +31,12 @@ if (!defined('ABSPATH')) {
 // Prepare variables for form fields partial
 $trip_id = $trip->id;
 $trip_slug = $trip->slug ?? '';
+$is_remaining_payment = !empty($booking->is_remaining_payment);
+$remaining_amount = isset($booking->remaining_amount) ? (float) $booking->remaining_amount : null;
+$existing_booking_id = $booking->existing_booking_id ?? 0;
+$booking_reference = $booking->booking_reference ?? '';
+$amount_paid = isset($booking->amount_paid) ? (float) $booking->amount_paid : null;
+$total_amount = isset($booking->total_amount) ? (float) $booking->total_amount : null;
 
 // Check if login is required
 $require_login = \Yatra\Services\SettingsService::get('require_login', false);
@@ -53,12 +63,58 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                 <?php else : ?>
                     <!-- Show Booking Form -->
                     <div class="yatra-booking-header">
-                        <h1><?php esc_html_e('Complete Your Booking', 'yatra'); ?></h1>
-                        <p class="yatra-booking-subtitle"><?php esc_html_e('Please fill in your details to complete the booking', 'yatra'); ?></p>
+                        <h1>
+                            <?php
+                            if (!empty($booking->is_remaining_payment)) {
+                                esc_html_e('Pay Remaining Balance', 'yatra');
+                            } else {
+                                esc_html_e('Complete Your Booking', 'yatra');
+                            }
+                            ?>
+                        </h1>
+                        <p class="yatra-booking-subtitle">
+                            <?php
+                            $reference_label = $booking_reference ? '#' . $booking_reference : '';
+
+                            if ($is_remaining_payment) {
+                                echo esc_html(
+                                    sprintf(
+                                        /* translators: %s booking reference */
+                                        __('You are paying the remaining balance for Booking %s.', 'yatra'),
+                                        $reference_label ?: __('(unknown reference)', 'yatra')
+                                    )
+                                );
+                            } else {
+                                esc_html_e('Please fill in your details to complete the booking', 'yatra');
+                            }
+                            ?>
+                        </p>
+                        <?php if ($is_remaining_payment && !empty($remaining_amount)) : ?>
+                            <div class="yatra-remaining-banner">
+                                <strong><?php esc_html_e('Amount Due Now', 'yatra'); ?>:</strong>
+                                <span><?php echo esc_html(yatra_format_price($remaining_amount)); ?></span>
+                                <?php if (!empty($amount_paid)) : ?>
+                                    <small>
+                                        <?php
+                                        printf(
+                                            /* translators: %s formatted amount */
+                                            esc_html__('Amount already paid: %s', 'yatra'),
+                                            yatra_format_price($amount_paid)
+                                        );
+                                        ?>
+                                    </small>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Booking Form -->
-                    <form class="yatra-booking-form" id="yatra-booking-form">
+                    <form
+                        class="yatra-booking-form"
+                        id="yatra-booking-form"
+                        data-payment-due="<?php echo esc_attr($is_remaining_payment && $remaining_amount ? $remaining_amount : ($trip->price * $total_travelers)); ?>"
+                        data-is-remaining-payment="<?php echo esc_attr($is_remaining_payment ? 'yes' : 'no'); ?>"
+                    >
                         <?php 
                         // Pass pricing type info to form fields partial
                         $pricing_type = $booking->pricing_type ?? 'regular';
@@ -92,7 +148,111 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
 
             <!-- Right Side: Booking Summary -->
             <div class="yatra-booking-sidebar">
-                <div class="yatra-booking-summary">
+                <?php
+                $default_total = $trip->price * $total_travelers;
+                $summary_total_amount = $is_remaining_payment && !empty($total_amount)
+                    ? (float) $total_amount
+                    : $default_total;
+                $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
+                    ? (float) $remaining_amount
+                    : $default_total;
+                ?>
+
+                <?php if ($is_remaining_payment) : ?>
+                <!-- Simplified Remaining Payment Sidebar -->
+                <div class="yatra-booking-summary yatra-remaining-summary" data-summary-total="<?php echo esc_attr($summary_total_amount); ?>" data-summary-due="<?php echo esc_attr($summary_due_amount); ?>" data-is-remaining="yes">
+                    <h3><?php esc_html_e('Payment Summary', 'yatra'); ?></h3>
+                    
+                    <!-- Booking Reference -->
+                    <div class="yatra-remaining-reference">
+                        <div class="yatra-reference-badge">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                            <span><?php esc_html_e('Booking Reference', 'yatra'); ?></span>
+                        </div>
+                        <strong class="yatra-reference-value">#<?php echo esc_html($booking_reference); ?></strong>
+                    </div>
+
+                    <!-- Trip Info Card -->
+                    <div class="yatra-remaining-trip-card">
+                        <div class="yatra-remaining-trip-image">
+                            <img src="<?php echo esc_url($trip->featured_image); ?>" alt="<?php echo esc_attr($trip->title); ?>">
+                        </div>
+                        <div class="yatra-remaining-trip-info">
+                            <h4><?php echo esc_html($trip->title); ?></h4>
+                            <div class="yatra-remaining-trip-meta">
+                                <span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?>
+                                </span>
+                                <span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                    </svg>
+                                    <?php echo esc_html($total_travelers . ' ' . _n('traveler', 'travelers', $total_travelers, 'yatra')); ?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Breakdown -->
+                    <div class="yatra-remaining-breakdown">
+                        <div class="yatra-remaining-row">
+                            <span><?php esc_html_e('Original Booking Total', 'yatra'); ?></span>
+                            <span><?php echo esc_html(yatra_format_price($total_amount)); ?></span>
+                        </div>
+                        <div class="yatra-remaining-row yatra-remaining-paid">
+                            <span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                <?php esc_html_e('Amount Already Paid', 'yatra'); ?>
+                            </span>
+                            <span class="yatra-paid-amount"><?php echo esc_html(yatra_format_price($amount_paid)); ?></span>
+                        </div>
+                        <div class="yatra-remaining-row yatra-remaining-due">
+                            <span><strong><?php esc_html_e('Remaining Balance', 'yatra'); ?></strong></span>
+                            <span class="yatra-due-amount"><strong><?php echo esc_html(yatra_format_price($remaining_amount)); ?></strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Due Now Highlight -->
+                    <div class="yatra-remaining-due-now">
+                        <div class="yatra-due-now-label">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                <line x1="1" y1="10" x2="23" y2="10"></line>
+                            </svg>
+                            <?php esc_html_e('Amount Due Now', 'yatra'); ?>
+                        </div>
+                        <div class="yatra-due-now-amount" id="summary-due">
+                            <?php echo esc_html(yatra_format_price($remaining_amount)); ?>
+                        </div>
+                    </div>
+
+                    <!-- Secure Payment Badge -->
+                    <div class="yatra-remaining-secure">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span><?php esc_html_e('Secure SSL encrypted payment', 'yatra'); ?></span>
+                    </div>
+                </div>
+                <?php else : ?>
+                <!-- Regular Booking Summary -->
+                <div class="yatra-booking-summary" data-summary-total="<?php echo esc_attr($summary_total_amount); ?>" data-summary-due="<?php echo esc_attr($summary_due_amount); ?>" data-is-remaining="no">
                     <h3><?php esc_html_e('Booking Summary', 'yatra'); ?></h3>
                     
                     <!-- Travel Details -->
@@ -330,7 +490,7 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                     </div>
 
                     <!-- Price Breakdown -->
-                    <div class="yatra-summary-pricing" data-pricing-type="<?php echo esc_attr($pricing_type); ?>">
+                    <div class="yatra-summary-pricing" data-pricing-type="<?php echo esc_attr($pricing_type); ?>" data-is-remaining="<?php echo esc_attr($is_remaining_payment ? 'yes' : 'no'); ?>">
                         <?php if ($pricing_type === 'traveler_based' && !empty($price_types)): 
                             // Calculate total for traveler-based pricing
                             $calculated_total = 0;
@@ -415,12 +575,18 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                         
                         <div class="yatra-price-row yatra-price-total">
                             <span><strong><?php esc_html_e('Total Amount', 'yatra'); ?></strong></span>
-                            <span id="summary-total"><strong><?php echo esc_html(yatra_format_price($trip->price * $total_travelers)); ?></strong></span>
+                            <span id="summary-total"><strong><?php echo esc_html(yatra_format_price($summary_total_amount)); ?></strong></span>
                         </div>
                         
-                        <div class="yatra-price-row yatra-price-due" style="display: none;">
-                            <span><?php esc_html_e('Due Now', 'yatra'); ?></span>
-                            <span id="summary-due"><strong><?php echo esc_html(yatra_format_price($trip->price * $total_travelers)); ?></strong></span>
+                        <div class="yatra-price-row yatra-price-due" style="<?php echo $is_remaining_payment ? '' : 'display: none;'; ?>">
+                            <span>
+                                <?php
+                                echo $is_remaining_payment
+                                    ? esc_html__('Remaining Balance Due', 'yatra')
+                                    : esc_html__('Due Now', 'yatra');
+                                ?>
+                            </span>
+                            <span id="summary-due"><strong><?php echo esc_html(yatra_format_price($summary_due_amount)); ?></strong></span>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -507,6 +673,7 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                         <div id="yatra-gateway-details"></div>
                     </div>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
