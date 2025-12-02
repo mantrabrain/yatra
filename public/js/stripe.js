@@ -928,6 +928,36 @@ class YatraStripe {
     buildReturnUrl(bookingInfo) {
         return `${window.location.origin}${window.location.pathname}?booking_id=${bookingInfo.booking_id}&payment_intent=success`;
     }
+
+    async notifyPaymentSuccess({ bookingId, transactionId, saveCard, amount, currency }) {
+        try {
+            const response = await fetch(`${this.apiUrl}/payment/confirm`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': this.nonce,
+                },
+                body: JSON.stringify({
+                    gateway: 'stripe',
+                    booking_id: bookingId,
+                    transaction_id: transactionId,
+                    save_card: !!saveCard,
+                    amount,
+                    currency,
+                }),
+            });
+
+            const payload = await response.json();
+            if (!response.ok || payload?.success === false) {
+                throw new Error(payload?.message || 'Failed to record payment.');
+            }
+
+            return payload;
+        } catch (error) {
+            console.error('Failed to notify backend about payment success:', error);
+            throw error;
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

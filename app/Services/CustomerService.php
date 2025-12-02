@@ -270,24 +270,26 @@ class CustomerService
         
         // Also get bookings directly by user_id (in case bookings were made before customer record was created)
         $bookingsByUserId = $this->bookingRepository->findByUserId($userId, $limit);
+
+        // And include bookings made via the same email address
+        $emailBookings = [];
+        $user = get_userdata($userId);
+        if ($user && !empty($user->user_email)) {
+            $emailBookings = $this->bookingRepository->findByContactEmail($user->user_email, $limit);
+        }
         
         // Merge and deduplicate by booking ID
         $bookingIds = [];
         $allBookings = [];
-        
-        foreach ($bookings as $booking) {
-            $bookingId = is_array($booking) ? ($booking['id'] ?? $booking['booking_id'] ?? null) : ($booking->id ?? null);
-            if ($bookingId && !in_array($bookingId, $bookingIds)) {
-                $bookingIds[] = $bookingId;
-                $allBookings[] = $booking;
-            }
-        }
-        
-        foreach ($bookingsByUserId as $booking) {
-            $bookingId = is_array($booking) ? ($booking['id'] ?? $booking['booking_id'] ?? null) : ($booking->id ?? null);
-            if ($bookingId && !in_array($bookingId, $bookingIds)) {
-                $bookingIds[] = $bookingId;
-                $allBookings[] = $booking;
+        $sources = [$bookings, $bookingsByUserId, $emailBookings];
+
+        foreach ($sources as $collection) {
+            foreach ($collection as $booking) {
+                $bookingId = is_array($booking) ? ($booking['id'] ?? $booking['booking_id'] ?? null) : ($booking->id ?? null);
+                if ($bookingId && !in_array($bookingId, $bookingIds, true)) {
+                    $bookingIds[] = $bookingId;
+                    $allBookings[] = $booking;
+                }
             }
         }
         
@@ -308,32 +310,101 @@ class CustomerService
      */
     public function getCustomerPayments(int $customerId, int $limit = 50): array
     {
-        // Get customer's bookings first
         $bookings = $this->customerRepository->getCustomerBookings($customerId, 1000);
-        $bookingIds = array_map(function($booking) {
-            return (int) $booking['id'];
+        $bookingIds = array_map(static function($booking) {
+            if (is_object($booking)) {
+                return (int) ($booking->id ?? 0);
+            }
+            if (is_array($booking)) {
+                return (int) ($booking['id'] ?? 0);
+            }
+            return 0;
         }, $bookings);
+
+        // Include bookings linked via user ID or email (older bookings may not have customer_id)
+        $customer = $this->customerRepository->find($customerId);
+        if ($customer) {
+            if (!empty($customer->user_id)) {
+                $userBookings = $this->bookingRepository->findByUserId((int) $customer->user_id, 1000);
+                $bookingIds = array_merge($bookingIds, array_map(static function($booking) {
+                    if (is_object($booking)) {
+                        return (int) ($booking->id ?? 0);
+                    }
+                    if (is_array($booking)) {
+                        return (int) ($booking['id'] ?? 0);
+                    }
+                    return 0;
+                }, $userBookings));
+            }
+
+            if (!empty($customer->email)) {
+                $emailBookings = $this->bookingRepository->findByContactEmail($customer->email, 1000);
+                $bookingIds = array_merge($bookingIds, array_map(static function($booking) {
+                    if (is_object($booking)) {
+                        return (int) ($booking->id ?? 0);
+                    }
+                    if (is_array($booking)) {
+                        return (int) ($booking['id'] ?? 0);
+                    }
+                    return 0;
+                }, $emailBookings));
+            }
+        }
+
+        $bookingIds = array_values(array_unique(array_filter($bookingIds)));
+
+        return $this->getPaymentsForBookingIds($bookingIds, $limit);
+    }
+
+    public function getPaymentsByUserId(int $userId, int $limit = 50): array
+    {
+        $bookings = $this->bookingRepository->findByUserId($userId, 1000);
+
+        $user = get_userdata($userId);
+        if ($user && !empty($user->user_email)) {
+            $bookingsByEmail = $this->bookingRepository->findByContactEmail($user->user_email, 1000);
+            $bookings = array_merge($bookings, $bookingsByEmail);
+        }
+
+        $bookingIds = array_map(static function($booking) {
+            if (is_object($booking)) {
+                return (int) ($booking->id ?? 0);
+            }
+            if (is_array($booking)) {
+                return (int) ($booking['id'] ?? 0);
+            }
+            return 0;
+        }, $bookings);
+
+        return $this->getPaymentsForBookingIds($bookingIds, $limit);
+    }
+
+    private function getPaymentsForBookingIds(array $bookingIds, int $limit = 50): array
+    {
+        $bookingIds = array_values(array_filter(array_map('intval', $bookingIds))); // ensure ints
 
         if (empty($bookingIds)) {
             return [];
         }
 
-        // Get payments for these bookings
         global $wpdb;
-        $payments_table = $wpdb->prefix . 'yatra_payments';
+        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
         $bookings_table = $wpdb->prefix . 'yatra_bookings';
         $trips_table = $wpdb->prefix . 'yatra_trips';
-        
-        $bookingIdsPlaceholder = implode(',', array_fill(0, count($bookingIds), '%d'));
-        
+
+        $placeholders = implode(',', array_fill(0, count($bookingIds), '%d'));
+
         $query = $wpdb->prepare(
             "SELECT p.*, 
                     b.reference as booking_reference,
+                    b.amount_due as booking_amount_due,
+                    b.amount_paid as booking_amount_paid,
+                    b.total_amount as booking_total_amount,
                     t.title as trip_title
              FROM {$payments_table} p
              LEFT JOIN {$bookings_table} b ON p.booking_id = b.id
              LEFT JOIN {$trips_table} t ON b.trip_id = t.id
-             WHERE p.booking_id IN ($bookingIdsPlaceholder)
+             WHERE p.booking_id IN ($placeholders)
              ORDER BY p.created_at DESC
              LIMIT %d",
             array_merge($bookingIds, [$limit])
@@ -341,10 +412,10 @@ class CustomerService
 
         $payments = $wpdb->get_results($query) ?: [];
 
-        // Format payments
-        return array_map(function($payment) {
+        return array_map(static function($payment) {
             return [
                 'id' => (int) $payment->id,
+                'booking_id' => (int) $payment->booking_id,
                 'reference' => 'PAY-' . str_pad((string) $payment->id, 6, '0', STR_PAD_LEFT),
                 'booking_number' => $payment->booking_reference ?? 'N/A',
                 'trip_title' => $payment->trip_title ?? '',
@@ -354,6 +425,9 @@ class CustomerService
                 'date' => $payment->created_at ?? $payment->processed_at ?? '',
                 'type' => $payment->type ?? 'balance',
                 'transaction_id' => $payment->transaction_id ?? '',
+                'booking_amount_due' => isset($payment->booking_amount_due) ? (float) $payment->booking_amount_due : null,
+                'booking_amount_paid' => isset($payment->booking_amount_paid) ? (float) $payment->booking_amount_paid : null,
+                'booking_total_amount' => isset($payment->booking_total_amount) ? (float) $payment->booking_total_amount : null,
             ];
         }, $payments);
     }

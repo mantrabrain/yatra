@@ -77,7 +77,33 @@ get_header();
                     
                     <div class="yatra-trip-info">
                         <h2 class="yatra-trip-name"><?php echo esc_html($booking->trip_title); ?></h2>
-                        
+
+                        <?php if (!empty($booking->trip_average_rating) && $booking->trip_review_count >= 0) : ?>
+                        <div class="yatra-trip-rating">
+                            <div class="yatra-rating-stars">
+                                <?php
+                                $filled_stars = floor($booking->trip_average_rating);
+                                $has_half = ($booking->trip_average_rating - $filled_stars) >= 0.5;
+                                for ($i = 1; $i <= 5; $i++) :
+                                    $class = $i <= $filled_stars ? 'yatra-star-filled' : ($has_half && $i === $filled_stars + 1 ? 'yatra-star-half' : '');
+                                ?>
+                                    <span class="yatra-star <?php echo esc_attr($class); ?>">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"></polygon></svg>
+                                    </span>
+                                <?php endfor; ?>
+                            </div>
+                            <div class="yatra-rating-meta">
+                                <strong><?php echo esc_html(number_format($booking->trip_average_rating, 1)); ?></strong>
+                                <span>
+                                    <?php
+                                    /* translators: %d review count */
+                                    printf(esc_html(_n('%d Review', '%d Reviews', (int) $booking->trip_review_count, 'yatra')), (int) $booking->trip_review_count);
+                                    ?>
+                                </span>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
                         <div class="yatra-trip-meta">
                             <?php if (!empty($booking->duration_days)) : ?>
                             <span class="yatra-meta-item">
@@ -110,6 +136,39 @@ get_header();
                                 → <?php echo esc_html($booking->ending_location); ?>
                             <?php endif; ?>
                         </p>
+                        <?php endif; ?>
+
+                        <?php if (!empty($booking->trip_destinations_list)) : ?>
+                        <div class="yatra-trip-tags">
+                            <span class="yatra-tag-label"><?php esc_html_e('Destinations:', 'yatra'); ?></span>
+                            <div class="yatra-tag-group">
+                                <?php foreach ($booking->trip_destinations_list as $destination) : ?>
+                                    <span class="yatra-tag-item"><?php echo esc_html($destination); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($booking->trip_activities_list)) : ?>
+                        <div class="yatra-trip-tags">
+                            <span class="yatra-tag-label"><?php esc_html_e('Activities:', 'yatra'); ?></span>
+                            <div class="yatra-tag-group">
+                                <?php foreach ($booking->trip_activities_list as $activity) : ?>
+                                    <span class="yatra-tag-item"><?php echo esc_html($activity); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($booking->trip_categories_list)) : ?>
+                        <div class="yatra-trip-tags">
+                            <span class="yatra-tag-label"><?php esc_html_e('Trip Type:', 'yatra'); ?></span>
+                            <div class="yatra-tag-group">
+                                <?php foreach ($booking->trip_categories_list as $category) : ?>
+                                    <span class="yatra-tag-item"><?php echo esc_html($category); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
                         <?php endif; ?>
                     </div>
                 </div>

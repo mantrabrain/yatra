@@ -244,14 +244,11 @@ class CustomerController extends BaseController
 
         $customer = $this->customerService->getCustomerByUserId($userId);
 
-        if (!$customer) {
-            return new WP_REST_Response([
-                'success' => true,
-                'data' => [],
-            ]);
+        if ($customer) {
+            $payments = $this->customerService->getCustomerPayments((int) $customer['id']);
+        } else {
+            $payments = $this->customerService->getPaymentsByUserId($userId);
         }
-
-        $payments = $this->customerService->getCustomerPayments((int) $customer['id']);
 
         return new WP_REST_Response([
             'success' => true,

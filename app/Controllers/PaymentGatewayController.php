@@ -11,6 +11,8 @@ use Yatra\PaymentGateways\PaymentGatewayRegistry;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\PaymentRepository;
 use Yatra\Repositories\ScheduledPaymentRepository;
+use Yatra\Repositories\TripRepository;
+use Yatra\Services\SettingsService;
 
 /**
  * Payment Gateway REST API Controller
@@ -23,6 +25,7 @@ class PaymentGatewayController extends BaseController
     private BookingRepository $bookingRepository;
     private PaymentRepository $paymentRepository;
     private ScheduledPaymentRepository $scheduledPaymentRepository;
+    private TripRepository $tripRepository;
 
     public function __construct()
     {
@@ -30,6 +33,7 @@ class PaymentGatewayController extends BaseController
         $this->bookingRepository = new BookingRepository();
         $this->paymentRepository = new PaymentRepository();
         $this->scheduledPaymentRepository = new ScheduledPaymentRepository();
+        $this->tripRepository = new TripRepository();
     }
 
     public function register_routes(): void
@@ -108,6 +112,22 @@ class PaymentGatewayController extends BaseController
                 'permission_callback' => '__return_true',
             ],
         ]);
+
+        register_rest_route($namespace, '/' . $base . '/remaining', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'create_remaining_balance_intent'],
+                'permission_callback' => [$this, 'check_customer_permission'],
+            ],
+        ]);
+
+        register_rest_route($namespace, '/' . $base . '/remaining/session', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'start_remaining_payment_session'],
+                'permission_callback' => [$this, 'check_customer_permission'],
+            ],
+        ]);
     }
 
     /**
@@ -116,6 +136,11 @@ class PaymentGatewayController extends BaseController
     public function check_admin_permission(): bool
     {
         return current_user_can('manage_options');
+    }
+
+    public function check_customer_permission(): bool
+    {
+        return is_user_logged_in();
     }
 
     /**
@@ -127,6 +152,141 @@ class PaymentGatewayController extends BaseController
             'gateways' => $this->registry->getDefinitions(),
             'currency' => get_option('yatra_currency', 'USD'),
         ], 200);
+    }
+
+    public function create_remaining_balance_intent(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        $bookingId = (int) $request->get_param('booking_id');
+        $method = sanitize_text_field($request->get_param('method') ?: 'stripe');
+
+        if ($bookingId <= 0) {
+            return new WP_Error('invalid_booking', __('Invalid booking ID provided.', 'yatra'), ['status' => 400]);
+        }
+
+        $booking = $this->bookingRepository->find($bookingId);
+
+        if (!$booking) {
+            return new WP_Error('booking_not_found', __('Booking not found.', 'yatra'), ['status' => 404]);
+        }
+
+        $currentUser = get_current_user_id();
+        if (!$currentUser || (int) $booking->user_id !== $currentUser) {
+            return new WP_Error('forbidden', __('You do not have permission to pay for this booking.', 'yatra'), ['status' => 403]);
+        }
+
+        $remainingAmount = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
+
+        if ($remainingAmount <= 0) {
+            return new WP_Error('no_balance_due', __('This booking is already fully paid.', 'yatra'), ['status' => 400]);
+        }
+
+        $gateway = $this->registry->get($method);
+        if (!$gateway) {
+            return new WP_Error('invalid_gateway', __('Selected payment method is unavailable.', 'yatra'), ['status' => 400]);
+        }
+
+        $customerEmail = $booking->contact_email ?? ($booking->customer_email ?? '');
+        $customerName = trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? ''));
+
+        $paymentData = [
+            'amount' => $remainingAmount,
+            'currency' => $booking->currency ?? get_option('yatra_currency', 'USD'),
+            'booking_id' => $bookingId,
+            'customer_email' => $customerEmail,
+            'customer_name' => $customerName ?: $customerEmail,
+            'return_url' => $this->getConfirmationUrl($booking->reference ?? (string) $bookingId),
+            'description' => sprintf(__('Remaining balance for Booking #%s', 'yatra'), $booking->reference ?? $bookingId),
+            'cancel_url' => home_url('/my-account?tab=payments&payment=cancelled'),
+        ];
+
+        $result = $gateway->processPayment($paymentData);
+
+        if (!$result['success']) {
+            $message = $result['error'] ?? $result['message'] ?? __('Unable to initiate payment.', 'yatra');
+            return new WP_Error('payment_error', $message, ['status' => 400]);
+        }
+
+        return new WP_REST_Response([ 'success' => true, 'data' => $result ], 200);
+    }
+
+    public function start_remaining_payment_session(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        if (!function_exists('yatra_start_session')) {
+            return new WP_Error('session_unavailable', __('Booking session helpers not loaded.', 'yatra'), ['status' => 500]);
+        }
+
+        yatra_start_session();
+
+        $bookingId = (int) $request->get_param('booking_id');
+
+        if ($bookingId <= 0) {
+            return new WP_Error('invalid_booking', __('Invalid booking ID provided.', 'yatra'), ['status' => 400]);
+        }
+
+        $booking = $this->bookingRepository->findWithTrip($bookingId);
+
+        if (!$booking) {
+            return new WP_Error('booking_not_found', __('Booking not found.', 'yatra'), ['status' => 404]);
+        }
+
+        $currentUser = get_current_user_id();
+
+        if (!$currentUser || (int) $booking->user_id !== $currentUser) {
+            return new WP_Error('forbidden', __('You do not have permission to pay for this booking.', 'yatra'), ['status' => 403]);
+        }
+
+        $remainingAmount = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
+
+        if ($remainingAmount <= 0) {
+            return new WP_Error('no_balance_due', __('This booking is already fully paid.', 'yatra'), ['status' => 400]);
+        }
+
+        $trip = $this->tripRepository->findPublished((int) $booking->trip_id);
+
+        if (!$trip) {
+            return new WP_Error('trip_not_found', __('Trip associated with this booking is unavailable.', 'yatra'), ['status' => 400]);
+        }
+
+        $currency = $booking->currency ?? ($trip->currency ?? SettingsService::getCurrency());
+        $travelersCount = (int) ($booking->travelers_count ?? $booking->travelers ?? 1);
+        $travelersCount = max(1, $travelersCount);
+        $pricePerPerson = $travelersCount > 0 ? ((float) $booking->total_amount / $travelersCount) : (float) $trip->sale_price;
+
+        $sessionData = [
+            'trip_id' => (int) $trip->id,
+            'trip_title' => $trip->title,
+            'trip_slug' => $trip->slug,
+            'trip_price' => $pricePerPerson,
+            'currency' => $currency,
+            'travel_date' => $booking->travel_date,
+            'travelers' => $travelersCount,
+            'timestamp' => time(),
+            'pricing_type' => $trip->pricing_type ?? 'regular',
+            'price_types' => [],
+            'traveler_counts' => [],
+            'is_day_trip' => ($trip->duration_days ?? 1) <= 1,
+            'is_remaining_payment' => true,
+            'existing_booking_id' => (int) $booking->id,
+            'booking_reference' => $booking->reference ?? '',
+            'remaining_amount' => $remainingAmount,
+            'amount_paid' => (float) ($booking->amount_paid ?? 0),
+            'total_amount' => (float) ($booking->total_amount ?? 0),
+            'trip_price_original' => (float) ($trip->original_price ?? 0),
+            'trip_featured_image' => $trip->featured_image ?? '',
+        ];
+
+        yatra_set_booking_session($sessionData);
+
+        $checkoutUrl = yatra_get_checkout_url();
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => [
+                'checkout_url' => $checkoutUrl,
+                'booking_reference' => $booking->reference ?? '',
+                'return_url' => $this->getConfirmationUrl($booking->reference ?? ''),
+            ],
+        ]);
     }
 
     /**
@@ -216,11 +376,9 @@ class PaymentGatewayController extends BaseController
     {
         $confirmation_page_id = \Yatra\Services\SettingsService::get('booking_confirmation_page');
 
-        if ($confirmation_page_id) {
-            return add_query_arg('booking', $reference, get_permalink($confirmation_page_id));
-        }
+        $baseUrl = $confirmation_page_id ? get_permalink($confirmation_page_id) : home_url('/booking-confirmation/');
 
-        return home_url('/booking-confirmation/' . $reference . '/');
+        return trailingslashit($baseUrl) . $reference . '/';
     }
 
     /**
@@ -372,6 +530,7 @@ class PaymentGatewayController extends BaseController
             'amount' => $paid_amount,
             'currency' => $payment_currency,
             'status' => 'completed',
+            'customer_id' => $booking->customer_id ? (int) $booking->customer_id : null,
         ];
 
         // Create or update payment record

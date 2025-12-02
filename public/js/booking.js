@@ -165,6 +165,12 @@
             }
             window.yatraBookingData = window.yatraBookingData || {};
             window.yatraBookingData.paymentDue = dueNow;
+            window.yatraBookingSummary = {
+                totalAmount: total,
+                amountDue: dueNow,
+                amountPaid: Math.max(0, total - dueNow),
+                paymentMethod,
+            };
 
             // Update deposit display
             if ($('.yatra-price-deposit').length) {
@@ -694,12 +700,16 @@
             
             // Convert to structured object
             const bookingData = formDataToObject(formData);
+            const summary = window.yatraBookingSummary || {};
             
             // Add checkbox values explicitly (unchecked checkboxes aren't in FormData)
             bookingData.accept_terms = $('input[name="accept_terms"]').is(':checked');
             bookingData.accept_privacy = $('input[name="accept_privacy"]').is(':checked');
             bookingData.subscribe_newsletter = $('input[name="subscribe_newsletter"]').is(':checked');
             bookingData.payment_due = parseFloat($form.attr('data-payment-due')) || window.yatraBookingData?.paymentDue || null;
+            bookingData.total_amount = summary.totalAmount ?? null;
+            bookingData.amount_due = summary.amountDue ?? null;
+            bookingData.amount_paid = summary.amountPaid ?? null;
             bookingData.currency = window.yatraBookingData?.currency || bookingData.currency || $('input[name="currency"]').val() || 'USD';
 
             // Allow payment gateways (e.g., Stripe) to intercept submission

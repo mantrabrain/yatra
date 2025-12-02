@@ -27,6 +27,9 @@ interface BookingsProps {
 const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
   const [bookingFilter, setBookingFilter] = useState<'all' | 'upcoming' | 'pending' | 'completed'>('all');
   const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
+  const [payLoading, setPayLoading] = useState<number | null>(null);
+  const apiBase = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+  const nonce = window.yatraAdmin?.nonce || '';
 
   // Fetch full booking details when a booking is selected
   const { data: bookingDetails, isLoading: isLoadingBookingDetails } = useQuery<any>({
@@ -219,7 +222,10 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
           {filteredDisplayBookings.map((booking) => {
             const isUpcoming = new Date(booking.travel_date) > new Date();
             const isCompleted = booking.booking_status === 'completed';
-            
+            const totalPaid = typeof booking.amount_paid === 'number' ? booking.amount_paid : null;
+            const amountDue = typeof booking.amount_due === 'number' ? Math.max(0, booking.amount_due) : null;
+            const canPayRemaining = typeof booking.id === 'number' && amountDue !== null && amountDue > 0.01;
+
             return (
               <div
                 key={booking.id}
@@ -260,7 +266,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                   </div>
 
                   {/* Details Grid */}
-                  <div className="yatra-booking-details grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg mb-4">
+                  <div className="yatra-booking-details grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg mb-4">
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1">
                         <CalendarIcon className="w-3.5 h-3.5" />
@@ -281,6 +287,20 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                         {__('Total Amount', 'Total Amount')}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{currency(booking.total_amount)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1">
+                        <CreditCard className="w-3.5 h-3.5" />
+                        {__('Paid / Due', 'Paid / Due')}
+                      </p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {currency(totalPaid ?? 0)}
+                        {amountDue !== null && (
+                          <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-1">
+                            {__('Due:', 'Due:')} {currency(amountDue)}
+                          </span>
+                        )}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1">
@@ -305,6 +325,51 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                       <CreditCard className="w-4 h-4" />
                       {__('Payment', 'Payment')}
                     </div>
+                    {canPayRemaining && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            setPayLoading(booking.id);
+                            const response = await fetch(`${apiBase}/payment/remaining`, {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'X-WP-Nonce': nonce,
+                              },
+                              body: JSON.stringify({ booking_id: booking.id, method: 'stripe' }),
+                            });
+                            const payload = await response.json();
+                            if (!response.ok || payload?.success === false) {
+                              throw new Error(payload?.message || __('Unable to start payment.', 'Unable to start payment.'));
+                            }
+                            const redirectUrl = payload?.data?.redirect_url || payload?.data?.payment_url;
+                            if (redirectUrl) {
+                              window.location.href = redirectUrl;
+                            } else {
+                              alert(__('Payment intent created. Please check your email for the payment link.', 'Payment intent created. Please check your email for the payment link.'));
+                            }
+                          } catch (error: any) {
+                            console.error('Remaining balance error:', error);
+                            alert(error?.message || __('Failed to start remaining balance payment.', 'Failed to start remaining balance payment.'));
+                          } finally {
+                            setPayLoading(null);
+                          }
+                        }}
+                        disabled={payLoading === booking.id}
+                        className="yatra-booking-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50"
+                      >
+                        {payLoading === booking.id ? (
+                          <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                            <path d="M4 12a8 8 0 018-8" />
+                          </svg>
+                        ) : (
+                          <CreditCard className="w-4 h-4" />
+                        )}
+                        {__('Pay Remaining Balance', 'Pay Remaining Balance')}
+                      </button>
+                    )}
                     <div role="button" tabIndex={0} onClick={() => onSectionChange('support')} className="yatra-booking-action yatra-booking-action-support inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer">
                       <LifeBuoy className="w-4 h-4" />
                       {__('Support', 'Support')}

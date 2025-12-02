@@ -18,12 +18,33 @@ class PaymentRepository extends BaseRepository
      */
     private const TABLE_NAME = 'yatra_booking_payments';
 
+    /** @var bool|null */
+    private ?bool $customerColumnExists = null;
+
     /**
      * Get full table name with prefix
      */
     protected function getTableName(): string
     {
         return $this->wpdb->prefix . self::TABLE_NAME;
+    }
+
+    private function hasCustomerColumn(): bool
+    {
+        if ($this->customerColumnExists !== null) {
+            return $this->customerColumnExists;
+        }
+
+        $table = esc_sql($this->getTableName());
+        $column = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s AND COLUMN_NAME = 'customer_id'",
+                $table
+            )
+        );
+
+        $this->customerColumnExists = ((int) $column) > 0;
+        return $this->customerColumnExists;
     }
 
     /**
@@ -364,6 +385,10 @@ class PaymentRepository extends BaseRepository
 
         if (array_key_exists('booking_id', $data)) {
             $prepared['booking_id'] = (int) $data['booking_id'];
+        }
+
+        if (array_key_exists('customer_id', $data) && $this->hasCustomerColumn()) {
+            $prepared['customer_id'] = $data['customer_id'] !== null ? (int) $data['customer_id'] : null;
         }
 
         if (array_key_exists('transaction_id', $data)) {

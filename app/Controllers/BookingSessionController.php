@@ -339,6 +339,15 @@ class BookingSessionController extends BaseController
             'is_day_trip' => $is_day_trip,
         ];
 
+        if (!empty($data['is_remaining_payment'])) {
+            $session_data['is_remaining_payment'] = true;
+            $session_data['existing_booking_id'] = (int) ($data['existing_booking_id'] ?? 0);
+            $session_data['booking_reference'] = $data['booking_reference'] ?? '';
+            $session_data['remaining_amount'] = isset($data['remaining_amount']) ? (float) $data['remaining_amount'] : null;
+            $session_data['amount_paid'] = isset($data['amount_paid']) ? (float) $data['amount_paid'] : null;
+            $session_data['total_amount'] = isset($data['total_amount']) ? (float) $data['total_amount'] : null;
+        }
+
         // Set session
         yatra_set_booking_session($session_data);
 
@@ -623,22 +632,38 @@ class BookingSessionController extends BaseController
             } else {
                 $price_per_person = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
             }
-        $total_amount = $price_per_person * $travelers_count;
+            $total_amount = $price_per_person * $travelers_count;
         }
 
-        // Handle payment method
+        // Handle payment method and totals from frontend booking summary
         $payment_method = sanitize_text_field($data['payment_method'] ?? 'full');
         $payment_gateway = sanitize_text_field($data['payment_gateway'] ?? 'pay_later');
-        
+        $frontend_total = isset($data['total_amount']) ? (float) $data['total_amount'] : null;
+        $frontend_due = isset($data['amount_due']) ? (float) $data['amount_due'] : null;
+        $frontend_paid = isset($data['amount_paid']) ? (float) $data['amount_paid'] : null;
+
         // Use SettingsService for settings
         $deposit_percentage = (int) \Yatra\Services\SettingsService::get('deposit_percentage', 20);
         $partial_percentage = (int) \Yatra\Services\SettingsService::get('partial_payment_percentage', 30);
 
-        $amount_due = $total_amount;
-        if ($payment_method === 'deposit') {
-            $amount_due = $total_amount * ($deposit_percentage / 100);
-        } elseif ($payment_method === 'partial') {
-            $amount_due = $total_amount * ($partial_percentage / 100);
+        if ($frontend_total !== null && $frontend_total > 0) {
+            $total_amount = $frontend_total;
+        }
+
+        if ($frontend_due !== null && $frontend_due >= 0) {
+            $amount_due = $frontend_due;
+        } else {
+            $amount_due = $total_amount;
+            if ($payment_method === 'deposit') {
+                $amount_due = $total_amount * ($deposit_percentage / 100);
+            } elseif ($payment_method === 'partial') {
+                $amount_due = $total_amount * ($partial_percentage / 100);
+            }
+        }
+
+        $amount_paid = $frontend_paid !== null ? $frontend_paid : ($total_amount - $amount_due);
+        if ($amount_paid < 0) {
+            $amount_paid = 0;
         }
 
         // Generate booking reference
@@ -1057,11 +1082,9 @@ class BookingSessionController extends BaseController
         // Check if a custom confirmation page is set
         $confirmation_page_id = \Yatra\Services\SettingsService::get('booking_confirmation_page');
         
-        if ($confirmation_page_id) {
-            return add_query_arg('booking', $reference, get_permalink($confirmation_page_id));
-        }
-        
-        return home_url('/booking-confirmation/' . $reference . '/');
+        $baseUrl = $confirmation_page_id ? get_permalink($confirmation_page_id) : home_url('/booking-confirmation/');
+
+        return trailingslashit($baseUrl) . $reference . '/';
     }
     
     /**

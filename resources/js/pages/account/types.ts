@@ -9,6 +9,8 @@ export interface Booking {
   travel_date: string;
   travelers: number;
   total_amount: number;
+  amount_paid?: number | null;
+  amount_due?: number | null;
   payment_status: 'paid' | 'pending' | 'partial' | 'refunded';
   booking_status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
   destination?: string;
@@ -19,11 +21,15 @@ export interface Payment {
   id: number;
   reference: string;
   booking_number: string;
+  booking_id?: number;
   amount: number;
   status: 'paid' | 'pending' | 'failed' | 'refunded';
   method: string;
   date: string;
   type: 'deposit' | 'balance' | 'installment';
+  booking_amount_due?: number | null;
+  booking_amount_paid?: number | null;
+  booking_total_amount?: number | null;
 }
 
 export interface TravelDocument {

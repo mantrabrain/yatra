@@ -276,14 +276,18 @@ class PaymentService
      */
     private function formatPayment(object $payment): array
     {
+        $contactName = isset($payment->contact_first_name)
+            ? trim($payment->contact_first_name . ' ' . ($payment->contact_last_name ?? ''))
+            : null;
+
         return [
             'id' => (int) $payment->id,
             'booking_id' => (int) $payment->booking_id,
             'booking_reference' => $payment->booking_reference ?? null,
             'contact_email' => $payment->contact_email ?? null,
-            'contact_name' => isset($payment->contact_first_name) 
-                ? trim($payment->contact_first_name . ' ' . ($payment->contact_last_name ?? ''))
-                : null,
+            'contact_name' => $contactName,
+            'customer_name' => $contactName,
+            'customer_email' => $payment->contact_email ?? null,
             'trip_title' => $payment->trip_title ?? null,
             'transaction_id' => $payment->transaction_id,
             'gateway' => $payment->gateway,

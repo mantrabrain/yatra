@@ -5,11 +5,10 @@
 .yatra-stripe-container {
     margin: 18px 0 0;
     display: none; /* Hidden by default, shown when Stripe is selected */
-    background: #ffffff;
-    border: 1px solid rgba(37, 99, 235, 0.18);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
 }
 
 .yatra-method-switcher {
@@ -52,8 +51,8 @@
     gap: 12px;
     padding: 14px 12px;
     border-radius: 14px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    background: #fff;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: #f8fafc;
     color: #0f172a;
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
@@ -64,7 +63,7 @@
     width: 40px;
     height: 40px;
     border-radius: 12px;
-    background: #eef2ff;
+    background: #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;

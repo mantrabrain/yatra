@@ -977,6 +977,7 @@ class Database
         $sql_booking_payments = "CREATE TABLE IF NOT EXISTS `{$table_booking_payments}` (
             `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             `booking_id` bigint(20) UNSIGNED NOT NULL,
+            `customer_id` bigint(20) UNSIGNED DEFAULT NULL,
             `transaction_id` varchar(255) DEFAULT NULL,
             `gateway` varchar(50) NOT NULL,
             `amount` decimal(12,2) NOT NULL,
@@ -989,6 +990,7 @@ class Database
             `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
             KEY `idx_booking_id` (`booking_id`),
+            KEY `idx_customer_id` (`customer_id`),
             KEY `idx_transaction_id` (`transaction_id`),
             KEY `idx_status` (`status`),
             KEY `idx_created` (`created_at`)

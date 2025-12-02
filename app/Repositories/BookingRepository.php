@@ -174,14 +174,34 @@ class BookingRepository extends BaseRepository
     {
         $table = $this->getTableName();
         $tripsTable = $this->wpdb->prefix . 'yatra_trips';
+        $tripDestinations = $this->wpdb->prefix . 'yatra_trip_destinations';
+        $destinations = $this->wpdb->prefix . 'yatra_destinations';
+        $tripActivities = $this->wpdb->prefix . 'yatra_trip_activities';
+        $activities = $this->wpdb->prefix . 'yatra_activities';
+        $tripCategories = $this->wpdb->prefix . 'yatra_trip_trip_categories';
+        $categories = $this->wpdb->prefix . 'yatra_trip_categories';
+        $reviewsTable = $this->wpdb->prefix . 'yatra_reviews';
 
         $query = $this->wpdb->prepare(
             "SELECT b.*, t.title as trip_title, t.slug as trip_slug, t.featured_image, 
                     t.duration_days, t.duration_nights, t.difficulty_level,
-                    t.starting_location, t.ending_location
+                    t.starting_location, t.ending_location,
+                    GROUP_CONCAT(DISTINCT d.name ORDER BY td.`order` SEPARATOR ',') as trip_destinations,
+                    GROUP_CONCAT(DISTINCT act.name ORDER BY ta.`order` SEPARATOR ',') as trip_activities,
+                    GROUP_CONCAT(DISTINCT cat.name ORDER BY tc.`order` SEPARATOR ',') as trip_categories,
+                    AVG(rv.rating) as trip_average_rating,
+                    COUNT(DISTINCT CASE WHEN rv.status = 'approved' THEN rv.id END) as trip_review_count
              FROM {$table} b
              LEFT JOIN {$tripsTable} t ON b.trip_id = t.id
+             LEFT JOIN {$tripDestinations} td ON td.trip_id = t.id
+             LEFT JOIN {$destinations} d ON d.id = td.destination_id
+             LEFT JOIN {$tripActivities} ta ON ta.trip_id = t.id
+             LEFT JOIN {$activities} act ON act.id = ta.activity_id
+             LEFT JOIN {$tripCategories} tc ON tc.trip_id = t.id
+             LEFT JOIN {$categories} cat ON cat.id = tc.category_id
+             LEFT JOIN {$reviewsTable} rv ON rv.trip_id = t.id AND rv.status = 'approved'
              WHERE b.reference = %s
+             GROUP BY b.id
              LIMIT 1",
             sanitize_text_field($reference)
         );
@@ -235,6 +255,32 @@ class BookingRepository extends BaseRepository
              ORDER BY b.created_at DESC
              LIMIT %d",
             $userId,
+            $limit
+        );
+
+        return $this->wpdb->get_results($query) ?: [];
+    }
+
+    /**
+     * Find bookings by contact email
+     *
+     * @param string $email Contact email
+     * @param int    $limit Limit results
+     * @return array
+     */
+    public function findByContactEmail(string $email, int $limit = 10): array
+    {
+        $table = $this->getTableName();
+        $trips_table = $this->getTripsTable();
+
+        $query = $this->wpdb->prepare(
+            "SELECT b.*, t.title as trip_title
+             FROM {$table} b
+             LEFT JOIN {$trips_table} t ON b.trip_id = t.id
+             WHERE b.contact_email = %s
+             ORDER BY b.created_at DESC
+             LIMIT %d",
+            sanitize_email($email),
             $limit
         );
 

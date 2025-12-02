@@ -1961,29 +1961,50 @@ class AppServiceProvider extends ServiceProvider
 
         // Check for query var first
         $booking_reference = get_query_var('yatra_booking_confirmation', '');
-        
+        $booking = null;
+        $bookingRepository = new BookingRepository();
+        $tripRepository = new TripRepository();
+        $reviewRepository = new ReviewRepository();
+
         // Also check URL path directly
         if (empty($booking_reference)) {
             $request_path = isset($wp->request) ? trim($wp->request, '/') : '';
-            
+
             if (preg_match('/^booking-confirmation\/([^\/]+)\/?$/', $request_path, $matches)) {
                 $booking_reference = $matches[1];
             }
         }
-        
+
         // Also check GET parameter (for custom confirmation pages)
         if (empty($booking_reference) && !empty($_GET['booking'])) {
             $booking_reference = sanitize_text_field($_GET['booking']);
+        }
+
+        // Support legacy URLs that provide booking_id instead of reference
+        $legacyBookingId = null;
+        if (empty($booking_reference) && !empty($_GET['booking_id'])) {
+            $legacyBookingId = absint($_GET['booking_id']);
+            if ($legacyBookingId > 0) {
+                $bookingById = $bookingRepository->findWithTrip($legacyBookingId);
+                if ($bookingById && !empty($bookingById->reference)) {
+                    $booking_reference = $bookingById->reference;
+
+                    $redirectUrl = home_url('/booking-confirmation/' . rawurlencode($booking_reference) . '/');
+                    wp_safe_redirect($redirectUrl);
+                    exit;
+                }
+            }
         }
 
         if (empty($booking_reference)) {
             return;
         }
 
-        // Fetch booking from database using BookingRepository
+        // Fetch booking from database using BookingRepository (if not already loaded)
         global $booking_data;
-        $bookingRepository = new BookingRepository();
-        $booking = $bookingRepository->findByReferenceWithTrip($booking_reference);
+        if (!$booking) {
+            $booking = $bookingRepository->findByReferenceWithTrip($booking_reference);
+        }
 
         if (!$booking) {
             // Show 404 for invalid booking reference
@@ -1996,6 +2017,60 @@ class AppServiceProvider extends ServiceProvider
         $booking->travelers = json_decode($booking->travelers_data, true) ?: [];
         $booking->contact = json_decode($booking->contact_data, true) ?: [];
         $booking->emergency = json_decode($booking->emergency_contact, true) ?: [];
+
+        // Normalize enriched trip data
+        $booking->trip_average_rating = isset($booking->trip_average_rating)
+            ? round((float) $booking->trip_average_rating, 1)
+            : null;
+        $booking->trip_review_count = isset($booking->trip_review_count)
+            ? (int) $booking->trip_review_count
+            : 0;
+
+        $booking->trip_destinations_list = !empty($booking->trip_destinations)
+            ? array_filter(array_map('trim', explode(',', $booking->trip_destinations)))
+            : [];
+        $booking->trip_activities_list = !empty($booking->trip_activities)
+            ? array_filter(array_map('trim', explode(',', $booking->trip_activities)))
+            : [];
+        $booking->trip_categories_list = !empty($booking->trip_categories)
+            ? array_filter(array_map('trim', explode(',', $booking->trip_categories)))
+            : [];
+
+        // Enrich trip metadata if still missing
+        if ((empty($booking->trip_destinations_list) || empty($booking->trip_activities_list) || empty($booking->trip_categories_list) || empty($booking->featured_image)) && !empty($booking->trip_id)) {
+            $relatedTrip = $tripRepository->findWithRelations((int) $booking->trip_id);
+            if ($relatedTrip) {
+                if (empty($booking->trip_destinations_list) && !empty($relatedTrip->destinations)) {
+                    $booking->trip_destinations_list = array_values(array_filter(array_unique(array_map(static function ($destination) {
+                        return trim($destination->destination_name ?? $destination->name ?? '');
+                    }, $relatedTrip->destinations))));
+                }
+
+                if (empty($booking->trip_activities_list) && !empty($relatedTrip->activities)) {
+                    $booking->trip_activities_list = array_values(array_filter(array_unique(array_map(static function ($activity) {
+                        return trim($activity->activity_name ?? $activity->name ?? '');
+                    }, $relatedTrip->activities))));
+                }
+
+                if (empty($booking->trip_categories_list) && !empty($relatedTrip->trip_category)) {
+                    $booking->trip_categories_list = array_values(array_filter(array_unique(array_map(static function ($category) {
+                        return trim($category->category_name ?? $category->name ?? '');
+                    }, $relatedTrip->trip_category))));
+                }
+
+                if (empty($booking->featured_image) && !empty($relatedTrip->featured_image)) {
+                    $booking->featured_image = $relatedTrip->featured_image;
+                }
+            }
+        }
+
+        if ((null === $booking->trip_average_rating || $booking->trip_average_rating <= 0) && !empty($booking->trip_id)) {
+            $booking->trip_average_rating = $reviewRepository->getAverageRating((int) $booking->trip_id);
+        }
+
+        if (empty($booking->trip_review_count) && !empty($booking->trip_id)) {
+            $booking->trip_review_count = $reviewRepository->getReviewCount((int) $booking->trip_id);
+        }
 
         // Make booking data globally available
         $booking_data = $booking;
