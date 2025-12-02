@@ -1470,6 +1470,225 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
+     * Handle invoice download request
+     */
+    public function handleInvoiceDownload(): void
+    {
+        // Check for invoice download request
+        if (empty($_GET['yatra_invoice'])) {
+            return;
+        }
+
+        $paymentId = (int) $_GET['yatra_invoice'];
+        
+        if ($paymentId <= 0) {
+            wp_die(__('Invalid payment ID.', 'yatra'), __('Error', 'yatra'), ['response' => 400]);
+        }
+
+        // Verify nonce
+        if (empty($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'wp_rest')) {
+            wp_die(__('Security check failed.', 'yatra'), __('Error', 'yatra'), ['response' => 403]);
+        }
+
+        // Must be logged in
+        if (!is_user_logged_in()) {
+            wp_die(__('You must be logged in to download invoices.', 'yatra'), __('Error', 'yatra'), ['response' => 401]);
+        }
+
+        $paymentRepository = new \Yatra\Repositories\PaymentRepository();
+        $payment = $paymentRepository->findWithBooking($paymentId);
+
+        if (!$payment) {
+            wp_die(__('Payment not found.', 'yatra'), __('Error', 'yatra'), ['response' => 404]);
+        }
+
+        // Verify user owns this payment or is admin
+        $currentUserId = get_current_user_id();
+        $bookingUserId = (int) ($payment->booking_user_id ?? $payment->user_id ?? 0);
+        
+        if ($bookingUserId && $currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
+            wp_die(__('You do not have permission to access this invoice.', 'yatra'), __('Error', 'yatra'), ['response' => 403]);
+        }
+
+        // Get trip details
+        $trip = null;
+        if (!empty($payment->trip_id)) {
+            $tripRepository = new \Yatra\Repositories\TripRepository();
+            $trip = $tripRepository->find((int) $payment->trip_id);
+        }
+
+        // Get company settings
+        $companyName = SettingsService::get('company_name', get_bloginfo('name'));
+        $companyAddress = SettingsService::get('company_address', '');
+        $companyEmail = SettingsService::get('company_email', get_option('admin_email'));
+        $companyPhone = SettingsService::get('company_phone', '');
+        $currencySymbol = yatra_get_currency_symbol(SettingsService::getCurrency());
+
+        // Format dates
+        $paymentDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : date_i18n(get_option('date_format'));
+        $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
+
+        // Generate invoice HTML
+        $invoiceHtml = $this->generateInvoiceHtml($payment, $trip, [
+            'company_name' => $companyName,
+            'company_address' => $companyAddress,
+            'company_email' => $companyEmail,
+            'company_phone' => $companyPhone,
+            'currency_symbol' => $currencySymbol,
+            'payment_date' => $paymentDate,
+            'travel_date' => $travelDate,
+        ]);
+
+        // Output invoice
+        header('Content-Type: text/html; charset=utf-8');
+        echo $invoiceHtml;
+        exit;
+    }
+
+    /**
+     * Generate invoice HTML
+     */
+    private function generateInvoiceHtml(object $payment, ?object $trip, array $data): string
+    {
+        $currencySymbol = $data['currency_symbol'];
+
+        $amount = number_format((float) ($payment->amount ?? 0), 2);
+        $bookingTotal = number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2);
+        $amountPaid = number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2);
+        $amountDue = number_format((float) ($payment->booking_amount_due ?? 0), 2);
+
+        $customerName = trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? ''));
+        if (empty($customerName)) {
+            $customerName = $payment->customer_name ?? __('Customer', 'yatra');
+        }
+        $customerEmail = $payment->contact_email ?? $payment->customer_email ?? '';
+
+        $tripTitle = $trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra');
+        $bookingRef = $payment->booking_reference ?? $payment->booking_number ?? '';
+        $paymentRef = $payment->reference ?? 'PAY-' . $payment->id;
+        $paymentMethod = ucfirst($payment->gateway ?? $payment->payment_method ?? 'Online');
+        $paymentStatus = ucfirst($payment->status ?? 'completed');
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - {$paymentRef}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.6; color: #333; background: #f5f5f5; padding: 20px; }
+        .invoice { max-width: 800px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+        .invoice-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: #fff; padding: 30px 40px; }
+        .invoice-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 5px; }
+        .invoice-header p { opacity: 0.9; font-size: 14px; }
+        .invoice-body { padding: 40px; }
+        .invoice-meta { display: flex; justify-content: space-between; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+        .invoice-meta-block h3 { font-size: 12px; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .invoice-meta-block p { font-size: 14px; color: #111; margin-bottom: 4px; }
+        .invoice-meta-block strong { font-weight: 600; }
+        .invoice-table { width: 100%; border-collapse: collapse; margin: 30px 0; }
+        .invoice-table th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 12px; text-transform: uppercase; color: #6b7280; border-bottom: 2px solid #e5e7eb; }
+        .invoice-table td { padding: 16px; border-bottom: 1px solid #e5e7eb; }
+        .invoice-table .amount { text-align: right; font-weight: 600; }
+        .invoice-totals { margin-top: 20px; border-top: 2px solid #e5e7eb; padding-top: 20px; }
+        .invoice-total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+        .invoice-total-row.grand-total { font-size: 18px; font-weight: 700; color: #1e40af; border-top: 2px solid #1e40af; margin-top: 10px; padding-top: 15px; }
+        .invoice-footer { background: #f9fafb; padding: 20px 40px; text-align: center; font-size: 12px; color: #6b7280; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-completed, .status-paid { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .print-btn { display: block; margin: 20px auto; padding: 12px 24px; background: #3b82f6; color: #fff; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+        .print-btn:hover { background: #2563eb; }
+        @media print { 
+            body { background: #fff; padding: 0; } 
+            .invoice { box-shadow: none; } 
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice">
+        <div class="invoice-header">
+            <h1>{$data['company_name']}</h1>
+            <p>Payment Invoice</p>
+        </div>
+        <div class="invoice-body">
+            <div class="invoice-meta">
+                <div class="invoice-meta-block">
+                    <h3>Invoice To</h3>
+                    <p><strong>{$customerName}</strong></p>
+                    <p>{$customerEmail}</p>
+                </div>
+                <div class="invoice-meta-block">
+                    <h3>Invoice Details</h3>
+                    <p><strong>Invoice #:</strong> {$paymentRef}</p>
+                    <p><strong>Date:</strong> {$data['payment_date']}</p>
+                    <p><strong>Status:</strong> <span class="status-badge status-{$payment->status}">{$paymentStatus}</span></p>
+                </div>
+                <div class="invoice-meta-block">
+                    <h3>Company</h3>
+                    <p>{$data['company_name']}</p>
+                    <p>{$data['company_address']}</p>
+                    <p>{$data['company_email']}</p>
+                    <p>{$data['company_phone']}</p>
+                </div>
+            </div>
+
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Booking Ref</th>
+                        <th>Travel Date</th>
+                        <th class="amount">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>{$tripTitle}</strong><br>
+                            <small style="color: #6b7280;">Payment via {$paymentMethod}</small>
+                        </td>
+                        <td>{$bookingRef}</td>
+                        <td>{$data['travel_date']}</td>
+                        <td class="amount">{$currencySymbol}{$amount}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="invoice-totals">
+                <div class="invoice-total-row">
+                    <span>Booking Total</span>
+                    <span>{$currencySymbol}{$bookingTotal}</span>
+                </div>
+                <div class="invoice-total-row">
+                    <span>Total Paid</span>
+                    <span style="color: #059669;">{$currencySymbol}{$amountPaid}</span>
+                </div>
+                <div class="invoice-total-row">
+                    <span>Balance Due</span>
+                    <span>{$currencySymbol}{$amountDue}</span>
+                </div>
+                <div class="invoice-total-row grand-total">
+                    <span>This Payment</span>
+                    <span>{$currencySymbol}{$amount}</span>
+                </div>
+            </div>
+        </div>
+        <div class="invoice-footer">
+            <p>Thank you for your booking! If you have any questions, please contact us at {$data['company_email']}</p>
+            <p style="margin-top: 10px;">This invoice was generated on {$data['payment_date']}</p>
+        </div>
+    </div>
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+</body>
+</html>
+HTML;
+    }
+
+    /**
      * Handle remaining checkout page (legacy URL - redirect to main checkout)
      */
     public function handleRemainingCheckoutPage(): void

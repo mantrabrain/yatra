@@ -236,7 +236,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                     {/* Download Invoice - show for paid/completed payments */}
                     {isPaid && (
                       <a
-                        href={`${(window as any).yatraAccountData?.siteUrl || ''}/?yatra_invoice=${payment.id}&_wpnonce=${(window as any).yatraAccountData?.nonce || ''}`}
+                        href={`${(window as any).yatraAdmin?.siteUrl || ''}/?yatra_invoice=${payment.id}&_wpnonce=${(window as any).yatraAdmin?.nonce || ''}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="yatra-payment-action yatra-payment-action-invoice inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
@@ -247,10 +247,16 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                       </a>
                     )}
                     {isPaid && (
-                      <button type="button" className="yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium">
+                      <a
+                        href={`${(window as any).yatraAdmin?.siteUrl || ''}/?yatra_invoice=${payment.id}&_wpnonce=${(window as any).yatraAdmin?.nonce || ''}&view=1`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
+                        style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
+                      >
                         <FileTextIcon className="w-4 h-4" />
                         {__('View Receipt', 'View Receipt')}
-                      </button>
+                      </a>
                     )}
                     {isPending && !canPayRemaining && (
                       <button type="button" className="yatra-payment-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium">

@@ -1285,7 +1285,7 @@ const Payments = ({ payments, onSectionChange }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400 font-medium mb-1", children: __("No payments found", "No payments found") }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-400 dark:text-gray-500", children: __("Payment history will appear here once you make a booking.", "Payment history will appear here once you make a booking.") })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: displayPayments.map((payment) => {
-      var _a;
+      var _a, _b, _c, _d;
       const bookingTotal = typeof payment.booking_total_amount === "number" ? payment.booking_total_amount : null;
       const bookingPaid = typeof payment.booking_amount_paid === "number" ? payment.booking_amount_paid : null;
       const bookingDue = typeof payment.booking_amount_due === "number" ? payment.booking_amount_due : null;
@@ -1349,7 +1349,7 @@ const Payments = ({ payments, onSectionChange }) => {
               isPaid && /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "a",
                 {
-                  href: `${((_a = window.yatraAccountData) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/payment/${payment.id}/invoice`,
+                  href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/?yatra_invoice=${payment.id}&_wpnonce=${((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""}`,
                   target: "_blank",
                   rel: "noopener noreferrer",
                   className: "yatra-payment-action yatra-payment-action-invoice inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium",
@@ -1360,10 +1360,20 @@ const Payments = ({ payments, onSectionChange }) => {
                   ]
                 }
               ),
-              isPaid && /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "button", className: "yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4" }),
-                __("View Receipt", "View Receipt")
-              ] }),
+              isPaid && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "a",
+                {
+                  href: `${((_c = window.yatraAdmin) == null ? void 0 : _c.siteUrl) || ""}/?yatra_invoice=${payment.id}&_wpnonce=${((_d = window.yatraAdmin) == null ? void 0 : _d.nonce) || ""}&view=1`,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  className: "yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium",
+                  style: { backgroundColor: "#2563eb", color: "#ffffff" },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4" }),
+                    __("View Receipt", "View Receipt")
+                  ]
+                }
+              ),
               isPending && !canPayRemaining && /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "button", className: "yatra-payment-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-4 h-4" }),
                 __("Pending approval", "Pending approval")
