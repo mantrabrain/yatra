@@ -1337,9 +1337,9 @@ class BookingSessionController extends BaseController
             }
             
             // Prepare payment data - pass all params, gateways extract what they need
+            // Note: Don't set return_url here - let each gateway set its own with gateway-specific query params
             $paymentData = array_merge($params, [
                 'description' => $params['trip_title'] ?? '',
-                'return_url' => $this->getConfirmationUrl($params['reference'] ?? '') . '?payment=success',
                 'cancel_url' => home_url('/book/?payment=cancelled&ref=' . ($params['reference'] ?? '')),
                 'metadata' => [
                     'booking_id' => $params['booking_id'],

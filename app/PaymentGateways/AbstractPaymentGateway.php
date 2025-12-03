@@ -131,6 +131,14 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
 
     public function isAvailable(): bool
     {
+        return $this->isEnabled();
+    }
+    
+    /**
+     * Check if gateway is enabled in settings
+     */
+    public function isEnabled(): bool
+    {
         return !empty($this->config['enabled'] ?? false);
     }
 

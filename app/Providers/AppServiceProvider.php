@@ -2314,11 +2314,18 @@ HTML;
         }
 
         // Handle payment gateway returns (generic - each gateway checks if it should handle)
+        error_log('[Yatra] Checking payment return handlers. GET params: ' . print_r($_GET, true));
         $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
         foreach ($registry->getAll() as $gateway) {
-            if (method_exists($gateway, 'shouldHandleReturn') && $gateway->shouldHandleReturn($_GET)) {
-                $gateway->handlePaymentReturn($booking, $bookingRepository);
-                break;
+            $gatewayId = $gateway->getId();
+            if (method_exists($gateway, 'shouldHandleReturn')) {
+                $shouldHandle = $gateway->shouldHandleReturn($_GET);
+                error_log("[Yatra] Gateway {$gatewayId} shouldHandleReturn: " . ($shouldHandle ? 'yes' : 'no'));
+                if ($shouldHandle) {
+                    error_log("[Yatra] Calling handlePaymentReturn for {$gatewayId}");
+                    $gateway->handlePaymentReturn($booking, $bookingRepository);
+                    break;
+                }
             }
         }
 

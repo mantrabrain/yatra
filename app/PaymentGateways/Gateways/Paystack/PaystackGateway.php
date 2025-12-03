@@ -87,16 +87,26 @@ class PaystackGateway extends AbstractPaymentGateway
             if (empty($secretKey)) {
                 throw new \Exception('Paystack secret key not configured');
             }
+            
+            $bookingId = $paymentData['booking_id'] ?? 0;
+            $reference = $paymentData['reference'] ?? '';
+            
+            // Build callback URL with paystack-specific query param
+            $callbackUrl = $paymentData['return_url'] ?? '';
+            if (empty($callbackUrl) && !empty($reference)) {
+                $callbackUrl = home_url('/booking-confirmation/' . $reference . '/');
+            }
 
             // Initialize transaction with Paystack
             $transactionData = [
                 'email' => $paymentData['customer_email'] ?? '',
                 'amount' => (int) ($paymentData['amount'] * 100), // Convert to kobo/cents
                 'currency' => $paymentData['currency'] ?? 'NGN',
-                'reference' => $this->generateReference($paymentData['booking_id'] ?? ''),
-                'callback_url' => $paymentData['return_url'] ?? '',
+                'reference' => $this->generateReference($bookingId),
+                'callback_url' => $callbackUrl,
                 'metadata' => [
-                    'booking_id' => $paymentData['booking_id'] ?? '',
+                    'booking_id' => $bookingId,
+                    'reference' => $reference,
                     'customer_name' => $paymentData['customer_name'] ?? '',
                 ],
             ];
@@ -301,6 +311,17 @@ class PaystackGateway extends AbstractPaymentGateway
     }
     
     /**
+     * Get frontend data for JavaScript
+     */
+    public function getFrontendData(): array
+    {
+        return [
+            'public_key' => $this->config['public_key'] ?? '',
+            'payment_channels' => $this->config['payment_channels'] ?? ['card', 'bank', 'ussd'],
+        ];
+    }
+    
+    /**
      * Check if this gateway should handle the return request
      */
     public function shouldHandleReturn(array $params): bool
@@ -360,14 +381,14 @@ class PaystackGateway extends AbstractPaymentGateway
         );
         
         // Record the payment
-        $payments_table = $wpdb->prefix . 'yatra_payments';
+        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
         $wpdb->insert(
             $payments_table,
             [
                 'booking_id' => $bookingId,
                 'amount' => $amount,
                 'currency' => $currency,
-                'payment_gateway' => 'paystack',
+                'gateway' => 'paystack',
                 'transaction_id' => $transactionId,
                 'status' => 'completed',
                 'created_at' => current_time('mysql'),

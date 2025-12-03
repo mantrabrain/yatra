@@ -19616,6 +19616,37 @@ const Settings = () => {
                             ] })
                           ] }, field.id);
                         }
+                        if (field.type === "multiselect" && field.options) {
+                          const rawValue = config[field.id];
+                          const selectedValues = Array.isArray(rawValue) ? rawValue : typeof rawValue === "string" && rawValue.length > 0 ? rawValue.split(",").map((val) => val.trim()).filter(Boolean) : Array.isArray(field.default) ? field.default : [];
+                          const methodOptions = Object.entries(field.options).map(([value, label]) => ({
+                            value,
+                            label: String(label)
+                          }));
+                          const handleMultiSelectChange = (values) => {
+                            handleGatewayConfigChange(gatewayId, field.id, values);
+                          };
+                          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              FormField,
+                              {
+                                id: `${gatewayId}_${field.id}`,
+                                label: field.label,
+                                description: field.description,
+                                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  MultiSelect,
+                                  {
+                                    value: selectedValues,
+                                    onChange: handleMultiSelectChange,
+                                    options: methodOptions,
+                                    placeholder: __("Select options...", "Select options...")
+                                  }
+                                )
+                              }
+                            ),
+                            field.help_text && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-blue-600 dark:text-blue-400", children: field.help_text })
+                          ] }, field.id);
+                        }
                         if (field.type === "select" && field.options) {
                           return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                             /* @__PURE__ */ jsxRuntimeExports.jsx(

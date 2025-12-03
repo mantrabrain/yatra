@@ -57,21 +57,90 @@ class AuthorizeNetGateway extends AbstractPaymentGateway
             ? 'https://apitest.authorize.net/xml/v1/request.api'
             : 'https://api.authorize.net/xml/v1/request.api';
     }
+    
+    public function isAvailable(): bool
+    {
+        $config = $this->getConfig();
+        return !empty($config['api_login_id']) && 
+               !empty($config['transaction_key']) && 
+               !empty($config['public_client_key']) && 
+               $this->isEnabled();
+    }
+    
+    /**
+     * Get frontend data for JavaScript
+     */
+    public function getFrontendData(): array
+    {
+        return [
+            'api_login_id' => $this->config['api_login_id'] ?? '',
+            'public_client_key' => $this->config['public_client_key'] ?? '',
+            'test_mode' => \Yatra\Services\SettingsService::isPaymentTestMode(),
+        ];
+    }
+    
+    /**
+     * Enqueue gateway scripts
+     */
+    public function enqueueScripts(): void
+    {
+        if (!$this->isAvailable()) {
+            return;
+        }
+        
+        wp_enqueue_script(
+            'yatra-authorize-net',
+            plugins_url('authorizenet.js', __FILE__),
+            ['jquery'],
+            '2.0.0',
+            true
+        );
+    }
 
     public function processPayment(array $paymentData): array
     {
-        // Authorize.net uses Accept.js for client-side tokenization
-        // Return config for frontend
         $bookingId = $paymentData['booking_id'] ?? 0;
+        $reference = $paymentData['reference'] ?? '';
         $amount = number_format((float) ($paymentData['amount'] ?? 0), 2, '.', '');
+        $currency = $paymentData['currency'] ?? 'USD';
+        $confirmationUrl = home_url('/booking-confirmation/' . $reference . '/');
         
+        // Check if we have payment token from frontend (Accept.js)
+        $dataDescriptor = $paymentData['authnet_data_descriptor'] ?? '';
+        $dataValue = $paymentData['authnet_data_value'] ?? '';
+        
+        if (!empty($dataDescriptor) && !empty($dataValue)) {
+            // Process payment with token
+            $result = $this->createPayment([
+                'data_descriptor' => $dataDescriptor,
+                'data_value' => $dataValue,
+                'amount' => $amount,
+                'booking_id' => $bookingId,
+            ]);
+            
+            if ($result['success']) {
+                return [
+                    'success' => true,
+                    'transaction_id' => $result['transaction_id'] ?? '',
+                    'status' => 'completed',
+                    'redirect_url' => $confirmationUrl,
+                ];
+            }
+            
+            return $result;
+        }
+        
+        // No token - return config for frontend to collect card via Accept.js
         return [
             'success' => true,
-            'requires_client_payment' => true,
+            'requires_action' => 'authorize_net_payment',
             'api_login_id' => $this->config['api_login_id'] ?? '',
             'public_client_key' => $this->config['public_client_key'] ?? '',
             'amount' => $amount,
+            'currency' => $currency,
             'booking_id' => $bookingId,
+            'booking_ref' => $reference,
+            'confirmation_url' => $confirmationUrl,
             'test_mode' => \Yatra\Services\SettingsService::isPaymentTestMode(),
         ];
     }

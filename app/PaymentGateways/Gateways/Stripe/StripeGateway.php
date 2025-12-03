@@ -71,7 +71,7 @@ class StripeGateway extends AbstractPaymentGateway
     {
         try {
             // Validate required fields
-            $required = ['amount', 'currency', 'booking_id', 'customer_email', 'return_url', 'cancel_url'];
+            $required = ['amount', 'currency', 'booking_id', 'customer_email'];
             foreach ($required as $field) {
                 if (empty($paymentData[$field])) {
                     return [
@@ -85,10 +85,17 @@ class StripeGateway extends AbstractPaymentGateway
             $amount = (int) ($paymentData['amount'] * 100);
             $currency = strtolower($paymentData['currency']);
             $bookingId = $paymentData['booking_id'] ?? 0;
+            $reference = $paymentData['reference'] ?? '';
             $customerEmail = $paymentData['customer_email'] ?? '';
             $customerName = $paymentData['customer_name'] ?? '';
             $saveCard = !empty($paymentData['save_card']) && !empty($this->config['save_cards']);
             $customerId = $paymentData['stripe_customer_id'] ?? null;
+            
+            // Build return URL with stripe-specific query param
+            $returnUrl = $paymentData['return_url'] ?? '';
+            if (empty($returnUrl) && !empty($reference)) {
+                $returnUrl = home_url('/booking-confirmation/' . $reference . '/?stripe=success');
+            }
 
             // Create or get customer if saving card
             if ($saveCard && !$customerId && $customerEmail) {

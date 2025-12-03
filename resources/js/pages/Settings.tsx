@@ -2417,6 +2417,47 @@ onChange={handleFieldChange}
                             );
                           }
 
+                          // Render multiselect fields (for Mollie, Paystack, etc.)
+                          if (field.type === 'multiselect' && field.options) {
+                            const rawValue = config[field.id];
+                            const selectedValues = Array.isArray(rawValue)
+                              ? rawValue
+                              : typeof rawValue === 'string' && rawValue.length > 0
+                                ? rawValue.split(',').map((val: string) => val.trim()).filter(Boolean)
+                                : Array.isArray(field.default) ? field.default : [];
+
+                            const methodOptions: MultiSelectOption[] = Object.entries(field.options).map(([value, label]) => ({
+                              value,
+                              label: String(label)
+                            }));
+
+                            const handleMultiSelectChange = (values: (string | number)[]) => {
+                              handleGatewayConfigChange(gatewayId, field.id, values);
+                            };
+
+                            return (
+                              <div key={field.id} className="space-y-2">
+                                <FormField
+                                  id={`${gatewayId}_${field.id}`}
+                                  label={field.label}
+                                  description={field.description}
+                                >
+                                  <MultiSelect
+                                    value={selectedValues}
+                                    onChange={handleMultiSelectChange}
+                                    options={methodOptions}
+                                    placeholder={__('Select options...', 'Select options...')}
+                                  />
+                                </FormField>
+                                {field.help_text && (
+                                  <p className="text-xs text-blue-600 dark:text-blue-400">
+                                    {field.help_text}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          }
+
                           // Render select/dropdown fields
                           if (field.type === 'select' && field.options) {
                             return (
