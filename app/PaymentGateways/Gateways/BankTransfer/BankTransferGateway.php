@@ -15,6 +15,14 @@ class BankTransferGateway extends AbstractPaymentGateway
     protected bool $isOffline = true;
     protected array $supports = ['bank_transfer'];
 
+    public function __construct()
+    {
+        parent::__construct();
+        
+        // Hook into confirmation page to display bank details
+        add_action('yatra_booking_confirmation_after_details', [$this, 'renderConfirmationDetails'], 10, 1);
+    }
+
     public function getConfigFields(): array
     {
         return [
@@ -83,6 +91,32 @@ class BankTransferGateway extends AbstractPaymentGateway
     {
         // Bank transfers are verified manually
         return ['success' => true, 'status' => 'pending_verification'];
+    }
+
+    /**
+     * Render bank transfer details on booking confirmation page
+     * 
+     * @param object $booking Booking object
+     */
+    public function renderConfirmationDetails($booking): void
+    {
+        // Only render if this booking used bank transfer
+        if ($booking->payment_gateway !== 'bank_transfer') {
+            return;
+        }
+
+        $bank_details = [
+            'bank_name' => $this->config['bank_name'] ?? '',
+            'account_name' => $this->config['account_name'] ?? '',
+            'account_number' => $this->config['account_number'] ?? '',
+            'routing_code' => $this->config['routing_code'] ?? '',
+            'instructions' => $this->config['instructions'] ?? __('Please transfer the amount to the bank account above and include your booking reference in the payment description.', 'yatra'),
+        ];
+
+        $amount_due = $booking->amount_due > 0 ? $booking->amount_due : $booking->total_amount;
+
+        // Include the template
+        include __DIR__ . '/confirmation-details.php';
     }
 }
 

@@ -329,6 +329,12 @@ get_header();
                 </div>
             </div>
 
+            <!-- Gateway-specific payment instructions -->
+            <?php
+            // Allow gateways to render their own confirmation content
+            do_action('yatra_booking_confirmation_after_details', $booking);
+            ?>
+
             <!-- What's Next Section -->
             <div class="yatra-confirmation-card yatra-whats-next">
                 <h3 class="yatra-card-title">
