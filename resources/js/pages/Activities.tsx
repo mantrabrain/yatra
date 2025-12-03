@@ -3,9 +3,9 @@
  * Clean, minimal SaaS-style activities management page
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw, MoreVertical, Columns } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
@@ -44,13 +44,69 @@ const Activities: React.FC = () => {
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; activity: Activity | null }>({
+  const [permanentDeleteConfirm, setPermanentDeleteConfirm] = useState<{ isOpen: boolean; activity: Activity | null }>({
     isOpen: false,
     activity: null,
   });
+  const [bulkActionConfirm, setBulkActionConfirm] = useState<{ isOpen: boolean; action: string; count: number }>({
+    isOpen: false,
+    action: '',
+    count: 0,
+  });
+  const [individualActionConfirm, setIndividualActionConfirm] = useState<{ isOpen: boolean; action: string; activity: Activity | null }>({
+    isOpen: false,
+    action: '',
+    activity: null,
+  });
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  
+  // Column visibility state with localStorage
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const saved = localStorage.getItem('yatra-activities-columns');
+    return saved ? JSON.parse(saved) : {
+      description: true,
+      status: true,
+      trips: true,
+      date: true,
+      author: true,
+    };
+  });
+
   const queryClient = useQueryClient();
   const { can, isPro } = usePermissions();
   const { showToast } = useToast();
+
+  // Toggle column visibility
+  const toggleColumn = (columnKey: string) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisibleColumns);
+    localStorage.setItem('yatra-activities-columns', JSON.stringify(newVisibleColumns));
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Don't close if clicking on dropdown button or dropdown content
+      if (target.closest('[data-dropdown-trigger]') || target.closest('[data-dropdown-content]') || 
+          target.closest('[data-columns-trigger]') || target.closest('[data-columns-content]')) {
+        return;
+      }
+      setOpenDropdown(null);
+      setShowColumnsDropdown(false);
+    };
+    
+    if (openDropdown !== null || showColumnsDropdown) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [openDropdown, showColumnsDropdown]);
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -86,212 +142,47 @@ const Activities: React.FC = () => {
     },
     enabled: can('yatra_view_trips'),
   });
-
-  // OLD CODE - REMOVED DUMMY DATA
-  /* const { data, isLoading, error } = useQuery({
-    queryKey: ['activities', queryParams],
+  // Status counts for WP-style views
+  const { data: statsData } = useQuery({
+    queryKey: ['activities', 'stats'],
     queryFn: async () => {
-      // Dummy data for development
-      const today = new Date();
-      const getDate = (days: number) => {
-        const date = new Date(today);
-        date.setDate(date.getDate() - days);
-        return date.toISOString();
-      };
-
-      const allActivities: Activity[] = [
-        {
-          id: 1,
-          name: 'Trekking',
-          slug: 'trekking',
-          description: 'Mountain trekking and hiking adventures',
-          status: 'publish',
-          trips_count: 12,
-          created_at: getDate(30),
-          updated_at: getDate(25),
-          created_by: 1,
-          updated_by: 1,
-          created_by_name: 'Admin User',
-          updated_by_name: 'Admin User',
-        },
-        {
-          id: 2,
-          name: 'Cultural Tours',
-          slug: 'cultural-tours',
-          description: 'Explore local culture and traditions',
-          status: 'publish',
-          trips_count: 8,
-          created_at: getDate(25),
-          updated_at: getDate(20),
-          created_by: 1,
-          updated_by: 2,
-          created_by_name: 'Admin User',
-          updated_by_name: 'Editor User',
-        },
-        {
-          id: 3,
-          name: 'Wildlife Safari',
-          slug: 'wildlife-safari',
-          description: 'Wildlife watching and safari experiences',
-          status: 'publish',
-          trips_count: 6,
-          created_at: getDate(20),
-          updated_at: getDate(18),
-          created_by: 2,
-          updated_by: 2,
-          created_by_name: 'Editor User',
-          updated_by_name: 'Editor User',
-        },
-        {
-          id: 4,
-          name: 'Adventure Sports',
-          slug: 'adventure-sports',
-          description: 'Paragliding, rafting, and extreme sports',
-          status: 'publish',
-          trips_count: 10,
-          created_at: getDate(15),
-          updated_at: getDate(10),
-          created_by: 1,
-          updated_by: 1,
-          created_by_name: 'Admin User',
-          updated_by_name: 'Admin User',
-        },
-        {
-          id: 5,
-          name: 'Photography Tours',
-          slug: 'photography-tours',
-          description: 'Photography-focused travel experiences',
-          status: 'draft',
-          trips_count: 3,
-          created_at: getDate(10),
-          updated_at: getDate(8),
-          created_by: 2,
-          updated_by: 2,
-          created_by_name: 'Editor User',
-          updated_by_name: 'Editor User',
-        },
-        {
-          id: 6,
-          name: 'Yoga & Meditation',
-          slug: 'yoga-meditation',
-          description: 'Wellness and spiritual retreats',
-          status: 'publish',
-          trips_count: 5,
-          created_at: getDate(8),
-          updated_at: getDate(5),
-          created_by: 1,
-          updated_by: 1,
-          created_by_name: 'Admin User',
-          updated_by_name: 'Admin User',
-        },
-        {
-          id: 7,
-          name: 'Beach Activities',
-          slug: 'beach-activities',
-          description: 'Water sports and beach activities',
-          status: 'publish',
-          trips_count: 7,
-          created_at: getDate(5),
-          updated_at: getDate(3),
-          created_by: 2,
-          updated_by: 1,
-          created_by_name: 'Editor User',
-          updated_by_name: 'Admin User',
-        },
-        {
-          id: 8,
-          name: 'City Tours',
-          slug: 'city-tours',
-          description: 'Urban exploration and city sightseeing',
-          status: 'trash',
-          trips_count: 4,
-          created_at: getDate(3),
-          updated_at: getDate(1),
-          created_by: 1,
-          updated_by: 1,
-          created_by_name: 'Admin User',
-          updated_by_name: 'Admin User',
-        },
-      ];
-
-      // Apply filters
-      let filtered = allActivities;
-      if (searchTerm) {
-        filtered = filtered.filter(activity =>
-          activity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          activity.slug.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(activity => activity.status === statusFilter);
-      }
-
-      // Apply sorting
-      filtered = [...filtered].sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
-
-        switch (sortBy) {
-          case 'name':
-            aValue = a.name.toLowerCase();
-            bValue = b.name.toLowerCase();
-            break;
-          case 'status':
-            aValue = a.status;
-            bValue = b.status;
-            break;
-          case 'date':
-          case 'created_at':
-            aValue = new Date(a.created_at).getTime();
-            bValue = new Date(b.created_at).getTime();
-            break;
-          case 'updated_at':
-            aValue = new Date(a.updated_at).getTime();
-            bValue = new Date(b.updated_at).getTime();
-            break;
-          default:
-            aValue = a.name.toLowerCase();
-            bValue = b.name.toLowerCase();
-        }
-
-        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
-      });
-
-      // Apply pagination
-      const start = (page - 1) * 10;
-      const end = start + 10;
-      const paginated = filtered.slice(start, end);
-
-      return {
-        data: paginated,
-        total: filtered.length,
-        page,
-        per_page: 10,
-      };
+      const response = await apiClient.get('/activities/stats');
+      console.log('Stats API Response:', response);
+      return response;
     },
     enabled: can('yatra_view_trips'),
-  }); */
-
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return await apiClient.delete(`/activities/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] });
-      showToast(__('Activity deleted successfully', 'Activity deleted successfully'), 'success');
-      setDeleteConfirm({ isOpen: false, activity: null });
-    },
-    onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete activity', 'Failed to delete activity'), 'error');
-    },
   });
+
 
   const activities = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+
+  const statusCounts = statsData?.data || {
+    all: 0,
+    publish: 0,
+    draft: 0,
+    trash: 0,
+  };
+
+  console.log('Status Counts:', statusCounts);
+
+  // Bulk actions mutation
+  const bulkMutation = useMutation({
+    mutationFn: async ({ action, ids }: { action: string; ids: number[] }) => {
+      return await apiClient.post('/activities/bulk', { action, ids });
+    },
+    onSuccess: (response: any) => {
+      const message = response?.message || __('Bulk action completed.', 'Bulk action completed.');
+      showToast(message, 'success');
+      setSelectedIds([]);
+      queryClient.invalidateQueries({ queryKey: ['activities'] });
+      queryClient.invalidateQueries({ queryKey: ['activities', 'stats'] });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to process bulk action', 'Failed to process bulk action'), 'error');
+    },
+  });
 
   const formatDate = (dateString: string) => {
     if (!dateString) return __('N/A', 'N/A');
@@ -312,26 +203,26 @@ const Activities: React.FC = () => {
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'publish': {
-        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Publish', 'Publish'),
+        className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800',
+        label: __('Published', 'Published'),
       },
       'draft': {
-        className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+        className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800',
         label: __('Draft', 'Draft'),
       },
       'trash': {
-        className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
+        className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800',
         label: __('Trash', 'Trash'),
       },
     };
 
     const statusInfo = statusMap[status] || {
-      className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+      className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600',
       label: status,
     };
 
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`}>
+      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusInfo.className}`}>
         {statusInfo.label}
       </span>
     );
@@ -384,12 +275,39 @@ const Activities: React.FC = () => {
   };
 
   const handleDelete = (activity: Activity) => {
-    setDeleteConfirm({ isOpen: true, activity });
+    // Show confirmation dialog for move to trash
+    setIndividualActionConfirm({
+      isOpen: true,
+      action: 'trash',
+      activity: activity
+    });
   };
 
-  const confirmDelete = () => {
-    if (deleteConfirm.activity) {
-      deleteMutation.mutate(deleteConfirm.activity.id);
+  const handleRestore = (activity: Activity) => {
+    // Show confirmation dialog for restore
+    setIndividualActionConfirm({
+      isOpen: true,
+      action: 'restore',
+      activity: activity
+    });
+  };
+
+  const handlePermanentDelete = (activity: Activity) => {
+    setPermanentDeleteConfirm({ isOpen: true, activity });
+  };
+
+  const confirmPermanentDelete = () => {
+    if (permanentDeleteConfirm.activity) {
+      bulkMutation.mutate({ action: 'delete', ids: [permanentDeleteConfirm.activity.id] });
+      setPermanentDeleteConfirm({ isOpen: false, activity: null });
+    }
+  };
+
+  const confirmIndividualAction = () => {
+    if (individualActionConfirm.activity) {
+      const action = individualActionConfirm.action === 'restore' ? 'restore' : 'trash';
+      bulkMutation.mutate({ action, ids: [individualActionConfirm.activity.id] });
+      setIndividualActionConfirm({ isOpen: false, action: '', activity: null });
     }
   };
 
@@ -397,12 +315,72 @@ const Activities: React.FC = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=create`;
   };
 
+  // Keep selection in sync with current page data
+  useEffect(() => {
+    setSelectedIds((prev) =>
+      prev.filter((id) => activities.some((activity: Activity) => activity.id === id))
+    );
+  }, [activities]);
+
+  const isAllSelected = activities.length > 0 && selectedIds.length === activities.length;
+
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(activities.map((activity: Activity) => activity.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const toggleSelectItem = (id: number, checked: boolean) => {
+    setSelectedIds((prev) => {
+      if (checked) {
+        return [...new Set([...prev, id])];
+      }
+      return prev.filter((itemId) => itemId !== id);
+    });
+  };
+
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      return;
+    }
+
+    if (selectedIds.length === 0) {
+      showToast(__('Select at least one activity.', 'Select at least one activity.'), 'warning');
+      return;
+    }
+
+    // Show confirmation dialog
+    setBulkActionConfirm({
+      isOpen: true,
+      action: bulkAction,
+      count: selectedIds.length
+    });
+  };
+
+  const confirmBulkAction = () => {
+    bulkMutation.mutate({ action: bulkActionConfirm.action, ids: selectedIds });
+    setBulkActionConfirm({ isOpen: false, action: '', count: 0 });
+    setBulkAction('');
+  };
+
+  const viewFilters = [
+    { key: 'all', label: __('All', 'All'), count: statusCounts.all ?? 0 },
+    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish ?? 0 },
+    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft ?? 0 },
+    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash ?? 0 },
+  ];
+
   const handleResetFilters = () => {
     setSearchTerm('');
     setStatusFilter('all');
     setSortBy('name');
     setSortOrder('asc');
     setPage(1);
+    setSelectedIds([]);
+    setBulkAction('');
   };
 
   const handleSort = (field: string) => {
@@ -427,20 +405,103 @@ const Activities: React.FC = () => {
 
   return (
     <div className="space-y-3">
-      {/* Confirmation Dialog */}
+      {/* Permanent Delete Confirmation Dialog */}
       <ConfirmationDialog
-        isOpen={deleteConfirm.isOpen}
-        onClose={() => setDeleteConfirm({ isOpen: false, activity: null })}
-        onConfirm={confirmDelete}
-        title={__('Delete Activity', 'Delete Activity')}
-        message={deleteConfirm.activity 
-          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'Are you sure you want to delete "{name}"? This action cannot be undone.').replace('{name}', deleteConfirm.activity.name)
-          : __('Are you sure you want to delete this activity? This action cannot be undone.', 'Are you sure you want to delete this activity? This action cannot be undone.')
+        isOpen={permanentDeleteConfirm.isOpen}
+        onClose={() => setPermanentDeleteConfirm({ isOpen: false, activity: null })}
+        onConfirm={confirmPermanentDelete}
+        title={__('Delete Activity Permanently', 'Delete Activity Permanently')}
+        message={permanentDeleteConfirm.activity 
+          ? __('Are you sure you want to permanently delete "{name}"? This action cannot be undone.', 'Are you sure you want to permanently delete "{name}"? This action cannot be undone.').replace('{name}', permanentDeleteConfirm.activity.name)
+          : __('Are you sure you want to permanently delete this activity? This action cannot be undone.', 'Are you sure you want to permanently delete this activity? This action cannot be undone.')
         }
-        confirmText={__('Delete', 'Delete')}
+        confirmText={__('Delete Permanently', 'Delete Permanently')}
         cancelText={__('Cancel', 'Cancel')}
         variant="danger"
-        isLoading={deleteMutation.isPending}
+        isLoading={bulkMutation.isPending}
+      />
+
+      {/* Bulk Action Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={bulkActionConfirm.isOpen}
+        onClose={() => setBulkActionConfirm({ isOpen: false, action: '', count: 0 })}
+        onConfirm={confirmBulkAction}
+        title={(() => {
+          switch (bulkActionConfirm.action) {
+            case 'trash':
+              return __('Move to Trash', 'Move to Trash');
+            case 'publish':
+              return __('Make Published', 'Make Published');
+            case 'draft':
+              return __('Make Draft', 'Make Draft');
+            case 'delete':
+              return __('Delete Permanently', 'Delete Permanently');
+            default:
+              return __('Confirm Action', 'Confirm Action');
+          }
+        })()}
+        message={(() => {
+          const count = bulkActionConfirm.count;
+          switch (bulkActionConfirm.action) {
+            case 'trash':
+              return count === 1 
+                ? __('Are you sure you want to move this activity to trash?', 'Are you sure you want to move this activity to trash?')
+                : __('Are you sure you want to move {count} activities to trash?', 'Are you sure you want to move {count} activities to trash?').replace('{count}', count.toString());
+            case 'publish':
+              return count === 1 
+                ? __('Are you sure you want to publish this activity?', 'Are you sure you want to publish this activity?')
+                : __('Are you sure you want to publish {count} activities?', 'Are you sure you want to publish {count} activities?').replace('{count}', count.toString());
+            case 'draft':
+              return count === 1 
+                ? __('Are you sure you want to make this activity draft?', 'Are you sure you want to make this activity draft?')
+                : __('Are you sure you want to make {count} activities draft?', 'Are you sure you want to make {count} activities draft?').replace('{count}', count.toString());
+            case 'delete':
+              return count === 1 
+                ? __('Are you sure you want to permanently delete this activity? This action cannot be undone.', 'Are you sure you want to permanently delete this activity? This action cannot be undone.')
+                : __('Are you sure you want to permanently delete {count} activities? This action cannot be undone.', 'Are you sure you want to permanently delete {count} activities? This action cannot be undone.').replace('{count}', count.toString());
+            default:
+              return __('Are you sure you want to perform this action?', 'Are you sure you want to perform this action?');
+          }
+        })()}
+        confirmText={(() => {
+          switch (bulkActionConfirm.action) {
+            case 'trash':
+              return __('Move to Trash', 'Move to Trash');
+            case 'publish':
+              return __('Make Published', 'Make Published');
+            case 'draft':
+              return __('Make Draft', 'Make Draft');
+            case 'delete':
+              return __('Delete Permanently', 'Delete Permanently');
+            default:
+              return __('Confirm', 'Confirm');
+          }
+        })()}
+        cancelText={__('Cancel', 'Cancel')}
+        variant={bulkActionConfirm.action === 'delete' ? 'danger' : 'warning'}
+        isLoading={bulkMutation.isPending}
+      />
+
+      {/* Individual Action Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={individualActionConfirm.isOpen}
+        onClose={() => setIndividualActionConfirm({ isOpen: false, action: '', activity: null })}
+        onConfirm={confirmIndividualAction}
+        title={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'Move to Trash') : __('Restore Activity', 'Restore Activity')}
+        message={individualActionConfirm.activity 
+          ? (individualActionConfirm.action === 'trash' 
+              ? __('Are you sure you want to move "{name}" to trash?', 'Are you sure you want to move "{name}" to trash?').replace('{name}', individualActionConfirm.activity.name)
+              : __('Are you sure you want to restore "{name}"?', 'Are you sure you want to restore "{name}"?').replace('{name}', individualActionConfirm.activity.name)
+            )
+          : (individualActionConfirm.action === 'trash' 
+              ? __('Are you sure you want to move this activity to trash?', 'Are you sure you want to move this activity to trash?')
+              : __('Are you sure you want to restore this activity?', 'Are you sure you want to restore this activity?')
+            )
+        }
+        confirmText={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'Move to Trash') : __('Restore', 'Restore')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="warning"
+        isLoading={bulkMutation.isPending}
       />
 
       <PageHeader
@@ -454,6 +515,7 @@ const Activities: React.FC = () => {
           </Button>
         }
       />
+
 
       {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
@@ -474,12 +536,17 @@ const Activities: React.FC = () => {
             {/* Status Filter */}
             <Select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+                setSelectedIds([]);
+                setBulkAction('');
+              }}
               className="w-full lg:flex-1"
             >
               <option value="all">{__('All Status', 'All Status')}</option>
+              <option value="publish">{__('Published', 'Published')}</option>
               <option value="draft">{__('Draft', 'Draft')}</option>
-              <option value="publish">{__('Publish', 'Publish')}</option>
               <option value="trash">{__('Trash', 'Trash')}</option>
             </Select>
 
@@ -526,7 +593,6 @@ const Activities: React.FC = () => {
       </Card>
 
       <ConditionalRender capability="yatra_view_trips">
-
         {/* Table */}
         {error ? (
           <Card>
@@ -536,6 +602,206 @@ const Activities: React.FC = () => {
           </Card>
         ) : (
           <>
+            {/* Bulk actions toolbar - Always above the table */}
+            <Card>
+              <CardContent className="p-0">
+                <div className="px-4 py-3 border-b space-y-3">
+                  {/* Top row: Bulk actions and status tabs */}
+                  <div className="flex items-center justify-between gap-4">
+                    {/* Left: Bulk actions - all in one line */}
+                    <div className="flex items-center gap-3 flex-nowrap">
+                      <Select
+                        value={bulkAction}
+                        onChange={(e) => setBulkAction(e.target.value)}
+                        className="min-w-[140px]"
+                        disabled={activities.length === 0}
+                      >
+                        <option value="">{__('Bulk actions', 'Bulk actions')}</option>
+                        {(() => {
+                          switch (statusFilter) {
+                            case 'publish':
+                              return (
+                                <>
+                                  <option value="trash">{__('Move to Trash', 'Move to Trash')}</option>
+                                  <option value="draft">{__('Make Draft', 'Make Draft')}</option>
+                                </>
+                              );
+                            case 'draft':
+                              return (
+                                <>
+                                  <option value="publish">{__('Make Published', 'Make Published')}</option>
+                                  <option value="trash">{__('Move to Trash', 'Move to Trash')}</option>
+                                </>
+                              );
+                            case 'trash':
+                              return (
+                                <>
+                                  <option value="publish">{__('Make Published', 'Make Published')}</option>
+                                  <option value="draft">{__('Make Draft', 'Make Draft')}</option>
+                                  <option value="delete">{__('Delete Permanently', 'Delete Permanently')}</option>
+                                </>
+                              );
+                            case 'all':
+                            default:
+                              return (
+                                <>
+                                  <option value="publish">{__('Make Published', 'Make Published')}</option>
+                                  <option value="draft">{__('Make Draft', 'Make Draft')}</option>
+                                  <option value="trash">{__('Move to Trash', 'Move to Trash')}</option>
+                                </>
+                              );
+                          }
+                        })()}
+                      </Select>
+                      <Button
+                        variant="outline"
+                        onClick={handleBulkApply}
+                        disabled={bulkMutation.isPending || selectedIds.length === 0}
+                        className="h-11 px-4 flex-shrink-0"
+                      >
+                        {__('Apply', 'Apply')}
+                      </Button>
+                      
+                      {/* Selection info right after Apply button */}
+                      {selectedIds.length > 0 && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border border-blue-200 dark:border-blue-800 whitespace-nowrap">
+                          <span className="font-medium text-xs">{`${__('Selected:', 'Selected:')} ${selectedIds.length}`}</span>
+                          <button
+                            type="button"
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                            onClick={() => setSelectedIds([])}
+                          >
+                            {__('Clear', 'Clear')}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right: Status filter tabs */}
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {viewFilters.map((filter) => {
+                        const isActive = statusFilter === filter.key;
+                        return (
+                          <button
+                            key={filter.key}
+                            type="button"
+                            className={`px-3 py-2.5 text-sm font-medium rounded border transition-all duration-200 ${
+                              isActive
+                                ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
+                                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:border-gray-500'
+                            }`}
+                            onClick={() => {
+                              setStatusFilter(filter.key);
+                              setPage(1);
+                              setSelectedIds([]);
+                              setBulkAction('');
+                            }}
+                          >
+                            <span className="flex items-center gap-2">
+                              {filter.label}
+                              <span className={`px-1.5 py-0.5 text-xs rounded-full font-medium ${
+                                isActive 
+                                  ? 'bg-white text-gray-900' 
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                              }`}>
+                                {filter.count ?? 0}
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                      
+                      {/* Columns visibility toggle */}
+                      <div className="relative ml-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowColumnsDropdown(!showColumnsDropdown);
+                          }}
+                          className="h-10 px-3 flex items-center gap-2"
+                          data-columns-trigger
+                        >
+                          <Columns className="w-4 h-4" />
+                          {__('Columns', 'Columns')}
+                        </Button>
+                        
+                        {/* Columns dropdown */}
+                        {showColumnsDropdown && (console.log('Columns dropdown is showing with new styles'),
+                          <div 
+                            className="absolute right-0 top-11 z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2"
+                            style={{ width: '240px', minWidth: '240px' }}
+                            data-columns-content
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
+                              {__('Show Columns', 'Show Columns')}
+                            </div>
+                            
+                            <div className="py-1">
+                              <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
+                                <input
+                                  type="checkbox"
+                                  checked={visibleColumns.description}
+                                  onChange={() => toggleColumn('description')}
+                                  className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Description', 'Description')}</span>
+                              </label>
+                              
+                              <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
+                                <input
+                                  type="checkbox"
+                                  checked={visibleColumns.status}
+                                  onChange={() => toggleColumn('status')}
+                                  className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Status', 'Status')}</span>
+                              </label>
+                              
+                              {isPro && (
+                                <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
+                                  <input
+                                    type="checkbox"
+                                    checked={visibleColumns.trips}
+                                    onChange={() => toggleColumn('trips')}
+                                    className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                                  />
+                                  <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Trips', 'Trips')}</span>
+                                </label>
+                              )}
+                              
+                              <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
+                                <input
+                                  type="checkbox"
+                                  checked={visibleColumns.date}
+                                  onChange={() => toggleColumn('date')}
+                                  className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Date', 'Date')}</span>
+                              </label>
+                              
+                              <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
+                                <input
+                                  type="checkbox"
+                                  checked={visibleColumns.author}
+                                  onChange={() => toggleColumn('author')}
+                                  className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Author', 'Author')}</span>
+                              </label>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
@@ -600,19 +866,35 @@ const Activities: React.FC = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-[250px]">{__('Activity', 'Activity')}</TableHead>
-                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
-                        {isPro && (
+                        {visibleColumns.description && (
+                          <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
+                        )}
+                        {visibleColumns.status && (
+                          <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
+                        )}
+                        {isPro && visibleColumns.trips && (
                           <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
                         )}
-                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        {visibleColumns.date && (
+                          <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
+                        )}
+                        {visibleColumns.author && (
+                          <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        )}
                         <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       <TableRow>
-                        <TableCell colSpan={isPro ? 7 : 6} className="h-64">
+                        <TableCell colSpan={
+                          1 + // Activity column (always visible)
+                          (visibleColumns.description ? 1 : 0) +
+                          (visibleColumns.status ? 1 : 0) +
+                          (isPro && visibleColumns.trips ? 1 : 0) +
+                          (visibleColumns.date ? 1 : 0) +
+                          (visibleColumns.author ? 1 : 0) +
+                          1 // Actions column (always visible)
+                        } className="h-64">
                           <div className="flex flex-col items-center justify-center h-full text-center py-12">
                             <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
                               <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -637,12 +919,9 @@ const Activities: React.FC = () => {
                               </Button>
                             ) : (
                               can('yatra_edit_trips') && (
-                                <Button
-                                  onClick={handleCreateActivity}
-                                  className="flex items-center gap-2"
-                                >
+                                <Button onClick={handleCreateActivity} className="flex items-center gap-2">
                                   <Plus className="w-4 h-4" />
-                                  {__('Create Activity', 'Create Activity')}
+                                  {__('Add New Activity', 'Add New Activity')}
                                 </Button>
                               )
                             )}
@@ -655,6 +934,15 @@ const Activities: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-10">
+                          <input
+                            type="checkbox"
+                            className="rounded border-gray-300 dark:border-gray-600"
+                            checked={isAllSelected}
+                            onChange={(e) => toggleSelectAll(e.target.checked)}
+                            aria-label={__('Select all activities', 'Select all activities')}
+                          />
+                        </TableHead>
                         <TableHead className="w-[250px]">
                           <button
                             onClick={() => handleSort('name')}
@@ -664,106 +952,238 @@ const Activities: React.FC = () => {
                             {getSortIcon('name')}
                           </button>
                         </TableHead>
-                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        <TableHead className="w-[100px]">
-                          <button
-                            onClick={() => handleSort('status')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Status', 'Status')}
-                            {getSortIcon('status')}
-                          </button>
-                        </TableHead>
-                        {isPro && (
+                        {visibleColumns.description && (
+                          <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
+                        )}
+                        {visibleColumns.status && (
+                          <TableHead className="w-[100px]">
+                            <button
+                              onClick={() => handleSort('status')}
+                              className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
+                            >
+                              {__('Status', 'Status')}
+                              {getSortIcon('status')}
+                            </button>
+                          </TableHead>
+                        )}
+                        {isPro && visibleColumns.trips && (
                           <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
                         )}
-                        <TableHead className="w-[150px]">
-                          <button
-                            onClick={() => handleSort('created_at')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Date', 'Date')}
-                            {getSortIcon('created_at')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        {visibleColumns.date && (
+                          <TableHead className="w-[150px]">
+                            <button
+                              onClick={() => handleSort('created_at')}
+                              className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
+                            >
+                              {__('Date', 'Date')}
+                              {getSortIcon('created_at')}
+                            </button>
+                          </TableHead>
+                        )}
+                        {visibleColumns.author && (
+                          <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
+                        )}
                         <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {activities.map((activity: Activity) => (
-                        <TableRow key={activity.id}>
+                      {activities.map((activity: Activity) => {
+                        const isTrash = activity.status === 'trash' || statusFilter === 'trash';
+                        return (
+                        <TableRow 
+                          key={activity.id} 
+                          className={isTrash ? 'bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20' : ''}
+                        >
+                          <TableCell>
+                            <input
+                              type="checkbox"
+                              className="rounded border-gray-300 dark:border-gray-600"
+                              checked={selectedIds.includes(activity.id)}
+                              onChange={(e) => toggleSelectItem(activity.id, e.target.checked)}
+                              aria-label={__('Select activity', 'Select activity')}
+                            />
+                          </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              {renderIcon(activity.icon)}
-                              <div>
-                                <div className="font-medium text-gray-900 dark:text-white">
+                              <div className={`flex-shrink-0 ${isTrash ? 'opacity-50 grayscale' : ''}`}>
+                                {renderIcon(activity.icon)}
+                              </div>
+                              <div className="min-w-0">
+                                <button
+                                  onClick={() => handleEdit(activity)}
+                                  className={`font-medium truncate hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-left ${
+                                    isTrash 
+                                      ? 'text-gray-500 dark:text-gray-500' 
+                                      : 'text-gray-900 dark:text-white'
+                                  }`}
+                                >
                                   {activity.name}
-                                </div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                </button>
+                                <div className={`text-sm truncate ${
+                                  isTrash 
+                                    ? 'text-gray-400 dark:text-gray-600' 
+                                    : 'text-gray-500 dark:text-gray-400'
+                                }`}>
                                   {activity.slug}
                                 </div>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                            <div className="line-clamp-2">
-                              {activity.description || __('No description', 'No description')}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(activity.status)}
-                          </TableCell>
-                          {isPro && (
-                            <TableCell className="text-gray-600 dark:text-gray-400">
-                              {activity.trips_count || 0}
+                          {visibleColumns.description && (
+                            <TableCell className={`text-sm ${
+                              isTrash 
+                                ? 'text-gray-400 dark:text-gray-600' 
+                                : 'text-gray-600 dark:text-gray-400'
+                            }`}>
+                              <div className="line-clamp-2">
+                                {activity.description || __('No description', 'No description')}
+                              </div>
                             </TableCell>
                           )}
-                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            <div>
-                              <div>{formatDate(activity.created_at)}</div>
-                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                {__('Updated', 'Updated')}: {formatDate(activity.updated_at)}
+                          {visibleColumns.status && (
+                            <TableCell>
+                              {getStatusBadge(activity.status)}
+                            </TableCell>
+                          )}
+                          {isPro && visibleColumns.trips && (
+                            <TableCell className={isTrash 
+                              ? 'text-gray-400 dark:text-gray-600' 
+                              : 'text-gray-600 dark:text-gray-400'
+                            }>
+                              <span>
+                                {activity.trips_count || 0}
+                              </span>
+                            </TableCell>
+                          )}
+                          {visibleColumns.date && (
+                            <TableCell className={`text-sm ${
+                              isTrash 
+                                ? 'text-gray-400 dark:text-gray-600' 
+                                : 'text-gray-500 dark:text-gray-400'
+                            }`}>
+                              <div>
+                                <div>{formatDate(activity.created_at)}</div>
+                                <div className={`text-xs mt-0.5 ${
+                                  isTrash 
+                                    ? 'text-gray-400 dark:text-gray-600' 
+                                    : 'text-gray-400 dark:text-gray-500'
+                                }`}>
+                                  {__('Updated', 'Updated')}: {formatDate(activity.updated_at)}
+                                </div>
                               </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                            <div>
-                              <div>{formatUser(activity.created_by, activity.created_by_name)}</div>
-                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                {__('Updated by', 'Updated by')}: {formatUser(activity.updated_by, activity.updated_by_name)}
+                            </TableCell>
+                          )}
+                          {visibleColumns.author && (
+                            <TableCell className={`text-sm ${
+                              isTrash 
+                                ? 'text-gray-400 dark:text-gray-600' 
+                                : 'text-gray-600 dark:text-gray-400'
+                            }`}>
+                              <div>
+                                <div>{formatUser(activity.created_by, activity.created_by_name)}</div>
+                                <div className={`text-xs mt-0.5 ${
+                                  isTrash 
+                                    ? 'text-gray-400 dark:text-gray-600' 
+                                    : 'text-gray-400 dark:text-gray-500'
+                                }`}>
+                                  {__('Updated by', 'Updated by')}: {formatUser(activity.updated_by, activity.updated_by_name)}
+                                </div>
                               </div>
-                            </div>
-                          </TableCell>
+                            </TableCell>
+                          )}
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <ConditionalRender capability="yatra_edit_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEdit(activity)}
-                                  className="h-8 w-8"
-                                  aria-label={__('Edit activity', 'Edit activity')}
+                            <div className="relative">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setOpenDropdown(openDropdown === activity.id ? null : activity.id);
+                                }}
+                                className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                aria-label={__('More actions', 'More actions')}
+                                data-dropdown-trigger
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                              
+                              {/* Dropdown Menu */}
+                              {openDropdown === activity.id && (
+                                <div 
+                                  className="absolute right-0 top-8 z-[9999] min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1"
+                                  data-dropdown-content
+                                  onClick={(e) => e.stopPropagation()}
                                 >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-
-                              <ConditionalRender capability="yatra_delete_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDelete(activity)}
-                                  className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                  aria-label={__('Delete activity', 'Delete activity')}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
+                                  <ConditionalRender capability="yatra_edit_trips">
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleEdit(activity);
+                                        setOpenDropdown(null);
+                                      }}
+                                      className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap"
+                                    >
+                                      <Edit className="w-4 h-4" />
+                                      {__('Edit', 'Edit')}
+                                    </button>
+                                  </ConditionalRender>
+                                  
+                                  <ConditionalRender capability="yatra_delete_trips">
+                                    {activity.status === 'trash' || statusFilter === 'trash' ? (
+                                      <>
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleRestore(activity);
+                                            setOpenDropdown(null);
+                                          }}
+                                          className="w-full px-4 py-2 text-left text-sm text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap"
+                                        >
+                                          <RotateCcw className="w-4 h-4" />
+                                          {__('Restore', 'Restore')}
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handlePermanentDelete(activity);
+                                            setOpenDropdown(null);
+                                          }}
+                                          className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                          {__('Delete Permanently', 'Delete Permanently')}
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleDelete(activity);
+                                          setOpenDropdown(null);
+                                        }}
+                                        className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        {__('Move to Trash', 'Move to Trash')}
+                                      </button>
+                                    )}
+                                  </ConditionalRender>
+                                </div>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
-                      ))}
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 )}
@@ -778,24 +1198,101 @@ const Activities: React.FC = () => {
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                       {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('activities', 'activities')}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-1">
+                      {/* Previous Button */}
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setPage(p => Math.max(1, p - 1))}
                         disabled={page === 1}
-                        className="h-8"
+                        className="h-8 px-3"
                       >
-                        {__('Previous', 'Previous')}
+                        {__('‹', '‹')}
                       </Button>
+
+                      {/* Page Numbers */}
+                      {(() => {
+                        const pages = [];
+                        const maxVisiblePages = 5;
+                        let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+                        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                        
+                        // Adjust start if we're near the end
+                        if (endPage - startPage + 1 < maxVisiblePages) {
+                          startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                        }
+
+                        // First page + ellipsis
+                        if (startPage > 1) {
+                          pages.push(
+                            <Button
+                              key={1}
+                              variant={1 === page ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setPage(1)}
+                              className="h-8 w-8 p-0"
+                            >
+                              1
+                            </Button>
+                          );
+                          if (startPage > 2) {
+                            pages.push(
+                              <span key="ellipsis1" className="px-2 text-gray-500">
+                                ...
+                              </span>
+                            );
+                          }
+                        }
+
+                        // Visible page range
+                        for (let i = startPage; i <= endPage; i++) {
+                          pages.push(
+                            <Button
+                              key={i}
+                              variant={i === page ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setPage(i)}
+                              className="h-8 w-8 p-0"
+                            >
+                              {i}
+                            </Button>
+                          );
+                        }
+
+                        // Ellipsis + last page
+                        if (endPage < totalPages) {
+                          if (endPage < totalPages - 1) {
+                            pages.push(
+                              <span key="ellipsis2" className="px-2 text-gray-500">
+                                ...
+                              </span>
+                            );
+                          }
+                          pages.push(
+                            <Button
+                              key={totalPages}
+                              variant={totalPages === page ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setPage(totalPages)}
+                              className="h-8 w-8 p-0"
+                            >
+                              {totalPages}
+                            </Button>
+                          );
+                        }
+
+                        return pages;
+                      })()}
+
+                      {/* Next Button */}
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                         disabled={page >= totalPages}
-                        className="h-8"
+                        className="h-8 px-3"
                       >
-                        {__('Next', 'Next')}
+                        {__('›', '›')}
                       </Button>
                     </div>
                   </div>

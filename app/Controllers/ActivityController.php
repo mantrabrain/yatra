@@ -46,6 +46,18 @@ class ActivityController extends BaseController
     {
         // Register standard CRUD routes with status filter
         $this->registerCrudRoutes($this->getStatusArg());
+
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/bulk', [
+            'methods' => \WP_REST_Server::CREATABLE,
+            'callback' => [$this, 'bulkAction'],
+            'permission_callback' => [$this, 'check_permission'],
+        ]);
+
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/stats', [
+            'methods' => \WP_REST_Server::READABLE,
+            'callback' => [$this, 'getStats'],
+            'permission_callback' => [$this, 'check_permission'],
+        ]);
     }
 
     /**
@@ -183,6 +195,54 @@ class ActivityController extends BaseController
             return $this->success_response([
                 'message' => __('Activity deleted successfully', 'yatra'),
             ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Bulk actions endpoint
+     */
+    public function bulkAction(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $data = $request->get_json_params();
+            $action = sanitize_text_field($data['action'] ?? '');
+            $ids = array_filter(array_map('absint', $data['ids'] ?? []));
+
+            if (empty($action)) {
+                return $this->validation_error(__('Action is required', 'yatra'));
+            }
+
+            if (empty($ids)) {
+                return $this->validation_error(__('No activities selected', 'yatra'));
+            }
+
+            $result = match ($action) {
+                'trash' => $this->service->bulkUpdateStatus($ids, 'trash'),
+                'publish' => $this->service->bulkUpdateStatus($ids, 'publish'),
+                'draft' => $this->service->bulkUpdateStatus($ids, 'draft'),
+                'restore' => $this->service->bulkUpdateStatus($ids, 'publish'),
+                'delete' => $this->service->bulkDelete($ids),
+                default => throw new \InvalidArgumentException(__('Invalid action', 'yatra'))
+            };
+
+            return $this->success_response($result);
+        } catch (\InvalidArgumentException $e) {
+            return $this->validation_error($e->getMessage());
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get statistics for admin views
+     */
+    public function getStats(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $stats = $this->service->getStatusCounts();
+            return $this->success_response($stats);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }

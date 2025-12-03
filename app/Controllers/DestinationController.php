@@ -33,6 +33,20 @@ class DestinationController extends BaseController
     public function register_routes(): void
     {
         $this->registerCrudRoutes($this->getStatusArg());
+        
+        // Bulk operations
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/bulk', [
+            'methods' => \WP_REST_Server::CREATABLE,
+            'callback' => [$this, 'bulkAction'],
+            'permission_callback' => [$this, 'check_permission'],
+        ]);
+
+        // Stats endpoint
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/stats', [
+            'methods' => \WP_REST_Server::READABLE,
+            'callback' => [$this, 'getStats'],
+            'permission_callback' => [$this, 'check_permission'],
+        ]);
     }
 
     public function check_permission(?WP_REST_Request $request = null): bool
@@ -177,5 +191,52 @@ class DestinationController extends BaseController
         }
 
         return $prepared;
+    }
+
+    /**
+     * Handle bulk operations
+     */
+    public function bulkAction(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $action = sanitize_text_field($request->get_param('action'));
+            $ids = $request->get_param('ids');
+
+            if (empty($action)) {
+                return $this->validation_error(__('Action is required', 'yatra'));
+            }
+
+            if (empty($ids)) {
+                return $this->validation_error(__('No destinations selected', 'yatra'));
+            }
+
+            $result = match ($action) {
+                'trash' => $this->service->bulkUpdateStatus($ids, 'trash'),
+                'publish' => $this->service->bulkUpdateStatus($ids, 'publish'),
+                'draft' => $this->service->bulkUpdateStatus($ids, 'draft'),
+                'restore' => $this->service->bulkUpdateStatus($ids, 'publish'),
+                'delete' => $this->service->bulkDelete($ids),
+                default => throw new \InvalidArgumentException(__('Invalid action', 'yatra'))
+            };
+
+            return $this->success_response($result);
+        } catch (\InvalidArgumentException $e) {
+            return $this->validation_error($e->getMessage());
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get statistics for admin views
+     */
+    public function getStats(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $stats = $this->service->getStatusCounts();
+            return $this->success_response($stats);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
     }
 }

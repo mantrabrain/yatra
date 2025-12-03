@@ -248,5 +248,86 @@ class ActivityService extends BaseService
 
         return $this->repository->count($args);
     }
+
+    /**
+     * Bulk update status
+     */
+    public function bulkUpdateStatus(array $ids, string $status): array
+    {
+        $ids = array_filter(array_map('absint', $ids));
+        if (empty($ids)) {
+            throw new \InvalidArgumentException(__('No activities selected.', 'yatra'));
+        }
+
+        $allowed = ['draft', 'publish', 'trash'];
+        if (!in_array($status, $allowed, true)) {
+            throw new \InvalidArgumentException(__('Invalid status selected.', 'yatra'));
+        }
+
+        $result = $this->repository->bulkUpdateStatus($ids, $status);
+        if (!$result) {
+            throw new \Exception(__('Failed to update activities.', 'yatra'));
+        }
+
+        return [
+            'message' => sprintf(
+                /* translators: %d number of activities */
+                _n('%d activity updated.', '%d activities updated.', count($ids), 'yatra'),
+                count($ids)
+            ),
+        ];
+    }
+
+    /**
+     * Bulk delete permanently
+     */
+    public function bulkDelete(array $ids): array
+    {
+        $ids = array_filter(array_map('absint', $ids));
+        if (empty($ids)) {
+            throw new \InvalidArgumentException(__('No activities selected.', 'yatra'));
+        }
+
+        $result = $this->repository->bulkDelete($ids);
+        if (!$result) {
+            throw new \Exception(__('Failed to delete activities.', 'yatra'));
+        }
+
+        return [
+            'message' => sprintf(
+                /* translators: %d number of activities */
+                _n('%d activity deleted.', '%d activities deleted.', count($ids), 'yatra'),
+                count($ids)
+            ),
+        ];
+    }
+
+    /**
+     * Get status counts for list views
+     */
+    public function getStatusCounts(): array
+    {
+        $counts = $this->repository->getStatusCounts();
+
+        $publish = $counts['publish'] ?? 0;
+        $draft = $counts['draft'] ?? 0;
+        $trash = $counts['trash'] ?? 0;
+        
+        // Calculate total from all statuses, not just the main three
+        $all = array_sum(array_values($counts));
+
+        $result = [
+            'all' => (int) $all,
+            'publish' => (int) $publish,
+            'draft' => (int) $draft,
+            'trash' => (int) $trash,
+        ];
+
+        // Debug logging
+        error_log('Activity Status Counts - Raw: ' . print_r($counts, true));
+        error_log('Activity Status Counts - Result: ' . print_r($result, true));
+
+        return $result;
+    }
 }
 

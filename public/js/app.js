@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Check, ar as Mail, as as Lightbulb, at as Database, au as History, av as Save, aw as Sparkles, ax as ChevronLeft, ay as Box, az as ChevronUp, aA as Upload, aB as ArrowLeft, aC as Pen, aD as React, aE as Phone, aF as Award, aG as Globe, aH as Download, aI as TrendingDown, aJ as PieChart, aK as ClipboardList, aL as Receipt, aM as Plug, aN as Shield, aO as Lock, aP as EyeOff, aQ as MoreVertical, aR as Ban, aS as Columns, aT as Send, aU as Crown, aV as reactDomExports, aW as Filter, aX as QueryClient, aY as client, aZ as QueryClientProvider } from "./react-vendor-Bm94BL72.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-D2wjdepn.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Check, ar as Mail, as as Lightbulb, at as Database, au as History, av as Save, aw as Sparkles, ax as ChevronLeft, ay as Box, az as ChevronUp, aA as Upload, aB as Columns, aC as MoreVertical, aD as RotateCcw, aE as ArrowLeft, aF as Pen, aG as React, aH as Phone, aI as Award, aJ as Globe, aK as Download, aL as TrendingDown, aM as PieChart, aN as ClipboardList, aO as Receipt, aP as Plug, aQ as Shield, aR as Lock, aS as EyeOff, aT as Ban, aU as Send, aV as Crown, aW as reactDomExports, aX as Filter, aY as QueryClient, aZ as client, a_ as QueryClientProvider } from "./react-vendor-CEoBGbYy.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-j4uQUSCR.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -8503,13 +8503,59 @@ const Activities = () => {
   const [sortBy, setSortBy] = reactExports.useState("name");
   const [sortOrder, setSortOrder] = reactExports.useState("asc");
   const [page, setPage] = reactExports.useState(1);
-  const [deleteConfirm, setDeleteConfirm] = reactExports.useState({
+  const [permanentDeleteConfirm, setPermanentDeleteConfirm] = reactExports.useState({
     isOpen: false,
     activity: null
+  });
+  const [bulkActionConfirm, setBulkActionConfirm] = reactExports.useState({
+    isOpen: false,
+    action: "",
+    count: 0
+  });
+  const [individualActionConfirm, setIndividualActionConfirm] = reactExports.useState({
+    isOpen: false,
+    action: "",
+    activity: null
+  });
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [openDropdown, setOpenDropdown] = reactExports.useState(null);
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    const saved = localStorage.getItem("yatra-activities-columns");
+    return saved ? JSON.parse(saved) : {
+      description: true,
+      status: true,
+      trips: true,
+      date: true,
+      author: true
+    };
   });
   const queryClient2 = useQueryClient();
   const { can, isPro } = usePermissions();
   const { showToast } = useToast();
+  const toggleColumn = (columnKey) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisibleColumns);
+    localStorage.setItem("yatra-activities-columns", JSON.stringify(newVisibleColumns));
+  };
+  reactExports.useEffect(() => {
+    const handleClickOutside = (event) => {
+      const target = event.target;
+      if (target.closest("[data-dropdown-trigger]") || target.closest("[data-dropdown-content]") || target.closest("[data-columns-trigger]") || target.closest("[data-columns-content]")) {
+        return;
+      }
+      setOpenDropdown(null);
+      setShowColumnsDropdown(false);
+    };
+    if (openDropdown !== null || showColumnsDropdown) {
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [openDropdown, showColumnsDropdown]);
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -8538,22 +8584,40 @@ const Activities = () => {
     },
     enabled: can("yatra_view_trips")
   });
-  const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      return await apiClient.delete(`/activities/${id}`);
+  const { data: statsData } = useQuery({
+    queryKey: ["activities", "stats"],
+    queryFn: async () => {
+      const response = await apiClient.get("/activities/stats");
+      console.log("Stats API Response:", response);
+      return response;
     },
-    onSuccess: () => {
-      queryClient2.invalidateQueries({ queryKey: ["activities"] });
-      showToast(__("Activity deleted successfully", "Activity deleted successfully"), "success");
-      setDeleteConfirm({ isOpen: false, activity: null });
-    },
-    onError: (error2) => {
-      showToast((error2 == null ? void 0 : error2.message) || __("Failed to delete activity", "Failed to delete activity"), "error");
-    }
+    enabled: can("yatra_view_trips")
   });
   const activities = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
+  const statusCounts = (statsData == null ? void 0 : statsData.data) || {
+    all: 0,
+    publish: 0,
+    draft: 0,
+    trash: 0
+  };
+  console.log("Status Counts:", statusCounts);
+  const bulkMutation = useMutation({
+    mutationFn: async ({ action, ids }) => {
+      return await apiClient.post("/activities/bulk", { action, ids });
+    },
+    onSuccess: (response) => {
+      const message2 = (response == null ? void 0 : response.message) || __("Bulk action completed.", "Bulk action completed.");
+      showToast(message2, "success");
+      setSelectedIds([]);
+      queryClient2.invalidateQueries({ queryKey: ["activities"] });
+      queryClient2.invalidateQueries({ queryKey: ["activities", "stats"] });
+    },
+    onError: (error2) => {
+      showToast((error2 == null ? void 0 : error2.message) || __("Failed to process bulk action", "Failed to process bulk action"), "error");
+    }
+  });
   const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
@@ -8572,23 +8636,23 @@ const Activities = () => {
   const getStatusBadge = (status) => {
     const statusMap = {
       "publish": {
-        className: "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
-        label: __("Publish", "Publish")
+        className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800",
+        label: __("Published", "Published")
       },
       "draft": {
-        className: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
+        className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800",
         label: __("Draft", "Draft")
       },
       "trash": {
-        className: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+        className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800",
         label: __("Trash", "Trash")
       }
     };
     const statusInfo = statusMap[status] || {
-      className: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
+      className: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600",
       label: status
     };
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`, children: statusInfo.label });
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusInfo.className}`, children: statusInfo.label });
   };
   const formatUser = (userId, userName) => {
     if (userName) {
@@ -8624,23 +8688,94 @@ const Activities = () => {
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=edit&id=${activity.id}`;
   };
   const handleDelete = (activity) => {
-    setDeleteConfirm({ isOpen: true, activity });
+    setIndividualActionConfirm({
+      isOpen: true,
+      action: "trash",
+      activity
+    });
   };
-  const confirmDelete = () => {
-    if (deleteConfirm.activity) {
-      deleteMutation.mutate(deleteConfirm.activity.id);
+  const handleRestore = (activity) => {
+    setIndividualActionConfirm({
+      isOpen: true,
+      action: "restore",
+      activity
+    });
+  };
+  const handlePermanentDelete = (activity) => {
+    setPermanentDeleteConfirm({ isOpen: true, activity });
+  };
+  const confirmPermanentDelete = () => {
+    if (permanentDeleteConfirm.activity) {
+      bulkMutation.mutate({ action: "delete", ids: [permanentDeleteConfirm.activity.id] });
+      setPermanentDeleteConfirm({ isOpen: false, activity: null });
+    }
+  };
+  const confirmIndividualAction = () => {
+    if (individualActionConfirm.activity) {
+      const action = individualActionConfirm.action === "restore" ? "restore" : "trash";
+      bulkMutation.mutate({ action, ids: [individualActionConfirm.activity.id] });
+      setIndividualActionConfirm({ isOpen: false, action: "", activity: null });
     }
   };
   const handleCreateActivity = () => {
     var _a;
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=create`;
   };
+  reactExports.useEffect(() => {
+    setSelectedIds(
+      (prev) => prev.filter((id) => activities.some((activity) => activity.id === id))
+    );
+  }, [activities]);
+  const isAllSelected = activities.length > 0 && selectedIds.length === activities.length;
+  const toggleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedIds(activities.map((activity) => activity.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+  const toggleSelectItem = (id, checked) => {
+    setSelectedIds((prev) => {
+      if (checked) {
+        return [.../* @__PURE__ */ new Set([...prev, id])];
+      }
+      return prev.filter((itemId) => itemId !== id);
+    });
+  };
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(__("Select a bulk action first.", "Select a bulk action first."), "warning");
+      return;
+    }
+    if (selectedIds.length === 0) {
+      showToast(__("Select at least one activity.", "Select at least one activity."), "warning");
+      return;
+    }
+    setBulkActionConfirm({
+      isOpen: true,
+      action: bulkAction,
+      count: selectedIds.length
+    });
+  };
+  const confirmBulkAction = () => {
+    bulkMutation.mutate({ action: bulkActionConfirm.action, ids: selectedIds });
+    setBulkActionConfirm({ isOpen: false, action: "", count: 0 });
+    setBulkAction("");
+  };
+  const viewFilters = [
+    { key: "all", label: __("All", "All"), count: statusCounts.all ?? 0 },
+    { key: "publish", label: __("Published", "Published"), count: statusCounts.publish ?? 0 },
+    { key: "draft", label: __("Draft", "Draft"), count: statusCounts.draft ?? 0 },
+    { key: "trash", label: __("Trash", "Trash"), count: statusCounts.trash ?? 0 }
+  ];
   const handleResetFilters = () => {
     setSearchTerm("");
     setStatusFilter("all");
     setSortBy("name");
     setSortOrder("asc");
     setPage(1);
+    setSelectedIds([]);
+    setBulkAction("");
   };
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -8661,15 +8796,83 @@ const Activities = () => {
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
       {
-        isOpen: deleteConfirm.isOpen,
-        onClose: () => setDeleteConfirm({ isOpen: false, activity: null }),
-        onConfirm: confirmDelete,
-        title: __("Delete Activity", "Delete Activity"),
-        message: deleteConfirm.activity ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'Are you sure you want to delete "{name}"? This action cannot be undone.').replace("{name}", deleteConfirm.activity.name) : __("Are you sure you want to delete this activity? This action cannot be undone.", "Are you sure you want to delete this activity? This action cannot be undone."),
-        confirmText: __("Delete", "Delete"),
+        isOpen: permanentDeleteConfirm.isOpen,
+        onClose: () => setPermanentDeleteConfirm({ isOpen: false, activity: null }),
+        onConfirm: confirmPermanentDelete,
+        title: __("Delete Activity Permanently", "Delete Activity Permanently"),
+        message: permanentDeleteConfirm.activity ? __('Are you sure you want to permanently delete "{name}"? This action cannot be undone.', 'Are you sure you want to permanently delete "{name}"? This action cannot be undone.').replace("{name}", permanentDeleteConfirm.activity.name) : __("Are you sure you want to permanently delete this activity? This action cannot be undone.", "Are you sure you want to permanently delete this activity? This action cannot be undone."),
+        confirmText: __("Delete Permanently", "Delete Permanently"),
         cancelText: __("Cancel", "Cancel"),
         variant: "danger",
-        isLoading: deleteMutation.isPending
+        isLoading: bulkMutation.isPending
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: bulkActionConfirm.isOpen,
+        onClose: () => setBulkActionConfirm({ isOpen: false, action: "", count: 0 }),
+        onConfirm: confirmBulkAction,
+        title: (() => {
+          switch (bulkActionConfirm.action) {
+            case "trash":
+              return __("Move to Trash", "Move to Trash");
+            case "publish":
+              return __("Make Published", "Make Published");
+            case "draft":
+              return __("Make Draft", "Make Draft");
+            case "delete":
+              return __("Delete Permanently", "Delete Permanently");
+            default:
+              return __("Confirm Action", "Confirm Action");
+          }
+        })(),
+        message: (() => {
+          const count = bulkActionConfirm.count;
+          switch (bulkActionConfirm.action) {
+            case "trash":
+              return count === 1 ? __("Are you sure you want to move this activity to trash?", "Are you sure you want to move this activity to trash?") : __("Are you sure you want to move {count} activities to trash?", "Are you sure you want to move {count} activities to trash?").replace("{count}", count.toString());
+            case "publish":
+              return count === 1 ? __("Are you sure you want to publish this activity?", "Are you sure you want to publish this activity?") : __("Are you sure you want to publish {count} activities?", "Are you sure you want to publish {count} activities?").replace("{count}", count.toString());
+            case "draft":
+              return count === 1 ? __("Are you sure you want to make this activity draft?", "Are you sure you want to make this activity draft?") : __("Are you sure you want to make {count} activities draft?", "Are you sure you want to make {count} activities draft?").replace("{count}", count.toString());
+            case "delete":
+              return count === 1 ? __("Are you sure you want to permanently delete this activity? This action cannot be undone.", "Are you sure you want to permanently delete this activity? This action cannot be undone.") : __("Are you sure you want to permanently delete {count} activities? This action cannot be undone.", "Are you sure you want to permanently delete {count} activities? This action cannot be undone.").replace("{count}", count.toString());
+            default:
+              return __("Are you sure you want to perform this action?", "Are you sure you want to perform this action?");
+          }
+        })(),
+        confirmText: (() => {
+          switch (bulkActionConfirm.action) {
+            case "trash":
+              return __("Move to Trash", "Move to Trash");
+            case "publish":
+              return __("Make Published", "Make Published");
+            case "draft":
+              return __("Make Draft", "Make Draft");
+            case "delete":
+              return __("Delete Permanently", "Delete Permanently");
+            default:
+              return __("Confirm", "Confirm");
+          }
+        })(),
+        cancelText: __("Cancel", "Cancel"),
+        variant: bulkActionConfirm.action === "delete" ? "danger" : "warning",
+        isLoading: bulkMutation.isPending
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: individualActionConfirm.isOpen,
+        onClose: () => setIndividualActionConfirm({ isOpen: false, action: "", activity: null }),
+        onConfirm: confirmIndividualAction,
+        title: individualActionConfirm.action === "trash" ? __("Move to Trash", "Move to Trash") : __("Restore Activity", "Restore Activity"),
+        message: individualActionConfirm.activity ? individualActionConfirm.action === "trash" ? __('Are you sure you want to move "{name}" to trash?', 'Are you sure you want to move "{name}" to trash?').replace("{name}", individualActionConfirm.activity.name) : __('Are you sure you want to restore "{name}"?', 'Are you sure you want to restore "{name}"?').replace("{name}", individualActionConfirm.activity.name) : individualActionConfirm.action === "trash" ? __("Are you sure you want to move this activity to trash?", "Are you sure you want to move this activity to trash?") : __("Are you sure you want to restore this activity?", "Are you sure you want to restore this activity?"),
+        confirmText: individualActionConfirm.action === "trash" ? __("Move to Trash", "Move to Trash") : __("Restore", "Restore"),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "warning",
+        isLoading: bulkMutation.isPending
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -8702,12 +8905,17 @@ const Activities = () => {
         Select,
         {
           value: statusFilter,
-          onChange: (e) => setStatusFilter(e.target.value),
+          onChange: (e) => {
+            setStatusFilter(e.target.value);
+            setPage(1);
+            setSelectedIds([]);
+            setBulkAction("");
+          },
           className: "w-full lg:flex-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Published", "Published") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Trash", "Trash") })
           ]
         }
@@ -8753,6 +8961,188 @@ const Activities = () => {
       )
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading activities", "Error loading activities") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-3 border-b space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 flex-nowrap", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Select,
+            {
+              value: bulkAction,
+              onChange: (e) => setBulkAction(e.target.value),
+              className: "min-w-[140px]",
+              disabled: activities.length === 0,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Bulk actions", "Bulk actions") }),
+                (() => {
+                  switch (statusFilter) {
+                    case "publish":
+                      return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Move to Trash", "Move to Trash") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Make Draft", "Make Draft") })
+                      ] });
+                    case "draft":
+                      return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Make Published", "Make Published") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Move to Trash", "Move to Trash") })
+                      ] });
+                    case "trash":
+                      return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Make Published", "Make Published") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Make Draft", "Make Draft") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "delete", children: __("Delete Permanently", "Delete Permanently") })
+                      ] });
+                    case "all":
+                    default:
+                      return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Make Published", "Make Published") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Make Draft", "Make Draft") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Move to Trash", "Move to Trash") })
+                      ] });
+                  }
+                })()
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "outline",
+              onClick: handleBulkApply,
+              disabled: bulkMutation.isPending || selectedIds.length === 0,
+              className: "h-11 px-4 flex-shrink-0",
+              children: __("Apply", "Apply")
+            }
+          ),
+          selectedIds.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border border-blue-200 dark:border-blue-800 whitespace-nowrap", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-xs", children: `${__("Selected:", "Selected:")} ${selectedIds.length}` }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                type: "button",
+                className: "text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium",
+                onClick: () => setSelectedIds([]),
+                children: __("Clear", "Clear")
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 flex-shrink-0", children: [
+          viewFilters.map((filter) => {
+            const isActive = statusFilter === filter.key;
+            return /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                type: "button",
+                className: `px-3 py-2.5 text-sm font-medium rounded border transition-all duration-200 ${isActive ? "bg-gray-900 text-white border-gray-900 shadow-sm" : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:border-gray-500"}`,
+                onClick: () => {
+                  setStatusFilter(filter.key);
+                  setPage(1);
+                  setSelectedIds([]);
+                  setBulkAction("");
+                },
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
+                  filter.label,
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `px-1.5 py-0.5 text-xs rounded-full font-medium ${isActive ? "bg-white text-gray-900" : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"}`, children: filter.count ?? 0 })
+                ] })
+              },
+              filter.key
+            );
+          }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative ml-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Button,
+              {
+                variant: "outline",
+                size: "sm",
+                onClick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowColumnsDropdown(!showColumnsDropdown);
+                },
+                className: "h-10 px-3 flex items-center gap-2",
+                "data-columns-trigger": true,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Columns, { className: "w-4 h-4" }),
+                  __("Columns", "Columns")
+                ]
+              }
+            ),
+            showColumnsDropdown && (console.log("Columns dropdown is showing with new styles"), /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "absolute right-0 top-11 z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2",
+                style: { width: "240px", minWidth: "240px" },
+                "data-columns-content": true,
+                onClick: (e) => e.stopPropagation(),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700", children: __("Show Columns", "Show Columns") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "py-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: visibleColumns.description,
+                          onChange: () => toggleColumn("description"),
+                          className: "rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300 ml-2", children: __("Description", "Description") })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: visibleColumns.status,
+                          onChange: () => toggleColumn("status"),
+                          className: "rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300 ml-2", children: __("Status", "Status") })
+                    ] }),
+                    isPro && /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: visibleColumns.trips,
+                          onChange: () => toggleColumn("trips"),
+                          className: "rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300 ml-2", children: __("Trips", "Trips") })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: visibleColumns.date,
+                          onChange: () => toggleColumn("date"),
+                          className: "rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300 ml-2", children: __("Date", "Date") })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          type: "checkbox",
+                          checked: visibleColumns.author,
+                          onChange: () => toggleColumn("author"),
+                          className: "rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300 ml-2", children: __("Author", "Author") })
+                    ] })
+                  ] })
+                ]
+              }
+            ))
+          ] })
+        ] })
+      ] }) }) }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: __("Activity", "Activity") }),
@@ -8787,14 +9177,15 @@ const Activities = () => {
       ] }) : activities.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: __("Activity", "Activity") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: __("Status", "Status") }),
-          isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[80px]", children: __("Trips", "Trips") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
+          visibleColumns.description && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
+          visibleColumns.status && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: __("Status", "Status") }),
+          isPro && visibleColumns.trips && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[80px]", children: __("Trips", "Trips") }),
+          visibleColumns.date && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Date", "Date") }),
+          visibleColumns.author && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
         ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: isPro ? 7 : 6, className: "h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center py-12", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 1 + // Activity column (always visible)
+        (visibleColumns.description ? 1 : 0) + (visibleColumns.status ? 1 : 0) + (isPro && visibleColumns.trips ? 1 : 0) + (visibleColumns.date ? 1 : 0) + (visibleColumns.author ? 1 : 0) + 1, className: "h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center py-12", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "w-8 h-8 text-gray-400 dark:text-gray-500" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: __("No activities found", "No activities found") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm", children: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first activity.", "Get started by creating your first activity.") }),
@@ -8809,20 +9200,23 @@ const Activities = () => {
                 __("Clear Filters", "Clear Filters")
               ]
             }
-          ) : can("yatra_edit_trips") && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              onClick: handleCreateActivity,
-              className: "flex items-center gap-2",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-                __("Create Activity", "Create Activity")
-              ]
-            }
-          )
+          ) : can("yatra_edit_trips") && /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreateActivity, className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+            __("Add New Activity", "Add New Activity")
+          ] })
         ] }) }) }) })
       ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-10", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "checkbox",
+              className: "rounded border-gray-300 dark:border-gray-600",
+              checked: isAllSelected,
+              onChange: (e) => toggleSelectAll(e.target.checked),
+              "aria-label": __("Select all activities", "Select all activities")
+            }
+          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
@@ -8834,8 +9228,8 @@ const Activities = () => {
               ]
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          visibleColumns.description && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
+          visibleColumns.status && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
               onClick: () => handleSort("status"),
@@ -8846,8 +9240,8 @@ const Activities = () => {
               ]
             }
           ) }),
-          isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[80px]", children: __("Trips", "Trips") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          isPro && visibleColumns.trips && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[80px]", children: __("Trips", "Trips") }),
+          visibleColumns.date && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "button",
             {
               onClick: () => handleSort("created_at"),
@@ -8858,61 +9252,161 @@ const Activities = () => {
               ]
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
+          visibleColumns.author && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
         ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: activities.map((activity) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-            renderIcon(activity.icon),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: activity.name }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: activity.slug })
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "line-clamp-2", children: activity.description || __("No description", "No description") }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(activity.status) }),
-          isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: activity.trips_count || 0 }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(activity.created_at) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
-              __("Updated", "Updated"),
-              ": ",
-              formatDate2(activity.updated_at)
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatUser(activity.created_by, activity.created_by_name) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
-              __("Updated by", "Updated by"),
-              ": ",
-              formatUser(activity.updated_by, activity.updated_by_name)
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleEdit(activity),
-                className: "h-8 w-8",
-                "aria-label": __("Edit activity", "Edit activity"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(activity),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete activity", "Delete activity"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, activity.id)) })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: activities.map((activity) => {
+          const isTrash = activity.status === "trash" || statusFilter === "trash";
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            TableRow,
+            {
+              className: isTrash ? "bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20" : "",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
+                  {
+                    type: "checkbox",
+                    className: "rounded border-gray-300 dark:border-gray-600",
+                    checked: selectedIds.includes(activity.id),
+                    onChange: (e) => toggleSelectItem(activity.id, e.target.checked),
+                    "aria-label": __("Select activity", "Select activity")
+                  }
+                ) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `flex-shrink-0 ${isTrash ? "opacity-50 grayscale" : ""}`, children: renderIcon(activity.icon) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "button",
+                      {
+                        onClick: () => handleEdit(activity),
+                        className: `font-medium truncate hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-left ${isTrash ? "text-gray-500 dark:text-gray-500" : "text-gray-900 dark:text-white"}`,
+                        children: activity.name
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-sm truncate ${isTrash ? "text-gray-400 dark:text-gray-600" : "text-gray-500 dark:text-gray-400"}`, children: activity.slug })
+                  ] })
+                ] }) }),
+                visibleColumns.description && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: `text-sm ${isTrash ? "text-gray-400 dark:text-gray-600" : "text-gray-600 dark:text-gray-400"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "line-clamp-2", children: activity.description || __("No description", "No description") }) }),
+                visibleColumns.status && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(activity.status) }),
+                isPro && visibleColumns.trips && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: isTrash ? "text-gray-400 dark:text-gray-600" : "text-gray-600 dark:text-gray-400", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: activity.trips_count || 0 }) }),
+                visibleColumns.date && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: `text-sm ${isTrash ? "text-gray-400 dark:text-gray-600" : "text-gray-500 dark:text-gray-400"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(activity.created_at) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `text-xs mt-0.5 ${isTrash ? "text-gray-400 dark:text-gray-600" : "text-gray-400 dark:text-gray-500"}`, children: [
+                    __("Updated", "Updated"),
+                    ": ",
+                    formatDate2(activity.updated_at)
+                  ] })
+                ] }) }),
+                visibleColumns.author && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: `text-sm ${isTrash ? "text-gray-400 dark:text-gray-600" : "text-gray-600 dark:text-gray-400"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatUser(activity.created_by, activity.created_by_name) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `text-xs mt-0.5 ${isTrash ? "text-gray-400 dark:text-gray-600" : "text-gray-400 dark:text-gray-500"}`, children: [
+                    __("Updated by", "Updated by"),
+                    ": ",
+                    formatUser(activity.updated_by, activity.updated_by_name)
+                  ] })
+                ] }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Button,
+                    {
+                      variant: "ghost",
+                      size: "icon",
+                      onClick: (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOpenDropdown(openDropdown === activity.id ? null : activity.id);
+                      },
+                      className: "h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700",
+                      "aria-label": __("More actions", "More actions"),
+                      "data-dropdown-trigger": true,
+                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(MoreVertical, { className: "w-4 h-4" })
+                    }
+                  ),
+                  openDropdown === activity.id && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "div",
+                    {
+                      className: "absolute right-0 top-8 z-[9999] min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1",
+                      "data-dropdown-content": true,
+                      onClick: (e) => e.stopPropagation(),
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          "button",
+                          {
+                            type: "button",
+                            onClick: (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleEdit(activity);
+                              setOpenDropdown(null);
+                            },
+                            className: "w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap",
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+                              __("Edit", "Edit")
+                            ]
+                          }
+                        ) }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: activity.status === "trash" || statusFilter === "trash" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleRestore(activity);
+                                setOpenDropdown(null);
+                              },
+                              className: "w-full px-4 py-2 text-left text-sm text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap",
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCcw, { className: "w-4 h-4" }),
+                                __("Restore", "Restore")
+                              ]
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handlePermanentDelete(activity);
+                                setOpenDropdown(null);
+                              },
+                              className: "w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap",
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+                                __("Delete Permanently", "Delete Permanently")
+                              ]
+                            }
+                          )
+                        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          "button",
+                          {
+                            type: "button",
+                            onClick: (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleDelete(activity);
+                              setOpenDropdown(null);
+                            },
+                            className: "w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap",
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+                              __("Move to Trash", "Move to Trash")
+                            ]
+                          }
+                        ) })
+                      ]
+                    }
+                  )
+                ] }) })
+              ]
+            },
+            activity.id
+          );
+        }) })
       ] }) }) }),
       total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
@@ -8928,7 +9422,7 @@ const Activities = () => {
           " ",
           __("activities", "activities")
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Button,
             {
@@ -8936,10 +9430,75 @@ const Activities = () => {
               size: "sm",
               onClick: () => setPage((p) => Math.max(1, p - 1)),
               disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
+              className: "h-8 px-3",
+              children: __("‹", "‹")
             }
           ),
+          (() => {
+            const pages = [];
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            if (endPage - startPage + 1 < maxVisiblePages) {
+              startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            if (startPage > 1) {
+              pages.push(
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    variant: 1 === page ? "default" : "outline",
+                    size: "sm",
+                    onClick: () => setPage(1),
+                    className: "h-8 w-8 p-0",
+                    children: "1"
+                  },
+                  1
+                )
+              );
+              if (startPage > 2) {
+                pages.push(
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-2 text-gray-500", children: "..." }, "ellipsis1")
+                );
+              }
+            }
+            for (let i = startPage; i <= endPage; i++) {
+              pages.push(
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    variant: i === page ? "default" : "outline",
+                    size: "sm",
+                    onClick: () => setPage(i),
+                    className: "h-8 w-8 p-0",
+                    children: i
+                  },
+                  i
+                )
+              );
+            }
+            if (endPage < totalPages) {
+              if (endPage < totalPages - 1) {
+                pages.push(
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-2 text-gray-500", children: "..." }, "ellipsis2")
+                );
+              }
+              pages.push(
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    variant: totalPages === page ? "default" : "outline",
+                    size: "sm",
+                    onClick: () => setPage(totalPages),
+                    className: "h-8 w-8 p-0",
+                    children: totalPages
+                  },
+                  totalPages
+                )
+              );
+            }
+            return pages;
+          })(),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Button,
             {
@@ -8947,8 +9506,8 @@ const Activities = () => {
               size: "sm",
               onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
               disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
+              className: "h-8 px-3",
+              children: __("›", "›")
             }
           )
         ] })

@@ -248,5 +248,63 @@ class DestinationService extends BaseService
 
         return $this->repository->count($args);
     }
-}
 
+    /**
+     * Bulk update status for multiple destinations
+     */
+    public function bulkUpdateStatus(array $ids, string $status): int
+    {
+        $allowed_statuses = ['draft', 'publish', 'trash'];
+        if (!in_array($status, $allowed_statuses, true)) {
+            throw new \InvalidArgumentException('Invalid status. Must be one of: ' . implode(', ', $allowed_statuses));
+        }
+
+        $updated = 0;
+        foreach ($ids as $id) {
+            $id = absint($id);
+            if ($this->repository->update($id, ['status' => $status])) {
+                $updated++;
+            }
+        }
+
+        return $updated;
+    }
+
+    /**
+     * Bulk delete destinations
+     */
+    public function bulkDelete(array $ids): int
+    {
+        $deleted = 0;
+        foreach ($ids as $id) {
+            $id = absint($id);
+            if ($this->repository->delete($id)) {
+                $deleted++;
+            }
+        }
+
+        return $deleted;
+    }
+
+    /**
+     * Get status counts for list views
+     */
+    public function getStatusCounts(): array
+    {
+        $counts = $this->repository->getStatusCounts();
+
+        $publish = $counts['publish'] ?? 0;
+        $draft = $counts['draft'] ?? 0;
+        $trash = $counts['trash'] ?? 0;
+
+        // Calculate total from all statuses, not just the main three
+        $all = array_sum(array_values($counts));
+
+        return [
+            'all' => (int) $all,
+            'publish' => (int) $publish,
+            'draft' => (int) $draft,
+            'trash' => (int) $trash,
+        ];
+    }
+}

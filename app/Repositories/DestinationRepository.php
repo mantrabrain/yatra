@@ -78,4 +78,32 @@ class DestinationRepository extends BaseRepository
 
         return $this->wpdb->get_results($query) ?: [];
     }
+
+    /**
+     * Get counts per status for admin views
+     */
+    public function getStatusCounts(): array
+    {
+        $table = esc_sql($this->table);
+
+        // Get counts for each status
+        $results = $this->wpdb->get_results("
+            SELECT status, COUNT(*) as count 
+            FROM `{$table}` 
+            WHERE 1=1 
+            GROUP BY status
+        ", ARRAY_A) ?: [];
+
+        $counts = [];
+        foreach ($results as $row) {
+            $counts[$row['status']] = (int) $row['count'];
+        }
+
+        // Ensure we have entries for all main statuses even if count is 0
+        $counts['publish'] = $counts['publish'] ?? 0;
+        $counts['draft'] = $counts['draft'] ?? 0;
+        $counts['trash'] = $counts['trash'] ?? 0;
+
+        return $counts;
+    }
 }
