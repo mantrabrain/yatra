@@ -19,6 +19,7 @@ export interface SearchableSelectProps {
   error?: boolean;
   required?: boolean;
   disabled?: boolean;
+  showValueId?: boolean; // Show "ID: value" next to label
 }
 
 export const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -30,6 +31,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   className = '',
   error = false,
   disabled = false,
+  showValueId = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -96,7 +98,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             {selectedOption ? (
               <div className="flex items-center justify-between w-full">
                 <span>{selectedOption.label}</span>
-                {selectedOption.value && selectedOption.value !== '' && (
+                {showValueId && selectedOption.value && selectedOption.value !== '' && (
                   <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium">
                     ID: {selectedOption.value}
                   </span>
@@ -162,7 +164,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 >
                   <div className="flex items-center justify-between">
                     <span>{option.label}</span>
-                    {option.value && option.value !== '' && (
+                    {showValueId && option.value && option.value !== '' && (
                       <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium">
                         ID: {option.value}
                       </span>

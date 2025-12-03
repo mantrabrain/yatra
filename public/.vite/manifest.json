@@ -3,8 +3,8 @@
     "file": "css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-DiOcf9RJ.js": {
-    "file": "js/index-DiOcf9RJ.js",
+  "_index-D2wjdepn.js": {
+    "file": "js/index-D2wjdepn.js",
     "name": "index",
     "imports": [
       "_react-vendor-Bm94BL72.js"
@@ -24,7 +24,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-Bm94BL72.js",
-      "_index-DiOcf9RJ.js"
+      "_index-D2wjdepn.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -34,7 +34,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-Bm94BL72.js",
-      "_index-DiOcf9RJ.js"
+      "_index-D2wjdepn.js"
     ]
   }
 }

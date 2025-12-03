@@ -16,37 +16,7 @@ namespace Yatra\Helpers;
  */
 class FormatHelper
 {
-    /**
-     * Currency symbols mapping
-     */
-    private const CURRENCY_SYMBOLS = [
-        'USD' => '$',
-        'EUR' => '€',
-        'GBP' => '£',
-        'JPY' => '¥',
-        'CNY' => '¥',
-        'INR' => '₹',
-        'NPR' => 'Rs',
-        'AUD' => 'A$',
-        'CAD' => 'C$',
-        'CHF' => 'CHF',
-        'NZD' => 'NZ$',
-        'SGD' => 'S$',
-        'HKD' => 'HK$',
-        'SEK' => 'kr',
-        'NOK' => 'kr',
-        'DKK' => 'kr',
-        'THB' => '฿',
-        'MYR' => 'RM',
-        'PHP' => '₱',
-        'IDR' => 'Rp',
-        'VND' => '₫',
-        'KRW' => '₩',
-        'BRL' => 'R$',
-        'MXN' => '$',
-        'AED' => 'د.إ',
-        'SAR' => '﷼',
-    ];
+    // Currency symbols are now managed by CurrencyHelper
 
     /**
      * Country codes to names mapping
@@ -114,16 +84,7 @@ class FormatHelper
      */
     public static function formatPrice(float $amount, string $currency = 'USD', bool $showCode = false): string
     {
-        $currency = strtoupper($currency);
-        $symbol = self::CURRENCY_SYMBOLS[$currency] ?? $currency;
-        
-        $formatted = number_format($amount, 2);
-        
-        if ($showCode && isset(self::CURRENCY_SYMBOLS[$currency])) {
-            return $symbol . $formatted . ' ' . $currency;
-        }
-        
-        return $symbol . $formatted;
+        return CurrencyHelper::format($amount, $currency, $showCode);
     }
 
     /**
@@ -134,8 +95,7 @@ class FormatHelper
      */
     public static function getCurrencySymbol(string $currency): string
     {
-        $currency = strtoupper($currency);
-        return self::CURRENCY_SYMBOLS[$currency] ?? $currency;
+        return CurrencyHelper::getSymbol($currency);
     }
 
     /**

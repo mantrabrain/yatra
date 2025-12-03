@@ -1,4 +1,5 @@
 import { __ } from '../../lib/i18n';
+import { getCurrencySymbol, getCurrency } from '../../data/currencies';
 
 export const formatDate = (value: string | undefined | null) => {
   if (!value) {
@@ -101,6 +102,16 @@ export const formatPriceForBooking = (price: number, currency?: string) => {
   return `${currencySymbol} ${formattedAmount}`;
 };
 
-export const currency = (value: number) =>
-  new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(value);
+export const currency = (value: number, currencyCode: string = 'USD') => {
+  const symbol = getCurrencySymbol(currencyCode);
+  const currencyData = getCurrency(currencyCode);
+  const decimals = currencyData?.decimalDigits ?? 2;
+  
+  const formatted = new Intl.NumberFormat(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(value);
+  
+  return `${symbol}${formatted}`;
+};
 

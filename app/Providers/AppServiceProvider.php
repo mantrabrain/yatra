@@ -2324,9 +2324,17 @@ HTML;
                 if ($shouldHandle) {
                     error_log("[Yatra] Calling handlePaymentReturn for {$gatewayId}");
                     $gateway->handlePaymentReturn($booking, $bookingRepository);
+                    // Reload booking to make sure we have the latest status/details updated by the gateway
+                    $booking = $bookingRepository->findByReferenceWithTrip($booking_reference);
                     break;
                 }
             }
+        }
+
+        if (!$booking) {
+            $wp_query->set_404();
+            status_header(404);
+            return;
         }
 
         // Parse JSON data

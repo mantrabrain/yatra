@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, h as Calendar, g as FileText, P as Plane, z as ArrowRight, d as MapPin, U as User, p as ChevronRight, aw as Sparkles, V as Package, i as CreditCard, a_ as LifeBuoy, w as Bell, E as AlertCircle, al as CheckCircle2, y as Clock, x as Users, D as DollarSign, ar as Mail, aE as Phone, r as reactExports, u as useQuery, G as CheckCircle, Y as Eye, aH as Download, aD as React, Z as PenSquare, X as XCircle, a$ as ShieldCheck, a2 as Heart, ap as AlertTriangle, L as LayoutDashboard, b0 as LogOut, aX as QueryClient, aY as client, aZ as QueryClientProvider } from "./react-vendor-Bm94BL72.js";
-import { _ as __, a as apiClient, T as ToastProvider } from "./index-DiOcf9RJ.js";
+import { _ as __, g as getCurrencySymbol, b as getCurrency, a as apiClient, T as ToastProvider } from "./index-D2wjdepn.js";
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "N/A");
@@ -80,7 +80,16 @@ const formatPriceForBooking = (price, currency2) => {
   }
   return `${currencySymbol} ${formattedAmount}`;
 };
-const currency = (value) => new Intl.NumberFormat(void 0, { style: "currency", currency: "USD" }).format(value);
+const currency = (value, currencyCode = "USD") => {
+  const symbol = getCurrencySymbol(currencyCode);
+  const currencyData = getCurrency(currencyCode);
+  const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
+  const formatted = new Intl.NumberFormat(void 0, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  }).format(value);
+  return `${symbol}${formatted}`;
+};
 const Dashboard = ({
   bookings,
   payments,

@@ -48,6 +48,7 @@ import { Alert } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { HelpText } from '../components/ui/help-text';
+import { getCurrencySymbol } from '../data/currencies';
 import { ItinerarySection } from '../components/trip-form/sections/ItinerarySection';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { useToast } from '../components/ui/toast';
@@ -348,19 +349,7 @@ interface ItineraryDay {
   entries: ItineraryEntry[];
 }
 
-// Helper function to get currency symbol
-const getCurrencySymbol = (currency: string): string => {
-  const symbols: Record<string, string> = {
-    'USD': '$',
-    'EUR': '€',
-    'GBP': '£',
-    'INR': '₹',
-    'NPR': '₨',
-    'AUD': 'A$',
-    'CAD': 'C$',
-  };
-  return symbols[currency] || currency;
-};
+// getCurrencySymbol is now imported from '../data/currencies'
 
 const TripForm: React.FC = () => {
   const queryClient = useQueryClient();

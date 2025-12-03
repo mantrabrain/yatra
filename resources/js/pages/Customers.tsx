@@ -17,6 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { getCurrencySymbol, getCurrency } from '../data/currencies';
 
 interface Customer {
   id: number;
@@ -129,11 +130,15 @@ const Customers: React.FC = () => {
     });
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
+  const formatPrice = (price: number, currencyCode: string = 'USD') => {
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = currencyData?.decimalDigits ?? 2;
+    
+    return `${symbol}${new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(price)}`;
   };
 
   const getStatusBadge = (status: string) => {

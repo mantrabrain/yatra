@@ -477,20 +477,13 @@
          * Show form error message
          */
         function showFormError(message) {
-            // Remove any existing error
-            $('.yatra-form-error').remove();
-            
-            const $error = $('<div class="yatra-form-error" style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px;">' +
-                '<svg style="display: inline-block; vertical-align: middle; margin-right: 8px; width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' +
-                '<span style="vertical-align: middle;">' + message + '</span>' +
-                '</div>');
-            
-            $form.find('.yatra-booking-form-content').prepend($error);
-            
-            // Scroll to error
-            $('html, body').animate({
-                scrollTop: $error.offset().top - 100
-            }, 300);
+            const $errorContainer = $('#yatra-booking-form-errors');
+            if ($errorContainer.length) {
+                $errorContainer.html('<div class="yatra-form-error" role="alert">' + message + '</div>');
+                $('html, body').animate({ scrollTop: $errorContainer.offset().top - 100 }, 300);
+            } else {
+                alert(message);
+            }
         }
 
         /**
@@ -751,8 +744,10 @@
          */
         function handlePaymentResponse(response, originalBtnHtml) {
             console.log('[Yatra Booking] Response:', response);
+            console.log('[Yatra Booking] Response success:', response.success);
             
             if (!response.success) {
+                console.log('[Yatra Booking] Showing error:', response.message);
                 showFormError(response.message || 'An error occurred. Please try again.');
                 $submitBtn.prop('disabled', false).html(originalBtnHtml);
                 return;

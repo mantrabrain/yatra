@@ -16,6 +16,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
+import { getCurrencySymbol, getCurrency } from '../data/currencies';
 
 interface Payment {
   id: number;
@@ -171,11 +172,15 @@ const Payments: React.FC = () => {
     });
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
+  const formatPrice = (price: number, currencyCode: string = 'USD') => {
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = currencyData?.decimalDigits ?? 2;
+    
+    return `${symbol}${new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(price)}`;
   };
 
   const getStatusBadge = (status: string) => {

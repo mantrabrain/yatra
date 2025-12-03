@@ -1051,11 +1051,12 @@ class BookingSessionController extends BaseController
         // For online gateways, create payment intent and return redirect URL
         if (!$is_offline && $amount_due > 0) {
             // Build payment params - merge with request data so gateways can access their own tokens
+            $globalCurrency = \Yatra\Services\SettingsService::getCurrency();
             $payment_params = array_merge($data, [
                 'booking_id' => $booking_id,
                 'reference' => $booking_reference,
                 'amount' => $amount_due,
-                'currency' => $trip->currency ?: 'USD',
+                'currency' => $globalCurrency,
                 'customer_email' => $contact_data['email'],
                 'customer_name' => $contact_data['first_name'] . ' ' . $contact_data['last_name'],
                 'trip_title' => $trip->title,
@@ -1091,16 +1092,16 @@ class BookingSessionController extends BaseController
                 }
             }
             
-            // If payment processing failed but booking was created, still return success
-            // but with a note about payment
+            // If payment processing failed, return error so user can fix the issue
             if (!$payment_result['success']) {
+                $errorMessage = $payment_result['error'] ?? __('Payment processing failed. Please try again.', 'yatra');
                 return new WP_REST_Response([
-                    'success' => true,
-                    'message' => __('Booking created but payment processing is pending. We will contact you.', 'yatra'),
+                    'success' => false,
+                    'message' => $errorMessage,
                     'data' => [
                         'booking_id' => $booking_id,
                         'reference' => $booking_reference,
-                        'redirect_url' => $this->getConfirmationUrl($booking_reference),
+                        'payment_error' => true,
                     ],
                 ]);
             }

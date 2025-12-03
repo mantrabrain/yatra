@@ -127,7 +127,7 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                     <!-- Submit Button -->
                     <div class="yatra-booking-actions">
                         <button type="submit" class="yatra-booking-pay-btn" id="yatra-submit-booking">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="CurrentColor" stroke-width="2">
                                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                                 <line x1="1" y1="10" x2="23" y2="10"></line>
                             </svg>
@@ -138,6 +138,7 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                             <?php esc_html_e('Cancel', 'yatra'); ?>
                         </a>
                     </div>
+                    <div class="yatra-booking-form-errors" id="yatra-booking-form-errors" aria-live="polite"></div>
                     
                     <input type="hidden" name="trip_price" value="<?php echo esc_attr($trip->price); ?>">
                     <input type="hidden" name="currency" value="<?php echo esc_attr(\Yatra\Services\SettingsService::getCurrency()); ?>">

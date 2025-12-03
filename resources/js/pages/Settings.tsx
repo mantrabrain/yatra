@@ -48,6 +48,8 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { getCurrencyOptions } from '../data/currencies';
+import { SearchableSelect } from '../components/ui/searchable-select';
 import { MultiSelect, MultiSelectOption } from '../components/ui/multi-select';
 
 // Helper component for form field with description - MUST be outside component to prevent remounts
@@ -1970,28 +1972,6 @@ onChange={handleFieldChange}
                 {__('Payment Options', 'Payment Options')}
               </h3>
               <div className="space-y-4">
-                <FormField
-                  id="currency"
-                  label={__('Default Currency', 'Default Currency')}
-                  description={__('Primary currency for all transactions', 'Primary currency for all transactions')}
-                  required
-                >
-                  <Select
-                    id="currency"
-                    value={formData.currency}
-                    name="currency"
-onChange={handleFieldChange}
-                  >
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="GBP">GBP - British Pound</option>
-                    <option value="NPR">NPR - Nepalese Rupee</option>
-                    <option value="INR">INR - Indian Rupee</option>
-                    <option value="AUD">AUD - Australian Dollar</option>
-                    <option value="CAD">CAD - Canadian Dollar</option>
-                  </Select>
-                </FormField>
-
                 <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                   <input
                     type="checkbox"
@@ -3383,23 +3363,19 @@ onChange={handleFieldChange}
           <div className="space-y-6">
             <div className="space-y-4">
               <FormField
-                id="default_currency"
+                id="currency"
                 label={__('Default Currency', 'Default Currency')}
                 description={__('Primary currency for all transactions', 'Primary currency for all transactions')}
                 required
               >
-                <Select
-                  id="default_currency"
-                  value={formData.default_currency}
-                  name='default_currency'
-                      onChange={handleFieldChange}
-                >
-                  <option value="USD">USD - US Dollar</option>
-                  <option value="EUR">EUR - Euro</option>
-                  <option value="GBP">GBP - British Pound</option>
-                  <option value="NPR">NPR - Nepalese Rupee</option>
-                  <option value="INR">INR - Indian Rupee</option>
-                </Select>
+                <SearchableSelect
+                  value={formData.currency}
+                  onChange={(val) => setFormData(prev => prev ? { ...prev, currency: val } : prev)}
+                  options={getCurrencyOptions()}
+                  placeholder={__('Select currency...', 'Select currency...')}
+                  searchPlaceholder={__('Search currencies...', 'Search currencies...')}
+                  showValueId={false}
+                />
               </FormField>
 
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">

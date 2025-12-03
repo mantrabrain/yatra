@@ -13,6 +13,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
+import { getCurrencySymbol, getCurrency } from '../data/currencies';
 
 interface FormFieldConfig {
   id: string;
@@ -157,13 +158,19 @@ const ViewBooking: React.FC = () => {
     });
   };
 
-  const formatPrice = (price: number, currency: string = 'USD') => {
+  const formatPrice = (price: number, currencyCode: string = 'USD') => {
     // Always format the price, even if 0 - don't show "Contact for pricing" for bookings
     const numPrice = Number(price) || 0;
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency || 'USD',
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = currencyData?.decimalDigits ?? 2;
+    
+    const formatted = new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
     }).format(numPrice);
+    
+    return `${symbol}${formatted}`;
   };
   
   // Country code to name mapping

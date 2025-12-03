@@ -2,7 +2,7 @@ var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Check, ar as Mail, as as Lightbulb, at as Database, au as History, av as Save, aw as Sparkles, ax as ChevronLeft, ay as Box, az as ChevronUp, aA as Upload, aB as ArrowLeft, aC as Pen, aD as React, aE as Phone, aF as Award, aG as Globe, aH as Download, aI as TrendingDown, aJ as PieChart, aK as ClipboardList, aL as Receipt, aM as Plug, aN as Shield, aO as Lock, aP as EyeOff, aQ as MoreVertical, aR as Ban, aS as Columns, aT as Send, aU as Crown, aV as reactDomExports, aW as Filter, aX as QueryClient, aY as client, aZ as QueryClientProvider } from "./react-vendor-Bm94BL72.js";
-import { u as useToast, _ as __, a as apiClient, T as ToastProvider } from "./index-DiOcf9RJ.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-D2wjdepn.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -1798,10 +1798,14 @@ const Trips = () => {
   };
   const formatPrice = (trip) => {
     const price = trip.sale_price || trip.discounted_price || trip.original_price || 0;
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD"
-    }).format(price);
+    const currencyCode = trip.currency || "USD";
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
+    return `${symbol}${new Intl.NumberFormat(void 0, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(price)}`;
   };
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -4359,18 +4363,6 @@ const normalizeAmenityItems = (items) => {
     }
   }
   return [];
-};
-const getCurrencySymbol = (currency) => {
-  const symbols = {
-    "USD": "$",
-    "EUR": "€",
-    "GBP": "£",
-    "INR": "₹",
-    "NPR": "₨",
-    "AUD": "A$",
-    "CAD": "C$"
-  };
-  return symbols[currency] || currency;
 };
 const TripForm = () => {
   var _a, _b, _c;
@@ -11911,11 +11903,14 @@ const Bookings = () => {
       year: "numeric"
     });
   };
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD"
-    }).format(price);
+  const formatPrice = (price, currencyCode = "USD") => {
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
+    return `${symbol}${new Intl.NumberFormat(void 0, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(price)}`;
   };
   const getBookingStatusBadge = (status) => {
     const statusMap = {
@@ -13447,12 +13442,16 @@ const ViewBooking = () => {
       day: "numeric"
     });
   };
-  const formatPrice = (price, currency = "USD") => {
+  const formatPrice = (price, currencyCode = "USD") => {
     const numPrice = Number(price) || 0;
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency || "USD"
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
+    const formatted = new Intl.NumberFormat(void 0, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
     }).format(numPrice);
+    return `${symbol}${formatted}`;
   };
   const COUNTRY_NAMES2 = {
     "AF": "Afghanistan",
@@ -14129,11 +14128,14 @@ const Customers = () => {
       year: "numeric"
     });
   };
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD"
-    }).format(price);
+  const formatPrice = (price, currencyCode = "USD") => {
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
+    return `${symbol}${new Intl.NumberFormat(void 0, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(price)}`;
   };
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -15276,11 +15278,14 @@ const ViewCustomer = () => {
       year: "numeric"
     });
   };
-  const formatPrice = (price, currency = "USD") => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency
-    }).format(price);
+  const formatPrice = (price, currencyCode = "USD") => {
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
+    return `${symbol}${new Intl.NumberFormat(void 0, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(price)}`;
   };
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -17119,11 +17124,14 @@ const Reports = () => {
     },
     enabled: can("yatra_view_bookings")
   });
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD"
-    }).format(price);
+  const formatPrice = (price, currencyCode = "USD") => {
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
+    return `${symbol}${new Intl.NumberFormat(void 0, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(price)}`;
   };
   const handleExport = (format2) => {
     console.log(`Exporting reports as ${format2}...`);
@@ -17626,6 +17634,131 @@ const Label = reactExports.forwardRef(
   }
 );
 Label.displayName = "Label";
+const SearchableSelect = ({
+  value,
+  onChange,
+  options: options2,
+  placeholder = __("Select an option...", "Select an option..."),
+  searchPlaceholder = __("Search...", "Search..."),
+  className = "",
+  error = false,
+  disabled = false,
+  showValueId = true
+}) => {
+  const [isOpen, setIsOpen] = reactExports.useState(false);
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const containerRef = reactExports.useRef(null);
+  const searchInputRef = reactExports.useRef(null);
+  const filteredOptions = options2.filter(
+    (option) => option.label.toLowerCase().includes(searchTerm.toLowerCase()) || option.value.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const selectedOption = options2.find((opt) => opt.value === value);
+  reactExports.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setSearchTerm("");
+      }
+    };
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      setTimeout(() => {
+        var _a;
+        (_a = searchInputRef.current) == null ? void 0 : _a.focus();
+      }, 100);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+  const handleSelect = (optionValue) => {
+    onChange(optionValue);
+    setIsOpen(false);
+    setSearchTerm("");
+  };
+  const handleClear = (e) => {
+    e.stopPropagation();
+    onChange("");
+    setSearchTerm("");
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: containerRef, className: `relative ${className}`, style: { zIndex: isOpen ? 9999 : "auto" }, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: `flex h-11 w-full rounded-md border-2 ${error ? "border-red-500" : "border-gray-300 dark:border-gray-600"} bg-white dark:bg-gray-800 px-4 py-2.5 text-base ring-offset-white focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:focus-within:ring-blue-400 transition-colors`,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            type: "button",
+            onClick: () => !disabled && setIsOpen(!isOpen),
+            disabled,
+            className: "flex-1 flex items-center justify-between text-left",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: selectedOption ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400", children: selectedOption ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between w-full", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: selectedOption.label }),
+                showValueId && selectedOption.value && selectedOption.value !== "" && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium", children: [
+                  "ID: ",
+                  selectedOption.value
+                ] })
+              ] }) : placeholder }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                value && !disabled && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: handleClear,
+                    className: "p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded",
+                    "aria-label": __("Clear selection", "Clear selection"),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4 text-gray-400" })
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  ChevronDown,
+                  {
+                    className: `w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`
+                  }
+                )
+              ] })
+            ]
+          }
+        )
+      }
+    ),
+    isOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute z-[9999] w-full mt-1 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-visible", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            ref: searchInputRef,
+            type: "text",
+            placeholder: searchPlaceholder,
+            value: searchTerm,
+            onChange: (e) => setSearchTerm(e.target.value),
+            className: "pl-8 h-8",
+            onClick: (e) => e.stopPropagation()
+          }
+        )
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-48 overflow-y-auto overflow-x-visible", children: filteredOptions.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center", children: __("No options found", "No options found") }) : filteredOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => handleSelect(option.value),
+          className: `w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${value === option.value ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" : "text-gray-900 dark:text-white"}`,
+          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: option.label }),
+            showValueId && option.value && option.value !== "" && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium", children: [
+              "ID: ",
+              option.value
+            ] })
+          ] })
+        },
+        option.value
+      )) })
+    ] })
+  ] });
+};
 const FormField = React.memo(({
   id,
   label,
@@ -19207,33 +19340,6 @@ const Settings = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: __("Payment Options", "Payment Options") }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                FormField,
-                {
-                  id: "currency",
-                  label: __("Default Currency", "Default Currency"),
-                  description: __("Primary currency for all transactions", "Primary currency for all transactions"),
-                  required: true,
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    Select,
-                    {
-                      id: "currency",
-                      value: formData.currency,
-                      name: "currency",
-                      onChange: handleFieldChange,
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "USD", children: "USD - US Dollar" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "EUR", children: "EUR - Euro" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "GBP", children: "GBP - British Pound" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "NPR", children: "NPR - Nepalese Rupee" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "INR", children: "INR - Indian Rupee" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "AUD", children: "AUD - Australian Dollar" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "CAD", children: "CAD - Canadian Dollar" })
-                      ]
-                    }
-                  )
-                }
-              ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "input",
@@ -20588,24 +20694,19 @@ const Settings = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             FormField,
             {
-              id: "default_currency",
+              id: "currency",
               label: __("Default Currency", "Default Currency"),
               description: __("Primary currency for all transactions", "Primary currency for all transactions"),
               required: true,
-              children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                Select,
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                SearchableSelect,
                 {
-                  id: "default_currency",
-                  value: formData.default_currency,
-                  name: "default_currency",
-                  onChange: handleFieldChange,
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "USD", children: "USD - US Dollar" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "EUR", children: "EUR - Euro" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "GBP", children: "GBP - British Pound" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "NPR", children: "NPR - Nepalese Rupee" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "INR", children: "INR - Indian Rupee" })
-                  ]
+                  value: formData.currency,
+                  onChange: (val) => setFormData((prev) => prev ? { ...prev, currency: val } : prev),
+                  options: getCurrencyOptions(),
+                  placeholder: __("Select currency...", "Select currency..."),
+                  searchPlaceholder: __("Search currencies...", "Search currencies..."),
+                  showValueId: false
                 }
               )
             }
@@ -22723,130 +22824,6 @@ const Items = () => {
         ] })
       ] }) }) })
     ] }) })
-  ] });
-};
-const SearchableSelect = ({
-  value,
-  onChange,
-  options: options2,
-  placeholder = __("Select an option...", "Select an option..."),
-  searchPlaceholder = __("Search...", "Search..."),
-  className = "",
-  error = false,
-  disabled = false
-}) => {
-  const [isOpen, setIsOpen] = reactExports.useState(false);
-  const [searchTerm, setSearchTerm] = reactExports.useState("");
-  const containerRef = reactExports.useRef(null);
-  const searchInputRef = reactExports.useRef(null);
-  const filteredOptions = options2.filter(
-    (option) => option.label.toLowerCase().includes(searchTerm.toLowerCase()) || option.value.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const selectedOption = options2.find((opt) => opt.value === value);
-  reactExports.useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setIsOpen(false);
-        setSearchTerm("");
-      }
-    };
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      setTimeout(() => {
-        var _a;
-        (_a = searchInputRef.current) == null ? void 0 : _a.focus();
-      }, 100);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-  const handleSelect = (optionValue) => {
-    onChange(optionValue);
-    setIsOpen(false);
-    setSearchTerm("");
-  };
-  const handleClear = (e) => {
-    e.stopPropagation();
-    onChange("");
-    setSearchTerm("");
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: containerRef, className: `relative ${className}`, style: { zIndex: isOpen ? 9999 : "auto" }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "div",
-      {
-        className: `flex h-11 w-full rounded-md border-2 ${error ? "border-red-500" : "border-gray-300 dark:border-gray-600"} bg-white dark:bg-gray-800 px-4 py-2.5 text-base ring-offset-white focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:focus-within:ring-blue-400 transition-colors`,
-        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "button",
-          {
-            type: "button",
-            onClick: () => !disabled && setIsOpen(!isOpen),
-            disabled,
-            className: "flex-1 flex items-center justify-between text-left",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: selectedOption ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400", children: selectedOption ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between w-full", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: selectedOption.label }),
-                selectedOption.value && selectedOption.value !== "" && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium", children: [
-                  "ID: ",
-                  selectedOption.value
-                ] })
-              ] }) : placeholder }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                value && !disabled && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: handleClear,
-                    className: "p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded",
-                    "aria-label": __("Clear selection", "Clear selection"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4 text-gray-400" })
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  ChevronDown,
-                  {
-                    className: `w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`
-                  }
-                )
-              ] })
-            ]
-          }
-        )
-      }
-    ),
-    isOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute z-[9999] w-full mt-1 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-visible", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            ref: searchInputRef,
-            type: "text",
-            placeholder: searchPlaceholder,
-            value: searchTerm,
-            onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-8 h-8",
-            onClick: (e) => e.stopPropagation()
-          }
-        )
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-48 overflow-y-auto overflow-x-visible", children: filteredOptions.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center", children: __("No options found", "No options found") }) : filteredOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "button",
-        {
-          type: "button",
-          onClick: () => handleSelect(option.value),
-          className: `w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${value === option.value ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" : "text-gray-900 dark:text-white"}`,
-          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: option.label }),
-            option.value && option.value !== "" && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium", children: [
-              "ID: ",
-              option.value
-            ] })
-          ] })
-        },
-        option.value
-      )) })
-    ] })
   ] });
 };
 const ItemForm = () => {
@@ -31072,11 +31049,14 @@ const Payments = () => {
       year: "numeric"
     });
   };
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD"
-    }).format(price);
+  const formatPrice = (price, currencyCode = "USD") => {
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
+    return `${symbol}${new Intl.NumberFormat(void 0, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(price)}`;
   };
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -31918,11 +31898,14 @@ const ViewPayment = () => {
       day: "numeric"
     });
   };
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD"
-    }).format(price);
+  const formatPrice = (price, currencyCode = "USD") => {
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
+    return `${symbol}${new Intl.NumberFormat(void 0, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    }).format(price)}`;
   };
   const getPaymentStatusBadge = (status) => {
     const statusMap = {

@@ -28,6 +28,7 @@ import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { getCurrencySymbol, getCurrency } from '../data/currencies';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { SimpleLineChart } from '../components/charts/SimpleLineChart';
 import { SimpleBarChart } from '../components/charts/SimpleBarChart';
@@ -297,11 +298,15 @@ const Reports: React.FC = () => {
     enabled: can('yatra_view_bookings'),
   });
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
+  const formatPrice = (price: number, currencyCode: string = 'USD') => {
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = currencyData?.decimalDigits ?? 2;
+    
+    return `${symbol}${new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(price)}`;
   };
 
   const handleExport = (format: 'pdf' | 'csv' | 'excel') => {

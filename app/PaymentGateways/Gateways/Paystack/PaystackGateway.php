@@ -18,6 +18,7 @@ class PaystackGateway extends AbstractPaymentGateway
     protected string $icon = 'icon.svg';
     protected string $sandboxUrl = 'https://paystack.com/docs/payments/test-payments/';
     protected array $supports = ['credit_card', 'debit_card', 'bank_transfer', 'ussd', 'mobile_money', 'refunds', 'webhooks'];
+    private array $supportedCurrencies = ['NGN', 'GHS', 'ZAR', 'USD'];
 
     private string $apiBase = 'https://api.paystack.co';
 
@@ -97,11 +98,26 @@ class PaystackGateway extends AbstractPaymentGateway
                 $callbackUrl = home_url('/booking-confirmation/' . $reference . '/');
             }
 
+            $currency = strtoupper($paymentData['currency'] ?? 'NGN');
+
+            if (!in_array($currency, $this->supportedCurrencies, true)) {
+                $supportedList = implode(', ', $this->supportedCurrencies);
+                return [
+                    'success' => false,
+                    'error' => sprintf(
+                        /* translators: 1: Unsupported currency code, 2: List of supported currencies */
+                        __('Paystack does not support transactions in %1$s. Please switch to one of the supported currencies (%2$s) or choose a different payment gateway.', 'yatra'),
+                        $currency,
+                        $supportedList
+                    ),
+                ];
+            }
+
             // Initialize transaction with Paystack
             $transactionData = [
                 'email' => $paymentData['customer_email'] ?? '',
                 'amount' => (int) ($paymentData['amount'] * 100), // Convert to kobo/cents
-                'currency' => $paymentData['currency'] ?? 'NGN',
+                'currency' => $currency,
                 'reference' => $this->generateReference($bookingId),
                 'callback_url' => $callbackUrl,
                 'metadata' => [
@@ -283,9 +299,9 @@ class PaystackGateway extends AbstractPaymentGateway
         return $decodedBody ?? [];
     }
 
-    private function generateReference(string $bookingId): string
+    private function generateReference($bookingId): string
     {
-        return 'yatra_' . $bookingId . '_' . time() . '_' . wp_generate_password(8, false);
+        return 'yatra_' . (string) $bookingId . '_' . time() . '_' . wp_generate_password(8, false);
     }
 
     private function mapPaystackStatus(string $paystackStatus): string

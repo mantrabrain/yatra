@@ -22,6 +22,7 @@ import { Alert } from '../components/ui/alert';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
 import { generateSlug } from '../lib/slug';
+import { getCurrencySymbol, getCurrency } from '../data/currencies';
 
 interface Trip {
   id: number;
@@ -227,10 +228,15 @@ const Trips: React.FC = () => {
   const formatPrice = (trip: Trip) => {
     // Use sale_price if available, otherwise discounted_price, otherwise original_price
     const price = trip.sale_price || trip.discounted_price || trip.original_price || 0;
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
+    const currencyCode = (trip as any).currency || 'USD';
+    const symbol = getCurrencySymbol(currencyCode);
+    const currencyData = getCurrency(currencyCode);
+    const decimals = currencyData?.decimalDigits ?? 2;
+    
+    return `${symbol}${new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(price)}`;
   };
 
   const getStatusBadge = (status: string) => {
