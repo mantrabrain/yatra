@@ -31,7 +31,8 @@ class PaystackGateway extends AbstractPaymentGateway
                 'description' => __('Your Paystack public key', 'yatra'),
                 'placeholder' => 'pk_test_... or pk_live_...',
                 'default' => '',
-                'help_url' => 'https://dashboard.paystack.com/#/settings/developer',
+                'help_url_test' => 'https://paystack.com/docs/payments/test-payments/',
+                'help_url_live' => 'https://dashboard.paystack.com/#/settings/developer',
                 'help_text' => __('Get your API keys from Paystack Dashboard > Settings > API Keys & Webhooks', 'yatra'),
             ],
             [
@@ -41,7 +42,8 @@ class PaystackGateway extends AbstractPaymentGateway
                 'description' => __('Your Paystack secret key (keep this secure)', 'yatra'),
                 'placeholder' => 'sk_test_... or sk_live_...',
                 'default' => '',
-                'help_url' => 'https://dashboard.paystack.com/#/settings/developer',
+                'help_url_test' => 'https://paystack.com/docs/payments/test-payments/',
+                'help_url_live' => 'https://dashboard.paystack.com/#/settings/developer',
                 'help_text' => __('Get your API keys from Paystack Dashboard > Settings > API Keys & Webhooks', 'yatra'),
             ],
             [
@@ -296,5 +298,89 @@ class PaystackGateway extends AbstractPaymentGateway
     public function supportsRecurring(): bool
     {
         return true; // Paystack supports recurring payments
+    }
+    
+    /**
+     * Check if this gateway should handle the return request
+     */
+    public function shouldHandleReturn(array $params): bool
+    {
+        return !empty($params['trxref']) || !empty($params['reference']);
+    }
+    
+    /**
+     * Handle payment return from Paystack
+     */
+    public function handlePaymentReturn($booking, $bookingRepository): void
+    {
+        $reference = sanitize_text_field($_GET['trxref'] ?? $_GET['reference'] ?? '');
+        
+        if (empty($reference)) {
+            return;
+        }
+        
+        // Verify payment with Paystack
+        $result = $this->verifyPayment($reference);
+        
+        if ($result['success'] && $result['status'] === 'completed') {
+            $this->completePayment($booking, $bookingRepository, $reference, $result);
+        }
+    }
+    
+    /**
+     * Complete the payment and update booking status
+     */
+    private function completePayment($booking, $bookingRepository, string $transactionId, array $paymentData = []): void
+    {
+        global $wpdb;
+        
+        if ($booking->payment_status === 'paid') {
+            return;
+        }
+        
+        $bookingId = (int) $booking->id;
+        $amountDue = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
+        $amount = $paymentData['amount'] ?? $amountDue;
+        $currency = $paymentData['currency'] ?? ($booking->currency ?? 'NGN');
+        
+        // Update booking payment status
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $wpdb->update(
+            $bookings_table,
+            [
+                'payment_status' => 'paid',
+                'amount_paid' => $booking->total_amount,
+                'amount_due' => 0,
+                'status' => 'confirmed',
+                'confirmed_at' => current_time('mysql'),
+            ],
+            ['id' => $bookingId],
+            ['%s', '%f', '%f', '%s', '%s'],
+            ['%d']
+        );
+        
+        // Record the payment
+        $payments_table = $wpdb->prefix . 'yatra_payments';
+        $wpdb->insert(
+            $payments_table,
+            [
+                'booking_id' => $bookingId,
+                'amount' => $amount,
+                'currency' => $currency,
+                'payment_gateway' => 'paystack',
+                'transaction_id' => $transactionId,
+                'status' => 'completed',
+                'created_at' => current_time('mysql'),
+            ],
+            ['%d', '%f', '%s', '%s', '%s', '%s', '%s']
+        );
+        
+        do_action('yatra_payment_completed', [
+            'booking_id' => $bookingId,
+            'transaction_id' => $transactionId,
+            'amount' => $amount,
+            'currency' => $currency,
+            'gateway' => 'paystack',
+        ]);
     }
 }

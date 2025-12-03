@@ -27,7 +27,8 @@ class StripeGateway extends AbstractPaymentGateway
                 'description' => __('Your Stripe publishable API key', 'yatra'),
                 'placeholder' => 'pk_test_...',
                 'default' => '',
-                'help_url' => 'https://dashboard.stripe.com/apikeys',
+                'help_url_test' => 'https://dashboard.stripe.com/test/apikeys',
+                'help_url_live' => 'https://dashboard.stripe.com/apikeys',
                 'help_text' => __('Get your API keys from Stripe Dashboard > Developers > API keys', 'yatra'),
             ],
             [
@@ -37,7 +38,8 @@ class StripeGateway extends AbstractPaymentGateway
                 'description' => __('Your Stripe secret API key (keep this secure)', 'yatra'),
                 'placeholder' => 'sk_test_...',
                 'default' => '',
-                'help_url' => 'https://dashboard.stripe.com/apikeys',
+                'help_url_test' => 'https://dashboard.stripe.com/test/apikeys',
+                'help_url_live' => 'https://dashboard.stripe.com/apikeys',
                 'help_text' => __('Get your API keys from Stripe Dashboard > Developers > API keys', 'yatra'),
             ],
             [
@@ -47,7 +49,8 @@ class StripeGateway extends AbstractPaymentGateway
                 'description' => __('Stripe webhook signing secret for payment verification', 'yatra'),
                 'placeholder' => 'whsec_...',
                 'default' => '',
-                'help_url' => 'https://dashboard.stripe.com/webhooks',
+                'help_url_test' => 'https://dashboard.stripe.com/test/webhooks',
+                'help_url_live' => 'https://dashboard.stripe.com/webhooks',
                 'help_text' => __('Create a webhook endpoint in Stripe Dashboard > Developers > Webhooks', 'yatra'),
             ],
             [
@@ -58,7 +61,8 @@ class StripeGateway extends AbstractPaymentGateway
                 'placeholder' => 'card,google_pay,apple_pay',
                 'default' => 'card,google_pay,apple_pay',
                 'help_text' => __('Apple Pay requires domain verification inside your Stripe Dashboard.', 'yatra'),
-                'help_url' => 'https://stripe.com/docs/payments/payment-request-button#apple-pay',
+                'help_url_test' => 'https://stripe.com/docs/testing',
+                'help_url_live' => 'https://stripe.com/docs/payments/payment-request-button#apple-pay',
             ],
         ];
     }
@@ -125,20 +129,23 @@ class StripeGateway extends AbstractPaymentGateway
                 ];
             }
 
+            $reference = $paymentData['reference'] ?? $paymentData['booking_id'];
+            $confirmationUrl = home_url('/booking-confirmation/' . $reference . '/');
+            
             // Return the payment intent data for frontend processing
+            // The frontend JS (stripe.js) will handle opening the payment form
             return [
                 'success' => true,
+                'requires_action' => 'stripe_payment',
                 'client_secret' => $response['body']['client_secret'],
                 'publishable_key' => $this->config['api_key'] ?? '',
                 'transaction_id' => $response['body']['id'],
                 'customer_id' => $customerId,
                 'save_card' => $saveCard,
-                'redirect_url' => add_query_arg([
-                    'gateway' => 'stripe',
-                    'client_secret' => $response['body']['client_secret'],
-                    'publishable_key' => $this->config['api_key'] ?? '',
-                    'booking_ref' => $paymentData['booking_id']
-                ], home_url('/yatra-payment/process/'))
+                'booking_ref' => $reference,
+                'confirmation_url' => $confirmationUrl,
+                'amount' => $paymentData['amount'],
+                'currency' => $paymentData['currency'],
             ];
 
         } catch (\Exception $e) {
@@ -387,5 +394,114 @@ class StripeGateway extends AbstractPaymentGateway
                 'error' => $e->getMessage(),
             ];
         }
+    }
+    
+    /**
+     * Register gateway scripts for frontend
+     */
+    public function enqueueScripts(): void
+    {
+        if (!$this->isAvailable()) {
+            return;
+        }
+        
+        // Stripe.js is loaded from CDN, but we need our handler
+        // The stripe.js in public/js handles the payment form
+    }
+    
+    /**
+     * Get frontend data for JavaScript
+     */
+    public function getFrontendData(): array
+    {
+        return [
+            'publishable_key' => $this->config['api_key'] ?? '',
+            'enabled_methods' => $this->config['enabled_methods'] ?? 'card,google_pay,apple_pay',
+        ];
+    }
+    
+    /**
+     * Check if this gateway should handle the return request
+     */
+    public function shouldHandleReturn(array $params): bool
+    {
+        return isset($params['stripe']) && $params['stripe'] === 'success';
+    }
+    
+    /**
+     * Handle payment return from Stripe
+     */
+    public function handlePaymentReturn($booking, $bookingRepository): void
+    {
+        // Get payment intent from booking's session ID
+        $paymentIntentId = $booking->payment_session_id ?? '';
+        
+        if (empty($paymentIntentId)) {
+            return;
+        }
+        
+        // Verify payment status
+        $result = $this->verifyPayment($paymentIntentId);
+        
+        if ($result['success'] && $result['status'] === 'succeeded') {
+            $this->completePayment($booking, $bookingRepository, $paymentIntentId, $result);
+        }
+    }
+    
+    /**
+     * Complete the payment and update booking status
+     */
+    private function completePayment($booking, $bookingRepository, string $transactionId, array $paymentData = []): void
+    {
+        global $wpdb;
+        
+        if ($booking->payment_status === 'paid') {
+            return;
+        }
+        
+        $bookingId = (int) $booking->id;
+        $amountDue = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
+        $amount = $paymentData['amount'] ?? $amountDue;
+        $currency = $paymentData['currency'] ?? ($booking->currency ?? 'USD');
+        
+        // Update booking payment status
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $wpdb->update(
+            $bookings_table,
+            [
+                'payment_status' => 'paid',
+                'amount_paid' => $booking->total_amount,
+                'amount_due' => 0,
+                'status' => 'confirmed',
+                'confirmed_at' => current_time('mysql'),
+            ],
+            ['id' => $bookingId],
+            ['%s', '%f', '%f', '%s', '%s'],
+            ['%d']
+        );
+        
+        // Record the payment
+        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+        $wpdb->insert(
+            $payments_table,
+            [
+                'booking_id' => $bookingId,
+                'amount' => $amount,
+                'currency' => $currency,
+                'gateway' => 'stripe',
+                'transaction_id' => $transactionId,
+                'status' => 'completed',
+                'created_at' => current_time('mysql'),
+            ],
+            ['%d', '%f', '%s', '%s', '%s', '%s', '%s']
+        );
+        
+        do_action('yatra_payment_completed', [
+            'booking_id' => $bookingId,
+            'transaction_id' => $transactionId,
+            'amount' => $amount,
+            'currency' => $currency,
+            'gateway' => 'stripe',
+        ]);
     }
 }

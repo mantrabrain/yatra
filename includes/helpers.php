@@ -542,6 +542,9 @@ function yatra_set_booking_session(array $data): void
 {
     yatra_start_session();
     
+    // Clear any existing remaining payment session to avoid conflicts
+    unset($_SESSION['yatra_remaining']);
+    
     $_SESSION['yatra_booking'] = array_merge(
         $_SESSION['yatra_booking'] ?? [],
         $data,
@@ -618,6 +621,9 @@ function yatra_has_booking_session(): bool
 function yatra_set_remaining_session(array $data): void
 {
     yatra_start_session();
+    
+    // Clear any existing booking session to avoid conflicts
+    unset($_SESSION['yatra_booking']);
     
     $_SESSION['yatra_remaining'] = array_merge(
         $data,

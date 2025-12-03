@@ -31,7 +31,8 @@ class MollieGateway extends AbstractPaymentGateway
                 'description' => __('Your Mollie API key (live or test)', 'yatra'),
                 'placeholder' => 'live_... or test_...',
                 'default' => '',
-                'help_url' => 'https://my.mollie.com/dashboard/developers/api-keys',
+                'help_url_test' => 'https://docs.mollie.com/overview/testing',
+                'help_url_live' => 'https://my.mollie.com/dashboard/developers/api-keys',
                 'help_text' => __('Get your API key from Mollie Dashboard > Developers > API keys', 'yatra'),
             ],
             [
@@ -266,5 +267,90 @@ class MollieGateway extends AbstractPaymentGateway
     public function supportsRecurring(): bool
     {
         return true; // Mollie supports recurring payments
+    }
+    
+    /**
+     * Check if this gateway should handle the return request
+     */
+    public function shouldHandleReturn(array $params): bool
+    {
+        return isset($params['mollie']) && $params['mollie'] === 'success';
+    }
+    
+    /**
+     * Handle payment return from Mollie
+     */
+    public function handlePaymentReturn($booking, $bookingRepository): void
+    {
+        // Mollie uses webhooks for payment confirmation
+        // On return, we just check the current status
+        $paymentId = $booking->payment_session_id ?? '';
+        
+        if (empty($paymentId)) {
+            return;
+        }
+        
+        $result = $this->verifyPayment($paymentId);
+        
+        if ($result['success'] && $result['status'] === 'completed') {
+            $this->completePayment($booking, $bookingRepository, $paymentId, $result);
+        }
+    }
+    
+    /**
+     * Complete the payment and update booking status
+     */
+    private function completePayment($booking, $bookingRepository, string $transactionId, array $paymentData = []): void
+    {
+        global $wpdb;
+        
+        if ($booking->payment_status === 'paid') {
+            return;
+        }
+        
+        $bookingId = (int) $booking->id;
+        $amountDue = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
+        $amount = $paymentData['amount'] ?? $amountDue;
+        $currency = $paymentData['currency'] ?? ($booking->currency ?? 'EUR');
+        
+        // Update booking payment status
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $wpdb->update(
+            $bookings_table,
+            [
+                'payment_status' => 'paid',
+                'amount_paid' => $booking->total_amount,
+                'amount_due' => 0,
+                'status' => 'confirmed',
+                'confirmed_at' => current_time('mysql'),
+            ],
+            ['id' => $bookingId],
+            ['%s', '%f', '%f', '%s', '%s'],
+            ['%d']
+        );
+        
+        // Record the payment
+        $payments_table = $wpdb->prefix . 'yatra_payments';
+        $wpdb->insert(
+            $payments_table,
+            [
+                'booking_id' => $bookingId,
+                'amount' => $amount,
+                'currency' => $currency,
+                'payment_gateway' => 'mollie',
+                'transaction_id' => $transactionId,
+                'status' => 'completed',
+                'created_at' => current_time('mysql'),
+            ],
+            ['%d', '%f', '%s', '%s', '%s', '%s', '%s']
+        );
+        
+        do_action('yatra_payment_completed', [
+            'booking_id' => $bookingId,
+            'transaction_id' => $transactionId,
+            'amount' => $amount,
+            'currency' => $currency,
+            'gateway' => 'mollie',
+        ]);
     }
 }

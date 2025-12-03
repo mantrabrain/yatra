@@ -71,7 +71,135 @@ class YatraStripe {
             this.initializeStripe();
         }
 
+        // Listen for unified booking submit event (new system)
+        document.addEventListener('yatra_booking_submit', (event) => this.handleBookingSubmit(event));
+        
+        // Listen for payment response for client-side Stripe payments
+        document.addEventListener('yatra_payment_response', (event) => this.handlePaymentResponse(event));
+        
+        // Legacy event support
         document.addEventListener('yatraBeforeBookingSubmit', (event) => this.handleGatewayIntercept(event));
+    }
+    
+    /**
+     * Handle unified booking submit event
+     */
+    handleBookingSubmit(event) {
+        if (event.detail?.gateway !== 'stripe') {
+            return; // Let other gateways handle
+        }
+        
+        // Stripe intercepts the form submission to handle card payment
+        event.preventDefault();
+        
+        // Use the existing handleGatewayIntercept logic
+        this.handleGatewayIntercept({
+            preventDefault: () => {},
+            detail: event.detail
+        });
+    }
+    
+    /**
+     * Handle payment response for Stripe (when server returns requires_action)
+     */
+    handlePaymentResponse(event) {
+        if (event.detail?.requires_action !== 'stripe_payment') {
+            return;
+        }
+        
+        console.log('[Yatra Stripe] Handling stripe_payment response:', event.detail);
+        this.handleStripePaymentAction(event.detail);
+    }
+    
+    /**
+     * Handle Stripe payment action from server response
+     */
+    async handleStripePaymentAction(data) {
+        try {
+            // Load Stripe if not already loaded
+            if (!this.stripe && data.publishable_key) {
+                await this.loadStripeScript();
+                this.stripe = Stripe(data.publishable_key);
+            }
+            
+            if (!this.stripe) {
+                throw new Error('Stripe not initialized');
+            }
+            
+            const elements = this.stripe.elements({
+                clientSecret: data.client_secret
+            });
+            
+            // Create payment element in a modal
+            const modal = document.createElement('div');
+            modal.id = 'yatra-stripe-modal';
+            modal.innerHTML = `
+                <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; padding: 32px; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                        <h2 style="margin: 0 0 24px; text-align: center;">${__('Complete Your Payment', 'yatra')}</h2>
+                        <div id="stripe-payment-element"></div>
+                        <button id="stripe-submit-btn" style="width: 100%; padding: 16px; background: #635bff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; margin-top: 24px; cursor: pointer;">
+                            ${__('Pay', 'yatra')} ${data.currency} ${parseFloat(data.amount).toFixed(2)}
+                        </button>
+                        <button id="stripe-cancel-btn" style="width: 100%; padding: 12px; background: transparent; color: #666; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-top: 12px; cursor: pointer;">
+                            ${__('Cancel', 'yatra')}
+                        </button>
+                        <div id="stripe-error-message" style="margin-top: 16px; color: #ef4444; display: none;"></div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            const paymentElement = elements.create('payment');
+            paymentElement.mount('#stripe-payment-element');
+            
+            document.getElementById('stripe-submit-btn').addEventListener('click', async () => {
+                const btn = document.getElementById('stripe-submit-btn');
+                btn.disabled = true;
+                btn.textContent = __('Processing...', 'yatra');
+                
+                const { error } = await this.stripe.confirmPayment({
+                    elements,
+                    confirmParams: {
+                        return_url: data.confirmation_url + '?stripe=success',
+                    },
+                });
+                
+                if (error) {
+                    document.getElementById('stripe-error-message').textContent = error.message;
+                    document.getElementById('stripe-error-message').style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = `${__('Pay', 'yatra')} ${data.currency} ${parseFloat(data.amount).toFixed(2)}`;
+                }
+            });
+            
+            document.getElementById('stripe-cancel-btn').addEventListener('click', () => {
+                modal.remove();
+                document.dispatchEvent(new CustomEvent('yatra_payment_cancelled', {
+                    detail: { gateway: 'stripe' }
+                }));
+            });
+            
+        } catch (error) {
+            console.error('Stripe payment error:', error);
+            document.dispatchEvent(new CustomEvent('yatra_payment_failed', {
+                detail: { gateway: 'stripe', error: error.message }
+            }));
+        }
+    }
+    
+    loadStripeScript() {
+        return new Promise((resolve, reject) => {
+            if (typeof Stripe !== 'undefined') {
+                resolve();
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://js.stripe.com/v3/';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
     }
 
     addStripeElementsContainer() {

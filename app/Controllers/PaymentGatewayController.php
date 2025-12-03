@@ -442,6 +442,7 @@ class PaymentGatewayController extends BaseController
         $data = $request->get_json_params() ?: [];
         $data['raw_body'] = $request->get_body();
         $data['headers'] = $request->get_headers();
+        $data['post_data'] = $request->get_body_params(); // For form-encoded data (like PayPal IPN)
 
         $result = $gateway->handleWebhook($data);
 

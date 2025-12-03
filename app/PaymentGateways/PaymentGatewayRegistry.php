@@ -171,5 +171,33 @@ class PaymentGatewayRegistry
 
         return $gateway->processPayment($paymentData);
     }
+    
+    /**
+     * Enqueue scripts for all available gateways
+     */
+    public function enqueueScripts(): void
+    {
+        foreach ($this->getAvailable() as $gateway) {
+            if (method_exists($gateway, 'enqueueScripts')) {
+                $gateway->enqueueScripts();
+            }
+        }
+    }
+    
+    /**
+     * Get frontend data for all available gateways
+     */
+    public function getFrontendData(): array
+    {
+        $data = [];
+        
+        foreach ($this->getAvailable() as $id => $gateway) {
+            if (method_exists($gateway, 'getFrontendData')) {
+                $data[$id] = $gateway->getFrontendData();
+            }
+        }
+        
+        return $data;
+    }
 }
 

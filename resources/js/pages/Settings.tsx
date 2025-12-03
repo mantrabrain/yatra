@@ -141,11 +141,14 @@ interface GatewayField {
   default?: any;
   options?: Record<string, string>;
   condition?: string;
+  show_when?: Record<string, string>; // Conditional display based on other field values
   min?: number;
   max?: number;
   readonly?: boolean;
   help_text?: string;
   help_url?: string;
+  help_url_test?: string;
+  help_url_live?: string;
 }
 
 interface GatewayDefinition {
@@ -2309,9 +2312,19 @@ onChange={handleFieldChange}
                         {gateway.fields && gateway.fields.length > 0 && (
                           <div className="space-y-4">
                             {gateway.fields.map((field: GatewayField) => {
-                          // Check conditional visibility
+                          // Check conditional visibility (legacy condition)
                           if (field.condition && !config[field.condition]) {
                             return null;
+                          }
+                          
+                          // Check show_when conditional visibility
+                          if (field.show_when) {
+                            const shouldShow = Object.entries(field.show_when).every(
+                              ([key, value]) => (config[key] || gateway.fields.find(f => f.id === key)?.default) === value
+                            );
+                            if (!shouldShow) {
+                              return null;
+                            }
                           }
 
                           // Render checkbox fields differently
@@ -2387,9 +2400,11 @@ onChange={handleFieldChange}
                                 </FormField>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                   {__('Apple Pay requires domain verification inside your Stripe Dashboard.', 'Apple Pay requires domain verification inside your Stripe Dashboard.')}
-                                  {field.help_url && (
+                                  {(field.help_url || field.help_url_test || field.help_url_live) && (
                                     <a
-                                      href={field.help_url}
+                                      href={formData.payment_test_mode 
+                                        ? (field.help_url_test || field.help_url) 
+                                        : (field.help_url_live || field.help_url)}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent"
@@ -2402,7 +2417,36 @@ onChange={handleFieldChange}
                             );
                           }
 
-                          // Render text, password, number inputs
+                          // Render select/dropdown fields
+                          if (field.type === 'select' && field.options) {
+                            return (
+                              <div key={field.id} className="space-y-2">
+                                <FormField
+                                  id={`${gatewayId}_${field.id}`}
+                                  label={field.label}
+                                  description={field.description}
+                                >
+                                  <Select
+                                    value={config[field.id] ?? field.default ?? ''}
+                                    onChange={(e) => handleGatewayConfigChange(gatewayId, field.id, e.target.value)}
+                                  >
+                                    {Object.entries(field.options).map(([value, label]) => (
+                                      <option key={value} value={value}>
+                                        {label}
+                                      </option>
+                                    ))}
+                                  </Select>
+                                </FormField>
+                                {field.help_text && (
+                                  <p className="text-xs text-blue-600 dark:text-blue-400">
+                                    {field.help_text}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          }
+
+                          // Render text, password, number, email inputs
                           return (
                             <div key={field.id} className="space-y-2">
                               <FormField
@@ -2411,7 +2455,7 @@ onChange={handleFieldChange}
                                 description={field.description}
                               >
                                 <Input
-                                  type={field.type}
+                                  type={field.type === 'email' ? 'email' : field.type}
                                   value={config[field.id] ?? field.default ?? ''}
                                   onChange={(e) => handleGatewayConfigChange(gatewayId, field.id, field.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value)}
                                   placeholder={field.placeholder}
@@ -2422,9 +2466,11 @@ onChange={handleFieldChange}
                               {field.help_text && (
                                 <p className="text-xs text-blue-600 dark:text-blue-400">
                                   {field.help_text}
-                                  {field.help_url && (
+                                  {(field.help_url || field.help_url_test || field.help_url_live) && (
                                     <a 
-                                      href={field.help_url} 
+                                      href={formData.payment_test_mode 
+                                        ? (field.help_url_test || field.help_url) 
+                                        : (field.help_url_live || field.help_url)} 
                                       target="_blank" 
                                       rel="noopener noreferrer"
                                       className="ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent transition-colors"

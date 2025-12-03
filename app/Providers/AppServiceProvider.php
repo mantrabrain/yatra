@@ -98,9 +98,6 @@ class AppServiceProvider extends ServiceProvider
         
         // Handle remaining checkout page
         add_action('template_redirect', [$this, 'handleRemainingCheckoutPage'], 1);
-        
-        // Handle payment processing page
-        add_action('template_redirect', [$this, 'handlePaymentProcessingPage'], 1);
 
         // Ensure frontend bundles are marked as ES modules
         add_filter('script_loader_tag', [$this, 'addFrontendModuleType'], 10, 2);
@@ -891,7 +888,6 @@ class AppServiceProvider extends ServiceProvider
         $vars[] = 'yatra_listing_page';
         $vars[] = 'yatra_booking_page';
         $vars[] = 'yatra_booking_confirmation';
-        $vars[] = 'yatra_payment_process';
         $vars[] = 'yatra_verify_email';
         // Single taxonomy pages
         $vars[] = 'yatra_destination_slug';
@@ -1013,13 +1009,6 @@ class AppServiceProvider extends ServiceProvider
                 'top'
             );
         }
-        
-        // Add rewrite rule for payment processing page
-        add_rewrite_rule(
-            '^yatra-payment/process/?$',
-            'index.php?yatra_payment_process=1',
-            'top'
-        );
         
         // Add rewrite rule for remaining checkout page
         add_rewrite_rule(
@@ -2104,12 +2093,20 @@ HTML;
             }
 
             $localized_data['companyCountry'] = SettingsService::get('company_country', 'US');
+            $localized_data['siteName'] = get_bloginfo('name');
 
             if (!empty($booking->is_remaining_payment)) {
                 $localized_data['paymentDue'] = $booking->remaining_amount ?? 0;
             }
+            
+            // Add gateway-specific frontend data
+            $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+            $localized_data['gateways'] = $registry->getFrontendData();
 
             wp_localize_script('yatra-booking', 'yatraBookingData', $localized_data);
+            
+            // Enqueue gateway-specific scripts
+            $registry->enqueueScripts();
         }
     }
 
@@ -2316,6 +2313,15 @@ HTML;
             return;
         }
 
+        // Handle payment gateway returns (generic - each gateway checks if it should handle)
+        $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+        foreach ($registry->getAll() as $gateway) {
+            if (method_exists($gateway, 'shouldHandleReturn') && $gateway->shouldHandleReturn($_GET)) {
+                $gateway->handlePaymentReturn($booking, $bookingRepository);
+                break;
+            }
+        }
+
         // Parse JSON data
         $booking->travelers = json_decode($booking->travelers_data, true) ?: [];
         $booking->contact = json_decode($booking->contact_data, true) ?: [];
@@ -2475,35 +2481,6 @@ HTML;
         }
 
         return $tag;
-    }
-    
-    /**
-     * Handle payment processing page
-     */
-    public function handlePaymentProcessingPage(): void
-    {
-        if (!get_query_var('yatra_payment_process')) {
-            return;
-        }
-        
-        global $wp_query;
-        
-        // Set up WordPress query
-        $wp_query->is_home = false;
-        $wp_query->is_page = true;
-        $wp_query->is_singular = true;
-        $wp_query->is_404 = false;
-        status_header(200);
-        
-        // Load the payment processing template
-        $template_path = YATRA_PLUGIN_PATH . 'templates/payment-process.php';
-        
-        if (file_exists($template_path)) {
-            include $template_path;
-            exit;
-        } else {
-            wp_die(__('Payment processing page template not found.', 'yatra'));
-        }
     }
 }
 

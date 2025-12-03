@@ -19521,6 +19521,17 @@ const Settings = () => {
                         if (field.condition && !config[field.condition]) {
                           return null;
                         }
+                        if (field.show_when) {
+                          const shouldShow = Object.entries(field.show_when).every(
+                            ([key, value]) => {
+                              var _a3;
+                              return (config[key] || ((_a3 = gateway.fields.find((f) => f.id === key)) == null ? void 0 : _a3.default)) === value;
+                            }
+                          );
+                          if (!shouldShow) {
+                            return null;
+                          }
+                        }
                         if (field.type === "checkbox") {
                           return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md", children: [
                             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -19592,10 +19603,10 @@ const Settings = () => {
                             ),
                             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
                               __("Apple Pay requires domain verification inside your Stripe Dashboard.", "Apple Pay requires domain verification inside your Stripe Dashboard."),
-                              field.help_url && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              (field.help_url || field.help_url_test || field.help_url_live) && /* @__PURE__ */ jsxRuntimeExports.jsx(
                                 "a",
                                 {
-                                  href: field.help_url,
+                                  href: formData.payment_test_mode ? field.help_url_test || field.help_url : field.help_url_live || field.help_url,
                                   target: "_blank",
                                   rel: "noopener noreferrer",
                                   className: "ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent",
@@ -19603,6 +19614,27 @@ const Settings = () => {
                                 }
                               )
                             ] })
+                          ] }, field.id);
+                        }
+                        if (field.type === "select" && field.options) {
+                          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              FormField,
+                              {
+                                id: `${gatewayId}_${field.id}`,
+                                label: field.label,
+                                description: field.description,
+                                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  Select,
+                                  {
+                                    value: config[field.id] ?? field.default ?? "",
+                                    onChange: (e) => handleGatewayConfigChange(gatewayId, field.id, e.target.value),
+                                    children: Object.entries(field.options).map(([value, label]) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value, children: label }, value))
+                                  }
+                                )
+                              }
+                            ),
+                            field.help_text && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-blue-600 dark:text-blue-400", children: field.help_text })
                           ] }, field.id);
                         }
                         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
@@ -19615,7 +19647,7 @@ const Settings = () => {
                               children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                                 Input,
                                 {
-                                  type: field.type,
+                                  type: field.type === "email" ? "email" : field.type,
                                   value: config[field.id] ?? field.default ?? "",
                                   onChange: (e) => handleGatewayConfigChange(gatewayId, field.id, field.type === "number" ? parseFloat(e.target.value) || 0 : e.target.value),
                                   placeholder: field.placeholder,
@@ -19627,10 +19659,10 @@ const Settings = () => {
                           ),
                           field.help_text && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-600 dark:text-blue-400", children: [
                             field.help_text,
-                            field.help_url && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            (field.help_url || field.help_url_test || field.help_url_live) && /* @__PURE__ */ jsxRuntimeExports.jsx(
                               "a",
                               {
-                                href: field.help_url,
+                                href: formData.payment_test_mode ? field.help_url_test || field.help_url : field.help_url_live || field.help_url,
                                 target: "_blank",
                                 rel: "noopener noreferrer",
                                 className: "ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent transition-colors",

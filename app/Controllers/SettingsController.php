@@ -50,6 +50,7 @@ class SettingsController extends BaseController
         
         // Payment Settings
         'currency' => 'USD',
+        'payment_test_mode' => true,
         'payment_gateways' => [],
         'payment_methods' => [],
         'partial_payment' => false,

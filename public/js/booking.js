@@ -31,6 +31,9 @@
         const currency = window.yatraBookingData?.currency || $('input[name="currency"]').val() || 'USD';
         const depositPercentage = window.yatraBookingData?.depositPercentage || 20;
         const partialPercentage = window.yatraBookingData?.partialPercentage || 30;
+        
+        // Coupon state
+        let appliedCoupon = null;
 
         // Country options for dynamically added travelers
         const countryOptions = generateCountryOptions();
@@ -705,7 +708,8 @@
             // Toggle gateway-specific content containers
             $('.yatra-gateway-extra').removeClass('active');
             const $gatewayExtra = $('#yatra-gateway-extra-' + gateway);
-            if ($gatewayExtra.length) {
+            // Only show if it has content (children elements)
+            if ($gatewayExtra.length && $gatewayExtra.children().length > 0) {
                 $gatewayExtra.addClass('active');
             }
         });
@@ -714,6 +718,98 @@
         const $defaultGateway = $('input[name="payment_gateway"]:checked');
         if ($defaultGateway.length) {
             $defaultGateway.trigger('change');
+        }
+
+        /**
+         * ============================================
+         * CENTRALIZED PAYMENT GATEWAY HOOK SYSTEM
+         * ============================================
+         * 
+         * Events:
+         * - yatra_booking_submit: Fired when form is submitted, gateways can intercept
+         * - yatra_payment_response: Fired when server responds with payment data
+         * - yatra_payment_success: Fired when payment completes successfully
+         * - yatra_payment_failed: Fired when payment fails
+         * - yatra_payment_cancelled: Fired when user cancels payment
+         */
+        
+        // Store for registered gateway handlers
+        window.yatraPaymentGateways = window.yatraPaymentGateways || {};
+        
+        /**
+         * Register a payment gateway handler
+         * @param {string} gatewayId - Gateway identifier (e.g., 'stripe', 'razorpay')
+         * @param {object} handler - Handler object with methods: canHandle, handlePayment
+         */
+        window.yatraRegisterPaymentGateway = function(gatewayId, handler) {
+            console.log('[Yatra] Registering payment gateway:', gatewayId);
+            window.yatraPaymentGateways[gatewayId] = handler;
+        };
+        
+        /**
+         * Handle payment response from server
+         */
+        function handlePaymentResponse(response, originalBtnHtml) {
+            console.log('[Yatra Booking] Response:', response);
+            
+            if (!response.success) {
+                showFormError(response.message || 'An error occurred. Please try again.');
+                $submitBtn.prop('disabled', false).html(originalBtnHtml);
+                return;
+            }
+            
+            const data = response.data || {};
+            console.log('[Yatra Booking] Response data:', data);
+            
+            // Check for redirect URLs first (PayPal, eSewa, Khalti, etc.)
+            if (data.payment_url) {
+                console.log('[Yatra Booking] Redirecting to payment_url:', data.payment_url);
+                window.location.href = data.payment_url;
+                return;
+            }
+            
+            if (data.redirect_url && !data.requires_action) {
+                console.log('[Yatra Booking] Redirecting to redirect_url:', data.redirect_url);
+                window.location.href = data.redirect_url;
+                return;
+            }
+            
+            // Check for client-side payment actions (Stripe, Razorpay, Square, etc.)
+            if (data.requires_action) {
+                console.log('[Yatra Booking] requires_action detected:', data.requires_action);
+                
+                // Dispatch unified payment event
+                const paymentEvent = new CustomEvent('yatra_payment_response', {
+                    detail: {
+                        ...data,
+                        originalBtnHtml,
+                        resetButton: () => $submitBtn.prop('disabled', false).html(originalBtnHtml)
+                    }
+                });
+                document.dispatchEvent(paymentEvent);
+                
+                // Setup failure/cancel listeners
+                const cleanup = () => {
+                    document.removeEventListener('yatra_payment_failed', onFailed);
+                    document.removeEventListener('yatra_payment_cancelled', onCancelled);
+                };
+                const onFailed = (e) => {
+                    showFormError(e.detail?.error || 'Payment failed. Please try again.');
+                    $submitBtn.prop('disabled', false).html(originalBtnHtml);
+                    cleanup();
+                };
+                const onCancelled = () => {
+                    $submitBtn.prop('disabled', false).html(originalBtnHtml);
+                    cleanup();
+                };
+                document.addEventListener('yatra_payment_failed', onFailed, { once: true });
+                document.addEventListener('yatra_payment_cancelled', onCancelled, { once: true });
+                return;
+            }
+            
+            // Default: show success message
+            const reference = data.reference || 'N/A';
+            showSuccessMessage(response.message || 'Success!', reference);
         }
 
         // Form submission - using FormData API
@@ -726,6 +822,7 @@
             }
 
             const originalBtnHtml = $submitBtn.html();
+            const selectedGateway = $('input[name="payment_gateway"]:checked').val();
             
             // Collect form data using FormData API
             const formData = new FormData(this);
@@ -744,23 +841,33 @@
             bookingData.amount_paid = summary.amountPaid ?? null;
             bookingData.currency = window.yatraBookingData?.currency || bookingData.currency || $('input[name="currency"]').val() || 'USD';
 
-            // Allow payment gateways (e.g., Stripe) to intercept submission
-            const beforeSubmitEvent = new CustomEvent('yatraBeforeBookingSubmit', {
+            // Dispatch unified booking submit event - gateways can intercept
+            const submitEvent = new CustomEvent('yatra_booking_submit', {
                 detail: {
+                    gateway: selectedGateway,
                     form: this,
                     bookingData,
                     submitButton: $submitBtn[0],
-                    originalBtnHtml
+                    originalBtnHtml,
+                    // Helper to proceed with default submission
+                    proceedWithSubmission: () => submitBookingToServer(bookingData, originalBtnHtml)
                 },
                 cancelable: true
             });
-
-            const handledByGateway = !document.dispatchEvent(beforeSubmitEvent);
-            if (handledByGateway) {
-                return;
+            
+            console.log('[Yatra Booking] Dispatching yatra_booking_submit for gateway:', selectedGateway);
+            const shouldProceed = document.dispatchEvent(submitEvent);
+            
+            // If event was not cancelled, proceed with server submission
+            if (shouldProceed) {
+                submitBookingToServer(bookingData, originalBtnHtml);
             }
-
-            // Server handles session type detection - same endpoint for both flows
+        });
+        
+        /**
+         * Submit booking to server
+         */
+        function submitBookingToServer(bookingData, originalBtnHtml) {
             // Show loading state
             $submitBtn.prop('disabled', true).html(
                 '<svg class="animate-spin" style="display: inline-block; width: 20px; height: 20px; margin-right: 8px; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
@@ -778,27 +885,13 @@
                 body: JSON.stringify(bookingData)
             })
             .then(response => response.json())
-            .then(response => {
-                if (response.success) {
-                    if (response.data && response.data.payment_url) {
-                        window.location.href = response.data.payment_url;
-                    } else if (response.data && response.data.redirect_url) {
-                        window.location.href = response.data.redirect_url;
-                    } else {
-                        const reference = response.data?.reference || 'N/A';
-                        showSuccessMessage(response.message || 'Success!', reference);
-                    }
-                } else {
-                    showFormError(response.message || 'An error occurred. Please try again.');
-                    $submitBtn.prop('disabled', false).html(originalBtnHtml);
-                }
-            })
+            .then(response => handlePaymentResponse(response, originalBtnHtml))
             .catch(error => {
                 console.error('Error:', error);
                 showFormError('An error occurred. Please try again.');
                 $submitBtn.prop('disabled', false).html(originalBtnHtml);
             });
-        });
+        }
         
         // Apply coupon
         $('#yatra-apply-coupon').on('click', function() {

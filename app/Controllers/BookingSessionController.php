@@ -135,6 +135,108 @@ class BookingSessionController extends BaseController
             'callback' => [$this, 'remove_coupon'],
             'permission_callback' => '__return_true',
         ]);
+        
+        // Complete payment for client-side gateways (Square, etc.)
+        register_rest_route($this->namespace, '/payment/(?P<gateway>[a-z_]+)/complete', [
+            'methods' => 'POST',
+            'callback' => [$this, 'complete_gateway_payment'],
+            'permission_callback' => '__return_true',
+        ]);
+    }
+    
+    /**
+     * Complete payment for client-side payment gateways
+     * Used by Square, and other gateways that tokenize on client
+     */
+    public function complete_gateway_payment(WP_REST_Request $request): WP_REST_Response
+    {
+        $gateway_id = $request->get_param('gateway');
+        $data = $request->get_json_params();
+        
+        $booking_id = $data['booking_id'] ?? 0;
+        $source_id = $data['source_id'] ?? '';
+        $amount = $data['amount'] ?? 0;
+        $currency = $data['currency'] ?? 'USD';
+        
+        if (empty($booking_id) || empty($source_id)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Missing required payment data.', 'yatra'),
+            ], 400);
+        }
+        
+        // Get the gateway
+        $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+        $gateway = $registry->get($gateway_id);
+        
+        if (!$gateway) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Invalid payment gateway.', 'yatra'),
+            ], 400);
+        }
+        
+        // Check if gateway has createPayment method
+        if (!method_exists($gateway, 'createPayment')) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Gateway does not support this payment method.', 'yatra'),
+            ], 400);
+        }
+        
+        // Create the payment
+        $result = $gateway->createPayment([
+            'source_id' => $source_id,
+            'booking_id' => $booking_id,
+            'amount' => $amount,
+            'currency' => $currency,
+        ]);
+        
+        if (!$result['success']) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $result['error'] ?? __('Payment failed.', 'yatra'),
+            ], 400);
+        }
+        
+        // Update booking payment status
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $booking = $bookingRepository->find($booking_id);
+        
+        if ($booking) {
+            // Record the payment using PaymentRepository
+            $paymentRepository = new \Yatra\Repositories\PaymentRepository();
+            $paymentRepository->create([
+                'booking_id' => $booking_id,
+                'amount' => $amount,
+                'currency' => $currency,
+                'gateway' => $gateway_id,
+                'transaction_id' => $result['transaction_id'] ?? '',
+                'status' => ($result['status'] ?? 'completed') === 'completed' ? 'completed' : 'pending',
+            ]);
+            
+            // Update booking status if payment is complete
+            if (($result['status'] ?? 'completed') === 'completed') {
+                // Get total paid amount
+                $total_paid = $paymentRepository->getTotalPaidForBooking($booking_id);
+                $total_amount = (float) $booking->total_amount;
+                
+                if ($total_paid >= $total_amount) {
+                    $bookingRepository->update($booking_id, ['status' => 'confirmed', 'payment_status' => 'paid']);
+                } else {
+                    $bookingRepository->update($booking_id, ['payment_status' => 'partial']);
+                }
+            }
+        }
+        
+        return new WP_REST_Response([
+            'success' => true,
+            'message' => __('Payment completed successfully.', 'yatra'),
+            'data' => [
+                'transaction_id' => $result['transaction_id'] ?? '',
+                'status' => $result['status'] ?? 'completed',
+            ],
+        ]);
     }
 
     /**
@@ -948,8 +1050,8 @@ class BookingSessionController extends BaseController
 
         // For online gateways, create payment intent and return redirect URL
         if (!$is_offline && $amount_due > 0) {
-            // Process payment based on gateway
-            $payment_result = $this->processPaymentGateway($payment_gateway, [
+            // Build payment params - merge with request data so gateways can access their own tokens
+            $payment_params = array_merge($data, [
                 'booking_id' => $booking_id,
                 'reference' => $booking_reference,
                 'amount' => $amount_due,
@@ -959,16 +1061,34 @@ class BookingSessionController extends BaseController
                 'trip_title' => $trip->title,
             ]);
             
-            if ($payment_result['success'] && !empty($payment_result['payment_url'])) {
-                return new WP_REST_Response([
-                    'success' => true,
-                    'message' => __('Booking created. Redirecting to payment...', 'yatra'),
-                    'data' => [
-                        'booking_id' => $booking_id,
-                        'reference' => $booking_reference,
-                        'payment_url' => $payment_result['payment_url'],
-                    ],
-                ]);
+            // Process payment based on gateway
+            $payment_result = $this->processPaymentGateway($payment_gateway, $payment_params);
+            
+            if ($payment_result['success']) {
+                // Handle redirect-based gateways (PayPal, eSewa, Khalti, etc.)
+                if (!empty($payment_result['payment_url'])) {
+                    return new WP_REST_Response([
+                        'success' => true,
+                        'message' => __('Booking created. Redirecting to payment...', 'yatra'),
+                        'data' => [
+                            'booking_id' => $booking_id,
+                            'reference' => $booking_reference,
+                            'payment_url' => $payment_result['payment_url'],
+                        ],
+                    ]);
+                }
+                
+                // Handle client-side payment gateways (Stripe, Razorpay, Square, etc.)
+                if (!empty($payment_result['requires_action'])) {
+                    return new WP_REST_Response([
+                        'success' => true,
+                        'message' => __('Booking created. Complete payment...', 'yatra'),
+                        'data' => array_merge([
+                            'booking_id' => $booking_id,
+                            'reference' => $booking_reference,
+                        ], $payment_result),
+                    ]);
+                }
             }
             
             // If payment processing failed but booking was created, still return success
@@ -1189,58 +1309,20 @@ class BookingSessionController extends BaseController
      */
     private function processPaymentGateway(string $gateway, array $params): array
     {
-        // Get gateway configuration
-        $gateway_configs = \Yatra\Services\SettingsService::get('gateway_configs', []);
-        $config = $gateway_configs[$gateway] ?? [];
-        
-        // Check if gateway is in test mode
-        $is_test_mode = !empty($config['test_mode']) || !empty($config['sandbox']);
-        
-        switch ($gateway) {
-            case 'stripe':
-                return $this->processStripePayment($params, $config, $is_test_mode);
-                
-            case 'paypal':
-                return $this->processPaymentWithGateway('paypal', $params, $config);
-                
-            case 'razorpay':
-                return $this->processPaymentWithGateway('razorpay', $params, $config);
-                
-            case 'mollie':
-                return $this->processPaymentWithGateway('mollie', $params, $config);
-                
-            case 'paystack':
-                return $this->processPaymentWithGateway('paystack', $params, $config);
-                
-            case 'square':
-                return $this->processPaymentWithGateway('square', $params, $config);
-                
-            case 'esewa':
-                return $this->processPaymentWithGateway('esewa', $params, $config);
-                
-            case 'khalti':
-                return $this->processPaymentWithGateway('khalti', $params, $config);
-                
-            case 'authorize_net':
-                return $this->processPaymentWithGateway('authorize_net', $params, $config);
-                
-            default:
-                return ['success' => false, 'message' => 'Unknown payment gateway'];
+        // Debug logging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Yatra] processPaymentGateway called with gateway: ' . $gateway);
+            error_log('[Yatra] Payment params: ' . print_r($params, true));
         }
-    }
-    
-    /**
-     * Process payment using PaymentGatewayRegistry
-     */
-    private function processStripePayment(array $params, array $config, bool $is_test): array
-    {
-        return $this->processPaymentWithGateway('stripe', $params, $config);
+        
+        // All gateways use the unified gateway system
+        return $this->processPaymentWithGateway($gateway, $params);
     }
     
     /**
      * Process payment using the proper gateway system
      */
-    private function processPaymentWithGateway(string $gatewayId, array $params, array $config): array
+    private function processPaymentWithGateway(string $gatewayId, array $params): array
     {
         try {
             $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
@@ -1254,25 +1336,24 @@ class BookingSessionController extends BaseController
                 return ['success' => false, 'message' => "Payment gateway '{$gatewayId}' is not available"];
             }
             
-            // Prepare payment data with additional Stripe-specific parameters
-            $paymentData = [
-                'amount' => $params['amount'],
-                'currency' => $params['currency'],
-                'booking_id' => $params['booking_id'],
-                'customer_email' => $params['customer_email'],
-                'customer_name' => $params['customer_name'] ?? '',
-                'description' => $params['trip_title'],
-                'reference' => $params['reference'] ?? '',
-                'return_url' => $this->getConfirmationUrl($params['reference']) . '?payment=success',
-                'cancel_url' => home_url('/book/?payment=cancelled&ref=' . $params['reference']),
+            // Prepare payment data - pass all params, gateways extract what they need
+            $paymentData = array_merge($params, [
+                'description' => $params['trip_title'] ?? '',
+                'return_url' => $this->getConfirmationUrl($params['reference'] ?? '') . '?payment=success',
+                'cancel_url' => home_url('/book/?payment=cancelled&ref=' . ($params['reference'] ?? '')),
                 'metadata' => [
                     'booking_id' => $params['booking_id'],
                     'reference' => $params['reference'] ?? ''
                 ]
-            ];
+            ]);
             
             // Process the payment through the gateway
             $result = $gateway->processPayment($paymentData);
+            
+            // Debug logging
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[Yatra Payment] Gateway: ' . $gatewayId . ' Result: ' . print_r($result, true));
+            }
             
             if ($result['success']) {
                 // Save transaction ID for tracking
@@ -1283,37 +1364,34 @@ class BookingSessionController extends BaseController
                     );
                 }
                 
-                // For gateways that return a direct redirect URL (like PayPal)
-                if (!empty($result['redirect_url'])) {
-                    return [
-                        'success' => true, 
-                        'payment_url' => $result['redirect_url']
-                    ];
+                // For gateways that require client-side action (Stripe, Razorpay, etc.)
+                // Payment will be recorded after client completes the action
+                if (!empty($result['requires_action'])) {
+                    return array_merge(['success' => true], $result);
                 }
                 
-                // For Stripe with client-side confirmation
-                if (!empty($result['client_secret'])) {
-                    // Create a payment processing page URL with the client secret
-                    $payment_url = add_query_arg([
-                        'gateway' => $gatewayId,
-                        'client_secret' => $result['client_secret'],
-                        'publishable_key' => $result['publishable_key'] ?? '',
-                        'booking_ref' => $params['reference'],
-                        'amount' => $params['amount'],
-                        'currency' => $params['currency'] ?? 'USD',
-                    ], home_url('/yatra-payment/process/'));
+                // For gateways that return a redirect URL for external payment (PayPal, eSewa, Khalti)
+                // Payment will be recorded on callback/return
+                if (!empty($result['redirect_url']) || !empty($result['payment_url'])) {
+                    // Check if this is a completed payment with redirect (like Square)
+                    // vs pending external payment (like PayPal)
+                    $isCompletedPayment = !empty($result['transaction_id']) && 
+                        (($result['status'] ?? '') === 'completed' || ($result['status'] ?? '') === 'succeeded');
+                    
+                    if ($isCompletedPayment) {
+                        $this->recordGatewayPayment($params, $result, $gatewayId);
+                    }
                     
                     return [
                         'success' => true, 
-                        'payment_url' => $payment_url,
-                        'client_secret' => $result['client_secret']
+                        'payment_url' => $result['redirect_url'] ?? $result['payment_url']
                     ];
                 }
                 
-                // For offline gateways or successful direct payments
+                // For offline gateways or successful direct payments without redirect
                 return [
                     'success' => true, 
-                    'redirect_url' => $this->getConfirmationUrl($params['reference'])
+                    'redirect_url' => $this->getConfirmationUrl($params['reference'] ?? '')
                 ];
             }
             
@@ -1329,7 +1407,7 @@ class BookingSessionController extends BaseController
             
             return [
                 'success' => false, 
-                'message' => $result['message'] ?? 'Payment processing failed. Please try again.'
+                'message' => $result['message'] ?? $result['error'] ?? 'Payment processing failed. Please try again.'
             ];
             
         } catch (\Exception $e) {
@@ -1341,6 +1419,98 @@ class BookingSessionController extends BaseController
                 'success' => false, 
                 'message' => 'An unexpected error occurred. Please try again or contact support.'
             ];
+        }
+    }
+    
+    /**
+     * Record payment from gateway result
+     * Matches Stripe's completePayment behavior
+     */
+    private function recordGatewayPayment(array $params, array $result, string $gatewayId): void
+    {
+        global $wpdb;
+        
+        try {
+            $bookingId = (int) $params['booking_id'];
+            $amount = (float) ($params['amount'] ?? 0);
+            $currency = $params['currency'] ?? 'USD';
+            $transactionId = $result['transaction_id'] ?? '';
+            
+            // Get booking
+            $booking = $this->bookingRepository->find($bookingId);
+            if (!$booking || $booking->payment_status === 'paid') {
+                return;
+            }
+            
+            // Record the payment
+            $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+            $wpdb->insert(
+                $payments_table,
+                [
+                    'booking_id' => $bookingId,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'gateway' => $gatewayId,
+                    'transaction_id' => $transactionId,
+                    'status' => 'completed',
+                    'created_at' => current_time('mysql'),
+                ],
+                ['%d', '%f', '%s', '%s', '%s', '%s', '%s']
+            );
+            
+            // Calculate total paid
+            $paymentRepository = new \Yatra\Repositories\PaymentRepository();
+            $totalPaid = $paymentRepository->getTotalPaidForBooking($bookingId);
+            $totalAmount = (float) $booking->total_amount;
+            
+            error_log("[Yatra] Booking {$bookingId}: totalPaid={$totalPaid}, totalAmount={$totalAmount}, amountDue=" . ($booking->amount_due ?? 'null'));
+            
+            // Update booking status
+            $bookings_table = $wpdb->prefix . 'yatra_bookings';
+            if ($totalPaid >= $totalAmount) {
+                $wpdb->update(
+                    $bookings_table,
+                    [
+                        'payment_status' => 'paid',
+                        'amount_paid' => $totalPaid,
+                        'amount_due' => 0,
+                        'status' => 'confirmed',
+                        'confirmed_at' => current_time('mysql'),
+                    ],
+                    ['id' => $bookingId],
+                    ['%s', '%f', '%f', '%s', '%s'],
+                    ['%d']
+                );
+            } else {
+                // Partial payment - confirm booking but mark payment as partial
+                $wpdb->update(
+                    $bookings_table,
+                    [
+                        'payment_status' => 'partial',
+                        'amount_paid' => $totalPaid,
+                        'amount_due' => $totalAmount - $totalPaid,
+                        'status' => 'confirmed',
+                        'confirmed_at' => $booking->confirmed_at ?: current_time('mysql'),
+                    ],
+                    ['id' => $bookingId],
+                    ['%s', '%f', '%f', '%s', '%s'],
+                    ['%d']
+                );
+            }
+            
+            // Fire payment completed action
+            do_action('yatra_payment_completed', [
+                'booking_id' => $bookingId,
+                'transaction_id' => $transactionId,
+                'amount' => $amount,
+                'currency' => $currency,
+                'gateway' => $gatewayId,
+            ]);
+            
+            error_log("[Yatra] Payment recorded for booking {$bookingId}: {$amount} {$currency} via {$gatewayId}");
+            
+        } catch (\Exception $e) {
+            error_log("[Yatra] Failed to record payment: " . $e->getMessage());
         }
     }
     

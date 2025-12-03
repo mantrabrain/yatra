@@ -27,6 +27,9 @@ class RazorpayGateway extends AbstractPaymentGateway
                 'description' => __('Your Razorpay key ID', 'yatra'),
                 'placeholder' => 'rzp_test_...',
                 'default' => '',
+                'help_url_test' => 'https://razorpay.com/docs/payments/payments/test-mode/',
+                'help_url_live' => 'https://dashboard.razorpay.com/app/keys',
+                'help_text' => __('Get your API keys from Razorpay Dashboard > Settings > API Keys', 'yatra'),
             ],
             [
                 'id' => 'key_secret',
@@ -35,7 +38,41 @@ class RazorpayGateway extends AbstractPaymentGateway
                 'description' => __('Your Razorpay key secret', 'yatra'),
                 'placeholder' => '...',
                 'default' => '',
+                'help_url_test' => 'https://razorpay.com/docs/payments/payments/test-mode/',
+                'help_url_live' => 'https://dashboard.razorpay.com/app/keys',
+                'help_text' => __('Get your API keys from Razorpay Dashboard > Settings > API Keys', 'yatra'),
             ],
+        ];
+    }
+    
+    /**
+     * Register gateway scripts for frontend
+     */
+    public function enqueueScripts(): void
+    {
+        if (!$this->isAvailable()) {
+            return;
+        }
+        
+        $gatewayDir = plugin_dir_url(__FILE__);
+        
+        wp_enqueue_script(
+            'yatra-razorpay',
+            $gatewayDir . 'razorpay.js',
+            ['jquery'],
+            YATRA_VERSION,
+            true
+        );
+    }
+    
+    /**
+     * Get frontend data for JavaScript
+     */
+    public function getFrontendData(): array
+    {
+        return [
+            'key_id' => $this->config['key_id'] ?? '',
+            'currency' => 'INR',
         ];
     }
 
@@ -49,9 +86,19 @@ class RazorpayGateway extends AbstractPaymentGateway
 
     public function processPayment(array $paymentData): array
     {
+        // Check if API keys are configured
+        if (empty($this->config['key_id']) || empty($this->config['key_secret'])) {
+            error_log('[Yatra Razorpay] API keys not configured');
+            return [
+                'success' => false,
+                'error' => __('Razorpay API keys are not configured. Please configure them in settings.', 'yatra'),
+            ];
+        }
+        
         $amount = (int) (($paymentData['amount'] ?? 0) * 100);
         $currency = $paymentData['currency'] ?? 'INR';
         $bookingId = $paymentData['booking_id'] ?? 0;
+        $reference = $paymentData['reference'] ?? $bookingId;
         $customerEmail = $paymentData['customer_email'] ?? '';
         $customerName = $paymentData['customer_name'] ?? '';
         $saveCard = !empty($paymentData['save_card']) && !empty($this->config['save_cards']);
@@ -65,17 +112,23 @@ class RazorpayGateway extends AbstractPaymentGateway
                 'customer_email' => $customerEmail,
             ],
         ];
+        
+        error_log('[Yatra Razorpay] Creating order: ' . wp_json_encode($orderData));
 
         $response = $this->makeRequest("{$this->apiBase}/orders", [
             'method' => 'POST',
             'headers' => $this->getHeaders(),
             'body' => wp_json_encode($orderData),
         ]);
+        
+        error_log('[Yatra Razorpay] Order response: ' . wp_json_encode($response));
 
         if (!$response['success'] || empty($response['body']['id'])) {
+            $errorMsg = $response['body']['error']['description'] ?? ($response['error'] ?? __('Failed to create order', 'yatra'));
+            error_log('[Yatra Razorpay] Order creation failed: ' . $errorMsg);
             return [
                 'success' => false,
-                'error' => $response['body']['error']['description'] ?? __('Failed to create order', 'yatra'),
+                'error' => $errorMsg,
             ];
         }
 
@@ -89,14 +142,24 @@ class RazorpayGateway extends AbstractPaymentGateway
                 $customerId = $customerResult['customer_id'];
             }
         }
+        
+        $orderId = $response['body']['id'];
+        $confirmationUrl = home_url('/booking-confirmation/' . $reference . '/');
 
+        // Return data for client-side Razorpay checkout
+        // The frontend JS (razorpay.js) will handle opening the checkout
         return [
             'success' => true,
-            'order_id' => $response['body']['id'],
+            'requires_action' => 'razorpay_checkout',
+            'order_id' => $orderId,
             'key_id' => $this->config['key_id'] ?? '',
             'amount' => $amount,
             'currency' => $currency,
             'customer_id' => $customerId,
+            'customer_name' => $customerName,
+            'customer_email' => $customerEmail,
+            'booking_ref' => $reference,
+            'confirmation_url' => $confirmationUrl,
             'save_card' => $saveCard,
         ];
     }
@@ -395,12 +458,15 @@ class RazorpayGateway extends AbstractPaymentGateway
     public function handleWebhook(array $data): array
     {
         $payload = $data['raw_body'] ?? '';
+        $postData = $data['post_data'] ?? [];
         $event = json_decode($payload, true);
         $eventType = $event['event'] ?? '';
 
         switch ($eventType) {
             case 'payment.captured':
-                do_action('yatra_razorpay_payment_captured', $event['payload']['payment']['entity'] ?? []);
+                $paymentEntity = $event['payload']['payment']['entity'] ?? [];
+                $this->completePaymentFromWebhook($paymentEntity);
+                do_action('yatra_razorpay_payment_captured', $paymentEntity);
                 break;
                 
             case 'payment.failed':
@@ -417,6 +483,131 @@ class RazorpayGateway extends AbstractPaymentGateway
         }
 
         return ['success' => true, 'event_type' => $eventType];
+    }
+    
+    /**
+     * Check if this gateway should handle the return request
+     * Razorpay returns with razorpay_payment_id parameter
+     */
+    public function shouldHandleReturn(array $params): bool
+    {
+        return !empty($params['razorpay_payment_id']) && !empty($params['razorpay_order_id']);
+    }
+    
+    /**
+     * Handle payment return from Razorpay
+     */
+    public function handlePaymentReturn($booking, $bookingRepository): void
+    {
+        $paymentId = sanitize_text_field($_GET['razorpay_payment_id'] ?? '');
+        $orderId = sanitize_text_field($_GET['razorpay_order_id'] ?? '');
+        $signature = sanitize_text_field($_GET['razorpay_signature'] ?? '');
+        
+        if (empty($paymentId) || empty($orderId)) {
+            return;
+        }
+        
+        // Verify signature
+        $expectedSignature = hash_hmac('sha256', $orderId . '|' . $paymentId, $this->config['key_secret'] ?? '');
+        
+        if (!hash_equals($expectedSignature, $signature)) {
+            $this->log('Razorpay signature verification failed', [
+                'order_id' => $orderId,
+                'payment_id' => $paymentId,
+            ]);
+            return;
+        }
+        
+        // Verify payment status
+        $result = $this->verifyPayment($paymentId);
+        
+        if ($result['success'] && $result['status'] === 'captured') {
+            $this->completePayment($booking, $bookingRepository, $paymentId, $result);
+        }
+    }
+    
+    /**
+     * Complete payment from webhook
+     */
+    private function completePaymentFromWebhook(array $paymentEntity): void
+    {
+        global $wpdb;
+        
+        $bookingId = $paymentEntity['notes']['booking_id'] ?? 0;
+        if (empty($bookingId)) {
+            return;
+        }
+        
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $booking = $bookingRepository->find((int) $bookingId);
+        
+        if (!$booking || $booking->payment_status === 'paid') {
+            return;
+        }
+        
+        $this->completePayment($booking, $bookingRepository, $paymentEntity['id'], [
+            'amount' => ($paymentEntity['amount'] ?? 0) / 100,
+            'currency' => strtoupper($paymentEntity['currency'] ?? 'INR'),
+        ]);
+    }
+    
+    /**
+     * Complete the payment and update booking status
+     */
+    private function completePayment($booking, $bookingRepository, string $transactionId, array $paymentData = []): void
+    {
+        global $wpdb;
+        
+        $bookingId = (int) $booking->id;
+        $amountDue = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
+        $amount = $paymentData['amount'] ?? $amountDue;
+        $currency = $paymentData['currency'] ?? ($booking->currency ?? 'INR');
+        
+        // Update booking payment status
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $wpdb->update(
+            $bookings_table,
+            [
+                'payment_status' => 'paid',
+                'amount_paid' => $booking->total_amount,
+                'amount_due' => 0,
+                'status' => 'confirmed',
+                'confirmed_at' => current_time('mysql'),
+            ],
+            ['id' => $bookingId],
+            ['%s', '%f', '%f', '%s', '%s'],
+            ['%d']
+        );
+        
+        // Record the payment
+        $payments_table = $wpdb->prefix . 'yatra_payments';
+        $wpdb->insert(
+            $payments_table,
+            [
+                'booking_id' => $bookingId,
+                'amount' => $amount,
+                'currency' => $currency,
+                'payment_gateway' => 'razorpay',
+                'transaction_id' => $transactionId,
+                'status' => 'completed',
+                'created_at' => current_time('mysql'),
+            ],
+            ['%d', '%f', '%s', '%s', '%s', '%s', '%s']
+        );
+        
+        $this->log('Razorpay payment completed', [
+            'booking_id' => $bookingId,
+            'transaction_id' => $transactionId,
+            'amount' => $amount,
+        ]);
+        
+        do_action('yatra_payment_completed', [
+            'booking_id' => $bookingId,
+            'transaction_id' => $transactionId,
+            'amount' => $amount,
+            'currency' => $currency,
+            'gateway' => 'razorpay',
+        ]);
     }
 }
 
