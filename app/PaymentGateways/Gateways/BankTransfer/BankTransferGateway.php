@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yatra\PaymentGateways\Gateways\Square;
+namespace Yatra\PaymentGateways\Gateways\BankTransfer;
 
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 

@@ -16,6 +16,7 @@ class MollieGateway extends AbstractPaymentGateway
     protected string $title = 'Mollie';
     protected string $description = 'Accept payments via Mollie - iDEAL, Credit Card, SEPA, and more';
     protected string $icon = 'icon.svg';
+    protected string $sandboxUrl = 'https://docs.mollie.com/overview/testing';
     protected array $supports = ['credit_card', 'debit_card', 'ideal', 'sepa', 'bancontact', 'sofort', 'refunds', 'webhooks'];
 
     private string $apiBase = 'https://api.mollie.com/v2';
@@ -32,13 +33,6 @@ class MollieGateway extends AbstractPaymentGateway
                 'default' => '',
                 'help_url' => 'https://my.mollie.com/dashboard/developers/api-keys',
                 'help_text' => __('Get your API key from Mollie Dashboard > Developers > API keys', 'yatra'),
-            ],
-            [
-                'id' => 'test_mode',
-                'type' => 'checkbox',
-                'label' => __('Test Mode', 'yatra'),
-                'description' => __('Enable test mode for development', 'yatra'),
-                'default' => '1',
             ],
             [
                 'id' => 'webhook_url',

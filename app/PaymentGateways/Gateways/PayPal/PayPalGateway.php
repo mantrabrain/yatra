@@ -12,6 +12,7 @@ class PayPalGateway extends AbstractPaymentGateway
     protected string $title = 'PayPal';
     protected string $description = 'Accept PayPal and credit card payments';
     protected string $icon = 'icon.svg';
+    protected string $sandboxUrl = 'https://developer.paypal.com/tools/sandbox/';
     protected array $supports = ['paypal', 'credit_card', 'refunds', 'recurring', 'tokenization', 'scheduled_payments'];
 
     public function getConfigFields(): array
@@ -37,26 +38,12 @@ class PayPalGateway extends AbstractPaymentGateway
                 'help_url' => 'https://developer.paypal.com/developer/applications/',
                 'help_text' => __('Get Client Secret from the same PayPal app you created', 'yatra'),
             ],
-            [
-                'id' => 'sandbox',
-                'type' => 'checkbox',
-                'label' => __('Sandbox Mode', 'yatra'),
-                'description' => __('Use PayPal sandbox for testing', 'yatra'),
-                'default' => true,
-            ],
-            [
-                'id' => 'save_payment_methods',
-                'type' => 'checkbox',
-                'label' => __('Save Payment Methods', 'yatra'),
-                'description' => __('Allow saving PayPal accounts for future payments', 'yatra'),
-                'default' => true,
-            ],
         ];
     }
 
     private function getBaseUrl(): string
     {
-        return !empty($this->config['sandbox']) 
+        return \Yatra\Services\SettingsService::isPaymentTestMode()
             ? 'https://api-m.sandbox.paypal.com' 
             : 'https://api-m.paypal.com';
     }

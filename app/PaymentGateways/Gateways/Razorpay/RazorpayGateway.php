@@ -12,6 +12,7 @@ class RazorpayGateway extends AbstractPaymentGateway
     protected string $title = 'Razorpay';
     protected string $description = 'Accept payments via Razorpay (India)';
     protected string $icon = 'icon.svg';
+    protected string $sandboxUrl = 'https://razorpay.com/docs/payments/payments/test-mode/';
     protected array $supports = ['credit_card', 'debit_card', 'upi', 'netbanking', 'wallet', 'recurring', 'tokenization', 'scheduled_payments'];
 
     private string $apiBase = 'https://api.razorpay.com/v1';
@@ -34,20 +35,6 @@ class RazorpayGateway extends AbstractPaymentGateway
                 'description' => __('Your Razorpay key secret', 'yatra'),
                 'placeholder' => '...',
                 'default' => '',
-            ],
-            [
-                'id' => 'test_mode',
-                'type' => 'checkbox',
-                'label' => __('Test Mode', 'yatra'),
-                'description' => __('Use Razorpay test keys', 'yatra'),
-                'default' => true,
-            ],
-            [
-                'id' => 'save_cards',
-                'type' => 'checkbox',
-                'label' => __('Save Cards for Recurring', 'yatra'),
-                'description' => __('Allow customers to save cards for future payments (requires Razorpay Tokens)', 'yatra'),
-                'default' => true,
             ],
         ];
     }

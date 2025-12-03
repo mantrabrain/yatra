@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yatra\PaymentGateways\Gateways\Square;
+namespace Yatra\PaymentGateways\Gateways\Khalti;
 
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
@@ -12,6 +12,7 @@ class KhaltiGateway extends AbstractPaymentGateway
     protected string $title = 'Khalti';
     protected string $description = 'Accept payments via Khalti (Nepal)';
     protected string $icon = 'khalti.svg';
+    protected string $sandboxUrl = 'https://docs.khalti.com/khalti-epayment/';
     protected array $supports = ['wallet', 'mobile_banking'];
 
     public function getConfigFields(): array
@@ -33,19 +34,12 @@ class KhaltiGateway extends AbstractPaymentGateway
                 'placeholder' => 'test_secret_key_...',
                 'default' => '',
             ],
-            [
-                'id' => 'test_mode',
-                'type' => 'checkbox',
-                'label' => __('Test Mode', 'yatra'),
-                'description' => __('Use Khalti sandbox for testing', 'yatra'),
-                'default' => true,
-            ],
         ];
     }
 
     private function getBaseUrl(): string
     {
-        return !empty($this->config['test_mode']) 
+        return \Yatra\Services\SettingsService::isPaymentTestMode()
             ? 'https://a.khalti.com/api/v2/epayment/initiate/' 
             : 'https://khalti.com/api/v2/epayment/initiate/';
     }

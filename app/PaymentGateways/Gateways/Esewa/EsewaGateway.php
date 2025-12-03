@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yatra\PaymentGateways\Gateways\Square;
+namespace Yatra\PaymentGateways\Gateways\Esewa;
 
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
@@ -12,6 +12,7 @@ class EsewaGateway extends AbstractPaymentGateway
     protected string $title = 'eSewa';
     protected string $description = 'Accept payments via eSewa (Nepal)';
     protected string $icon = 'esewa.svg';
+    protected string $sandboxUrl = 'https://developer.esewa.com.np/pages/Epay';
     protected array $supports = ['wallet'];
 
     public function getConfigFields(): array
@@ -32,19 +33,12 @@ class EsewaGateway extends AbstractPaymentGateway
                 'description' => __('Your eSewa secret key for verification', 'yatra'),
                 'default' => '',
             ],
-            [
-                'id' => 'test_mode',
-                'type' => 'checkbox',
-                'label' => __('Test Mode', 'yatra'),
-                'description' => __('Use eSewa sandbox for testing', 'yatra'),
-                'default' => true,
-            ],
         ];
     }
 
     private function getBaseUrl(): string
     {
-        return !empty($this->config['test_mode']) 
+        return \Yatra\Services\SettingsService::isPaymentTestMode()
             ? 'https://uat.esewa.com.np/epay/main' 
             : 'https://esewa.com.np/epay/main';
     }

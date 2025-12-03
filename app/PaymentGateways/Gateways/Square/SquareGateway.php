@@ -12,6 +12,7 @@ class SquareGateway extends AbstractPaymentGateway
     protected string $title = 'Square';
     protected string $description = 'Accept payments via Square';
     protected string $icon = 'icon.svg';
+    protected string $sandboxUrl = 'https://developer.squareup.com/docs/devtools/sandbox/overview';
     protected array $supports = ['credit_card', 'debit_card', 'refunds'];
 
     public function getConfigFields(): array
@@ -40,13 +41,6 @@ class SquareGateway extends AbstractPaymentGateway
                 'description' => __('Your Square location ID', 'yatra'),
                 'placeholder' => '...',
                 'default' => '',
-            ],
-            [
-                'id' => 'sandbox',
-                'type' => 'checkbox',
-                'label' => __('Sandbox Mode', 'yatra'),
-                'description' => __('Use Square sandbox for testing', 'yatra'),
-                'default' => true,
             ],
         ];
     }

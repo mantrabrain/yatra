@@ -16,6 +16,7 @@ class PaystackGateway extends AbstractPaymentGateway
     protected string $title = 'Paystack';
     protected string $description = 'Accept payments via Paystack - Cards, Bank Transfer, USSD, and more';
     protected string $icon = 'icon.svg';
+    protected string $sandboxUrl = 'https://paystack.com/docs/payments/test-payments/';
     protected array $supports = ['credit_card', 'debit_card', 'bank_transfer', 'ussd', 'mobile_money', 'refunds', 'webhooks'];
 
     private string $apiBase = 'https://api.paystack.co';
@@ -42,13 +43,6 @@ class PaystackGateway extends AbstractPaymentGateway
                 'default' => '',
                 'help_url' => 'https://dashboard.paystack.com/#/settings/developer',
                 'help_text' => __('Get your API keys from Paystack Dashboard > Settings > API Keys & Webhooks', 'yatra'),
-            ],
-            [
-                'id' => 'test_mode',
-                'type' => 'checkbox',
-                'label' => __('Test Mode', 'yatra'),
-                'description' => __('Enable test mode for development', 'yatra'),
-                'default' => '1',
             ],
             [
                 'id' => 'webhook_url',

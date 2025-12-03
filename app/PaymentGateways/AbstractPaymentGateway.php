@@ -14,6 +14,7 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
     protected string $title;
     protected string $description;
     protected string $icon = '';
+    protected string $sandboxUrl = '';
     protected bool $isOffline = false;
     protected array $supports = [];
     protected array $config = [];
@@ -73,6 +74,11 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
     public function isOffline(): bool
     {
         return $this->isOffline;
+    }
+
+    public function getSandboxUrl(): string
+    {
+        return $this->sandboxUrl;
     }
 
     public function getSupports(): array

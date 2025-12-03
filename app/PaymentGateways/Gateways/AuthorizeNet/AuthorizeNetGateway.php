@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yatra\PaymentGateways\Gateways\Square;
+namespace Yatra\PaymentGateways\Gateways\AuthorizeNet;
 
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
@@ -12,6 +12,7 @@ class AuthorizeNetGateway extends AbstractPaymentGateway
     protected string $title = 'Authorize.net';
     protected string $description = 'Accept payments via Authorize.net';
     protected string $icon = 'authorize-net.svg';
+    protected string $sandboxUrl = 'https://developer.authorize.net/hello_world/testing_guide.html';
     protected array $supports = ['credit_card', 'debit_card'];
 
     public function getConfigFields(): array
@@ -30,13 +31,6 @@ class AuthorizeNetGateway extends AbstractPaymentGateway
                 'label' => __('Transaction Key', 'yatra'),
                 'description' => __('Your Authorize.net transaction key', 'yatra'),
                 'default' => '',
-            ],
-            [
-                'id' => 'test_mode',
-                'type' => 'checkbox',
-                'label' => __('Test Mode', 'yatra'),
-                'description' => __('Use Authorize.net sandbox', 'yatra'),
-                'default' => true,
             ],
         ];
     }

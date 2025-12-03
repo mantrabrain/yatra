@@ -55,6 +55,7 @@ class SettingsService
         
         // Payment
         'currency' => 'USD',
+        'payment_test_mode' => true,
         'currency_position' => 'before',
         'thousand_separator' => ',',
         'decimal_separator' => '.',
@@ -457,6 +458,14 @@ class SettingsService
     public static function getCurrencyPosition(): string
     {
         return self::getString('currency_position', 'before');
+    }
+
+    /**
+     * Check if payment test mode is enabled
+     */
+    public static function isPaymentTestMode(): bool
+    {
+        return self::isEnabled('payment_test_mode');
     }
 
     /**

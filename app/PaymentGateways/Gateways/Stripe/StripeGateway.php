@@ -12,6 +12,7 @@ class StripeGateway extends AbstractPaymentGateway
     protected string $title = 'Stripe';
     protected string $description = 'Accept credit and debit cards via Stripe';
     protected string $icon = 'icon.svg';
+    protected string $sandboxUrl = 'https://stripe.com/docs/testing';
     protected array $supports = ['credit_card', 'debit_card', 'refunds', 'recurring', 'subscriptions', 'scheduled_payments'];
 
     private string $apiBase = 'https://api.stripe.com/v1';
@@ -48,20 +49,6 @@ class StripeGateway extends AbstractPaymentGateway
                 'default' => '',
                 'help_url' => 'https://dashboard.stripe.com/webhooks',
                 'help_text' => __('Create a webhook endpoint in Stripe Dashboard > Developers > Webhooks', 'yatra'),
-            ],
-            [
-                'id' => 'test_mode',
-                'type' => 'checkbox',
-                'label' => __('Test Mode', 'yatra'),
-                'description' => __('Use test API keys for development', 'yatra'),
-                'default' => true,
-            ],
-            [
-                'id' => 'save_cards',
-                'type' => 'checkbox',
-                'label' => __('Allow Saving Cards', 'yatra'),
-                'description' => __('Allow customers to save cards for future payments and recurring charges', 'yatra'),
-                'default' => true,
             ],
             [
                 'id' => 'enabled_methods',

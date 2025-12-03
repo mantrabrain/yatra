@@ -103,6 +103,7 @@ class PaymentGatewayRegistry
                 'title' => $gateway->getTitle(),
                 'description' => $gateway->getDescription(),
                 'icon' => $gateway->getIcon(),
+                'sandbox_url' => $gateway->getSandboxUrl(),
                 'is_offline' => $gateway->isOffline(),
                 'supports' => $gateway->getSupports(),
                 'fields' => $gateway->getConfigFields(),

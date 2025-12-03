@@ -41,6 +41,11 @@ interface PaymentGatewayInterface
     public function isOffline(): bool;
 
     /**
+     * Get sandbox/test mode documentation URL
+     */
+    public function getSandboxUrl(): string;
+
+    /**
      * Get supported features
      * @return array e.g., ['credit_card', 'refunds', 'recurring', 'tokenization', 'scheduled_payments']
      */

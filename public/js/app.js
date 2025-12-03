@@ -18440,6 +18440,7 @@ const Settings = () => {
     allow_waitlist: true,
     waitlist_auto_confirm: false,
     currency: "USD",
+    payment_test_mode: true,
     payment_gateways: ["stripe", "paypal"],
     payment_methods: ["credit_card", "paypal", "bank_transfer"],
     partial_payment: true,
@@ -18454,40 +18455,35 @@ const Settings = () => {
         description: "Accept credit and debit cards",
         api_key: "",
         api_secret: "",
-        webhook_secret: "",
-        test_mode: true
+        webhook_secret: ""
       },
       paypal: {
         enabled: true,
         title: "PayPal",
         description: "Accept PayPal payments",
         client_id: "",
-        client_secret: "",
-        sandbox: true
+        client_secret: ""
       },
       razorpay: {
         enabled: false,
         title: "Razorpay",
         description: "Accept payments via Razorpay",
         api_key: "",
-        api_secret: "",
-        test_mode: true
+        api_secret: ""
       },
       square: {
         enabled: false,
         title: "Square",
         description: "Accept payments via Square",
         api_key: "",
-        api_secret: "",
-        sandbox: true
+        api_secret: ""
       },
       authorize_net: {
         enabled: false,
         title: "Authorize.net",
         description: "Accept payments via Authorize.net",
         api_key: "",
-        api_secret: "",
-        test_mode: true
+        api_secret: ""
       },
       bank_transfer: {
         enabled: false,
@@ -18507,16 +18503,14 @@ const Settings = () => {
         title: "eSewa",
         description: "Accept payments via eSewa (Nepal)",
         api_key: "",
-        api_secret: "",
-        test_mode: true
+        api_secret: ""
       },
       khalti: {
         enabled: false,
         title: "Khalti",
         description: "Accept payments via Khalti (Nepal)",
         api_key: "",
-        api_secret: "",
-        test_mode: true
+        api_secret: ""
       },
       pay_later: {
         enabled: false,
@@ -19342,6 +19336,24 @@ const Settings = () => {
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Payment Gateways", "Payment Gateways") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg mb-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "checkbox",
+                id: "payment_test_mode",
+                checked: formData.payment_test_mode,
+                name: "payment_test_mode",
+                onChange: handleFieldChange,
+                className: "w-5 h-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "payment_test_mode", className: "font-semibold cursor-pointer text-amber-800 dark:text-amber-200", children: __("Test Mode", "Test Mode") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-amber-700 dark:text-amber-300 mt-0.5", children: __("Enable test/sandbox mode for all payment gateways. Use test API keys for development and testing. Disable this for live payments.", "Enable test/sandbox mode for all payment gateways. Use test API keys for development and testing. Disable this for live payments.") })
+            ] }),
+            formData.payment_test_mode && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-2 py-1 text-xs font-semibold bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 rounded", children: __("TEST", "TEST") })
+          ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-3.5 h-3.5" }),
             __("Drag and drop to reorder gateways. Use arrows for precise positioning.", "Drag and drop to reorder gateways. Use arrows for precise positioning.")
@@ -19405,7 +19417,18 @@ const Settings = () => {
                           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                             /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-sm font-semibold flex items-center gap-2", children: [
                               gateway.title,
-                              config.enabled && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-normal px-1.5 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded", children: __("Active", "Active") })
+                              config.enabled && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-normal px-1.5 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded", children: __("Active", "Active") }),
+                              formData.payment_test_mode && gateway.sandbox_url && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                "a",
+                                {
+                                  href: gateway.sandbox_url,
+                                  target: "_blank",
+                                  rel: "noopener noreferrer",
+                                  className: "text-xs font-normal px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded hover:bg-amber-200 dark:hover:bg-amber-800/40 transition-colors",
+                                  onClick: (e) => e.stopPropagation(),
+                                  children: __("Sandbox Docs →", "Sandbox Docs →")
+                                }
+                              )
                             ] }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: gateway.description })
                           ] })
