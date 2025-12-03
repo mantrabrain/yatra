@@ -14,6 +14,7 @@
         constructor() {
             console.log('[Yatra AuthorizeNet] Constructor called');
             this.config = window.yatraBookingData?.gateways?.authorize_net || {};
+            console.log('[Yatra AuthorizeNet] Config:', this.config);
             this.acceptJsLoaded = false;
             this.init();
         }
@@ -178,6 +179,7 @@
             
             console.log('[Yatra AuthorizeNet] Intercepting form submission');
             event.preventDefault();
+            event.stopImmediatePropagation(); // Prevent booking.js from also submitting
             
             const { bookingData, submitButton, originalBtnHtml } = event.detail;
             
@@ -232,6 +234,11 @@
 
         tokenizeCard(cardNumber, expMonth, expYear, cvv) {
             return new Promise((resolve, reject) => {
+                console.log('[Yatra AuthorizeNet] Tokenizing with config:', {
+                    apiLoginID: this.config.api_login_id,
+                    hasClientKey: !!this.config.public_client_key
+                });
+                
                 const authData = {
                     clientKey: this.config.public_client_key,
                     apiLoginID: this.config.api_login_id

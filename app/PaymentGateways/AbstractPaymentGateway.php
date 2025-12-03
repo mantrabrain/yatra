@@ -166,11 +166,17 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
 
         $body = wp_remote_retrieve_body($response);
         $code = wp_remote_retrieve_response_code($response);
+        
+        // Remove BOM (Byte Order Mark) that some APIs like Authorize.net return
+        $body = preg_replace('/^\xEF\xBB\xBF/', '', $body);
+        
+        // Try to decode JSON
+        $decoded = json_decode($body, true);
 
         return [
             'success' => $code >= 200 && $code < 300,
             'code' => $code,
-            'body' => json_decode($body, true) ?: $body,
+            'body' => $decoded !== null ? $decoded : $body,
         ];
     }
 

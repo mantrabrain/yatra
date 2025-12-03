@@ -99,6 +99,8 @@ class AuthorizeNetGateway extends AbstractPaymentGateway
 
     public function processPayment(array $paymentData): array
     {
+        error_log('[Yatra AuthorizeNet] processPayment called');
+        
         $bookingId = $paymentData['booking_id'] ?? 0;
         $reference = $paymentData['reference'] ?? '';
         $amount = number_format((float) ($paymentData['amount'] ?? 0), 2, '.', '');
@@ -108,6 +110,8 @@ class AuthorizeNetGateway extends AbstractPaymentGateway
         // Check if we have payment token from frontend (Accept.js)
         $dataDescriptor = $paymentData['authnet_data_descriptor'] ?? '';
         $dataValue = $paymentData['authnet_data_value'] ?? '';
+        
+        error_log('[Yatra AuthorizeNet] Token check - descriptor: ' . ($dataDescriptor ? 'present' : 'empty') . ', value: ' . ($dataValue ? 'present' : 'empty'));
         
         if (!empty($dataDescriptor) && !empty($dataValue)) {
             // Process payment with token
@@ -155,7 +159,15 @@ class AuthorizeNetGateway extends AbstractPaymentGateway
         $amount = number_format((float) ($paymentData['amount'] ?? 0), 2, '.', '');
         $bookingId = $paymentData['booking_id'] ?? 0;
         
+        error_log('[Yatra AuthorizeNet] createPayment called with: ' . print_r([
+            'data_descriptor' => $dataDescriptor,
+            'has_data_value' => !empty($dataValue),
+            'amount' => $amount,
+            'booking_id' => $bookingId,
+        ], true));
+        
         if (empty($dataDescriptor) || empty($dataValue)) {
+            error_log('[Yatra AuthorizeNet] Missing token data');
             return ['success' => false, 'error' => __('Payment token is required', 'yatra')];
         }
         
@@ -183,25 +195,38 @@ class AuthorizeNetGateway extends AbstractPaymentGateway
             ],
         ];
         
+        error_log('[Yatra AuthorizeNet] Sending request to: ' . $this->getApiUrl());
+        
         $response = $this->makeRequest($this->getApiUrl(), [
             'method' => 'POST',
             'headers' => ['Content-Type' => 'application/json'],
             'body' => wp_json_encode($request),
         ]);
         
+        error_log('[Yatra AuthorizeNet] API Response: ' . print_r($response, true));
+        
+        // Parse JSON body if it's a string
         $body = $response['body'] ?? [];
+        if (is_string($body)) {
+            $body = json_decode($body, true) ?: [];
+        }
+        
         $messages = $body['messages'] ?? [];
         $transactionResponse = $body['transactionResponse'] ?? [];
         
         if (($messages['resultCode'] ?? '') !== 'Ok') {
             $error = $messages['message'][0]['text'] ?? __('Payment failed', 'yatra');
+            error_log('[Yatra AuthorizeNet] Payment failed: ' . $error);
             return ['success' => false, 'error' => $error];
         }
         
         if (($transactionResponse['responseCode'] ?? '') !== '1') {
             $error = $transactionResponse['errors'][0]['errorText'] ?? __('Transaction declined', 'yatra');
+            error_log('[Yatra AuthorizeNet] Transaction declined: ' . $error);
             return ['success' => false, 'error' => $error];
         }
+        
+        error_log('[Yatra AuthorizeNet] Payment successful! Transaction ID: ' . ($transactionResponse['transId'] ?? ''));
         
         return [
             'success' => true,
