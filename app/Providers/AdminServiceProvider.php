@@ -131,7 +131,7 @@ class AdminServiceProvider extends ServiceProvider
         }
 
         if (file_exists($app_js)) {
-            $js_version = YATRA_VERSION . '.' . filemtime($app_js);
+            $js_version = YATRA_VERSION . '.' . filemtime($app_js) . '.currency-fix';
             // Enqueue our script with media library as dependency
             // Note: wp_enqueue_media() registers these scripts: media-models, media-views, etc.
             // We need to ensure they load before our React app
@@ -300,6 +300,7 @@ class AdminServiceProvider extends ServiceProvider
                 'isPro' => defined('YATRA_PRO_VERSION'),
                 'translations' => $translations,
                 'locale' => get_locale(),
+                'currency' => \Yatra\Services\SettingsService::getCurrency(),
             ]);
         }
     }

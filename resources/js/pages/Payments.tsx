@@ -27,6 +27,7 @@ interface Payment {
   customer_email: string;
   trip_title: string;
   amount: number;
+  currency?: string;
   payment_method: string;
   payment_status: 'pending' | 'completed' | 'failed' | 'refunded' | 'partial';
   transaction_id?: string;
@@ -44,6 +45,7 @@ const Payments: React.FC = () => {
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const defaultCurrency = (window as any)?.yatraAdmin?.currency || (window as any)?.yatraBookingData?.currency || 'USD';
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -110,6 +112,7 @@ const Payments: React.FC = () => {
           customer_email: payment.customer_email || '',
           trip_title: payment.trip_title || '',
           amount: payment.amount,
+          currency: payment.currency || 'USD',
           payment_method: payment.gateway,
           payment_status: payment.status,
           transaction_id: payment.transaction_id,
@@ -172,7 +175,7 @@ const Payments: React.FC = () => {
     });
   };
 
-  const formatPrice = (price: number, currencyCode: string = 'USD') => {
+  const formatPrice = (price: number, currencyCode: string = defaultCurrency) => {
     const symbol = getCurrencySymbol(currencyCode);
     const currencyData = getCurrency(currencyCode);
     const decimals = currencyData?.decimalDigits ?? 2;
@@ -513,7 +516,7 @@ const Payments: React.FC = () => {
                             </div>
                           </TableCell>
                           <TableCell className="font-semibold text-gray-900 dark:text-white">
-                            {formatPrice(payment.amount)}
+                            {formatPrice(payment.amount, payment.currency || defaultCurrency)}
                           </TableCell>
                           <TableCell className="text-gray-600 dark:text-gray-400">
                             {payment.payment_method}

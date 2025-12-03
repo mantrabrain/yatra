@@ -944,7 +944,7 @@ class BookingSessionController extends BaseController
                 'total_amount' => $total_amount,
                 'amount_paid' => 0,
                 'amount_due' => $amount_due,
-                'currency' => $trip->currency ?: 'USD',
+                'currency' => \Yatra\Services\SettingsService::getCurrency(),
                 'payment_method' => $payment_method,
                 'payment_gateway' => $payment_gateway,
                 'status' => 'pending',

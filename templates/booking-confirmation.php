@@ -248,6 +248,11 @@ get_header();
                         </div>
                     </div>
                     <?php endif; ?>
+
+                    <?php
+                    // Allow gateways to inject cards (e.g., Bank Transfer instructions)
+                    do_action('yatra_booking_confirmation_after_details', $booking);
+                    ?>
                 </div>
 
                 <!-- Right Column -->
@@ -328,12 +333,6 @@ get_header();
                     </div>
                 </div>
             </div>
-
-            <!-- Gateway-specific payment instructions -->
-            <?php
-            // Allow gateways to render their own confirmation content
-            do_action('yatra_booking_confirmation_after_details', $booking);
-            ?>
 
             <!-- What's Next Section -->
             <div class="yatra-confirmation-card yatra-whats-next">

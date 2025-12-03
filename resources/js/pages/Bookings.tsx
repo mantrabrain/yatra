@@ -30,6 +30,7 @@ interface Booking {
   travel_date: string;
   travelers: number;
   total_amount: number;
+  currency?: string;
   payment_status: string;
   booking_status: string;
   payment_method: string;
@@ -47,6 +48,7 @@ const Bookings: React.FC = () => {
   const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const defaultCurrency = (window as any)?.yatraAdmin?.currency || (window as any)?.yatraBookingData?.currency || 'USD';
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -103,23 +105,37 @@ const Bookings: React.FC = () => {
       const result = await response.json();
       
       if (result.success) {
+        // Debug: Log first 3 bookings to see what currency we're getting
+        if (result.data.length > 0) {
+          console.log('Bookings API Response - First 3:', result.data.slice(0, 3).map((b: any) => ({
+            id: b.id,
+            reference: b.reference,
+            currency: b.currency,
+            total_amount: b.total_amount
+          })));
+        }
+        
         // Map API response to expected format
-        const bookings = result.data.map((booking: any) => ({
-          id: booking.id,
-          booking_number: booking.reference,
-          customer_name: booking.customer_name || 'N/A',
-          customer_email: booking.customer_email,
-          trip_title: booking.trip_title || `Trip #${booking.trip_id}`,
-          trip_id: booking.trip_id,
-          booking_date: booking.created_at,
-          travel_date: booking.travel_date,
-          travelers: booking.travelers_count,
-          total_amount: booking.total_amount,
-          payment_status: booking.payment_status,
-          booking_status: booking.status,
-          payment_method: booking.payment_gateway,
-          created_at: booking.created_at,
-        }));
+        const bookings = result.data.map((booking: any) => {
+          console.log(`Booking ${booking.reference}: currency="${booking.currency}"`);
+          return {
+            id: booking.id,
+            booking_number: booking.reference,
+            customer_name: booking.customer_name || 'N/A',
+            customer_email: booking.customer_email,
+            trip_title: booking.trip_title || `Trip #${booking.trip_id}`,
+            trip_id: booking.trip_id,
+            booking_date: booking.created_at,
+            travel_date: booking.travel_date,
+            travelers: booking.travelers_count,
+            total_amount: booking.total_amount,
+            currency: booking.currency || 'USD',
+            payment_status: booking.payment_status,
+            booking_status: booking.status,
+            payment_method: booking.payment_gateway,
+            created_at: booking.created_at,
+          };
+        });
 
         return {
           data: bookings,
@@ -167,7 +183,7 @@ const Bookings: React.FC = () => {
     });
   };
 
-  const formatPrice = (price: number, currencyCode: string = 'USD') => {
+  const formatPrice = (price: number, currencyCode: string = defaultCurrency) => {
     const symbol = getCurrencySymbol(currencyCode);
     const currencyData = getCurrency(currencyCode);
     const decimals = currencyData?.decimalDigits ?? 2;
@@ -559,7 +575,7 @@ const Bookings: React.FC = () => {
                             {formatDate(booking.travel_date)}
                           </TableCell>
                           <TableCell className="font-medium">
-                            {formatPrice(booking.total_amount)}
+                            {formatPrice(booking.total_amount, booking.currency || defaultCurrency)}
                           </TableCell>
                           <TableCell>
                             {getPaymentStatusBadge(booking.payment_status)}

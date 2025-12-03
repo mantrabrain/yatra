@@ -11794,6 +11794,7 @@ const Skeleton = ({ className = "" }) => {
   );
 };
 const Bookings = () => {
+  var _a, _b;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [paymentFilter, setPaymentFilter] = reactExports.useState("all");
@@ -11804,6 +11805,7 @@ const Bookings = () => {
   const [bookingToDelete, setBookingToDelete] = reactExports.useState(null);
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
+  const defaultCurrency = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.currency) || ((_b = window == null ? void 0 : window.yatraBookingData) == null ? void 0 : _b.currency) || "USD";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -11825,7 +11827,7 @@ const Bookings = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["bookings", queryParams],
     queryFn: async () => {
-      var _a, _b;
+      var _a2, _b2;
       const params = new URLSearchParams();
       params.append("page", String(queryParams.page));
       params.append("per_page", String(queryParams.per_page));
@@ -11838,9 +11840,9 @@ const Bookings = () => {
       if (queryParams.payment_status) {
         params.append("payment_status", queryParams.payment_status);
       }
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/bookings?${params.toString()}`, {
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/bookings?${params.toString()}`, {
         headers: {
-          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
         }
       });
       if (!response.ok) {
@@ -11848,22 +11850,34 @@ const Bookings = () => {
       }
       const result = await response.json();
       if (result.success) {
-        const bookings2 = result.data.map((booking) => ({
-          id: booking.id,
-          booking_number: booking.reference,
-          customer_name: booking.customer_name || "N/A",
-          customer_email: booking.customer_email,
-          trip_title: booking.trip_title || `Trip #${booking.trip_id}`,
-          trip_id: booking.trip_id,
-          booking_date: booking.created_at,
-          travel_date: booking.travel_date,
-          travelers: booking.travelers_count,
-          total_amount: booking.total_amount,
-          payment_status: booking.payment_status,
-          booking_status: booking.status,
-          payment_method: booking.payment_gateway,
-          created_at: booking.created_at
-        }));
+        if (result.data.length > 0) {
+          console.log("Bookings API Response - First 3:", result.data.slice(0, 3).map((b) => ({
+            id: b.id,
+            reference: b.reference,
+            currency: b.currency,
+            total_amount: b.total_amount
+          })));
+        }
+        const bookings2 = result.data.map((booking) => {
+          console.log(`Booking ${booking.reference}: currency="${booking.currency}"`);
+          return {
+            id: booking.id,
+            booking_number: booking.reference,
+            customer_name: booking.customer_name || "N/A",
+            customer_email: booking.customer_email,
+            trip_title: booking.trip_title || `Trip #${booking.trip_id}`,
+            trip_id: booking.trip_id,
+            booking_date: booking.created_at,
+            travel_date: booking.travel_date,
+            travelers: booking.travelers_count,
+            total_amount: booking.total_amount,
+            currency: booking.currency || "USD",
+            payment_status: booking.payment_status,
+            booking_status: booking.status,
+            payment_method: booking.payment_gateway,
+            created_at: booking.created_at
+          };
+        });
         return {
           data: bookings2,
           total: result.meta.total,
@@ -11877,11 +11891,11 @@ const Bookings = () => {
   });
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
-      var _a, _b;
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/bookings/${id}`, {
+      var _a2, _b2;
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/bookings/${id}`, {
         method: "DELETE",
         headers: {
-          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
         }
       });
       if (!response.ok) {
@@ -11903,7 +11917,7 @@ const Bookings = () => {
       year: "numeric"
     });
   };
-  const formatPrice = (price, currencyCode = "USD") => {
+  const formatPrice = (price, currencyCode = defaultCurrency) => {
     const symbol = getCurrencySymbol(currencyCode);
     const currencyData = getCurrency(currencyCode);
     const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
@@ -11963,8 +11977,8 @@ const Bookings = () => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`, children: statusInfo.label });
   };
   const handleEdit = (booking) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=edit&id=${booking.id}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=edit&id=${booking.id}`;
   };
   const handleDelete = (booking) => {
     setBookingToDelete(booking);
@@ -11982,12 +11996,12 @@ const Bookings = () => {
     setBookingToDelete(null);
   };
   const handleView = (booking) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${booking.id}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${booking.id}`;
   };
   const handleCreateBooking = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=create`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=create`;
   };
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -12232,7 +12246,7 @@ const Bookings = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: booking.travelers }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(booking.booking_date) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(booking.travel_date) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(booking.total_amount) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(booking.total_amount, booking.currency || defaultCurrency) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getPaymentStatusBadge(booking.payment_status) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getBookingStatusBadge(booking.booking_status) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
@@ -30936,6 +30950,7 @@ const DiscountForm = () => {
   ] });
 };
 const Payments = () => {
+  var _a, _b;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [methodFilter, setMethodFilter] = reactExports.useState("all");
@@ -30944,6 +30959,7 @@ const Payments = () => {
   const [page, setPage] = reactExports.useState(1);
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
+  const defaultCurrency = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.currency) || ((_b = window == null ? void 0 : window.yatraBookingData) == null ? void 0 : _b.currency) || "USD";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -30965,7 +30981,7 @@ const Payments = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["payments", queryParams],
     queryFn: async () => {
-      var _a, _b;
+      var _a2, _b2;
       const params = new URLSearchParams();
       params.append("page", String(queryParams.page));
       params.append("per_page", String(queryParams.per_page));
@@ -30978,9 +30994,9 @@ const Payments = () => {
       if (queryParams.payment_method) {
         params.append("gateway", queryParams.payment_method);
       }
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/payments?${params.toString()}`, {
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/payments?${params.toString()}`, {
         headers: {
-          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
         }
       });
       if (!response.ok) {
@@ -30997,6 +31013,7 @@ const Payments = () => {
           customer_email: payment.customer_email || "",
           trip_title: payment.trip_title || "",
           amount: payment.amount,
+          currency: payment.currency || "USD",
           payment_method: payment.gateway,
           payment_status: payment.status,
           transaction_id: payment.transaction_id,
@@ -31017,11 +31034,11 @@ const Payments = () => {
   });
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
-      var _a, _b;
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/payments/${id}`, {
+      var _a2, _b2;
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/payments/${id}`, {
         method: "DELETE",
         headers: {
-          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
         }
       });
       if (!response.ok) {
@@ -31049,7 +31066,7 @@ const Payments = () => {
       year: "numeric"
     });
   };
-  const formatPrice = (price, currencyCode = "USD") => {
+  const formatPrice = (price, currencyCode = defaultCurrency) => {
     const symbol = getCurrencySymbol(currencyCode);
     const currencyData = getCurrency(currencyCode);
     const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
@@ -31088,8 +31105,8 @@ const Payments = () => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`, children: statusInfo.label });
   };
   const handleEdit = (payment) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=edit&id=${payment.id}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=edit&id=${payment.id}`;
   };
   const handleDelete = (payment) => {
     if (confirm(__("Are you sure you want to delete this payment?", "Are you sure you want to delete this payment?"))) {
@@ -31097,12 +31114,12 @@ const Payments = () => {
     }
   };
   const handleView = (payment) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=view&id=${payment.id}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=view&id=${payment.id}`;
   };
   const handleCreatePayment = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=create`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=create`;
   };
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -31340,7 +31357,7 @@ const Payments = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: payment.booking_number }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: payment.trip_title })
           ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-semibold text-gray-900 dark:text-white", children: formatPrice(payment.amount) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-semibold text-gray-900 dark:text-white", children: formatPrice(payment.amount, payment.currency || defaultCurrency) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: payment.payment_method }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(payment.payment_status) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(payment.payment_date) }),
