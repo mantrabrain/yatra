@@ -5,8 +5,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ChevronRight, ChevronDown, Edit, Trash2 } from 'lucide-react';
-import { SearchFilterToolbar } from '../components/shared';
+import { Plus, Edit, Trash2 } from 'lucide-react';
+import { SearchFilterToolbar, Table as SharedTable, BulkActionToolbar, Pagination } from '../components/shared';
+import { getDefaultBulkStatusOptions } from '../components/shared/bulkStatusOptions';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
@@ -15,8 +16,6 @@ import { Button } from '../components/ui/button';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { IconSelector } from '../components/ui/icon-selector';
 import type { IconPickerValue } from '../components/ui/icon-picker';
@@ -52,6 +51,21 @@ const Categories: React.FC = () => {
     isOpen: false,
     category: null,
   });
+  // Bulk action state
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const saved = localStorage.getItem('yatra_categories_columns');
+    return saved ? JSON.parse(saved) : {
+      name: true,
+      slug: true,
+      description: true,
+      status: true,
+      created_at: true,
+    };
+  });
+  
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
@@ -114,6 +128,120 @@ const Categories: React.FC = () => {
   });
 
   const categories = data?.data || [];
+  const total = data?.total || 0;
+  const totalPages = Math.ceil(total / 50);
+
+  // Toggle column visibility
+  const toggleColumn = (columnKey: string) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisibleColumns);
+    localStorage.setItem('yatra_categories_columns', JSON.stringify(newVisibleColumns));
+  };
+
+  // Status counts for bulk toolbar - count both parents and children
+  const statusCounts = useMemo(() => {
+    const counts = {
+      all: 0,
+      publish: 0,
+      draft: 0,
+      trash: 0,
+    };
+    
+    const countCategory = (cat: Category) => {
+      counts.all++;
+      if (cat.status === 'publish') counts.publish++;
+      else if (cat.status === 'draft') counts.draft++;
+      else if (cat.status === 'trash') counts.trash++;
+    };
+    
+    categories.forEach((cat: Category) => {
+      // Count parent category
+      countCategory(cat);
+      
+      // Count subcategories
+      if (cat.subcategories && Array.isArray(cat.subcategories)) {
+        cat.subcategories.forEach((sub: Category) => {
+          countCategory(sub);
+        });
+      }
+    });
+    
+    return counts;
+  }, [categories]);
+
+  // Bulk mutation for status changes and deletes
+  const bulkMutation = useMutation({
+    mutationFn: async ({ action, ids }: { action: string; ids: (string | number)[] }) => {
+      if (action === 'delete') {
+        await Promise.all(ids.map(id => apiClient.delete(`/trip-categories/${id}`)));
+      } else {
+        // Status change - fetch each category and update with full payload
+        await Promise.all(
+          ids.map(async (id) => {
+            try {
+              const categoryResponse = await apiClient.get(`/trip-categories/${id}`);
+              const category = categoryResponse;
+              if (!category || !category.name) {
+                return;
+              }
+
+              await apiClient.put(`/trip-categories/${id}`, {
+                name: category.name,
+                slug: category.slug,
+                description: category.description,
+                icon: category.icon,
+                parent_id: category.parent_id,
+                status: action,
+              });
+            } catch {
+              throw new Error('bulk_item_failed');
+            }
+          })
+        );
+      }
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['trip-categories'] });
+      const msgMap: Record<string, string> = {
+        delete: __('Selected categories deleted successfully', 'Selected categories deleted successfully'),
+        trash: __('Selected categories moved to trash', 'Selected categories moved to trash'),
+        draft: __('Selected categories marked as draft', 'Selected categories marked as draft'),
+        publish: __('Selected categories published', 'Selected categories published'),
+      };
+      showToast(msgMap[variables.action] || __('Bulk action completed', 'Bulk action completed'), 'success');
+      setSelectedIds([]);
+      setBulkAction('');
+    },
+    onError: (error: any, variables) => {
+      const msgMapError: Record<string, string> = {
+        delete: __('Failed to delete selected categories', 'Failed to delete selected categories'),
+        trash: __('Failed to move categories to trash', 'Failed to move categories to trash'),
+        draft: __('Failed to mark categories as draft', 'Failed to mark categories as draft'),
+        publish: __('Failed to publish categories', 'Failed to publish categories'),
+      };
+      showToast(
+        error?.message || msgMapError[variables.action] || __('Bulk action failed', 'Bulk action failed'),
+        'error'
+      );
+    },
+  });
+
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      return;
+    }
+
+    if (selectedIds.length === 0) {
+      showToast(__('Select at least one category.', 'Select at least one category.'), 'warning');
+      return;
+    }
+
+    bulkMutation.mutate({ action: bulkAction, ids: selectedIds });
+  };
 
   // Process categories for hierarchical display
   const processedCategories = useMemo(() => {
@@ -126,8 +254,35 @@ const Categories: React.FC = () => {
       subcategories: Array.isArray(cat.subcategories) ? cat.subcategories : [],
     }));
 
+    // Apply status filtering to both parents and children
+    const filterByStatus = (items: Category[]): Category[] => {
+      return items.map((cat: Category) => {
+        // Filter subcategories by status
+        const filteredSubcategories = cat.subcategories ? 
+          cat.subcategories.filter((sub: Category) => 
+            statusFilter === 'all' || sub.status === statusFilter
+          ) : [];
+
+        return {
+          ...cat,
+          subcategories: filteredSubcategories,
+        };
+      }).filter((cat: Category) => {
+        // Filter parent categories by status
+        if (statusFilter === 'all') return true;
+        
+        // Show parent if it matches status OR if it has children that match status
+        const parentMatches = cat.status === statusFilter;
+        const hasMatchingChildren = cat.subcategories && cat.subcategories.length > 0;
+        
+        return parentMatches || hasMatchingChildren;
+      });
+    };
+
+    const statusFiltered = filterByStatus(normalized);
+
     if (parentFilter === 'subcategories') {
-      const onlySubs: Category[] = normalized.flatMap((cat: Category) =>
+      const onlySubs: Category[] = statusFiltered.flatMap((cat: Category) =>
         (cat.subcategories || []).map(sub => ({
           ...sub,
           parent_name: cat.name,
@@ -139,11 +294,14 @@ const Categories: React.FC = () => {
     }
 
     if (parentFilter === 'top-level') {
-      return normalized;
+      return statusFiltered.map(cat => ({
+        ...cat,
+        subcategories: [], // Don't show subcategories when filtering for top-level only
+      }));
     }
 
-    return normalized;
-  }, [categories, parentFilter]);
+    return statusFiltered;
+  }, [categories, parentFilter, statusFilter]);
 
   // Expand all parent categories that have subcategories by default
   useEffect(() => {
@@ -238,13 +396,14 @@ const Categories: React.FC = () => {
     );
   };
 
-  const toggleExpand = (categoryId: number) => {
+  const toggleExpand = (categoryId: string | number) => {
+    const id = typeof categoryId === 'string' ? parseInt(categoryId, 10) : categoryId;
     setExpandedCategories(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(categoryId)) {
-        newSet.delete(categoryId);
+      if (newSet.has(id)) {
+        newSet.delete(id);
       } else {
-        newSet.add(categoryId);
+        newSet.add(id);
       }
       return newSet;
     });
@@ -254,9 +413,6 @@ const Categories: React.FC = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`;
   };
 
-  const handleDelete = (category: Category) => {
-    setDeleteConfirm({ isOpen: true, category });
-  };
 
   const confirmDelete = () => {
     if (deleteConfirm.category) {
@@ -279,87 +435,154 @@ const Categories: React.FC = () => {
 
   const hasFilters = searchTerm || statusFilter !== 'all' || parentFilter !== 'all' || sortBy !== 'name' || sortOrder !== 'asc';
 
-  const renderCategoryRow = (category: Category, isSubcategory: boolean = false) => {
-    const derivedSub = isSubcategory || !!category.__subOnly;
-    const hasSubcategories = !category.__subOnly && category.subcategories && category.subcategories.length > 0;
-    const isExpanded = expandedCategories.has(category.id);
+  // Define columns for the shared table
+  const columns = [
+    {
+      key: 'name',
+      label: __('Name', 'Name'),
+      sortable: true,
+      visible: visibleColumns.name,
+    },
+    {
+      key: 'slug',
+      label: __('Slug', 'Slug'),
+      visible: visibleColumns.slug,
+    },
+    {
+      key: 'description',
+      label: __('Description', 'Description'),
+      visible: visibleColumns.description,
+    },
+    {
+      key: 'status',
+      label: __('Status', 'Status'),
+      sortable: true,
+      visible: visibleColumns.status,
+    },
+    {
+      key: 'created_at',
+      label: __('Created', 'Created'),
+      sortable: true,
+      visible: visibleColumns.created_at,
+    },
+  ];
 
-    return (
-      <React.Fragment key={category.id}>
-        <TableRow className={derivedSub ? 'bg-gray-50 dark:bg-gray-900/50' : ''}>
-          <TableCell className="w-12">
-            {hasSubcategories && (
-              <button
-                onClick={() => toggleExpand(category.id)}
-                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-              >
-                {isExpanded ? (
-                  <ChevronDown className="w-4 h-4" />
-                ) : (
-                  <ChevronRight className="w-4 h-4" />
-                )}
-              </button>
-            )}
-          </TableCell>
-          <TableCell>
-            <div className="flex items-center gap-2">
-              {renderIcon(category.icon)}
-              <div>
-                <div className="font-medium text-gray-900 dark:text-white">
-                  {derivedSub && <span className="text-gray-400 mr-1">└─</span>}
-                  <a
-                    href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`}
-                    className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
-                  >
-                    {category.name}
-                  </a>
-                </div>
-                {category.parent_name && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {__('Parent:', 'Parent:')} {category.parent_name}
-                  </div>
-                )}
-              </div>
+  // Status mutation for individual actions
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      const categoryResponse = await apiClient.get(`/trip-categories/${id}`);
+      const category = categoryResponse as Category;
+
+      return apiClient.put(`/trip-categories/${id}`, {
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+        icon: category.icon,
+        parent_id: category.parent_id,
+        status,
+      });
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['trip-categories'] });
+      const msgMap: Record<string, string> = {
+        trash: __('Category moved to trash', 'Category moved to trash'),
+        draft: __('Category marked as draft', 'Category marked as draft'),
+        publish: __('Category published', 'Category published'),
+      };
+      const msg = msgMap[variables.status] || __('Category updated successfully', 'Category updated successfully');
+      showToast(msg, 'success');
+    },
+    onError: (error: any, variables) => {
+      const msgMapError: Record<string, string> = {
+        trash: __('Failed to move category to trash', 'Failed to move category to trash'),
+        draft: __('Failed to mark category as draft', 'Failed to mark category as draft'),
+        publish: __('Failed to publish category', 'Failed to publish category'),
+      };
+      const fallback = msgMapError[variables.status] || __('Failed to update category', 'Failed to update category');
+      showToast(error?.message || fallback, 'error');
+    },
+  });
+
+  // Define actions for the shared table - dynamic based on item status
+  const actions = [
+    {
+      key: 'edit',
+      label: __('Edit', 'Edit'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (category: Category) => handleEdit(category),
+      condition: () => can('yatra_edit_trips'),
+    },
+    {
+      key: 'publish',
+      label: __('Make Published', 'Make Published'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (category: Category) => statusMutation.mutate({ id: category.id, status: 'publish' }),
+      condition: (category: Category) =>
+        can('yatra_edit_trips') && category.status !== 'publish',
+    },
+    {
+      key: 'draft',
+      label: __('Make Draft', 'Make Draft'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (category: Category) => statusMutation.mutate({ id: category.id, status: 'draft' }),
+      condition: (category: Category) =>
+        can('yatra_edit_trips') && category.status !== 'draft',
+    },
+    {
+      key: 'trash',
+      label: __('Move to Trash', 'Move to Trash'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (category: Category) => statusMutation.mutate({ id: category.id, status: 'trash' }),
+      variant: 'destructive' as const,
+      condition: (category: Category) =>
+        can('yatra_edit_trips') && category.status !== 'trash',
+    },
+    {
+      key: 'delete',
+      label: __('Delete Permanently', 'Delete Permanently'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (category: Category) => setDeleteConfirm({ isOpen: true, category }),
+      variant: 'destructive' as const,
+      condition: (category: Category) => can('yatra_edit_trips') && category.status === 'trash',
+    },
+  ];
+
+  // Custom row content renderer for hierarchical display
+  const renderRowContent = (category: Category, _index: number, isChild = false): React.ReactNode[] => {
+    return [
+      // Name column with icon and hierarchy indicator
+      <div className="flex items-center gap-2">
+        {renderIcon(category.icon)}
+        <div>
+          <div className="font-medium text-gray-900 dark:text-white">
+            {isChild && <span className="text-gray-400 mr-1">└─</span>}
+            <a
+              href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`}
+              className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+            >
+              {category.name}
+            </a>
+          </div>
+          {category.parent_name && (
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {__('Parent:', 'Parent:')} {category.parent_name}
             </div>
-          </TableCell>
-          <TableCell>
-            <code className="text-xs text-gray-600 dark:text-gray-400">{category.slug}</code>
-          </TableCell>
-          <TableCell>
-            <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
-              {category.description || '—'}
-            </div>
-          </TableCell>
-          <TableCell>{getStatusBadge(category.status)}</TableCell>
-          <TableCell className="text-sm text-gray-600 dark:text-gray-400">
-            {formatDate(category.created_at)}
-          </TableCell>
-          <TableCell className="text-right">
-            <div className="flex items-center justify-end gap-2">
-              <ConditionalRender capability="yatra_edit_trips">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleEdit(category)}
-                  className="h-9 w-9 p-0"
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(category)}
-                  className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </ConditionalRender>
-            </div>
-          </TableCell>
-        </TableRow>
-        {hasSubcategories && isExpanded && category.subcategories?.map(sub => renderCategoryRow(sub, true))}
-      </React.Fragment>
-    );
+          )}
+        </div>
+      </div>,
+      // Slug column
+      <code className="text-xs text-gray-600 dark:text-gray-400">{category.slug}</code>,
+      // Description column
+      <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
+        {category.description || '—'}
+      </div>,
+      // Status column
+      getStatusBadge(category.status),
+      // Created date column
+      <span className="text-sm text-gray-600 dark:text-gray-400">
+        {formatDate(category.created_at)}
+      </span>,
+    ];
   };
 
   return (
@@ -437,7 +660,7 @@ const Categories: React.FC = () => {
             <Select
               value={parentFilter}
               onChange={(e) => setParentFilter(e.target.value as 'all' | 'top-level' | 'subcategories')}
-              className="w-full lg:w-36 lg:flex-none text-sm"
+              className="w-full lg:w-28 lg:flex-none text-sm"
             >
               <option value="all">{__('All Categories', 'All Categories')}</option>
               <option value="top-level">{__('Top Level Only', 'Top Level Only')}</option>
@@ -447,130 +670,100 @@ const Categories: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Bulk Actions */}
+      <BulkActionToolbar
+        selectedIds={selectedIds}
+        bulkAction={bulkAction}
+        setBulkAction={setBulkAction}
+        onApply={handleBulkApply}
+        onClearSelection={() => setSelectedIds([])}
+        statusFilter={statusFilter}
+        setStatusFilter={(value) => {
+          setStatusFilter(value);
+          setPage(1);
+          setSelectedIds([]);
+          setBulkAction('');
+        }}
+        statusOptions={[
+          { key: 'all', label: __('All', 'All'), count: statusCounts.all },
+          { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
+          { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
+          { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+        ]}
+        showColumnsDropdown={showColumnsDropdown}
+        setShowColumnsDropdown={setShowColumnsDropdown}
+        columnOptions={[
+          { key: 'name', label: __('Name', 'Name'), visible: visibleColumns.name },
+          { key: 'slug', label: __('Slug', 'Slug'), visible: visibleColumns.slug },
+          { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+          { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+          { key: 'created_at', label: __('Created', 'Created'), visible: visibleColumns.created_at },
+        ]}
+        onToggleColumn={toggleColumn}
+        bulkMutationPending={bulkMutation.isPending}
+        totalItems={processedCategories.length}
+        bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
+      />
+
+      {/* Table */}
       <Card>
         <CardContent className="p-0">
-          {isLoading ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12"></TableHead>
-                  <TableHead>{__('Name', 'Name')}</TableHead>
-                  <TableHead>{__('Slug', 'Slug')}</TableHead>
-                  <TableHead>{__('Description', 'Description')}</TableHead>
-                  <TableHead>{__('Status', 'Status')}</TableHead>
-                  <TableHead>{__('Created', 'Created')}</TableHead>
-                  <TableHead className="w-28 text-right">{__('Actions', 'Actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow key={`category-skeleton-${index}`}>
-                    <TableCell>
-                      <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 animate-pulse" />
-                        <div className="space-y-2">
-                          <div className="h-4 w-40 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                          <div className="h-3 w-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-48 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-6 w-20 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center gap-2 justify-end">
-                        <div className="h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                        <div className="h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : error ? (
-            <div className="p-12 text-center">
-              <div className="text-red-600 dark:text-red-400">{__('Failed to load categories', 'Failed to load categories')}</div>
-            </div>
-          ) : processedCategories.length === 0 ? (
-            <div className="relative flex flex-col items-center justify-center text-center py-16 px-6 my-6 min-h-[400px]">
-              {/* Background decoration */}
-              <div className="absolute inset-8 bg-gradient-to-br from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700"></div>
-
-              {/* Content */}
-              <div className="relative z-10 max-w-md mx-auto space-y-6">
-                {/* Icon */}
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 ring-8 ring-blue-50/50 dark:ring-blue-900/20">
-                  <svg
-                    className="w-10 h-10 text-blue-600 dark:text-blue-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                </div>
-
-                {/* Text content */}
-                <div className="space-y-3">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {__('No categories found', 'No categories found')}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                    {__('Get started by creating your first category to organize your trips.', 'Get started by creating your first category to organize your trips.')}
-                  </p>
-                </div>
-
-                {/* Action button */}
-                <ConditionalRender capability="yatra_edit_trips">
-                  <div className="pt-2">
-                    <Button
-                      onClick={handleCreateCategory}
-                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-                    >
-                      <Plus className="w-4 h-4" />
-                      {__('Add Your First Category', 'Add Your First Category')}
-                    </Button>
-                  </div>
-                </ConditionalRender>
-              </div>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12"></TableHead>
-                  <TableHead>{__('Name', 'Name')}</TableHead>
-                  <TableHead>{__('Slug', 'Slug')}</TableHead>
-                  <TableHead>{__('Description', 'Description')}</TableHead>
-                  <TableHead>{__('Status', 'Status')}</TableHead>
-                  <TableHead>{__('Created', 'Created')}</TableHead>
-                  <TableHead className="w-28 text-right">{__('Actions', 'Actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {processedCategories.map(category => renderCategoryRow(category))}
-              </TableBody>
-            </Table>
-          )}
+          <SharedTable
+            data={processedCategories}
+            columns={columns}
+            actions={actions}
+            isLoading={isLoading}
+            isError={!!error}
+            errorText={__('Failed to load categories', 'Failed to load categories')}
+            emptyText={__('No categories found', 'No categories found')}
+            emptyDescription={__('Get started by creating your first category to organize your trips.', 'Get started by creating your first category to organize your trips.')}
+            onCreateClick={handleCreateCategory}
+            selectedItemIds={selectedIds}
+            onSelectItem={(id: string | number, checked: boolean) => {
+              if (checked) {
+                setSelectedIds([...selectedIds, id]);
+              } else {
+                setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+              }
+            }}
+            onSelectAll={(checked: boolean) => {
+              if (checked) {
+                setSelectedIds(processedCategories.map((cat: Category) => cat.id));
+              } else {
+                setSelectedIds([]);
+              }
+            }}
+            isAllSelected={processedCategories.length > 0 && selectedIds.length === processedCategories.length}
+            getItemId={(category: Category) => category.id}
+            getItemStatus={(category: Category) => category.status}
+            statusFilter={statusFilter}
+            skeletonRows={5}
+            capability="yatra_view_trips"
+            // Hierarchical props
+            isHierarchical={true}
+            expandedIds={expandedCategories}
+            onToggleExpand={toggleExpand}
+            getChildren={(category: Category) => category.subcategories || []}
+            renderRowContent={renderRowContent}
+          />
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {total > 0 && (
+        <Card>
+          <CardContent className="p-3">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={total}
+              itemsPerPage={50}
+              onPageChange={setPage}
+              itemName={__('categories', 'categories')}
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

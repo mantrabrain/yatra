@@ -572,24 +572,25 @@ const Destinations: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Pagination - Always Visible */}
-            {total > 0 && (
-              <Card>
-                <CardContent className="p-3">
-                  <Pagination
-                    currentPage={page}
-                    totalPages={totalPages}
-                    totalItems={total}
-                    itemsPerPage={10}
-                    onPageChange={setPage}
-                    itemName={__('destinations', 'destinations')}
-                  />
-                </CardContent>
-              </Card>
-            )}
           </>
         )}
       </ConditionalRender>
+
+      {/* Pagination */}
+      {total > 0 && (
+        <Card>
+          <CardContent className="p-3">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={total}
+              itemsPerPage={10}
+              onPageChange={setPage}
+              itemName={__('destinations', 'destinations')}
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

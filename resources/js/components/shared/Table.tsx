@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table as UITable, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Button } from '../ui/button';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, ChevronRight, ChevronDown } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { ConditionalRender } from '../ui/conditional-render';
 
@@ -44,6 +44,12 @@ interface TableProps {
   statusFilter?: string;
   capability?: string;
   skeletonRows?: number;
+  // Hierarchical support
+  isHierarchical?: boolean;
+  expandedIds?: Set<string | number>;
+  onToggleExpand?: (id: string | number) => void;
+  getChildren?: (item: any) => any[];
+  renderRowContent?: (item: any, index: number, isChild?: boolean) => React.ReactNode[];
 }
 
 export const Table: React.FC<TableProps> = ({
@@ -67,6 +73,12 @@ export const Table: React.FC<TableProps> = ({
   statusFilter = '',
   capability = 'yatra_view_trips',
   skeletonRows = 5,
+  // Hierarchical props
+  isHierarchical = false,
+  expandedIds = new Set(),
+  onToggleExpand,
+  getChildren,
+  renderRowContent,
 }) => {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; right: number } | null>(null);
@@ -92,6 +104,9 @@ export const Table: React.FC<TableProps> = ({
     <UITable>
       <TableHeader>
         <TableRow>
+          {isHierarchical && (
+            <TableHead className="w-12"></TableHead>
+          )}
           {onSelectItem && onSelectAll && (
             <TableHead className="w-12"></TableHead>
           )}
@@ -106,6 +121,11 @@ export const Table: React.FC<TableProps> = ({
       <TableBody>
         {[...Array(skeletonRows)].map((_, index) => (
           <TableRow key={`skeleton-${index}`}>
+            {isHierarchical && (
+              <TableCell>
+                <div className="w-4 h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+              </TableCell>
+            )}
             {onSelectItem && onSelectAll && (
               <TableCell>
                 <div className="w-4 h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
@@ -199,6 +219,245 @@ export const Table: React.FC<TableProps> = ({
     </div>
   );
 
+  // Render hierarchical row with children
+  const renderHierarchicalRow = (item: any, index: number, isChild = false): React.ReactNode => {
+    const itemId = getItemId(item);
+    const itemStatus = getItemStatus(item);
+    const isTrash = itemStatus === 'trash' || statusFilter === 'trash';
+    const children = getChildren ? getChildren(item) : [];
+    const hasChildren = children.length > 0;
+    const isExpanded = expandedIds.has(itemId);
+
+    return (
+      <React.Fragment key={itemId}>
+        <TableRow 
+          className={`${isTrash ? 'bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20' : ''} ${isChild ? 'bg-gray-50 dark:bg-gray-900/50' : ''}`}
+        >
+          {/* Expand/collapse column */}
+          <TableCell className="w-12">
+            {hasChildren && onToggleExpand && (
+              <button
+                onClick={() => onToggleExpand(itemId)}
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+              >
+                {isExpanded ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
+              </button>
+            )}
+          </TableCell>
+
+          {/* Selection checkbox */}
+          {onSelectItem && (
+            <TableCell>
+              <input
+                type="checkbox"
+                className="rounded border-gray-300 dark:border-gray-600"
+                checked={selectedItemIds.includes(itemId)}
+                onChange={(e) => onSelectItem(itemId, e.target.checked)}
+                aria-label={__('Select item', 'Select item')}
+              />
+            </TableCell>
+          )}
+
+          {/* Custom row content or default columns */}
+          {renderRowContent ? (
+            renderRowContent(item, index, isChild).map((cellContent, cellIndex) => (
+              <TableCell 
+                key={`cell-${itemId}-${cellIndex}`}
+                className={isTrash ? 'text-gray-400 dark:text-gray-600' : ''}
+              >
+                {cellContent}
+              </TableCell>
+            ))
+          ) : (
+            columns.filter(col => col.visible !== false).map((column) => (
+              <TableCell 
+                key={`${column.key}-${itemId}`} 
+                className={isTrash ? 'text-gray-400 dark:text-gray-600' : ''}
+              >
+                {column.render ? column.render(item, index) : item[column.key]}
+              </TableCell>
+            ))
+          )}
+
+          {/* Actions */}
+          {actions.length > 0 && (
+            <TableCell className="text-right">
+              <div className="relative inline-block">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const button = e.currentTarget;
+                    const rect = button.getBoundingClientRect();
+                    setDropdownPosition({
+                      top: rect.bottom + window.scrollY,
+                      right: window.innerWidth - rect.right + window.scrollX
+                    });
+                    setOpenDropdownId(openDropdownId === itemId ? null : itemId);
+                  }}
+                  className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  aria-label={__('More actions', 'More actions')}
+                  data-dropdown-trigger
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+                
+                {openDropdownId === itemId && dropdownPosition && (
+                  <div 
+                    className="fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1"
+                    style={{
+                      top: `${dropdownPosition.top}px`,
+                      right: `${dropdownPosition.right}px`,
+                      zIndex: 999999
+                    }}
+                    data-dropdown-content
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {actions
+                      .filter(action => !action.condition || action.condition(item))
+                      .map(action => (
+                        <button
+                          key={action.key}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            action.onClick(item);
+                            setOpenDropdownId(null);
+                          }}
+                          className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${
+                            action.variant === 'destructive' 
+                              ? 'text-red-600 dark:text-red-400' 
+                              : action.variant === 'outline' 
+                                ? 'text-blue-600 dark:text-blue-400' 
+                                : 'text-gray-700 dark:text-gray-300'
+                          }`}
+                        >
+                          {action.icon}
+                          {action.label}
+                        </button>
+                      ))
+                    }
+                  </div>
+                )}
+              </div>
+            </TableCell>
+          )}
+        </TableRow>
+
+        {/* Render children if expanded */}
+        {hasChildren && isExpanded && children.map((child, childIndex) => 
+          renderHierarchicalRow(child, childIndex, true)
+        )}
+      </React.Fragment>
+    );
+  };
+
+  // Render flat row (original behavior)
+  const renderFlatRow = (item: any, index: number): React.ReactNode => {
+    const itemId = getItemId(item);
+    const itemStatus = getItemStatus(item);
+    const isTrash = itemStatus === 'trash' || statusFilter === 'trash';
+    
+    return (
+      <TableRow 
+        key={itemId} 
+        className={isTrash ? 'bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20' : ''}
+      >
+        {onSelectItem && (
+          <TableCell>
+            <input
+              type="checkbox"
+              className="rounded border-gray-300 dark:border-gray-600"
+              checked={selectedItemIds.includes(itemId)}
+              onChange={(e) => onSelectItem(itemId, e.target.checked)}
+              aria-label={__('Select item', 'Select item')}
+            />
+          </TableCell>
+        )}
+        {columns.filter(col => col.visible !== false).map((column) => (
+          <TableCell 
+            key={`${column.key}-${itemId}`} 
+            className={isTrash ? 'text-gray-400 dark:text-gray-600' : ''}
+          >
+            {column.render ? column.render(item, index) : item[column.key]}
+          </TableCell>
+        ))}
+        {actions.length > 0 && (
+          <TableCell className="text-right">
+            <div className="relative inline-block">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const button = e.currentTarget;
+                  const rect = button.getBoundingClientRect();
+                  setDropdownPosition({
+                    top: rect.bottom + window.scrollY,
+                    right: window.innerWidth - rect.right + window.scrollX
+                  });
+                  setOpenDropdownId(openDropdownId === itemId ? null : itemId);
+                }}
+                className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
+                aria-label={__('More actions', 'More actions')}
+                data-dropdown-trigger
+              >
+                <MoreVertical className="w-4 h-4" />
+              </Button>
+              
+              {openDropdownId === itemId && dropdownPosition && (
+                <div 
+                  className="fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1"
+                  style={{
+                    top: `${dropdownPosition.top}px`,
+                    right: `${dropdownPosition.right}px`,
+                    zIndex: 999999
+                  }}
+                  data-dropdown-content
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {actions
+                    .filter(action => !action.condition || action.condition(item))
+                    .map(action => (
+                      <button
+                        key={action.key}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          action.onClick(item);
+                          setOpenDropdownId(null);
+                        }}
+                        className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${
+                          action.variant === 'destructive' 
+                            ? 'text-red-600 dark:text-red-400' 
+                            : action.variant === 'outline' 
+                              ? 'text-blue-600 dark:text-blue-400' 
+                              : 'text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        {action.icon}
+                        {action.label}
+                      </button>
+                    ))
+                  }
+                </div>
+              )}
+            </div>
+          </TableCell>
+        )}
+      </TableRow>
+    );
+  };
+
   // Render table data
   const renderTable = () => {
     if (isLoading) return renderSkeleton();
@@ -209,6 +468,10 @@ export const Table: React.FC<TableProps> = ({
       <UITable>
         <TableHeader>
           <TableRow>
+            {/* Expand/collapse column for hierarchical tables */}
+            {isHierarchical && (
+              <TableHead className="w-12"></TableHead>
+            )}
             {onSelectItem && onSelectAll && (
               <TableHead className="w-12">
                 <input
@@ -244,103 +507,11 @@ export const Table: React.FC<TableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((item, index) => {
-            const itemId = getItemId(item);
-            const itemStatus = getItemStatus(item);
-            const isTrash = itemStatus === 'trash' || statusFilter === 'trash';
-            
-            return (
-              <TableRow 
-                key={itemId} 
-                className={isTrash ? 'bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20' : ''}
-              >
-                {onSelectItem && (
-                  <TableCell>
-                    <input
-                      type="checkbox"
-                      className="rounded border-gray-300 dark:border-gray-600"
-                      checked={selectedItemIds.includes(itemId)}
-                      onChange={(e) => onSelectItem(itemId, e.target.checked)}
-                      aria-label={__('Select item', 'Select item')}
-                    />
-                  </TableCell>
-                )}
-                {columns.filter(col => col.visible !== false).map((column) => (
-                  <TableCell 
-                    key={`${column.key}-${itemId}`} 
-                    className={isTrash ? 'text-gray-400 dark:text-gray-600' : ''}
-                  >
-                    {column.render ? column.render(item, index) : item[column.key]}
-                  </TableCell>
-                ))}
-                {actions.length > 0 && (
-                  <TableCell className="text-right">
-                    <div className="relative inline-block">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          const button = e.currentTarget;
-                          const rect = button.getBoundingClientRect();
-                          setDropdownPosition({
-                            top: rect.bottom + window.scrollY,
-                            right: window.innerWidth - rect.right + window.scrollX
-                          });
-                          setOpenDropdownId(openDropdownId === itemId ? null : itemId);
-                        }}
-                        className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        aria-label={__('More actions', 'More actions')}
-                        data-dropdown-trigger
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                      
-                      {openDropdownId === itemId && dropdownPosition && (
-                        <div 
-                          className="fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1"
-                          style={{
-                            top: `${dropdownPosition.top}px`,
-                            right: `${dropdownPosition.right}px`,
-                            zIndex: 999999
-                          }}
-                          data-dropdown-content
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {actions
-                            .filter(action => !action.condition || action.condition(item))
-                            .map(action => (
-                              <button
-                                key={action.key}
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  action.onClick(item);
-                                  setOpenDropdownId(null);
-                                }}
-                                className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${
-                                  action.variant === 'destructive' 
-                                    ? 'text-red-600 dark:text-red-400' 
-                                    : action.variant === 'outline' 
-                                      ? 'text-blue-600 dark:text-blue-400' 
-                                      : 'text-gray-700 dark:text-gray-300'
-                                }`}
-                              >
-                                {action.icon}
-                                {action.label}
-                              </button>
-                            ))
-                          }
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                )}
-              </TableRow>
-            );
-          })}
+          {data.map((item, index) => 
+            isHierarchical 
+              ? renderHierarchicalRow(item, index)
+              : renderFlatRow(item, index)
+          )}
         </TableBody>
       </UITable>
     );

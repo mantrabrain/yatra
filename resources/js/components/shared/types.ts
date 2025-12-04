@@ -109,4 +109,10 @@ export interface TableProps {
   statusFilter?: string;
   capability?: string;
   skeletonRows?: number;
+  // Hierarchical support
+  isHierarchical?: boolean;
+  expandedIds?: Set<string | number>;
+  onToggleExpand?: (id: string | number) => void;
+  getChildren?: (item: any) => any[];
+  renderRowContent?: (item: any, index: number, isChild?: boolean) => React.ReactNode[];
 }
