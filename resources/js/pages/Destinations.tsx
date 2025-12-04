@@ -3,54 +3,78 @@
  * Clean, minimal SaaS-style destinations management page
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw, Edit, Trash2 } from 'lucide-react';
+import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
-import { Edit, Trash2 } from 'lucide-react';
 import { IconSelector } from '../components/ui/icon-selector';
 import type { IconPickerValue } from '../components/ui/icon-picker';
 
 interface Destination {
-  id: number;
+  id: string | number;
   name: string;
   slug: string;
   description: string;
   icon?: IconPickerValue | null;
   status: string;
-  trips_count?: number;
   created_at: string;
   updated_at: string;
-  created_by: number; // user_id
-  updated_by: number; // user_id
-  created_by_name?: string; // Optional: user name from API
-  updated_by_name?: string; // Optional: user name from API
+  created_by: string;
+  updated_by: string;
+  created_by_name?: string;
+  updated_by_name?: string;
 }
 
 const Destinations: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const saved = localStorage.getItem('yatra_destinations_visible_columns');
+    return saved ? JSON.parse(saved) : {
+      name: true,
+      description: true,
+      status: true,
+      created_at: false,
+      updated_at: false,
+      created_by_name: false,
+      updated_by_name: false,
+    };
+  });
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; destination: Destination | null }>({
     isOpen: false,
     destination: null,
   });
   const queryClient = useQueryClient();
-  const { can, isPro } = usePermissions();
+  const { can } = usePermissions();
   const { showToast } = useToast();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('[data-columns-trigger]') && !target.closest('[data-columns-content]')) {
+        setShowColumnsDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -89,7 +113,7 @@ const Destinations: React.FC = () => {
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string | number) => {
       return await apiClient.delete(`/destinations/${id}`);
     },
     onSuccess: () => {
@@ -105,92 +129,6 @@ const Destinations: React.FC = () => {
   const destinations = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return __('N/A', 'N/A');
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch (e) {
-      return dateString;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { className: string; label: string }> = {
-      'publish': {
-        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Publish', 'Publish'),
-      },
-      'draft': {
-        className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Draft', 'Draft'),
-      },
-      'trash': {
-        className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Trash', 'Trash'),
-      },
-    };
-
-    const statusInfo = statusMap[status] || {
-      className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-      label: status,
-    };
-
-    return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`}>
-        {statusInfo.label}
-      </span>
-    );
-  };
-
-  const formatUser = (userId: number, userName?: string) => {
-    if (userName) {
-      return userName;
-    }
-    return `User #${userId}`;
-  };
-
-  const renderIcon = (icon: IconPickerValue | null | undefined) => {
-    if (!icon) {
-      return (
-        <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-          <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
-        </div>
-      );
-    }
-
-    if (icon.type === 'image') {
-      return (
-        <img
-          src={icon.value}
-          alt=""
-          className="w-8 h-8 rounded object-cover"
-          onError={(e) => {
-            // Fallback if image fails to load
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            if (target.parentElement) {
-              target.parentElement.innerHTML = '<div class="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><span class="text-xs text-gray-400 dark:text-gray-500">—</span></div>';
-            }
-          }}
-        />
-      );
-    }
-
-    // Icon type
-    return (
-      <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-        <IconSelector iconName={icon.value} className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-      </div>
-    );
-  };
 
   const handleEdit = (destination: Destination) => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`;
@@ -236,11 +174,70 @@ const Destinations: React.FC = () => {
       : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
   };
 
+  // Toggle column visibility
+  const toggleColumn = (columnKey: string) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns]
+    };
+    setVisibleColumns(newVisibleColumns);
+    localStorage.setItem('yatra_destinations_visible_columns', JSON.stringify(newVisibleColumns));
+  };
+
+  // Status counts
+  const statusCounts = useMemo(() => {
+    const counts = {
+      all: total,
+      publish: 0,
+      draft: 0,
+      trash: 0,
+    };
+    return counts;
+  }, [total]);
+
+  // Bulk actions mutation
+  const bulkMutation = useMutation({
+    mutationFn: async ({ action, ids }: { action: string; ids: (string | number)[] }) => {
+      return await apiClient.post('/destinations/bulk', { action, ids });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['destinations'] });
+      showToast(__('Bulk action completed successfully', 'Bulk action completed successfully'), 'success');
+      setSelectedIds([]);
+      setBulkAction('');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to perform bulk action', 'Failed to perform bulk action'), 'error');
+    },
+  });
+
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      return;
+    }
+
+    if (selectedIds.length === 0) {
+      showToast(__('Select at least one destination.', 'Select at least one destination.'), 'warning');
+      return;
+    }
+
+    // Execute bulk action (confirmation is now handled in BulkActionToolbar)
+    bulkMutation.mutate({ action: bulkAction, ids: selectedIds });
+  };
+
+  const viewFilters = [
+    { key: 'all', label: __('All', 'All'), count: statusCounts.all ?? 0 },
+    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish ?? 0 },
+    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft ?? 0 },
+    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash ?? 0 },
+  ];
+
   const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'name' || sortOrder !== 'asc';
 
   return (
     <div className="space-y-3">
-      {/* Confirmation Dialog */}
+      {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, destination: null })}
@@ -271,72 +268,93 @@ const Destinations: React.FC = () => {
       {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
         <CardContent className="p-3">
-          <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
-            {/* Search */}
-            <div className="relative min-w-0 w-full lg:flex-[2]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder={__('Search destinations...', 'Search destinations...')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full"
-              />
-            </div>
-
-            {/* Status Filter */}
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full lg:flex-1"
-            >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="draft">{__('Draft', 'Draft')}</option>
-              <option value="publish">{__('Publish', 'Publish')}</option>
-              <option value="trash">{__('Trash', 'Trash')}</option>
-            </Select>
-
-            {/* Sort By */}
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full lg:flex-1"
-            >
-              <option value="name">{__('Name', 'Name')}</option>
-              <option value="status">{__('Status', 'Status')}</option>
-              <option value="created_at">{__('Created At', 'Created At')}</option>
-              <option value="updated_at">{__('Updated At', 'Updated At')}</option>
-            </Select>
-
-            {/* Sort Order */}
-            <Button
-              variant="outline"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-11 px-4 flex items-center gap-1.5 flex-shrink-0"
-              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
-            >
-              {sortOrder === 'asc' ? (
-                <ArrowUp className="w-4 h-4" />
-              ) : (
-                <ArrowDown className="w-4 h-4" />
-              )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
-            </Button>
-
-            {/* Reset Button */}
-            {hasFilters && (
-              <Button
-                variant="outline"
-                onClick={handleResetFilters}
-                className="h-11 flex items-center gap-2 flex-shrink-0"
-              >
-                <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
-              </Button>
-            )}
-          </div>
+          <SearchFilterToolbar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={statusFilter}
+            onStatusChange={(value) => {
+              setStatusFilter(value);
+              setPage(1);
+              setSelectedIds([]);
+              setBulkAction('');
+            }}
+            statusOptions={[
+              { value: "all", label: __('All Status', 'All Status') },
+              { value: "publish", label: __('Published', 'Published') },
+              { value: "draft", label: __('Draft', 'Draft') },
+              { value: "trash", label: __('Trash', 'Trash') }
+            ]}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
+            sortOrder={sortOrder}
+            onSortOrderChange={setSortOrder}
+            sortOptions={[
+              { value: "name", label: __('Name', 'Name') },
+              { value: "status", label: __('Status', 'Status') },
+              { value: "created_at", label: __('Created At', 'Created At') },
+              { value: "updated_at", label: __('Updated At', 'Updated At') }
+            ]}
+            onResetFilters={handleResetFilters}
+            hasFilters={!!hasFilters}
+            placeholder={__('Search destinations...', 'Search destinations...')}
+          />
         </CardContent>
       </Card>
+
+      <BulkActionToolbar
+        selectedIds={selectedIds}
+        bulkAction={bulkAction}
+        setBulkAction={setBulkAction}
+        onApply={handleBulkApply}
+        onClearSelection={() => setSelectedIds([])}
+        statusFilter={statusFilter}
+        setStatusFilter={(value) => {
+          setStatusFilter(value);
+          setPage(1);
+          setSelectedIds([]);
+          setBulkAction('');
+        }}
+        statusOptions={viewFilters}
+        showColumnsDropdown={showColumnsDropdown}
+        setShowColumnsDropdown={setShowColumnsDropdown}
+        columnOptions={[
+          { key: 'name', label: __('Destination', 'Destination'), visible: visibleColumns.name },
+          { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+          { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+          { key: 'created_at', label: __('Created Date', 'Created Date'), visible: visibleColumns.created_at },
+          { key: 'updated_at', label: __('Updated Date', 'Updated Date'), visible: visibleColumns.updated_at },
+          { key: 'created_by_name', label: __('Created By', 'Created By'), visible: visibleColumns.created_by_name },
+          { key: 'updated_by_name', label: __('Updated By', 'Updated By'), visible: visibleColumns.updated_by_name }
+        ]}
+        onToggleColumn={toggleColumn}
+        bulkMutationPending={bulkMutation.isPending}
+        totalItems={destinations.length}
+        bulkActionOptions={(() => {
+          const options = [];
+          switch (statusFilter) {
+            case 'publish':
+              options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
+              options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
+              break;
+            case 'draft':
+              options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
+              options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
+              break;
+            case 'trash':
+              options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
+              options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
+              options.push({ value: 'delete', label: __('Delete Permanently', 'Delete Permanently') });
+              break;
+            case 'all':
+            default:
+              options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
+              options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
+              options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
+              break;
+          }
+          return options;
+        })()}
+      />
 
       <ConditionalRender capability="yatra_view_trips">
         {/* Table */}
@@ -348,240 +366,206 @@ const Destinations: React.FC = () => {
           </Card>
         ) : (
           <>
-            <Card>
-              <CardContent className="p-0">
-                {isLoading ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[250px]">{__('Destination', 'Destination')}</TableHead>
-                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
-                        {isPro && (
-                          <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
-                        )}
-                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[...Array(5)].map((_, index) => (
-                        <TableRow key={`skeleton-${index}`}>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                              <div className="space-y-2">
-                                <div className="h-4 w-36 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                                <div className="h-3 w-24 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-48 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-5 w-16 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse" />
-                          </TableCell>
-                          {isPro && (
-                            <TableCell>
-                              <div className="h-4 w-12 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                            </TableCell>
-                          )}
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="h-4 w-24 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                              <div className="h-3 w-20 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="h-4 w-20 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                              <div className="h-3 w-24 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <div className="h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                              <div className="h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : destinations.length === 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[250px]">{__('Destination', 'Destination')}</TableHead>
-                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
-                        {isPro && (
-                          <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
-                        )}
-                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={isPro ? 7 : 6} className="h-64">
-                          <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                              <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                              {__('No destinations found', 'No destinations found')}
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
-                              {hasFilters 
-                                ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                                : __('Get started by creating your first destination.', 'Get started by creating your first destination.')
-                              }
-                            </p>
-                            {hasFilters ? (
-                              <Button
-                                variant="outline"
-                                onClick={handleResetFilters}
-                                className="flex items-center gap-2"
-                              >
-                                <X className="w-4 h-4" />
-                                {__('Clear Filters', 'Clear Filters')}
-                              </Button>
-                            ) : (
-                              can('yatra_edit_trips') && (
-                                <Button
-                                  onClick={handleCreateDestination}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Plus className="w-4 h-4" />
-                                  {__('Create Destination', 'Create Destination')}
-                                </Button>
+            <Card className="overflow-visible">
+              <CardContent className="p-0 overflow-visible">
+                <SharedTable
+                  data={destinations}
+                  columns={[
+                    {
+                      key: 'name',
+                      label: __('Destination', 'Destination'),
+                      sortable: true,
+                      visible: visibleColumns.name,
+                      render: (destination: Destination) => (
+                        <div className="flex items-center gap-3">
+                          {/* Icon/Image */}
+                          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                            {destination.icon ? (
+                              destination.icon.type === 'image' ? (
+                                <img 
+                                  src={destination.icon.value} 
+                                  alt={destination.name}
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
+                              ) : (
+                                <IconSelector 
+                                  iconName={destination.icon.value} 
+                                  className="w-5 h-5 text-blue-600 dark:text-blue-400" 
+                                />
                               )
+                            ) : (
+                              <div className="w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold">
+                                {destination.name.charAt(0).toUpperCase()}
+                              </div>
                             )}
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[250px]">
-                          <button
-                            onClick={() => handleSort('name')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Destination', 'Destination')}
-                            {getSortIcon('name')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        <TableHead className="w-[100px]">
-                          <button
-                            onClick={() => handleSort('status')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Status', 'Status')}
-                            {getSortIcon('status')}
-                          </button>
-                        </TableHead>
-                        {isPro && (
-                          <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
-                        )}
-                        <TableHead className="w-[150px]">
-                          <button
-                            onClick={() => handleSort('created_at')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Date', 'Date')}
-                            {getSortIcon('created_at')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {destinations.map((destination: Destination) => (
-                        <TableRow key={destination.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              {renderIcon(destination.icon)}
-                              <div>
-                                <div className="font-medium text-gray-900 dark:text-white">
-                                  {destination.name}
-                                </div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                  {destination.slug}
-                                </div>
-                              </div>
+                          {/* Text */}
+                          <div>
+                            <div className="font-medium text-gray-900 dark:text-white">
+                              {destination.name}
                             </div>
-                          </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                            <div className="line-clamp-2">
-                              {destination.description || __('No description', 'No description')}
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              {destination.slug}
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(destination.status)}
-                          </TableCell>
-                          {isPro && (
-                            <TableCell className="text-gray-600 dark:text-gray-400">
-                              {destination.trips_count || 0}
-                            </TableCell>
-                          )}
-                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            <div>
-                              <div>{formatDate(destination.created_at)}</div>
-                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                {__('Updated', 'Updated')}: {formatDate(destination.updated_at)}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                            <div>
-                              <div>{formatUser(destination.created_by, destination.created_by_name)}</div>
-                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                {__('Updated by', 'Updated by')}: {formatUser(destination.updated_by, destination.updated_by_name)}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <ConditionalRender capability="yatra_edit_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEdit(destination)}
-                                  className="h-9 w-9 p-0"
-                                  aria-label={__('Edit destination', 'Edit destination')}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-
-                              <ConditionalRender capability="yatra_delete_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDelete(destination)}
-                                  className="h-9 w-9 p-0 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                  aria-label={__('Delete destination', 'Delete destination')}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
+                          </div>
+                        </div>
+                      )
+                    },
+                    {
+                      key: 'description',
+                      label: __('Description', 'Description'),
+                      visible: visibleColumns.description,
+                      render: (destination: Destination) => (
+                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                          {destination.description || __('No description', 'No description')}
+                        </span>
+                      )
+                    },
+                    {
+                      key: 'status',
+                      label: __('Status', 'Status'),
+                      sortable: true,
+                      visible: visibleColumns.status,
+                      render: (destination: Destination) => (
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          destination.status === 'trash' || statusFilter === 'trash'
+                            ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                            : destination.status === 'publish'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                        }`}>
+                          {destination.status === 'trash' || statusFilter === 'trash'
+                            ? __('Trash', 'Trash')
+                            : destination.status === 'publish'
+                              ? __('Published', 'Published')
+                              : __('Draft', 'Draft')
+                          }
+                        </span>
+                      )
+                    },
+                    {
+                      key: 'created_at',
+                      label: __('Created Date', 'Created Date'),
+                      sortable: true,
+                      visible: visibleColumns.created_at,
+                      render: (destination: Destination) => (
+                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                          {new Date(destination.created_at).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      )
+                    },
+                    {
+                      key: 'updated_at',
+                      label: __('Updated Date', 'Updated Date'),
+                      sortable: true,
+                      visible: visibleColumns.updated_at,
+                      render: (destination: Destination) => (
+                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                          {new Date(destination.updated_at).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      )
+                    },
+                    {
+                      key: 'created_by_name',
+                      label: __('Created By', 'Created By'),
+                      visible: visibleColumns.created_by_name,
+                      render: (destination: Destination) => (
+                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                          {destination.created_by_name || __('Unknown', 'Unknown')}
+                        </span>
+                      )
+                    },
+                    {
+                      key: 'updated_by_name',
+                      label: __('Updated By', 'Updated By'),
+                      visible: visibleColumns.updated_by_name,
+                      render: (destination: Destination) => (
+                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                          {destination.updated_by_name || __('Unknown', 'Unknown')}
+                        </span>
+                      )
+                    }
+                  ]}
+                  actions={[
+                    {
+                      key: 'edit',
+                      label: __('Edit', 'Edit'),
+                      icon: <Edit className="w-4 h-4" />,
+                      onClick: handleEdit,
+                      condition: () => can('yatra_edit_trips'),
+                    },
+                    {
+                      key: 'restore',
+                      label: __('Restore', 'Restore'),
+                      icon: <RotateCcw className="w-4 h-4" />,
+                      onClick: (destination: Destination) => {
+                        // Handle restore action
+                        bulkMutation.mutate({ action: 'restore', ids: [destination.id] });
+                      },
+                      condition: (destination: Destination) => (destination.status === 'trash' || statusFilter === 'trash') && can('yatra_edit_trips'),
+                    },
+                    {
+                      key: 'trash',
+                      label: __('Move to Trash', 'Move to Trash'),
+                      icon: <Trash2 className="w-4 h-4" />,
+                      onClick: (destination: Destination) => {
+                        bulkMutation.mutate({ action: 'trash', ids: [destination.id] });
+                      },
+                      condition: (destination: Destination) => destination.status !== 'trash' && statusFilter !== 'trash' && can('yatra_edit_trips'),
+                    },
+                    {
+                      key: 'delete',
+                      label: __('Delete Permanently', 'Delete Permanently'),
+                      icon: <Trash2 className="w-4 h-4" />,
+                      onClick: handleDelete,
+                      condition: (destination: Destination) => (destination.status === 'trash' || statusFilter === 'trash') && can('yatra_delete_trips'),
+                      variant: 'destructive',
+                    }
+                  ]}
+                  isLoading={isLoading}
+                  isError={!!error}
+                  errorText={__('Error loading destinations', 'Error loading destinations')}
+                  emptyText={__('No destinations found', 'No destinations found')}
+                  emptyDescription={hasFilters 
+                    ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                    : __('Get started by creating your first destination.', 'Get started by creating your first destination.')
+                  }
+                  onCreateClick={can('yatra_edit_trips') ? handleCreateDestination : undefined}
+                  onSort={handleSort}
+                  getSortIcon={getSortIcon}
+                  selectedItemIds={selectedIds}
+                  onSelectItem={(id: string | number, checked: boolean) => {
+                    if (checked) {
+                      setSelectedIds([...selectedIds, id]);
+                    } else {
+                      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+                    }
+                  }}
+                  onSelectAll={(checked: boolean) => {
+                    if (checked) {
+                      setSelectedIds(destinations.map((d: Destination) => d.id));
+                    } else {
+                      setSelectedIds([]);
+                    }
+                  }}
+                  isAllSelected={destinations.length > 0 && selectedIds.length === destinations.length}
+                  getItemId={(destination: Destination) => destination.id}
+                  getItemStatus={(destination: Destination) => destination.status}
+                  statusFilter={statusFilter}
+                  skeletonRows={5}
+                />
               </CardContent>
             </Card>
 
@@ -589,31 +573,14 @@ const Destinations: React.FC = () => {
             {total > 0 && (
               <Card>
                 <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('destinations', 'destinations')}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="h-8"
-                      >
-                        {__('Previous', 'Previous')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                        disabled={page >= totalPages}
-                        className="h-8"
-                      >
-                        {__('Next', 'Next')}
-                      </Button>
-                    </div>
-                  </div>
+                  <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    totalItems={total}
+                    itemsPerPage={10}
+                    onPageChange={setPage}
+                    itemName={__('destinations', 'destinations')}
+                  />
                 </CardContent>
               </Card>
             )}

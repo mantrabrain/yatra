@@ -1,5 +1,5 @@
-import { j as jsxRuntimeExports, h as Calendar, g as FileText, P as Plane, z as ArrowRight, d as MapPin, U as User, p as ChevronRight, aw as Sparkles, V as Package, i as CreditCard, a$ as LifeBuoy, w as Bell, E as AlertCircle, al as CheckCircle2, y as Clock, x as Users, D as DollarSign, ar as Mail, aH as Phone, r as reactExports, u as useQuery, G as CheckCircle, Y as Eye, aK as Download, aG as React, Z as PenSquare, X as XCircle, b0 as ShieldCheck, a2 as Heart, ap as AlertTriangle, L as LayoutDashboard, b1 as LogOut, aY as QueryClient, aZ as client, a_ as QueryClientProvider } from "./react-vendor-CEoBGbYy.js";
-import { _ as __, g as getCurrencySymbol, b as getCurrency, a as apiClient, T as ToastProvider } from "./index-j4uQUSCR.js";
+import { j as jsxRuntimeExports, h as Calendar, g as FileText, P as Plane, z as ArrowRight, d as MapPin, U as User, p as ChevronRight, aw as Sparkles, V as Package, i as CreditCard, a$ as LifeBuoy, w as Bell, E as AlertCircle, al as CheckCircle2, y as Clock, x as Users, D as DollarSign, ar as Mail, aH as Phone, r as reactExports, u as useQuery, G as CheckCircle, Y as Eye, aK as Download, aB as React, Z as PenSquare, X as XCircle, b0 as ShieldCheck, a2 as Heart, ap as AlertTriangle, L as LayoutDashboard, b1 as LogOut, aY as QueryClient, aZ as client, a_ as QueryClientProvider } from "./react-vendor-CU8MdjjT.js";
+import { _ as __, g as getCurrencySymbol, b as getCurrency, a as apiClient, T as ToastProvider } from "./index-CfZw3dNY.js";
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "N/A");

@@ -5,37 +5,33 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw, MoreVertical, Columns } from 'lucide-react';
+import { Plus, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw, Edit, Trash2 } from 'lucide-react';
+import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
-import { Edit, Trash2 } from 'lucide-react';
 import { IconSelector } from '../components/ui/icon-selector';
 import type { IconPickerValue } from '../components/ui/icon-picker';
 
 interface Activity {
-  id: number;
+  id: string | number;
   name: string;
   slug: string;
   description: string;
   icon?: IconPickerValue | null;
   status: string;
-  trips_count?: number;
   created_at: string;
   updated_at: string;
-  created_by: number; // user_id
-  updated_by: number; // user_id
-  created_by_name?: string; // Optional: user name from API
-  updated_by_name?: string; // Optional: user name from API
+  created_by: string;
+  updated_by: string;
+  created_by_name?: string;
+  updated_by_name?: string;
 }
 
 const Activities: React.FC = () => {
@@ -48,35 +44,32 @@ const Activities: React.FC = () => {
     isOpen: false,
     activity: null,
   });
-  const [bulkActionConfirm, setBulkActionConfirm] = useState<{ isOpen: boolean; action: string; count: number }>({
-    isOpen: false,
-    action: '',
-    count: 0,
-  });
   const [individualActionConfirm, setIndividualActionConfirm] = useState<{ isOpen: boolean; action: string; activity: Activity | null }>({
     isOpen: false,
     action: '',
     activity: null,
   });
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const [bulkAction, setBulkAction] = useState('');
-  const [openDropdown, setOpenDropdown] = useState<number | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<string | number | null>(null);
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   
   // Column visibility state with localStorage
   const [visibleColumns, setVisibleColumns] = useState(() => {
     const saved = localStorage.getItem('yatra-activities-columns');
     return saved ? JSON.parse(saved) : {
+      name: true,
       description: true,
       status: true,
-      trips: true,
-      date: true,
-      author: true,
+      created_at: false,
+      updated_at: false,
+      created_by_name: false,
+      updated_by_name: false,
     };
   });
 
   const queryClient = useQueryClient();
-  const { can, isPro } = usePermissions();
+  const { can } = usePermissions();
   const { showToast } = useToast();
 
   // Toggle column visibility
@@ -169,7 +162,7 @@ const Activities: React.FC = () => {
 
   // Bulk actions mutation
   const bulkMutation = useMutation({
-    mutationFn: async ({ action, ids }: { action: string; ids: number[] }) => {
+    mutationFn: async ({ action, ids }: { action: string; ids: (string | number)[] }) => {
       return await apiClient.post('/activities/bulk', { action, ids });
     },
     onSuccess: (response: any) => {
@@ -184,113 +177,15 @@ const Activities: React.FC = () => {
     },
   });
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return __('N/A', 'N/A');
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-    } catch (e) {
-      return dateString;
-    }
-  };
 
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { className: string; label: string }> = {
-      'publish': {
-        className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 border border-green-200 dark:border-green-800',
-        label: __('Published', 'Published'),
-      },
-      'draft': {
-        className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800',
-        label: __('Draft', 'Draft'),
-      },
-      'trash': {
-        className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border border-red-200 dark:border-red-800',
-        label: __('Trash', 'Trash'),
-      },
-    };
 
-    const statusInfo = statusMap[status] || {
-      className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600',
-      label: status,
-    };
 
-    return (
-      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusInfo.className}`}>
-        {statusInfo.label}
-      </span>
-    );
-  };
-
-  const formatUser = (userId: number, userName?: string) => {
-    if (userName) {
-      return userName;
-    }
-    return `User #${userId}`;
-  };
-
-  const renderIcon = (icon: IconPickerValue | null | undefined) => {
-    if (!icon) {
-      return (
-        <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-          <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
-        </div>
-      );
-    }
-
-    if (icon.type === 'image') {
-      return (
-        <img
-          src={icon.value}
-          alt=""
-          className="w-8 h-8 rounded object-cover"
-          onError={(e) => {
-            // Fallback if image fails to load
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            if (target.parentElement) {
-              target.parentElement.innerHTML = '<div class="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center"><span class="text-xs text-gray-400 dark:text-gray-500">—</span></div>';
-            }
-          }}
-        />
-      );
-    }
-
-    // Icon type
-    return (
-      <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-        <IconSelector iconName={icon.value} className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-      </div>
-    );
-  };
 
   const handleEdit = (activity: Activity) => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=edit&id=${activity.id}`;
   };
 
-  const handleDelete = (activity: Activity) => {
-    // Show confirmation dialog for move to trash
-    setIndividualActionConfirm({
-      isOpen: true,
-      action: 'trash',
-      activity: activity
-    });
-  };
 
-  const handleRestore = (activity: Activity) => {
-    // Show confirmation dialog for restore
-    setIndividualActionConfirm({
-      isOpen: true,
-      action: 'restore',
-      activity: activity
-    });
-  };
 
   const handlePermanentDelete = (activity: Activity) => {
     setPermanentDeleteConfirm({ isOpen: true, activity });
@@ -322,24 +217,8 @@ const Activities: React.FC = () => {
     );
   }, [activities]);
 
-  const isAllSelected = activities.length > 0 && selectedIds.length === activities.length;
 
-  const toggleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(activities.map((activity: Activity) => activity.id));
-    } else {
-      setSelectedIds([]);
-    }
-  };
 
-  const toggleSelectItem = (id: number, checked: boolean) => {
-    setSelectedIds((prev) => {
-      if (checked) {
-        return [...new Set([...prev, id])];
-      }
-      return prev.filter((itemId) => itemId !== id);
-    });
-  };
 
   const handleBulkApply = () => {
     if (!bulkAction) {
@@ -352,18 +231,8 @@ const Activities: React.FC = () => {
       return;
     }
 
-    // Show confirmation dialog
-    setBulkActionConfirm({
-      isOpen: true,
-      action: bulkAction,
-      count: selectedIds.length
-    });
-  };
-
-  const confirmBulkAction = () => {
-    bulkMutation.mutate({ action: bulkActionConfirm.action, ids: selectedIds });
-    setBulkActionConfirm({ isOpen: false, action: '', count: 0 });
-    setBulkAction('');
+    // Execute bulk action (confirmation is now handled in BulkActionToolbar)
+    bulkMutation.mutate({ action: bulkAction, ids: selectedIds });
   };
 
   const viewFilters = [
@@ -421,67 +290,6 @@ const Activities: React.FC = () => {
         isLoading={bulkMutation.isPending}
       />
 
-      {/* Bulk Action Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={bulkActionConfirm.isOpen}
-        onClose={() => setBulkActionConfirm({ isOpen: false, action: '', count: 0 })}
-        onConfirm={confirmBulkAction}
-        title={(() => {
-          switch (bulkActionConfirm.action) {
-            case 'trash':
-              return __('Move to Trash', 'Move to Trash');
-            case 'publish':
-              return __('Make Published', 'Make Published');
-            case 'draft':
-              return __('Make Draft', 'Make Draft');
-            case 'delete':
-              return __('Delete Permanently', 'Delete Permanently');
-            default:
-              return __('Confirm Action', 'Confirm Action');
-          }
-        })()}
-        message={(() => {
-          const count = bulkActionConfirm.count;
-          switch (bulkActionConfirm.action) {
-            case 'trash':
-              return count === 1 
-                ? __('Are you sure you want to move this activity to trash?', 'Are you sure you want to move this activity to trash?')
-                : __('Are you sure you want to move {count} activities to trash?', 'Are you sure you want to move {count} activities to trash?').replace('{count}', count.toString());
-            case 'publish':
-              return count === 1 
-                ? __('Are you sure you want to publish this activity?', 'Are you sure you want to publish this activity?')
-                : __('Are you sure you want to publish {count} activities?', 'Are you sure you want to publish {count} activities?').replace('{count}', count.toString());
-            case 'draft':
-              return count === 1 
-                ? __('Are you sure you want to make this activity draft?', 'Are you sure you want to make this activity draft?')
-                : __('Are you sure you want to make {count} activities draft?', 'Are you sure you want to make {count} activities draft?').replace('{count}', count.toString());
-            case 'delete':
-              return count === 1 
-                ? __('Are you sure you want to permanently delete this activity? This action cannot be undone.', 'Are you sure you want to permanently delete this activity? This action cannot be undone.')
-                : __('Are you sure you want to permanently delete {count} activities? This action cannot be undone.', 'Are you sure you want to permanently delete {count} activities? This action cannot be undone.').replace('{count}', count.toString());
-            default:
-              return __('Are you sure you want to perform this action?', 'Are you sure you want to perform this action?');
-          }
-        })()}
-        confirmText={(() => {
-          switch (bulkActionConfirm.action) {
-            case 'trash':
-              return __('Move to Trash', 'Move to Trash');
-            case 'publish':
-              return __('Make Published', 'Make Published');
-            case 'draft':
-              return __('Make Draft', 'Make Draft');
-            case 'delete':
-              return __('Delete Permanently', 'Delete Permanently');
-            default:
-              return __('Confirm', 'Confirm');
-          }
-        })()}
-        cancelText={__('Cancel', 'Cancel')}
-        variant={bulkActionConfirm.action === 'delete' ? 'danger' : 'warning'}
-        isLoading={bulkMutation.isPending}
-      />
-
       {/* Individual Action Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={individualActionConfirm.isOpen}
@@ -520,75 +328,36 @@ const Activities: React.FC = () => {
       {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
         <CardContent className="p-3">
-          <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
-            {/* Search */}
-            <div className="relative min-w-0 w-full lg:flex-[2]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder={__('Search activities...', 'Search activities...')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full"
-              />
-            </div>
-
-            {/* Status Filter */}
-            <Select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setPage(1);
-                setSelectedIds([]);
-                setBulkAction('');
-              }}
-              className="w-full lg:flex-1"
-            >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="publish">{__('Published', 'Published')}</option>
-              <option value="draft">{__('Draft', 'Draft')}</option>
-              <option value="trash">{__('Trash', 'Trash')}</option>
-            </Select>
-
-            {/* Sort By */}
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full lg:flex-1"
-            >
-              <option value="name">{__('Name', 'Name')}</option>
-              <option value="status">{__('Status', 'Status')}</option>
-              <option value="created_at">{__('Created At', 'Created At')}</option>
-              <option value="updated_at">{__('Updated At', 'Updated At')}</option>
-            </Select>
-
-            {/* Sort Order */}
-            <Button
-              variant="outline"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="h-11 px-4 flex items-center gap-1.5 flex-shrink-0"
-              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
-            >
-              {sortOrder === 'asc' ? (
-                <ArrowUp className="w-4 h-4" />
-              ) : (
-                <ArrowDown className="w-4 h-4" />
-              )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
-            </Button>
-
-            {/* Reset Button */}
-            {hasFilters && (
-              <Button
-                variant="outline"
-                onClick={handleResetFilters}
-                className="h-11 flex items-center gap-2 flex-shrink-0"
-              >
-                <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
-              </Button>
-            )}
-          </div>
+          <SearchFilterToolbar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={statusFilter}
+            onStatusChange={(value) => {
+              setStatusFilter(value);
+              setPage(1);
+              setSelectedIds([]);
+              setBulkAction('');
+            }}
+            statusOptions={[
+              { value: "all", label: __('All Status', 'All Status') },
+              { value: "publish", label: __('Published', 'Published') },
+              { value: "draft", label: __('Draft', 'Draft') },
+              { value: "trash", label: __('Trash', 'Trash') }
+            ]}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
+            sortOrder={sortOrder}
+            onSortOrderChange={setSortOrder}
+            sortOptions={[
+              { value: "name", label: __('Name', 'Name') },
+              { value: "status", label: __('Status', 'Status') },
+              { value: "created_at", label: __('Created At', 'Created At') },
+              { value: "updated_at", label: __('Updated At', 'Updated At') }
+            ]}
+            onResetFilters={handleResetFilters}
+            hasFilters={!!hasFilters}
+            placeholder={__('Search activities...', 'Search activities...')}
+          />
         </CardContent>
       </Card>
 
@@ -602,591 +371,260 @@ const Activities: React.FC = () => {
           </Card>
         ) : (
           <>
-            {/* Bulk actions toolbar - Always above the table */}
-            <Card>
-              <CardContent className="p-0">
-                <div className="px-4 py-3 border-b space-y-3">
-                  {/* Top row: Bulk actions and status tabs */}
-                  <div className="flex items-center justify-between gap-4">
-                    {/* Left: Bulk actions - all in one line */}
-                    <div className="flex items-center gap-3 flex-nowrap">
-                      <Select
-                        value={bulkAction}
-                        onChange={(e) => setBulkAction(e.target.value)}
-                        className="min-w-[140px]"
-                        disabled={activities.length === 0}
-                      >
-                        <option value="">{__('Bulk actions', 'Bulk actions')}</option>
-                        {(() => {
-                          switch (statusFilter) {
-                            case 'publish':
-                              return (
-                                <>
-                                  <option value="trash">{__('Move to Trash', 'Move to Trash')}</option>
-                                  <option value="draft">{__('Make Draft', 'Make Draft')}</option>
-                                </>
-                              );
-                            case 'draft':
-                              return (
-                                <>
-                                  <option value="publish">{__('Make Published', 'Make Published')}</option>
-                                  <option value="trash">{__('Move to Trash', 'Move to Trash')}</option>
-                                </>
-                              );
-                            case 'trash':
-                              return (
-                                <>
-                                  <option value="publish">{__('Make Published', 'Make Published')}</option>
-                                  <option value="draft">{__('Make Draft', 'Make Draft')}</option>
-                                  <option value="delete">{__('Delete Permanently', 'Delete Permanently')}</option>
-                                </>
-                              );
-                            case 'all':
-                            default:
-                              return (
-                                <>
-                                  <option value="publish">{__('Make Published', 'Make Published')}</option>
-                                  <option value="draft">{__('Make Draft', 'Make Draft')}</option>
-                                  <option value="trash">{__('Move to Trash', 'Move to Trash')}</option>
-                                </>
-                              );
-                          }
-                        })()}
-                      </Select>
-                      <Button
-                        variant="outline"
-                        onClick={handleBulkApply}
-                        disabled={bulkMutation.isPending || selectedIds.length === 0}
-                        className="h-11 px-4 flex-shrink-0"
-                      >
-                        {__('Apply', 'Apply')}
-                      </Button>
-                      
-                      {/* Selection info right after Apply button */}
-                      {selectedIds.length > 0 && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border border-blue-200 dark:border-blue-800 whitespace-nowrap">
-                          <span className="font-medium text-xs">{`${__('Selected:', 'Selected:')} ${selectedIds.length}`}</span>
-                          <button
-                            type="button"
-                            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
-                            onClick={() => setSelectedIds([])}
-                          >
-                            {__('Clear', 'Clear')}
-                          </button>
-                        </div>
-                      )}
-                    </div>
+            <BulkActionToolbar
+              selectedIds={selectedIds}
+              bulkAction={bulkAction}
+              setBulkAction={setBulkAction}
+              onApply={handleBulkApply}
+              onClearSelection={() => setSelectedIds([])}
+              statusFilter={statusFilter}
+              setStatusFilter={(value) => {
+                setStatusFilter(value);
+                setPage(1);
+                setSelectedIds([]);
+                setBulkAction('');
+              }}
+              statusOptions={viewFilters}
+              showColumnsDropdown={showColumnsDropdown}
+              setShowColumnsDropdown={setShowColumnsDropdown}
+              columnOptions={[
+                { key: 'name', label: __('Activity', 'Activity'), visible: visibleColumns.name },
+                { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+                { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+                { key: 'created_at', label: __('Created Date', 'Created Date'), visible: visibleColumns.created_at },
+                { key: 'updated_at', label: __('Updated Date', 'Updated Date'), visible: visibleColumns.updated_at },
+                { key: 'created_by_name', label: __('Created By', 'Created By'), visible: visibleColumns.created_by_name },
+                { key: 'updated_by_name', label: __('Updated By', 'Updated By'), visible: visibleColumns.updated_by_name }
+              ]}
+              onToggleColumn={toggleColumn}
+              bulkMutationPending={bulkMutation.isPending}
+              totalItems={activities.length}
+              bulkActionOptions={(() => {
+                const options = [];
+                switch (statusFilter) {
+                  case 'publish':
+                    options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
+                    options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
+                    break;
+                  case 'draft':
+                    options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
+                    options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
+                    break;
+                  case 'trash':
+                    options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
+                    options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
+                    options.push({ value: 'delete', label: __('Delete Permanently', 'Delete Permanently') });
+                    break;
+                  case 'all':
+                  default:
+                    options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
+                    options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
+                    options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
+                    break;
+                }
+                return options;
+              })()}
+            />
 
-                    {/* Right: Status filter tabs */}
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      {viewFilters.map((filter) => {
-                        const isActive = statusFilter === filter.key;
-                        return (
-                          <button
-                            key={filter.key}
-                            type="button"
-                            className={`px-3 py-2.5 text-sm font-medium rounded border transition-all duration-200 ${
-                              isActive
-                                ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
-                                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:border-gray-500'
-                            }`}
-                            onClick={() => {
-                              setStatusFilter(filter.key);
-                              setPage(1);
-                              setSelectedIds([]);
-                              setBulkAction('');
-                            }}
-                          >
-                            <span className="flex items-center gap-2">
-                              {filter.label}
-                              <span className={`px-1.5 py-0.5 text-xs rounded-full font-medium ${
-                                isActive 
-                                  ? 'bg-white text-gray-900' 
-                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                              }`}>
-                                {filter.count ?? 0}
-                              </span>
-                            </span>
-                          </button>
-                        );
-                      })}
-                      
-                      {/* Columns visibility toggle */}
-                      <div className="relative ml-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setShowColumnsDropdown(!showColumnsDropdown);
-                          }}
-                          className="h-10 px-3 flex items-center gap-2"
-                          data-columns-trigger
-                        >
-                          <Columns className="w-4 h-4" />
-                          {__('Columns', 'Columns')}
-                        </Button>
-                        
-                        {/* Columns dropdown */}
-                        {showColumnsDropdown && (console.log('Columns dropdown is showing with new styles'),
-                          <div 
-                            className="absolute right-0 top-11 z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2"
-                            style={{ width: '240px', minWidth: '240px' }}
-                            data-columns-content
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <div className="px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
-                              {__('Show Columns', 'Show Columns')}
-                            </div>
-                            
-                            <div className="py-1">
-                              <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
-                                <input
-                                  type="checkbox"
-                                  checked={visibleColumns.description}
-                                  onChange={() => toggleColumn('description')}
-                                  className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Description', 'Description')}</span>
-                              </label>
-                              
-                              <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
-                                <input
-                                  type="checkbox"
-                                  checked={visibleColumns.status}
-                                  onChange={() => toggleColumn('status')}
-                                  className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Status', 'Status')}</span>
-                              </label>
-                              
-                              {isPro && (
-                                <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
-                                  <input
-                                    type="checkbox"
-                                    checked={visibleColumns.trips}
-                                    onChange={() => toggleColumn('trips')}
-                                    className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+            <Card className="overflow-visible">
+              <CardContent className="p-0 overflow-visible">
+                <SharedTable
+                  data={activities}
+                    columns={[
+                      {
+                        key: 'name',
+                        label: __('Activity', 'Activity'),
+                        sortable: true,
+                        visible: visibleColumns.name,
+                        render: (activity: Activity) => (
+                          <div className="flex items-center gap-3">
+                            {/* Icon/Image */}
+                            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                              {activity.icon ? (
+                                activity.icon.type === 'image' ? (
+                                  <img 
+                                    src={activity.icon.value} 
+                                    alt={activity.name}
+                                    className="w-full h-full object-cover rounded-lg"
                                   />
-                                  <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Trips', 'Trips')}</span>
-                                </label>
-                              )}
-                              
-                              <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
-                                <input
-                                  type="checkbox"
-                                  checked={visibleColumns.date}
-                                  onChange={() => toggleColumn('date')}
-                                  className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Date', 'Date')}</span>
-                              </label>
-                              
-                              <label className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
-                                <input
-                                  type="checkbox"
-                                  checked={visibleColumns.author}
-                                  onChange={() => toggleColumn('author')}
-                                  className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{__('Author', 'Author')}</span>
-                              </label>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-0">
-                {isLoading ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[250px]">{__('Activity', 'Activity')}</TableHead>
-                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
-                        {isPro && (
-                          <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
-                        )}
-                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[...Array(5)].map((_, index) => (
-                        <TableRow key={`skeleton-${index}`}>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          {isPro && (
-                            <TableCell>
-                              <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </TableCell>
-                          )}
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : activities.length === 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[250px]">{__('Activity', 'Activity')}</TableHead>
-                        {visibleColumns.description && (
-                          <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        )}
-                        {visibleColumns.status && (
-                          <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
-                        )}
-                        {isPro && visibleColumns.trips && (
-                          <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
-                        )}
-                        {visibleColumns.date && (
-                          <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
-                        )}
-                        {visibleColumns.author && (
-                          <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        )}
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={
-                          1 + // Activity column (always visible)
-                          (visibleColumns.description ? 1 : 0) +
-                          (visibleColumns.status ? 1 : 0) +
-                          (isPro && visibleColumns.trips ? 1 : 0) +
-                          (visibleColumns.date ? 1 : 0) +
-                          (visibleColumns.author ? 1 : 0) +
-                          1 // Actions column (always visible)
-                        } className="h-64">
-                          <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                              <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                              {__('No activities found', 'No activities found')}
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
-                              {hasFilters 
-                                ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                                : __('Get started by creating your first activity.', 'Get started by creating your first activity.')
-                              }
-                            </p>
-                            {hasFilters ? (
-                              <Button
-                                variant="outline"
-                                onClick={handleResetFilters}
-                                className="flex items-center gap-2"
-                              >
-                                <X className="w-4 h-4" />
-                                {__('Clear Filters', 'Clear Filters')}
-                              </Button>
-                            ) : (
-                              can('yatra_edit_trips') && (
-                                <Button onClick={handleCreateActivity} className="flex items-center gap-2">
-                                  <Plus className="w-4 h-4" />
-                                  {__('Add New Activity', 'Add New Activity')}
-                                </Button>
-                              )
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-10">
-                          <input
-                            type="checkbox"
-                            className="rounded border-gray-300 dark:border-gray-600"
-                            checked={isAllSelected}
-                            onChange={(e) => toggleSelectAll(e.target.checked)}
-                            aria-label={__('Select all activities', 'Select all activities')}
-                          />
-                        </TableHead>
-                        <TableHead className="w-[250px]">
-                          <button
-                            onClick={() => handleSort('name')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Activity', 'Activity')}
-                            {getSortIcon('name')}
-                          </button>
-                        </TableHead>
-                        {visibleColumns.description && (
-                          <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        )}
-                        {visibleColumns.status && (
-                          <TableHead className="w-[100px]">
-                            <button
-                              onClick={() => handleSort('status')}
-                              className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                              {__('Status', 'Status')}
-                              {getSortIcon('status')}
-                            </button>
-                          </TableHead>
-                        )}
-                        {isPro && visibleColumns.trips && (
-                          <TableHead className="w-[80px]">{__('Trips', 'Trips')}</TableHead>
-                        )}
-                        {visibleColumns.date && (
-                          <TableHead className="w-[150px]">
-                            <button
-                              onClick={() => handleSort('created_at')}
-                              className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                              {__('Date', 'Date')}
-                              {getSortIcon('created_at')}
-                            </button>
-                          </TableHead>
-                        )}
-                        {visibleColumns.author && (
-                          <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        )}
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {activities.map((activity: Activity) => {
-                        const isTrash = activity.status === 'trash' || statusFilter === 'trash';
-                        return (
-                        <TableRow 
-                          key={activity.id} 
-                          className={isTrash ? 'bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20' : ''}
-                        >
-                          <TableCell>
-                            <input
-                              type="checkbox"
-                              className="rounded border-gray-300 dark:border-gray-600"
-                              checked={selectedIds.includes(activity.id)}
-                              onChange={(e) => toggleSelectItem(activity.id, e.target.checked)}
-                              aria-label={__('Select activity', 'Select activity')}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <div className={`flex-shrink-0 ${isTrash ? 'opacity-50 grayscale' : ''}`}>
-                                {renderIcon(activity.icon)}
-                              </div>
-                              <div className="min-w-0">
-                                <button
-                                  onClick={() => handleEdit(activity)}
-                                  className={`font-medium truncate hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-left ${
-                                    isTrash 
-                                      ? 'text-gray-500 dark:text-gray-500' 
-                                      : 'text-gray-900 dark:text-white'
-                                  }`}
-                                >
-                                  {activity.name}
-                                </button>
-                                <div className={`text-sm truncate ${
-                                  isTrash 
-                                    ? 'text-gray-400 dark:text-gray-600' 
-                                    : 'text-gray-500 dark:text-gray-400'
-                                }`}>
-                                  {activity.slug}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          {visibleColumns.description && (
-                            <TableCell className={`text-sm ${
-                              isTrash 
-                                ? 'text-gray-400 dark:text-gray-600' 
-                                : 'text-gray-600 dark:text-gray-400'
-                            }`}>
-                              <div className="line-clamp-2">
-                                {activity.description || __('No description', 'No description')}
-                              </div>
-                            </TableCell>
-                          )}
-                          {visibleColumns.status && (
-                            <TableCell>
-                              {getStatusBadge(activity.status)}
-                            </TableCell>
-                          )}
-                          {isPro && visibleColumns.trips && (
-                            <TableCell className={isTrash 
-                              ? 'text-gray-400 dark:text-gray-600' 
-                              : 'text-gray-600 dark:text-gray-400'
-                            }>
-                              <span>
-                                {activity.trips_count || 0}
-                              </span>
-                            </TableCell>
-                          )}
-                          {visibleColumns.date && (
-                            <TableCell className={`text-sm ${
-                              isTrash 
-                                ? 'text-gray-400 dark:text-gray-600' 
-                                : 'text-gray-500 dark:text-gray-400'
-                            }`}>
-                              <div>
-                                <div>{formatDate(activity.created_at)}</div>
-                                <div className={`text-xs mt-0.5 ${
-                                  isTrash 
-                                    ? 'text-gray-400 dark:text-gray-600' 
-                                    : 'text-gray-400 dark:text-gray-500'
-                                }`}>
-                                  {__('Updated', 'Updated')}: {formatDate(activity.updated_at)}
-                                </div>
-                              </div>
-                            </TableCell>
-                          )}
-                          {visibleColumns.author && (
-                            <TableCell className={`text-sm ${
-                              isTrash 
-                                ? 'text-gray-400 dark:text-gray-600' 
-                                : 'text-gray-600 dark:text-gray-400'
-                            }`}>
-                              <div>
-                                <div>{formatUser(activity.created_by, activity.created_by_name)}</div>
-                                <div className={`text-xs mt-0.5 ${
-                                  isTrash 
-                                    ? 'text-gray-400 dark:text-gray-600' 
-                                    : 'text-gray-400 dark:text-gray-500'
-                                }`}>
-                                  {__('Updated by', 'Updated by')}: {formatUser(activity.updated_by, activity.updated_by_name)}
-                                </div>
-                              </div>
-                            </TableCell>
-                          )}
-                          <TableCell className="text-right">
-                            <div className="relative">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setOpenDropdown(openDropdown === activity.id ? null : activity.id);
-                                }}
-                                className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                aria-label={__('More actions', 'More actions')}
-                                data-dropdown-trigger
-                              >
-                                <MoreVertical className="w-4 h-4" />
-                              </Button>
-                              
-                              {/* Dropdown Menu */}
-                              {openDropdown === activity.id && (
-                                <div 
-                                  className="absolute right-0 top-8 z-[9999] min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-1"
-                                  data-dropdown-content
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <ConditionalRender capability="yatra_edit_trips">
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        handleEdit(activity);
-                                        setOpenDropdown(null);
-                                      }}
-                                      className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap"
-                                    >
-                                      <Edit className="w-4 h-4" />
-                                      {__('Edit', 'Edit')}
-                                    </button>
-                                  </ConditionalRender>
-                                  
-                                  <ConditionalRender capability="yatra_delete_trips">
-                                    {activity.status === 'trash' || statusFilter === 'trash' ? (
-                                      <>
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            handleRestore(activity);
-                                            setOpenDropdown(null);
-                                          }}
-                                          className="w-full px-4 py-2 text-left text-sm text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap"
-                                        >
-                                          <RotateCcw className="w-4 h-4" />
-                                          {__('Restore', 'Restore')}
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            handlePermanentDelete(activity);
-                                            setOpenDropdown(null);
-                                          }}
-                                          className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap"
-                                        >
-                                          <Trash2 className="w-4 h-4" />
-                                          {__('Delete Permanently', 'Delete Permanently')}
-                                        </button>
-                                      </>
-                                    ) : (
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                          handleDelete(activity);
-                                          setOpenDropdown(null);
-                                        }}
-                                        className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap"
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                        {__('Move to Trash', 'Move to Trash')}
-                                      </button>
-                                    )}
-                                  </ConditionalRender>
+                                ) : (
+                                  <IconSelector 
+                                    iconName={activity.icon.value} 
+                                    className="w-5 h-5 text-blue-600 dark:text-blue-400" 
+                                  />
+                                )
+                              ) : (
+                                <div className="w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold">
+                                  {activity.name.charAt(0).toUpperCase()}
                                 </div>
                               )}
                             </div>
-                          </TableCell>
-                        </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                )}
+                            {/* Text */}
+                            <div>
+                              <div className="font-medium text-gray-900 dark:text-white">
+                                {activity.name}
+                              </div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                {activity.slug}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      },
+                      {
+                        key: 'description',
+                        label: __('Description', 'Description'),
+                        visible: visibleColumns.description,
+                        render: (activity: Activity) => (
+                          <span className={activity.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                            {activity.description || __('No description', 'No description')}
+                          </span>
+                        )
+                      },
+                      {
+                        key: 'status',
+                        label: __('Status', 'Status'),
+                        sortable: true,
+                        visible: visibleColumns.status,
+                        render: (activity: Activity) => (
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            activity.status === 'trash' || statusFilter === 'trash'
+                              ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                              : activity.status === 'publish'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                          }`}>
+                            {activity.status === 'trash' || statusFilter === 'trash'
+                              ? __('Trash', 'Trash')
+                              : activity.status === 'publish'
+                                ? __('Published', 'Published')
+                                : __('Draft', 'Draft')
+                            }
+                          </span>
+                        )
+                      },
+                      {
+                        key: 'created_at',
+                        label: __('Created Date', 'Created Date'),
+                        sortable: true,
+                        visible: visibleColumns.created_at,
+                        render: (activity: Activity) => (
+                          <span className={activity.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                            {new Date(activity.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        )
+                      },
+                      {
+                        key: 'updated_at',
+                        label: __('Updated Date', 'Updated Date'),
+                        sortable: true,
+                        visible: visibleColumns.updated_at,
+                        render: (activity: Activity) => (
+                          <span className={activity.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                            {new Date(activity.updated_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        )
+                      },
+                      {
+                        key: 'created_by_name',
+                        label: __('Created By', 'Created By'),
+                        visible: visibleColumns.created_by_name,
+                        render: (activity: Activity) => (
+                          <span className={activity.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                            {activity.created_by_name || __('Unknown', 'Unknown')}
+                          </span>
+                        )
+                      },
+                      {
+                        key: 'updated_by_name',
+                        label: __('Updated By', 'Updated By'),
+                        visible: visibleColumns.updated_by_name,
+                        render: (activity: Activity) => (
+                          <span className={activity.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
+                            {activity.updated_by_name || __('Unknown', 'Unknown')}
+                          </span>
+                        )
+                      }
+                    ]}
+                    actions={[
+                      {
+                        key: 'edit',
+                        label: __('Edit', 'Edit'),
+                        icon: <Edit className="w-4 h-4" />,
+                        onClick: handleEdit,
+                        condition: () => can('yatra_edit_trips'),
+                      },
+                      {
+                        key: 'restore',
+                        label: __('Restore', 'Restore'),
+                        icon: <RotateCcw className="w-4 h-4" />,
+                        onClick: (activity: Activity) => {
+                          bulkMutation.mutate({ action: 'restore', ids: [activity.id] });
+                        },
+                        condition: (activity: Activity) => (activity.status === 'trash' || statusFilter === 'trash') && can('yatra_edit_trips'),
+                      },
+                      {
+                        key: 'trash',
+                        label: __('Move to Trash', 'Move to Trash'),
+                        icon: <Trash2 className="w-4 h-4" />,
+                        onClick: (activity: Activity) => {
+                          bulkMutation.mutate({ action: 'trash', ids: [activity.id] });
+                        },
+                        condition: (activity: Activity) => activity.status !== 'trash' && statusFilter !== 'trash' && can('yatra_edit_trips'),
+                      },
+                      {
+                        key: 'delete',
+                        label: __('Delete Permanently', 'Delete Permanently'),
+                        icon: <Trash2 className="w-4 h-4" />,
+                        onClick: handlePermanentDelete,
+                        condition: (activity: Activity) => (activity.status === 'trash' || statusFilter === 'trash') && can('yatra_delete_trips'),
+                        variant: 'destructive',
+                      }
+                    ]}
+                    isLoading={isLoading}
+                    isError={!!error}
+                    errorText={__('Error loading activities', 'Error loading activities')}
+                    emptyText={__('No activities found', 'No activities found')}
+                    emptyDescription={hasFilters 
+                      ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                      : __('Get started by creating your first activity.', 'Get started by creating your first activity.')
+                    }
+                    onCreateClick={can('yatra_edit_trips') ? handleCreateActivity : undefined}
+                    onSort={handleSort}
+                    getSortIcon={getSortIcon}
+                    selectedItemIds={selectedIds}
+                    onSelectItem={(id: string | number, checked: boolean) => {
+                      if (checked) {
+                        setSelectedIds([...selectedIds, id]);
+                      } else {
+                        setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+                      }
+                    }}
+                    onSelectAll={(checked: boolean) => {
+                      if (checked) {
+                        setSelectedIds(activities.map((a: Activity) => a.id));
+                      } else {
+                        setSelectedIds([]);
+                      }
+                    }}
+                    isAllSelected={activities.length > 0 && selectedIds.length === activities.length}
+                    getItemId={(activity: Activity) => activity.id}
+                    getItemStatus={(activity: Activity) => activity.status}
+                    statusFilter={statusFilter}
+                    skeletonRows={5}
+                  />
               </CardContent>
             </Card>
 
@@ -1194,108 +632,14 @@ const Activities: React.FC = () => {
             {total > 0 && (
               <Card>
                 <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('activities', 'activities')}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {/* Previous Button */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="h-8 px-3"
-                      >
-                        {__('‹', '‹')}
-                      </Button>
-
-                      {/* Page Numbers */}
-                      {(() => {
-                        const pages = [];
-                        const maxVisiblePages = 5;
-                        let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
-                        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-                        
-                        // Adjust start if we're near the end
-                        if (endPage - startPage + 1 < maxVisiblePages) {
-                          startPage = Math.max(1, endPage - maxVisiblePages + 1);
-                        }
-
-                        // First page + ellipsis
-                        if (startPage > 1) {
-                          pages.push(
-                            <Button
-                              key={1}
-                              variant={1 === page ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setPage(1)}
-                              className="h-8 w-8 p-0"
-                            >
-                              1
-                            </Button>
-                          );
-                          if (startPage > 2) {
-                            pages.push(
-                              <span key="ellipsis1" className="px-2 text-gray-500">
-                                ...
-                              </span>
-                            );
-                          }
-                        }
-
-                        // Visible page range
-                        for (let i = startPage; i <= endPage; i++) {
-                          pages.push(
-                            <Button
-                              key={i}
-                              variant={i === page ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setPage(i)}
-                              className="h-8 w-8 p-0"
-                            >
-                              {i}
-                            </Button>
-                          );
-                        }
-
-                        // Ellipsis + last page
-                        if (endPage < totalPages) {
-                          if (endPage < totalPages - 1) {
-                            pages.push(
-                              <span key="ellipsis2" className="px-2 text-gray-500">
-                                ...
-                              </span>
-                            );
-                          }
-                          pages.push(
-                            <Button
-                              key={totalPages}
-                              variant={totalPages === page ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setPage(totalPages)}
-                              className="h-8 w-8 p-0"
-                            >
-                              {totalPages}
-                            </Button>
-                          );
-                        }
-
-                        return pages;
-                      })()}
-
-                      {/* Next Button */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                        disabled={page >= totalPages}
-                        className="h-8 px-3"
-                      >
-                        {__('›', '›')}
-                      </Button>
-                    </div>
-                  </div>
+                  <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    totalItems={total}
+                    itemsPerPage={10}
+                    onPageChange={setPage}
+                    itemName={__('activities', 'activities')}
+                  />
                 </CardContent>
               </Card>
             )}
