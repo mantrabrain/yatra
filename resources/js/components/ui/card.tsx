@@ -6,7 +6,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className = "", ...props }, ref) => (
     <div
       ref={ref}
-      className={`rounded-lg border border-gray-100 dark:border-gray-700/50 bg-white dark:bg-gray-800 flex flex-col ${className}`}
+      className={`rounded-lg border border-gray-100 dark:border-gray-700/50 bg-white dark:bg-gray-800 flex flex-col py-4 ${className}`}
       {...props}
     />
   )

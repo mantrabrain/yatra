@@ -114,7 +114,7 @@ const Card = reactExports.forwardRef(
     "div",
     {
       ref,
-      className: `rounded-lg border border-gray-100 dark:border-gray-700/50 bg-white dark:bg-gray-800 flex flex-col ${className}`,
+      className: `rounded-lg border border-gray-100 dark:border-gray-700/50 bg-white dark:bg-gray-800 flex flex-col py-4 ${className}`,
       ...props
     }
   )
@@ -8962,11 +8962,60 @@ const Table = ({
     ] }, `skeleton-${index}`)) })
   ] });
   const renderError = () => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-red-500", children: errorText });
-  const renderEmpty = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center py-12", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 text-gray-400 dark:text-gray-500" }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: emptyText }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm", children: emptyDescription }),
-    onCreateClick && /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: onCreateClick, className: "flex items-center gap-2", children: __("Create", "Create") })
+  const renderEmpty = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex flex-col items-center justify-center text-center py-16 px-6 my-6 min-h-[400px]", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-8 bg-gradient-to-br from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative z-10 max-w-md mx-auto space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 ring-8 ring-blue-50/50 dark:ring-blue-900/20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "svg",
+        {
+          className: "w-10 h-10 text-blue-600 dark:text-blue-400",
+          fill: "none",
+          stroke: "currentColor",
+          viewBox: "0 0 24 24",
+          strokeWidth: "1.5",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "path",
+            {
+              strokeLinecap: "round",
+              strokeLinejoin: "round",
+              d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            }
+          )
+        }
+      ) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: emptyText }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 leading-relaxed", children: emptyDescription })
+      ] }),
+      onCreateClick && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "pt-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Button,
+        {
+          onClick: onCreateClick,
+          className: "inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "svg",
+              {
+                className: "w-4 h-4",
+                fill: "none",
+                stroke: "currentColor",
+                viewBox: "0 0 24 24",
+                strokeWidth: "2",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "path",
+                  {
+                    strokeLinecap: "round",
+                    strokeLinejoin: "round",
+                    d: "M12 4v16m8-8H4"
+                  }
+                )
+              }
+            ),
+            __("Create New", "Create New")
+          ]
+        }
+      ) })
+    ] })
   ] });
   const renderTable = () => {
     if (isLoading) return renderSkeleton();
@@ -9166,6 +9215,18 @@ const Activities = () => {
     }
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+  const { data: statsData } = useQuery({
+    queryKey: ["activities-stats"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/activities/stats");
+        return response;
+      } catch (error2) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can("yatra_view_trips")
+  });
   const { data, isLoading, error } = useQuery({
     queryKey: ["activities", queryParams],
     queryFn: async () => {
@@ -9179,38 +9240,38 @@ const Activities = () => {
     },
     enabled: can("yatra_view_trips")
   });
-  const { data: statsData } = useQuery({
-    queryKey: ["activities", "stats"],
-    queryFn: async () => {
-      const response = await apiClient.get("/activities/stats");
-      console.log("Stats API Response:", response);
-      return response;
-    },
-    enabled: can("yatra_view_trips")
-  });
   const activities = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
-  const statusCounts = (statsData == null ? void 0 : statsData.data) || {
-    all: 0,
-    publish: 0,
-    draft: 0,
-    trash: 0
-  };
-  console.log("Status Counts:", statusCounts);
+  const statusCounts = reactExports.useMemo(() => {
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0
+      };
+    }
+    return {
+      all: 0,
+      publish: 0,
+      draft: 0,
+      trash: 0
+    };
+  }, [statsData]);
   const bulkMutation = useMutation({
     mutationFn: async ({ action, ids }) => {
       return await apiClient.post("/activities/bulk", { action, ids });
     },
-    onSuccess: (response) => {
-      const message2 = (response == null ? void 0 : response.message) || __("Bulk action completed.", "Bulk action completed.");
-      showToast(message2, "success");
-      setSelectedIds([]);
+    onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["activities"] });
-      queryClient2.invalidateQueries({ queryKey: ["activities", "stats"] });
+      queryClient2.invalidateQueries({ queryKey: ["activities-stats"] });
+      showToast(__("Bulk action completed successfully", "Bulk action completed successfully"), "success");
+      setSelectedIds([]);
+      setBulkAction("");
     },
     onError: (error2) => {
-      showToast((error2 == null ? void 0 : error2.message) || __("Failed to process bulk action", "Failed to process bulk action"), "error");
+      showToast((error2 == null ? void 0 : error2.message) || __("Failed to perform bulk action", "Failed to perform bulk action"), "error");
     }
   });
   const handleEdit = (activity) => {
@@ -9425,26 +9486,36 @@ const Activities = () => {
               label: __("Activity", "Activity"),
               sortable: true,
               visible: visibleColumns.name,
-              render: (activity) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0", children: activity.icon ? activity.icon.type === "image" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "img",
-                  {
-                    src: activity.icon.value,
-                    alt: activity.name,
-                    className: "w-full h-full object-cover rounded-lg"
-                  }
-                ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  IconSelector,
-                  {
-                    iconName: activity.icon.value,
-                    className: "w-5 h-5 text-blue-600 dark:text-blue-400"
-                  }
-                ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold", children: activity.name.charAt(0).toUpperCase() }) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: activity.name }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: activity.slug })
-                ] })
-              ] })
+              render: (activity) => {
+                var _a;
+                return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0", children: activity.icon ? activity.icon.type === "image" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "img",
+                    {
+                      src: activity.icon.value,
+                      alt: activity.name,
+                      className: "w-full h-full object-cover rounded-lg"
+                    }
+                  ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    IconSelector,
+                    {
+                      iconName: activity.icon.value,
+                      className: "w-5 h-5 text-blue-600 dark:text-blue-400"
+                    }
+                  ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold", children: activity.name.charAt(0).toUpperCase() }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "a",
+                      {
+                        href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=edit&id=${activity.id}`,
+                        className: "font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer",
+                        children: activity.name
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: activity.slug })
+                  ] })
+                ] });
+              }
             },
             {
               key: "description",
@@ -10073,13 +10144,12 @@ const ActivityForm = () => {
     }
   }, [activityData, isEditMode]);
   const handleNameChange = (value) => {
-    if (!isSlugEditable) {
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData((prev) => ({
         ...prev,
         name: value,
         slug: newSlug
-        // Always auto-generate slug from name
       }));
     } else {
       setFormData((prev) => ({
@@ -10176,9 +10246,37 @@ const ActivityForm = () => {
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities`;
   };
   if (isEditMode && isLoadingActivity) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-gray-600 dark:text-gray-400", children: __("Loading activity...", "Loading activity...") })
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2 animate-pulse" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] })
+        ] }) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }) })
+        ] })
+      ] })
     ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -10391,6 +10489,18 @@ const Destinations = () => {
     }
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+  const { data: statsData } = useQuery({
+    queryKey: ["destinations-stats"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/destinations/stats");
+        return response;
+      } catch (error2) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can("yatra_view_trips")
+  });
   const { data, isLoading, error } = useQuery({
     queryKey: ["destinations", queryParams],
     queryFn: async () => {
@@ -10410,6 +10520,7 @@ const Destinations = () => {
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["destinations"] });
+      queryClient2.invalidateQueries({ queryKey: ["destinations-stats"] });
       showToast(__("Destination deleted successfully", "Destination deleted successfully"), "success");
       setDeleteConfirm({ isOpen: false, destination: null });
     },
@@ -10466,20 +10577,28 @@ const Destinations = () => {
     localStorage.setItem("yatra_destinations_visible_columns", JSON.stringify(newVisibleColumns));
   };
   const statusCounts = reactExports.useMemo(() => {
-    const counts = {
-      all: total,
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0
+      };
+    }
+    return {
+      all: 0,
       publish: 0,
       draft: 0,
       trash: 0
     };
-    return counts;
-  }, [total]);
+  }, [statsData]);
   const bulkMutation = useMutation({
     mutationFn: async ({ action, ids }) => {
       return await apiClient.post("/destinations/bulk", { action, ids });
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["destinations"] });
+      queryClient2.invalidateQueries({ queryKey: ["destinations-stats"] });
       showToast(__("Bulk action completed successfully", "Bulk action completed successfully"), "success");
       setSelectedIds([]);
       setBulkAction("");
@@ -10634,26 +10753,36 @@ const Destinations = () => {
               label: __("Destination", "Destination"),
               sortable: true,
               visible: visibleColumns.name,
-              render: (destination) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0", children: destination.icon ? destination.icon.type === "image" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "img",
-                  {
-                    src: destination.icon.value,
-                    alt: destination.name,
-                    className: "w-full h-full object-cover rounded-lg"
-                  }
-                ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  IconSelector,
-                  {
-                    iconName: destination.icon.value,
-                    className: "w-5 h-5 text-blue-600 dark:text-blue-400"
-                  }
-                ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold", children: destination.name.charAt(0).toUpperCase() }) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: destination.name }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: destination.slug })
-                ] })
-              ] })
+              render: (destination) => {
+                var _a;
+                return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0", children: destination.icon ? destination.icon.type === "image" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "img",
+                    {
+                      src: destination.icon.value,
+                      alt: destination.name,
+                      className: "w-full h-full object-cover rounded-lg"
+                    }
+                  ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    IconSelector,
+                    {
+                      iconName: destination.icon.value,
+                      className: "w-5 h-5 text-blue-600 dark:text-blue-400"
+                    }
+                  ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold", children: destination.name.charAt(0).toUpperCase() }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "a",
+                      {
+                        href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`,
+                        className: "font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer",
+                        children: destination.name
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: destination.slug })
+                  ] })
+                ] });
+              }
             },
             {
               key: "description",
@@ -10835,13 +10964,12 @@ const DestinationForm = () => {
     }
   }, [destinationData, isEditMode]);
   const handleNameChange = (value) => {
-    if (!isSlugEditable) {
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData((prev) => ({
         ...prev,
         name: value,
         slug: newSlug
-        // Always auto-generate slug from name
       }));
     } else {
       setFormData((prev) => ({
@@ -10938,9 +11066,37 @@ const DestinationForm = () => {
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations`;
   };
   if (isEditMode && isLoadingDestination) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-gray-600 dark:text-gray-400", children: __("Loading destination...", "Loading destination...") })
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2 animate-pulse" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] })
+        ] }) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }) })
+        ] })
+      ] })
     ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [

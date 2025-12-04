@@ -88,13 +88,14 @@ const ActivityForm: React.FC = () => {
   }, [activityData, isEditMode]);
 
   const handleNameChange = (value: string) => {
-    // Auto-generate slug from name (only if slug is not manually edited)
-    if (!isSlugEditable) {
+    // Auto-generate slug from name only in ADD mode (not in EDIT mode)
+    // In EDIT mode, slug only changes if user explicitly edits it
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData(prev => ({
         ...prev,
         name: value,
-        slug: newSlug, // Always auto-generate slug from name
+        slug: newSlug,
       }));
     } else {
       setFormData(prev => ({
@@ -212,9 +213,54 @@ const ActivityForm: React.FC = () => {
 
   if (isEditMode && isLoadingActivity) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading activity...', 'Loading activity...')}</span>
+      <div className="space-y-3">
+        {/* Header Skeleton */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div>
+        </div>
+
+        {/* Form Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Main Fields */}
+          <div className="lg:col-span-2 space-y-3">
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                {/* Name field */}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+                {/* Slug field */}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+                {/* Description field */}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                  <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-3">
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse"></div>
+                <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }

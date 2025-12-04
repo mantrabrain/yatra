@@ -96,6 +96,20 @@ const Destinations: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
+  // Fetch status counts from API
+  const { data: statsData } = useQuery({
+    queryKey: ['destinations-stats'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/destinations/stats');
+        return response;
+      } catch (error: any) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
   // Fetch destinations from API
   const { data, isLoading, error } = useQuery({
     queryKey: ['destinations', queryParams],
@@ -118,6 +132,7 @@ const Destinations: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['destinations'] });
+      queryClient.invalidateQueries({ queryKey: ['destinations-stats'] });
       showToast(__('Destination deleted successfully', 'Destination deleted successfully'), 'success');
       setDeleteConfirm({ isOpen: false, destination: null });
     },
@@ -184,16 +199,23 @@ const Destinations: React.FC = () => {
     localStorage.setItem('yatra_destinations_visible_columns', JSON.stringify(newVisibleColumns));
   };
 
-  // Status counts
+  // Status counts from stats API
   const statusCounts = useMemo(() => {
-    const counts = {
-      all: total,
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0,
+      };
+    }
+    return {
+      all: 0,
       publish: 0,
       draft: 0,
       trash: 0,
     };
-    return counts;
-  }, [total]);
+  }, [statsData]);
 
   // Bulk actions mutation
   const bulkMutation = useMutation({
@@ -202,6 +224,7 @@ const Destinations: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['destinations'] });
+      queryClient.invalidateQueries({ queryKey: ['destinations-stats'] });
       showToast(__('Bulk action completed successfully', 'Bulk action completed successfully'), 'success');
       setSelectedIds([]);
       setBulkAction('');
@@ -401,9 +424,12 @@ const Destinations: React.FC = () => {
                           </div>
                           {/* Text */}
                           <div>
-                            <div className="font-medium text-gray-900 dark:text-white">
+                            <a 
+                              href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`}
+                              className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+                            >
                               {destination.name}
-                            </div>
+                            </a>
                             <div className="text-sm text-gray-500 dark:text-gray-400">
                               {destination.slug}
                             </div>

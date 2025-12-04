@@ -122,35 +122,26 @@ class ActivityService extends BaseService
      */
     protected function processBeforeUpdate(int $id, array $data): array
     {
+        // Remove preserve_slug flag if sent from frontend (not a database column)
+        unset($data['preserve_slug']);
+
         // Sanitize name
         if (isset($data['name'])) {
             $data['name'] = sanitize_text_field($data['name']);
         }
 
-        // Handle slug: preserve manually edited slug, otherwise auto-generate from name
-        $preserveSlug = isset($data['preserve_slug']) && $data['preserve_slug'] === true;
-        unset($data['preserve_slug']); // Remove flag from data array
-
-        if ($preserveSlug && isset($data['slug']) && !empty($data['slug'])) {
-            // Slug was manually edited - preserve it but ensure uniqueness
+        // Handle slug in EDIT mode: Only update if explicitly provided
+        // Do NOT auto-generate from name in edit mode
+        if (isset($data['slug']) && !empty($data['slug'])) {
+            // Slug was explicitly provided - ensure uniqueness
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['slug'],
                 'yatra_activities',
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );
-        } elseif (!empty($data['name'])) {
-            // Auto-generate slug from name if name is provided and slug not manually edited
-            $data['slug'] = SlugHelper::generateUniqueFromDatabase(
-                $data['name'],
-                'yatra_activities',
-                'slug',
-                $id // Exclude current record when checking uniqueness
-            );
-        } elseif (isset($data['slug'])) {
-            // If name is not provided but slug is, sanitize the slug
-            $data['slug'] = SlugHelper::generate($data['slug']);
         }
+        // If slug is not provided, don't modify it (keep existing slug)
 
         // Sanitize description
         if (isset($data['description'])) {

@@ -138,21 +138,64 @@ export const Table: React.FC<TableProps> = ({
 
   // Render empty state
   const renderEmpty = () => (
-    <div className="flex flex-col items-center justify-center h-full text-center py-12">
-      <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-        <div className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+    <div className="relative flex flex-col items-center justify-center text-center py-16 px-6 my-6 min-h-[400px]">
+      {/* Background decoration */}
+      <div className="absolute inset-8 bg-gradient-to-br from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700"></div>
+      
+      {/* Content */}
+      <div className="relative z-10 max-w-md mx-auto space-y-6">
+        {/* Icon */}
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 ring-8 ring-blue-50/50 dark:ring-blue-900/20">
+          <svg 
+            className="w-10 h-10 text-blue-600 dark:text-blue-400" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+        </div>
+
+        {/* Text content */}
+        <div className="space-y-3">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            {emptyText}
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+            {emptyDescription}
+          </p>
+        </div>
+
+        {/* Action button */}
+        {onCreateClick && (
+          <div className="pt-2">
+            <Button 
+              onClick={onCreateClick} 
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+            >
+              <svg 
+                className="w-4 h-4" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              {__('Create New', 'Create New')}
+            </Button>
+          </div>
+        )}
       </div>
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-        {emptyText}
-      </h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
-        {emptyDescription}
-      </p>
-      {onCreateClick && (
-        <Button onClick={onCreateClick} className="flex items-center gap-2">
-          {__('Create', 'Create')}
-        </Button>
-      )}
     </div>
   );
 

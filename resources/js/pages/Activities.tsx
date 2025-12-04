@@ -121,6 +121,20 @@ const Activities: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
+  // Fetch status counts from API
+  const { data: statsData } = useQuery({
+    queryKey: ['activities-stats'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/activities/stats');
+        return response;
+      } catch (error: any) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
   // Fetch activities from API
   const { data, isLoading, error } = useQuery({
     queryKey: ['activities', queryParams],
@@ -135,45 +149,43 @@ const Activities: React.FC = () => {
     },
     enabled: can('yatra_view_trips'),
   });
-  // Status counts for WP-style views
-  const { data: statsData } = useQuery({
-    queryKey: ['activities', 'stats'],
-    queryFn: async () => {
-      const response = await apiClient.get('/activities/stats');
-      console.log('Stats API Response:', response);
-      return response;
-    },
-    enabled: can('yatra_view_trips'),
-  });
-
 
   const activities = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
 
-  const statusCounts = statsData?.data || {
-    all: 0,
-    publish: 0,
-    draft: 0,
-    trash: 0,
-  };
-
-  console.log('Status Counts:', statusCounts);
+  // Status counts from stats API
+  const statusCounts = useMemo(() => {
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0,
+      };
+    }
+    return {
+      all: 0,
+      publish: 0,
+      draft: 0,
+      trash: 0,
+    };
+  }, [statsData]);
 
   // Bulk actions mutation
   const bulkMutation = useMutation({
     mutationFn: async ({ action, ids }: { action: string; ids: (string | number)[] }) => {
       return await apiClient.post('/activities/bulk', { action, ids });
     },
-    onSuccess: (response: any) => {
-      const message = response?.message || __('Bulk action completed.', 'Bulk action completed.');
-      showToast(message, 'success');
-      setSelectedIds([]);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activities'] });
-      queryClient.invalidateQueries({ queryKey: ['activities', 'stats'] });
+      queryClient.invalidateQueries({ queryKey: ['activities-stats'] });
+      showToast(__('Bulk action completed successfully', 'Bulk action completed successfully'), 'success');
+      setSelectedIds([]);
+      setBulkAction('');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to process bulk action', 'Failed to process bulk action'), 'error');
+      showToast(error?.message || __('Failed to perform bulk action', 'Failed to perform bulk action'), 'error');
     },
   });
 
@@ -461,9 +473,12 @@ const Activities: React.FC = () => {
                             </div>
                             {/* Text */}
                             <div>
-                              <div className="font-medium text-gray-900 dark:text-white">
+                              <a 
+                                href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=edit&id=${activity.id}`}
+                                className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+                              >
                                 {activity.name}
-                              </div>
+                              </a>
                               <div className="text-sm text-gray-500 dark:text-gray-400">
                                 {activity.slug}
                               </div>
