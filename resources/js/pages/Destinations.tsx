@@ -7,6 +7,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw, Edit, Trash2 } from 'lucide-react';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
+import { getDefaultBulkStatusOptions } from '../components/shared/bulkStatusOptions';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
@@ -352,31 +353,7 @@ const Destinations: React.FC = () => {
         onToggleColumn={toggleColumn}
         bulkMutationPending={bulkMutation.isPending}
         totalItems={destinations.length}
-        bulkActionOptions={(() => {
-          const options = [];
-          switch (statusFilter) {
-            case 'publish':
-              options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
-              options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
-              break;
-            case 'draft':
-              options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
-              options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
-              break;
-            case 'trash':
-              options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
-              options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
-              options.push({ value: 'delete', label: __('Delete Permanently', 'Delete Permanently') });
-              break;
-            case 'all':
-            default:
-              options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
-              options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
-              options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
-              break;
-          }
-          return options;
-        })()}
+        bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
       />
 
       <ConditionalRender capability="yatra_view_trips">

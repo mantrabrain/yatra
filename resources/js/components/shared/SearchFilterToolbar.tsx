@@ -50,7 +50,7 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
 }) => {
   return (
     <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
-      {/* Search */}
+      {/* Search - give more space on large screens */}
       <div className="relative min-w-0 w-full lg:flex-[2]">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
         <Input
@@ -66,7 +66,7 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
       <Select
         value={statusFilter}
         onChange={(e) => onStatusChange(e.target.value)}
-        className="w-full lg:flex-1"
+        className="w-full lg:w-48 lg:flex-none"
       >
         {statusOptions.map(option => (
           <option key={option.value} value={option.value}>
@@ -79,7 +79,7 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
       <Select
         value={sortBy}
         onChange={(e) => onSortByChange(e.target.value)}
-        className="w-full lg:flex-1"
+        className="w-full lg:w-48 lg:flex-none"
       >
         {sortOptions.map(option => (
           <option key={option.value} value={option.value}>

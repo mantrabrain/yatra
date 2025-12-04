@@ -3,22 +3,21 @@
  * Clean, minimal SaaS-style categories management page with subcategory support
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ChevronRight, ChevronDown } from 'lucide-react';
+import { Plus, ChevronRight, ChevronDown, Edit, Trash2 } from 'lucide-react';
+import { SearchFilterToolbar } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
-import { Edit, Trash2 } from 'lucide-react';
 import { IconSelector } from '../components/ui/icon-selector';
 import type { IconPickerValue } from '../components/ui/icon-picker';
 
@@ -145,6 +144,22 @@ const Categories: React.FC = () => {
 
     return normalized;
   }, [categories, parentFilter]);
+
+  // Expand all parent categories that have subcategories by default
+  useEffect(() => {
+    if (expandedCategories.size > 0) return;
+
+    const initialExpanded = new Set<number>();
+    processedCategories.forEach((cat: Category) => {
+      if (!cat.__subOnly && cat.subcategories && cat.subcategories.length > 0) {
+        initialExpanded.add(cat.id);
+      }
+    });
+
+    if (initialExpanded.size > 0) {
+      setExpandedCategories(initialExpanded);
+    }
+  }, [processedCategories, expandedCategories.size]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return __('N/A', 'N/A');
@@ -292,7 +307,12 @@ const Categories: React.FC = () => {
               <div>
                 <div className="font-medium text-gray-900 dark:text-white">
                   {derivedSub && <span className="text-gray-400 mr-1">└─</span>}
-                  {category.name}
+                  <a
+                    href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`}
+                    className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+                  >
+                    {category.name}
+                  </a>
                 </div>
                 {category.parent_name && (
                   <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -371,51 +391,58 @@ const Categories: React.FC = () => {
         }
       />
 
+      {/* Filters */}
       <Card>
         <CardContent className="p-3">
-          <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
-            <div className="relative min-w-0 w-full lg:flex-[2]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
+          <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
+            {/* Shared search + status + sort toolbar - give it more space on large screens */}
+            <div className="min-w-0 w-full lg:flex-[3]">
+              <SearchFilterToolbar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                statusFilter={statusFilter}
+                onStatusChange={(value) => {
+                  setStatusFilter(value);
+                  setPage(1);
+                }}
+                statusOptions={[
+                  { value: 'all', label: __('All Status', 'All Status') },
+                  { value: 'publish', label: __('Publish', 'Publish') },
+                  { value: 'draft', label: __('Draft', 'Draft') },
+                  { value: 'trash', label: __('Trash', 'Trash') },
+                ]}
+                sortBy={sortBy}
+                onSortByChange={(value) => {
+                  setSortBy(value);
+                  setSortOrder('asc');
+                  setPage(1);
+                }}
+                sortOrder={sortOrder}
+                onSortOrderChange={(order) => {
+                  setSortOrder(order);
+                  setPage(1);
+                }}
+                sortOptions={[
+                  { value: 'name', label: __('Name', 'Name') },
+                  { value: 'status', label: __('Status', 'Status') },
+                  { value: 'created_at', label: __('Created', 'Created') },
+                ]}
+                onResetFilters={handleResetFilters}
+                hasFilters={!!hasFilters}
                 placeholder={__('Search categories...', 'Search categories...')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full"
               />
             </div>
 
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full lg:flex-1"
-            >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="draft">{__('Draft', 'Draft')}</option>
-              <option value="publish">{__('Publish', 'Publish')}</option>
-              <option value="trash">{__('Trash', 'Trash')}</option>
-            </Select>
-
+            {/* Parent filter - narrower on large screens */}
             <Select
               value={parentFilter}
               onChange={(e) => setParentFilter(e.target.value as 'all' | 'top-level' | 'subcategories')}
-              className="w-full lg:flex-1"
+              className="w-full lg:w-36 lg:flex-none text-sm"
             >
               <option value="all">{__('All Categories', 'All Categories')}</option>
               <option value="top-level">{__('Top Level Only', 'Top Level Only')}</option>
               <option value="subcategories">{__('Subcategories Only', 'Subcategories Only')}</option>
             </Select>
-
-            {hasFilters && (
-              <Button
-                variant="outline"
-                onClick={handleResetFilters}
-                className="h-11 flex items-center gap-2 flex-shrink-0"
-              >
-                <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
@@ -477,14 +504,52 @@ const Categories: React.FC = () => {
               <div className="text-red-600 dark:text-red-400">{__('Failed to load categories', 'Failed to load categories')}</div>
             </div>
           ) : processedCategories.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="text-gray-500 dark:text-gray-400 mb-4">{__('No categories found', 'No categories found')}</div>
-              <ConditionalRender capability="yatra_edit_trips">
-                <Button onClick={handleCreateCategory} variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {__('Add Your First Category', 'Add Your First Category')}
-                </Button>
-              </ConditionalRender>
+            <div className="relative flex flex-col items-center justify-center text-center py-16 px-6 my-6 min-h-[400px]">
+              {/* Background decoration */}
+              <div className="absolute inset-8 bg-gradient-to-br from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700"></div>
+
+              {/* Content */}
+              <div className="relative z-10 max-w-md mx-auto space-y-6">
+                {/* Icon */}
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 ring-8 ring-blue-50/50 dark:ring-blue-900/20">
+                  <svg
+                    className="w-10 h-10 text-blue-600 dark:text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+
+                {/* Text content */}
+                <div className="space-y-3">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {__('No categories found', 'No categories found')}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {__('Get started by creating your first category to organize your trips.', 'Get started by creating your first category to organize your trips.')}
+                  </p>
+                </div>
+
+                {/* Action button */}
+                <ConditionalRender capability="yatra_edit_trips">
+                  <div className="pt-2">
+                    <Button
+                      onClick={handleCreateCategory}
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {__('Add Your First Category', 'Add Your First Category')}
+                    </Button>
+                  </div>
+                </ConditionalRender>
+              </div>
             </div>
           ) : (
             <Table>

@@ -3593,6 +3593,10 @@ video {
     width: 3rem;
   }
 
+  .lg\:w-36 {
+    width: 9rem;
+  }
+
   .lg\:w-48 {
     width: 12rem;
   }
@@ -3623,6 +3627,14 @@ video {
 
   .lg\:flex-\[2\] {
     flex: 2;
+  }
+
+  .lg\:flex-\[3\] {
+    flex: 3;
+  }
+
+  .lg\:flex-none {
+    flex: none;
   }
 
   .lg\:flex-shrink-0 {

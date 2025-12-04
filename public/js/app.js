@@ -8647,7 +8647,7 @@ const SearchFilterToolbar = ({
       {
         value: statusFilter,
         onChange: (e) => onStatusChange(e.target.value),
-        className: "w-full lg:flex-1",
+        className: "w-full lg:w-48 lg:flex-none",
         children: statusOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: option.value, children: option.label }, option.value))
       }
     ),
@@ -8656,7 +8656,7 @@ const SearchFilterToolbar = ({
       {
         value: sortBy,
         onChange: (e) => onSortByChange(e.target.value),
-        className: "w-full lg:flex-1",
+        className: "w-full lg:w-48 lg:flex-none",
         children: sortOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: option.value, children: [
           option.label,
           sortBy === option.value && (sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }))
@@ -9144,6 +9144,31 @@ const Table = ({
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability, children: renderTable() });
 };
+const getDefaultBulkStatusOptions = (statusFilter) => {
+  const options2 = [];
+  switch (statusFilter) {
+    case "publish":
+      options2.push({ value: "trash", label: __("Move to Trash", "Move to Trash") });
+      options2.push({ value: "draft", label: __("Make Draft", "Make Draft") });
+      break;
+    case "draft":
+      options2.push({ value: "publish", label: __("Make Published", "Make Published") });
+      options2.push({ value: "trash", label: __("Move to Trash", "Move to Trash") });
+      break;
+    case "trash":
+      options2.push({ value: "publish", label: __("Make Published", "Make Published") });
+      options2.push({ value: "draft", label: __("Make Draft", "Make Draft") });
+      options2.push({ value: "delete", label: __("Delete Permanently", "Delete Permanently") });
+      break;
+    case "all":
+    default:
+      options2.push({ value: "publish", label: __("Make Published", "Make Published") });
+      options2.push({ value: "draft", label: __("Make Draft", "Make Draft") });
+      options2.push({ value: "trash", label: __("Move to Trash", "Move to Trash") });
+      break;
+  }
+  return options2;
+};
 const Activities = () => {
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
@@ -9449,31 +9474,7 @@ const Activities = () => {
           onToggleColumn: toggleColumn,
           bulkMutationPending: bulkMutation.isPending,
           totalItems: activities.length,
-          bulkActionOptions: (() => {
-            const options2 = [];
-            switch (statusFilter) {
-              case "publish":
-                options2.push({ value: "trash", label: __("Move to Trash", "Move to Trash") });
-                options2.push({ value: "draft", label: __("Make Draft", "Make Draft") });
-                break;
-              case "draft":
-                options2.push({ value: "publish", label: __("Make Published", "Make Published") });
-                options2.push({ value: "trash", label: __("Move to Trash", "Move to Trash") });
-                break;
-              case "trash":
-                options2.push({ value: "publish", label: __("Make Published", "Make Published") });
-                options2.push({ value: "draft", label: __("Make Draft", "Make Draft") });
-                options2.push({ value: "delete", label: __("Delete Permanently", "Delete Permanently") });
-                break;
-              case "all":
-              default:
-                options2.push({ value: "publish", label: __("Make Published", "Make Published") });
-                options2.push({ value: "draft", label: __("Make Draft", "Make Draft") });
-                options2.push({ value: "trash", label: __("Move to Trash", "Move to Trash") });
-                break;
-            }
-            return options2;
-          })()
+          bulkActionOptions: getDefaultBulkStatusOptions(statusFilter)
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "overflow-visible", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0 overflow-visible", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -10715,31 +10716,7 @@ const Destinations = () => {
         onToggleColumn: toggleColumn,
         bulkMutationPending: bulkMutation.isPending,
         totalItems: destinations.length,
-        bulkActionOptions: (() => {
-          const options2 = [];
-          switch (statusFilter) {
-            case "publish":
-              options2.push({ value: "trash", label: __("Move to Trash", "Move to Trash") });
-              options2.push({ value: "draft", label: __("Make Draft", "Make Draft") });
-              break;
-            case "draft":
-              options2.push({ value: "publish", label: __("Make Published", "Make Published") });
-              options2.push({ value: "trash", label: __("Move to Trash", "Move to Trash") });
-              break;
-            case "trash":
-              options2.push({ value: "publish", label: __("Make Published", "Make Published") });
-              options2.push({ value: "draft", label: __("Make Draft", "Make Draft") });
-              options2.push({ value: "delete", label: __("Delete Permanently", "Delete Permanently") });
-              break;
-            case "all":
-            default:
-              options2.push({ value: "publish", label: __("Make Published", "Make Published") });
-              options2.push({ value: "draft", label: __("Make Draft", "Make Draft") });
-              options2.push({ value: "trash", label: __("Move to Trash", "Move to Trash") });
-              break;
-          }
-          return options2;
-        })()
+        bulkActionOptions: getDefaultBulkStatusOptions(statusFilter)
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading destinations", "Error loading destinations") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -11344,6 +11321,18 @@ const Categories = () => {
     }
     return normalized;
   }, [categories, parentFilter]);
+  reactExports.useEffect(() => {
+    if (expandedCategories.size > 0) return;
+    const initialExpanded = /* @__PURE__ */ new Set();
+    processedCategories.forEach((cat) => {
+      if (!cat.__subOnly && cat.subcategories && cat.subcategories.length > 0) {
+        initialExpanded.add(cat.id);
+      }
+    });
+    if (initialExpanded.size > 0) {
+      setExpandedCategories(initialExpanded);
+    }
+  }, [processedCategories, expandedCategories.size]);
   const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
@@ -11440,7 +11429,7 @@ const Categories = () => {
   };
   const hasFilters = searchTerm || statusFilter !== "all" || parentFilter !== "all" || sortBy !== "name" || sortOrder !== "asc";
   const renderCategoryRow = (category, isSubcategory = false) => {
-    var _a;
+    var _a, _b;
     const derivedSub = isSubcategory || !!category.__subOnly;
     const hasSubcategories = !category.__subOnly && category.subcategories && category.subcategories.length > 0;
     const isExpanded = expandedCategories.has(category.id);
@@ -11459,7 +11448,14 @@ const Categories = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-medium text-gray-900 dark:text-white", children: [
               derivedSub && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400 mr-1", children: "└─" }),
-              category.name
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "a",
+                {
+                  href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`,
+                  className: "font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer",
+                  children: category.name
+                }
+              )
             ] }),
             category.parent_name && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
               __("Parent:", "Parent:"),
@@ -11495,7 +11491,7 @@ const Categories = () => {
           )
         ] }) }) })
       ] }),
-      hasSubcategories && isExpanded && ((_a = category.subcategories) == null ? void 0 : _a.map((sub) => renderCategoryRow(sub, true)))
+      hasSubcategories && isExpanded && ((_b = category.subcategories) == null ? void 0 : _b.map((sub) => renderCategoryRow(sub, true)))
     ] }, category.id);
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -11525,56 +11521,54 @@ const Categories = () => {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-2 items-stretch lg:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "text",
-            placeholder: __("Search categories...", "Search categories..."),
-            value: searchTerm,
-            onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-10 w-full"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-3 items-stretch lg:items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-w-0 w-full lg:flex-[3]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SearchFilterToolbar,
         {
-          value: statusFilter,
-          onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full lg:flex-1",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Trash", "Trash") })
-          ]
+          searchTerm,
+          onSearchChange: setSearchTerm,
+          statusFilter,
+          onStatusChange: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+          },
+          statusOptions: [
+            { value: "all", label: __("All Status", "All Status") },
+            { value: "publish", label: __("Publish", "Publish") },
+            { value: "draft", label: __("Draft", "Draft") },
+            { value: "trash", label: __("Trash", "Trash") }
+          ],
+          sortBy,
+          onSortByChange: (value) => {
+            setSortBy(value);
+            setSortOrder("asc");
+            setPage(1);
+          },
+          sortOrder,
+          onSortOrderChange: (order) => {
+            setSortOrder(order);
+            setPage(1);
+          },
+          sortOptions: [
+            { value: "name", label: __("Name", "Name") },
+            { value: "status", label: __("Status", "Status") },
+            { value: "created_at", label: __("Created", "Created") }
+          ],
+          onResetFilters: handleResetFilters,
+          hasFilters: !!hasFilters,
+          placeholder: __("Search categories...", "Search categories...")
         }
-      ),
+      ) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Select,
         {
           value: parentFilter,
           onChange: (e) => setParentFilter(e.target.value),
-          className: "w-full lg:flex-1",
+          className: "w-full lg:w-36 lg:flex-none text-sm",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Categories", "All Categories") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "top-level", children: __("Top Level Only", "Top Level Only") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "subcategories", children: __("Subcategories Only", "Subcategories Only") })
-          ]
-        }
-      ),
-      hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: handleResetFilters,
-          className: "h-11 flex items-center gap-2 flex-shrink-0",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-            __("Reset", "Reset")
           ]
         }
       )
@@ -11607,12 +11601,43 @@ const Categories = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" })
         ] }) })
       ] }, `category-skeleton-${index}`)) })
-    ] }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-red-600 dark:text-red-400", children: __("Failed to load categories", "Failed to load categories") }) }) : processedCategories.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-12 text-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-500 dark:text-gray-400 mb-4", children: __("No categories found", "No categories found") }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreateCategory, variant: "outline", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
-        __("Add Your First Category", "Add Your First Category")
-      ] }) })
+    ] }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-red-600 dark:text-red-400", children: __("Failed to load categories", "Failed to load categories") }) }) : processedCategories.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex flex-col items-center justify-center text-center py-16 px-6 my-6 min-h-[400px]", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-8 bg-gradient-to-br from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative z-10 max-w-md mx-auto space-y-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 ring-8 ring-blue-50/50 dark:ring-blue-900/20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "svg",
+          {
+            className: "w-10 h-10 text-blue-600 dark:text-blue-400",
+            fill: "none",
+            stroke: "currentColor",
+            viewBox: "0 0 24 24",
+            strokeWidth: "1.5",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "path",
+              {
+                strokeLinecap: "round",
+                strokeLinejoin: "round",
+                d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              }
+            )
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: __("No categories found", "No categories found") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 leading-relaxed", children: __("Get started by creating your first category to organize your trips.", "Get started by creating your first category to organize your trips.") })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "pt-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: handleCreateCategory,
+            className: "inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+              __("Add Your First Category", "Add Your First Category")
+            ]
+          }
+        ) }) })
+      ] })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-12" }),
@@ -11818,9 +11843,41 @@ const CategoryForm = () => {
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories`;
   };
   if (isEditMode && isLoadingCategory) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center p-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-gray-600 dark:text-gray-400", children: __("Loading category...", "Loading category...") })
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2 animate-pulse" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] })
+        ] }) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-6 space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }) })
+        ] })
+      ] })
     ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -11980,13 +12037,124 @@ const DifficultyLevels = () => {
   const [sortBy, setSortBy] = reactExports.useState("level_order");
   const [sortOrder, setSortOrder] = reactExports.useState("asc");
   const [page, setPage] = reactExports.useState(1);
-  const [deleteConfirm, setDeleteConfirm] = reactExports.useState({
-    isOpen: false,
-    level: null
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    const saved = localStorage.getItem("yatra_difficulty_levels_columns");
+    return saved ? JSON.parse(saved) : {
+      level_order: true,
+      name: true,
+      slug: true,
+      description: true,
+      status: true,
+      created_at: false
+    };
   });
-  const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const queryClient2 = useQueryClient();
+  const [deleteConfirm, setDeleteConfirm] = reactExports.useState(
+    {
+      isOpen: false,
+      level: null
+    }
+  );
+  const columns = [
+    {
+      key: "level_order",
+      label: __("Order", "Order"),
+      sortable: true,
+      width: "100px",
+      visible: visibleColumns.level_order,
+      render: (level) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-900 dark:text-white", children: level.level_order })
+    },
+    {
+      key: "name",
+      label: __("Name", "Name"),
+      sortable: true,
+      visible: visibleColumns.name,
+      render: (level) => {
+        var _a;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+          renderIcon(level.icon),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "a",
+            {
+              href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels&action=edit&id=${level.id}`,
+              className: "font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer",
+              children: level.name
+            }
+          )
+        ] });
+      }
+    },
+    {
+      key: "slug",
+      label: __("Slug", "Slug"),
+      visible: visibleColumns.slug,
+      render: (level) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: level.slug || "—" })
+    },
+    {
+      key: "description",
+      label: __("Description", "Description"),
+      visible: visibleColumns.description,
+      render: (level) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-xs truncate text-sm text-gray-600 dark:text-gray-400", children: level.description || "—" })
+    },
+    {
+      key: "status",
+      label: __("Status", "Status"),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (level) => getStatusBadge(level.status)
+    },
+    {
+      key: "created_at",
+      label: __("Created", "Created"),
+      sortable: true,
+      visible: visibleColumns.created_at,
+      render: (level) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: formatDate2(level.created_at) })
+    }
+  ];
+  const actions = [
+    {
+      key: "edit",
+      label: __("Edit", "Edit"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (level) => handleEdit(level),
+      condition: () => can("yatra_edit_trips")
+    },
+    {
+      key: "publish",
+      label: __("Make Published", "Make Published"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (level) => statusMutation.mutate({ id: level.id, status: "publish" }),
+      condition: (level) => can("yatra_edit_trips") && level.status !== "publish"
+    },
+    {
+      key: "draft",
+      label: __("Make Draft", "Make Draft"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (level) => statusMutation.mutate({ id: level.id, status: "draft" }),
+      condition: (level) => can("yatra_edit_trips") && level.status !== "draft"
+    },
+    {
+      key: "delete",
+      label: __("Delete", "Delete"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (level) => setDeleteConfirm({ isOpen: true, level }),
+      variant: "destructive",
+      condition: (level) => can("yatra_edit_trips") && level.status === "trash"
+    },
+    {
+      key: "trash",
+      label: __("Move to Trash", "Move to Trash"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (level) => statusMutation.mutate({ id: level.id, status: "trash" }),
+      variant: "destructive",
+      condition: (level) => can("yatra_edit_trips") && level.status !== "trash"
+    }
+  ];
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -12020,15 +12188,61 @@ const DifficultyLevels = () => {
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["difficulty-levels"] });
       showToast(__("Difficulty level deleted successfully", "Difficulty level deleted successfully"), "success");
-      setDeleteConfirm({ isOpen: false, level: null });
     },
     onError: (error2) => {
       showToast((error2 == null ? void 0 : error2.message) || __("Failed to delete difficulty level", "Failed to delete difficulty level"), "error");
     }
   });
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, status }) => {
+      const levelResponse = await apiClient.get(`/difficulty-levels/${id}`);
+      const level = levelResponse;
+      return apiClient.put(`/difficulty-levels/${id}`, {
+        name: level.name,
+        slug: level.slug,
+        description: level.description,
+        icon: level.icon,
+        level_order: level.level_order,
+        status
+      });
+    },
+    onSuccess: (_data, variables) => {
+      queryClient2.invalidateQueries({ queryKey: ["difficulty-levels"] });
+      const msgMap = {
+        trash: __("Difficulty level moved to trash", "Difficulty level moved to trash"),
+        draft: __("Difficulty level marked as draft", "Difficulty level marked as draft"),
+        publish: __("Difficulty level published", "Difficulty level published")
+      };
+      const msg = msgMap[variables.status] || __("Difficulty level updated successfully", "Difficulty level updated successfully");
+      showToast(msg, "success");
+    },
+    onError: (error2, variables) => {
+      const msgMapError = {
+        trash: __("Failed to move difficulty level to trash", "Failed to move difficulty level to trash"),
+        draft: __("Failed to mark difficulty level as draft", "Failed to mark difficulty level as draft"),
+        publish: __("Failed to publish difficulty level", "Failed to publish difficulty level")
+      };
+      const fallback = msgMapError[variables.status] || __("Failed to update difficulty level", "Failed to update difficulty level");
+      showToast((error2 == null ? void 0 : error2.message) || fallback, "error");
+    }
+  });
   const levels = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 20);
+  const statusCounts = reactExports.useMemo(() => {
+    const counts = {
+      all: levels.length,
+      publish: 0,
+      draft: 0,
+      trash: 0
+    };
+    levels.forEach((level) => {
+      if (level.status === "publish") counts.publish += 1;
+      else if (level.status === "draft") counts.draft += 1;
+      else if (level.status === "trash") counts.trash += 1;
+    });
+    return counts;
+  }, [levels]);
   const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
@@ -12080,24 +12294,9 @@ const DifficultyLevels = () => {
     var _a;
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels&action=edit&id=${level.id}`;
   };
-  const handleDelete = (level) => {
-    setDeleteConfirm({ isOpen: true, level });
-  };
-  const confirmDelete = () => {
-    if (deleteConfirm.level) {
-      deleteMutation.mutate(deleteConfirm.level.id);
-    }
-  };
   const handleCreate = () => {
     var _a;
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels&action=create`;
-  };
-  const handleResetFilters = () => {
-    setSearchTerm("");
-    setStatusFilter("all");
-    setSortBy("level_order");
-    setSortOrder("asc");
-    setPage(1);
   };
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -12108,21 +12307,118 @@ const DifficultyLevels = () => {
     }
   };
   const getSortIcon = (field) => {
-    if (sortBy !== field) {
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUpDown, { className: "w-3.5 h-3.5 ml-1 text-gray-400" });
-    }
-    return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
+    if (sortBy !== field) return null;
+    return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "ml-1 w-3.5 h-3.5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "ml-1 w-3.5 h-3.5" });
   };
-  const hasFilters = searchTerm || statusFilter !== "all" || sortBy !== "level_order" || sortOrder !== "asc";
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setSortBy("level_order");
+    setSortOrder("asc");
+    setPage(1);
+  };
+  const hasFilters = !!searchTerm || statusFilter !== "all" || sortBy !== "level_order" || sortOrder !== "asc";
+  const toggleColumn = (columnKey) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisibleColumns);
+    localStorage.setItem("yatra_difficulty_levels_columns", JSON.stringify(newVisibleColumns));
+  };
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(
+        __("Select a bulk action first.", "Select a bulk action first."),
+        "warning"
+      );
+      return;
+    }
+    if (selectedIds.length === 0) {
+      showToast(
+        __("Select at least one difficulty level.", "Select at least one difficulty level."),
+        "warning"
+      );
+      return;
+    }
+    const performBulk = async () => {
+      try {
+        if (bulkAction === "delete") {
+          await Promise.all(
+            selectedIds.map((id) => apiClient.delete(`/difficulty-levels/${id}`))
+          );
+          showToast(
+            __("Selected difficulty levels deleted successfully", "Selected difficulty levels deleted successfully"),
+            "success"
+          );
+        } else if (bulkAction === "trash" || bulkAction === "draft" || bulkAction === "publish") {
+          const status = bulkAction === "trash" ? "trash" : bulkAction === "draft" ? "draft" : "publish";
+          await Promise.all(
+            selectedIds.map(async (id) => {
+              try {
+                const levelResponse = await apiClient.get(`/difficulty-levels/${id}`);
+                const level = levelResponse;
+                if (!level || !level.name) {
+                  return;
+                }
+                await apiClient.put(`/difficulty-levels/${id}`, {
+                  name: level.name,
+                  slug: level.slug,
+                  description: level.description,
+                  icon: level.icon,
+                  level_order: level.level_order,
+                  status
+                });
+              } catch {
+                throw new Error("bulk_item_failed");
+              }
+            })
+          );
+          const msgMap = {
+            trash: __("Selected difficulty levels moved to trash", "Selected difficulty levels moved to trash"),
+            draft: __("Selected difficulty levels marked as draft", "Selected difficulty levels marked as draft"),
+            publish: __("Selected difficulty levels published", "Selected difficulty levels published")
+          };
+          showToast(msgMap[bulkAction], "success");
+        }
+        queryClient2.invalidateQueries({ queryKey: ["difficulty-levels"] });
+        setSelectedIds([]);
+        setBulkAction("");
+      } catch (error2) {
+        const msgMapError = {
+          delete: __("Failed to delete selected difficulty levels", "Failed to delete selected difficulty levels"),
+          trash: __("Failed to move selected difficulty levels to trash", "Failed to move selected difficulty levels to trash"),
+          draft: __("Failed to mark selected difficulty levels as draft", "Failed to mark selected difficulty levels as draft"),
+          publish: __("Failed to publish selected difficulty levels", "Failed to publish selected difficulty levels")
+        };
+        showToast(
+          (error2 == null ? void 0 : error2.message) || msgMapError[bulkAction],
+          "error"
+        );
+      }
+    };
+    void performBulk();
+  };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
       {
         isOpen: deleteConfirm.isOpen,
         onClose: () => setDeleteConfirm({ isOpen: false, level: null }),
-        onConfirm: confirmDelete,
+        onConfirm: () => {
+          if (deleteConfirm.level) {
+            deleteMutation.mutate(deleteConfirm.level.id);
+            setDeleteConfirm({ isOpen: false, level: null });
+          }
+        },
         title: __("Delete Difficulty Level", "Delete Difficulty Level"),
-        message: deleteConfirm.level ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'Are you sure you want to delete "{name}"? This action cannot be undone.').replace("{name}", deleteConfirm.level.name) : __("Are you sure you want to delete this difficulty level?", "Are you sure you want to delete this difficulty level?"),
+        message: deleteConfirm.level ? __(
+          'Are you sure you want to delete "{name}"? This action cannot be undone.',
+          'Are you sure you want to delete "{name}"? This action cannot be undone.'
+        ).replace("{name}", deleteConfirm.level.name) : __(
+          "Are you sure you want to delete this difficulty level? This action cannot be undone.",
+          "Are you sure you want to delete this difficulty level? This action cannot be undone."
+        ),
         confirmText: __("Delete", "Delete"),
         cancelText: __("Cancel", "Cancel"),
         variant: "danger",
@@ -12133,118 +12429,138 @@ const DifficultyLevels = () => {
       PageHeader,
       {
         title: __("Difficulty Levels", "Difficulty Levels"),
-        description: __("Define and manage trip difficulty levels", "Define and manage trip difficulty levels"),
+        description: __("Manage trip difficulty levels and their ordering", "Manage trip difficulty levels and their ordering"),
         actionCapability: "yatra_edit_trips",
-        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreate, className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-          __("Add Difficulty Level", "Add Difficulty Level")
+        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreate, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
+          __("Add New", "Add New")
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-2 items-stretch lg:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "text",
-            placeholder: __("Search difficulty levels...", "Search difficulty levels..."),
-            value: searchTerm,
-            onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-10 w-full"
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      SearchFilterToolbar,
+      {
+        searchTerm,
+        onSearchChange: setSearchTerm,
+        statusFilter,
+        onStatusChange: (value) => {
+          setStatusFilter(value);
+          setPage(1);
+        },
+        statusOptions: [
+          { value: "all", label: __("All Status", "All Status") },
+          { value: "publish", label: __("Published", "Published") },
+          { value: "draft", label: __("Draft", "Draft") }
+        ],
+        sortBy,
+        onSortByChange: (value) => {
+          setSortBy(value);
+          setSortOrder("asc");
+          setPage(1);
+        },
+        sortOrder,
+        onSortOrderChange: (order) => {
+          setSortOrder(order);
+          setPage(1);
+        },
+        sortOptions: [
+          { value: "level_order", label: __("Order", "Order") },
+          { value: "name", label: __("Name", "Name") },
+          { value: "created_at", label: __("Created", "Created") }
+        ],
+        onResetFilters: handleResetFilters,
+        hasFilters,
+        placeholder: __("Search difficulty levels...", "Search difficulty levels...")
+      }
+    ) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      BulkActionToolbar,
+      {
+        selectedIds,
+        bulkAction,
+        setBulkAction,
+        onApply: handleBulkApply,
+        onClearSelection: () => setSelectedIds([]),
+        statusFilter,
+        setStatusFilter: (value) => {
+          setStatusFilter(value);
+          setPage(1);
+          setSelectedIds([]);
+          setBulkAction("");
+        },
+        statusOptions: [
+          { key: "all", label: __("All", "All"), count: statusCounts.all },
+          { key: "publish", label: __("Published", "Published"), count: statusCounts.publish },
+          { key: "draft", label: __("Draft", "Draft"), count: statusCounts.draft },
+          { key: "trash", label: __("Trash", "Trash"), count: statusCounts.trash }
+        ],
+        showColumnsDropdown,
+        setShowColumnsDropdown,
+        columnOptions: [
+          { key: "level_order", label: __("Order", "Order"), visible: visibleColumns.level_order },
+          { key: "name", label: __("Name", "Name"), visible: visibleColumns.name },
+          { key: "slug", label: __("Slug", "Slug"), visible: visibleColumns.slug },
+          { key: "description", label: __("Description", "Description"), visible: visibleColumns.description },
+          { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
+          { key: "created_at", label: __("Created", "Created"), visible: visibleColumns.created_at }
+        ],
+        onToggleColumn: toggleColumn,
+        bulkMutationPending: false,
+        totalItems: levels.length,
+        bulkActionOptions: getDefaultBulkStatusOptions(statusFilter)
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Table,
+      {
+        data: levels,
+        columns,
+        actions,
+        isLoading,
+        isError: !!error,
+        errorText: __("Failed to load difficulty levels", "Failed to load difficulty levels"),
+        emptyText: __("No difficulty levels found", "No difficulty levels found"),
+        emptyDescription: __(
+          "Get started by creating your first difficulty level to categorize trips by their physical challenge level.",
+          "Get started by creating your first difficulty level to categorize trips by their physical challenge level."
+        ),
+        onCreateClick: handleCreate,
+        onSort: handleSort,
+        getSortIcon,
+        selectedItemIds: selectedIds,
+        onSelectItem: (id, checked) => {
+          if (checked) {
+            setSelectedIds([...selectedIds, id]);
+          } else {
+            setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
           }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: statusFilter, onChange: (e) => setStatusFilter(e.target.value), className: "w-full lg:flex-1", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Trash", "Trash") })
-      ] }),
-      hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: handleResetFilters, className: "h-11 flex items-center gap-2 flex-shrink-0", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-        __("Reset", "Reset")
-      ] })
-    ] }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-24", children: __("Order", "Order") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Name", "Name") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Slug", "Slug") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Description", "Description") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Created", "Created") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-28 text-right", children: __("Actions", "Actions") })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: Array.from({ length: 5 }).map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-12 bg-gray-100 dark:bg-gray-800 rounded-md animate-pulse" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 animate-pulse" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-36 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-48 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-20 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-28 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" })
-        ] }) })
-      ] }, `difficulty-skeleton-${index}`)) })
-    ] }) : error ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-red-600 dark:text-red-400", children: __("Failed to load difficulty levels", "Failed to load difficulty levels") }) }) : levels.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-12 text-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-500 dark:text-gray-400 mb-4", children: __("No difficulty levels found", "No difficulty levels found") }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreate, variant: "outline", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
-        __("Add Your First Difficulty Level", "Add Your First Difficulty Level")
-      ] }) })
-    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-24 cursor-pointer select-none", onClick: () => handleSort("level_order"), children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex items-center", children: [
-          __("Order", "Order"),
-          getSortIcon("level_order")
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Name", "Name") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Slug", "Slug") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Description", "Description") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "cursor-pointer select-none", onClick: () => handleSort("status"), children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex items-center", children: [
-          __("Status", "Status"),
-          getSortIcon("status")
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Created", "Created") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-28 text-right", children: __("Actions", "Actions") })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: levels.map((level) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-700 dark:text-gray-300", children: level.level_order ?? "—" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-          renderIcon(level.icon),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: level.name }) })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-xs text-gray-600 dark:text-gray-400", children: level.slug }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-xs truncate text-sm text-gray-600 dark:text-gray-400", children: level.description || "—" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(level.status) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-sm text-gray-600 dark:text-gray-400", children: formatDate2(level.created_at) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-end gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_edit_trips", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "ghost", size: "sm", onClick: () => handleEdit(level), className: "h-9 w-9 p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "ghost",
-              size: "sm",
-              onClick: () => handleDelete(level),
-              className: "h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20",
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-            }
-          )
-        ] }) }) })
-      ] }, level.id)) })
-    ] }) }) }),
-    totalPages > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __("Showing {current} of {total} levels", "Showing {current} of {total} levels").replace("{current}", String(Math.min(page * 20, total))).replace("{total}", String(total)) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", disabled: page === 1, onClick: () => setPage(page - 1), children: __("Previous", "Previous") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", disabled: page === totalPages, onClick: () => setPage(page + 1), children: __("Next", "Next") })
-      ] })
-    ] })
+        },
+        onSelectAll: (checked) => {
+          if (checked) {
+            setSelectedIds(levels.map((level) => level.id));
+          } else {
+            setSelectedIds([]);
+          }
+        },
+        isAllSelected: levels.length > 0 && selectedIds.length === levels.length,
+        getItemId: (level) => level.id,
+        getItemStatus: (level) => level.status,
+        statusFilter,
+        skeletonRows: 5,
+        capability: "yatra_edit_trips"
+      }
+    ) }) }),
+    total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Pagination,
+      {
+        currentPage: page,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: 20,
+        onPageChange: setPage,
+        itemName: __("difficulty levels", "difficulty levels")
+      }
+    ) }) })
   ] });
 };
 const DifficultyLevelForm = () => {
@@ -12298,7 +12614,7 @@ const DifficultyLevelForm = () => {
     }
   }, [levelData, isEditMode]);
   const handleNameChange = (value) => {
-    if (!isSlugEditable) {
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData((prev) => ({
         ...prev,

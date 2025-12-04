@@ -5,18 +5,17 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, ArrowUp, ArrowDown } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { ConditionalRender } from '../components/ui/conditional-render';
+import { Table } from '../components/shared/Table';
+import { Pagination, SearchFilterToolbar, BulkActionToolbar } from '../components/shared';
+import { getDefaultBulkStatusOptions } from '../components/shared/bulkStatusOptions';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { Edit, Trash2 } from 'lucide-react';
 import { IconSelector } from '../components/ui/icon-selector';
@@ -44,13 +43,148 @@ const DifficultyLevels: React.FC = () => {
   const [sortBy, setSortBy] = useState('level_order');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; level: DifficultyLevel | null }>({
-    isOpen: false,
-    level: null,
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const saved = localStorage.getItem('yatra_difficulty_levels_columns');
+    return saved
+      ? JSON.parse(saved)
+      : {
+          level_order: true,
+          name: true,
+          slug: true,
+          description: true,
+          status: true,
+          created_at: false,
+        };
   });
-  const queryClient = useQueryClient();
+
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; level: DifficultyLevel | null }>(
+    {
+      isOpen: false,
+      level: null,
+    }
+  );
+
+  // Define table columns
+  const columns = [
+    {
+      key: 'level_order',
+      label: __('Order', 'Order'),
+      sortable: true,
+      width: '100px',
+      visible: visibleColumns.level_order,
+      render: (level: DifficultyLevel) => (
+        <div className="text-sm text-gray-900 dark:text-white">
+          {level.level_order}
+        </div>
+      ),
+    },
+    {
+      key: 'name',
+      label: __('Name', 'Name'),
+      sortable: true,
+      visible: visibleColumns.name,
+      render: (level: DifficultyLevel) => (
+        <div className="flex items-center gap-3">
+          {renderIcon(level.icon)}
+          <a
+            href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels&action=edit&id=${level.id}`}
+            className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+          >
+            {level.name}
+          </a>
+        </div>
+      ),
+    },
+    {
+      key: 'slug',
+      label: __('Slug', 'Slug'),
+      visible: visibleColumns.slug,
+      render: (level: DifficultyLevel) => (
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {level.slug || '—'}
+        </div>
+      ),
+    },
+    {
+      key: 'description',
+      label: __('Description', 'Description'),
+      visible: visibleColumns.description,
+      render: (level: DifficultyLevel) => (
+        <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
+          {level.description || '—'}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      label: __('Status', 'Status'),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (level: DifficultyLevel) => getStatusBadge(level.status),
+    },
+    {
+      key: 'created_at',
+      label: __('Created', 'Created'),
+      sortable: true,
+      visible: visibleColumns.created_at,
+      render: (level: DifficultyLevel) => (
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {formatDate(level.created_at)}
+        </div>
+      ),
+    },
+  ];
+
+  // Define table actions
+  const actions = [
+    {
+      key: 'edit',
+      label: __('Edit', 'Edit'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (level: DifficultyLevel) => handleEdit(level),
+      condition: () => can('yatra_edit_trips'),
+    },
+    {
+      key: 'publish',
+      label: __('Make Published', 'Make Published'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (level: DifficultyLevel) => statusMutation.mutate({ id: level.id, status: 'publish' }),
+      condition: (level: DifficultyLevel) =>
+        can('yatra_edit_trips') && level.status !== 'publish',
+    },
+    {
+      key: 'draft',
+      label: __('Make Draft', 'Make Draft'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (level: DifficultyLevel) => statusMutation.mutate({ id: level.id, status: 'draft' }),
+      condition: (level: DifficultyLevel) =>
+        can('yatra_edit_trips') && level.status !== 'draft',
+    },
+    {
+      key: 'delete',
+      label: __('Delete', 'Delete'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (level: DifficultyLevel) =>
+        setDeleteConfirm({ isOpen: true, level }),
+      variant: 'destructive' as const,
+      condition: (level: DifficultyLevel) => can('yatra_edit_trips') && level.status === 'trash',
+    },
+    {
+      key: 'trash',
+      label: __('Move to Trash', 'Move to Trash'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (level: DifficultyLevel) => statusMutation.mutate({ id: level.id, status: 'trash' }),
+      variant: 'destructive' as const,
+      condition: (level: DifficultyLevel) =>
+        can('yatra_edit_trips') && level.status !== 'trash',
+    },
+  ];
 
   const queryParams = useMemo(() => {
     const params: Record<string, any> = {
@@ -88,16 +222,67 @@ const DifficultyLevels: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] });
       showToast(__('Difficulty level deleted successfully', 'Difficulty level deleted successfully'), 'success');
-      setDeleteConfirm({ isOpen: false, level: null });
     },
     onError: (error: any) => {
       showToast(error?.message || __('Failed to delete difficulty level', 'Failed to delete difficulty level'), 'error');
     },
   });
 
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      const levelResponse = await apiClient.get(`/difficulty-levels/${id}`);
+      const level = levelResponse as DifficultyLevel;
+
+      return apiClient.put(`/difficulty-levels/${id}`, {
+        name: level.name,
+        slug: level.slug,
+        description: level.description,
+        icon: level.icon,
+        level_order: level.level_order,
+        status,
+      });
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] });
+      const msgMap: Record<string, string> = {
+        trash: __('Difficulty level moved to trash', 'Difficulty level moved to trash'),
+        draft: __('Difficulty level marked as draft', 'Difficulty level marked as draft'),
+        publish: __('Difficulty level published', 'Difficulty level published'),
+      };
+      const msg = msgMap[variables.status] || __('Difficulty level updated successfully', 'Difficulty level updated successfully');
+      showToast(msg, 'success');
+    },
+    onError: (error: any, variables) => {
+      const msgMapError: Record<string, string> = {
+        trash: __('Failed to move difficulty level to trash', 'Failed to move difficulty level to trash'),
+        draft: __('Failed to mark difficulty level as draft', 'Failed to mark difficulty level as draft'),
+        publish: __('Failed to publish difficulty level', 'Failed to publish difficulty level'),
+      };
+      const fallback = msgMapError[variables.status] || __('Failed to update difficulty level', 'Failed to update difficulty level');
+      showToast(error?.message || fallback, 'error');
+    },
+  });
+
   const levels = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 20);
+
+  const statusCounts = useMemo(() => {
+    const counts = {
+      all: levels.length,
+      publish: 0,
+      draft: 0,
+      trash: 0,
+    };
+
+    levels.forEach((level: DifficultyLevel) => {
+      if (level.status === 'publish') counts.publish += 1;
+      else if (level.status === 'draft') counts.draft += 1;
+      else if (level.status === 'trash') counts.trash += 1;
+    });
+
+    return counts;
+  }, [levels]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return __('N/A', 'N/A');
@@ -161,26 +346,8 @@ const DifficultyLevels: React.FC = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels&action=edit&id=${level.id}`;
   };
 
-  const handleDelete = (level: DifficultyLevel) => {
-    setDeleteConfirm({ isOpen: true, level });
-  };
-
-  const confirmDelete = () => {
-    if (deleteConfirm.level) {
-      deleteMutation.mutate(deleteConfirm.level.id);
-    }
-  };
-
   const handleCreate = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels&action=create`;
-  };
-
-  const handleResetFilters = () => {
-    setSearchTerm('');
-    setStatusFilter('all');
-    setSortBy('level_order');
-    setSortOrder('asc');
-    setPage(1);
   };
 
   const handleSort = (field: string) => {
@@ -193,228 +360,288 @@ const DifficultyLevels: React.FC = () => {
   };
 
   const getSortIcon = (field: string) => {
-    if (sortBy !== field) {
-      return <ArrowUpDown className="w-3.5 h-3.5 ml-1 text-gray-400" />;
-    }
-    return sortOrder === 'asc'
-      ? <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
-      : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
+    if (sortBy !== field) return null;
+    return sortOrder === 'asc' ? (
+      <ArrowUp className="ml-1 w-3.5 h-3.5" />
+    ) : (
+      <ArrowDown className="ml-1 w-3.5 h-3.5" />
+    );
   };
 
-  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'level_order' || sortOrder !== 'asc';
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('all');
+    setSortBy('level_order');
+    setSortOrder('asc');
+    setPage(1);
+  };
+
+  const hasFilters =
+    !!searchTerm || statusFilter !== 'all' || sortBy !== 'level_order' || sortOrder !== 'asc';
+
+  const toggleColumn = (columnKey: string) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns],
+    };
+    setVisibleColumns(newVisibleColumns);
+    localStorage.setItem('yatra_difficulty_levels_columns', JSON.stringify(newVisibleColumns));
+  };
+
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(
+        __('Select a bulk action first.', 'Select a bulk action first.'),
+        'warning'
+      );
+      return;
+    }
+
+    if (selectedIds.length === 0) {
+      showToast(
+        __('Select at least one difficulty level.', 'Select at least one difficulty level.'),
+        'warning'
+      );
+      return;
+    }
+
+    const performBulk = async () => {
+      try {
+        if (bulkAction === 'delete') {
+          await Promise.all(
+            selectedIds.map((id) => apiClient.delete(`/difficulty-levels/${id}`))
+          );
+          showToast(
+            __('Selected difficulty levels deleted successfully', 'Selected difficulty levels deleted successfully'),
+            'success'
+          );
+        } else if (bulkAction === 'trash' || bulkAction === 'draft' || bulkAction === 'publish') {
+          const status =
+            bulkAction === 'trash' ? 'trash' : bulkAction === 'draft' ? 'draft' : 'publish';
+
+          await Promise.all(
+            selectedIds.map(async (id) => {
+              try {
+                const levelResponse = await apiClient.get(`/difficulty-levels/${id}`);
+                const level = levelResponse;
+                if (!level || !level.name) {
+                  return;
+                }
+
+                await apiClient.put(`/difficulty-levels/${id}`, {
+                  name: level.name,
+                  slug: level.slug,
+                  description: level.description,
+                  icon: level.icon,
+                  level_order: level.level_order,
+                  status,
+                });
+              } catch {
+                // If a single item fails, let the outer catch handle messaging
+                throw new Error('bulk_item_failed');
+              }
+            })
+          );
+          const msgMap: Record<string, string> = {
+            trash: __('Selected difficulty levels moved to trash', 'Selected difficulty levels moved to trash'),
+            draft: __('Selected difficulty levels marked as draft', 'Selected difficulty levels marked as draft'),
+            publish: __('Selected difficulty levels published', 'Selected difficulty levels published'),
+          };
+          showToast(msgMap[bulkAction], 'success');
+        }
+
+        queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] });
+        setSelectedIds([]);
+        setBulkAction('');
+      } catch (error: any) {
+        const msgMapError: Record<string, string> = {
+          delete: __('Failed to delete selected difficulty levels', 'Failed to delete selected difficulty levels'),
+          trash: __('Failed to move selected difficulty levels to trash', 'Failed to move selected difficulty levels to trash'),
+          draft: __('Failed to mark selected difficulty levels as draft', 'Failed to mark selected difficulty levels as draft'),
+          publish: __('Failed to publish selected difficulty levels', 'Failed to publish selected difficulty levels'),
+        };
+        showToast(
+          error?.message || msgMapError[bulkAction],
+          'error'
+        );
+      }
+    };
+
+    void performBulk();
+  };
 
   return (
     <div className="space-y-3">
       <ConfirmationDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, level: null })}
-        onConfirm={confirmDelete}
+        onConfirm={() => {
+          if (deleteConfirm.level) {
+            deleteMutation.mutate(deleteConfirm.level.id);
+            setDeleteConfirm({ isOpen: false, level: null });
+          }
+        }}
         title={__('Delete Difficulty Level', 'Delete Difficulty Level')}
-        message={deleteConfirm.level
-          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'Are you sure you want to delete "{name}"? This action cannot be undone.').replace('{name}', deleteConfirm.level.name)
-          : __('Are you sure you want to delete this difficulty level?', 'Are you sure you want to delete this difficulty level?')}
+        message={
+          deleteConfirm.level
+            ? __(
+                'Are you sure you want to delete "{name}"? This action cannot be undone.',
+                'Are you sure you want to delete "{name}"? This action cannot be undone.'
+              ).replace('{name}', deleteConfirm.level.name)
+            : __(
+                'Are you sure you want to delete this difficulty level? This action cannot be undone.',
+                'Are you sure you want to delete this difficulty level? This action cannot be undone.'
+              )
+        }
         confirmText={__('Delete', 'Delete')}
         cancelText={__('Cancel', 'Cancel')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
-
       <PageHeader
         title={__('Difficulty Levels', 'Difficulty Levels')}
-        description={__('Define and manage trip difficulty levels', 'Define and manage trip difficulty levels')}
+        description={__('Manage trip difficulty levels and their ordering', 'Manage trip difficulty levels and their ordering')}
         actionCapability="yatra_edit_trips"
         actions={
-          <Button onClick={handleCreate} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            {__('Add Difficulty Level', 'Add Difficulty Level')}
+          <Button onClick={handleCreate}>
+            <Plus className="w-4 h-4 mr-2" />
+            {__('Add New', 'Add New')}
           </Button>
         }
       />
 
+      {/* Filters */}
       <Card>
         <CardContent className="p-3">
-          <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
-            <div className="relative min-w-0 w-full lg:flex-[2]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder={__('Search difficulty levels...', 'Search difficulty levels...')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full"
-              />
-            </div>
-
-            <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full lg:flex-1">
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="draft">{__('Draft', 'Draft')}</option>
-              <option value="publish">{__('Publish', 'Publish')}</option>
-              <option value="trash">{__('Trash', 'Trash')}</option>
-            </Select>
-
-            {hasFilters && (
-              <Button variant="outline" onClick={handleResetFilters} className="h-11 flex items-center gap-2 flex-shrink-0">
-                <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
-              </Button>
-            )}
-          </div>
+          <SearchFilterToolbar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={statusFilter}
+            onStatusChange={(value) => {
+              setStatusFilter(value);
+              setPage(1);
+            }}
+            statusOptions={[
+              { value: 'all', label: __('All Status', 'All Status') },
+              { value: 'publish', label: __('Published', 'Published') },
+              { value: 'draft', label: __('Draft', 'Draft') },
+            ]}
+            sortBy={sortBy}
+            onSortByChange={(value) => {
+              setSortBy(value);
+              setSortOrder('asc');
+              setPage(1);
+            }}
+            sortOrder={sortOrder}
+            onSortOrderChange={(order) => {
+              setSortOrder(order);
+              setPage(1);
+            }}
+            sortOptions={[
+              { value: 'level_order', label: __('Order', 'Order') },
+              { value: 'name', label: __('Name', 'Name') },
+              { value: 'created_at', label: __('Created', 'Created') },
+            ]}
+            onResetFilters={handleResetFilters}
+            hasFilters={hasFilters}
+            placeholder={__('Search difficulty levels...', 'Search difficulty levels...')}
+          />
         </CardContent>
       </Card>
 
+      {/* Bulk actions (no card, same as Activities) */}
+      <BulkActionToolbar
+            selectedIds={selectedIds}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={() => setSelectedIds([])}
+            statusFilter={statusFilter}
+            setStatusFilter={(value) => {
+              setStatusFilter(value);
+              setPage(1);
+              setSelectedIds([]);
+              setBulkAction('');
+            }}
+            statusOptions={[
+              { key: 'all', label: __('All', 'All'), count: statusCounts.all },
+              { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
+              { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
+              { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+            ]}
+            showColumnsDropdown={showColumnsDropdown}
+            setShowColumnsDropdown={setShowColumnsDropdown}
+            columnOptions={[
+              { key: 'level_order', label: __('Order', 'Order'), visible: visibleColumns.level_order },
+              { key: 'name', label: __('Name', 'Name'), visible: visibleColumns.name },
+              { key: 'slug', label: __('Slug', 'Slug'), visible: visibleColumns.slug },
+              { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+              { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+              { key: 'created_at', label: __('Created', 'Created'), visible: visibleColumns.created_at },
+            ]}
+            onToggleColumn={toggleColumn}
+            bulkMutationPending={false}
+            totalItems={levels.length}
+            bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
+          />
+
+      {/* Table */}
       <Card>
         <CardContent className="p-0">
-          {isLoading ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-24">{__('Order', 'Order')}</TableHead>
-                  <TableHead>{__('Name', 'Name')}</TableHead>
-                  <TableHead>{__('Slug', 'Slug')}</TableHead>
-                  <TableHead>{__('Description', 'Description')}</TableHead>
-                  <TableHead>{__('Status', 'Status')}</TableHead>
-                  <TableHead>{__('Created', 'Created')}</TableHead>
-                  <TableHead className="w-28 text-right">{__('Actions', 'Actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow key={`difficulty-skeleton-${index}`}>
-                    <TableCell>
-                      <div className="h-6 w-12 bg-gray-100 dark:bg-gray-800 rounded-md animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 animate-pulse" />
-                        <div className="h-4 w-36 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-48 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-6 w-20 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-4 w-28 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                        <div className="h-9 w-9 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : error ? (
-            <div className="p-12 text-center">
-              <div className="text-red-600 dark:text-red-400">{__('Failed to load difficulty levels', 'Failed to load difficulty levels')}</div>
-            </div>
-          ) : levels.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="text-gray-500 dark:text-gray-400 mb-4">{__('No difficulty levels found', 'No difficulty levels found')}</div>
-              <ConditionalRender capability="yatra_edit_trips">
-                <Button onClick={handleCreate} variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {__('Add Your First Difficulty Level', 'Add Your First Difficulty Level')}
-                </Button>
-              </ConditionalRender>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-24 cursor-pointer select-none" onClick={() => handleSort('level_order')}>
-                    <div className="inline-flex items-center">
-                      {__('Order', 'Order')}
-                      {getSortIcon('level_order')}
-                    </div>
-                  </TableHead>
-                  <TableHead>{__('Name', 'Name')}</TableHead>
-                  <TableHead>{__('Slug', 'Slug')}</TableHead>
-                  <TableHead>{__('Description', 'Description')}</TableHead>
-                  <TableHead className="cursor-pointer select-none" onClick={() => handleSort('status')}>
-                    <div className="inline-flex items-center">
-                      {__('Status', 'Status')}
-                      {getSortIcon('status')}
-                    </div>
-                  </TableHead>
-                  <TableHead>{__('Created', 'Created')}</TableHead>
-                  <TableHead className="w-28 text-right">{__('Actions', 'Actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {levels.map((level: DifficultyLevel) => (
-                  <TableRow key={level.id}>
-                    <TableCell>
-                      <span className="inline-flex items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-700 dark:text-gray-300">
-                        {level.level_order ?? '—'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {renderIcon(level.icon)}
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">{level.name}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <code className="text-xs text-gray-600 dark:text-gray-400">{level.slug}</code>
-                    </TableCell>
-                    <TableCell>
-                      <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
-                        {level.description || '—'}
-                      </div>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(level.status)}</TableCell>
-                    <TableCell className="text-sm text-gray-600 dark:text-gray-400">{formatDate(level.created_at)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <ConditionalRender capability="yatra_edit_trips">
-                          <Button variant="ghost" size="sm" onClick={() => handleEdit(level)} className="h-9 w-9 p-0">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(level)}
-                            className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </ConditionalRender>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <Table
+            data={levels}
+            columns={columns}
+            actions={actions}
+            isLoading={isLoading}
+            isError={!!error}
+            errorText={__('Failed to load difficulty levels', 'Failed to load difficulty levels')}
+            emptyText={__('No difficulty levels found', 'No difficulty levels found')}
+            emptyDescription={__(
+              'Get started by creating your first difficulty level to categorize trips by their physical challenge level.',
+              'Get started by creating your first difficulty level to categorize trips by their physical challenge level.'
+            )}
+            onCreateClick={handleCreate}
+            onSort={handleSort}
+            getSortIcon={getSortIcon}
+            selectedItemIds={selectedIds}
+            onSelectItem={(id: string | number, checked: boolean) => {
+              if (checked) {
+                setSelectedIds([...selectedIds, id]);
+              } else {
+                setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+              }
+            }}
+            onSelectAll={(checked: boolean) => {
+              if (checked) {
+                setSelectedIds(levels.map((level: DifficultyLevel) => level.id));
+              } else {
+                setSelectedIds([]);
+              }
+            }}
+            isAllSelected={levels.length > 0 && selectedIds.length === levels.length}
+            getItemId={(level: DifficultyLevel) => level.id}
+            getItemStatus={(level: DifficultyLevel) => level.status}
+            statusFilter={statusFilter}
+            skeletonRows={5}
+            capability="yatra_edit_trips"
+          />
         </CardContent>
       </Card>
 
-      {totalPages > 1 && (
-        <div className="flex justify-between items-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {__('Showing {current} of {total} levels', 'Showing {current} of {total} levels')
-              .replace('{current}', String(Math.min(page * 20, total)))
-              .replace('{total}', String(total))}
-          </p>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" disabled={page === 1} onClick={() => setPage(page - 1)}>
-              {__('Previous', 'Previous')}
-            </Button>
-            <Button variant="outline" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
-              {__('Next', 'Next')}
-            </Button>
-          </div>
-        </div>
+      {/* Pagination */}
+      {total > 0 && (
+        <Card>
+          <CardContent className="p-3">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={total}
+              itemsPerPage={20}
+              onPageChange={setPage}
+              itemName={__('difficulty levels', 'difficulty levels')}
+            />
+          </CardContent>
+        </Card>
       )}
     </div>
   );
