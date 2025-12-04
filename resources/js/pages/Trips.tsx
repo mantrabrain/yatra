@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Package, MapPin, Calendar, Users, Tag, Mountain } from 'lucide-react';
+import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Package, MapPin, Calendar, Users, Tag, Mountain, Archive } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -13,16 +13,18 @@ import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Badge } from '../components/ui/badge';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Edit, Trash2, Eye } from 'lucide-react';
 import { HelpText } from '../components/ui/help-text';
-import { Alert } from '../components/ui/alert';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
 import { generateSlug } from '../lib/slug';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
+import { Pagination } from '../components/shared/Pagination';
+import { Table as SharedTable } from '../components/shared/Table';
+import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 
 interface Trip {
   id: number;
@@ -41,6 +43,8 @@ interface Trip {
   duration_nights?: number;
   min_travelers?: number;
   max_travelers?: number;
+  countries?: string[];
+  regions?: string[];
   trip_category?: Array<{
     id: number;
     name: string;
@@ -68,6 +72,11 @@ const Trips: React.FC = () => {
   const [createTripError, setCreateTripError] = useState<string | null>(null);
   const [newTripSlug, setNewTripSlug] = useState('');
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
   const queryClient = useQueryClient();
   const { can, isPro } = usePermissions();
   const { showToast } = useToast();
@@ -109,6 +118,12 @@ const Trips: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
+      setIsDeleteDialogOpen(false);
+      setTripToDelete(null);
+      showToast(__('Trip deleted permanently.', 'Trip deleted permanently.'), 'success');
+    },
+    onError: () => {
+      showToast(__('Failed to delete trip. Please try again.', 'Failed to delete trip. Please try again.'), 'error');
     },
   });
 
@@ -261,9 +276,9 @@ const Trips: React.FC = () => {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
         label: __('Approved', 'Approved'),
       },
-      'suspended': {
-        className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
-        label: __('Suspended', 'Suspended'),
+      'trash': {
+        className: 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+        label: __('Trash', 'Trash'),
       },
     };
 
@@ -314,10 +329,8 @@ const Trips: React.FC = () => {
   };
 
   const handleDelete = (trip: Trip) => {
-    const confirmMessage = __('Are you sure you want to delete "{title}"? This action cannot be undone and will remove all associated bookings.', 'Are you sure you want to delete "{title}"? This action cannot be undone and will remove all associated bookings.').replace('{title}', trip.title);
-    if (confirm(confirmMessage)) {
-      deleteMutation.mutate(trip.id);
-    }
+    setTripToDelete(trip);
+    setIsDeleteDialogOpen(true);
   };
 
   // Fetch trip_base setting for permalink
@@ -406,6 +419,423 @@ const Trips: React.FC = () => {
 
   const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'title' || sortOrder !== 'asc';
 
+  // Helper: update trip status, including required fields for backend validation
+  const updateTripStatus = async (trip: Trip, status: string) => {
+    await apiClient.put(`/trips/${trip.id}`, {
+      status,
+      title: trip.title,
+      slug: trip.slug,
+    });
+  };
+
+  // Column visibility state with localStorage persistence
+  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(() => {
+    const defaults = {
+      trip: true,
+      price: true,
+      status: true,
+      trip_type: true,
+      duration: false,
+      countries: false,
+      difficulty: false,
+      bookings: true,
+      created: true,
+    };
+
+    if (typeof window === 'undefined') {
+      return defaults;
+    }
+
+    const stored = window.localStorage.getItem('yatra-trips-visible-columns');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as Record<string, boolean>;
+        // Merge stored config with defaults so new columns (duration, countries, difficulty) default to true
+        return { ...defaults, ...parsed };
+      } catch {
+        return defaults;
+      }
+    }
+    return defaults;
+  });
+
+  const toggleColumn = (columnKey: string) => {
+    const updated = { ...visibleColumns, [columnKey]: !visibleColumns[columnKey] };
+    setVisibleColumns(updated);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('yatra-trips-visible-columns', JSON.stringify(updated));
+    }
+  };
+
+  const columnOptions = [
+    { key: 'trip', label: __('Trip', 'Trip'), visible: visibleColumns.trip },
+    { key: 'price', label: __('Price', 'Price'), visible: visibleColumns.price },
+    { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+    { key: 'trip_type', label: __('Trip Type', 'Trip Type'), visible: visibleColumns.trip_type },
+    { key: 'duration', label: __('Duration', 'Duration'), visible: visibleColumns.duration },
+    { key: 'countries', label: __('Countries', 'Countries'), visible: visibleColumns.countries },
+    { key: 'difficulty', label: __('Difficulty', 'Difficulty'), visible: visibleColumns.difficulty },
+    ...(isPro ? [{ key: 'bookings', label: __('Bookings', 'Bookings'), visible: visibleColumns.bookings }] : []),
+    { key: 'created', label: __('Created', 'Created'), visible: visibleColumns.created },
+  ];
+
+  // Selection helpers for shared table
+  const isAllSelected = trips.length > 0 && selectedIds.length === trips.length;
+
+  const handleSelectItem = (id: string | number, checked: boolean) => {
+    setSelectedIds(prev =>
+      checked ? [...prev, id] : prev.filter(existingId => existingId !== id)
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(trips.map((trip: Trip) => trip.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  // Status counts for filter tabs
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      all: total,
+      published: 0,
+      draft: 0,
+      review: 0,
+      approved: 0,
+      archived: 0,
+      trash: 0,
+    };
+    trips.forEach((trip: Trip) => {
+      if (counts[trip.status] !== undefined) {
+        counts[trip.status] += 1;
+      }
+    });
+    return counts;
+  }, [trips, total]);
+
+  const statusOptions = [
+    { key: 'all', label: __('All', 'All'), count: statusCounts.all },
+    { key: 'published', label: __('Published', 'Published'), count: statusCounts.published },
+    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
+    { key: 'review', label: __('Review', 'Review'), count: statusCounts.review },
+    { key: 'approved', label: __('Approved', 'Approved'), count: statusCounts.approved },
+    { key: 'archived', label: __('Archived', 'Archived'), count: statusCounts.archived },
+    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+  ];
+
+  // Bulk action options (status + delete)
+  const bulkActionOptions = useMemo(() => {
+    // In Trash view: allow restore to Draft and permanent delete only
+    if (statusFilter === 'trash') {
+      return [
+        { value: 'mark_draft', label: __('Restore to Draft', 'Restore to Draft') },
+        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      ];
+    }
+
+    // Other views: normal status changes + move to trash + delete
+    return [
+      { value: 'mark_published', label: __('Mark as Published', 'Mark as Published') },
+      { value: 'mark_draft', label: __('Mark as Draft', 'Mark as Draft') },
+      { value: 'mark_archived', label: __('Archive', 'Archive') },
+      { value: 'mark_trash', label: __('Move to Trash', 'Move to Trash') },
+      { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+    ];
+  }, [statusFilter]);
+
+  // Bulk apply handler
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) return;
+
+    const confirmMessages: Record<string, string> = {
+      delete: __('Are you sure you want to permanently delete {count} trip(s)? This cannot be undone.', 'Are you sure you want to permanently delete {count} trip(s)? This cannot be undone.').replace('{count}', selectedIds.length.toString()),
+      mark_published: __('Mark {count} trip(s) as Published?', 'Mark {count} trip(s) as Published?').replace('{count}', selectedIds.length.toString()),
+      mark_draft: statusFilter === 'trash'
+        ? __('Restore {count} trip(s) to Draft?', 'Restore {count} trip(s) to Draft?').replace('{count}', selectedIds.length.toString())
+        : __('Mark {count} trip(s) as Draft?', 'Mark {count} trip(s) as Draft?').replace('{count}', selectedIds.length.toString()),
+      mark_archived: __('Archive {count} trip(s)?', 'Archive {count} trip(s)?').replace('{count}', selectedIds.length.toString()),
+      mark_trash: __('Move {count} trip(s) to Trash?', 'Move {count} trip(s) to Trash?').replace('{count}', selectedIds.length.toString()),
+    };
+
+    const message = confirmMessages[bulkAction];
+    if (message && !window.confirm(message)) return;
+
+    try {
+      if (bulkAction === 'delete') {
+        await Promise.all(selectedIds.map(id => apiClient.delete(`/trips/${id}`)));
+        showToast(__('Trips deleted successfully', 'Trips deleted successfully'), 'success');
+      } else if (bulkAction.startsWith('mark_')) {
+        const status = bulkAction.replace('mark_', '');
+        // Only update trips that are currently loaded in this page
+        const selectedTrips = trips.filter((trip: Trip) => selectedIds.includes(trip.id));
+        await Promise.all(selectedTrips.map((trip: Trip) => updateTripStatus(trip, status)));
+        showToast(__('Trip status updated successfully', 'Trip status updated successfully'), 'success');
+      }
+      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      setSelectedIds([]);
+      setBulkAction('');
+    } catch (error) {
+      showToast(__('Bulk action failed', 'Bulk action failed'), 'error');
+    }
+  };
+
+  // Columns configuration for shared table
+  const columns = useMemo(() => {
+    const cols: { key: string; label: string; sortable?: boolean; visible?: boolean; width?: string; render?: (trip: Trip, index: number) => React.ReactNode }[] = [];
+
+    cols.push({
+      key: 'title',
+      label: __('Trip', 'Trip'),
+      sortable: true,
+      visible: visibleColumns.trip,
+      width: 'w-[300px]',
+      render: (trip: Trip) => (
+        <div className="flex items-center gap-2">
+          <div>
+            <div className="font-medium text-gray-900 dark:text-white">
+              {trip.title}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {trip.slug}
+            </div>
+            {(() => {
+              const destinationLabel = summarizeDestinations(trip);
+              const durationLabel = trip.duration_days
+                ? `${trip.duration_days}${__('d', 'd')}${trip.duration_nights ? ` / ${trip.duration_nights}${__('n', 'n')}` : ''}`
+                : null;
+              const travelerLabel = summarizeTravelers(trip);
+              const categoryLabel = summarizeCategories(trip);
+              const difficultyLabel = formatLabel(trip.difficulty_level);
+              const chips = [
+                destinationLabel && { key: 'dest', label: destinationLabel, icon: MapPin },
+                durationLabel && { key: 'duration', label: durationLabel, icon: Calendar },
+                travelerLabel && { key: 'traveler', label: travelerLabel, icon: Users },
+                categoryLabel && { key: 'category', label: categoryLabel, icon: Tag },
+                difficultyLabel && { key: 'difficulty', label: difficultyLabel, icon: Mountain },
+              ].filter(Boolean) as Array<{ key: string; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }>;
+              if (!chips.length) return null;
+              return (
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {chips.map(({ key, label, icon: Icon }) => (
+                    <span
+                      key={`${trip.id}-${key}`}
+                      className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 text-[11px]"
+                    >
+                      <Icon className="w-3 h-3" />
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+          {(trip.featured_priority && trip.featured_priority !== 'none' && isPro) && (
+            <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+              {trip.featured_priority === 'featured' ? __('Featured', 'Featured') :
+               trip.featured_priority === 'popular' ? __('Popular', 'Popular') :
+               trip.featured_priority === 'new' ? __('New', 'New') :
+               trip.featured_priority === 'limited' ? __('Limited', 'Limited') :
+               trip.featured_priority === 'bestseller' ? __('Bestseller', 'Bestseller') :
+               trip.featured_priority}
+            </Badge>
+          )}
+        </div>
+      ),
+    });
+
+    cols.push({
+      key: 'price',
+      label: __('Price', 'Price'),
+      sortable: true,
+      visible: visibleColumns.price,
+      render: (trip: Trip) => (
+        <span className="font-medium">{formatPrice(trip)}</span>
+      ),
+    });
+
+    cols.push({
+      key: 'status',
+      label: __('Status', 'Status'),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (trip: Trip) => getStatusBadge(trip.status),
+    });
+
+    cols.push({
+      key: 'trip_type',
+      label: __('Trip Type', 'Trip Type'),
+      sortable: true,
+      visible: visibleColumns.trip_type,
+      render: (trip: Trip) => getTripTypeBadge(trip.trip_type),
+    });
+
+    // Duration column (days / nights)
+    cols.push({
+      key: 'duration',
+      label: __('Duration', 'Duration'),
+      sortable: false,
+      visible: visibleColumns.duration,
+      render: (trip: Trip) => {
+        if (!trip.duration_days && !trip.duration_nights) return null;
+        const days = trip.duration_days ? `${trip.duration_days} ${__('days', 'days')}` : '';
+        const nights = trip.duration_nights ? `${trip.duration_nights} ${__('nights', 'nights')}` : '';
+        const label = [days, nights].filter(Boolean).join(' / ');
+        return <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>;
+      },
+    });
+
+    // Countries column
+    cols.push({
+      key: 'countries',
+      label: __('Countries', 'Countries'),
+      sortable: false,
+      visible: visibleColumns.countries,
+      render: (trip: Trip) => {
+        const list = (trip.countries || []).filter(Boolean);
+        if (!list.length) return null;
+        return <span className="text-sm text-gray-700 dark:text-gray-300">{list.join(', ')}</span>;
+      },
+    });
+
+    // Difficulty column (from difficulty_level)
+    cols.push({
+      key: 'difficulty',
+      label: __('Difficulty', 'Difficulty'),
+      sortable: false,
+      visible: visibleColumns.difficulty,
+      render: (trip: Trip) => {
+        if (!trip.difficulty_level) return null;
+        return <span className="text-sm text-gray-700 dark:text-gray-300">{formatLabel(trip.difficulty_level)}</span>;
+      },
+    });
+
+    if (isPro) {
+      cols.push({
+        key: 'bookings',
+        label: __('Bookings', 'Bookings'),
+        sortable: false,
+        visible: visibleColumns.bookings,
+        render: (trip: Trip) => (
+          <span className="text-gray-600 dark:text-gray-400">{trip.bookings_count || 0}</span>
+        ),
+      });
+    }
+
+    cols.push({
+      key: 'date',
+      label: __('Created', 'Created'),
+      sortable: true,
+      visible: visibleColumns.created,
+      render: (trip: Trip) => (
+        <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(trip.created_at)}</span>
+      ),
+    });
+
+    return cols;
+  }, [isPro, visibleColumns, summarizeDestinations, summarizeTravelers, summarizeCategories, formatLabel, formatPrice, getStatusBadge, getTripTypeBadge]);
+
+  // Row actions for shared table (3-dot menu)
+  const tableActions = useMemo(() => {
+    const actions: any[] = [];
+
+    // View is always available (if capability allows)
+    if (can('yatra_view_trips')) {
+      actions.push({
+        key: 'view',
+        label: __('View', 'View'),
+        icon: <Eye className="w-4 h-4" />,
+        onClick: (trip: Trip) => handleView(trip),
+      });
+    }
+
+    // Edit available for all statuses
+    if (can('yatra_edit_trips')) {
+      actions.push({
+        key: 'edit',
+        label: __('Edit', 'Edit'),
+        icon: <Edit className="w-4 h-4" />,
+        onClick: (trip: Trip) => handleEdit(trip),
+      });
+
+      // Status-based actions
+      actions.push({
+        key: 'publish',
+        label: __('Mark as Published', 'Mark as Published'),
+        icon: <ArrowUp className="w-4 h-4" />,
+        onClick: async (trip: Trip) => {
+          await updateTripStatus(trip, 'published');
+          showToast(__('Trip marked as published.', 'Trip marked as published.'), 'success');
+          queryClient.invalidateQueries({ queryKey: ['trips'] });
+        },
+        condition: (trip: Trip) => trip.status !== 'published' && trip.status !== 'trash',
+      });
+
+      actions.push({
+        key: 'draft',
+        label: __('Mark as Draft', 'Mark as Draft'),
+        icon: <ArrowDown className="w-4 h-4" />,
+        onClick: async (trip: Trip) => {
+          await updateTripStatus(trip, 'draft');
+          showToast(__('Trip marked as draft.', 'Trip marked as draft.'), 'success');
+          queryClient.invalidateQueries({ queryKey: ['trips'] });
+        },
+        condition: (trip: Trip) => trip.status !== 'draft' && trip.status !== 'trash',
+      });
+
+      actions.push({
+        key: 'archive',
+        label: __('Archive', 'Archive'),
+        icon: <Archive className="w-4 h-4" />,
+        onClick: async (trip: Trip) => {
+          await updateTripStatus(trip, 'archived');
+          showToast(__('Trip archived.', 'Trip archived.'), 'success');
+          queryClient.invalidateQueries({ queryKey: ['trips'] });
+        },
+        condition: (trip: Trip) => trip.status !== 'archived' && trip.status !== 'trash',
+      });
+
+      actions.push({
+        key: 'trash',
+        label: __('Move to Trash', 'Move to Trash'),
+        icon: <Trash2 className="w-4 h-4" />,
+        onClick: async (trip: Trip) => {
+          await updateTripStatus(trip, 'trash');
+          showToast(__('Trip moved to trash.', 'Trip moved to trash.'), 'success');
+          queryClient.invalidateQueries({ queryKey: ['trips'] });
+        },
+        condition: (trip: Trip) => trip.status !== 'trash',
+      });
+
+      actions.push({
+        key: 'restore',
+        label: __('Restore to Draft', 'Restore to Draft'),
+        icon: <ArrowUp className="w-4 h-4" />,
+        onClick: async (trip: Trip) => {
+          await updateTripStatus(trip, 'draft');
+          showToast(__('Trip restored to draft.', 'Trip restored to draft.'), 'success');
+          queryClient.invalidateQueries({ queryKey: ['trips'] });
+        },
+        condition: (trip: Trip) => trip.status === 'trash',
+      });
+    }
+
+    // Permanent delete only for items in Trash
+    if (can('yatra_delete_trips')) {
+      actions.push({
+        key: 'delete',
+        label: __('Delete Permanently', 'Delete Permanently'),
+        icon: <Trash2 className="w-4 h-4" />,
+        onClick: (trip: Trip) => handleDelete(trip),
+        variant: 'destructive' as const,
+        condition: (trip: Trip) => trip.status === 'trash',
+      });
+    }
+
+    return actions;
+  }, [can, queryClient, showToast]);
+
   return (
     <>
     <div className="space-y-3">
@@ -456,7 +886,7 @@ const Trips: React.FC = () => {
                 <option value="review">{__('Review', 'Review')}</option>
                 <option value="approved">{__('Approved', 'Approved')}</option>
                 <option value="archived">{__('Archived', 'Archived')}</option>
-                <option value="suspended">{__('Suspended', 'Suspended')}</option>
+                <option value="trash">{__('Trash', 'Trash')}</option>
               </Select>
             </div>
 
@@ -510,326 +940,65 @@ const Trips: React.FC = () => {
 
       <ConditionalRender capability="yatra_view_trips">
 
+        {/* Bulk Actions & Column Visibility */}
+        <BulkActionToolbar
+          selectedIds={selectedIds}
+          bulkAction={bulkAction}
+          setBulkAction={setBulkAction}
+          onApply={handleBulkApply}
+          onClearSelection={() => setSelectedIds([])}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          statusOptions={statusOptions}
+          showColumnsDropdown={showColumnsDropdown}
+          setShowColumnsDropdown={setShowColumnsDropdown}
+          columnOptions={columnOptions}
+          onToggleColumn={toggleColumn}
+          bulkMutationPending={false}
+          totalItems={total}
+          bulkActionOptions={bulkActionOptions}
+        />
+
         {/* Table */}
-        {error ? (
-          <Alert variant="error" title={__('Error Loading Trips', 'Error Loading Trips')}>
-            {__('We couldn\'t load your trips. Please refresh the page or try again later.', 'We couldn\'t load your trips. Please refresh the page or try again later.')}
-          </Alert>
-        ) : (
-          <>
-            <Card>
-              <CardContent className="p-0">
-                {isLoading ? (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-[300px]">
-                            {__('Trip', 'Trip')}
-                          </TableHead>
-                          <TableHead>
-                            {__('Price', 'Price')}
-                          </TableHead>
-                          <TableHead>
-                            {__('Status', 'Status')}
-                          </TableHead>
-                          <TableHead>
-                            {__('Trip Type', 'Trip Type')}
-                          </TableHead>
-                          {isPro && (
-                            <TableHead>{__('Bookings', 'Bookings')}</TableHead>
-                          )}
-                          <TableHead>
-                            {__('Created', 'Created')}
-                          </TableHead>
-                          <TableHead className="text-right w-[120px]">
-                            <span className="sr-only">{__('Actions', 'Actions')}</span>
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {[...Array(10)].map((_, index) => (
-                          <TableRow key={`skeleton-${index}`}>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <div className="flex-1">
-                                  <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
-                                  <div className="h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                                </div>
-                                {index % 3 === 0 && (
-                                  <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </TableCell>
-                            <TableCell>
-                              <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-                            </TableCell>
-                            <TableCell>
-                              <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-                            </TableCell>
-                            {isPro && (
-                              <TableCell>
-                                <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              </TableCell>
-                            )}
-                            <TableCell>
-                              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-1">
-                                <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                                <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                                <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : trips.length === 0 ? (
-                  <div className="p-12 text-center">
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                        <Package className="w-8 h-8 text-gray-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-                          {searchTerm || statusFilter !== 'all' 
-                            ? __('No trips match your search', 'No trips match your search')
-                            : __('No trips yet', 'No trips yet')}
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                          {searchTerm || statusFilter !== 'all'
-                            ? __('Try adjusting your search or filters to see more results.', 'Try adjusting your search or filters to see more results.')
-                            : __('Get started by creating your first travel package. Click the button above to add a new trip.', 'Get started by creating your first travel package. Click the button above to add a new trip.')}
-                        </p>
-                        {(!searchTerm && statusFilter === 'all') && (
-                          <Button onClick={handleCreateTrip} className="flex items-center gap-2 mx-auto">
-                            <Plus className="w-4 h-4" />
-                            {__('Create Your First Trip', 'Create Your First Trip')}
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[300px]">
-                          <button
-                            onClick={() => handleSort('title')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Trip', 'Trip')}
-                            {getSortIcon('title')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('price')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Price', 'Price')}
-                            {getSortIcon('price')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('status')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Status', 'Status')}
-                            {getSortIcon('status')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('trip_type')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Trip Type', 'Trip Type')}
-                            {getSortIcon('trip_type')}
-                          </button>
-                        </TableHead>
-                        {isPro && (
-                          <TableHead>{__('Bookings', 'Bookings')}</TableHead>
-                        )}
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('date')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Created', 'Created')}
-                            {getSortIcon('date')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="text-right w-[120px]">
-                          <span className="sr-only">{__('Actions', 'Actions')}</span>
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {trips.map((trip: Trip) => (
-                        <TableRow key={trip.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div>
-                                <div className="font-medium text-gray-900 dark:text-white">
-                                  {trip.title}
-                                </div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                  {trip.slug}
-                                </div>
-                                {(() => {
-                                  const destinationLabel = summarizeDestinations(trip);
-                                  const durationLabel = trip.duration_days
-                                    ? `${trip.duration_days}${__('d', 'd')}${trip.duration_nights ? ` / ${trip.duration_nights}${__('n', 'n')}` : ''}`
-                                    : null;
-                                  const travelerLabel = summarizeTravelers(trip);
-                                  const categoryLabel = summarizeCategories(trip);
-                                  const difficultyLabel = formatLabel(trip.difficulty_level);
-                                  const chips = [
-                                    destinationLabel && { key: 'dest', label: destinationLabel, icon: MapPin },
-                                    durationLabel && { key: 'duration', label: durationLabel, icon: Calendar },
-                                    travelerLabel && { key: 'traveler', label: travelerLabel, icon: Users },
-                                    categoryLabel && { key: 'category', label: categoryLabel, icon: Tag },
-                                    difficultyLabel && { key: 'difficulty', label: difficultyLabel, icon: Mountain },
-                                  ].filter(Boolean) as Array<{ key: string; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }>;
-                                  if (!chips.length) return null;
-                                  return (
-                                    <div className="flex flex-wrap gap-2 mt-1">
-                                      {chips.map(({ key, label, icon: Icon }) => (
-                                        <span
-                                          key={`${trip.id}-${key}`}
-                                          className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 text-[11px]"
-                                        >
-                                          <Icon className="w-3 h-3" />
-                                          {label}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  );
-                                })()}
-                              </div>
-                              {(trip.featured_priority && trip.featured_priority !== 'none' && isPro) && (
-                                <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-                                  {trip.featured_priority === 'featured' ? __('Featured', 'Featured') :
-                                   trip.featured_priority === 'popular' ? __('Popular', 'Popular') :
-                                   trip.featured_priority === 'new' ? __('New', 'New') :
-                                   trip.featured_priority === 'limited' ? __('Limited', 'Limited') :
-                                   trip.featured_priority === 'bestseller' ? __('Bestseller', 'Bestseller') :
-                                   trip.featured_priority}
-                                </Badge>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {formatPrice(trip)}
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(trip.status)}
-                          </TableCell>
-                          <TableCell>
-                            {getTripTypeBadge(trip.trip_type)}
-                          </TableCell>
-                          {isPro && (
-                            <TableCell className="text-gray-600 dark:text-gray-400">
-                              {trip.bookings_count || 0}
-                            </TableCell>
-                          )}
-                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            {formatDate(trip.created_at)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <ConditionalRender capability="yatra_view_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleView(trip)}
-                                  className="h-8 w-8"
-                                  title={__('View trip details', 'View trip details')}
-                                  aria-label={__('View trip', 'View trip')}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
+        <Card>
+          <CardContent className="p-0">
+            <SharedTable
+              data={trips}
+              columns={columns}
+              actions={tableActions}
+              isLoading={isLoading}
+              isError={!!error}
+              errorText={__('Error Loading Trips', 'Error Loading Trips')}
+              emptyText={searchTerm || statusFilter !== 'all'
+                ? __('No trips match your search', 'No trips match your search')
+                : __('No trips yet', 'No trips yet')}
+              emptyDescription={searchTerm || statusFilter !== 'all'
+                ? __('Try adjusting your search or filters to see more results.', 'Try adjusting your search or filters to see more results.')
+                : __('Get started by creating your first travel package. Click the button above to add a new trip.', 'Get started by creating your first travel package. Click the button above to add a new trip.')}
+              onCreateClick={!searchTerm && statusFilter === 'all' ? handleCreateTrip : undefined}
+              onSort={handleSort}
+              getSortIcon={getSortIcon}
+              selectedItemIds={selectedIds}
+              onSelectItem={handleSelectItem}
+              onSelectAll={handleSelectAll}
+              isAllSelected={isAllSelected}
+              getItemId={(trip: Trip) => trip.id}
+            />
+          </CardContent>
+        </Card>
 
-                              <ConditionalRender capability="yatra_edit_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEdit(trip)}
-                                  className="h-8 w-8"
-                                  title={__('Edit this trip', 'Edit this trip')}
-                                  aria-label={__('Edit trip', 'Edit trip')}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-
-                              <ConditionalRender capability="yatra_delete_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDelete(trip)}
-                                  className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                  title={__('Delete this trip (cannot be undone)', 'Delete this trip (cannot be undone)')}
-                                  aria-label={__('Delete trip', 'Delete trip')}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Pagination - Always Visible */}
-            {total > 0 && (
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
-                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('trips', 'trips')}
-                    </div>
-                    <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="h-9 px-4 min-w-[100px]"
-                      >
-                        {__('Previous', 'Previous')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                        disabled={page >= totalPages}
-                        className="h-9 px-4 min-w-[100px]"
-                      >
-                        {__('Next', 'Next')}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
+        {/* Pagination - Always Visible */}
+        {total > 0 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={total}
+              itemsPerPage={10}
+              onPageChange={setPage}
+              itemName={__('trips', 'trips')}
+            />
+          </div>
         )}
       </ConditionalRender>
     </div>
@@ -952,6 +1121,30 @@ const Trips: React.FC = () => {
         </div>
       </div>
     )}
+
+    {/* Permanent Delete Confirmation (for Trash only) */}
+    <ConfirmationDialog
+      isOpen={isDeleteDialogOpen && !!tripToDelete}
+      onClose={() => {
+        if (!deleteMutation.isPending) {
+          setIsDeleteDialogOpen(false);
+          setTripToDelete(null);
+        }
+      }}
+      onConfirm={() => {
+        if (tripToDelete && !deleteMutation.isPending) {
+          deleteMutation.mutate(tripToDelete.id);
+        }
+      }}
+      title={__('Delete Trip Permanently', 'Delete Trip Permanently')}
+      message={tripToDelete
+        ? __('Are you sure you want to permanently delete "{title}"? This cannot be undone and will remove all associated bookings.', 'Are you sure you want to permanently delete "{title}"? This cannot be undone and will remove all associated bookings.').replace('{title}', tripToDelete.title)
+        : ''}
+      confirmText={__('Delete Permanently', 'Delete Permanently')}
+      cancelText={__('Cancel', 'Cancel')}
+      variant="danger"
+      isLoading={deleteMutation.isPending}
+    />
     </>
   );
 };

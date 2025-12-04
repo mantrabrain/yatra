@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Check, ar as Mail, as as Lightbulb, at as Database, au as History, av as Save, aw as Sparkles, ax as ChevronLeft, ay as Box, az as ChevronUp, aA as Upload, aB as React, aC as Columns, aD as MoreVertical, aE as RotateCcw, aF as ArrowLeft, aG as Pen, aH as Phone, aI as Globe, aJ as Award, aK as Download, aL as TrendingDown, aM as PieChart, aN as ClipboardList, aO as Receipt, aP as Plug, aQ as Shield, aR as Lock, aS as EyeOff, aT as Ban, aU as Send, aV as Crown, aW as reactDomExports, aX as Filter, aY as QueryClient, aZ as client, a_ as QueryClientProvider } from "./react-vendor-Bv4qn3Ai.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-BfnVJaob.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as React, G as MoreVertical, J as AlertTriangle, X, K as Columns, N as Mountain, O as Eye, Q as PenSquare, V as ArrowUp, W as ArrowDown, Y as Archive, Z as Trash2, _ as Plus, $ as Search, a0 as ArrowUpDown, a1 as AlertCircle, a2 as XCircle, a3 as CheckCircle, a4 as Flame, a5 as Zap, a6 as Heart, a7 as ShoppingBag, a8 as BookOpen, a9 as Gamepad2, aa as Music, ab as Image, ac as Footprints, ad as Bed, ae as Coffee, af as Hotel, ag as Car, ah as Palette, ai as Waves, aj as Camera, ak as Target, al as Package, am as Bus, an as Building2, ao as UtensilsCrossed, ap as ExternalLink, aq as CheckCircle2, ar as GripVertical, as as Pencil, at as Copy, au as Check, av as Mail, aw as Lightbulb, ax as Database, ay as History, az as Save, aA as Sparkles, aB as ChevronLeft, aC as Box, aD as ChevronUp, aE as Upload, aF as RotateCcw, aG as ArrowLeft, aH as Pen, aI as Phone, aJ as Globe, aK as Award, aL as Download, aM as TrendingDown, aN as PieChart, aO as ClipboardList, aP as Receipt, aQ as Plug, aR as Shield, aS as Lock, aT as EyeOff, aU as Ban, aV as Send, aW as Crown, aX as reactDomExports, aY as Filter, aZ as QueryClient, a_ as client, a$ as QueryClientProvider } from "./react-vendor-iXoRXq_s.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-DmH2XHoI.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -1554,6 +1554,137 @@ const PageHeader = ({
     )
   ] });
 };
+const HelpText = ({
+  text,
+  variant = "info",
+  className = ""
+}) => {
+  const Icon = variant === "help" ? HelpCircle : Info;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `flex items-start gap-1.5 text-[11px] text-gray-400 dark:text-gray-500 ${className}`, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-3 h-3 mt-0.5 flex-shrink-0 opacity-60" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "opacity-80", children: text })
+  ] });
+};
+const generateSlug = (text) => {
+  if (!text) return "";
+  return text.toLowerCase().trim().replace(/[\s_]+/g, "-").replace(/[^\w-]+/g, "").replace(/-+/g, "-").replace(/^-+|-+$/g, "");
+};
+const Pagination = ({
+  currentPage,
+  totalPages,
+  totalItems,
+  itemsPerPage,
+  onPageChange,
+  itemName = "items"
+}) => {
+  const generatePageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    if (startPage > 1) {
+      pages.push(
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: 1 === currentPage ? "default" : "outline",
+            size: "sm",
+            onClick: () => onPageChange(1),
+            className: "h-8 w-8 p-0",
+            children: "1"
+          },
+          1
+        )
+      );
+      if (startPage > 2) {
+        pages.push(
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-2 text-gray-500", children: "..." }, "ellipsis1")
+        );
+      }
+    }
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: i === currentPage ? "default" : "outline",
+            size: "sm",
+            onClick: () => onPageChange(i),
+            className: "h-8 w-8 p-0",
+            children: i
+          },
+          i
+        )
+      );
+    }
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-2 text-gray-500", children: "..." }, "ellipsis2")
+        );
+      }
+      pages.push(
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: totalPages === currentPage ? "default" : "outline",
+            size: "sm",
+            onClick: () => onPageChange(totalPages),
+            className: "h-8 w-8 p-0",
+            children: totalPages
+          },
+          totalPages
+        )
+      );
+    }
+    return pages;
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
+      __("Showing", "Showing"),
+      " ",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (currentPage - 1) * itemsPerPage + 1 }),
+      " ",
+      "-",
+      " ",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(currentPage * itemsPerPage, totalItems) }),
+      " ",
+      __("of", "of"),
+      " ",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: totalItems }),
+      " ",
+      itemName
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          variant: "outline",
+          size: "sm",
+          onClick: () => onPageChange(Math.max(1, currentPage - 1)),
+          disabled: currentPage === 1,
+          className: "h-8 px-3",
+          children: __("Previous", "Previous")
+        }
+      ),
+      generatePageNumbers(),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          variant: "outline",
+          size: "sm",
+          onClick: () => onPageChange(Math.min(totalPages, currentPage + 1)),
+          disabled: currentPage >= totalPages,
+          className: "h-8 px-3",
+          children: __("Next", "Next")
+        }
+      )
+    ] })
+  ] });
+};
 const Table$1 = reactExports.forwardRef(({ className = "", ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative w-full overflow-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
   "table",
   {
@@ -1601,57 +1732,677 @@ const TableCell = reactExports.forwardRef(({ className = "", ...props }, ref) =>
   }
 ));
 TableCell.displayName = "TableCell";
-const HelpText = ({
-  text,
-  variant = "info",
-  className = ""
+const Table = ({
+  data,
+  columns,
+  actions = [],
+  isLoading = false,
+  isError = false,
+  errorText = __("Error loading data", "Error loading data"),
+  emptyText = __("No items found", "No items found"),
+  emptyDescription = __("Get started by creating your first item.", "Get started by creating your first item"),
+  onCreateClick,
+  onSort,
+  getSortIcon,
+  selectedItemIds = [],
+  onSelectItem,
+  onSelectAll,
+  isAllSelected = false,
+  getItemId = (item) => item.id,
+  getItemStatus = (item) => item.status,
+  statusFilter = "",
+  capability = "yatra_view_trips",
+  skeletonRows = 5,
+  // Hierarchical props
+  isHierarchical = false,
+  expandedIds = /* @__PURE__ */ new Set(),
+  onToggleExpand,
+  getChildren,
+  renderRowContent
 }) => {
-  const Icon = variant === "help" ? HelpCircle : Info;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `flex items-start gap-1.5 text-[11px] text-gray-400 dark:text-gray-500 ${className}`, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-3 h-3 mt-0.5 flex-shrink-0 opacity-60" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "opacity-80", children: text })
+  const [openDropdownId, setOpenDropdownId] = reactExports.useState(null);
+  const [dropdownPosition, setDropdownPosition] = reactExports.useState(null);
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      const target = event.target;
+      if (target.closest("[data-dropdown-trigger]") || target.closest("[data-dropdown-content]")) {
+        return;
+      }
+      setOpenDropdownId(null);
+    };
+    if (openDropdownId !== null) {
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [openDropdownId]);
+  const renderSkeleton = () => /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+      isHierarchical && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-12" }),
+      onSelectItem && onSelectAll && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-12" }),
+      columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: column.width, children: column.label }, column.key)),
+      actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(skeletonRows)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+      isHierarchical && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }),
+      onSelectItem && onSelectAll && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }),
+      columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }, `${column.key}-${index}`)),
+      actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-end gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }) })
+    ] }, `skeleton-${index}`)) })
   ] });
-};
-const Alert = ({
-  variant = "info",
-  title: title2,
-  children,
-  onClose,
-  className = ""
-}) => {
-  const variantClasses = {
-    success: "bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800",
-    error: "bg-red-50 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800",
-    warning: "bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800",
-    info: "bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800"
+  const renderError = () => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-red-500", children: errorText });
+  const renderEmpty = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex flex-col items-center justify-center text-center py-16 px-6 my-6 min-h-[400px]", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-8 bg-gradient-to-br from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative z-10 max-w-md mx-auto space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 ring-8 ring-blue-50/50 dark:ring-blue-900/20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "svg",
+        {
+          className: "w-10 h-10 text-blue-600 dark:text-blue-400",
+          fill: "none",
+          stroke: "currentColor",
+          viewBox: "0 0 24 24",
+          strokeWidth: "1.5",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "path",
+            {
+              strokeLinecap: "round",
+              strokeLinejoin: "round",
+              d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            }
+          )
+        }
+      ) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: emptyText }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 leading-relaxed", children: emptyDescription })
+      ] }),
+      onCreateClick && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "pt-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Button,
+        {
+          onClick: onCreateClick,
+          className: "inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "svg",
+              {
+                className: "w-4 h-4",
+                fill: "none",
+                stroke: "currentColor",
+                viewBox: "0 0 24 24",
+                strokeWidth: "2",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "path",
+                  {
+                    strokeLinecap: "round",
+                    strokeLinejoin: "round",
+                    d: "M12 4v16m8-8H4"
+                  }
+                )
+              }
+            ),
+            __("Create New", "Create New")
+          ]
+        }
+      ) })
+    ] })
+  ] });
+  const renderHierarchicalRow = (item, index, isChild = false) => {
+    const itemId = getItemId(item);
+    const itemStatus = getItemStatus(item);
+    const isTrash = itemStatus === "trash" || statusFilter === "trash";
+    const children = getChildren ? getChildren(item) : [];
+    const hasChildren = children.length > 0;
+    const isExpanded = expandedIds.has(itemId);
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(React.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        TableRow,
+        {
+          className: `${isTrash ? "bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20" : ""} ${isChild ? "bg-gray-50 dark:bg-gray-900/50" : ""}`,
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "w-12", children: hasChildren && onToggleExpand && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => onToggleExpand(itemId),
+                className: "p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded",
+                children: isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4" })
+              }
+            ) }),
+            onSelectItem && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "checkbox",
+                className: "rounded border-gray-300 dark:border-gray-600",
+                checked: selectedItemIds.includes(itemId),
+                onChange: (e) => onSelectItem(itemId, e.target.checked),
+                "aria-label": __("Select item", "Select item")
+              }
+            ) }),
+            renderRowContent ? renderRowContent(item, index, isChild).map((cellContent, cellIndex) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              TableCell,
+              {
+                className: isTrash ? "text-gray-400 dark:text-gray-600" : "",
+                children: cellContent
+              },
+              `cell-${itemId}-${cellIndex}`
+            )) : columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              TableCell,
+              {
+                className: isTrash ? "text-gray-400 dark:text-gray-600" : "",
+                children: column.render ? column.render(item, index) : item[column.key]
+              },
+              `${column.key}-${itemId}`
+            )),
+            actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative inline-block", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  variant: "ghost",
+                  size: "icon",
+                  onClick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const button = e.currentTarget;
+                    const rect = button.getBoundingClientRect();
+                    setDropdownPosition({
+                      top: rect.bottom + window.scrollY,
+                      right: window.innerWidth - rect.right + window.scrollX
+                    });
+                    setOpenDropdownId(openDropdownId === itemId ? null : itemId);
+                  },
+                  className: "h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700",
+                  "aria-label": __("More actions", "More actions"),
+                  "data-dropdown-trigger": true,
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(MoreVertical, { className: "w-4 h-4" })
+                }
+              ),
+              openDropdownId === itemId && dropdownPosition && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  className: "fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1",
+                  style: {
+                    top: `${dropdownPosition.top}px`,
+                    right: `${dropdownPosition.right}px`,
+                    zIndex: 999999
+                  },
+                  "data-dropdown-content": true,
+                  onClick: (e) => e.stopPropagation(),
+                  children: actions.filter((action) => !action.condition || action.condition(item)).map((action) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "button",
+                    {
+                      type: "button",
+                      onClick: (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        action.onClick(item);
+                        setOpenDropdownId(null);
+                      },
+                      className: `w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${action.variant === "destructive" ? "text-red-600 dark:text-red-400" : action.variant === "outline" ? "text-blue-600 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"}`,
+                      children: [
+                        action.icon,
+                        action.label
+                      ]
+                    },
+                    action.key
+                  ))
+                }
+              )
+            ] }) })
+          ]
+        }
+      ),
+      hasChildren && isExpanded && children.map(
+        (child, childIndex) => renderHierarchicalRow(child, childIndex, true)
+      )
+    ] }, itemId);
   };
-  const icons = {
-    success: CheckCircle,
-    error: XCircle,
-    warning: AlertCircle,
-    info: Info
-  };
-  const Icon = icons[variant];
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `rounded-md border p-4 ${variantClasses[variant]} ${className}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-5 h-5 flex-shrink-0 mt-0.5" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-      title2 && /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium mb-1", children: title2 }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children })
-    ] }),
-    onClose && /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "button",
+  const renderFlatRow = (item, index) => {
+    const itemId = getItemId(item);
+    const itemStatus = getItemStatus(item);
+    const isTrash = itemStatus === "trash" || statusFilter === "trash";
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      TableRow,
       {
-        onClick: onClose,
-        className: "flex-shrink-0 text-current opacity-70 hover:opacity-100 transition-opacity",
-        "aria-label": "Close",
-        children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" })
+        className: isTrash ? "bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20" : "",
+        children: [
+          onSelectItem && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "checkbox",
+              className: "rounded border-gray-300 dark:border-gray-600",
+              checked: selectedItemIds.includes(itemId),
+              onChange: (e) => onSelectItem(itemId, e.target.checked),
+              "aria-label": __("Select item", "Select item")
+            }
+          ) }),
+          columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            TableCell,
+            {
+              className: isTrash ? "text-gray-400 dark:text-gray-600" : "",
+              children: column.render ? column.render(item, index) : item[column.key]
+            },
+            `${column.key}-${itemId}`
+          )),
+          actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative inline-block", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "ghost",
+                size: "icon",
+                onClick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const button = e.currentTarget;
+                  const rect = button.getBoundingClientRect();
+                  setDropdownPosition({
+                    top: rect.bottom + window.scrollY,
+                    right: window.innerWidth - rect.right + window.scrollX
+                  });
+                  setOpenDropdownId(openDropdownId === itemId ? null : itemId);
+                },
+                className: "h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700",
+                "aria-label": __("More actions", "More actions"),
+                "data-dropdown-trigger": true,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(MoreVertical, { className: "w-4 h-4" })
+              }
+            ),
+            openDropdownId === itemId && dropdownPosition && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1",
+                style: {
+                  top: `${dropdownPosition.top}px`,
+                  right: `${dropdownPosition.right}px`,
+                  zIndex: 999999
+                },
+                "data-dropdown-content": true,
+                onClick: (e) => e.stopPropagation(),
+                children: actions.filter((action) => !action.condition || action.condition(item)).map((action) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      action.onClick(item);
+                      setOpenDropdownId(null);
+                    },
+                    className: `w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${action.variant === "destructive" ? "text-red-600 dark:text-red-400" : action.variant === "outline" ? "text-blue-600 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"}`,
+                    children: [
+                      action.icon,
+                      action.label
+                    ]
+                  },
+                  action.key
+                ))
+              }
+            )
+          ] }) })
+        ]
+      },
+      itemId
+    );
+  };
+  const renderTable = () => {
+    if (isLoading) return renderSkeleton();
+    if (isError) return renderError();
+    if (data.length === 0) return renderEmpty();
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+        isHierarchical && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-12" }),
+        onSelectItem && onSelectAll && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-12", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "input",
+          {
+            type: "checkbox",
+            className: "rounded border-gray-300 dark:border-gray-600",
+            checked: isAllSelected,
+            onChange: (e) => onSelectAll(e.target.checked),
+            "aria-label": __("Select all items", "Select all items")
+          }
+        ) }),
+        columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          TableHead,
+          {
+            className: column.width,
+            children: column.sortable && onSort ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: () => onSort(column.key),
+                className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
+                children: [
+                  column.label,
+                  getSortIcon && getSortIcon(column.key)
+                ]
+              }
+            ) : column.label
+          },
+          column.key
+        )),
+        actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: data.map(
+        (item, index) => isHierarchical ? renderHierarchicalRow(item, index) : renderFlatRow(item, index)
+      ) })
+    ] });
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability, children: renderTable() });
+};
+const ConfirmationDialog = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title: title2,
+  message: message2,
+  description,
+  confirmText,
+  cancelText,
+  variant = "danger",
+  isLoading = false,
+  icon
+}) => {
+  const displayMessage = description || message2 || "";
+  if (!isOpen) return null;
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+  const getVariantStyles = () => {
+    switch (variant) {
+      case "danger":
+        return "text-red-600 dark:text-red-400";
+      case "warning":
+        return "text-yellow-600 dark:text-yellow-400";
+      case "info":
+        return "text-blue-600 dark:text-blue-400";
+      default:
+        return "text-gray-600 dark:text-gray-400";
+    }
+  };
+  const getButtonVariant = () => {
+    switch (variant) {
+      case "danger":
+        return "destructive";
+      case "warning":
+        return "default";
+      case "info":
+        return "default";
+      default:
+        return "default";
+    }
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "div",
+    {
+      className: "fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm",
+      onClick: handleBackdropClick,
+      children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-md mx-4 shadow-xl animate-in fade-in zoom-in-95 duration-200", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `flex-shrink-0 mt-0.5 ${getVariantStyles()}`, children: icon || /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTriangle, { className: "w-6 h-6" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg", children: title2 || __("Confirm Action", "Confirm Action") }) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: onClose,
+              className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors",
+              disabled: isLoading,
+              "aria-label": __("Close", "Close"),
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-5 h-5" })
+            }
+          )
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: displayMessage }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 justify-end pt-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "outline",
+                onClick: onClose,
+                disabled: isLoading,
+                children: cancelText || __("Cancel", "Cancel")
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: getButtonVariant(),
+                onClick: onConfirm,
+                disabled: isLoading,
+                className: "min-w-[100px]",
+                children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 mr-2 animate-spin" }),
+                  __("Deleting...", "Deleting...")
+                ] }) : confirmText || __("Confirm", "Confirm")
+              }
+            )
+          ] })
+        ] })
+      ] })
+    }
+  );
+};
+const BulkActionToolbar = ({
+  selectedIds,
+  bulkAction,
+  setBulkAction,
+  onApply,
+  onClearSelection,
+  statusFilter,
+  setStatusFilter,
+  statusOptions,
+  showColumnsDropdown,
+  setShowColumnsDropdown,
+  columnOptions,
+  onToggleColumn,
+  bulkMutationPending,
+  totalItems,
+  bulkActionOptions
+}) => {
+  const [confirmDialog, setConfirmDialog] = reactExports.useState({
+    isOpen: false,
+    action: "",
+    count: 0
+  });
+  const handleApplyClick = () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      onApply();
+      return;
+    }
+    setConfirmDialog({
+      isOpen: true,
+      action: bulkAction,
+      count: selectedIds.length
+    });
+  };
+  const handleConfirm = () => {
+    setConfirmDialog({ isOpen: false, action: "", count: 0 });
+    onApply();
+    setBulkAction("");
+  };
+  const handleCancel = () => {
+    setConfirmDialog({ isOpen: false, action: "", count: 0 });
+  };
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      const target = event.target;
+      if (target.closest("[data-columns-trigger]") || target.closest("[data-columns-content]")) {
+        return;
+      }
+      setShowColumnsDropdown(false);
+    };
+    if (showColumnsDropdown) {
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [showColumnsDropdown, setShowColumnsDropdown]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "py-3 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 flex-nowrap", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Select,
+          {
+            value: bulkAction,
+            onChange: (e) => setBulkAction(e.target.value),
+            className: "min-w-[140px]",
+            disabled: totalItems === 0,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Bulk actions", "Bulk actions") }),
+              bulkActionOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: option.value, children: option.label }, option.value))
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: "outline",
+            onClick: handleApplyClick,
+            disabled: bulkMutationPending || selectedIds.length === 0,
+            className: "h-11 px-4 flex-shrink-0",
+            children: __("Apply", "Apply")
+          }
+        ),
+        selectedIds.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border border-blue-200 dark:border-blue-800 whitespace-nowrap", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-xs", children: `${__("Selected:", "Selected:")} ${selectedIds.length}` }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              className: "text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium",
+              onClick: onClearSelection,
+              children: __("Clear", "Clear")
+            }
+          )
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 flex-shrink-0", children: [
+        statusOptions.map((filter) => {
+          const isActive = statusFilter === filter.key;
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              className: `px-3 py-2.5 text-sm font-medium rounded border transition-all duration-200 ${isActive ? "bg-gray-900 text-white border-gray-900 shadow-sm" : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:border-gray-500"}`,
+              onClick: () => {
+                setStatusFilter(filter.key);
+                onClearSelection();
+                setBulkAction("");
+              },
+              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
+                filter.label,
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `px-1.5 py-0.5 text-xs rounded-full font-medium ${isActive ? "bg-white text-gray-900" : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"}`, children: filter.count ?? 0 })
+              ] })
+            },
+            filter.key
+          );
+        }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative ml-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              variant: "outline",
+              size: "sm",
+              onClick: (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowColumnsDropdown(!showColumnsDropdown);
+              },
+              className: "h-10 px-3 flex items-center gap-2",
+              "data-columns-trigger": true,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Columns, { className: "w-4 h-4" }),
+                __("Columns", "Columns")
+              ]
+            }
+          ),
+          showColumnsDropdown && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              className: "absolute right-0 top-11 z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2",
+              style: { width: "240px", minWidth: "240px" },
+              "data-columns-content": true,
+              onClick: (e) => e.stopPropagation(),
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700", children: __("Show Columns", "Show Columns") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "py-1", children: columnOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "checkbox",
+                      checked: option.visible,
+                      onChange: () => onToggleColumn(option.key),
+                      className: "rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300 ml-2", children: option.label })
+                ] }, option.key)) })
+              ]
+            }
+          )
+        ] })
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: confirmDialog.isOpen,
+        onClose: handleCancel,
+        onConfirm: handleConfirm,
+        title: (() => {
+          switch (confirmDialog.action) {
+            case "delete":
+              return __("Delete Permanently", "Delete Permanently");
+            case "trash":
+              return __("Move to Trash", "Move to Trash");
+            case "publish":
+              return __("Publish Items", "Publish Items");
+            case "draft":
+              return __("Make Draft", "Make Draft");
+            case "restore":
+              return __("Restore Items", "Restore Items");
+            default:
+              return __("Confirm Bulk Action", "Confirm Bulk Action");
+          }
+        })(),
+        message: (() => {
+          const count = confirmDialog.count;
+          switch (confirmDialog.action) {
+            case "delete":
+              return __("Are you sure you want to permanently delete {count} item(s)? This action cannot be undone.", "Are you sure you want to permanently delete {count} item(s)? This action cannot be undone.").replace("{count}", count.toString());
+            case "trash":
+              return __("Are you sure you want to move {count} item(s) to trash?", "Are you sure you want to move {count} item(s) to trash?").replace("{count}", count.toString());
+            case "publish":
+              return __("Are you sure you want to publish {count} item(s)?", "Are you sure you want to publish {count} item(s)?").replace("{count}", count.toString());
+            case "draft":
+              return __("Are you sure you want to make {count} item(s) draft?", "Are you sure you want to make {count} item(s) draft?").replace("{count}", count.toString());
+            case "restore":
+              return __("Are you sure you want to restore {count} item(s)?", "Are you sure you want to restore {count} item(s)?").replace("{count}", count.toString());
+            default:
+              return __("Are you sure you want to perform this action on {count} item(s)?", "Are you sure you want to perform this action on {count} item(s)?").replace("{count}", count.toString());
+          }
+        })(),
+        confirmText: (() => {
+          switch (confirmDialog.action) {
+            case "delete":
+              return __("Delete Permanently", "Delete Permanently");
+            case "trash":
+              return __("Move to Trash", "Move to Trash");
+            case "publish":
+              return __("Publish", "Publish");
+            case "draft":
+              return __("Make Draft", "Make Draft");
+            case "restore":
+              return __("Restore", "Restore");
+            default:
+              return __("Confirm", "Confirm");
+          }
+        })(),
+        cancelText: __("Cancel", "Cancel"),
+        variant: confirmDialog.action === "delete" ? "danger" : "warning",
+        isLoading: bulkMutationPending
       }
     )
-  ] }) });
-};
-const generateSlug = (text) => {
-  if (!text) return "";
-  return text.toLowerCase().trim().replace(/[\s_]+/g, "-").replace(/[^\w-]+/g, "").replace(/-+/g, "-").replace(/^-+|-+$/g, "");
+  ] });
 };
 const Trips = () => {
   var _a;
@@ -1665,6 +2416,11 @@ const Trips = () => {
   const [createTripError, setCreateTripError] = reactExports.useState(null);
   const [newTripSlug, setNewTripSlug] = reactExports.useState("");
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = reactExports.useState(false);
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = reactExports.useState(false);
+  const [tripToDelete, setTripToDelete] = reactExports.useState(null);
   const queryClient2 = useQueryClient();
   const { can, isPro } = usePermissions();
   const { showToast } = useToast();
@@ -1697,6 +2453,12 @@ const Trips = () => {
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["trips"] });
+      setIsDeleteDialogOpen(false);
+      setTripToDelete(null);
+      showToast(__("Trip deleted permanently.", "Trip deleted permanently."), "success");
+    },
+    onError: () => {
+      showToast(__("Failed to delete trip. Please try again.", "Failed to delete trip. Please try again."), "error");
     }
   });
   const createTripMutation = useMutation({
@@ -1829,9 +2591,9 @@ const Trips = () => {
         className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
         label: __("Approved", "Approved")
       },
-      "suspended": {
-        className: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
-        label: __("Suspended", "Suspended")
+      "trash": {
+        className: "bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+        label: __("Trash", "Trash")
       }
     };
     const statusInfo = statusMap[status] || {
@@ -1867,10 +2629,8 @@ const Trips = () => {
     window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${trip.id}`;
   };
   const handleDelete = (trip) => {
-    const confirmMessage = __('Are you sure you want to delete "{title}"? This action cannot be undone and will remove all associated bookings.', 'Are you sure you want to delete "{title}"? This action cannot be undone and will remove all associated bookings.').replace("{title}", trip.title);
-    if (confirm(confirmMessage)) {
-      deleteMutation.mutate(trip.id);
-    }
+    setTripToDelete(trip);
+    setIsDeleteDialogOpen(true);
   };
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -1946,6 +2706,339 @@ const Trips = () => {
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
   const hasFilters = searchTerm || statusFilter !== "all" || sortBy !== "title" || sortOrder !== "asc";
+  const updateTripStatus = async (trip, status) => {
+    await apiClient.put(`/trips/${trip.id}`, {
+      status,
+      title: trip.title,
+      slug: trip.slug
+    });
+  };
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    const defaults = {
+      trip: true,
+      price: true,
+      status: true,
+      trip_type: true,
+      duration: false,
+      countries: false,
+      difficulty: false,
+      bookings: true,
+      created: true
+    };
+    if (typeof window === "undefined") {
+      return defaults;
+    }
+    const stored = window.localStorage.getItem("yatra-trips-visible-columns");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        return { ...defaults, ...parsed };
+      } catch {
+        return defaults;
+      }
+    }
+    return defaults;
+  });
+  const toggleColumn = (columnKey) => {
+    const updated = { ...visibleColumns, [columnKey]: !visibleColumns[columnKey] };
+    setVisibleColumns(updated);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("yatra-trips-visible-columns", JSON.stringify(updated));
+    }
+  };
+  const columnOptions = [
+    { key: "trip", label: __("Trip", "Trip"), visible: visibleColumns.trip },
+    { key: "price", label: __("Price", "Price"), visible: visibleColumns.price },
+    { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
+    { key: "trip_type", label: __("Trip Type", "Trip Type"), visible: visibleColumns.trip_type },
+    { key: "duration", label: __("Duration", "Duration"), visible: visibleColumns.duration },
+    { key: "countries", label: __("Countries", "Countries"), visible: visibleColumns.countries },
+    { key: "difficulty", label: __("Difficulty", "Difficulty"), visible: visibleColumns.difficulty },
+    ...isPro ? [{ key: "bookings", label: __("Bookings", "Bookings"), visible: visibleColumns.bookings }] : [],
+    { key: "created", label: __("Created", "Created"), visible: visibleColumns.created }
+  ];
+  const isAllSelected = trips.length > 0 && selectedIds.length === trips.length;
+  const handleSelectItem = (id, checked) => {
+    setSelectedIds(
+      (prev) => checked ? [...prev, id] : prev.filter((existingId) => existingId !== id)
+    );
+  };
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedIds(trips.map((trip) => trip.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+  const statusCounts = reactExports.useMemo(() => {
+    const counts = {
+      all: total,
+      published: 0,
+      draft: 0,
+      review: 0,
+      approved: 0,
+      archived: 0,
+      trash: 0
+    };
+    trips.forEach((trip) => {
+      if (counts[trip.status] !== void 0) {
+        counts[trip.status] += 1;
+      }
+    });
+    return counts;
+  }, [trips, total]);
+  const statusOptions = [
+    { key: "all", label: __("All", "All"), count: statusCounts.all },
+    { key: "published", label: __("Published", "Published"), count: statusCounts.published },
+    { key: "draft", label: __("Draft", "Draft"), count: statusCounts.draft },
+    { key: "review", label: __("Review", "Review"), count: statusCounts.review },
+    { key: "approved", label: __("Approved", "Approved"), count: statusCounts.approved },
+    { key: "archived", label: __("Archived", "Archived"), count: statusCounts.archived },
+    { key: "trash", label: __("Trash", "Trash"), count: statusCounts.trash }
+  ];
+  const bulkActionOptions = reactExports.useMemo(() => {
+    if (statusFilter === "trash") {
+      return [
+        { value: "mark_draft", label: __("Restore to Draft", "Restore to Draft") },
+        { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+      ];
+    }
+    return [
+      { value: "mark_published", label: __("Mark as Published", "Mark as Published") },
+      { value: "mark_draft", label: __("Mark as Draft", "Mark as Draft") },
+      { value: "mark_archived", label: __("Archive", "Archive") },
+      { value: "mark_trash", label: __("Move to Trash", "Move to Trash") },
+      { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+    ];
+  }, [statusFilter]);
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) return;
+    const confirmMessages = {
+      delete: __("Are you sure you want to permanently delete {count} trip(s)? This cannot be undone.", "Are you sure you want to permanently delete {count} trip(s)? This cannot be undone.").replace("{count}", selectedIds.length.toString()),
+      mark_published: __("Mark {count} trip(s) as Published?", "Mark {count} trip(s) as Published?").replace("{count}", selectedIds.length.toString()),
+      mark_draft: statusFilter === "trash" ? __("Restore {count} trip(s) to Draft?", "Restore {count} trip(s) to Draft?").replace("{count}", selectedIds.length.toString()) : __("Mark {count} trip(s) as Draft?", "Mark {count} trip(s) as Draft?").replace("{count}", selectedIds.length.toString()),
+      mark_archived: __("Archive {count} trip(s)?", "Archive {count} trip(s)?").replace("{count}", selectedIds.length.toString()),
+      mark_trash: __("Move {count} trip(s) to Trash?", "Move {count} trip(s) to Trash?").replace("{count}", selectedIds.length.toString())
+    };
+    const message2 = confirmMessages[bulkAction];
+    if (message2 && !window.confirm(message2)) return;
+    try {
+      if (bulkAction === "delete") {
+        await Promise.all(selectedIds.map((id) => apiClient.delete(`/trips/${id}`)));
+        showToast(__("Trips deleted successfully", "Trips deleted successfully"), "success");
+      } else if (bulkAction.startsWith("mark_")) {
+        const status = bulkAction.replace("mark_", "");
+        const selectedTrips = trips.filter((trip) => selectedIds.includes(trip.id));
+        await Promise.all(selectedTrips.map((trip) => updateTripStatus(trip, status)));
+        showToast(__("Trip status updated successfully", "Trip status updated successfully"), "success");
+      }
+      queryClient2.invalidateQueries({ queryKey: ["trips"] });
+      setSelectedIds([]);
+      setBulkAction("");
+    } catch (error2) {
+      showToast(__("Bulk action failed", "Bulk action failed"), "error");
+    }
+  };
+  const columns = reactExports.useMemo(() => {
+    const cols = [];
+    cols.push({
+      key: "title",
+      label: __("Trip", "Trip"),
+      sortable: true,
+      visible: visibleColumns.trip,
+      width: "w-[300px]",
+      render: (trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: trip.title }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: trip.slug }),
+          (() => {
+            const destinationLabel = summarizeDestinations(trip);
+            const durationLabel = trip.duration_days ? `${trip.duration_days}${__("d", "d")}${trip.duration_nights ? ` / ${trip.duration_nights}${__("n", "n")}` : ""}` : null;
+            const travelerLabel = summarizeTravelers(trip);
+            const categoryLabel = summarizeCategories(trip);
+            const difficultyLabel = formatLabel(trip.difficulty_level);
+            const chips = [
+              destinationLabel && { key: "dest", label: destinationLabel, icon: MapPin },
+              durationLabel && { key: "duration", label: durationLabel, icon: Calendar$1 },
+              travelerLabel && { key: "traveler", label: travelerLabel, icon: Users },
+              categoryLabel && { key: "category", label: categoryLabel, icon: Tag },
+              difficultyLabel && { key: "difficulty", label: difficultyLabel, icon: Mountain }
+            ].filter(Boolean);
+            if (!chips.length) return null;
+            return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2 mt-1", children: chips.map(({ key, label, icon: Icon }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "span",
+              {
+                className: "inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 text-[11px]",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-3 h-3" }),
+                  label
+                ]
+              },
+              `${trip.id}-${key}`
+            )) });
+          })()
+        ] }),
+        trip.featured_priority && trip.featured_priority !== "none" && isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400", children: trip.featured_priority === "featured" ? __("Featured", "Featured") : trip.featured_priority === "popular" ? __("Popular", "Popular") : trip.featured_priority === "new" ? __("New", "New") : trip.featured_priority === "limited" ? __("Limited", "Limited") : trip.featured_priority === "bestseller" ? __("Bestseller", "Bestseller") : trip.featured_priority })
+      ] })
+    });
+    cols.push({
+      key: "price",
+      label: __("Price", "Price"),
+      sortable: true,
+      visible: visibleColumns.price,
+      render: (trip) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: formatPrice(trip) })
+    });
+    cols.push({
+      key: "status",
+      label: __("Status", "Status"),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (trip) => getStatusBadge(trip.status)
+    });
+    cols.push({
+      key: "trip_type",
+      label: __("Trip Type", "Trip Type"),
+      sortable: true,
+      visible: visibleColumns.trip_type,
+      render: (trip) => getTripTypeBadge(trip.trip_type)
+    });
+    cols.push({
+      key: "duration",
+      label: __("Duration", "Duration"),
+      sortable: false,
+      visible: visibleColumns.duration,
+      render: (trip) => {
+        if (!trip.duration_days && !trip.duration_nights) return null;
+        const days = trip.duration_days ? `${trip.duration_days} ${__("days", "days")}` : "";
+        const nights = trip.duration_nights ? `${trip.duration_nights} ${__("nights", "nights")}` : "";
+        const label = [days, nights].filter(Boolean).join(" / ");
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300", children: label });
+      }
+    });
+    cols.push({
+      key: "countries",
+      label: __("Countries", "Countries"),
+      sortable: false,
+      visible: visibleColumns.countries,
+      render: (trip) => {
+        const list = (trip.countries || []).filter(Boolean);
+        if (!list.length) return null;
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300", children: list.join(", ") });
+      }
+    });
+    cols.push({
+      key: "difficulty",
+      label: __("Difficulty", "Difficulty"),
+      sortable: false,
+      visible: visibleColumns.difficulty,
+      render: (trip) => {
+        if (!trip.difficulty_level) return null;
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300", children: formatLabel(trip.difficulty_level) });
+      }
+    });
+    if (isPro) {
+      cols.push({
+        key: "bookings",
+        label: __("Bookings", "Bookings"),
+        sortable: false,
+        visible: visibleColumns.bookings,
+        render: (trip) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: trip.bookings_count || 0 })
+      });
+    }
+    cols.push({
+      key: "date",
+      label: __("Created", "Created"),
+      sortable: true,
+      visible: visibleColumns.created,
+      render: (trip) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(trip.created_at) })
+    });
+    return cols;
+  }, [isPro, visibleColumns, summarizeDestinations, summarizeTravelers, summarizeCategories, formatLabel, formatPrice, getStatusBadge, getTripTypeBadge]);
+  const tableActions = reactExports.useMemo(() => {
+    const actions = [];
+    if (can("yatra_view_trips")) {
+      actions.push({
+        key: "view",
+        label: __("View", "View"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
+        onClick: (trip) => handleView(trip)
+      });
+    }
+    if (can("yatra_edit_trips")) {
+      actions.push({
+        key: "edit",
+        label: __("Edit", "Edit"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+        onClick: (trip) => handleEdit(trip)
+      });
+      actions.push({
+        key: "publish",
+        label: __("Mark as Published", "Mark as Published"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+        onClick: async (trip) => {
+          await updateTripStatus(trip, "published");
+          showToast(__("Trip marked as published.", "Trip marked as published."), "success");
+          queryClient2.invalidateQueries({ queryKey: ["trips"] });
+        },
+        condition: (trip) => trip.status !== "published" && trip.status !== "trash"
+      });
+      actions.push({
+        key: "draft",
+        label: __("Mark as Draft", "Mark as Draft"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+        onClick: async (trip) => {
+          await updateTripStatus(trip, "draft");
+          showToast(__("Trip marked as draft.", "Trip marked as draft."), "success");
+          queryClient2.invalidateQueries({ queryKey: ["trips"] });
+        },
+        condition: (trip) => trip.status !== "draft" && trip.status !== "trash"
+      });
+      actions.push({
+        key: "archive",
+        label: __("Archive", "Archive"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Archive, { className: "w-4 h-4" }),
+        onClick: async (trip) => {
+          await updateTripStatus(trip, "archived");
+          showToast(__("Trip archived.", "Trip archived."), "success");
+          queryClient2.invalidateQueries({ queryKey: ["trips"] });
+        },
+        condition: (trip) => trip.status !== "archived" && trip.status !== "trash"
+      });
+      actions.push({
+        key: "trash",
+        label: __("Move to Trash", "Move to Trash"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+        onClick: async (trip) => {
+          await updateTripStatus(trip, "trash");
+          showToast(__("Trip moved to trash.", "Trip moved to trash."), "success");
+          queryClient2.invalidateQueries({ queryKey: ["trips"] });
+        },
+        condition: (trip) => trip.status !== "trash"
+      });
+      actions.push({
+        key: "restore",
+        label: __("Restore to Draft", "Restore to Draft"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+        onClick: async (trip) => {
+          await updateTripStatus(trip, "draft");
+          showToast(__("Trip restored to draft.", "Trip restored to draft."), "success");
+          queryClient2.invalidateQueries({ queryKey: ["trips"] });
+        },
+        condition: (trip) => trip.status === "trash"
+      });
+    }
+    if (can("yatra_delete_trips")) {
+      actions.push({
+        key: "delete",
+        label: __("Delete Permanently", "Delete Permanently"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+        onClick: (trip) => handleDelete(trip),
+        variant: "destructive",
+        condition: (trip) => trip.status === "trash"
+      });
+    }
+    return actions;
+  }, [can, queryClient2, showToast]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -1995,7 +3088,7 @@ const Trips = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "review", children: __("Review", "Review") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "approved", children: __("Approved", "Approved") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "archived", children: __("Archived", "Archived") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "suspended", children: __("Suspended", "Suspended") })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Trash", "Trash") })
               ]
             }
           ) }),
@@ -2040,225 +3133,60 @@ const Trips = () => {
           ) })
         ] })
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Alert, { variant: "error", title: __("Error Loading Trips", "Error Loading Trips"), children: __("We couldn't load your trips. Please refresh the page or try again later.", "We couldn't load your trips. Please refresh the page or try again later.") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[300px]", children: __("Trip", "Trip") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Price", "Price") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip Type", "Trip Type") }),
-            isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Bookings", "Bookings") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Created", "Created") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[120px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sr-only", children: __("Actions", "Actions") }) })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(10)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-              ] }),
-              index % 3 === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" }) }),
-            isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-            ] }) })
-          ] }, `skeleton-${index}`)) })
-        ] }) }) : trips.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Package, { className: "w-8 h-8 text-gray-400" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-gray-900 dark:text-white mb-1", children: searchTerm || statusFilter !== "all" ? __("No trips match your search", "No trips match your search") : __("No trips yet", "No trips yet") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-4", children: searchTerm || statusFilter !== "all" ? __("Try adjusting your search or filters to see more results.", "Try adjusting your search or filters to see more results.") : __("Get started by creating your first travel package. Click the button above to add a new trip.", "Get started by creating your first travel package. Click the button above to add a new trip.") }),
-            !searchTerm && statusFilter === "all" && /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreateTrip, className: "flex items-center gap-2 mx-auto", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-              __("Create Your First Trip", "Create Your First Trip")
-            ] })
-          ] })
-        ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[300px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "button",
-              {
-                onClick: () => handleSort("title"),
-                className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-                children: [
-                  __("Trip", "Trip"),
-                  getSortIcon("title")
-                ]
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "button",
-              {
-                onClick: () => handleSort("price"),
-                className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-                children: [
-                  __("Price", "Price"),
-                  getSortIcon("price")
-                ]
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "button",
-              {
-                onClick: () => handleSort("status"),
-                className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-                children: [
-                  __("Status", "Status"),
-                  getSortIcon("status")
-                ]
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "button",
-              {
-                onClick: () => handleSort("trip_type"),
-                className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-                children: [
-                  __("Trip Type", "Trip Type"),
-                  getSortIcon("trip_type")
-                ]
-              }
-            ) }),
-            isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Bookings", "Bookings") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "button",
-              {
-                onClick: () => handleSort("date"),
-                className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-                children: [
-                  __("Created", "Created"),
-                  getSortIcon("date")
-                ]
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[120px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sr-only", children: __("Actions", "Actions") }) })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: trips.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: trip.title }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: trip.slug }),
-                (() => {
-                  const destinationLabel = summarizeDestinations(trip);
-                  const durationLabel = trip.duration_days ? `${trip.duration_days}${__("d", "d")}${trip.duration_nights ? ` / ${trip.duration_nights}${__("n", "n")}` : ""}` : null;
-                  const travelerLabel = summarizeTravelers(trip);
-                  const categoryLabel = summarizeCategories(trip);
-                  const difficultyLabel = formatLabel(trip.difficulty_level);
-                  const chips = [
-                    destinationLabel && { key: "dest", label: destinationLabel, icon: MapPin },
-                    durationLabel && { key: "duration", label: durationLabel, icon: Calendar$1 },
-                    travelerLabel && { key: "traveler", label: travelerLabel, icon: Users },
-                    categoryLabel && { key: "category", label: categoryLabel, icon: Tag },
-                    difficultyLabel && { key: "difficulty", label: difficultyLabel, icon: Mountain }
-                  ].filter(Boolean);
-                  if (!chips.length) return null;
-                  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2 mt-1", children: chips.map(({ key, label, icon: Icon }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    "span",
-                    {
-                      className: "inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 text-[11px]",
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-3 h-3" }),
-                        label
-                      ]
-                    },
-                    `${trip.id}-${key}`
-                  )) });
-                })()
-              ] }),
-              trip.featured_priority && trip.featured_priority !== "none" && isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400", children: trip.featured_priority === "featured" ? __("Featured", "Featured") : trip.featured_priority === "popular" ? __("Popular", "Popular") : trip.featured_priority === "new" ? __("New", "New") : trip.featured_priority === "limited" ? __("Limited", "Limited") : trip.featured_priority === "bestseller" ? __("Bestseller", "Bestseller") : trip.featured_priority })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(trip) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(trip.status) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getTripTypeBadge(trip.trip_type) }),
-            isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: trip.bookings_count || 0 }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(trip.created_at) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  variant: "ghost",
-                  size: "icon",
-                  onClick: () => handleView(trip),
-                  className: "h-8 w-8",
-                  title: __("View trip details", "View trip details"),
-                  "aria-label": __("View trip", "View trip"),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
-                }
-              ) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  variant: "ghost",
-                  size: "icon",
-                  onClick: () => handleEdit(trip),
-                  className: "h-8 w-8",
-                  title: __("Edit this trip", "Edit this trip"),
-                  "aria-label": __("Edit trip", "Edit trip"),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-                }
-              ) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  variant: "ghost",
-                  size: "icon",
-                  onClick: () => handleDelete(trip),
-                  className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                  title: __("Delete this trip (cannot be undone)", "Delete this trip (cannot be undone)"),
-                  "aria-label": __("Delete trip", "Delete trip"),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-                }
-              ) })
-            ] }) })
-          ] }, trip.id)) })
-        ] }) }) }) }),
-        total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row items-center justify-between gap-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left", children: [
-            __("Showing", "Showing"),
-            " ",
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-            " - ",
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-            " ",
-            __("of", "of"),
-            " ",
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-            " ",
-            __("trips", "trips")
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 w-full sm:w-auto justify-center sm:justify-end", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "outline",
-                size: "sm",
-                onClick: () => setPage((p) => Math.max(1, p - 1)),
-                disabled: page === 1,
-                className: "h-9 px-4 min-w-[100px]",
-                children: __("Previous", "Previous")
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "outline",
-                size: "sm",
-                onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-                disabled: page >= totalPages,
-                className: "h-9 px-4 min-w-[100px]",
-                children: __("Next", "Next")
-              }
-            )
-          ] })
-        ] }) }) })
-      ] }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_view_trips", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          BulkActionToolbar,
+          {
+            selectedIds,
+            bulkAction,
+            setBulkAction,
+            onApply: handleBulkApply,
+            onClearSelection: () => setSelectedIds([]),
+            statusFilter,
+            setStatusFilter,
+            statusOptions,
+            showColumnsDropdown,
+            setShowColumnsDropdown,
+            columnOptions,
+            onToggleColumn: toggleColumn,
+            bulkMutationPending: false,
+            totalItems: total,
+            bulkActionOptions
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Table,
+          {
+            data: trips,
+            columns,
+            actions: tableActions,
+            isLoading,
+            isError: !!error,
+            errorText: __("Error Loading Trips", "Error Loading Trips"),
+            emptyText: searchTerm || statusFilter !== "all" ? __("No trips match your search", "No trips match your search") : __("No trips yet", "No trips yet"),
+            emptyDescription: searchTerm || statusFilter !== "all" ? __("Try adjusting your search or filters to see more results.", "Try adjusting your search or filters to see more results.") : __("Get started by creating your first travel package. Click the button above to add a new trip.", "Get started by creating your first travel package. Click the button above to add a new trip."),
+            onCreateClick: !searchTerm && statusFilter === "all" ? handleCreateTrip : void 0,
+            onSort: handleSort,
+            getSortIcon,
+            selectedItemIds: selectedIds,
+            onSelectItem: handleSelectItem,
+            onSelectAll: handleSelectAll,
+            isAllSelected,
+            getItemId: (trip) => trip.id
+          }
+        ) }) }),
+        total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Pagination,
+          {
+            currentPage: page,
+            totalPages,
+            totalItems: total,
+            itemsPerPage: 10,
+            onPageChange: setPage,
+            itemName: __("trips", "trips")
+          }
+        ) })
+      ] })
     ] }),
     isCreateModalOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
       "div",
@@ -2377,8 +3305,68 @@ const Trips = () => {
           }
         )
       }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: isDeleteDialogOpen && !!tripToDelete,
+        onClose: () => {
+          if (!deleteMutation.isPending) {
+            setIsDeleteDialogOpen(false);
+            setTripToDelete(null);
+          }
+        },
+        onConfirm: () => {
+          if (tripToDelete && !deleteMutation.isPending) {
+            deleteMutation.mutate(tripToDelete.id);
+          }
+        },
+        title: __("Delete Trip Permanently", "Delete Trip Permanently"),
+        message: tripToDelete ? __('Are you sure you want to permanently delete "{title}"? This cannot be undone and will remove all associated bookings.', 'Are you sure you want to permanently delete "{title}"? This cannot be undone and will remove all associated bookings.').replace("{title}", tripToDelete.title) : "",
+        confirmText: __("Delete Permanently", "Delete Permanently"),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "danger",
+        isLoading: deleteMutation.isPending
+      }
     )
   ] });
+};
+const Alert = ({
+  variant = "info",
+  title: title2,
+  children,
+  onClose,
+  className = ""
+}) => {
+  const variantClasses = {
+    success: "bg-green-50 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800",
+    error: "bg-red-50 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800",
+    warning: "bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800",
+    info: "bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800"
+  };
+  const icons = {
+    success: CheckCircle,
+    error: XCircle,
+    warning: AlertCircle,
+    info: Info
+  };
+  const Icon = icons[variant];
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `rounded-md border p-4 ${variantClasses[variant]} ${className}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-5 h-5 flex-shrink-0 mt-0.5" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+      title2 && /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium mb-1", children: title2 }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children })
+    ] }),
+    onClose && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "button",
+      {
+        onClick: onClose,
+        className: "flex-shrink-0 text-current opacity-70 hover:opacity-100 transition-opacity",
+        "aria-label": "Close",
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" })
+      }
+    )
+  ] }) });
 };
 const SectionHeader = ({
   icon: Icon,
@@ -4088,103 +5076,6 @@ const ItinerarySection = ({
       }
     )
   ] });
-};
-const ConfirmationDialog = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  title: title2,
-  message: message2,
-  description,
-  confirmText,
-  cancelText,
-  variant = "danger",
-  isLoading = false,
-  icon
-}) => {
-  const displayMessage = description || message2 || "";
-  if (!isOpen) return null;
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-  const getVariantStyles = () => {
-    switch (variant) {
-      case "danger":
-        return "text-red-600 dark:text-red-400";
-      case "warning":
-        return "text-yellow-600 dark:text-yellow-400";
-      case "info":
-        return "text-blue-600 dark:text-blue-400";
-      default:
-        return "text-gray-600 dark:text-gray-400";
-    }
-  };
-  const getButtonVariant = () => {
-    switch (variant) {
-      case "danger":
-        return "destructive";
-      case "warning":
-        return "default";
-      case "info":
-        return "default";
-      default:
-        return "default";
-    }
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    "div",
-    {
-      className: "fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm",
-      onClick: handleBackdropClick,
-      children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "w-full max-w-md mx-4 shadow-xl animate-in fade-in zoom-in-95 duration-200", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `flex-shrink-0 mt-0.5 ${getVariantStyles()}`, children: icon || /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTriangle, { className: "w-6 h-6" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-lg", children: title2 || __("Confirm Action", "Confirm Action") }) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
-            {
-              onClick: onClose,
-              className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors",
-              disabled: isLoading,
-              "aria-label": __("Close", "Close"),
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-5 h-5" })
-            }
-          )
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: displayMessage }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 justify-end pt-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "outline",
-                onClick: onClose,
-                disabled: isLoading,
-                children: cancelText || __("Cancel", "Cancel")
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: getButtonVariant(),
-                onClick: onConfirm,
-                disabled: isLoading,
-                className: "min-w-[100px]",
-                children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 mr-2 animate-spin" }),
-                  __("Deleting...", "Deleting...")
-                ] }) : confirmText || __("Confirm", "Confirm")
-              }
-            )
-          ] })
-        ] })
-      ] })
-    }
-  );
 };
 const MultiSelect = ({
   value,
@@ -8497,122 +9388,6 @@ const TripForm = () => {
     )
   ] });
 };
-const Pagination = ({
-  currentPage,
-  totalPages,
-  totalItems,
-  itemsPerPage,
-  onPageChange,
-  itemName = "items"
-}) => {
-  const generatePageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-    if (startPage > 1) {
-      pages.push(
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            variant: 1 === currentPage ? "default" : "outline",
-            size: "sm",
-            onClick: () => onPageChange(1),
-            className: "h-8 w-8 p-0",
-            children: "1"
-          },
-          1
-        )
-      );
-      if (startPage > 2) {
-        pages.push(
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-2 text-gray-500", children: "..." }, "ellipsis1")
-        );
-      }
-    }
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            variant: i === currentPage ? "default" : "outline",
-            size: "sm",
-            onClick: () => onPageChange(i),
-            className: "h-8 w-8 p-0",
-            children: i
-          },
-          i
-        )
-      );
-    }
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
-        pages.push(
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-2 text-gray-500", children: "..." }, "ellipsis2")
-        );
-      }
-      pages.push(
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            variant: totalPages === currentPage ? "default" : "outline",
-            size: "sm",
-            onClick: () => onPageChange(totalPages),
-            className: "h-8 w-8 p-0",
-            children: totalPages
-          },
-          totalPages
-        )
-      );
-    }
-    return pages;
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-      __("Showing", "Showing"),
-      " ",
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (currentPage - 1) * itemsPerPage + 1 }),
-      " ",
-      "-",
-      " ",
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(currentPage * itemsPerPage, totalItems) }),
-      " ",
-      __("of", "of"),
-      " ",
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: totalItems }),
-      " ",
-      itemName
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Button,
-        {
-          variant: "outline",
-          size: "sm",
-          onClick: () => onPageChange(Math.max(1, currentPage - 1)),
-          disabled: currentPage === 1,
-          className: "h-8 px-3",
-          children: __("Previous", "Previous")
-        }
-      ),
-      generatePageNumbers(),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Button,
-        {
-          variant: "outline",
-          size: "sm",
-          onClick: () => onPageChange(Math.min(totalPages, currentPage + 1)),
-          disabled: currentPage >= totalPages,
-          className: "h-8 px-3",
-          children: __("Next", "Next")
-        }
-      )
-    ] })
-  ] });
-};
 const SearchFilterToolbar = ({
   searchTerm,
   onSearchChange,
@@ -8689,581 +9464,6 @@ const SearchFilterToolbar = ({
       }
     )
   ] });
-};
-const BulkActionToolbar = ({
-  selectedIds,
-  bulkAction,
-  setBulkAction,
-  onApply,
-  onClearSelection,
-  statusFilter,
-  setStatusFilter,
-  statusOptions,
-  showColumnsDropdown,
-  setShowColumnsDropdown,
-  columnOptions,
-  onToggleColumn,
-  bulkMutationPending,
-  totalItems,
-  bulkActionOptions
-}) => {
-  const [confirmDialog, setConfirmDialog] = reactExports.useState({
-    isOpen: false,
-    action: "",
-    count: 0
-  });
-  const handleApplyClick = () => {
-    if (!bulkAction || selectedIds.length === 0) {
-      onApply();
-      return;
-    }
-    setConfirmDialog({
-      isOpen: true,
-      action: bulkAction,
-      count: selectedIds.length
-    });
-  };
-  const handleConfirm = () => {
-    setConfirmDialog({ isOpen: false, action: "", count: 0 });
-    onApply();
-    setBulkAction("");
-  };
-  const handleCancel = () => {
-    setConfirmDialog({ isOpen: false, action: "", count: 0 });
-  };
-  React.useEffect(() => {
-    const handleClickOutside = (event) => {
-      const target = event.target;
-      if (target.closest("[data-columns-trigger]") || target.closest("[data-columns-content]")) {
-        return;
-      }
-      setShowColumnsDropdown(false);
-    };
-    if (showColumnsDropdown) {
-      document.addEventListener("click", handleClickOutside);
-      return () => document.removeEventListener("click", handleClickOutside);
-    }
-  }, [showColumnsDropdown, setShowColumnsDropdown]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "py-3 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 flex-nowrap", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Select,
-          {
-            value: bulkAction,
-            onChange: (e) => setBulkAction(e.target.value),
-            className: "min-w-[140px]",
-            disabled: totalItems === 0,
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Bulk actions", "Bulk actions") }),
-              bulkActionOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: option.value, children: option.label }, option.value))
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            variant: "outline",
-            onClick: handleApplyClick,
-            disabled: bulkMutationPending || selectedIds.length === 0,
-            className: "h-11 px-4 flex-shrink-0",
-            children: __("Apply", "Apply")
-          }
-        ),
-        selectedIds.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border border-blue-200 dark:border-blue-800 whitespace-nowrap", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-xs", children: `${__("Selected:", "Selected:")} ${selectedIds.length}` }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
-            {
-              type: "button",
-              className: "text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium",
-              onClick: onClearSelection,
-              children: __("Clear", "Clear")
-            }
-          )
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 flex-shrink-0", children: [
-        statusOptions.map((filter) => {
-          const isActive = statusFilter === filter.key;
-          return /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
-            {
-              type: "button",
-              className: `px-3 py-2.5 text-sm font-medium rounded border transition-all duration-200 ${isActive ? "bg-gray-900 text-white border-gray-900 shadow-sm" : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:border-gray-500"}`,
-              onClick: () => {
-                setStatusFilter(filter.key);
-                onClearSelection();
-                setBulkAction("");
-              },
-              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
-                filter.label,
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `px-1.5 py-0.5 text-xs rounded-full font-medium ${isActive ? "bg-white text-gray-900" : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"}`, children: filter.count ?? 0 })
-              ] })
-            },
-            filter.key
-          );
-        }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative ml-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setShowColumnsDropdown(!showColumnsDropdown);
-              },
-              className: "h-10 px-3 flex items-center gap-2",
-              "data-columns-trigger": true,
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Columns, { className: "w-4 h-4" }),
-                __("Columns", "Columns")
-              ]
-            }
-          ),
-          showColumnsDropdown && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "div",
-            {
-              className: "absolute right-0 top-11 z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2",
-              style: { width: "240px", minWidth: "240px" },
-              "data-columns-content": true,
-              onClick: (e) => e.stopPropagation(),
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700", children: __("Show Columns", "Show Columns") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "py-1", children: columnOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      type: "checkbox",
-                      checked: option.visible,
-                      onChange: () => onToggleColumn(option.key),
-                      className: "rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
-                    }
-                  ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300 ml-2", children: option.label })
-                ] }, option.key)) })
-              ]
-            }
-          )
-        ] })
-      ] })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      ConfirmationDialog,
-      {
-        isOpen: confirmDialog.isOpen,
-        onClose: handleCancel,
-        onConfirm: handleConfirm,
-        title: (() => {
-          switch (confirmDialog.action) {
-            case "delete":
-              return __("Delete Permanently", "Delete Permanently");
-            case "trash":
-              return __("Move to Trash", "Move to Trash");
-            case "publish":
-              return __("Publish Items", "Publish Items");
-            case "draft":
-              return __("Make Draft", "Make Draft");
-            case "restore":
-              return __("Restore Items", "Restore Items");
-            default:
-              return __("Confirm Bulk Action", "Confirm Bulk Action");
-          }
-        })(),
-        message: (() => {
-          const count = confirmDialog.count;
-          switch (confirmDialog.action) {
-            case "delete":
-              return __("Are you sure you want to permanently delete {count} item(s)? This action cannot be undone.", "Are you sure you want to permanently delete {count} item(s)? This action cannot be undone.").replace("{count}", count.toString());
-            case "trash":
-              return __("Are you sure you want to move {count} item(s) to trash?", "Are you sure you want to move {count} item(s) to trash?").replace("{count}", count.toString());
-            case "publish":
-              return __("Are you sure you want to publish {count} item(s)?", "Are you sure you want to publish {count} item(s)?").replace("{count}", count.toString());
-            case "draft":
-              return __("Are you sure you want to make {count} item(s) draft?", "Are you sure you want to make {count} item(s) draft?").replace("{count}", count.toString());
-            case "restore":
-              return __("Are you sure you want to restore {count} item(s)?", "Are you sure you want to restore {count} item(s)?").replace("{count}", count.toString());
-            default:
-              return __("Are you sure you want to perform this action on {count} item(s)?", "Are you sure you want to perform this action on {count} item(s)?").replace("{count}", count.toString());
-          }
-        })(),
-        confirmText: (() => {
-          switch (confirmDialog.action) {
-            case "delete":
-              return __("Delete Permanently", "Delete Permanently");
-            case "trash":
-              return __("Move to Trash", "Move to Trash");
-            case "publish":
-              return __("Publish", "Publish");
-            case "draft":
-              return __("Make Draft", "Make Draft");
-            case "restore":
-              return __("Restore", "Restore");
-            default:
-              return __("Confirm", "Confirm");
-          }
-        })(),
-        cancelText: __("Cancel", "Cancel"),
-        variant: confirmDialog.action === "delete" ? "danger" : "warning",
-        isLoading: bulkMutationPending
-      }
-    )
-  ] });
-};
-const Table = ({
-  data,
-  columns,
-  actions = [],
-  isLoading = false,
-  isError = false,
-  errorText = __("Error loading data", "Error loading data"),
-  emptyText = __("No items found", "No items found"),
-  emptyDescription = __("Get started by creating your first item.", "Get started by creating your first item"),
-  onCreateClick,
-  onSort,
-  getSortIcon,
-  selectedItemIds = [],
-  onSelectItem,
-  onSelectAll,
-  isAllSelected = false,
-  getItemId = (item) => item.id,
-  getItemStatus = (item) => item.status,
-  statusFilter = "",
-  capability = "yatra_view_trips",
-  skeletonRows = 5,
-  // Hierarchical props
-  isHierarchical = false,
-  expandedIds = /* @__PURE__ */ new Set(),
-  onToggleExpand,
-  getChildren,
-  renderRowContent
-}) => {
-  const [openDropdownId, setOpenDropdownId] = reactExports.useState(null);
-  const [dropdownPosition, setDropdownPosition] = reactExports.useState(null);
-  React.useEffect(() => {
-    const handleClickOutside = (event) => {
-      const target = event.target;
-      if (target.closest("[data-dropdown-trigger]") || target.closest("[data-dropdown-content]")) {
-        return;
-      }
-      setOpenDropdownId(null);
-    };
-    if (openDropdownId !== null) {
-      document.addEventListener("click", handleClickOutside);
-      return () => document.removeEventListener("click", handleClickOutside);
-    }
-  }, [openDropdownId]);
-  const renderSkeleton = () => /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-      isHierarchical && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-12" }),
-      onSelectItem && onSelectAll && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-12" }),
-      columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: column.width, children: column.label }, column.key)),
-      actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(skeletonRows)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-      isHierarchical && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }),
-      onSelectItem && onSelectAll && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }),
-      columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }, `${column.key}-${index}`)),
-      actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-end gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }) }) })
-    ] }, `skeleton-${index}`)) })
-  ] });
-  const renderError = () => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-red-500", children: errorText });
-  const renderEmpty = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex flex-col items-center justify-center text-center py-16 px-6 my-6 min-h-[400px]", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-8 bg-gradient-to-br from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative z-10 max-w-md mx-auto space-y-6", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 ring-8 ring-blue-50/50 dark:ring-blue-900/20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "svg",
-        {
-          className: "w-10 h-10 text-blue-600 dark:text-blue-400",
-          fill: "none",
-          stroke: "currentColor",
-          viewBox: "0 0 24 24",
-          strokeWidth: "1.5",
-          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "path",
-            {
-              strokeLinecap: "round",
-              strokeLinejoin: "round",
-              d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            }
-          )
-        }
-      ) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: emptyText }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 leading-relaxed", children: emptyDescription })
-      ] }),
-      onCreateClick && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "pt-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          onClick: onCreateClick,
-          className: "inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "svg",
-              {
-                className: "w-4 h-4",
-                fill: "none",
-                stroke: "currentColor",
-                viewBox: "0 0 24 24",
-                strokeWidth: "2",
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "path",
-                  {
-                    strokeLinecap: "round",
-                    strokeLinejoin: "round",
-                    d: "M12 4v16m8-8H4"
-                  }
-                )
-              }
-            ),
-            __("Create New", "Create New")
-          ]
-        }
-      ) })
-    ] })
-  ] });
-  const renderHierarchicalRow = (item, index, isChild = false) => {
-    const itemId = getItemId(item);
-    const itemStatus = getItemStatus(item);
-    const isTrash = itemStatus === "trash" || statusFilter === "trash";
-    const children = getChildren ? getChildren(item) : [];
-    const hasChildren = children.length > 0;
-    const isExpanded = expandedIds.has(itemId);
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs(React.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        TableRow,
-        {
-          className: `${isTrash ? "bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20" : ""} ${isChild ? "bg-gray-50 dark:bg-gray-900/50" : ""}`,
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "w-12", children: hasChildren && onToggleExpand && /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
-              {
-                onClick: () => onToggleExpand(itemId),
-                className: "p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded",
-                children: isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4" })
-              }
-            ) }),
-            onSelectItem && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "input",
-              {
-                type: "checkbox",
-                className: "rounded border-gray-300 dark:border-gray-600",
-                checked: selectedItemIds.includes(itemId),
-                onChange: (e) => onSelectItem(itemId, e.target.checked),
-                "aria-label": __("Select item", "Select item")
-              }
-            ) }),
-            renderRowContent ? renderRowContent(item, index, isChild).map((cellContent, cellIndex) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-              TableCell,
-              {
-                className: isTrash ? "text-gray-400 dark:text-gray-600" : "",
-                children: cellContent
-              },
-              `cell-${itemId}-${cellIndex}`
-            )) : columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-              TableCell,
-              {
-                className: isTrash ? "text-gray-400 dark:text-gray-600" : "",
-                children: column.render ? column.render(item, index) : item[column.key]
-              },
-              `${column.key}-${itemId}`
-            )),
-            actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative inline-block", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  variant: "ghost",
-                  size: "icon",
-                  onClick: (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const button = e.currentTarget;
-                    const rect = button.getBoundingClientRect();
-                    setDropdownPosition({
-                      top: rect.bottom + window.scrollY,
-                      right: window.innerWidth - rect.right + window.scrollX
-                    });
-                    setOpenDropdownId(openDropdownId === itemId ? null : itemId);
-                  },
-                  className: "h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700",
-                  "aria-label": __("More actions", "More actions"),
-                  "data-dropdown-trigger": true,
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(MoreVertical, { className: "w-4 h-4" })
-                }
-              ),
-              openDropdownId === itemId && dropdownPosition && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "div",
-                {
-                  className: "fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1",
-                  style: {
-                    top: `${dropdownPosition.top}px`,
-                    right: `${dropdownPosition.right}px`,
-                    zIndex: 999999
-                  },
-                  "data-dropdown-content": true,
-                  onClick: (e) => e.stopPropagation(),
-                  children: actions.filter((action) => !action.condition || action.condition(item)).map((action) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    "button",
-                    {
-                      type: "button",
-                      onClick: (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        action.onClick(item);
-                        setOpenDropdownId(null);
-                      },
-                      className: `w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${action.variant === "destructive" ? "text-red-600 dark:text-red-400" : action.variant === "outline" ? "text-blue-600 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"}`,
-                      children: [
-                        action.icon,
-                        action.label
-                      ]
-                    },
-                    action.key
-                  ))
-                }
-              )
-            ] }) })
-          ]
-        }
-      ),
-      hasChildren && isExpanded && children.map(
-        (child, childIndex) => renderHierarchicalRow(child, childIndex, true)
-      )
-    ] }, itemId);
-  };
-  const renderFlatRow = (item, index) => {
-    const itemId = getItemId(item);
-    const itemStatus = getItemStatus(item);
-    const isTrash = itemStatus === "trash" || statusFilter === "trash";
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      TableRow,
-      {
-        className: isTrash ? "bg-red-50/30 dark:bg-red-900/10 opacity-75 hover:bg-red-50/50 dark:hover:bg-red-900/20" : "",
-        children: [
-          onSelectItem && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "input",
-            {
-              type: "checkbox",
-              className: "rounded border-gray-300 dark:border-gray-600",
-              checked: selectedItemIds.includes(itemId),
-              onChange: (e) => onSelectItem(itemId, e.target.checked),
-              "aria-label": __("Select item", "Select item")
-            }
-          ) }),
-          columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-            TableCell,
-            {
-              className: isTrash ? "text-gray-400 dark:text-gray-600" : "",
-              children: column.render ? column.render(item, index) : item[column.key]
-            },
-            `${column.key}-${itemId}`
-          )),
-          actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative inline-block", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const button = e.currentTarget;
-                  const rect = button.getBoundingClientRect();
-                  setDropdownPosition({
-                    top: rect.bottom + window.scrollY,
-                    right: window.innerWidth - rect.right + window.scrollX
-                  });
-                  setOpenDropdownId(openDropdownId === itemId ? null : itemId);
-                },
-                className: "h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700",
-                "aria-label": __("More actions", "More actions"),
-                "data-dropdown-trigger": true,
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(MoreVertical, { className: "w-4 h-4" })
-              }
-            ),
-            openDropdownId === itemId && dropdownPosition && /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "div",
-              {
-                className: "fixed min-w-[180px] w-max bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-2xl py-1",
-                style: {
-                  top: `${dropdownPosition.top}px`,
-                  right: `${dropdownPosition.right}px`,
-                  zIndex: 999999
-                },
-                "data-dropdown-content": true,
-                onClick: (e) => e.stopPropagation(),
-                children: actions.filter((action) => !action.condition || action.condition(item)).map((action) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  "button",
-                  {
-                    type: "button",
-                    onClick: (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      action.onClick(item);
-                      setOpenDropdownId(null);
-                    },
-                    className: `w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors cursor-pointer whitespace-nowrap ${action.variant === "destructive" ? "text-red-600 dark:text-red-400" : action.variant === "outline" ? "text-blue-600 dark:text-blue-400" : "text-gray-700 dark:text-gray-300"}`,
-                    children: [
-                      action.icon,
-                      action.label
-                    ]
-                  },
-                  action.key
-                ))
-              }
-            )
-          ] }) })
-        ]
-      },
-      itemId
-    );
-  };
-  const renderTable = () => {
-    if (isLoading) return renderSkeleton();
-    if (isError) return renderError();
-    if (data.length === 0) return renderEmpty();
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        isHierarchical && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-12" }),
-        onSelectItem && onSelectAll && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-12", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "input",
-          {
-            type: "checkbox",
-            className: "rounded border-gray-300 dark:border-gray-600",
-            checked: isAllSelected,
-            onChange: (e) => onSelectAll(e.target.checked),
-            "aria-label": __("Select all items", "Select all items")
-          }
-        ) }),
-        columns.filter((col) => col.visible !== false).map((column) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-          TableHead,
-          {
-            className: column.width,
-            children: column.sortable && onSort ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "button",
-              {
-                onClick: () => onSort(column.key),
-                className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-                children: [
-                  column.label,
-                  getSortIcon && getSortIcon(column.key)
-                ]
-              }
-            ) : column.label
-          },
-          column.key
-        )),
-        actions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: data.map(
-        (item, index) => isHierarchical ? renderHierarchicalRow(item, index) : renderFlatRow(item, index)
-      ) })
-    ] });
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability, children: renderTable() });
 };
 const getDefaultBulkStatusOptions = (statusFilter) => {
   const options2 = [];
